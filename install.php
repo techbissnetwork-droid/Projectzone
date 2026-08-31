@@ -693,7 +693,7 @@ function tb_upgrade(bool $dryRun = false): int
     }
     if ($copyPlan['rows'] > 0) {
         echo "  · " . $copyPlan['rows'] . " piece" . ($copyPlan['rows'] === 1 ? '' : 's')
-            . " of seeded copy brought up to the current wording\n";
+            . " of seeded content brought up to date — wording corrected, and any row a later release made obsolete removed\n";
     }
     echo "\n";
 
@@ -723,8 +723,8 @@ function tb_upgrade(bool $dryRun = false): int
         return 1;
     }
     if ($copy['rows'] > 0) {
-        echo "  ✓ Updated " . $copy['rows'] . " piece" . ($copy['rows'] === 1 ? '' : 's')
-            . " of seeded copy (anything you had edited yourself was left alone)\n";
+        echo "  ✓ Brought " . $copy['rows'] . " piece" . ($copy['rows'] === 1 ? '' : 's')
+            . " of seeded content up to date (anything you had edited yourself was left alone)\n";
     }
 
     tb_clear_cache();
@@ -966,8 +966,8 @@ if ($upgradeMode) {
                         }
                         $copy = $migrator->refreshCopy();
                         if ($copy['rows'] > 0) {
-                            $uSteps[] = 'Updated ' . $copy['rows'] . ' piece' . ($copy['rows'] === 1 ? '' : 's')
-                                . ' of seeded wording (anything you had edited yourself was left alone)';
+                            $uSteps[] = 'Brought ' . $copy['rows'] . ' piece' . ($copy['rows'] === 1 ? '' : 's')
+                                . ' of seeded content up to date (anything you had edited yourself was left alone)';
                         }
                     } catch (Throwable $e) {
                         $uErrors['upgrade'] = $e->getMessage();

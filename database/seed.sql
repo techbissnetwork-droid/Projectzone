@@ -328,40 +328,10 @@ INSERT INTO `pages` (`slug`,`title`,`eyebrow`,`subtitle`,`content`,`template`,`s
 -- ---------------------------------------------------------------------
 INSERT INTO `page_sections` (`page_key`,`section_key`,`eyebrow`,`heading`,`subheading`,`body`,`cta_label`,`cta_url`,`is_published`,`sort_order`,`created_at`,`updated_at`) VALUES
 ('home','hero','One partner. Websites and apps.','Your Digital Business Starts Here.','We take offline businesses online — domain, website, email, branding, SEO — and build the custom app you have in mind.','','Tell Us What You Need','/request',1,1,NOW(),NOW()),
-('home','problem','The starting point','Still running your business mostly offline?','You have the customers and the reputation. What is missing is the part that makes you easy to find and easy to buy from.','','','',1,2,NOW(),NOW()),
-('home','chain','The transformation','From offline business to digital brand.','Each piece depends on the one before. We build them in order.','','','',1,3,NOW(),NOW()),
+('home','problem','The starting point','Still running your business mostly offline?','You have the customers and the reputation. What is missing is the part that makes you easy to find and easy to buy from.','','See how it works','/how-it-works',1,2,NOW(),NOW()),
 ('home','services','What we do','Everything your business needs to operate online.','Ten services — your domain and website, custom web and mobile apps, and the work that keeps them running.','','View all services','/services',1,4,NOW(),NOW()),
-('home','trust','Credibility','What this actually changes.','Not guaranteed sales. How established you look, how easily customers find you, and how far past your front door you reach.','','','',1,5,NOW(),NOW()),
-('home','process','How it works','Six stages, first call to ongoing support.','A defined process, with a schedule you see before we start.','','See the full process','/how-it-works',1,6,NOW(),NOW()),
 ('home','work','Selected work','Built the same way yours will be.','Case studies covering websites, applications, commerce and brand systems.','','View all work','/portfolio',1,8,NOW(),NOW()),
 ('home','industries','Industries','Built around your sector.','A restaurant and a law firm need different things. We start from your sector, not a template.','','All industries','/industries',1,9,NOW(),NOW()),
 ('home','cta','Ready when you are','Let''s build your digital business.','Tell us about the business. You get a scope, a schedule and a price. No obligation.','','Tell Us What You Need','/request',1,10,NOW(),NOW());
 
-INSERT INTO `section_items` (`section_id`,`title`,`description`,`icon`,`value`,`sort_order`)
-SELECT s.id, i.title, i.descr, i.icon, i.val, i.ord
-FROM `page_sections` s JOIN (
-  SELECT 'problem' AS sk,'No professional website' AS title,'Customers who look you up find nothing, or something built years ago.' AS descr,'window' AS icon,'' AS val,1 AS ord
-  UNION ALL SELECT 'problem','No custom domain','Your business runs on a platform address instead of one you own.','globe','',2
-  UNION ALL SELECT 'problem','Personal email address','Quotes and invoices arrive from a free mailbox, and it shows.','mail','',3
-  UNION ALL SELECT 'problem','Information is hard to find','Hours, services, prices and location live in people''s heads.','search','',4
-  UNION ALL SELECT 'problem','Limited online credibility','Nothing online confirms that the business is real and established.','shield','',5
-  UNION ALL SELECT 'problem','No online booking or ordering','Every enquiry needs a phone call, during working hours only.','cart','',6
-  UNION ALL SELECT 'problem','Weak digital presence','You do not appear where customers are already searching.','pin','',7
-  UNION ALL SELECT 'problem','Hard to scale digitally','There is no foundation to add commerce, apps or automation onto.','trend','',8
 
-  UNION ALL SELECT 'chain','Domain','The address you own.','globe','01',1
-  UNION ALL SELECT 'chain','Hosting','Infrastructure that stays up.','server','02',2
-  UNION ALL SELECT 'chain','Website','Your presence, built to convert.','window','03',3
-  UNION ALL SELECT 'chain','Business Email','Credibility on every message.','mail','04',4
-  UNION ALL SELECT 'chain','Web & Apps','Systems around your workflows.','layers','05',5
-  UNION ALL SELECT 'chain','SEO','Found by the people searching.','search','06',6
-  UNION ALL SELECT 'chain','Growth','Analytics, automation, support.','trend','07',7
-
-  UNION ALL SELECT 'trust','Look more established','A considered digital presence signals that a business is real, current and worth dealing with.','building','',1
-  UNION ALL SELECT 'trust','Build customer confidence','Clear information, a secure connection and a professional address remove the reasons to hesitate.','shield','',2
-  UNION ALL SELECT 'trust','Make information accessible','Hours, services, pricing, location and contact details available at any hour, without a phone call.','info','',3
-  UNION ALL SELECT 'trust','Reach beyond your location','Customers who would never walk past your door can still find and contact you.','globe','',4
-  UNION ALL SELECT 'trust','Accept enquiries online','Bookings, orders and enquiries captured while you sleep, routed to the right person.','inbox','',5
-  UNION ALL SELECT 'trust','Establish a brand identity','A consistent identity across every touchpoint, so the business is recognisable.','palette','',6
-  UNION ALL SELECT 'trust','Build a scalable foundation','Infrastructure you can add commerce, applications and automation onto later.','layers','',7
-) i ON i.sk = s.section_key AND s.page_key = 'home';

@@ -8,7 +8,6 @@
  */
 $s = static fn (string $key, string $field, string $fallback = ''): string
     => (string) ($sections[$key][$field] ?? $fallback);
-$items = static fn (string $key): array => $sections[$key]['items'] ?? [];
 
 $hero = $sections['hero'] ?? [];
 ?>
@@ -122,61 +121,11 @@ $hero = $sections['hero'] ?? [];
             <h2><?= e($s('problem', 'heading')) ?></h2>
             <p class="lead"><?= e($s('problem', 'subheading')) ?></p>
         </div>
-
-        <?php if ($items('problem')): ?>
-        <div class="problem-grid" data-reveal data-reveal-stagger>
-            <?php foreach ($items('problem') as $i => $item): ?>
-            <div class="problem-item" style="--i:<?= $i ?>">
-                <span class="problem-item__icon"><?= icon((string) ($item['icon'] ?: 'x')) ?></span>
-                <div>
-                    <div class="problem-item__title"><?= e($item['title']) ?></div>
-                    <?php if (!empty($item['description'])): ?>
-                    <p class="problem-item__text"><?= e($item['description']) ?></p>
-                    <?php endif; ?>
-                </div>
-            </div>
-            <?php endforeach; ?>
-        </div>
-        <?php endif; ?>
-
-        <?php if (isset($sections['chain'])): ?>
-        <div class="mt-8" data-reveal>
-            <div class="row row--between mb-5">
-                <div>
-                    <p class="eyebrow"><?= e($s('chain', 'eyebrow')) ?></p>
-                    <h3 class="mt-3"><?= e($s('chain', 'heading')) ?></h3>
-                </div>
-                <?php if ($s('chain', 'cta_label') !== ''): ?>
-                <a class="link hide-sm" href="<?= e(url($s('chain', 'cta_url', '/request'))) ?>">
-                    <?= e($s('chain', 'cta_label')) ?><?= icon('arrow-right') ?>
-                </a>
-                <?php endif; ?>
-            </div>
-
-            <div class="chain">
-                <?php foreach ($items('chain') as $item): ?>
-                <div class="chain__step">
-                    <?php if (!empty($item['value'])): ?>
-                    <span class="chain__num"><?= e($item['value']) ?></span>
-                    <?php endif; ?>
-                    <span class="chain__icon"><?= icon((string) ($item['icon'] ?: 'spark')) ?></span>
-                    <span class="chain__label"><?= e($item['title']) ?></span>
-                    <?php if (!empty($item['description'])): ?>
-                    <span class="chain__text"><?= e($item['description']) ?></span>
-                    <?php endif; ?>
-                </div>
-                <?php endforeach; ?>
-            </div>
-        </div>
-        <?php endif; ?>
-
-        <?php if ($s('problem', 'cta_label') !== ''): ?>
-        <div class="row mt-6" data-reveal>
-            <a class="btn btn--primary btn--lg btn--arrow" href="<?= e(url($s('problem', 'cta_url', '/request'))) ?>">
-                <?= e($s('problem', 'cta_label')) ?><?= icon('arrow-right') ?>
+        <div class="row" data-reveal>
+            <a class="btn btn--primary btn--lg btn--arrow" href="<?= e(url($s('problem', 'cta_url', '/how-it-works'))) ?>">
+                <?= e($s('problem', 'cta_label', 'See how it works')) ?><?= icon('arrow-right') ?>
             </a>
         </div>
-        <?php endif; ?>
     </div>
 </section>
 <?php endif; ?>

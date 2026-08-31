@@ -303,7 +303,7 @@ final class SystemController extends BaseAdminController
         }
         if ($copy['rows'] > 0) {
             $parts[] = $copy['rows'] . ' ' . ($copy['rows'] === 1 ? 'piece' : 'pieces')
-                . ' of wording brought up to date';
+                . ' of seeded content brought up to date';
         }
 
         ActivityLog::record('migrate', 'system', null, 'Applied ' . implode(' and ', $parts));

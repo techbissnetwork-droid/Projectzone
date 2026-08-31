@@ -38,13 +38,15 @@ final class Migrator
     }
 
     /**
-     * Bring seeded copy up to the current wording.
+     * Bring seeded copy and now-obsolete seeded rows up to date.
      *
-     * seed.sql only runs at install time, so a site set up on an earlier release
-     * keeps the text it was installed with — including, at one point, sentences
-     * telling visitors to look for prices the site no longer publishes. Every
-     * statement in copy-refresh.sql is guarded on the original text, so a
-     * sentence the owner has rewritten themselves is never overwritten.
+     * seed.sql only runs at install time, so a site set up on an earlier
+     * release keeps the text and rows it was installed with — including, at
+     * various points, sentences telling visitors to look for prices the site
+     * no longer publishes, and homepage sections no page has read in a while.
+     * Every UPDATE in copy-refresh.sql is guarded on the original text, so a
+     * sentence the owner has rewritten themselves is never overwritten; every
+     * DELETE removes a row only a stale seed could have produced.
      *
      * A dry run does the same work inside a transaction and rolls it back, so
      * the number it reports is the real one rather than an estimate.
@@ -57,9 +59,14 @@ final class Migrator
             return ['rows' => 0, 'statements' => 0];
         }
 
+        // UPDATE corrects wording; DELETE retires a row a past release seeded
+        // that a later one made obsolete (a dropped nav entry, a section no
+        // page reads any more). Nothing else — this file never touches schema
+        // and is never reachable from a web request, but restricting it to
+        // exactly these two keeps it that way even if that ever changes.
         $statements = array_values(array_filter(
             self::splitScript((string) file_get_contents($this->copyFile)),
-            static fn (string $sql): bool => stripos($sql, 'UPDATE') === 0
+            static fn (string $sql): bool => stripos($sql, 'UPDATE') === 0 || stripos($sql, 'DELETE') === 0
         ));
         if ($statements === []) {
             return ['rows' => 0, 'statements' => 0];

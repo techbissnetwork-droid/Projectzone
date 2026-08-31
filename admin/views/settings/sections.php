@@ -2,7 +2,7 @@
 <div class="page-header">
     <div>
         <h1>Homepage content</h1>
-        <p>Every band on the homepage — headline, the offline-business problem list, the transformation chain, trust points — is edited here.</p>
+        <p>Every band on the homepage — headline, the starting-point pitch, services, work, industries, the closing call to action — is edited here.</p>
     </div>
     <div class="page-header__actions">
         <a class="btn btn--ghost btn--sm" target="_blank" rel="noopener" href="<?= e(url('/')) ?>"><?= icon('external') ?>View homepage</a>
@@ -45,6 +45,6 @@
 
 <p class="help-text mt-4">
     <?= icon('info') ?>
-    Hiding a section removes it from the homepage entirely. Sections that pull from other tables — services, packages,
+    Hiding a section removes it from the homepage entirely. Sections that pull from other tables — services,
     portfolio, industries — use their own content but take their heading and intro copy from here.
 </p>

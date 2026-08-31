@@ -629,16 +629,11 @@ body.has-cursor-fx.cursor-hidden .cursor-ring { opacity: 0; }
 }
 
 /* ---------------------------------------------------------------------
-   7. Problem → solution band
+   7. Problem indicator icon
+   The card grid and the transformation chain that used to live here went
+   with the homepage section that rendered them; only the small icon used
+   inline on /industries/{slug}'s "What usually gets in the way" list survives.
    --------------------------------------------------------------------- */
-.problem-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1px; background: var(--border-faint); border: 1px solid var(--border-faint); border-radius: var(--r-lg); overflow: hidden; }
-.problem-item {
-  background: var(--bg);
-  padding: 1.35rem 1.4rem;
-  display: flex; gap: 0.85rem; align-items: flex-start;
-  transition: background-color var(--t-base) var(--ease);
-}
-.problem-item:hover { background: var(--surface); }
 .problem-item__icon {
   flex: none;
   width: 30px; height: 30px;
@@ -648,59 +643,7 @@ body.has-cursor-fx.cursor-hidden .cursor-ring { opacity: 0; }
   color: var(--danger);
 }
 .problem-item__icon .icon { width: 15px; height: 15px; }
-.problem-item__title { font-size: var(--fs-sm); font-weight: 550; color: var(--text); margin-bottom: 0.2rem; }
-.problem-item__text { font-size: var(--fs-xs); color: var(--text-muted); line-height: 1.55; }
 
-/* The transformation chain */
-.chain {
-  display: flex;
-  align-items: stretch;
-  gap: 0.5rem;
-  overflow-x: auto;
-  padding-block: 0.5rem 1rem;
-  scroll-snap-type: x proximity;
-  -webkit-overflow-scrolling: touch;
-}
-.chain::-webkit-scrollbar { height: 4px; }
-.chain__step {
-  position: relative;
-  /* Shrink to share the row so all six steps fit the column at desktop; the
-     min-width keeps them readable and lets the row scroll once they cannot. */
-  flex: 1 1 0;
-  min-width: 148px;
-  scroll-snap-align: start;
-  padding: 1.15rem 1.1rem;
-  border: 1px solid var(--border);
-  border-radius: var(--r-md);
-  background: var(--surface);
-  display: flex; flex-direction: column; gap: 0.6rem;
-  transition: all var(--t-base) var(--ease-out);
-}
-.chain__step:hover { border-color: var(--accent); background: var(--accent-tint); transform: translateY(-2px); }
-.chain__step:not(:last-child)::after {
-  content: "";
-  position: absolute;
-  top: 50%; right: -0.5rem;
-  width: 0.5rem; height: 1px;
-  background: var(--border-strong);
-}
-.chain__num { font-size: 0.75rem; font-weight: 650; letter-spacing: 0.13em; color: var(--text-faint); font-variant-numeric: tabular-nums; }
-.chain__icon { color: var(--accent); }
-.chain__icon .icon { width: 20px; height: 20px; }
-.chain__label { font-size: var(--fs-sm); font-weight: 550; color: var(--text); }
-.chain__text { font-size: var(--fs-xs); color: var(--text-muted); line-height: 1.5; }
-
-/* Below the widest column the seven steps cannot share one row, so they wrap
-   into a grid instead of scrolling off the edge — nothing is ever half-cut. */
-@media (max-width: 1279px) {
-  .chain {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
-    overflow-x: visible;
-    scroll-snap-type: none;
-  }
-  .chain__step:not(:last-child)::after { display: none; }
-}
 
 /* ---------------------------------------------------------------------
    8. Service / feature cards

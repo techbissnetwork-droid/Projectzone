@@ -6,9 +6,13 @@
 -- to the shorter wording.
 --
 -- Safe to run more than once, and safe to run on a site you have edited:
--- each statement only updates a row whose text is still exactly the
--- original. Anything you have rewritten yourself is left alone.
+-- every UPDATE only touches a row whose text is still exactly the original,
+-- so anything you have rewritten yourself is left alone. Every DELETE removes
+-- a row a later release made obsolete — a dropped nav entry, a homepage
+-- section no page reads any more — never anything you added yourself.
 --
+-- Applied automatically by `php install.php --upgrade` and by the admin's
+-- Database updates button; only run it by hand if you have a reason to.
 --     mysql -u USER -p DATABASE < database/copy-refresh.sql
 -- =====================================================================
 SET NAMES utf8mb4;
@@ -232,3 +236,19 @@ UPDATE `settings` s
   JOIN (SELECT value AS contact FROM `settings` WHERE `key_name` = 'contact_email') c
   SET s.value = ''
   WHERE s.key_name IN ('sales_email', 'support_email') AND s.value = c.contact;
+
+-- ---------------------------------------------------------------------
+-- Three homepage bands ("chain", "trust", "process") no longer render on
+-- the homepage — "chain" restated the services grid one scroll below it,
+-- and "trust"/"process" were cut when the homepage was shortened. Left in
+-- place they were a Visible toggle in the admin that silently did nothing.
+-- Their content (six-stage process, credibility points) lives on
+-- /how-it-works and elsewhere; nothing on the site is lost by removing
+-- the row, only the dead duplicate of it.
+-- ---------------------------------------------------------------------
+DELETE FROM `page_sections` WHERE `page_key` = 'home' AND `section_key` IN ('chain', 'trust', 'process');
+
+-- The teaser needs a destination; it had none before because the full
+-- problem grid used to be the whole section.
+UPDATE `page_sections` SET `cta_label` = 'See how it works', `cta_url` = '/how-it-works'
+  WHERE `page_key` = 'home' AND `section_key` = 'problem' AND `cta_label` = '' AND `cta_url` = '';

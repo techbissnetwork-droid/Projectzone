@@ -20,7 +20,7 @@ if ($uPlan !== null) {
     if ($uPlan['columns'] > 0) { $planLines[] = $uPlan['columns'] . ' column' . ($uPlan['columns'] === 1 ? '' : 's') . ' to add'; }
     if ($uPlan['indexes'] > 0) { $planLines[] = $uPlan['indexes'] . ' index' . ($uPlan['indexes'] === 1 ? '' : 'es') . ' to add'; }
     if ($uPlan['data'] > 0)    { $planLines[] = $uPlan['data'] . ' new setting' . ($uPlan['data'] === 1 ? '' : 's') . ', permission' . ($uPlan['data'] === 1 ? '' : 's') . ' or menu entr' . ($uPlan['data'] === 1 ? 'y' : 'ies') . ' to add'; }
-    if ($uPlan['copy'] > 0)    { $planLines[] = $uPlan['copy'] . ' piece' . ($uPlan['copy'] === 1 ? '' : 's') . ' of seeded wording to bring up to date'; }
+    if ($uPlan['copy'] > 0)    { $planLines[] = $uPlan['copy'] . ' piece' . ($uPlan['copy'] === 1 ? '' : 's') . ' of seeded content to bring up to date'; }
 }
 ?><!doctype html>
 <html lang="en">
