@@ -119,7 +119,7 @@ foreach ($tables as $t) { $totalBytes += (int) $t['bytes']; }
     <?= icon('alert') ?>
     <span>
         <strong style="color:var(--text)">Security checklist:</strong>
-        delete <code>database/install.php</code> after installation, keep <code>config/config.php</code> outside version control,
+        delete <code>install.php</code> after installation, keep <code>config/config.php</code> outside version control,
         serve the whole site over HTTPS and enable <code>cookie_secure</code> in the config once you do.
     </span>
 </div>

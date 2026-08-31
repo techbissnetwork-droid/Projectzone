@@ -49,8 +49,8 @@ site address, writes the configuration and builds the database for you.
 https://yourdomain.com/
 ```
 
-Any request made before setup is complete redirects to
-`/database/install.php`. You can also go there directly.
+Any request made before setup is complete redirects to `/install`. You can
+also go there directly.
 
 ### 2. Work through the wizard
 
@@ -71,7 +71,7 @@ The wizard then writes `config/config.php` for you, containing:
 ### 3. Delete the installer
 
 ```bash
-rm database/install.php
+rm install.php
 ```
 
 It refuses to run once an administrator exists, but there is no reason to leave
@@ -87,12 +87,37 @@ If you later move the site to a different domain or directory, you can blank
 `url` and `base_path` in `config/config.php` and both will be detected per
 request again.
 
+### www and non-www
+
+Both work as shipped. Nothing in `.htaccess` forces one over the other, and the
+application builds its links relative to whichever host the visitor arrived on,
+so sessions, forms and the admin all stay on that host. The canonical `<link>`
+and the sitemap still point at the address configured in Settings, which is the
+one search engines index.
+
+If you would rather collapse the two into a single address, `.htaccess` carries
+both redirects ready to uncomment — one drops the `www`, the other requires it.
+Enable exactly one, and make sure DNS answers on both names first.
+
+### Clean URLs
+
+There is no `.php` in any address. The front controller already handles the
+public site and the admin, and `.htaccess` maps the remaining real file the same
+way: `/install.php` redirects to `/install` and is served from there. Requests
+are redirected only on `GET` and `HEAD`, so a form post is never bounced and
+stripped of its body.
+
+This relies on `mod_rewrite` and on `AllowOverride` being set to `All` (or at
+least `FileInfo`) for the site's directory. If your host has either turned off,
+the site will still start but every clean URL will fall through to the front
+controller — the setup page tells you so explicitly rather than looping.
+
 ### Command line
 
 For scripted deployments:
 
 ```bash
-php database/install.php \
+php install.php \
     --db-name=techbiss --db-user=USER --db-pass=SECRET \
     --name="Your Name" --email=you@example.com --password='a-strong-password' \
     --site-url=https://yourdomain.com
@@ -178,7 +203,7 @@ The measures actually implemented, not a checklist:
 
 ### Before going live
 
-1. Delete `database/install.php`
+1. Delete `install.php`
 2. Serve everything over HTTPS. If you installed over HTTP, set
    `cookie_secure => true` in `config/config.php` afterwards — the wizard sets
    it automatically when it reaches you over HTTPS

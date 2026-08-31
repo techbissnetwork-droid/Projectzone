@@ -12,14 +12,57 @@ DirectoryIndex index.php
     # RewriteBase /techbiss/
     # RewriteBase /
 
+    # -----------------------------------------------------------------
+    # Canonical host
+    # -----------------------------------------------------------------
+    # www and non-www both work as shipped: nothing here forces one, and
+    # the application builds its links relative to whichever host the
+    # visitor used, so sessions and forms stay on that host either way.
+    # The canonical <link> still points at the address configured in
+    # Settings, which is what search engines index.
+    #
+    # To collapse the two into one address, uncomment ONE block below.
+    # Point your DNS at both hosts first, or the redirect will lead to a
+    # name that does not resolve.
+    #
+    # Drop the www (https://www.example.com -> https://example.com):
+    # RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+    # RewriteRule ^ %{REQUEST_SCHEME}://%1%{REQUEST_URI} [R=301,L]
+    #
+    # Require the www (https://example.com -> https://www.example.com):
+    # RewriteCond %{HTTP_HOST} !^www\. [NC]
+    # RewriteCond %{HTTP_HOST} !^localhost [NC]
+    # RewriteCond %{HTTP_HOST} !^[0-9.]+$
+    # RewriteRule ^ %{REQUEST_SCHEME}://www.%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
     # Force HTTPS — uncomment once a certificate is installed.
     # RewriteCond %{HTTPS} !=on
     # RewriteCond %{HTTP:X-Forwarded-Proto} !https
     # RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
 
-    # Strip a trailing slash (except on the site root)
+    # -----------------------------------------------------------------
+    # Clean URLs — no .php anywhere in the address bar
+    # -----------------------------------------------------------------
+    # /index.php -> /   and   /anything/index.php -> /anything/
+    # Matched against THE_REQUEST so it only fires on what the browser
+    # actually asked for, never on a URL we rewrote internally. Limited to
+    # GET and HEAD so a POST is never bounced and stripped of its body.
+    RewriteCond %{THE_REQUEST} "^(GET|HEAD) /(.*/)?index\.php[?\s]" [NC]
+    RewriteRule ^ /%2 [R=301,L]
+
+    # /install.php -> /install, and the same for any other real .php file
+    RewriteCond %{THE_REQUEST} "^(GET|HEAD) /([^?\s]+)\.php[?\s]" [NC]
+    RewriteRule ^ /%2 [R=301,L]
+
+    # Strip a trailing slash (except on the site root and real directories)
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^(.+)/$ /$1 [R=301,L]
+
+    # Serve /install from install.php, and likewise for any other .php file
+    # that exists. This is what makes the extensionless address above work.
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME}\.php -f
+    RewriteRule ^(.+)$ $1.php [L]
 
     # Never route real files or directories through the front controller
     RewriteCond %{REQUEST_FILENAME} -f [OR]
@@ -40,7 +83,7 @@ DirectoryIndex index.php
     Require all denied
 </FilesMatch>
 
-RedirectMatch 404 ^/(config|includes|storage|database)(/|$)
+RedirectMatch 404 ^/(config|includes|storage|database|tools)(/|$)
 
 # ---------------------------------------------------------------------
 # Security headers

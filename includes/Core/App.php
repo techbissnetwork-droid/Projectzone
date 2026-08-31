@@ -234,12 +234,9 @@ final class App
             return '';
         }
         $dir = str_replace('\\', '/', dirname($script));
-        // The admin front controller sits one level deeper; so does the installer.
-        foreach (['/admin', '/database'] as $suffix) {
-            if (str_ends_with($dir, $suffix)) {
-                $dir = substr($dir, 0, -strlen($suffix));
-                break;
-            }
+        // The admin front controller sits one level deeper than the site root.
+        if (str_ends_with($dir, '/admin')) {
+            $dir = substr($dir, 0, -6);
         }
         $dir = rtrim($dir, '/');
         return ($dir === '' || $dir === '.') ? '' : $dir;
@@ -249,11 +246,28 @@ final class App
     {
         http_response_code(503);
         header('Content-Type: text/html; charset=utf-8');
-        // If the installer is still present, send them straight to it.
-        $installer = self::$root . '/database/install.php';
-        if (is_file($installer)) {
+        // If the installer is still present, send them straight to it — but never
+        // from a request that is already aimed at the installer. Apache serves
+        // this front controller as the 404 handler, so a mis-configured rewrite
+        // would otherwise bounce /install -> index.php -> /install forever.
+        $installer = self::$root . '/install.php';
+        $path      = (string) parse_url((string) ($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_PATH);
+        $atInstaller = (bool) preg_match('#/install(\.php)?/?$#', $path);
+        if (is_file($installer) && !$atInstaller) {
             $base = self::detectBasePath();
-            header('Location: ' . self::detectOrigin() . $base . '/database/install.php', true, 302);
+            header('Location: ' . self::detectOrigin() . $base . '/install.php', true, 302);
+            exit;
+        }
+        if ($atInstaller) {
+            echo '<!doctype html><meta charset="utf-8"><title>Setup could not start</title>'
+                . '<body style="font:16px/1.7 ui-sans-serif,system-ui;background:#0a0c12;color:#e6e9f2;padding:56px;max-width:46rem;margin:auto">'
+                . '<h1 style="font-size:1.6rem;margin:0 0 .5rem">Setup could not start</h1>'
+                . '<p style="color:#9aa3b8">The web server did not run <code>install.php</code>; it handed the request to the '
+                . 'front controller instead. That usually means <code>mod_rewrite</code> is off, or the shipped '
+                . '<code>.htaccess</code> is being ignored because <code>AllowOverride</code> is set to <code>None</code>.</p>'
+                . '<p style="color:#9aa3b8">Ask your host to enable both, or run the installer from the command line:<br>'
+                . '<code>php install.php</code> (with no arguments it prints the options)</p>'
+                . '</body>';
             exit;
         }
 
@@ -262,7 +276,7 @@ final class App
             . '<h1 style="font-size:1.6rem;margin:0 0 .5rem">Configuration required</h1>'
             . '<p style="color:#9aa3b8">TECHBISS cannot start because <code>config/config.php</code> is missing.</p>'
             . '<p style="color:#9aa3b8">Copy <code>config/config.sample.php</code> to <code>config/config.php</code> and '
-            . 'fill in your database credentials, or restore <code>database/install.php</code> and reload this page '
+            . 'fill in your database credentials, or restore <code>install.php</code> and reload this page '
             . 'to run the setup wizard again.</p>'
             . '</body>';
         exit;

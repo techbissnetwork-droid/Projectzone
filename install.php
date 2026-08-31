@@ -14,14 +14,14 @@ declare(strict_types=1);
  * Delete this file once setup is finished.
  *
  * Command line equivalent:
- *   php database/install.php --db-name=techbiss --db-user=root --db-pass=secret \
+ *   php install.php --db-name=techbiss --db-user=root --db-pass=secret \
  *       --name="Your Name" --email=you@example.com --password='a-strong-password'
  */
 
 // ---------------------------------------------------------------------
 // Environment
 // ---------------------------------------------------------------------
-define('TB_ROOT', dirname(__DIR__));
+define('TB_ROOT', __DIR__);
 define('TB_CONFIG', TB_ROOT . '/config/config.php');
 
 const TB_REQUIRED_EXT = ['pdo_mysql', 'mbstring', 'json', 'fileinfo'];
@@ -57,9 +57,6 @@ function tb_detect_base_path(): string
         return '';
     }
     $dir = str_replace('\\', '/', dirname($script));
-    if (str_ends_with($dir, '/database')) {
-        $dir = substr($dir, 0, -9);
-    }
     $dir = rtrim($dir, '/');
     return ($dir === '' || $dir === '.') ? '' : $dir;
 }
@@ -242,7 +239,7 @@ return [
     // Uploads
     // ---------------------------------------------------------------------
     'uploads' => [
-        'dir'          => __DIR__ . '/../uploads',
+        'dir'          => __DIR__ . '/uploads',
         'max_bytes'    => 6 * 1024 * 1024,
         'max_width'    => 6000,
         'max_height'   => 6000,
@@ -272,7 +269,7 @@ return [
     // ---------------------------------------------------------------------
     'cache' => [
         'enabled' => true,
-        'dir'     => __DIR__ . '/../storage/cache',
+        'dir'     => __DIR__ . '/storage/cache',
         'ttl'     => 300,
     ],
 ];
@@ -502,7 +499,7 @@ if ($cli) {
     $pass  = (string) ($args['password'] ?? '');
 
     if ($email === '' || $pass === '') {
-        echo "Usage:\n  php database/install.php \\\n"
+        echo "Usage:\n  php install.php \\\n"
            . "    --db-name=techbiss --db-user=USER --db-pass=SECRET \\\n"
            . "    --name=\"Your Name\" --email=you@example.com --password='a-strong-password' \\\n"
            . "    [--db-host=127.0.0.1] [--db-port=3306] [--db-socket=/path/mysqld.sock] \\\n"
@@ -548,7 +545,7 @@ if ($cli) {
 
     echo "\nSetup complete.\n";
     echo "  Sign in at " . ($site['url'] !== '' ? $site['url'] : '(your site)') . "/admin/login\n";
-    echo "  Then DELETE database/install.php\n";
+    echo "  Then DELETE install.php\n";
     exit(0);
 }
 
@@ -576,12 +573,12 @@ if (!$justFinished && tb_already_installed()) {
     $installedUrl = $detectedUrl . '/admin/login';
     ?><!doctype html><html lang="en"><head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">
-    <title>Already installed</title><link rel="icon" type="image/svg+xml" href="../assets/images/brand/favicon.svg"><?php require __DIR__ . '/../pages/partials/_installer-style.php'; ?></head>
+    <title>Already installed</title><link rel="icon" type="image/svg+xml" href="assets/images/brand/favicon.svg"><?php require __DIR__ . '/pages/partials/_installer-style.php'; ?></head>
     <body><main class="wrap"><div class="card">
-        <div class="brand"><img class="glyph" src="../assets/images/brand/logo-mark.svg" width="32" height="32" alt=""><span class="name">TECHBISS</span></div>
+        <div class="brand"><img class="glyph" src="assets/images/brand/logo-mark.svg" width="32" height="32" alt=""><span class="name">TECHBISS</span></div>
         <h1>Already installed</h1>
         <p class="muted">An administrator account already exists, so the wizard will not run again.</p>
-        <div class="alert alert--warn"><strong>Delete <code>database/install.php</code> now.</strong>
+        <div class="alert alert--warn"><strong>Delete <code>install.php</code> now.</strong>
             Leaving the installer in place is a security risk.</div>
         <a class="btn btn--primary" href="<?= htmlspecialchars($installedUrl, ENT_QUOTES) ?>">Go to the admin sign-in page</a>
     </div></main></body></html><?php
@@ -714,14 +711,14 @@ $e = static fn (?string $s): string => htmlspecialchars((string) $s, ENT_QUOTES,
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex, nofollow">
     <title>Install TECHBISS</title>
-    <link rel="icon" type="image/svg+xml" href="../assets/images/brand/favicon.svg">
-    <link rel="shortcut icon" href="../assets/images/brand/favicon.ico">
-    <?php require __DIR__ . '/../pages/partials/_installer-style.php'; ?>
+    <link rel="icon" type="image/svg+xml" href="assets/images/brand/favicon.svg">
+    <link rel="shortcut icon" href="assets/images/brand/favicon.ico">
+    <?php require __DIR__ . '/pages/partials/_installer-style.php'; ?>
 </head>
 <body>
 <main class="wrap">
     <div class="card">
-        <div class="brand"><img class="glyph" src="../assets/images/brand/logo-mark.svg" width="32" height="32" alt=""><span class="name">TECHBISS</span></div>
+        <div class="brand"><img class="glyph" src="assets/images/brand/logo-mark.svg" width="32" height="32" alt=""><span class="name">TECHBISS</span></div>
 
         <?php if ($step < 4): ?>
         <ol class="steps" aria-label="Setup progress">
@@ -955,7 +952,7 @@ $e = static fn (?string $s): string => htmlspecialchars((string) $s, ENT_QUOTES,
             </ul>
 
             <div class="alert alert--warn">
-                <strong>One last thing: delete <code>database/install.php</code>.</strong>
+                <strong>One last thing: delete <code>install.php</code>.</strong>
                 It refuses to run again while an administrator exists, but there is no reason to leave it on the server.
             </div>
 
