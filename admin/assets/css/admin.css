@@ -296,6 +296,7 @@ a.tile:hover { border-color: var(--border-strong); transform: translateY(-2px); 
 .data-table .cell-title { color: var(--text); font-weight: 550; display: block; }
 /* Table rows tint their own ground, so the faint tone falls under 4.5:1 here. */
 .data-table .cell-sub { font-size: var(--fs-xs); color: var(--text-muted); display: block; margin-top: .1rem; }
+.data-table .hint { color: var(--text-muted); }
 .data-table .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .data-table .actions { text-align: right; white-space: nowrap; }
 .data-table .drag-handle {

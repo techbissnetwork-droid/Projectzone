@@ -518,6 +518,33 @@
      Forms: client-side hints, submit lock, async submission
      Server-side validation remains authoritative in every case.
      ------------------------------------------------------------------- */
+
+  // An error a screen reader never hears is not an error message. Messages the
+  // server renders are already wired up; these do the same for the ones built
+  // here, and keep aria-invalid in step with the visible invalid state.
+  var errSeq = 0;
+  function errorId(name) {
+    var base = 'err-live-' + String(name || 'field').replace(/[^a-zA-Z0-9_-]+/g, '-');
+    if (!document.getElementById(base)) return base;
+    errSeq += 1;
+    return base + '-' + errSeq;
+  }
+  function describe(el, id) {
+    if (!el || !id) return;
+    var current = (el.getAttribute('aria-describedby') || '').split(/\s+/).filter(Boolean);
+    if (current.indexOf(id) === -1) current.push(id);
+    el.setAttribute('aria-describedby', current.join(' '));
+    el.setAttribute('aria-invalid', 'true');
+  }
+  function undescribe(el, id) {
+    if (!el) return;
+    el.removeAttribute('aria-invalid');
+    if (!id) return;
+    var current = (el.getAttribute('aria-describedby') || '').split(/\s+/).filter(function (v) { return v && v !== id; });
+    if (current.length) el.setAttribute('aria-describedby', current.join(' '));
+    else el.removeAttribute('aria-describedby');
+  }
+
   function initForms() {
     $$('form[data-form]').forEach(function (form) {
       var submitBtn = form.querySelector('[type="submit"]');
@@ -528,7 +555,14 @@
         on(field, 'input', function () {
           field.classList.remove('is-invalid');
           var err = field.parentNode && field.parentNode.querySelector('.field-error');
-          if (err && err.getAttribute('data-live') === 'true') err.remove();
+          if (err && err.getAttribute('data-live') === 'true') {
+            undescribe(field, err.id);
+            err.remove();
+          } else {
+            // A message the server rendered stays on screen, so it stays in the
+            // description; only the invalid state is cleared.
+            field.removeAttribute('aria-invalid');
+          }
         });
       });
 
@@ -579,9 +613,14 @@
                   if (wrap && !wrap.querySelector('.field-error')) {
                     var msg = document.createElement('span');
                     msg.className = 'field-error';
+                    msg.id = errorId(name);
+                    msg.setAttribute('role', 'alert');
                     msg.setAttribute('data-live', 'true');
                     msg.textContent = data.errors[name];
                     wrap.appendChild(msg);
+                    describe(field, msg.id);
+                  } else {
+                    field.setAttribute('aria-invalid', 'true');
                   }
                 });
               }
@@ -623,15 +662,22 @@
       $$('[data-require-one]', panel).forEach(function (group) {
         var checked = $$('input[type="checkbox"]', group).some(function (c) { return c.checked; });
         var msg = $('.field-error', group);
+        var boxes = $$('input[type="checkbox"]', group);
         if (!checked) {
           valid = false;
           if (!msg) {
             msg = document.createElement('span');
             msg.className = 'field-error';
+            msg.id = errorId(boxes.length ? boxes[0].name : 'group');
+            msg.setAttribute('role', 'alert');
             msg.textContent = 'Please choose at least one option.';
             group.appendChild(msg);
           }
+          // The requirement is on the group, so every box in it points at the
+          // one message rather than each carrying its own.
+          boxes.forEach(function (box) { describe(box, msg.id); });
         } else if (msg) {
+          boxes.forEach(function (box) { undescribe(box, msg.id); });
           msg.remove();
         }
       });
