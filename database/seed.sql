@@ -37,6 +37,7 @@ INSERT INTO `permissions` (`name`, `slug`, `group_name`, `sort_order`) VALUES
 ('View leads',            'leads.view',        'Leads',     40),
 ('Manage leads',          'leads.manage',      'Leads',     41),
 ('Export data',           'export.manage',     'System',    50),
+('Download a full database backup','system.backup','System',    54),
 ('View activity logs',    'logs.view',         'System',    51),
 ('Manage admin users',    'users.manage',      'System',    52),
 ('Manage roles',          'roles.manage',      'System',    53);

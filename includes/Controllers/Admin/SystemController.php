@@ -320,7 +320,12 @@ final class SystemController extends BaseAdminController
     /** Structural SQL dump of the content tables, for backup purposes. */
     public function exportDatabase(Request $request): never
     {
-        $this->authorize('export.manage');
+        // Not export.manage: that is held by roles who need the lead and
+        // customer CSVs, and this dump is a different thing entirely — it
+        // carries every administrator's password hash. A role that cannot
+        // open System & maintenance must not be able to download it.
+        $this->authorize('system.backup');
+        $this->verify($request);
         $db = Database::instance();
 
         $tables = array_map('strval', $db->column(

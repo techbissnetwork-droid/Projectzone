@@ -88,11 +88,8 @@ final class Uploader
             }
         }
 
-        if ($mime === 'image/svg+xml') {
-            $svg = (string) file_get_contents($tmp);
-            if (preg_match('/<script|javascript:|on\w+\s*=|<foreignObject|<!ENTITY/i', $svg)) {
-                return $fail('That SVG contains scripting and was rejected.');
-            }
+        if ($mime === 'image/svg+xml' && !self::svgIsSafe((string) file_get_contents($tmp))) {
+            return $fail('That SVG contains scripting and was rejected.');
         }
 
         $folder = preg_match('/^[a-z0-9_-]{1,40}$/', $folder) ? $folder : 'general';
@@ -135,6 +132,61 @@ final class Uploader
                 'folder'        => $folder,
             ],
         ];
+    }
+
+    /**
+     * Is this SVG free of anything that can execute?
+     *
+     * A plain substring scan is not enough: an SVG is XML, so a scheme can be
+     * written as character references and still run — &#106;avascript: is
+     * javascript:. Entities are resolved first, then the check looks for
+     * scripting elements, event handlers, and any link whose scheme is not one
+     * we allow.
+     */
+    private static function svgIsSafe(string $svg): bool
+    {
+        // Resolve character references so an encoded scheme cannot slip past,
+        // and drop whitespace that XML tolerates inside an attribute value.
+        $probe = html_entity_decode($svg, ENT_QUOTES | ENT_HTML5 | ENT_XML1, 'UTF-8');
+        $probe = preg_replace('/&#x?0*(?:9|10|13|32);/i', '', $probe) ?? $probe;
+        $probe = preg_replace('/[\x00-\x20]+/', ' ', $probe) ?? $probe;
+
+        // Elements and constructs that can run code or pull in a remote document.
+        if (preg_match('/<\s*(script|foreignObject|iframe|embed|object|handler|set|animate|animateTransform|animateMotion)\b/i', $probe)) {
+            return false;
+        }
+        // An inline DTD can define entities that expand into anything.
+        if (preg_match('/<!\s*(ENTITY|DOCTYPE)\b/i', $probe)) {
+            return false;
+        }
+        // on* handlers, in any casing, with or without spaces around the equals.
+        if (preg_match('/\bon[a-z]+\s*=/i', $probe)) {
+            return false;
+        }
+        // Any link target must use a scheme we are willing to allow. Fragments,
+        // relative paths, http(s) and data:image are fine; everything else —
+        // javascript:, vbscript:, data:text/html — is not.
+        if (preg_match_all('/\b(?:xlink:)?href\s*=\s*["\']([^"\']*)["\']/i', $probe, $m)) {
+            foreach ($m[1] as $target) {
+                // Browsers ignore whitespace inside a scheme, so "java\nscript:"
+                // runs. Strip it all before deciding what the scheme is.
+                $target = preg_replace('/\s+/', '', $target) ?? $target;
+                if ($target === '' || $target[0] === '#' || $target[0] === '/') {
+                    continue;
+                }
+                if (preg_match('#^https?://#i', $target)) {
+                    continue;
+                }
+                if (preg_match('#^data:image/(png|jpe?g|gif|webp);base64,#i', $target)) {
+                    continue;
+                }
+                if (!preg_match('/^[a-z][a-z0-9+.\-]*:/i', $target)) {
+                    continue; // a relative path
+                }
+                return false;
+            }
+        }
+        return true;
     }
 
     /**

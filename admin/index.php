@@ -216,7 +216,7 @@ if (!in_array($path, ['/admin/login', '/admin/logout'], true)) {
     $router->post('/admin/system/recheck', [$system, 'recheckSecurity']);
     $router->post('/admin/system/migrate', [$system, 'migrate']);
     $router->post('/admin/system/prune-logs', [$system, 'pruneLogs']);
-    $router->get('/admin/system/backup', [$system, 'exportDatabase']);
+    $router->post('/admin/system/backup', [$system, 'exportDatabase']);
 
     // --- Declarative resources ---------------------------------------
     foreach (array_keys(Resources::all()) as $key) {

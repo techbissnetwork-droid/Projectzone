@@ -154,9 +154,14 @@ foreach ($security as $s) { if ($s['status'] === 'fail') { $secFails++; } }
                     <?= icon('download') ?><?= e($exp['label']) ?>
                 </a>
                 <?php endforeach; ?>
-                <a class="btn btn--ghost btn--sm btn--block" href="<?= e(url('/admin/system/backup')) ?>" style="justify-content:flex-start">
-                    <?= icon('database') ?>Full database backup (.sql)
-                </a>
+                <?php if (Auth::can('system.backup')): ?>
+                <form method="post" action="<?= e(url('/admin/system/backup')) ?>">
+                    <?= csrf_field() ?>
+                    <button class="btn btn--ghost btn--sm btn--block" type="submit" style="justify-content:flex-start">
+                        <?= icon('database') ?>Full database backup (.sql)
+                    </button>
+                </form>
+                <?php endif; ?>
             </div>
             <p class="help-text mt-4">
                 <strong>The SQL backup is a complete copy of the database.</strong> It contains administrator password
