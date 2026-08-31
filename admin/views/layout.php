@@ -22,7 +22,7 @@ $title    = $title ?? 'Admin';
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'">
     <link rel="stylesheet" href="<?= e(asset('assets/css/design-system.css')) ?>">
     <link rel="stylesheet" href="<?= e(asset('admin/assets/css/admin.css')) ?>">
-    <script>
+    <script nonce="<?= e(\Techbiss\Core\App::nonce()) ?>">
     (function () {
         try {
             var s = localStorage.getItem('techbiss-theme');
@@ -70,7 +70,7 @@ $title    = $title ?? 'Admin';
 <div data-flash="<?= e($item['type']) ?>" data-flash-message="<?= e($item['message']) ?>" hidden></div>
 <?php endforeach; ?>
 
-<script>
+<script nonce="<?= e(\Techbiss\Core\App::nonce()) ?>">
 window.TECHBISS = { cursor: false, transitions: false };
 window.TECHBISS_ADMIN = { csrf: <?= ejs(csrf_token()) ?>, base: <?= ejs(url('/')) ?> };
 </script>

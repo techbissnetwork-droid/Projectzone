@@ -2,7 +2,7 @@
 <?= $view->partial('partials/page-head', [
     'eyebrow' => 'Services',
     'heading' => 'Everything your business needs to operate online.',
-    'lead'    => 'Ten services covering the entire digital foundation — infrastructure, presence, applications and the ongoing work that keeps them performing. Take one, or take the lot from a single partner.',
+    'lead'    => 'Ten services, from infrastructure to the work that keeps it running. Take one, or take the lot.',
 ]) ?>
 
 <section class="section section--flush-top">
@@ -122,5 +122,5 @@
 <?= $view->partial('partials/cta-band', [
     'eyebrow' => 'Next step',
     'heading' => 'Not sure which services you need?',
-    'lead'    => 'Tell us where the business is today. We will tell you what actually needs building first — and what can wait.',
+    'lead'    => 'Tell us where you are today. We will say what to build first, and what can wait.',
 ]) ?>

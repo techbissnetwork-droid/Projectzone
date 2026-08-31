@@ -25,7 +25,7 @@
 <div data-flash="<?= e($item['type']) ?>" data-flash-message="<?= e($item['message']) ?>" hidden></div>
 <?php endforeach; ?>
 
-<script>window.TECHBISS = { cursor: false, transitions: false };</script>
+<script nonce="<?= e(\Techbiss\Core\App::nonce()) ?>">window.TECHBISS = { cursor: false, transitions: false };</script>
 <script src="<?= e(asset('assets/js/app.js')) ?>" defer></script>
 </body>
 </html>

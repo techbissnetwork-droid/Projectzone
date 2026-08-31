@@ -6,7 +6,7 @@ $query = array_filter(['category' => $activeCat, 'industry' => $activeInd, 'q' =
 <?= $view->partial('partials/page-head', [
     'eyebrow' => 'Selected work',
     'heading' => 'Projects built the same way yours will be.',
-    'lead'    => 'Websites, applications, commerce platforms and brand systems. Each one started with a business problem, not a design brief.',
+    'lead'    => 'Websites, apps, stores and brand systems. Each started with a business problem, not a design brief.',
 ]) ?>
 
 <section class="section section--flush-top">
@@ -74,5 +74,5 @@ $query = array_filter(['category' => $activeCat, 'industry' => $activeInd, 'q' =
 <?= $view->partial('partials/cta-band', [
     'eyebrow' => 'Your project',
     'heading' => 'Let us build the next one.',
-    'lead'    => 'Tell us what the business does and where it is stuck. We will come back with an approach, a schedule and a price.',
+    'lead'    => 'Tell us what the business does and where it is stuck. You get an approach, a schedule and a price.',
 ]) ?>

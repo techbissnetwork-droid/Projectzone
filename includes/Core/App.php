@@ -15,6 +15,9 @@ final class App
     private static string $basePath = '';
     /** Scheme and host only — never includes the sub-directory. */
     private static string $origin = '';
+
+    /** Per-request CSP nonce, so inline scripts run without 'unsafe-inline'. */
+    private static string $nonce = '';
     private static ?SettingsRepo $settings = null;
     private static ?Seo $seo = null;
     private static ?Mailer $mailer = null;
@@ -187,11 +190,65 @@ final class App
     }
 
     /** Security headers applied to every response. */
+    /**
+     * A fresh random nonce for this request.
+     *
+     * Every inline <script> we emit carries it and the Content-Security-Policy
+     * names it, so a script tag injected into the page has no nonce and will
+     * not run.
+     */
+    public static function nonce(): string
+    {
+        if (self::$nonce === '') {
+            self::$nonce = base64_encode(random_bytes(16));
+        }
+        return self::$nonce;
+    }
+
+    /**
+     * Send the security headers.
+     *
+     * Emitted from PHP rather than left to .htaccess, so they still apply on a
+     * server where AllowOverride is off or which is not Apache at all.
+     *
+     * @param bool $isAdmin the admin embeds nothing third-party, so its policy is tighter
+     */
     public static function sendSecurityHeaders(bool $isAdmin = false): void
     {
         if (headers_sent()) {
             return;
         }
+
+        $script  = ["'self'", "'nonce-" . self::nonce() . "'"];
+        $connect = ["'self'"];
+        $img     = ["'self'", 'data:', 'blob:'];
+        $style   = ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'];
+        $font    = ["'self'", 'https://fonts.gstatic.com', 'data:'];
+
+        // Analytics is named only when an ID is actually configured, so a site
+        // without it does not advertise a Google origin it never contacts.
+        if (!$isAdmin && self::settings()->get('google_analytics_id') !== '') {
+            $script[]  = 'https://www.googletagmanager.com';
+            $connect[] = 'https://www.googletagmanager.com';
+            $connect[] = 'https://www.google-analytics.com';
+            $img[]     = 'https://www.google-analytics.com';
+        }
+        // Media can legitimately be stored on another host, so images stay open.
+        $img[] = 'https:';
+
+        header('Content-Security-Policy: ' . implode('; ', [
+            "default-src 'self'",
+            'script-src ' . implode(' ', $script),
+            'style-src ' . implode(' ', $style),
+            'img-src ' . implode(' ', $img),
+            'font-src ' . implode(' ', $font),
+            'connect-src ' . implode(' ', $connect),
+            "object-src 'none'",
+            "base-uri 'self'",
+            "form-action 'self'",
+            "frame-ancestors 'self'",
+            "frame-src 'none'",
+        ]));
         header('X-Content-Type-Options: nosniff');
         header('X-Frame-Options: SAMEORIGIN');
         header('Referrer-Policy: strict-origin-when-cross-origin');

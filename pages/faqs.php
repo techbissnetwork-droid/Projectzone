@@ -52,7 +52,7 @@
 <?= $view->partial('partials/cta-band', [
     'eyebrow' => 'Still have a question?',
     'heading' => 'Ask us anything.',
-    'lead'    => 'We answer plainly, including when the answer is that something is outside what we do well.',
+    'lead'    => 'We answer plainly, including when something is outside what we do well.',
     'primaryLabel' => 'Contact the team',
     'primaryUrl'   => '/contact',
 ]) ?>

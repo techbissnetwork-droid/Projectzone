@@ -44,6 +44,7 @@ final class SystemController extends BaseAdminController
 
         $this->view->render('system/tools', [
             'title'     => 'System & maintenance',
+            'security'  => \Techbiss\Core\Cache::get('security_audit'),
             'tables'    => $tables,
             'php'       => PHP_VERSION,
             'server'    => $db->value('SELECT VERSION()', [], 'unknown'),
@@ -58,6 +59,164 @@ final class SystemController extends BaseAdminController
                 ['label' => 'Newsletter list',   'url' => '/admin/subscribers/export','permission' => 'export.manage'],
             ],
         ]);
+    }
+
+    /**
+     * Check that the shipped protections are actually in force on this server.
+     *
+     * Everything that hides config/, database/, storage/ and the rest is done
+     * with .htaccess. On a host with AllowOverride None, or on nginx, those
+     * files are served in full and nothing in the application would notice. So
+     * rather than assume, this fetches the URLs over HTTP exactly as a visitor
+     * would and reports what actually came back.
+     *
+     * Only fixed, hardcoded paths on this site's own address are requested;
+     * nothing here takes a target from the request.
+     *
+     * @return array<int,array{label:string,detail:string,status:string,note:string}>
+     */
+    private function securityAudit(): array
+    {
+        $base    = rtrim(App::siteUrl(), '/');
+        $results = [];
+
+        $exposed = [
+            '/config/config.php'        => 'Your database password and application key',
+            '/config/config.sample.php' => 'The configuration template',
+            '/database/schema.sql'      => 'Your full database structure',
+            '/database/seed.sql'        => 'The seed data',
+            '/includes/helpers.php'     => 'Application source code',
+            '/storage/logs/'            => 'Error and mail logs',
+            '/tools/'                   => 'Build scripts',
+            '/uploads/'                 => 'A listing of every uploaded file',
+        ];
+
+        $reachable = [];
+        $unknown   = 0;
+        foreach ($exposed as $path => $what) {
+            $code = $this->probe($base . $path);
+            if ($code === null) {
+                $unknown++;
+            } elseif ($code === 200) {
+                $reachable[] = $path . ' — ' . $what;
+            }
+        }
+
+        if ($unknown === count($exposed)) {
+            $results[] = [
+                'label'  => 'Private files',
+                'detail' => 'Could not be checked',
+                'status' => 'unknown',
+                'note'   => 'This server could not make a request to itself, so the check could not run. '
+                          . 'Open ' . $base . '/config/config.php in a browser: it must not show you anything.',
+            ];
+        } elseif ($reachable !== []) {
+            $results[] = [
+                'label'  => 'Private files',
+                'detail' => count($reachable) . ' exposed',
+                'status' => 'fail',
+                'note'   => 'These are downloadable by anyone: ' . implode('; ', $reachable)
+                          . '. The .htaccess files that block them are being ignored — ask your host to enable '
+                          . 'AllowOverride All, or add the same rules to your server configuration.',
+            ];
+        } else {
+            $results[] = [
+                'label'  => 'Private files',
+                'detail' => 'Not reachable',
+                'status' => 'pass',
+                'note'   => 'config/, database/, includes/, storage/, tools/ and the uploads listing all refuse '
+                          . 'direct requests.',
+            ];
+        }
+
+        // The installer must not survive setup.
+        $installer = App::root() . '/install.php';
+        $results[] = is_file($installer)
+            ? ['label' => 'Setup wizard', 'detail' => 'Still present', 'status' => 'fail',
+               'note'  => 'install.php is still on the server. It refuses to run while an administrator exists, but '
+                        . 'there is no reason to leave it there. Delete it.']
+            : ['label' => 'Setup wizard', 'detail' => 'Removed', 'status' => 'pass',
+               'note'  => 'install.php is no longer on the server.'];
+
+        // HTTPS, and the cookie flag that depends on it.
+        $https  = str_starts_with($base, 'https://');
+        $secure = (bool) (App::config('security.cookie_secure') ?? false);
+        if (!$https) {
+            $results[] = ['label' => 'HTTPS', 'detail' => 'Not in use', 'status' => 'fail',
+                'note' => 'Sign-in details and everything customers submit travel in the clear. Install a certificate, '
+                        . 'then uncomment the HTTPS redirect in .htaccess and set cookie_secure to true in config.php.'];
+        } elseif (!$secure) {
+            $results[] = ['label' => 'HTTPS', 'detail' => 'On, cookie not marked secure', 'status' => 'warn',
+                'note' => 'The site is served over HTTPS but cookie_secure is false in config/config.php, so the '
+                        . 'session cookie may still be sent over a plain connection. Set it to true.'];
+        } else {
+            $results[] = ['label' => 'HTTPS', 'detail' => 'In use', 'status' => 'pass',
+                'note' => 'The session cookie is marked secure.'];
+        }
+
+        // Debug output must never reach visitors.
+        $debug = (bool) (App::config('site.debug') ?? false);
+        $results[] = $debug
+            ? ['label' => 'Debug mode', 'detail' => 'On', 'status' => 'fail',
+               'note'  => 'PHP errors are being printed to the page, which shows visitors your file paths and queries. '
+                        . 'Set debug to false in config/config.php.']
+            : ['label' => 'Debug mode', 'detail' => 'Off', 'status' => 'pass',
+               'note'  => 'Errors are written to storage/logs and never shown to visitors.'];
+
+        return $results;
+    }
+
+    /**
+     * Fetch one of our own URLs and return its status code, or null if the
+     * request could not be made at all. Short timeout: this runs while an
+     * administrator waits for the page.
+     */
+    private function probe(string $url): ?int
+    {
+        $context = stream_context_create([
+            'http' => [
+                'method'          => 'GET',
+                'timeout'         => 2,
+                'ignore_errors'   => true,
+                'follow_location' => 0,
+                'header'          => "User-Agent: TECHBISS-self-check\r\n",
+            ],
+            'ssl'  => ['verify_peer' => false, 'verify_peer_name' => false],
+        ]);
+        $headers = @get_headers($url, false, $context);
+        if ($headers === false || $headers === null || !isset($headers[0])) {
+            return null;
+        }
+        return preg_match('#\s(\d{3})\s#', ' ' . $headers[0] . ' ', $m) ? (int) $m[1] : null;
+    }
+
+    /**
+     * Run the security check now and store the result.
+     *
+     * Deliberately on demand: it makes real HTTP requests to this same site, so
+     * running it on every page load would both slow the page down and, on a
+     * server with one PHP worker, block waiting for itself.
+     */
+    public function recheckSecurity(Request $request): never
+    {
+        $this->authorize('settings.manage');
+        $this->verify($request);
+
+        // Release the session file lock first. Without this the request we make
+        // to ourselves blocks waiting for the lock this request is holding, and
+        // every probe times out for a reason that has nothing to do with the
+        // server's actual configuration.
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_write_close();
+        }
+        $result = $this->securityAudit();
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            @session_start();
+        }
+
+        \Techbiss\Core\Cache::put('security_audit', $result, 86400);
+        ActivityLog::record('check', 'system', null, 'Ran the security check');
+        $this->ok('Security check complete.', '/admin/system');
     }
 
     public function clearCache(Request $request): never
@@ -95,6 +254,11 @@ final class SystemController extends BaseAdminController
         header('Cache-Control: no-store');
 
         echo "-- TECHBISS database export\n-- Generated " . date('c') . "\n";
+        echo "--\n";
+        echo "-- SENSITIVE. This is a complete backup, so it contains administrator\n";
+        echo "-- password hashes and the personal details of every customer and lead.\n";
+        echo "-- Store it somewhere private and delete copies you no longer need.\n";
+        echo "--\n";
         echo "SET NAMES utf8mb4;\nSET FOREIGN_KEY_CHECKS = 0;\n\n";
 
         foreach ($tables as $table) {
@@ -106,7 +270,7 @@ final class SystemController extends BaseAdminController
                 echo "DROP TABLE IF EXISTS `$table`;\n";
                 echo (string) ($create['Create Table'] ?? '') . ";\n\n";
             }
-            // Never export password hashes or session artefacts in a content backup.
+            // Login attempts are throttling state, not data worth restoring.
             if (in_array($table, ['login_attempts'], true)) {
                 continue;
             }

@@ -6,7 +6,7 @@ $query = array_filter(['category' => $activeCat, 'tag' => $activeTag, 'q' => $se
 <?= $view->partial('partials/page-head', [
     'eyebrow' => 'Blog',
     'heading' => 'Practical writing on taking a business digital.',
-    'lead'    => 'Domains, hosting, websites, business email, search, e-commerce and automation — explained for business owners, not developers.',
+    'lead'    => 'Domains, hosting, websites, email, search and automation — explained for business owners, not developers.',
 ]) ?>
 
 <section class="section section--flush-top">
@@ -83,5 +83,5 @@ $query = array_filter(['category' => $activeCat, 'tag' => $activeTag, 'q' => $se
 <?= $view->partial('partials/cta-band', [
     'eyebrow' => 'Beyond reading',
     'heading' => 'Ready to act on any of this?',
-    'lead'    => 'We can do the work described in these articles for your business. Start with a short conversation.',
+    'lead'    => 'We can do this work for your business. Start with a short conversation.',
 ]) ?>

@@ -2,7 +2,7 @@
 <?= $view->partial('partials/page-head', [
     'eyebrow' => 'Industries',
     'heading' => 'Built around how your sector actually works.',
-    'lead'    => 'A restaurant, a law firm and a manufacturer need different things from the same technology. We start from the sector, not from a template.',
+    'lead'    => 'A restaurant and a law firm need different things. We start from your sector, not a template.',
 ]) ?>
 
 <section class="section section--flush-top">
@@ -58,5 +58,5 @@
 <?= $view->partial('partials/cta-band', [
     'eyebrow' => 'Your industry',
     'heading' => 'Not listed? That is not a problem.',
-    'lead'    => 'These are the sectors we work in most often, not the only ones we work in. Tell us what your business does.',
+    'lead'    => 'These are the sectors we see most, not the only ones. Tell us what you do.',
 ]) ?>

@@ -41,7 +41,7 @@ $gaId       = $settings->get('google_analytics_id');
     <link rel="stylesheet" href="<?= e(asset('assets/css/design-system.css')) ?>">
     <link rel="stylesheet" href="<?= e(asset('assets/css/site.css')) ?>">
 
-    <script>
+    <script nonce="<?= e(\Techbiss\Core\App::nonce()) ?>">
     // Applied before first paint so a stored theme preference never flashes.
     (function () {
         try {
@@ -95,7 +95,7 @@ if ($whatsapp !== '' && strlen($whatsapp) >= 8):
 </a>
 <?php endif; ?>
 
-<script>
+<script nonce="<?= e(\Techbiss\Core\App::nonce()) ?>">
 window.TECHBISS = {
     base: <?= ejs(url('/')) ?>,
     cursor: <?= $settings->bool('enable_cursor', true) ? 'true' : 'false' ?>,
@@ -107,7 +107,7 @@ window.TECHBISS = {
 
 <?php if ($gaId !== '' && preg_match('/^(G|UA|GTM)-[A-Za-z0-9-]+$/', $gaId)): ?>
 <script async src="https://www.googletagmanager.com/gtag/js?id=<?= e($gaId) ?>"></script>
-<script>
+<script nonce="<?= e(\Techbiss\Core\App::nonce()) ?>">
 window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());

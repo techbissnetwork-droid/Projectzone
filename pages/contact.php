@@ -5,7 +5,7 @@ $whatsapp = preg_replace('/[^0-9]/', '', $settings->get('whatsapp'));
 <?= $view->partial('partials/page-head', [
     'eyebrow' => 'Contact',
     'heading' => 'Tell us where your business is today.',
-    'lead'    => 'No sales script. A short conversation about what you run, what is missing, and whether we are the right people to fix it.',
+    'lead'    => 'No sales script. Tell us what you run and what is missing.',
 ]) ?>
 
 <section class="section section--flush-top">

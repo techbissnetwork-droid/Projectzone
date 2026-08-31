@@ -213,6 +213,7 @@ if (!in_array($path, ['/admin/login', '/admin/logout'], true)) {
     $router->get('/admin/logs', [$system, 'logs']);
     $router->get('/admin/system', [$system, 'tools']);
     $router->post('/admin/system/cache', [$system, 'clearCache']);
+    $router->post('/admin/system/recheck', [$system, 'recheckSecurity']);
     $router->post('/admin/system/prune-logs', [$system, 'pruneLogs']);
     $router->get('/admin/system/backup', [$system, 'exportDatabase']);
 

@@ -2,7 +2,7 @@
 <?= $view->partial('partials/page-head', [
     'eyebrow' => 'How it works',
     'heading' => 'Six stages from first conversation to ongoing growth.',
-    'lead'    => 'A defined process with a schedule you see before we start. No mystery, no open-ended timelines, no invoice surprises.',
+    'lead'    => 'You see the schedule before we start. No open-ended timelines, no invoice surprises.',
     'center'  => true,
 ]) ?>
 
@@ -102,5 +102,5 @@
 <?= $view->partial('partials/cta-band', [
     'eyebrow' => 'Stage 01',
     'heading' => 'Tell us about your business.',
-    'lead'    => 'That is genuinely where this starts. Six short questions and we will come back with a plan.',
+    'lead'    => 'That is where it starts. Six short questions, then a plan.',
 ]) ?>

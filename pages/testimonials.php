@@ -2,7 +2,7 @@
 <?= $view->partial('partials/page-head', [
     'eyebrow' => 'Testimonials',
     'heading' => 'What clients say about working with us.',
-    'lead'    => 'Every testimonial here was given by a real client about real work. We do not write them ourselves.',
+    'lead'    => 'Every testimonial here came from a real client. We do not write them ourselves.',
     'center'  => true,
 ]) ?>
 

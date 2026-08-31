@@ -70,11 +70,11 @@ INSERT INTO `settings` (`group_name`, `key_name`, `value`, `type`, `label`, `hin
 -- General
 ('general','site_name','TECHBISS','text','Company name','',1,NOW()),
 ('general','tagline','Your Digital Business Starts Here.','text','Tagline','Shown in the hero and browser title.',2,NOW()),
-('general','brand_promise','Transform your offline business into a premium digital brand.','textarea','Brand promise','',3,NOW()),
+('general','brand_promise','Take your business online, properly.','textarea','Brand promise','',3,NOW()),
 ('general','logo','','image','Logo','SVG or PNG with transparent background.',4,NOW()),
 ('general','logo_light','','image','Logo (light backgrounds)','',5,NOW()),
 ('general','favicon','','image','Favicon','32×32 or 48×48 PNG / ICO.',6,NOW()),
-('general','footer_text','TECHBISS is a complete digital transformation partner. We take businesses from offline to a premium, trusted digital presence — domain, hosting, website, apps, email, branding, SEO and ongoing support.','textarea','Footer intro',' ',7,NOW()),
+('general','footer_text','One partner for everything your business needs online: domain, hosting, website, apps, email, branding, SEO and support.','textarea','Footer intro',' ',7,NOW()),
 ('general','copyright','© {year} TECHBISS. All rights reserved.','text','Copyright line','Use {year} for the current year.',8,NOW()),
 -- Contact
 ('contact','contact_email','hello@techbiss.com','text','Primary email','',1,NOW()),
@@ -403,16 +403,16 @@ INSERT INTO `pages` (`slug`,`title`,`eyebrow`,`subtitle`,`content`,`template`,`s
 -- Homepage sections
 -- ---------------------------------------------------------------------
 INSERT INTO `page_sections` (`page_key`,`section_key`,`eyebrow`,`heading`,`subheading`,`body`,`cta_label`,`cta_url`,`is_published`,`sort_order`,`created_at`,`updated_at`) VALUES
-('home','hero','One partner. Everything digital.','Your Digital Business Starts Here.','Transform your offline business into a premium, trusted digital brand. TECHBISS provides everything you need — from your own domain and hosting to websites, apps, business email, branding, SEO and ongoing support.','','Start Your Digital Journey','/start',1,1,NOW(),NOW()),
-('home','problem','The starting point','Still running your business mostly offline?','You have customers, a reputation and something that works. What you do not have is the digital foundation that makes it visible, credible and easy to buy from.','','Build My Digital Business','/start',1,2,NOW(),NOW()),
-('home','chain','The transformation','From offline business to digital brand.','Each piece depends on the one before it. We build them in order, and we build all of them.','','Explore Packages','/packages',1,3,NOW(),NOW()),
-('home','services','What we do','Everything your business needs to operate online.','Ten services that cover the entire digital foundation — infrastructure, presence, applications and the work that keeps them performing.','','View all services','/services',1,4,NOW(),NOW()),
-('home','trust','Credibility','What a professional digital presence actually changes.','Not guaranteed sales. Something more fundamental: how established your business looks, how easily customers find what they need, and how far beyond your physical location you can reach.','','','',1,5,NOW(),NOW()),
-('home','process','How it works','Six stages from first conversation to ongoing growth.','A defined process, with a schedule you see before we start.','','See the full process','/how-it-works',1,6,NOW(),NOW()),
-('home','packages','Packages','Pay upfront. Save more. Build better.','Complete setups with published pricing. Where a prepaid discount applies, you see the regular price, the prepaid price and the exact saving.','','Compare all packages','/packages',1,7,NOW(),NOW()),
-('home','work','Selected work','Projects built the same way yours will be.','Case studies covering websites, applications, commerce and brand systems.','','View all work','/portfolio',1,8,NOW(),NOW()),
-('home','industries','Industries','Built around how your sector actually works.','A restaurant, a law firm and a manufacturer need different things. We start from the sector, not from a template.','','All industries','/industries',1,9,NOW(),NOW()),
-('home','cta','Ready when you are','Let''s build your digital business.','Tell us about the business. We will come back with a clear scope, a schedule and a price — no obligation.','','Start Your Digital Journey','/start',1,10,NOW(),NOW());
+('home','hero','One partner. Everything digital.','Your Digital Business Starts Here.','Everything your business needs online — domain, website, apps, email, branding and SEO — from one partner.','','Start Your Digital Journey','/start',1,1,NOW(),NOW()),
+('home','problem','The starting point','Still running your business mostly offline?','You have the customers and the reputation. What is missing is the part that makes you easy to find and easy to buy from.','','Build My Digital Business','/start',1,2,NOW(),NOW()),
+('home','chain','The transformation','From offline business to digital brand.','Each piece depends on the one before. We build them in order.','','Explore Packages','/packages',1,3,NOW(),NOW()),
+('home','services','What we do','Everything your business needs to operate online.','Ten services, from infrastructure to the work that keeps it running.','','View all services','/services',1,4,NOW(),NOW()),
+('home','trust','Credibility','What this actually changes.','Not guaranteed sales. How established you look, how easily customers find you, and how far past your front door you reach.','','','',1,5,NOW(),NOW()),
+('home','process','How it works','Six stages, first call to ongoing support.','A defined process, with a schedule you see before we start.','','See the full process','/how-it-works',1,6,NOW(),NOW()),
+('home','packages','Packages','Pay upfront. Save more. Build better.','Complete setups with published prices. Where a prepaid discount applies, you see the exact saving.','','Compare all packages','/packages',1,7,NOW(),NOW()),
+('home','work','Selected work','Built the same way yours will be.','Case studies covering websites, applications, commerce and brand systems.','','View all work','/portfolio',1,8,NOW(),NOW()),
+('home','industries','Industries','Built around your sector.','A restaurant and a law firm need different things. We start from your sector, not a template.','','All industries','/industries',1,9,NOW(),NOW()),
+('home','cta','Ready when you are','Let''s build your digital business.','Tell us about the business. You get a scope, a schedule and a price. No obligation.','','Start Your Digital Journey','/start',1,10,NOW(),NOW());
 
 INSERT INTO `section_items` (`section_id`,`title`,`description`,`icon`,`value`,`sort_order`)
 SELECT s.id, i.title, i.descr, i.icon, i.val, i.ord

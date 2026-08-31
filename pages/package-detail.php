@@ -153,7 +153,7 @@ $others   = array_values(array_filter($packages, static fn ($x) => (int) $x['id'
 <?= $view->partial('partials/cta-band', [
     'eyebrow'      => $package['name'] . ' package',
     'heading'      => 'Ready to start?',
-    'lead'         => 'Send your details and requirements. We will confirm everything in writing before any money changes hands.',
+    'lead'         => 'Send your details. We confirm everything in writing before any money changes hands.',
     'primaryLabel' => $p['is_custom'] ? 'Request a Quote' : 'Request ' . $package['name'],
     'primaryUrl'   => $p['is_custom'] ? '/quote?package=' . $package['slug'] : '/checkout/' . $package['slug'],
 ]) ?>

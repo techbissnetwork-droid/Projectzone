@@ -9,7 +9,7 @@ $sorts    = ['featured' => 'Featured first', 'newest' => 'Newest', 'name' => 'A 
 <?= $view->partial('partials/page-head', [
     'eyebrow' => 'Ready to launch',
     'heading' => 'Premade projects.',
-    'lead'    => 'Finished builds. See one working, then we set it up on your domain with your content. Ask about any of them — we agree the price with you directly.',
+    'lead'    => 'Finished builds. See one working, then we set it up on your domain. Ask about any of them for a price.',
 ]) ?>
 
 <section class="section section--flush-top">

@@ -19,8 +19,8 @@ foreach ($packages as $p) {
     'eyebrow' => 'Packages',
     'heading' => $anyPrepaid ? 'Pay Upfront. Save More. Build Better.' : 'Complete digital setups, clearly priced.',
     'lead'    => $anyPrepaid
-        ? 'Complete digital setups with published pricing. Where a prepaid discount applies you see the regular price, the prepaid price and the exact saving — nothing invented, nothing hidden.'
-        : 'Complete digital setups with published pricing and everything included listed in full before you commit.',
+        ? 'Complete setups with published prices. Where a prepaid discount applies, you see the exact saving.'
+        : 'Complete setups with published prices, and everything included listed before you commit.',
     'center'  => true,
 ]) ?>
 
@@ -196,5 +196,5 @@ foreach ($packages as $p) {
 <?= $view->partial('partials/cta-band', [
     'eyebrow' => 'Not sure which one?',
     'heading' => 'Tell us about the business and we will recommend one.',
-    'lead'    => 'Six short questions. We will suggest the package that fits — or tell you honestly that a custom scope makes more sense.',
+    'lead'    => 'Six short questions. We suggest the package that fits, or say a custom scope makes more sense.',
 ]) ?>

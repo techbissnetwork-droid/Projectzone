@@ -1,5 +1,5 @@
 <?php
-/** @var array $tables @var array $exports */
+/** @var array $tables @var array $exports @var array $security */
 use Techbiss\Core\Auth;
 $human = static function (int $b): string {
     $u = ['B', 'KB', 'MB', 'GB']; $i = 0; $n = (float) $b;
@@ -31,6 +31,60 @@ foreach ($tables as $t) { $totalBytes += (int) $t['bytes']; }
         <span class="tile__meta">Application version</span></div>
 </div>
 
+<?php
+$secClass = static fn (string $s): string => match ($s) {
+    'pass' => 'live', 'warn' => 'warn', 'fail' => 'danger', default => 'info',
+};
+$security = is_array($security) ? $security : [];
+$secFails = 0;
+foreach ($security as $s) { if ($s['status'] === 'fail') { $secFails++; } }
+?>
+<div class="panel">
+    <div class="panel__head">
+        <div>
+            <span class="panel__title">Security check</span>
+            <div class="panel__sub">
+                Asks this server for the files that should be private, and reports what actually comes back.
+            </div>
+        </div>
+        <div class="row row--tight">
+            <?php if ($secFails > 0): ?>
+            <span class="badge badge--accent nowrap"><?= (int) $secFails ?> need<?= $secFails === 1 ? 's' : '' ?> attention</span>
+            <?php endif; ?>
+            <form method="post" action="<?= e(url('/admin/system/recheck')) ?>">
+                <?= csrf_field() ?>
+                <button class="btn btn--quiet btn--sm" type="submit"><?= icon('refresh') ?>Run again</button>
+            </form>
+        </div>
+    </div>
+    <div class="panel__body">
+        <?php if ($security === []): ?>
+        <div class="empty-state" style="border:0;background:none;padding:1.5rem 0">
+            <p style="margin:0">
+                Not run yet. This asks your server for the files that are supposed to be private — such as
+                <code>config/config.php</code> — and reports what it actually gets back.
+            </p>
+            <form method="post" class="mt-4" action="<?= e(url('/admin/system/recheck')) ?>">
+                <?= csrf_field() ?>
+                <button class="btn btn--primary btn--sm" type="submit"><?= icon('shield') ?>Run the check</button>
+            </form>
+        </div>
+        <?php else: ?>
+        <div class="stack stack-4">
+            <?php foreach ($security as $item): ?>
+            <div>
+                <div class="row row--tight">
+                    <span class="status-dot status-dot--<?= e($secClass($item['status'])) ?>"><?= e($item['detail']) ?></span>
+                    <strong style="font-size:var(--fs-sm)"><?= e($item['label']) ?></strong>
+                </div>
+                <p class="hint mt-2" style="max-width:70ch"><?= e($item['note']) ?></p>
+            </div>
+            <?php endforeach; ?>
+        </div>
+        <?php endif; ?>
+    </div>
+</div>
+
 <div class="grid-panels">
     <?php if (Auth::can('export.manage')): ?>
     <div class="panel">
@@ -53,7 +107,10 @@ foreach ($tables as $t) { $totalBytes += (int) $t['bytes']; }
                 </a>
             </div>
             <p class="help-text mt-4">
-                The SQL backup contains your content and lead data. Store it somewhere private — it is not encrypted.
+                <strong>The SQL backup is a complete copy of the database.</strong> It contains administrator password
+                hashes and the personal details of every customer and lead, and it is not encrypted. Store it somewhere
+                private and delete copies you no longer need. The CSV exports above carry only the records named on each
+                button.
             </p>
         </div>
     </div>

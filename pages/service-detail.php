@@ -122,5 +122,5 @@ $image        = media_url($service['image']);
 <?= $view->partial('partials/cta-band', [
     'eyebrow' => 'Next step',
     'heading' => 'Ready to talk about ' . strtolower((string) $service['name']) . '?',
-    'lead'    => 'Tell us about the business and we will come back with a scope, a schedule and a price.',
+    'lead'    => 'Tell us about the business. You get a scope, a schedule and a price.',
 ]) ?>

@@ -8,7 +8,7 @@ foreach ($packages as $p) { if ($p['slug'] === $preselect) { $preselectId = (int
 <?= $view->partial('partials/page-head', [
     'eyebrow' => 'Request a quote',
     'heading' => 'Tell us what you need. We will price it properly.',
-    'lead'    => 'One form, no obligation. You get a written scope, a schedule and a price — not a range that changes later.',
+    'lead'    => 'One form, no obligation. You get a written scope, a schedule and a price.',
 ]) ?>
 
 <section class="section section--flush-top">
