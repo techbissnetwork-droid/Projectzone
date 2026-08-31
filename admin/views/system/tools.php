@@ -1,5 +1,5 @@
 <?php
-/** @var array $tables @var array $exports @var array $security */
+/** @var array $tables @var array $exports @var array $security @var array $migration */
 use Techbiss\Core\Auth;
 $human = static function (int $b): string {
     $u = ['B', 'KB', 'MB', 'GB']; $i = 0; $n = (float) $b;
@@ -39,6 +39,58 @@ $security = is_array($security) ? $security : [];
 $secFails = 0;
 foreach ($security as $s) { if ($s['status'] === 'fail') { $secFails++; } }
 ?>
+<?php if ($migration['pending'] > 0 || $migration['error'] !== '' || $migration['mismatched'] !== []): ?>
+<div class="panel">
+    <div class="panel__head">
+        <div>
+            <span class="panel__title">Database updates</span>
+            <div class="panel__sub">
+                This copy of the software expects fields your database does not have yet.
+            </div>
+        </div>
+        <?php if ($migration['pending'] > 0): ?>
+        <span class="badge badge--accent nowrap"><?= (int) $migration['pending'] ?> pending</span>
+        <?php endif; ?>
+    </div>
+    <div class="panel__body">
+        <?php if ($migration['error'] !== ''): ?>
+        <div class="alert alert--warn">
+            <strong>The database could not be checked.</strong> <?= e($migration['error']) ?>
+        </div>
+        <?php endif; ?>
+
+        <?php if ($migration['pending'] > 0): ?>
+        <p>
+            These are additions only — new tables, new fields and the permissions a new feature needs.
+            Nothing existing is removed, renamed or overwritten, so your content is not at risk.
+            Take a backup first anyway if you would rather be careful.
+        </p>
+        <ul class="plain-list mt-4">
+            <?php foreach (array_slice($migration['items'], 0, 40) as $item): ?>
+            <li class="hint"><?= e($item) ?></li>
+            <?php endforeach; ?>
+            <?php if (count($migration['items']) > 40): ?>
+            <li class="hint">…and <?= count($migration['items']) - 40 ?> more.</li>
+            <?php endif; ?>
+        </ul>
+        <form method="post" class="mt-5" action="<?= e(url('/admin/system/migrate')) ?>"
+              data-confirm="Apply <?= (int) $migration['pending'] ?> database updates? These are additions only.">
+            <?= csrf_field() ?>
+            <button class="btn btn--primary btn--sm" type="submit"><?= icon('database') ?>Apply the updates</button>
+        </form>
+        <?php endif; ?>
+
+        <?php if ($migration['mismatched'] !== []): ?>
+        <div class="alert alert--warn mt-5">
+            <strong>These fields exist but no longer match the current schema:</strong>
+            <?= e(implode(', ', array_slice($migration['mismatched'], 0, 20))) ?>.
+            Nothing was changed — altering a field that already holds data is your call, not the software's.
+        </div>
+        <?php endif; ?>
+    </div>
+</div>
+<?php endif; ?>
+
 <div class="panel">
     <div class="panel__head">
         <div>

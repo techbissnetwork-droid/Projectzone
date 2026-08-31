@@ -454,11 +454,114 @@ function tb_install(array $db, array $site, array $admin, bool $demo, bool $crea
 // =====================================================================
 // Command line
 // =====================================================================
+/**
+ * Bring an already-installed database up to the current schema.
+ *
+ * Reads config/config.php for the connection, so there is nothing to re-enter,
+ * and only ever adds: new tables, new columns, new indexes, and the permission
+ * and taxonomy rows a new feature needs. Nothing is dropped or overwritten.
+ */
+function tb_upgrade(bool $dryRun = false): int
+{
+    if (!is_file(TB_CONFIG)) {
+        fwrite(STDERR, "config/config.php is missing — there is nothing installed to upgrade.\n");
+        return 1;
+    }
+    $config = require TB_CONFIG;
+    $db     = $config['db'] ?? [];
+
+    $conn = tb_connect([
+        'host'   => (string) ($db['host'] ?? '127.0.0.1'),
+        'port'   => (int) ($db['port'] ?? 3306),
+        'name'   => (string) ($db['name'] ?? ''),
+        'user'   => (string) ($db['user'] ?? ''),
+        'pass'   => (string) ($db['pass'] ?? ''),
+        'socket' => (string) ($db['socket'] ?? ''),
+    ]);
+    if (!$conn['ok'] || !$conn['pdo'] instanceof PDO) {
+        fwrite(STDERR, "Could not reach the database: " . (string) $conn['error'] . "\n");
+        return 1;
+    }
+    $pdo = $conn['pdo'];
+
+    require_once TB_ROOT . '/includes/Core/Migrator.php';
+    $migrator = new Techbiss\Core\Migrator($pdo, TB_ROOT . '/database/schema.sql');
+
+    try {
+        $pending = $migrator->pending();
+    } catch (Throwable $e) {
+        fwrite(STDERR, "The schema could not be read: " . $e->getMessage() . "\n");
+        return 1;
+    }
+
+    $count = count($pending['tables']) + count($pending['columns'])
+           + count($pending['indexes']) + count($pending['data']);
+
+    if ($count === 0) {
+        echo "Database is already up to date. Nothing to do.\n";
+        if ($pending['mismatched'] !== []) {
+            echo "\nWorth a look — these columns exist but no longer match schema.sql:\n";
+            foreach ($pending['mismatched'] as $m) {
+                echo "  · $m\n";
+            }
+            echo "Nothing was changed: altering a populated column is your call, not this script's.\n";
+        }
+        return 0;
+    }
+
+    echo "Pending changes\n" . str_repeat('=', 46) . "\n";
+    foreach ($pending['tables'] as $t) {
+        echo "  + table   " . $t['name'] . "\n";
+    }
+    foreach ($pending['columns'] as $c) {
+        echo "  + column  " . $c['table'] . '.' . $c['column'] . "\n";
+    }
+    foreach ($pending['indexes'] as $i) {
+        echo "  + index   " . $i['name'] . ' on ' . $i['table'] . "\n";
+    }
+    foreach ($pending['data'] as $d) {
+        echo "  · " . $d['label'] . "\n";
+    }
+    echo "\n";
+
+    if ($dryRun) {
+        echo "Dry run: nothing was changed. Run again without --dry-run to apply.\n";
+        return 0;
+    }
+
+    try {
+        $log = $migrator->apply();
+    } catch (Throwable $e) {
+        fwrite(STDERR, "The upgrade stopped: " . $e->getMessage() . "\n"
+            . "Nothing after that point was applied. Fix the cause and run again — "
+            . "the steps that did succeed will simply be skipped.\n");
+        return 1;
+    }
+
+    foreach ($log as $line) {
+        echo "  ✓ $line\n";
+    }
+
+    tb_clear_cache();
+    echo "  ✓ Cleared the cache\n";
+
+    if ($pending['mismatched'] !== []) {
+        echo "\nWorth a look — these columns exist but no longer match schema.sql:\n";
+        foreach ($pending['mismatched'] as $m) {
+            echo "  · $m\n";
+        }
+        echo "Nothing was changed: altering a populated column is your call, not this script's.\n";
+    }
+
+    echo "\nUpgrade complete.\n";
+    return 0;
+}
+
 if ($cli) {
     $args = getopt('', [
         'db-host::', 'db-port::', 'db-name::', 'db-user::', 'db-pass::', 'db-socket::',
         'name::', 'email::', 'password::', 'site-name::', 'site-url::',
-        'demo', 'create-db', 'force', 'check',
+        'demo', 'create-db', 'force', 'check', 'upgrade', 'dry-run',
     ]);
 
     $req = tb_requirements();
@@ -482,8 +585,17 @@ if ($cli) {
         fwrite(STDERR, "Requirements are not met. Fix the items marked ✗ and run again.\n");
         exit(1);
     }
+    // Upgrading an existing install: add whatever the current schema has and
+    // this database does not. Purely additive, so it never needs credentials
+    // beyond the ones already in config/config.php.
+    if (isset($args['upgrade'])) {
+        exit(tb_upgrade(isset($args['dry-run'])));
+    }
+
     if (tb_already_installed() && !isset($args['force'])) {
-        fwrite(STDERR, "TECHBISS is already installed. Pass --force to reload the schema (this DESTROYS existing data).\n");
+        fwrite(STDERR, "TECHBISS is already installed.\n"
+            . "  To bring its database up to date, run:  php install.php --upgrade\n"
+            . "  To wipe it and start over, pass --force (this DESTROYS existing data).\n");
         exit(1);
     }
 
@@ -504,8 +616,10 @@ if ($cli) {
            . "    --name=\"Your Name\" --email=you@example.com --password='a-strong-password' \\\n"
            . "    [--db-host=127.0.0.1] [--db-port=3306] [--db-socket=/path/mysqld.sock] \\\n"
            . "    [--site-name=TECHBISS] [--site-url=https://example.com] [--create-db] [--demo]\n\n"
-           . "  --check   report requirements only\n"
-           . "  --force   reload the schema over an existing installation\n";
+           . "  --check     report requirements only\n"
+           . "  --upgrade   bring an existing install's database up to date (additive, safe)\n"
+           . "  --dry-run   with --upgrade, list what would change and stop\n"
+           . "  --force     reload the schema over an existing installation (DESTRUCTIVE)\n";
         exit($email === '' && $pass === '' ? 0 : 1);
     }
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {

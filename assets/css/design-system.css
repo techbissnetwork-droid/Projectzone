@@ -1212,3 +1212,8 @@ a.pill:hover, button.pill:hover { border-color: var(--border-strong); color: var
 @media (max-width: 900px) {
   .hide-md { display: none !important; }
 }
+
+/* A bare list — used where the bullets would only add noise. */
+.plain-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.3rem; }
+.plain-list li::before { content: "·"; margin-right: 0.5rem; opacity: 0.55; }
+

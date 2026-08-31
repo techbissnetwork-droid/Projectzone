@@ -45,6 +45,7 @@ final class SystemController extends BaseAdminController
         $this->view->render('system/tools', [
             'title'     => 'System & maintenance',
             'security'  => \Techbiss\Core\Cache::get('security_audit'),
+            'migration' => $this->migrationStatus(),
             'tables'    => $tables,
             'php'       => PHP_VERSION,
             'server'    => $db->value('SELECT VERSION()', [], 'unknown'),
@@ -217,6 +218,84 @@ final class SystemController extends BaseAdminController
         \Techbiss\Core\Cache::put('security_audit', $result, 86400);
         ActivityLog::record('check', 'system', null, 'Ran the security check');
         $this->ok('Security check complete.', '/admin/system');
+    }
+
+    /**
+     * What the database is missing compared to the current schema.
+     *
+     * Read-only, and cheap enough to run on every page load: it is a handful of
+     * information_schema queries against a file already on disk.
+     *
+     * @return array{pending:int,items:array<int,string>,mismatched:array<int,string>,error:string}
+     */
+    private function migrationStatus(): array
+    {
+        try {
+            $migrator = new \Techbiss\Core\Migrator(
+                Database::instance()->pdo(),
+                App::root() . '/database/schema.sql'
+            );
+            $p = $migrator->pending();
+        } catch (\Throwable $e) {
+            return ['pending' => 0, 'items' => [], 'mismatched' => [], 'error' => $e->getMessage()];
+        }
+
+        $items = [];
+        foreach ($p['tables'] as $t) {
+            $items[] = 'New table: ' . $t['name'];
+        }
+        foreach ($p['columns'] as $c) {
+            $items[] = 'New field: ' . $c['table'] . '.' . $c['column'];
+        }
+        foreach ($p['indexes'] as $i) {
+            $items[] = 'New index: ' . $i['name'] . ' on ' . $i['table'];
+        }
+        foreach ($p['data'] as $d) {
+            $items[] = $d['label'];
+        }
+
+        return [
+            'pending'    => count($items),
+            'items'      => $items,
+            'mismatched' => $p['mismatched'],
+            'error'      => '',
+        ];
+    }
+
+    /**
+     * Apply the pending database changes.
+     *
+     * Additive only — new tables, fields, indexes and the permission rows a new
+     * feature needs. Nothing existing is dropped, re-typed or overwritten, so
+     * this cannot lose content.
+     */
+    public function migrate(Request $request): never
+    {
+        $this->authorize('settings.manage');
+        $this->verify($request);
+
+        try {
+            $migrator = new \Techbiss\Core\Migrator(
+                Database::instance()->pdo(),
+                App::root() . '/database/schema.sql'
+            );
+            $log = $migrator->apply();
+        } catch (\Throwable $e) {
+            ActivityLog::record('migrate', 'system', null, 'Database update failed: ' . $e->getMessage());
+            flash('error', 'The update stopped: ' . $e->getMessage()
+                . ' Nothing after that point was applied — fix the cause and run it again.');
+            redirect('/admin/system');
+        }
+
+        \Techbiss\Core\Cache::flush();
+
+        if ($log === []) {
+            flash('success', 'The database was already up to date.');
+            redirect('/admin/system');
+        }
+
+        ActivityLog::record('migrate', 'system', null, 'Applied ' . count($log) . ' database updates');
+        $this->ok(count($log) . ' database ' . (count($log) === 1 ? 'update' : 'updates') . ' applied.', '/admin/system');
     }
 
     public function clearCache(Request $request): never
