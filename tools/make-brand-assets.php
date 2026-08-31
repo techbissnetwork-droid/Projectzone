@@ -440,8 +440,8 @@ echo "\nSocial\n";
 makeOgImage(
     'og-image.png',
     'Your Digital Business Starts Here.',
-    'From offline business to premium digital brand — one partner, everything digital.',
-    ['Domain', 'Hosting', 'Website', 'Business Email', 'Apps', 'Branding', 'SEO']
+    'Offline business to online — and the custom app you have in mind.',
+    ['Website', 'Mobile Apps', 'Domain', 'Hosting', 'Business Email', 'Branding', 'SEO']
 );
 
 echo "\nDone. Assets written to assets/images/brand/\n";

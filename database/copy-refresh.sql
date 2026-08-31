@@ -55,6 +55,39 @@ UPDATE `settings` SET `value` = 'Take your business online, properly.'
 UPDATE `settings` SET `value` = 'One partner for everything your business needs online: domain, hosting, website, apps, email, branding, SEO and support.'
   WHERE `key_name` = 'footer_text' AND `value` = 'TECHBISS is a complete digital transformation partner. We take businesses from offline to a premium, trusted digital presence — domain, hosting, website, apps, email, branding, SEO and ongoing support.';
 
+
+-- ---------------------------------------------------------------------
+-- Positioning: the site now leads with both promises — taking an offline
+-- business online, and building the app you have in mind.
+-- ---------------------------------------------------------------------
+
+UPDATE `page_sections` SET `eyebrow` = 'One partner. Websites and apps.'
+  WHERE `section_key` = 'hero' AND `eyebrow` = 'One partner. Everything digital.';
+
+UPDATE `page_sections` SET `subheading` = 'We take offline businesses online — domain, website, email, branding, SEO — and build the custom app you have in mind.'
+  WHERE `section_key` = 'hero' AND `subheading` = 'Everything your business needs online — domain, website, apps, email, branding and SEO — from one partner.';
+
+UPDATE `page_sections` SET `subheading` = 'Ten services — your domain and website, custom web and mobile apps, and the work that keeps them running.'
+  WHERE `section_key` = 'services' AND `subheading` = 'Ten services, from infrastructure to the work that keeps it running.';
+
+UPDATE `settings` SET `value` = 'Offline business to online, plus the app you have in mind.'
+  WHERE `key_name` = 'brand_promise' AND `value` = 'Take your business online, properly.';
+
+UPDATE `services` SET `tagline` = 'The app you have in mind, built for Android and iOS.'
+  WHERE `slug` = 'mobile-applications' AND `tagline` = 'Professional Android and iOS applications.';
+
+UPDATE `services` SET `short_description` = 'The app you have in mind — for your customers, or for your team in the field.'
+  WHERE `slug` = 'mobile-applications' AND `short_description` = 'Native-quality mobile apps for customers or for the team in the field.';
+
+UPDATE `services` SET `description` = '<p>Bring us the idea. We tell you what it takes to build, what it will do on day one, and what can wait for later. Then we build it for Android and iOS, ship it to both stores, and handle the releases and updates after that.</p><p>Apps we build most: ordering and booking, loyalty, field data capture, and internal tools for a team that works away from a desk.</p>'
+  WHERE `slug` = 'mobile-applications' AND `description` = '<p>We build mobile apps when a phone is genuinely the right place for the job — field data capture, loyalty, ordering, bookings. Shipped to both stores, with the release and update process handled.</p>';
+
+UPDATE `settings` SET `value` = 'We take offline businesses online and build the app you have in mind. Websites, mobile apps, hosting, business email, branding and SEO from one partner.'
+  WHERE `key_name` = 'seo_default_description' AND `value` = 'TECHBISS turns offline businesses into premium digital brands. Domain, hosting, websites, apps, business email, branding, SEO and ongoing support from one partner.';
+
+-- Show mobile apps on the homepage, next to the website service.
+UPDATE `services` SET `is_featured` = 1, `sort_order` = 3 WHERE `slug` = 'mobile-applications' AND `is_featured` = 0;
+UPDATE `services` SET `sort_order` = 4 WHERE `slug` = 'web-applications' AND `sort_order` = 3;
 -- The cache holds rendered settings and navigation, so clear it afterwards:
 --     rm -f storage/cache/*.cache
 -- or use Admin → System → Tools → Clear cache.
