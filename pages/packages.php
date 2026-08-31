@@ -1,7 +1,9 @@
 <?php
 /** @var array $packages @var array $addons @var array $compareRows @var array $faqs */
-$showSave = setting_bool('show_prepaid_savings', true);
-// Only advertise the prepaid model when at least one package genuinely has one.
+$showSave  = setting_bool('show_prepaid_savings', true);
+$showPrice = setting_bool('public_pricing', false);
+// Only advertise the prepaid model when prices are published at all, and at
+// least one package genuinely has one.
 $anyPrepaid = false;
 $bestSaving = 0.0;
 foreach ($packages as $p) {
@@ -14,13 +16,21 @@ $example = null;
 foreach ($packages as $p) {
     if ($p['pricing']['has_discount']) { $example = $p; break; }
 }
+if (!$showPrice) {
+    $anyPrepaid = false;
+    $example    = null;
+}
 ?>
 <?= $view->partial('partials/page-head', [
     'eyebrow' => 'Packages',
-    'heading' => $anyPrepaid ? 'Pay Upfront. Save More. Build Better.' : 'Complete digital setups, clearly priced.',
-    'lead'    => $anyPrepaid
-        ? 'Complete setups with published prices. Where a prepaid discount applies, you see the exact saving.'
-        : 'Complete setups with published prices, and everything included listed before you commit.',
+    'heading' => $showPrice
+        ? ($anyPrepaid ? 'Pay upfront. Save more. Build better.' : 'Complete digital setups, clearly priced.')
+        : 'Pick what you need. We price it with you.',
+    'lead'    => $showPrice
+        ? ($anyPrepaid
+            ? 'Complete setups with published prices. Where a prepaid discount applies, you see the exact saving.'
+            : 'Complete setups with everything included listed before you commit.')
+        : 'Start from a package, tick what you actually want, add anything missing, and send it over. We reply with a figure.',
     'center'  => true,
 ]) ?>
 
@@ -62,11 +72,13 @@ foreach ($packages as $p) {
                 <a class="btn btn--primary mt-4" href="<?= e(url('/quote')) ?>">Request a quote</a>
             </div>
         <?php else: ?>
-            <div class="package-grid" data-reveal-stagger>
+            <div class="slider" data-slider>
+            <div class="slider__track slider__track--packages" data-reveal-stagger>
                 <?php foreach ($packages as $package): ?>
-                    <?= $view->partial('partials/package-card', ['package' => $package, 'compact' => false]) ?>
+                    <?= $view->partial('partials/package-card', ['package' => $package, 'compact' => true]) ?>
                 <?php endforeach; ?>
             </div>
+        </div>
         <?php endif; ?>
     </div>
 </section>
@@ -95,6 +107,7 @@ foreach ($packages as $p) {
                     </tr>
                 </thead>
                 <tbody>
+                    <?php if ($showPrice): ?>
                     <tr>
                         <th scope="row" style="color:var(--text)">Price</th>
                         <?php foreach ($packages as $p): ?>
@@ -110,6 +123,7 @@ foreach ($packages as $p) {
                         </td>
                         <?php endforeach; ?>
                     </tr>
+                    <?php endif; ?>
                     <?php foreach ($compareRows as $rowTitle): ?>
                     <tr>
                         <th scope="row"><?= e($rowTitle) ?></th>
@@ -147,15 +161,22 @@ foreach ($packages as $p) {
         <div class="section-head" data-reveal>
             <p class="eyebrow">Add-ons</p>
             <h2 class="mt-4">Extend any package.</h2>
-            <p class="lead">Add these at checkout, or later. Each is priced individually so you always know what a change costs.</p>
+            <p class="lead">
+                <?= $showPrice
+                    ? 'Add these at checkout, or later. Each is priced individually so you always know what a change costs.'
+                    : 'Tick any of these when you send your request, or add them later.' ?>
+            </p>
         </div>
 
-        <div class="grid grid-3" data-reveal-stagger>
+        <div class="slider" data-slider>
+            <div class="slider__track slider__track--cards" data-reveal-stagger>
             <?php foreach ($addons as $i => $addon): ?>
             <div class="card card--interactive" style="--i:<?= $i ?>" data-reveal>
                 <div class="row row--between" style="align-items:flex-start">
                     <h3 class="card__title" style="font-size:var(--fs-sm)"><?= e($addon['name']) ?></h3>
+                    <?php if ($showPrice): ?>
                     <span class="badge badge--accent nowrap"><?= e(money($addon['price'])) ?></span>
+                    <?php endif; ?>
                 </div>
                 <p class="card__text"><?= e($addon['description']) ?></p>
                 <div class="card__footer">
@@ -163,6 +184,7 @@ foreach ($packages as $p) {
                 </div>
             </div>
             <?php endforeach; ?>
+        </div>
         </div>
     </div>
 </section>

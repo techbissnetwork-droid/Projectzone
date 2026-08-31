@@ -4,6 +4,7 @@ $p        = $package['pricing'];
 $compact  = $compact ?? false;
 $features = $package['features'] ?? [];
 $showSave = setting_bool('show_prepaid_savings', true);
+$showPrice = setting_bool('public_pricing', false);
 $limit    = $compact ? 6 : count($features);
 ?>
 <article class="package-card<?= (int) $package['is_featured'] === 1 ? ' package-card--featured' : '' ?>"
@@ -23,7 +24,12 @@ $limit    = $compact ? 6 : count($features);
     </div>
 
     <div class="price">
-        <?php if ($p['is_custom']): ?>
+        <?php if (!$showPrice): ?>
+            <div class="price__custom">Priced with you</div>
+            <p class="price__note">
+                <?= !empty($package['best_for']) ? e($package['best_for']) : 'Tell us what you need and we agree the figure directly.' ?>
+            </p>
+        <?php elseif ($p['is_custom']): ?>
             <div class="price__custom">Custom quote</div>
             <p class="price__note">Scoped and priced from your requirements.</p>
         <?php else: ?>
@@ -63,12 +69,12 @@ $limit    = $compact ? 6 : count($features);
     <?php endif; ?>
 
     <div class="package-card__cta stack stack-2">
-        <?php if ($p['is_custom'] || !setting_bool('checkout_enabled', true)): ?>
+        <?php if (!setting_bool('checkout_enabled', true)): ?>
             <a class="btn <?= (int) $package['is_featured'] === 1 ? 'btn--primary' : 'btn--ghost' ?> btn--block"
                href="<?= e(url('/quote?package=' . $package['slug'])) ?>"><?= e($package['cta_label'] ?: 'Request a Quote') ?></a>
         <?php else: ?>
             <a class="btn <?= (int) $package['is_featured'] === 1 ? 'btn--primary' : 'btn--ghost' ?> btn--block"
-               href="<?= e(url('/checkout/' . $package['slug'])) ?>"><?= e($package['cta_label'] ?: 'Get Started') ?></a>
+               href="<?= e(url('/checkout/' . $package['slug'])) ?>"><?= e($package['cta_label'] ?: 'Choose what you need') ?></a>
         <?php endif; ?>
         <a class="btn btn--quiet btn--block btn--sm" href="<?= e(url('/packages/' . $package['slug'])) ?>">
             See what's included

@@ -175,11 +175,13 @@ $blocks = array_filter([
             <h2>Related projects</h2>
             <a class="link hide-sm" href="<?= e(url('/portfolio')) ?>">All work<?= icon('arrow-right') ?></a>
         </div>
-        <div class="work-grid" data-reveal-stagger>
+        <div class="slider" data-slider>
+            <div class="slider__track slider__track--work" data-reveal-stagger>
             <?php foreach ($related as $i => $rel): ?>
                 <?= $view->partial('partials/work-card', ['project' => $rel, 'i' => $i]) ?>
             <?php endforeach; ?>
         </div>
+    </div>
     </div>
 </section>
 <?php endif; ?>

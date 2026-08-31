@@ -4,6 +4,7 @@ $p        = $package['pricing'];
 $features = $package['features'] ?? [];
 $addons   = $package['addons'] ?? [];
 $showSave = setting_bool('show_prepaid_savings', true);
+$showPrice = setting_bool('public_pricing', false);
 $others   = array_values(array_filter($packages, static fn ($x) => (int) $x['id'] !== (int) $package['id']));
 ?>
 <?= $view->partial('partials/page-head', [
@@ -48,7 +49,7 @@ $others   = array_values(array_filter($packages, static fn ($x) => (int) $x['id'
                     <div class="card" style="padding:1rem 1.15rem">
                         <div class="row row--between" style="align-items:flex-start">
                             <span style="font-size:var(--fs-sm);font-weight:550"><?= e($addon['name']) ?></span>
-                            <span class="badge nowrap"><?= e(money($addon['price'])) ?></span>
+                            <?php if ($showPrice): ?><span class="badge nowrap"><?= e(money($addon['price'])) ?></span><?php endif; ?>
                         </div>
                         <p class="card__text mt-2" style="font-size:var(--fs-xs)"><?= e($addon['description']) ?></p>
                     </div>
@@ -79,7 +80,10 @@ $others   = array_values(array_filter($packages, static fn ($x) => (int) $x['id'
                     <?php endif; ?>
 
                     <div class="price" style="padding-top:0">
-                        <?php if ($p['is_custom']): ?>
+                        <?php if (!$showPrice): ?>
+                            <div class="price__custom">Priced with you</div>
+                            <p class="price__note">Pick what you need below and we come back with a figure — usually the same day.</p>
+                        <?php elseif ($p['is_custom']): ?>
                             <div class="price__custom">Custom quote</div>
                             <p class="price__note">Priced from your requirements after a short scoping conversation.</p>
                         <?php else: ?>
@@ -102,13 +106,13 @@ $others   = array_values(array_filter($packages, static fn ($x) => (int) $x['id'
                     <?php endif; ?>
 
                     <div class="card__footer stack stack-2">
-                        <?php if ($p['is_custom'] || !setting_bool('checkout_enabled', true)): ?>
+                        <?php if (!setting_bool('checkout_enabled', true)): ?>
                         <a class="btn btn--primary btn--lg btn--block btn--arrow" href="<?= e(url('/quote?package=' . $package['slug'])) ?>">
                             <?= e($package['cta_label'] ?: 'Request a Quote') ?><?= icon('arrow-right') ?>
                         </a>
                         <?php else: ?>
                         <a class="btn btn--primary btn--lg btn--block btn--arrow" href="<?= e(url('/checkout/' . $package['slug'])) ?>" data-magnetic="0.2">
-                            <?= e($package['cta_label'] ?: 'Get Started') ?><?= icon('arrow-right') ?>
+                            <?= e($package['cta_label'] ?: 'Choose what you need') ?><?= icon('arrow-right') ?>
                         </a>
                         <?php endif; ?>
                         <a class="btn btn--ghost btn--block" href="<?= e(url('/contact')) ?>">Ask a question first</a>
@@ -125,9 +129,13 @@ $others   = array_values(array_filter($packages, static fn ($x) => (int) $x['id'
                         <a class="row row--between" href="<?= e(url('/packages/' . $other['slug'])) ?>"
                            style="padding:.6rem .75rem;border-radius:var(--r-sm);border:1px solid var(--border)">
                             <span style="font-size:var(--fs-sm);font-weight:500"><?= e($other['name']) ?></span>
+                            <?php if ($showPrice): ?>
                             <span class="hint tabular">
                                 <?= $other['pricing']['is_custom'] ? 'On request' : e(money($other['pricing']['payable'])) ?>
                             </span>
+                            <?php else: ?>
+                            <span class="hint"><?= icon('chevron-right') ?></span>
+                            <?php endif; ?>
                         </a>
                         <?php endforeach; ?>
                     </div>

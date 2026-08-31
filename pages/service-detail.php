@@ -61,7 +61,7 @@ $image        = media_url($service['image']);
                 </div>
                 <?php endif; ?>
 
-                <?php if ($service['starting_price'] !== null && (float) $service['starting_price'] > 0): ?>
+                <?php if (setting_bool('public_pricing', false) && $service['starting_price'] !== null && (float) $service['starting_price'] > 0): ?>
                 <div class="card">
                     <div class="hint">Starting from</div>
                     <div class="price__amount mt-2"><?= e(money($service['starting_price'])) ?></div>
@@ -94,11 +94,13 @@ $image        = media_url($service['image']);
             <h2>Related work</h2>
             <a class="link hide-sm" href="<?= e(url('/portfolio')) ?>">All projects<?= icon('arrow-right') ?></a>
         </div>
-        <div class="work-grid" data-reveal-stagger>
+        <div class="slider" data-slider>
+            <div class="slider__track slider__track--work" data-reveal-stagger>
             <?php foreach ($projects as $i => $project): ?>
                 <?= $view->partial('partials/work-card', ['project' => $project, 'i' => $i]) ?>
             <?php endforeach; ?>
         </div>
+    </div>
     </div>
 </section>
 <?php endif; ?>

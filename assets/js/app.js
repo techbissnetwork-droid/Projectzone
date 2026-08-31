@@ -781,6 +781,153 @@
     initFlash();
     if (cfg.cursor !== false) initCursor();
     initMagnetic();
+    initSliders();
+  }
+
+  /* ---------------------------------------------------------------------
+     Card sliders
+
+     Progressive enhancement over a plain grid: the scrolling and snapping are
+     CSS, so a swipe works with no JS at all. This only adds the arrows and
+     dots, and only while the track is actually scrollable — above the
+     breakpoint the CSS turns the track back into a grid and the controls hide
+     themselves.
+     ------------------------------------------------------------------ */
+  function initSliders() {
+    var sliders = $$('[data-slider]');
+    if (!sliders.length) return;
+
+    sliders.forEach(function (slider) {
+      var track = slider.querySelector('.slider__track');
+      if (!track) return;
+
+      var slides = Array.prototype.filter.call(track.children, function (el) {
+        return el.nodeType === 1;
+      });
+      if (slides.length < 2) return;
+
+      var controls = document.createElement('div');
+      controls.className = 'slider__controls';
+
+      var prev = document.createElement('button');
+      prev.type = 'button';
+      prev.className = 'slider__btn';
+      prev.setAttribute('aria-label', 'Previous');
+      prev.innerHTML = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>';
+
+      var next = prev.cloneNode(true);
+      next.setAttribute('aria-label', 'Next');
+      next.innerHTML = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>';
+
+      var dots = document.createElement('div');
+      dots.className = 'slider__dots';
+      dots.setAttribute('role', 'tablist');
+      dots.setAttribute('aria-label', 'Choose a card');
+
+      var dotEls = slides.map(function (slide, i) {
+        var dot = document.createElement('button');
+        dot.type = 'button';
+        dot.className = 'slider__dot';
+        dot.setAttribute('role', 'tab');
+        dot.setAttribute('aria-label', 'Card ' + (i + 1) + ' of ' + slides.length);
+        on(dot, 'click', function () {
+          track.scrollTo({ left: slide.offsetLeft - track.offsetLeft, behavior: 'smooth' });
+        });
+        dots.appendChild(dot);
+        return dot;
+      });
+
+      controls.appendChild(prev);
+      controls.appendChild(dots);
+      controls.appendChild(next);
+      slider.appendChild(controls);
+
+      function step(dir) {
+        var by = slides[0].getBoundingClientRect().width + 16;
+        track.scrollBy({ left: dir * by, behavior: 'smooth' });
+      }
+      on(prev, 'click', function () { step(-1); });
+      on(next, 'click', function () { step(1); });
+
+      var sync = throttleFrame(function () {
+        var max = track.scrollWidth - track.clientWidth;
+        prev.disabled = track.scrollLeft <= 2;
+        next.disabled = track.scrollLeft >= max - 2;
+
+        // Whichever slide sits nearest the track's left edge is the current one.
+        var best = 0;
+        var bestGap = Infinity;
+        slides.forEach(function (slide, i) {
+          var gap = Math.abs(slide.offsetLeft - track.offsetLeft - track.scrollLeft);
+          if (gap < bestGap) { bestGap = gap; best = i; }
+        });
+        dotEls.forEach(function (dot, i) {
+          dot.classList.toggle('is-active', i === best);
+          dot.setAttribute('aria-selected', i === best ? 'true' : 'false');
+        });
+      });
+
+      on(track, 'scroll', sync, { passive: true });
+      on(window, 'resize', sync);
+      sync();
+
+      /* Auto-advance ------------------------------------------------
+         Only where the track actually scrolls, which is the same
+         condition under which the controls are visible. It stops for
+         anyone who has asked for reduced motion, pauses while the tab is
+         hidden or a pointer is over the row, and stops for good the
+         moment someone takes control themselves — a row that keeps
+         moving under a finger is worse than one that never moved. */
+      var DELAY = 5000;
+      var timer = null;
+      var stopped = false;
+
+      function scrollable() {
+        return track.scrollWidth > track.clientWidth + 2;
+      }
+
+      function advance() {
+        if (stopped || !scrollable() || document.hidden) return;
+        var max = track.scrollWidth - track.clientWidth;
+        if (track.scrollLeft >= max - 2) {
+          track.scrollTo({ left: 0, behavior: 'smooth' });
+        } else {
+          step(1);
+        }
+      }
+
+      function play() {
+        if (stopped || timer || reduceMotion.matches || !scrollable()) return;
+        timer = window.setInterval(advance, DELAY);
+      }
+      function pause() {
+        if (timer) { window.clearInterval(timer); timer = null; }
+      }
+      function stopForGood() {
+        stopped = true;
+        pause();
+      }
+
+      on(slider, 'pointerenter', pause);
+      on(slider, 'pointerleave', play);
+      on(slider, 'focusin', pause);
+      on(slider, 'focusout', play);
+      on(document, 'visibilitychange', function () {
+        if (document.hidden) { pause(); } else { play(); }
+      });
+
+      // Any deliberate move — a swipe, an arrow, a dot — hands control over.
+      on(track, 'pointerdown', stopForGood);
+      on(track, 'wheel', stopForGood, { passive: true });
+      on(prev, 'click', stopForGood);
+      on(next, 'click', stopForGood);
+      dotEls.forEach(function (dot) { on(dot, 'click', stopForGood); });
+      on(reduceMotion, 'change', function () {
+        if (reduceMotion.matches) { pause(); } else { play(); }
+      });
+
+      play();
+    });
   }
 
   if (document.readyState === 'loading') {

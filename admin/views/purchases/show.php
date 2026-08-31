@@ -36,9 +36,59 @@ $val = static fn (string $k, $d = '') => old($k, $row[$k] ?? $d);
             </div>
         </div>
 
+        <?php
+        $wanted  = array_values(array_filter(array_map('trim', explode("\n", (string) ($row['selected_features'] ?? '')))));
+        $channel = (string) ($row['preferred_contact'] ?? 'whatsapp');
+        $phone   = preg_replace('/[^0-9]/', '', (string) $row['customer_phone']);
+        $waLink  = ($phone !== '' && strlen($phone) >= 8)
+            ? 'https://wa.me/' . $phone . '?text=' . rawurlencode('Hi ' . $row['customer_name'] . ', about your request ' . $row['reference'] . ' for the ' . $row['package_name'] . ' package:')
+            : '';
+        ?>
+        <div class="panel">
+            <div class="panel__head">
+                <div>
+                    <span class="panel__title">Reply to them</span>
+                    <div class="panel__sub">They asked to be reached on <strong><?= e(ucfirst($channel)) ?></strong>.</div>
+                </div>
+            </div>
+            <div class="panel__body">
+                <div class="row row--tight">
+                    <?php if ($waLink !== ''): ?>
+                    <a class="btn btn--primary btn--sm" target="_blank" rel="noopener noreferrer" href="<?= e($waLink) ?>">
+                        <?= icon('whatsapp') ?>WhatsApp
+                    </a>
+                    <?php endif; ?>
+                    <a class="btn btn--ghost btn--sm" href="mailto:<?= e($row['customer_email']) ?>?subject=<?= e(rawurlencode('Your request ' . $row['reference'] . ' — ' . $row['package_name'])) ?>">
+                        <?= icon('mail') ?>Email
+                    </a>
+                </div>
+                <?php if ($channel === 'whatsapp' && $waLink === ''): ?>
+                <p class="hint mt-4">They chose WhatsApp but left no usable number, so email them instead.</p>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <?php if ($wanted !== []): ?>
+        <div class="panel">
+            <div class="panel__head">
+                <div>
+                    <span class="panel__title">What they picked</span>
+                    <div class="panel__sub">Ticked from the package list. Anything they unticked is not here.</div>
+                </div>
+            </div>
+            <div class="panel__body">
+                <ul class="plain-list">
+                    <?php foreach ($wanted as $w): ?>
+                    <li><?= e($w) ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        </div>
+        <?php endif; ?>
+
         <?php if (!empty($row['business_details']) || !empty($row['requirements'])): ?>
         <div class="panel">
-            <div class="panel__head"><span class="panel__title">What the customer told us</span></div>
+            <div class="panel__head"><span class="panel__title">In their own words</span></div>
             <div class="panel__body">
                 <div class="kv-list">
                     <?php if (!empty($row['business_details'])): ?>
@@ -46,7 +96,7 @@ $val = static fn (string $k, $d = '') => old($k, $row[$k] ?? $d);
                         <span class="kv__value" style="white-space:pre-wrap;font-weight:400"><?= e($row['business_details']) ?></span></div>
                     <?php endif; ?>
                     <?php if (!empty($row['requirements'])): ?>
-                    <div class="kv"><span class="kv__label">Requirements</span>
+                    <div class="kv"><span class="kv__label">Anything not on the list</span>
                         <span class="kv__value" style="white-space:pre-wrap;font-weight:400"><?= e($row['requirements']) ?></span></div>
                     <?php endif; ?>
                 </div>

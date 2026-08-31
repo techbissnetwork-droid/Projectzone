@@ -78,11 +78,13 @@ $image      = media_url($industry['image']);
             <h2><?= e($industry['name']) ?> work</h2>
             <a class="link hide-sm" href="<?= e(url('/portfolio?industry=' . $industry['slug'])) ?>">All <?= e(strtolower((string) $industry['name'])) ?> projects<?= icon('arrow-right') ?></a>
         </div>
-        <div class="work-grid" data-reveal-stagger>
+        <div class="slider" data-slider>
+            <div class="slider__track slider__track--work" data-reveal-stagger>
             <?php foreach ($projects as $i => $project): ?>
                 <?= $view->partial('partials/work-card', ['project' => $project, 'i' => $i]) ?>
             <?php endforeach; ?>
         </div>
+    </div>
     </div>
 </section>
 <?php endif; ?>
@@ -94,11 +96,13 @@ $image      = media_url($industry['image']);
             <p class="eyebrow eyebrow--plain">Where to start</p>
             <h2 class="mt-4">Packages that suit <?= e(strtolower((string) $industry['name'])) ?>.</h2>
         </div>
-        <div class="package-grid" data-reveal-stagger>
+        <div class="slider" data-slider>
+            <div class="slider__track slider__track--packages" data-reveal-stagger>
             <?php foreach (array_slice($packages, 0, 3) as $package): ?>
                 <?= $view->partial('partials/package-card', ['package' => $package, 'compact' => true]) ?>
             <?php endforeach; ?>
         </div>
+    </div>
     </div>
 </section>
 <?php endif; ?>

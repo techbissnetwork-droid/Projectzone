@@ -46,7 +46,8 @@ $query = array_filter(['category' => $activeCat, 'tag' => $activeTag, 'q' => $se
                 <?php endif; ?>
             </div>
         <?php else: ?>
-            <div class="grid grid-3" data-reveal-stagger>
+            <div class="slider" data-slider>
+                <div class="slider__track slider__track--cards" data-reveal-stagger>
                 <?php foreach ($posts as $i => $post): $img = media_url($post['featured_image']); ?>
                 <article class="card card--interactive post-card" style="--i:<?= $i ?>" data-reveal>
                     <?php if ($img !== ''): ?>
@@ -74,6 +75,7 @@ $query = array_filter(['category' => $activeCat, 'tag' => $activeTag, 'q' => $se
                     </div>
                 </article>
                 <?php endforeach; ?>
+            </div>
             </div>
             <?= $view->partial('partials/pagination', ['paginator' => $paginator, 'baseUrl' => '/blog', 'query' => $query]) ?>
         <?php endif; ?>

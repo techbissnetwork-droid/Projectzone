@@ -110,6 +110,7 @@ INSERT INTO `settings` (`group_name`, `key_name`, `value`, `type`, `label`, `hin
 ('appearance','enable_cursor','1','bool','Desktop cursor enhancement','Automatically disabled on touch devices.',4,NOW()),
 ('appearance','enable_transitions','1','bool','Page transitions','',5,NOW()),
 -- Commerce
+('commerce','public_pricing','0','bool','Show prices on the website','Off by default: packages and services are priced in conversation. Turn on only if you want figures published.',0,NOW()),
 ('commerce','currency','USD','text','Currency code','',1,NOW()),
 ('commerce','currency_symbol','$','text','Currency symbol','',2,NOW()),
 ('commerce','show_prepaid_savings','1','bool','Show prepaid savings','Displays the saving on packages that have a prepaid price.',3,NOW()),

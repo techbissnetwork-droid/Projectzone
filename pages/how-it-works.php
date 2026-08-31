@@ -78,11 +78,13 @@
             <h2 class="mt-4">Choose your setup</h2>
             <p class="lead">Pick a package, or ask for a custom scope. Either way you see the full price before deciding.</p>
         </div>
-        <div class="package-grid" data-reveal-stagger>
+        <div class="slider" data-slider>
+            <div class="slider__track slider__track--packages" data-reveal-stagger>
             <?php foreach ($packages as $package): ?>
                 <?= $view->partial('partials/package-card', ['package' => $package, 'compact' => true]) ?>
             <?php endforeach; ?>
         </div>
+    </div>
     </div>
 </section>
 <?php endif; ?>

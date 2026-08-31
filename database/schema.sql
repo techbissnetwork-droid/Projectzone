@@ -541,6 +541,8 @@ CREATE TABLE IF NOT EXISTS `package_purchases` (
   `expires_at`       DATE         NULL,
   `business_details` TEXT         NULL,
   `requirements`     TEXT         NULL,
+  `selected_features` TEXT        NULL,
+  `preferred_contact` ENUM('whatsapp','email','phone') NOT NULL DEFAULT 'whatsapp',
   `admin_notes`      TEXT         NULL,
   `ip_address`       VARCHAR(45)  NOT NULL DEFAULT '',
   `created_at`       DATETIME     NOT NULL,

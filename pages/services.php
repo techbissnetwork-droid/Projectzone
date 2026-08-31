@@ -15,10 +15,12 @@
                 <a class="btn btn--primary mt-4" href="<?= e(url('/contact')) ?>">Get in touch</a>
             </div>
         <?php else: ?>
-            <div class="grid grid-3" data-reveal-stagger>
+            <div class="slider" data-slider>
+                <div class="slider__track slider__track--cards" data-reveal-stagger>
                 <?php foreach ($services as $i => $service): ?>
                     <?= $view->partial('partials/service-card', ['service' => $service, 'i' => $i]) ?>
                 <?php endforeach; ?>
+            </div>
             </div>
         <?php endif; ?>
     </div>
@@ -94,7 +96,8 @@
             <p class="eyebrow">The process</p>
             <h2 class="mt-4">However many services you take, the process is the same.</h2>
         </div>
-        <div class="grid grid-3" data-reveal-stagger>
+        <div class="slider" data-slider>
+            <div class="slider__track slider__track--cards" data-reveal-stagger>
             <?php foreach ($steps as $i => $step): ?>
             <div class="card" style="--i:<?= $i ?>" data-reveal>
                 <div class="process__num" style="font-size:1.5rem"><?= e($step['step_number']) ?></div>
@@ -102,6 +105,7 @@
                 <p class="card__text"><?= e(str_limit($step['description'], 130)) ?></p>
             </div>
             <?php endforeach; ?>
+        </div>
         </div>
     </div>
 </section>

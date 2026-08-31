@@ -121,7 +121,10 @@ foreach ($packages as $p) { if ($p['slug'] === $preselect) { $preselectId = (int
                                         <?php foreach ($packages as $package): ?>
                                         <option value="<?= (int) $package['id'] ?>"
                                                 <?= ((int) old('package_id') === (int) $package['id'] || $preselectId === (int) $package['id']) ? 'selected' : '' ?>>
-                                            <?= e($package['name']) ?><?= $package['pricing']['is_custom'] ? ' — custom quote' : ' — ' . money($package['pricing']['payable']) ?>
+                                            <?= e($package['name']) ?><?php
+                                                if (setting_bool('public_pricing', false)) {
+                                                    echo $package['pricing']['is_custom'] ? ' — custom quote' : ' — ' . e(money($package['pricing']['payable']));
+                                                } ?>
                                         </option>
                                         <?php endforeach; ?>
                                     </select>
@@ -130,14 +133,14 @@ foreach ($packages as $p) { if ($p['slug'] === $preselect) { $preselectId = (int
 
                                 <div class="field--row">
                                     <div class="field">
-                                        <label class="label" for="q-budget">Budget</label>
+                                        <label class="label" for="q-budget">Where are you on budget?</label>
                                         <select class="select" id="q-budget" name="budget_range">
                                             <option value="">Prefer not to say</option>
                                             <?php foreach ($budgets as $budget): ?>
                                             <option value="<?= e($budget) ?>" <?= old('budget_range') === $budget ? 'selected' : '' ?>><?= e($budget) ?></option>
                                             <?php endforeach; ?>
                                         </select>
-                                        <span class="hint">A range helps us propose something realistic.</span>
+                                        <span class="hint">Optional. You can name a figure in the message below if you want to.</span>
                                     </div>
                                     <div class="field">
                                         <label class="label" for="q-timeline">Timeline</label>

@@ -1079,7 +1079,7 @@ final class SiteController
             return;
         }
 
-        $methods = array_column(self::paymentMethods(), 'key');
+        $channels = array_keys(\Techbiss\Repo\ProjectOrderRepo::contactLabels());
 
         $v = Validator::make($request->all())
             ->honeypot()
@@ -1088,10 +1088,11 @@ final class SiteController
             ->email('email')
             ->phone('phone', true)
             ->in('country', self::countries(), 'Country', false)
-            ->in('payment_method', $methods, 'Payment method', $methods !== [])
+            ->in('preferred_contact', $channels, 'Reply channel', false)
             ->text('business_details', 3000, false, 'Business details')
             ->text('requirements', 3000, false, 'Requirements')
-            ->multi('addons');
+            ->multi('addons')
+            ->multi('features');
 
         if ($v->fails()) {
             $this->formFail($request, '/checkout/' . $slug, $v->firstError(), $v->errors());
@@ -1111,6 +1112,25 @@ final class SiteController
             $addonsTotal += (float) $addon['price'];
             $addonRows[]  = ['id' => (int) $addon['id'], 'name' => (string) $addon['name'], 'price' => (float) $addon['price']];
         }
+
+        // The picked list is a choice from what this package offers, so
+        // anything else posted is discarded rather than stored.
+        $offeredFeatures = [];
+        foreach ($package['features'] ?? [] as $f) {
+            if ((int) $f['is_included'] === 1) {
+                $offeredFeatures[] = (string) $f['title'];
+            }
+        }
+        $chosenFeatures = array_values(array_intersect(
+            array_map('strval', (array) $v->get('features', [])),
+            $offeredFeatures
+        ));
+        if ($chosenFeatures === [] && $request->arr('features') === []) {
+            // Nothing posted at all: the form went untouched, and every
+            // included line was ticked when it rendered.
+            $chosenFeatures = $offeredFeatures;
+        }
+        $droppedFeatures = array_values(array_diff($offeredFeatures, $chosenFeatures));
 
         $customerId = (new CustomerRepo())->upsert([
             'name'          => $v->get('name'),
@@ -1136,7 +1156,7 @@ final class SiteController
             'total_amount'     => round($pricing['payable'] + $addonsTotal, 2),
             'duration_months'  => $months,
             'billing_period'   => (string) $package['billing_period'],
-            'payment_method'   => (string) $v->get('payment_method', 'manual'),
+            'payment_method'   => 'manual',
             'payment_status'   => 'pending',
             'package_status'   => 'pending',
             'renewal_status'   => 'not_due',
@@ -1145,13 +1165,16 @@ final class SiteController
             'expires_at'       => null,
             'business_details' => $v->get('business_details', ''),
             'requirements'     => $v->get('requirements', ''),
+            'selected_features' => implode("\n", $chosenFeatures),
+            'preferred_contact' => $v->get('preferred_contact', '') ?: 'whatsapp',
             'ip_address'       => $request->ip(),
         ], $addonRows);
 
         $this->notify(
             'New package request ' . $reference,
             sprintf(
-                "Reference: %s\nPackage: %s\nCustomer: %s (%s)\nBusiness: %s\nPhone: %s\nCountry: %s\nAdd-ons: %s\nTotal: %s %s\nPayment method: %s\n\nRequirements:\n%s",
+                "Reference: %s\nPackage: %s\nCustomer: %s (%s)\nBusiness: %s\nPhone: %s\nCountry: %s\n"
+                . "Reply on: %s\nAdd-ons: %s\n\nWants:\n%s\n\nDoes not want:\n%s\n\nIn their own words:\n%s",
                 $reference,
                 $package['name'],
                 $v->get('name'),
@@ -1159,10 +1182,10 @@ final class SiteController
                 $v->get('business_name'),
                 $v->get('phone', '') ?: '—',
                 $v->get('country', '') ?: '—',
+                $v->get('preferred_contact', '') ?: 'whatsapp',
                 $addonRows === [] ? '—' : implode(', ', array_column($addonRows, 'name')),
-                $package['currency'],
-                number_format($pricing['payable'] + $addonsTotal, 2),
-                $v->get('payment_method', 'manual'),
+                $chosenFeatures === [] ? '—' : '· ' . implode("\n· ", $chosenFeatures),
+                $droppedFeatures === [] ? '—' : '· ' . implode("\n· ", $droppedFeatures),
                 $v->get('requirements', '') ?: '—'
             ),
             (string) $v->get('email')
@@ -1476,15 +1499,22 @@ final class SiteController
     }
 
     /** @return array<int,string> */
+    /**
+     * How ready someone is to spend, rather than how much.
+     *
+     * Deliberately carries no figures: we do not publish prices, and a bracket
+     * on the page is a price on the page — it anchors the conversation before
+     * anyone has told us what they actually need. Whoever wants to name a
+     * number can do it in their own words in the message field.
+     *
+     * @return array<int,string>
+     */
     public static function budgets(): array
     {
         return [
-            'Under $1,000',
-            '$1,000 – $2,500',
-            '$2,500 – $5,000',
-            '$5,000 – $10,000',
-            '$10,000 – $25,000',
-            'Over $25,000',
+            'I have a budget set',
+            'I have a rough figure in mind',
+            'I want to know what it costs first',
             'Not sure yet',
         ];
     }

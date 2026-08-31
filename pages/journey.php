@@ -123,7 +123,7 @@ $stepLabels  = ['Business', 'Needs', 'Budget', 'Timeline', 'Details', 'Contact']
                     <!-- Step 3 — Budget -->
                     <section class="wizard__panel" aria-label="Step 3 of 6: budget">
                         <div class="wizard__panel-head">
-                            <h2>What budget are you working with?</h2>
+                            <h2>Where are you on budget?</h2>
                             <p>An honest range means we propose something realistic instead of wasting your time.</p>
                         </div>
                         <div class="stack stack-2">

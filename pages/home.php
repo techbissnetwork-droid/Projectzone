@@ -192,10 +192,12 @@ $hero = $sections['hero'] ?? [];
             </div>
         </div>
 
-        <div class="grid grid-3" data-reveal-stagger>
+        <div class="slider" data-slider>
+            <div class="slider__track slider__track--cards" data-reveal-stagger>
             <?php foreach ($services as $i => $service): ?>
                 <?= $view->partial('partials/service-card', ['service' => $service, 'i' => $i]) ?>
             <?php endforeach; ?>
+        </div>
         </div>
 
         <?php if ($s('services', 'cta_label') !== ''): ?>
@@ -314,11 +316,13 @@ $hero = $sections['hero'] ?? [];
             <p class="lead"><?= e($s('packages', 'subheading')) ?></p>
         </div>
 
-        <div class="package-grid" data-reveal-stagger>
+        <div class="slider" data-slider>
+            <div class="slider__track slider__track--packages" data-reveal-stagger>
             <?php foreach ($packages as $package): ?>
                 <?= $view->partial('partials/package-card', ['package' => $package, 'compact' => true]) ?>
             <?php endforeach; ?>
         </div>
+    </div>
 
         <div class="row row--center mt-6" data-reveal>
             <a class="btn btn--ghost btn--arrow" href="<?= e(url($s('packages', 'cta_url', '/packages'))) ?>">
@@ -343,11 +347,13 @@ $hero = $sections['hero'] ?? [];
             </a>
         </div>
 
-        <div class="work-grid" data-reveal-stagger>
+        <div class="slider" data-slider>
+            <div class="slider__track slider__track--work" data-reveal-stagger>
             <?php foreach ($projects as $i => $project): ?>
                 <?= $view->partial('partials/work-card', ['project' => $project, 'i' => $i]) ?>
             <?php endforeach; ?>
         </div>
+    </div>
     </div>
 </section>
 <?php endif; ?>
@@ -362,7 +368,8 @@ $hero = $sections['hero'] ?? [];
             <p class="lead"><?= e($s('industries', 'subheading')) ?></p>
         </div>
 
-        <div class="grid grid-4" data-reveal-stagger>
+        <div class="slider" data-slider>
+            <div class="slider__track slider__track--wide" data-reveal-stagger>
             <?php foreach ($industries as $i => $industry): ?>
             <div class="industry-card" style="--i:<?= $i ?>" data-reveal>
                 <span class="icon-plate icon-plate--sm"><?= icon((string) ($industry['icon'] ?: 'building')) ?></span>
@@ -377,6 +384,7 @@ $hero = $sections['hero'] ?? [];
                 <span class="industry-card__arrow"><?= icon('arrow-right') ?></span>
             </div>
             <?php endforeach; ?>
+        </div>
         </div>
 
         <div class="row row--center mt-6" data-reveal>
@@ -397,7 +405,8 @@ $hero = $sections['hero'] ?? [];
             <h2 class="mt-4">What clients say about working with us.</h2>
         </div>
 
-        <div class="grid grid-3" data-reveal-stagger>
+        <div class="slider" data-slider>
+            <div class="slider__track slider__track--cards" data-reveal-stagger>
             <?php foreach ($testimonials as $i => $t): ?>
             <article class="card quote-card" style="--i:<?= $i ?>" data-reveal>
                 <span class="quote-card__mark"><?= icon('quote') ?></span>
@@ -425,6 +434,7 @@ $hero = $sections['hero'] ?? [];
                 </div>
             </article>
             <?php endforeach; ?>
+        </div>
         </div>
     </div>
 </section>
@@ -464,7 +474,8 @@ $hero = $sections['hero'] ?? [];
             <a class="link hide-sm" href="<?= e(url('/blog')) ?>">All articles<?= icon('arrow-right') ?></a>
         </div>
 
-        <div class="grid grid-3" data-reveal-stagger>
+        <div class="slider" data-slider>
+            <div class="slider__track slider__track--cards" data-reveal-stagger>
             <?php foreach ($posts as $i => $post): ?>
             <article class="card card--interactive post-card" style="--i:<?= $i ?>" data-reveal>
                 <?php $img = media_url($post['featured_image']); ?>
@@ -488,6 +499,7 @@ $hero = $sections['hero'] ?? [];
                 </div>
             </article>
             <?php endforeach; ?>
+        </div>
         </div>
     </div>
 </section>

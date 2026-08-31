@@ -67,11 +67,13 @@
             <h2>The work behind the words</h2>
             <a class="link hide-sm" href="<?= e(url('/portfolio')) ?>">All projects<?= icon('arrow-right') ?></a>
         </div>
-        <div class="work-grid" data-reveal-stagger>
+        <div class="slider" data-slider>
+            <div class="slider__track slider__track--work" data-reveal-stagger>
             <?php foreach ($projects as $i => $project): ?>
                 <?= $view->partial('partials/work-card', ['project' => $project, 'i' => $i]) ?>
             <?php endforeach; ?>
         </div>
+    </div>
     </div>
 </section>
 <?php endif; ?>

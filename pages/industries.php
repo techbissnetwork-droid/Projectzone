@@ -15,7 +15,8 @@
                 <a class="btn btn--primary mt-4" href="<?= e(url('/contact')) ?>">Talk to us</a>
             </div>
         <?php else: ?>
-        <div class="grid grid-3" data-reveal-stagger>
+        <div class="slider" data-slider>
+            <div class="slider__track slider__track--cards" data-reveal-stagger>
             <?php foreach ($industries as $i => $industry): ?>
             <article class="card card--interactive card--spotlight" style="--i:<?= $i ?>" data-reveal>
                 <span class="icon-plate"><?= icon((string) ($industry['icon'] ?: 'building')) ?></span>
@@ -34,6 +35,7 @@
             </article>
             <?php endforeach; ?>
         </div>
+        </div>
         <?php endif; ?>
     </div>
 </section>
@@ -46,10 +48,12 @@
             <h2 class="mt-4">What every sector needs regardless.</h2>
             <p class="lead">The foundation is the same everywhere. What changes is what gets built on top of it.</p>
         </div>
-        <div class="grid grid-3" data-reveal-stagger>
+        <div class="slider" data-slider>
+            <div class="slider__track slider__track--cards" data-reveal-stagger>
             <?php foreach ($services as $i => $service): ?>
                 <?= $view->partial('partials/service-card', ['service' => $service, 'i' => $i]) ?>
             <?php endforeach; ?>
+        </div>
         </div>
     </div>
 </section>

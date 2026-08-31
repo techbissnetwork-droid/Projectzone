@@ -367,11 +367,13 @@ $meta = array_filter([
             <span class="eyebrow">Similar</span>
             <h2>Others like this.</h2>
         </div>
-        <div class="work-grid" data-reveal-stagger>
+        <div class="slider" data-slider>
+            <div class="slider__track slider__track--work" data-reveal-stagger>
             <?php foreach ($related as $i => $item): ?>
                 <?= $view->partial('partials/project-card', ['project' => $item, 'i' => $i]) ?>
             <?php endforeach; ?>
         </div>
+    </div>
     </div>
 </section>
 <?php endif; ?>

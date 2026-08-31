@@ -3,12 +3,20 @@
 $p        = $package['pricing'];
 $showSave = setting_bool('show_prepaid_savings', true);
 $currency = setting('currency_symbol', '$');
-$oldAddons = array_map('intval', (array) old('addons', []));
+$oldAddons  = array_map('intval', (array) old('addons', []));
+$showPrice  = setting_bool('public_pricing', false);
+$features   = $package['features'] ?? [];
+$oldFeats   = old('features', null);
+// Everything the package includes starts ticked; unticking is how someone says
+// "I do not need that", which is exactly what makes the request worth pricing.
+$featChosen = static function (string $title) use ($oldFeats): bool {
+    return $oldFeats === null ? true : in_array($title, (array) $oldFeats, true);
+};
 ?>
 <?= $view->partial('partials/page-head', [
     'eyebrow' => 'Package request',
-    'heading' => 'Request the ' . $package['name'] . ' package',
-    'lead'    => 'Confirm your details and requirements. No payment is taken on this page.',
+    'heading' => 'Build your ' . $package['name'] . ' request',
+    'lead'    => 'Tick what you want, drop what you do not, add anything missing. We reply with a price.',
 ]) ?>
 
 <section class="section section--flush-top">
@@ -69,11 +77,36 @@ $oldAddons = array_map('intval', (array) old('addons', []));
                             </div>
                         </fieldset>
 
+                        <?php if ($features): ?>
+                        <fieldset style="border:0;padding:0;margin:0">
+                            <legend class="eyebrow mb-2">What do you want included?</legend>
+                            <p class="hint mb-4">
+                                Everything in the package is ticked. Untick anything you do not need — it changes what we quote.
+                            </p>
+                            <div class="option-grid">
+                                <?php foreach ($features as $f): ?>
+                                <?php if ((int) $f['is_included'] === 0) { continue; } ?>
+                                <label class="option-card">
+                                    <input type="checkbox" name="features[]" value="<?= e($f['title']) ?>"
+                                           <?= $featChosen((string) $f['title']) ? 'checked' : '' ?>>
+                                    <span class="check__box" aria-hidden="true"></span>
+                                    <span class="flex-1">
+                                        <span class="option-card__title"><?= e($f['title']) ?></span>
+                                        <?php if (!empty($f['description'])): ?>
+                                        <span class="option-card__text"><?= e($f['description']) ?></span>
+                                        <?php endif; ?>
+                                    </span>
+                                </label>
+                                <?php endforeach; ?>
+                            </div>
+                        </fieldset>
+                        <?php endif; ?>
+
                         <?php if ($addons): ?>
                         <fieldset style="border:0;padding:0;margin:0">
-                            <legend class="eyebrow mb-2">Optional add-ons</legend>
-                            <p class="hint mb-4">Prices update live. Nothing is charged until you approve an invoice.</p>
-                            <div class="stack stack-2">
+                            <legend class="eyebrow mb-2">Anything else?</legend>
+                            <p class="hint mb-4">Tick any of these to have them included in the quote.</p>
+                            <div class="option-grid">
                                 <?php foreach ($addons as $addon): ?>
                                 <label class="option-card">
                                     <input type="checkbox" name="addons[]" value="<?= (int) $addon['id'] ?>"
@@ -84,7 +117,7 @@ $oldAddons = array_map('intval', (array) old('addons', []));
                                         <span class="option-card__title"><?= e($addon['name']) ?></span>
                                         <span class="option-card__text"><?= e($addon['description']) ?></span>
                                     </span>
-                                    <span class="badge nowrap"><?= e(money($addon['price'])) ?></span>
+                                    <?php if ($showPrice): ?><span class="badge nowrap"><?= e(money($addon['price'])) ?></span><?php endif; ?>
                                 </label>
                                 <?php endforeach; ?>
                             </div>
@@ -100,45 +133,35 @@ $oldAddons = array_map('intval', (array) old('addons', []));
                                               placeholder="What does the business do, who are your customers, and where are you based?"><?= e(old('business_details')) ?></textarea>
                                 </div>
                                 <div class="field">
-                                    <label class="label" for="k-req">Specific requirements</label>
-                                    <textarea class="textarea" id="k-req" name="requirements" maxlength="3000"
-                                              placeholder="Anything the package must cover: pages you need, systems to integrate, deadlines to hit."><?= e(old('requirements')) ?></textarea>
+                                    <label class="label" for="k-req">Anything not on the list?</label>
+                                    <textarea class="textarea" id="k-req" name="requirements" rows="5" maxlength="3000"
+                                              placeholder="Features you want that are not ticked above, how the app or site should work, pages you need, systems to connect to, deadlines to hit."><?= e(old('requirements')) ?></textarea>
+                                    <span class="hint">Write it in your own words. This is what we price against.</span>
                                 </div>
                             </div>
                         </fieldset>
 
                         <fieldset style="border:0;padding:0;margin:0">
-                            <legend class="eyebrow mb-4">How would you like to pay?</legend>
-                            <?php if (!$paymentMethods): ?>
-                                <div class="notice notice--warning">
-                                    <?= icon('alert') ?>
-                                    <span>No payment methods are configured yet. Send your request and we will contact you to arrange payment directly.</span>
-                                </div>
-                            <?php else: ?>
-                                <div class="stack stack-2">
-                                    <?php foreach ($paymentMethods as $i => $method): ?>
-                                    <label class="option-card">
-                                        <input type="radio" name="payment_method" value="<?= e($method['key']) ?>"
-                                               <?= (old('payment_method') === $method['key'] || (old('payment_method') === '' && $i === 0)) ? 'checked' : '' ?> required>
-                                        <span class="check__box" aria-hidden="true" style="border-radius:50%"></span>
-                                        <span class="icon-plate icon-plate--sm"><?= icon($method['icon']) ?></span>
-                                        <span class="flex-1">
-                                            <span class="option-card__title"><?= e($method['label']) ?></span>
-                                            <span class="option-card__text"><?= e($method['description']) ?></span>
-                                        </span>
-                                    </label>
-                                    <?php endforeach; ?>
-                                </div>
-                            <?php endif; ?>
-
-                            <?php if (setting('payment_note') !== ''): ?>
-                            <div class="notice notice--accent mt-4"><?= icon('info') ?><span><?= e(setting('payment_note')) ?></span></div>
-                            <?php endif; ?>
+                            <legend class="eyebrow mb-4">How should we reply?</legend>
+                            <div class="stack stack-2">
+                                <?php foreach (\Techbiss\Repo\ProjectOrderRepo::contactLabels() as $key => $label): ?>
+                                <label class="option-card">
+                                    <input type="radio" name="preferred_contact" value="<?= e($key) ?>"
+                                           <?= old('preferred_contact', 'whatsapp') === $key ? 'checked' : '' ?>>
+                                    <span class="check__box" aria-hidden="true" style="border-radius:50%"></span>
+                                    <span class="flex-1"><span class="option-card__title"><?= e($label) ?></span></span>
+                                </label>
+                                <?php endforeach; ?>
+                            </div>
+                            <p class="hint mt-4">
+                                We send back what it costs and how long it takes. Nothing is charged here, and no payment
+                                details are asked for.
+                            </p>
                         </fieldset>
 
                         <div class="form-actions">
-                            <button class="btn btn--primary btn--lg btn--arrow" type="submit">Submit request<?= icon('arrow-right') ?></button>
-                            <span class="hint">This sends a request. Nothing is charged.</span>
+                            <button class="btn btn--primary btn--lg btn--arrow" type="submit">Send my request<?= icon('arrow-right') ?></button>
+                            <span class="hint">Nothing is charged, and no payment details are taken.</span>
                         </div>
                     </div>
                 </form>
@@ -154,6 +177,7 @@ $oldAddons = array_map('intval', (array) old('addons', []));
                         </div>
                     </div>
 
+                    <?php if ($showPrice): ?>
                     <div class="summary-line">
                         <span>Regular price</span>
                         <span class="num<?= ($p['has_discount'] && $showSave) ? ' strike text-muted' : '' ?>"><?= e(money($p['regular'])) ?></span>
@@ -184,6 +208,17 @@ $oldAddons = array_map('intval', (array) old('addons', []));
                         <?= icon('shield') ?> Indicative total. We confirm the final figure in writing before invoicing,
                         and it will not exceed this without your written approval.
                     </p>
+                    <?php else: ?>
+                    <p class="mt-2" style="font-size:var(--fs-sm)">
+                        There is no price on this page on purpose. What you tick below changes the work, and the work is
+                        what sets the figure — so we quote against your actual list rather than a number you would have
+                        to negotiate down.
+                    </p>
+                    <p class="hint mt-4">
+                        <?= icon('shield') ?> Nothing is charged here and no payment details are asked for. You get a
+                        written price and a schedule, and nothing starts until you say so.
+                    </p>
+                    <?php endif; ?>
                 </div>
 
                 <div class="card mt-4" data-reveal="right">
