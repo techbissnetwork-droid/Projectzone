@@ -191,8 +191,23 @@
      ------------------------------------------------------------------- */
   function initCounters() {
     var els = $$('[data-count]');
-    if (!els.length || !('IntersectionObserver' in window)) return;
-    if (reduceMotion.matches) return;
+    if (!els.length) return;
+
+    // The markup ships "0" so the animation has somewhere to start. Whenever we
+    // are not going to animate — reduced motion, or no IntersectionObserver —
+    // the final value has to be written immediately, or the number stays a
+    // permanent zero and the section reads as broken.
+    function settle(el) {
+      var target = parseFloat(el.getAttribute('data-count'));
+      if (isNaN(target)) return;
+      var decimals = (el.getAttribute('data-count').split('.')[1] || '').length;
+      el.textContent = target.toFixed(decimals);
+    }
+
+    if (reduceMotion.matches || !('IntersectionObserver' in window)) {
+      els.forEach(settle);
+      return;
+    }
 
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
@@ -215,6 +230,15 @@
       });
     }, { threshold: 0.4 });
     els.forEach(function (el) { io.observe(el); });
+
+    on(reduceMotion, 'change', function () {
+      if (reduceMotion.matches) {
+        els.forEach(function (el) {
+          io.unobserve(el);
+          settle(el);
+        });
+      }
+    });
   }
 
   /* -------------------------------------------------------------------

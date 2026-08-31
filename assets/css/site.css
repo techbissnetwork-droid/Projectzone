@@ -655,7 +655,9 @@ body.has-cursor-fx.cursor-hidden .cursor-ring { opacity: 0; }
 .chain::-webkit-scrollbar { height: 4px; }
 .chain__step {
   position: relative;
-  flex: 1 0 auto;
+  /* Shrink to share the row so all six steps fit the column at desktop; the
+     min-width keeps them readable and lets the row scroll once they cannot. */
+  flex: 1 1 0;
   min-width: 148px;
   scroll-snap-align: start;
   padding: 1.15rem 1.1rem;
@@ -678,6 +680,18 @@ body.has-cursor-fx.cursor-hidden .cursor-ring { opacity: 0; }
 .chain__icon .icon { width: 20px; height: 20px; }
 .chain__label { font-size: var(--fs-sm); font-weight: 550; color: var(--text); }
 .chain__text { font-size: var(--fs-xs); color: var(--text-muted); line-height: 1.5; }
+
+/* Below the widest column the seven steps cannot share one row, so they wrap
+   into a grid instead of scrolling off the edge — nothing is ever half-cut. */
+@media (max-width: 1279px) {
+  .chain {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
+    overflow-x: visible;
+    scroll-snap-type: none;
+  }
+  .chain__step:not(:last-child)::after { display: none; }
+}
 
 /* ---------------------------------------------------------------------
    8. Service / feature cards
