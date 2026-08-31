@@ -49,8 +49,10 @@ site address, writes the configuration and builds the database for you.
 https://yourdomain.com/
 ```
 
-Any request made before setup is complete redirects to `/install`. You can
-also go there directly.
+Visiting anywhere except `/install.php` before setup is complete shows a
+plain "not open yet" page — a stranger who finds the domain before you have
+finished setup never sees a database-and-password form. Go to `/install.php`
+yourself to run the wizard.
 
 ### 2. Work through the wizard
 

@@ -299,6 +299,46 @@ final class App
         return ($dir === '' || $dir === '.') ? '' : $dir;
     }
 
+    /**
+     * Shown at every path but /install(.php) while the site has no config yet.
+     *
+     * Deliberately says nothing about setup, PHP, or a database — a stranger
+     * who finds the domain before the owner has run the wizard sees a plain
+     * "not open yet" page, the same way any business's site looks before it
+     * launches. 503 because the state is real but temporary; a search engine
+     * or a monitor should not treat this as the site's permanent content.
+     */
+    private static function renderComingSoon(): never
+    {
+        http_response_code(503);
+        header('Content-Type: text/html; charset=utf-8');
+        header('Retry-After: 3600');
+
+        $base  = self::detectBasePath();
+        $asset = static fn (string $path): string => htmlspecialchars($base . '/' . $path, ENT_QUOTES);
+
+        echo '<!doctype html><html lang="en"><head><meta charset="utf-8">'
+            . '<meta name="viewport" content="width=device-width, initial-scale=1">'
+            . '<meta name="robots" content="noindex">'
+            . '<title>Coming soon</title>'
+            . '<link rel="icon" type="image/svg+xml" href="' . $asset('assets/images/brand/favicon.svg') . '">'
+            . '<link rel="shortcut icon" href="' . $asset('assets/images/brand/favicon.ico') . '">'
+            . '<style>'
+            . '*{box-sizing:border-box}'
+            . 'body{margin:0;min-height:100vh;display:grid;place-items:center;padding:2rem;'
+            . 'background:#06070c;color:#e9ecf6;font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;'
+            . 'text-align:center}'
+            . 'img{height:40px;width:auto;margin-bottom:1.75rem}'
+            . 'h1{font-size:1.5rem;margin:0 0 .6rem;font-weight:600}'
+            . 'p{color:#838da3;margin:0;max-width:32rem}'
+            . '</style></head><body>'
+            . '<div><img src="' . $asset('assets/images/brand/logo-mark.svg') . '" alt="">'
+            . '<h1>We are getting things ready.</h1>'
+            . '<p>This site is not open yet. Check back shortly.</p>'
+            . '</div></body></html>';
+        exit;
+    }
+
     private static function fatalConfig(): never
     {
         http_response_code(503);
@@ -310,10 +350,14 @@ final class App
         $installer = self::$root . '/install.php';
         $path      = (string) parse_url((string) ($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_PATH);
         $atInstaller = (bool) preg_match('#/install(\.php)?/?$#', $path);
+
+        // Everyone except someone already headed to the installer sees a
+        // neutral landing page, not the setup wizard. A stranger who finds
+        // the domain before the owner finishes setup should not land in a
+        // database-and-password form; the owner reaches it by going to
+        // /install.php directly, which the README already tells them to do.
         if (is_file($installer) && !$atInstaller) {
-            $base = self::detectBasePath();
-            header('Location: ' . self::detectOrigin() . $base . '/install.php', true, 302);
-            exit;
+            self::renderComingSoon();
         }
         if ($atInstaller) {
             echo '<!doctype html><meta charset="utf-8"><title>Setup could not start</title>'
@@ -328,14 +372,10 @@ final class App
             exit;
         }
 
-        echo '<!doctype html><meta charset="utf-8"><title>Configuration required</title>'
-            . '<body style="font:16px/1.7 ui-sans-serif,system-ui;background:#0a0c12;color:#e6e9f2;padding:56px;max-width:46rem;margin:auto">'
-            . '<h1 style="font-size:1.6rem;margin:0 0 .5rem">Configuration required</h1>'
-            . '<p style="color:#9aa3b8">TECHBISS cannot start because <code>config/config.php</code> is missing.</p>'
-            . '<p style="color:#9aa3b8">Copy <code>config/config.sample.php</code> to <code>config/config.php</code> and '
-            . 'fill in your database credentials, or restore <code>install.php</code> and reload this page '
-            . 'to run the setup wizard again.</p>'
-            . '</body>';
-        exit;
+        // install.php is gone and there is no config either — broken rather than
+        // simply not-yet-installed. Still no reason for a stranger on this path
+        // to see database jargon; the owner is the only one who will go looking
+        // for it, in the server's error log rather than a page in the browser.
+        self::renderComingSoon();
     }
 }
