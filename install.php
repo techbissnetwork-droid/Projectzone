@@ -353,6 +353,144 @@ function tb_clear_cache(): int
 }
 
 /** Has setup already been completed? */
+/** The address the request came from, used only for throttling. */
+function tb_client_ip(): string
+{
+    // REMOTE_ADDR only — a forwarded-for header is written by whoever is
+    // calling, so trusting it would hand an attacker an unlimited number of
+    // identities to spread guesses across.
+    return (string) ($_SERVER['REMOTE_ADDR'] ?? '0.0.0.0');
+}
+
+/**
+ * Check an existing administrator's credentials.
+ *
+ * The upgrade path changes a live database, so it cannot be open to anyone who
+ * finds install.php. Signing in as an existing administrator is the same bar
+ * the admin area itself sets — including the same lockout, so this page cannot
+ * be used to guess a password without the limit the admin login applies.
+ *
+ * @return array{ok:bool,name:string,error:string}
+ */
+function tb_verify_admin(PDO $pdo, string $email, string $password): array
+{
+    if ($email === '' || $password === '') {
+        return ['ok' => false, 'name' => '', 'error' => 'Enter the email address and password of an existing administrator.'];
+    }
+
+    $ip     = tb_client_ip();
+    $window = date('Y-m-d H:i:s', time() - 900);
+
+    try {
+        $count = $pdo->prepare('SELECT COUNT(*) FROM login_attempts
+                                WHERE successful = 0 AND created_at > ? AND (identifier = ? OR ip_address = ?)');
+        $count->execute([$window, $email, $ip]);
+        if ((int) $count->fetchColumn() >= 5) {
+            return ['ok' => false, 'name' => '', 'error' => 'Too many failed attempts. Wait fifteen minutes and try again.'];
+        }
+    } catch (Throwable) {
+        // An older database may not have the table yet; the password check below
+        // still stands, so carry on rather than locking the owner out.
+    }
+
+    try {
+        $stmt = $pdo->prepare('SELECT a.name, a.password_hash, a.is_active, r.slug AS role
+                               FROM admins a JOIN roles r ON r.id = a.role_id
+                               WHERE a.email = ? LIMIT 1');
+        $stmt->execute([$email]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    } catch (Throwable $e) {
+        return ['ok' => false, 'name' => '', 'error' => 'The database could not be read: ' . $e->getMessage()];
+    }
+
+    // Always spend the time hashing, so a missing account and a wrong password
+    // take the same length of time to answer.
+    $hash = is_array($row) ? (string) $row['password_hash'] : '$2y$12$usesomesillystringfore7hnbRJHxXVLeakoG8K30M1MlGKGIry';
+    $ok   = password_verify($password, $hash) && is_array($row)
+        && (int) $row['is_active'] === 1 && (string) $row['role'] === 'super-admin';
+
+    tb_record_attempt($pdo, $email, $ip, $ok);
+
+    if (!$ok) {
+        // One message for every failure: which of the four reasons applied is
+        // not something a stranger should be able to learn from the answer.
+        return ['ok' => false, 'name' => '', 'error' => 'Those credentials do not match an active super administrator.'];
+    }
+
+    return ['ok' => true, 'name' => (string) $row['name'], 'error' => ''];
+}
+
+/** Log an attempt in the same table the admin login uses. */
+function tb_record_attempt(PDO $pdo, string $email, string $ip, bool $success): void
+{
+    try {
+        $pdo->prepare('INSERT INTO login_attempts (identifier, ip_address, successful, created_at) VALUES (?, ?, ?, ?)')
+            ->execute([mb_substr($email, 0, 190), $ip, $success ? 1 : 0, date('Y-m-d H:i:s')]);
+        if ($success) {
+            $pdo->prepare('DELETE FROM login_attempts WHERE successful = 0 AND (identifier = ? OR ip_address = ?)')
+                ->execute([$email, $ip]);
+        }
+    } catch (Throwable) {
+        // Recording is best effort; it must never block a legitimate upgrade.
+    }
+}
+
+/**
+ * Add an administrator to a database that already has one.
+ *
+ * @return array{ok:bool,error:string}
+ */
+function tb_add_admin(PDO $pdo, string $name, string $email, string $password): array
+{
+    try {
+        $roleId = (int) $pdo->query("SELECT id FROM roles WHERE slug = 'super-admin'")->fetchColumn();
+        if ($roleId === 0) {
+            return ['ok' => false, 'error' => 'The super-admin role is missing from this database.'];
+        }
+
+        $check = $pdo->prepare('SELECT COUNT(*) FROM admins WHERE email = ?');
+        $check->execute([$email]);
+        if ((int) $check->fetchColumn() > 0) {
+            return ['ok' => false, 'error' => 'An administrator with that email address already exists.'];
+        }
+
+        $now = date('Y-m-d H:i:s');
+        $pdo->prepare(
+            'INSERT INTO admins (role_id, name, email, password_hash, is_active, created_at, updated_at)
+             VALUES (?, ?, ?, ?, 1, ?, ?)'
+        )->execute([$roleId, $name, $email, password_hash($password, PASSWORD_DEFAULT), $now, $now]);
+    } catch (Throwable $e) {
+        return ['ok' => false, 'error' => $e->getMessage()];
+    }
+
+    return ['ok' => true, 'error' => ''];
+}
+
+/**
+ * Delete install.php so the wizard cannot be reached again.
+ *
+ * Deleting a file over FTP or a hosting file manager is a step people skip,
+ * and an installer left in place is the one file on the site that must not
+ * stay. Offering the button means it usually does get done.
+ *
+ * @return array{ok:bool,error:string}
+ */
+function tb_lock_installer(): array
+{
+    $file = __FILE__;
+    if (!is_file($file)) {
+        return ['ok' => true, 'error' => ''];
+    }
+    if (!is_writable($file) || !is_writable(dirname($file))) {
+        return ['ok' => false, 'error' => 'The web server cannot delete install.php — its permissions do not allow it. Delete the file yourself.'];
+    }
+    if (!@unlink($file)) {
+        return ['ok' => false, 'error' => 'install.php could not be deleted. Delete the file yourself.'];
+    }
+
+    return ['ok' => true, 'error' => ''];
+}
+
 function tb_already_installed(): bool
 {
     if (!is_file(TB_CONFIG)) {
@@ -707,20 +845,121 @@ $detectedUrl = $detected['origin'] . $detected['base_path'];
 // wizard finishes by telling you it cannot run, which is a confusing last word.
 $justFinished = ($_GET['step'] ?? '') === 'done' && isset($_SESSION['tb_done']);
 
-if (!$justFinished && tb_already_installed()) {
-    http_response_code(403);
+// An existing install cannot be set up again, but it can be upgraded. The
+// wizard offers that instead of refusing outright — the database needs to
+// gain new tables and columns after an update, and asking people to find a
+// command line for it is how a site ends up half-migrated.
+$upgradeMode = !$justFinished && tb_already_installed();
+
+if ($upgradeMode) {
+    $cfg  = require TB_CONFIG;
+    $conn = tb_connect($cfg['db'] ?? []);
+    $pdo  = $conn['ok'] ? $conn['pdo'] : null;
+
+    $uErrors  = [];
+    $uSteps   = [];
+    $uDone    = false;
+    $uLocked  = null;
+    $uEmail   = trim((string) ($_POST['upgrade_email'] ?? ''));
+    $uAuthed  = false;
+    $uName    = '';
+    $uPlan    = null;
+
+    if ($pdo instanceof PDO) {
+        require_once TB_ROOT . '/includes/Core/Migrator.php';
+        $migrator = new Techbiss\Core\Migrator($pdo, TB_ROOT . '/database/schema.sql');
+    }
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && $pdo instanceof PDO) {
+        $action = (string) ($_POST['action'] ?? '');
+        $auth   = tb_verify_admin($pdo, mb_strtolower($uEmail), (string) ($_POST['upgrade_password'] ?? ''));
+
+        if (!$auth['ok']) {
+            $uErrors['auth'] = $auth['error'];
+        } else {
+            $uAuthed = true;
+            $uName   = $auth['name'];
+
+            if ($action === 'lock') {
+                $uLocked = tb_lock_installer();
+                $uDone   = true;
+            } elseif ($action === 'upgrade') {
+                // A new administrator is optional: most upgrades keep the ones
+                // that are already there.
+                $addAdmin   = isset($_POST['add_admin']);
+                $newName    = trim((string) ($_POST['new_admin_name'] ?? ''));
+                $newEmail   = mb_strtolower(trim((string) ($_POST['new_admin_email'] ?? '')));
+                $newPass    = (string) ($_POST['new_admin_password'] ?? '');
+
+                if ($addAdmin) {
+                    if ($newName === '') {
+                        $uErrors['new_admin_name'] = 'Enter a name for the new administrator.';
+                    }
+                    if (!filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
+                        $uErrors['new_admin_email'] = 'Enter a valid email address.';
+                    }
+                    if (strlen($newPass) < 10) {
+                        $uErrors['new_admin_password'] = 'Use at least 10 characters.';
+                    } elseif (!preg_match('/[A-Za-z]/', $newPass) || !preg_match('/[0-9]/', $newPass)) {
+                        $uErrors['new_admin_password'] = 'Include both letters and numbers.';
+                    }
+                }
+
+                if ($uErrors === []) {
+                    try {
+                        foreach ($migrator->apply() as $line) {
+                            $uSteps[] = $line;
+                        }
+                        $copy = $migrator->refreshCopy();
+                        if ($copy['rows'] > 0) {
+                            $uSteps[] = 'Updated ' . $copy['rows'] . ' piece' . ($copy['rows'] === 1 ? '' : 's')
+                                . ' of seeded wording (anything you had edited yourself was left alone)';
+                        }
+                    } catch (Throwable $e) {
+                        $uErrors['upgrade'] = $e->getMessage();
+                    }
+
+                    if ($uErrors === [] && $addAdmin) {
+                        $added = tb_add_admin($pdo, $newName, $newEmail, $newPass);
+                        if ($added['ok']) {
+                            $uSteps[] = 'Created the administrator ' . $newEmail;
+                        } else {
+                            $uErrors['new_admin_email'] = $added['error'];
+                        }
+                    }
+
+                    if ($uErrors === []) {
+                        tb_clear_cache();
+                        $uSteps[] = 'Cleared the cache';
+                        if ($uSteps === ['Cleared the cache']) {
+                            $uSteps = ['The database was already up to date — nothing needed changing'];
+                        }
+                        $uDone = true;
+                    }
+                }
+            }
+        }
+    }
+
+    if ($pdo instanceof PDO && !$uDone && $uErrors === []) {
+        try {
+            $pending = $migrator->pending();
+            $plan    = $migrator->refreshCopy(true);
+            $uPlan   = [
+                'tables'  => count($pending['tables']),
+                'columns' => count($pending['columns']),
+                'indexes' => count($pending['indexes']),
+                'data'    => count($pending['data']),
+                'copy'    => $plan['rows'],
+            ];
+        } catch (Throwable $e) {
+            $uErrors['plan'] = $e->getMessage();
+        }
+    }
+
     $installedUrl = $detectedUrl . '/admin/login';
-    ?><!doctype html><html lang="en"><head><meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">
-    <title>Already installed</title><link rel="icon" type="image/svg+xml" href="assets/images/brand/favicon.svg"><?php require __DIR__ . '/pages/partials/_installer-style.php'; ?></head>
-    <body><main class="wrap"><div class="card">
-        <div class="brand"><img class="glyph" src="assets/images/brand/logo-mark.svg" width="32" height="32" alt=""><span class="name">TECHBISS</span></div>
-        <h1>Already installed</h1>
-        <p class="muted">An administrator account already exists, so the wizard will not run again.</p>
-        <div class="alert alert--warn"><strong>Delete <code>install.php</code> now.</strong>
-            Leaving the installer in place is a security risk.</div>
-        <a class="btn btn--primary" href="<?= htmlspecialchars($installedUrl, ENT_QUOTES) ?>">Go to the admin sign-in page</a>
-    </div></main></body></html><?php
+    $eh = static fn (?string $v): string => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
+    require __DIR__ . '/pages/partials/_installer-upgrade.php';
     exit;
 }
 
