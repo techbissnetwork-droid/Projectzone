@@ -177,8 +177,8 @@ final class SiteController
         $packages = $repo->publishedWithFeatures();
 
         $seo = App::seo();
-        $seo->title('Packages — Pay Upfront. Save More. Build Better.');
-        $seo->description('Complete digital setups with published pricing. Where a prepaid discount applies you see the regular price, the prepaid price and the exact saving.');
+        $seo->title('Packages — Pick What You Need');
+        $seo->description('Complete digital setups — domain, hosting, website, email, SEO. Tell us what you need included and we send the figure directly.');
         $seo->canonical(absolute_url('/packages'));
         $seo->breadcrumbs([['label' => 'Home', 'url' => '/'], ['label' => 'Packages', 'url' => '/packages']]);
 
@@ -414,7 +414,7 @@ final class SiteController
 
         $seo = App::seo();
         $seo->title('Frequently Asked Questions');
-        $seo->description('Answers about getting started, pricing, prepaid packages, ownership, technical support, SEO and working with TECHBISS.');
+        $seo->description('Answers about getting started, pricing, ownership, technical support, SEO and working with TECHBISS.');
         $seo->canonical(absolute_url('/faqs'));
         $seo->breadcrumbs([['label' => 'Home', 'url' => '/'], ['label' => 'FAQs', 'url' => '/faqs']]);
 
@@ -818,12 +818,12 @@ final class SiteController
         $paginator = new Paginator($page, $perPage, $result['total']);
 
         $seo = App::seo();
-        $seo->title('Premade Projects — Ready-Made Websites You Can Launch Fast');
+        $seo->title('Ready Projects — Launch-Ready Websites');
         $seo->description('Working builds you can see live, then have set up on your own domain. Ask about any of them and we agree the price with you directly.');
         $seo->canonical(absolute_url('/premade-projects'));
         $seo->breadcrumbs([
             ['label' => 'Home', 'url' => '/'],
-            ['label' => 'Premade Projects', 'url' => '/premade-projects'],
+            ['label' => 'Ready Projects', 'url' => '/premade-projects'],
         ]);
         if ($page > 1) {
             $seo->noindex(true);
@@ -858,7 +858,7 @@ final class SiteController
         $seo->ogImage($project['og_image'] !== '' ? $project['og_image'] : ($project['hero_image'] !== '' ? $project['hero_image'] : $project['thumbnail']));
         $seo->breadcrumbs([
             ['label' => 'Home', 'url' => '/'],
-            ['label' => 'Premade Projects', 'url' => '/premade-projects'],
+            ['label' => 'Ready Projects', 'url' => '/premade-projects'],
             ['label' => (string) $project['name'], 'url' => '/premade-projects/' . $project['slug']],
         ]);
         // Described as a creative work rather than a Product: with no price and

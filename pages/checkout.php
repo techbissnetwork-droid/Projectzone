@@ -154,14 +154,12 @@ $featChosen = static function (string $title) use ($oldFeats): bool {
                                 <?php endforeach; ?>
                             </div>
                             <p class="hint mt-4">
-                                We send back what it costs and how long it takes. Nothing is charged here, and no payment
-                                details are asked for.
+                                We send back what it costs and how long it takes.
                             </p>
                         </fieldset>
 
                         <div class="form-actions">
                             <button class="btn btn--primary btn--lg btn--arrow" type="submit">Send my request<?= icon('arrow-right') ?></button>
-                            <span class="hint">Nothing is charged, and no payment details are taken.</span>
                         </div>
                     </div>
                 </form>

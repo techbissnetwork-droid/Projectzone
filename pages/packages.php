@@ -196,8 +196,8 @@ if (!$showPrice) {
             <?= icon('shield') ?>
             <span>
                 <strong style="color:var(--text)">No payment is taken on this website.</strong>
-                Choosing a package sends us a request. We confirm the scope with you, then issue a formal invoice with
-                payment instructions. Prices shown are the prices we quote.
+                Sending a request starts a conversation. We confirm the scope, then issue an invoice with payment
+                instructions.
             </span>
         </div>
     </div>

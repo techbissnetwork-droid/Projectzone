@@ -54,7 +54,6 @@
                      aria-labelledby="trigger-<?= e($id) ?>" data-open="false">
                     <div>
                         <div class="accordion__body">
-                            <p><?= e($service['short_description']) ?></p>
                             <?php $deliverables = lines_to_list($service['deliverables']); ?>
                             <?php if ($deliverables): ?>
                             <div class="grid grid-2 mt-5">

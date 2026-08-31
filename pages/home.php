@@ -312,7 +312,7 @@ $hero = $sections['hero'] ?? [];
     <div class="container">
         <div class="section-head section-head--center" data-reveal>
             <p class="eyebrow eyebrow--plain"><?= e($s('packages', 'eyebrow', 'Packages')) ?></p>
-            <h2 class="mt-4"><?= e($s('packages', 'heading', 'Pay Upfront. Save More. Build Better.')) ?></h2>
+            <h2 class="mt-4"><?= e($s('packages', 'heading', 'Pick what you need. We price it with you.')) ?></h2>
             <p class="lead"><?= e($s('packages', 'subheading')) ?></p>
         </div>
 

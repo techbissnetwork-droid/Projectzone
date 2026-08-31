@@ -224,8 +224,8 @@ $meta = array_filter([
                 <div class="card" data-reveal="right">
                     <h3 class="card__title" style="font-size:var(--fs-sm)">Price</h3>
                     <p class="card__text mt-2">
-                        Quoted per project — your content, your domain, any changes. Message us and you will have a
-                        figure the same day.
+                        Quoted per project — your content, your domain, any changes. Message us and we come back with a
+                        figure, usually within one business day.
                     </p>
                     <div class="card__footer stack stack-2">
                         <?php if ($waLink !== ''): ?>

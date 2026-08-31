@@ -82,7 +82,7 @@ $others   = array_values(array_filter($packages, static fn ($x) => (int) $x['id'
                     <div class="price" style="padding-top:0">
                         <?php if (!$showPrice): ?>
                             <div class="price__custom">Priced with you</div>
-                            <p class="price__note">Pick what you need below and we come back with a figure — usually the same day.</p>
+                            <p class="price__note">Tell us what you want included and we come back with a figure, usually within one business day.</p>
                         <?php elseif ($p['is_custom']): ?>
                             <div class="price__custom">Custom quote</div>
                             <p class="price__note">Priced from your requirements after a short scoping conversation.</p>

@@ -105,7 +105,7 @@ VALUES
  '<p>Alloy supplies components to distributors across three countries. Quoting ran on emailed spreadsheets, with version conflicts that occasionally reached customers.</p>',
  '<p>Distributors requested quotes by email, often against an outdated price list. Sales rebuilt the same quote repeatedly. Nobody could answer “what did we quote them last time” without searching a mailbox.</p>',
  '<p>We built a distributor portal with authenticated access, current specifications and pricing per distributor tier, and a structured RFQ flow that produces a quote record rather than an email thread. Quote history is visible to both sides.</p>',
- '<p>Quotes are issued against current pricing by construction, not by discipline. Sales can answer history questions in seconds, and distributors stopped quoting from stale spreadsheets.</p>',
+ '<p>Quotes now go out against current pricing automatically, not from whatever spreadsheet someone had open. Sales can answer history questions in seconds, and distributors stopped quoting from stale spreadsheets.</p>',
  'uploads/media/demo/alloy-thumb.jpg','uploads/media/demo/alloy-hero.jpg',
  DATE_SUB(CURDATE(), INTERVAL 16 MONTH),'12 weeks','blue',0,1,5,
  'Alloy Fabrication — Distributor Portal Case Study',

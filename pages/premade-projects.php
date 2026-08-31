@@ -8,7 +8,7 @@ $sorts    = ['featured' => 'Featured first', 'newest' => 'Newest', 'name' => 'A 
 ?>
 <?= $view->partial('partials/page-head', [
     'eyebrow' => 'Ready to launch',
-    'heading' => 'Premade projects.',
+    'heading' => 'Ready projects.',
     'lead'    => 'Finished builds. See one working, then we set it up on your domain. Ask about any of them for a price.',
 ]) ?>
 

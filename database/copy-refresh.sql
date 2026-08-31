@@ -88,6 +88,41 @@ UPDATE `settings` SET `value` = 'We take offline businesses online and build the
 -- Show mobile apps on the homepage, next to the website service.
 UPDATE `services` SET `is_featured` = 1, `sort_order` = 3 WHERE `slug` = 'mobile-applications' AND `is_featured` = 0;
 UPDATE `services` SET `sort_order` = 4 WHERE `slug` = 'web-applications' AND `sort_order` = 3;
+
+-- ---------------------------------------------------------------------
+-- Remove the copy that still promised published prices. The site shows no
+-- figures; these sentences told visitors to look for them.
+-- ---------------------------------------------------------------------
+
+UPDATE `page_sections` SET `heading` = 'Pick what you need. We price it with you.'
+  WHERE `section_key` = 'packages' AND `heading` = 'Pay upfront. Save more. Build better.';
+
+UPDATE `page_sections` SET `subheading` = 'Complete setups. Tell us what you want included and we send the figure.'
+  WHERE `section_key` = 'packages' AND `subheading` = 'Complete setups with published prices. Where a prepaid discount applies, you see the exact saving.';
+
+UPDATE `process_steps` SET `description` = 'Select a package that fits, or ask for a custom scope. You see exactly what is included, and we send the price before you decide.'
+  WHERE `step_number` = '02' AND `description` = 'Select a package that fits, or ask for a custom scope. You see the regular price, the prepaid price and exactly what is included before deciding.';
+
+UPDATE `faqs` SET `answer` = 'Sometimes settling upfront rather than in stages reduces the total. We tell you both figures in writing when we quote.'
+  WHERE `question` = 'What does the prepaid price mean?' AND `answer` = 'Some packages have a lower price when the package is paid upfront rather than in stages. Where that applies, both prices and the exact saving are shown on the package. If no prepaid price is shown, there is no prepaid discount on that package.';
+
+UPDATE `faqs` SET `answer` = 'Yes. Staged payment is the standard arrangement. If you would rather settle upfront, say so and we will quote that way too.'
+  WHERE `question` = 'Can I pay in stages?' AND `answer` = 'Yes. Staged payment is the standard arrangement. The prepaid price is the alternative for businesses that prefer to settle upfront.';
+
+UPDATE `navigation` SET `description` = 'Complete setups, priced with you'
+  WHERE `url` = '/packages' AND `description` = 'Prepaid setups with clear pricing';
+
+UPDATE `faqs` SET `question` = 'Can I pay less by paying upfront?'
+  WHERE `question` = 'What does the prepaid price mean?';
+
+UPDATE `pages` SET `content` = REPLACE(`content`, '<h2>Clear pricing</h2><p>Package prices are published. Where a prepaid discount applies, both prices and the exact saving are shown. Custom work is scoped and quoted in writing before it starts.</p>', '<h2>Priced in conversation</h2><p>We do not publish prices, because the work changes with what you actually need. Tell us the list and we send a written figure, usually within one business day.</p>')
+  WHERE `slug` = 'why-techbiss';
+
+UPDATE `pages` SET `seo_description` = 'One partner for domain, hosting, website, apps, email, branding and SEO — with full ownership and a written price before you commit.'
+  WHERE `slug` = 'why-techbiss' AND `seo_description` = 'One partner for domain, hosting, website, apps, email, branding and SEO — with full ownership and clear pricing.';
+
+UPDATE `pages` SET `content` = REPLACE(`content`, '<h2>Pricing</h2><p>Prices published on this website are indicative and may change. The price that applies to your project is the one stated in your written proposal. Where a prepaid price is shown, the conditions attached to it are stated in the proposal.</p>', '<h2>Pricing</h2><p>We do not publish prices on this website. The price that applies to your project is the one stated in your written proposal.</p>')
+  WHERE `slug` = 'terms-and-conditions';
 -- The cache holds rendered settings and navigation, so clear it afterwards:
 --     rm -f storage/cache/*.cache
 -- or use Admin → System → Tools → Clear cache.
