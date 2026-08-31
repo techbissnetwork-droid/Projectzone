@@ -35,12 +35,12 @@
                     <td class="num"><span class="hint"><?= $row['last_login_at'] ? e(time_ago($row['last_login_at'])) : 'Never' ?></span></td>
                     <td class="actions">
                         <div class="row-actions">
-                            <a class="icon-btn" title="Edit" href="<?= e(url('/admin/users/' . (int) $row['id'] . '/edit')) ?>"><?= icon('edit') ?></a>
+                            <a class="icon-btn" title="Edit" aria-label="Edit" href="<?= e(url('/admin/users/' . (int) $row['id'] . '/edit')) ?>"><?= icon('edit') ?></a>
                             <?php if ((int) $row['id'] !== \Techbiss\Core\Auth::id()): ?>
                             <form method="post" style="display:inline" action="<?= e(url('/admin/users/' . (int) $row['id'] . '/delete')) ?>"
                                   data-confirm="Delete this admin account? They will lose access immediately.">
                                 <?= csrf_field() ?>
-                                <button class="icon-btn icon-btn--danger" type="submit" title="Delete"><?= icon('trash') ?></button>
+                                <button class="icon-btn icon-btn--danger" type="submit" title="Delete" aria-label="Delete"><?= icon('trash') ?></button>
                             </form>
                             <?php endif; ?>
                         </div>

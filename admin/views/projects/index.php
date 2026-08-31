@@ -83,7 +83,7 @@
                     <td><?php if ($row['category_name']): ?><span class="badge"><?= e($row['category_name']) ?></span><?php endif; ?></td>
                     <td>
                         <?php if ((string) $row['demo_url'] !== ''): ?>
-                            <a class="icon-btn" title="Open the demo" target="_blank" rel="noopener noreferrer"
+                            <a class="icon-btn" title="Open the demo" aria-label="Open the demo" target="_blank" rel="noopener noreferrer"
                                href="<?= e($row['demo_url']) ?>"><?= icon('external') ?></a>
                         <?php else: ?>
                             <span class="hint">None</span>
@@ -107,18 +107,18 @@
                     <td class="actions">
                         <div class="row-actions">
                             <?php if ((int) $row['is_published'] === 1): ?>
-                            <a class="icon-btn" title="View on the site" target="_blank" rel="noopener"
+                            <a class="icon-btn" title="View on the site" aria-label="View on the site" target="_blank" rel="noopener"
                                href="<?= e(url('/premade-projects/' . $row['slug'])) ?>"><?= icon('eye') ?></a>
                             <?php endif; ?>
-                            <a class="icon-btn" title="Edit" href="<?= e(url('/admin/projects/' . (int) $row['id'] . '/edit')) ?>"><?= icon('edit') ?></a>
+                            <a class="icon-btn" title="Edit" aria-label="Edit" href="<?= e(url('/admin/projects/' . (int) $row['id'] . '/edit')) ?>"><?= icon('edit') ?></a>
                             <form method="post" style="display:inline" action="<?= e(url('/admin/projects/' . (int) $row['id'] . '/duplicate')) ?>">
                                 <?= csrf_field() ?>
-                                <button class="icon-btn" type="submit" title="Duplicate as a draft"><?= icon('copy') ?></button>
+                                <button class="icon-btn" type="submit" title="Duplicate as a draft" aria-label="Duplicate as a draft"><?= icon('copy') ?></button>
                             </form>
                             <form method="post" style="display:inline" action="<?= e(url('/admin/projects/' . (int) $row['id'] . '/delete')) ?>"
                                   data-confirm="Delete this project, its images and its features? Enquiries already received are kept. This cannot be undone.">
                                 <?= csrf_field() ?>
-                                <button class="icon-btn icon-btn--danger" type="submit" title="Delete"><?= icon('trash') ?></button>
+                                <button class="icon-btn icon-btn--danger" type="submit" title="Delete" aria-label="Delete"><?= icon('trash') ?></button>
                             </form>
                         </div>
                     </td>

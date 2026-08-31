@@ -61,11 +61,11 @@
                     </td>
                     <td class="actions">
                         <div class="row-actions">
-                            <a class="icon-btn" title="Edit" href="<?= e(url('/admin/navigation/' . (int) $row['id'] . '/edit')) ?>"><?= icon('edit') ?></a>
+                            <a class="icon-btn" title="Edit" aria-label="Edit" href="<?= e(url('/admin/navigation/' . (int) $row['id'] . '/edit')) ?>"><?= icon('edit') ?></a>
                             <form method="post" style="display:inline" action="<?= e(url('/admin/navigation/' . (int) $row['id'] . '/delete')) ?>"
                                   data-confirm="Delete this menu item? Any dropdown items under it are deleted too.">
                                 <?= csrf_field() ?>
-                                <button class="icon-btn icon-btn--danger" type="submit" title="Delete"><?= icon('trash') ?></button>
+                                <button class="icon-btn icon-btn--danger" type="submit" title="Delete" aria-label="Delete"><?= icon('trash') ?></button>
                             </form>
                         </div>
                     </td>

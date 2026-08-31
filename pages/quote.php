@@ -30,8 +30,9 @@ foreach ($packages as $p) { if ($p['slug'] === $preselect) { $preselectId = (int
                                     <div class="field">
                                         <label class="label" for="q-name">Your name <span class="req" aria-hidden="true">*</span></label>
                                         <input class="input<?= error_for('name') ? ' is-invalid' : '' ?>" id="q-name" type="text" name="name"
-                                               value="<?= e(old('name')) ?>" required maxlength="120" autocomplete="name">
-                                        <?php if (error_for('name')): ?><span class="field-error"><?= icon('alert') ?><?= e(error_for('name')) ?></span><?php endif; ?>
+                                               value="<?= e(old('name')) ?>" required maxlength="120" autocomplete="name"
+                                               <?= $view->partial('partials/field-invalid', ['key' => 'name']) ?>>
+                                        <?= $view->partial('partials/field-error', ['key' => 'name']) ?>
                                     </div>
                                     <div class="field">
                                         <label class="label" for="q-business">Business name</label>
@@ -43,8 +44,9 @@ foreach ($packages as $p) { if ($p['slug'] === $preselect) { $preselectId = (int
                                     <div class="field">
                                         <label class="label" for="q-email">Email <span class="req" aria-hidden="true">*</span></label>
                                         <input class="input<?= error_for('email') ? ' is-invalid' : '' ?>" id="q-email" type="email" name="email"
-                                               value="<?= e(old('email')) ?>" required maxlength="190" autocomplete="email">
-                                        <?php if (error_for('email')): ?><span class="field-error"><?= icon('alert') ?><?= e(error_for('email')) ?></span><?php endif; ?>
+                                               value="<?= e(old('email')) ?>" required maxlength="190" autocomplete="email"
+                                               <?= $view->partial('partials/field-invalid', ['key' => 'email']) ?>>
+                                        <?= $view->partial('partials/field-error', ['key' => 'email']) ?>
                                     </div>
                                     <div class="field">
                                         <label class="label" for="q-phone">Phone</label>
@@ -157,8 +159,9 @@ foreach ($packages as $p) { if ($p['slug'] === $preselect) { $preselectId = (int
                                     <label class="label" for="q-details">Project details <span class="req" aria-hidden="true">*</span></label>
                                     <textarea class="textarea textarea--tall<?= error_for('project_details') ? ' is-invalid' : '' ?>" id="q-details"
                                               name="project_details" required maxlength="5000"
-                                              placeholder="What does the business do? Who are your customers? What is not working today, and what would success look like?"><?= e(old('project_details')) ?></textarea>
-                                    <?php if (error_for('project_details')): ?><span class="field-error"><?= icon('alert') ?><?= e(error_for('project_details')) ?></span><?php endif; ?>
+                                              placeholder="What does the business do? Who are your customers? What is not working today, and what would success look like?"
+                                              <?= $view->partial('partials/field-invalid', ['key' => 'project_details']) ?>><?= e(old('project_details')) ?></textarea>
+                                    <?= $view->partial('partials/field-error', ['key' => 'project_details']) ?>
                                 </div>
                             </div>
                         </fieldset>

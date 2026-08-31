@@ -85,7 +85,7 @@ $isActive = static function (array $item) use ($currentPath): bool {
     return $currentPath === $path || str_starts_with($currentPath, $path . '/');
 };
 ?>
-<aside class="sidebar" id="admin-sidebar">
+<aside class="sidebar" id="admin-sidebar" aria-label="Admin sidebar">
     <div class="sidebar__head">
         <a class="brand" href="<?= e(url('/admin')) ?>">
             <svg class="brand__mark" aria-hidden="true" focusable="false"><use href="#tb-mark"/></svg>

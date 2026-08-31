@@ -62,6 +62,7 @@ $human = static function (int $b): string {
 </form>
 
 <div class="panel">
+    <h2 class="sr-only">Files</h2>
     <?php if (!$rows): ?>
         <div class="panel__body">
             <div class="empty-state" style="border:0;background:none">
@@ -92,12 +93,12 @@ $human = static function (int $b): string {
                         <?php if ($row['width']): ?> · <?= (int) $row['width'] ?>×<?= (int) $row['height'] ?><?php endif; ?>
                     </div>
                     <div class="row row--tight mt-2">
-                        <button class="icon-btn" type="button" data-copy="<?= e($row['path']) ?>" title="Copy path"><?= icon('copy') ?></button>
-                        <a class="icon-btn" href="<?= e(media_url($row['path'])) ?>" target="_blank" rel="noopener" title="Open"><?= icon('external') ?></a>
+                        <button class="icon-btn" type="button" data-copy="<?= e($row['path']) ?>" title="Copy path" aria-label="Copy path"><?= icon('copy') ?></button>
+                        <a class="icon-btn" href="<?= e(media_url($row['path'])) ?>" target="_blank" rel="noopener" title="Open" aria-label="Open"><?= icon('external') ?></a>
                         <form method="post" style="display:inline" action="<?= e(url('/admin/media/' . (int) $row['id'] . '/delete')) ?>"
                               data-confirm="Delete this file permanently? Anything using it will lose the image.">
                             <?= csrf_field() ?>
-                            <button class="icon-btn icon-btn--danger" type="submit" title="Delete"><?= icon('trash') ?></button>
+                            <button class="icon-btn icon-btn--danger" type="submit" title="Delete" aria-label="Delete"><?= icon('trash') ?></button>
                         </form>
                     </div>
                     <form method="post" action="<?= e(url('/admin/media/' . (int) $row['id'])) ?>" class="mt-2">

@@ -7,6 +7,7 @@
 
 <section class="section section--flush-top">
     <div class="container">
+        <h2 class="sr-only">Services</h2>
         <?php if (!$services): ?>
             <div class="empty-state">
                 <span class="empty-state__icon"><?= icon('layers') ?></span>

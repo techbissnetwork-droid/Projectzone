@@ -32,8 +32,9 @@ $formFeatures = old('features', null);
                         <div class="field">
                             <label class="label" for="pr-name">Name <span class="req">*</span></label>
                             <input class="input<?= error_for('name') ? ' is-invalid' : '' ?>" id="pr-name" type="text"
-                                   name="name" value="<?= e($val('name')) ?>" required maxlength="190" data-counter>
-                            <?php if (error_for('name')): ?><span class="field-error"><?= icon('alert') ?><?= e(error_for('name')) ?></span><?php endif; ?>
+                                   name="name" value="<?= e($val('name')) ?>" required maxlength="190" data-counter
+                                   <?= $view->partial('partials/field-invalid', ['key' => 'name']) ?>>
+                            <?= $view->partial('partials/field-error', ['key' => 'name']) ?>
                         </div>
 
                         <div class="field">
@@ -41,7 +42,8 @@ $formFeatures = old('features', null);
                             <div class="input-group">
                                 <input class="input" id="pr-slug" type="text" name="slug" value="<?= e($val('slug')) ?>"
                                        maxlength="190" data-slug-from="name" spellcheck="false">
-                                <button class="btn btn--quiet btn--sm" type="button" data-slug-regenerate><?= icon('refresh') ?></button>
+                                <button class="btn btn--quiet btn--sm" type="button" data-slug-regenerate
+                                        aria-label="Regenerate slug from the title"><?= icon('refresh') ?></button>
                             </div>
                             <span class="hint">/premade-projects/<?= e($val('slug') ?: 'project-name') ?></span>
                         </div>
@@ -139,7 +141,7 @@ $formFeatures = old('features', null);
                     <div class="form-section">
                         <?php $apk = (string) $val('apk_path'); ?>
                         <div class="field">
-                            <span class="label">Test APK</span>
+                            <label class="label" for="f-apk">Test APK</label>
                             <?php if ($apk !== ''): ?>
                             <div class="row row--tight">
                                 <span class="badge"><?= e(basename($apk)) ?></span>
@@ -151,7 +153,7 @@ $formFeatures = old('features', null);
                             </div>
                             <span class="hint">Uploading a new file replaces this one.</span>
                             <?php endif; ?>
-                            <input class="input mt-2" type="file" name="apk" accept=".apk,application/vnd.android.package-archive">
+                            <input class="input mt-2" id="f-apk" type="file" name="apk" accept=".apk,application/vnd.android.package-archive">
                             <span class="hint">
                                 Checked on upload for an Android manifest, so an archive renamed <code>.apk</code> is refused.
                                 It is served as a download, never run on the server.

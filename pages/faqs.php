@@ -18,7 +18,7 @@
         <?php else: ?>
         <div class="split" style="align-items:start">
             <aside style="position:sticky;top:6.5rem" class="hide-md">
-                <p class="footer-col__title">Categories</p>
+                <h2 class="footer-col__title" style="line-height:inherit">Categories</h2>
                 <div class="stack stack-2">
                     <?php foreach (array_keys($grouped) as $category): ?>
                     <a class="pill" href="#cat-<?= e(\Techbiss\Core\Str::slug($category)) ?>" data-no-transition>

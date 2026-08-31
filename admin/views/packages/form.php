@@ -34,15 +34,17 @@ $formFeatures = old('features', null);
                             <div class="field">
                                 <label class="label" for="k-name">Name <span class="req">*</span></label>
                                 <input class="input<?= error_for('name') ? ' is-invalid' : '' ?>" id="k-name" type="text"
-                                       name="name" value="<?= e($val('name')) ?>" required maxlength="120">
-                                <?php if (error_for('name')): ?><span class="field-error"><?= e(error_for('name')) ?></span><?php endif; ?>
+                                       name="name" value="<?= e($val('name')) ?>" required maxlength="120"
+                                       <?= $view->partial('partials/field-invalid', ['key' => 'name']) ?>>
+                                <?= $view->partial('partials/field-error', ['key' => 'name', 'withIcon' => false]) ?>
                             </div>
                             <div class="field">
                                 <label class="label" for="k-slug">URL slug</label>
                                 <div class="input-group">
                                     <input class="input" id="k-slug" type="text" name="slug" value="<?= e($val('slug')) ?>"
                                            maxlength="190" data-slug-from="name" spellcheck="false">
-                                    <button class="btn btn--quiet btn--sm" type="button" data-slug-regenerate><?= icon('refresh') ?></button>
+                                    <button class="btn btn--quiet btn--sm" type="button" data-slug-regenerate
+                                            aria-label="Regenerate slug from the title"><?= icon('refresh') ?></button>
                                 </div>
                             </div>
                         </div>
@@ -92,15 +94,17 @@ $formFeatures = old('features', null);
                             <div class="field">
                                 <label class="label" for="k-regular">Regular price</label>
                                 <input class="input<?= error_for('regular_price') ? ' is-invalid' : '' ?>" id="k-regular" type="number"
-                                       name="regular_price" value="<?= e((string) $val('regular_price', '')) ?>" step="0.01" min="0" inputmode="decimal">
-                                <?php if (error_for('regular_price')): ?><span class="field-error"><?= e(error_for('regular_price')) ?></span><?php endif; ?>
+                                       name="regular_price" value="<?= e((string) $val('regular_price', '')) ?>" step="0.01" min="0" inputmode="decimal"
+                                       <?= $view->partial('partials/field-invalid', ['key' => 'regular_price']) ?>>
+                                <?= $view->partial('partials/field-error', ['key' => 'regular_price', 'withIcon' => false]) ?>
                             </div>
                             <div class="field">
                                 <label class="label" for="k-prepaid">Prepaid price</label>
                                 <input class="input<?= error_for('prepaid_price') ? ' is-invalid' : '' ?>" id="k-prepaid" type="number"
-                                       name="prepaid_price" value="<?= e((string) $val('prepaid_price', '')) ?>" step="0.01" min="0" inputmode="decimal">
-                                <span class="hint">Leave empty for no prepaid discount.</span>
-                                <?php if (error_for('prepaid_price')): ?><span class="field-error"><?= e(error_for('prepaid_price')) ?></span><?php endif; ?>
+                                       name="prepaid_price" value="<?= e((string) $val('prepaid_price', '')) ?>" step="0.01" min="0" inputmode="decimal"
+                                       <?= $view->partial('partials/field-invalid', ['key' => 'prepaid_price', 'describedBy' => 'hint-prepaid_price']) ?>>
+                                <span class="hint" id="hint-prepaid_price">Leave empty for no prepaid discount.</span>
+                                <?= $view->partial('partials/field-error', ['key' => 'prepaid_price', 'withIcon' => false]) ?>
                             </div>
                         </div>
 

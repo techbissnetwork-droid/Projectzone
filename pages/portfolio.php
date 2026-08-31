@@ -11,6 +11,7 @@ $query = array_filter(['category' => $activeCat, 'industry' => $activeInd, 'q' =
 
 <section class="section section--flush-top">
     <div class="container">
+        <h2 class="sr-only">All projects</h2>
         <?php if ($categories || $industries): ?>
         <form class="filter-bar" method="get" action="<?= e(url('/portfolio')) ?>" data-reveal>
             <div class="filter-bar__scroll">

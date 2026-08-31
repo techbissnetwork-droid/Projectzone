@@ -21,9 +21,12 @@ $featChosen = static function (string $title) use ($oldFeats): bool {
 
 <section class="section section--flush-top">
     <div class="container">
-        <div class="checkout" data-checkout data-currency="<?= e($currency) ?>"
+        <?php // The figures are agreed in conversation, never published: with public
+              // pricing off they must not reach the page at all, not even as data
+              // attributes that view-source would hand over. ?>
+        <div class="checkout" data-checkout data-currency="<?= e($currency) ?>"<?php if ($showPrice): ?>
              data-base="<?= e(number_format($p['payable'], 2, '.', '')) ?>"
-             data-regular="<?= e(number_format($p['regular'], 2, '.', '')) ?>">
+             data-regular="<?= e(number_format($p['regular'], 2, '.', '')) ?>"<?php endif; ?>>
 
             <div class="card card--pad-lg" data-reveal>
                 <form method="post" action="<?= e(url('/checkout/' . $package['slug'])) ?>" data-form novalidate>
@@ -41,28 +44,32 @@ $featChosen = static function (string $title) use ($oldFeats): bool {
                                     <div class="field">
                                         <label class="label" for="k-name">Full name <span class="req" aria-hidden="true">*</span></label>
                                         <input class="input<?= error_for('name') ? ' is-invalid' : '' ?>" id="k-name" type="text" name="name"
-                                               value="<?= e(old('name')) ?>" required maxlength="120" autocomplete="name">
-                                        <?php if (error_for('name')): ?><span class="field-error"><?= icon('alert') ?><?= e(error_for('name')) ?></span><?php endif; ?>
+                                               value="<?= e(old('name')) ?>" required maxlength="120" autocomplete="name"
+                                               <?= $view->partial('partials/field-invalid', ['key' => 'name']) ?>>
+                                        <?= $view->partial('partials/field-error', ['key' => 'name']) ?>
                                     </div>
                                     <div class="field">
                                         <label class="label" for="k-business">Business name <span class="req" aria-hidden="true">*</span></label>
                                         <input class="input<?= error_for('business_name') ? ' is-invalid' : '' ?>" id="k-business" type="text"
-                                               name="business_name" value="<?= e(old('business_name')) ?>" required maxlength="190" autocomplete="organization">
-                                        <?php if (error_for('business_name')): ?><span class="field-error"><?= icon('alert') ?><?= e(error_for('business_name')) ?></span><?php endif; ?>
+                                               name="business_name" value="<?= e(old('business_name')) ?>" required maxlength="190" autocomplete="organization"
+                                               <?= $view->partial('partials/field-invalid', ['key' => 'business_name']) ?>>
+                                        <?= $view->partial('partials/field-error', ['key' => 'business_name']) ?>
                                     </div>
                                 </div>
                                 <div class="field--row">
                                     <div class="field">
                                         <label class="label" for="k-email">Email <span class="req" aria-hidden="true">*</span></label>
                                         <input class="input<?= error_for('email') ? ' is-invalid' : '' ?>" id="k-email" type="email" name="email"
-                                               value="<?= e(old('email')) ?>" required maxlength="190" autocomplete="email">
-                                        <?php if (error_for('email')): ?><span class="field-error"><?= icon('alert') ?><?= e(error_for('email')) ?></span><?php endif; ?>
+                                               value="<?= e(old('email')) ?>" required maxlength="190" autocomplete="email"
+                                               <?= $view->partial('partials/field-invalid', ['key' => 'email']) ?>>
+                                        <?= $view->partial('partials/field-error', ['key' => 'email']) ?>
                                     </div>
                                     <div class="field">
                                         <label class="label" for="k-phone">Phone <span class="req" aria-hidden="true">*</span></label>
                                         <input class="input<?= error_for('phone') ? ' is-invalid' : '' ?>" id="k-phone" type="tel" name="phone"
-                                               value="<?= e(old('phone')) ?>" required maxlength="32" autocomplete="tel">
-                                        <?php if (error_for('phone')): ?><span class="field-error"><?= icon('alert') ?><?= e(error_for('phone')) ?></span><?php endif; ?>
+                                               value="<?= e(old('phone')) ?>" required maxlength="32" autocomplete="tel"
+                                               <?= $view->partial('partials/field-invalid', ['key' => 'phone']) ?>>
+                                        <?= $view->partial('partials/field-error', ['key' => 'phone']) ?>
                                     </div>
                                 </div>
                                 <div class="field">
@@ -107,10 +114,14 @@ $featChosen = static function (string $title) use ($oldFeats): bool {
                             <legend class="eyebrow mb-2">Anything else?</legend>
                             <p class="hint mb-4">Tick any of these to have them included in the quote.</p>
                             <div class="option-grid">
-                                <?php foreach ($addons as $addon): ?>
+                                <?php foreach ($addons as $addon):
+                                    // The running total is only ever shown when pricing is public, so the
+                                    // figure the script adds up stays off the page entirely otherwise.
+                                    $priceAttr = $showPrice
+                                        ? ' data-price="' . e(number_format((float) $addon['price'], 2, '.', '')) . '"'
+                                        : ''; ?>
                                 <label class="option-card">
-                                    <input type="checkbox" name="addons[]" value="<?= (int) $addon['id'] ?>"
-                                           data-price="<?= e(number_format((float) $addon['price'], 2, '.', '')) ?>"
+                                    <input type="checkbox" name="addons[]" value="<?= (int) $addon['id'] ?>"<?= $priceAttr ?>
                                            <?= in_array((int) $addon['id'], $oldAddons, true) ? 'checked' : '' ?>>
                                     <span class="check__box" aria-hidden="true"></span>
                                     <span class="flex-1">
@@ -165,7 +176,8 @@ $featChosen = static function (string $title) use ($oldFeats): bool {
                 </form>
             </div>
 
-            <aside class="checkout__aside">
+            <aside class="checkout__aside" aria-labelledby="checkout-summary-title">
+                <h2 class="sr-only" id="checkout-summary-title">Package summary</h2>
                 <div class="card card--pad-lg" data-accent="<?= e($package['accent'] ?: 'cyan') ?>" data-reveal="right">
                     <div class="row row--tight mb-4">
                         <span class="icon-plate icon-plate--sm"><?= icon((string) $package['icon']) ?></span>

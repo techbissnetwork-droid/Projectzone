@@ -68,13 +68,13 @@ $query = array_filter(['q' => $search, 'status' => $status]);
                     <td class="num"><span class="hint"><?= e(time_ago($row['created_at'])) ?></span></td>
                     <td class="actions">
                         <div class="row-actions">
-                            <a class="icon-btn" title="Open" href="<?= e(url('/admin/messages/' . (int) $row['id'])) ?>"><?= icon('eye') ?></a>
-                            <a class="icon-btn" title="Reply by email" href="mailto:<?= e($row['email']) ?>?subject=<?= rawurlencode('Re: ' . ($row['subject'] ?: 'Your enquiry')) ?>"><?= icon('send') ?></a>
+                            <a class="icon-btn" title="Open" aria-label="Open" href="<?= e(url('/admin/messages/' . (int) $row['id'])) ?>"><?= icon('eye') ?></a>
+                            <a class="icon-btn" title="Reply by email" aria-label="Reply by email" href="mailto:<?= e($row['email']) ?>?subject=<?= rawurlencode('Re: ' . ($row['subject'] ?: 'Your enquiry')) ?>"><?= icon('send') ?></a>
                             <?php if (Auth::can('leads.manage')): ?>
                             <form method="post" style="display:inline" action="<?= e(url('/admin/messages/' . (int) $row['id'] . '/delete')) ?>"
                                   data-confirm="Delete this message permanently?">
                                 <?= csrf_field() ?>
-                                <button class="icon-btn icon-btn--danger" type="submit" title="Delete"><?= icon('trash') ?></button>
+                                <button class="icon-btn icon-btn--danger" type="submit" title="Delete" aria-label="Delete"><?= icon('trash') ?></button>
                             </form>
                             <?php endif; ?>
                         </div>

@@ -96,7 +96,7 @@ $blocks = array_filter([
             <div>
                 <?php foreach ($blocks as $label => $html): ?>
                 <div class="case-block" data-reveal>
-                    <p class="eyebrow case-block__label"><?= e($label) ?></p>
+                    <h2 class="eyebrow case-block__label" style="line-height:inherit"><?= e($label) ?></h2>
                     <div class="prose"><?= $html ?></div>
                 </div>
                 <?php endforeach; ?>
@@ -152,12 +152,24 @@ $blocks = array_filter([
             <p class="eyebrow">Gallery</p>
             <h2 class="mt-4">A closer look</h2>
         </div>
+        <?php
+        // Alt text has to tell the images apart: the stored text is often the same
+        // line for every shot, so anything not unique to this image gets its
+        // position instead.
+        $altCounts = array_count_values(array_map(static fn ($im) => trim((string) $im['alt_text']), $images));
+        ?>
         <div class="gallery" data-reveal-stagger>
-            <?php foreach ($images as $i => $img): $src = media_url($img['path']); ?>
+            <?php foreach ($images as $i => $img):
+                $src = media_url($img['path']);
+                $alt = trim((string) $img['alt_text']);
+                if ($alt === '' || ($altCounts[$alt] ?? 0) !== 1) {
+                    $alt = ($alt !== '' ? $alt : $project['title'])
+                        . ', image ' . ($i + 1) . ' of ' . count($images);
+                } ?>
             <figure class="gallery__item" data-lightbox="<?= e($src) ?>"
-                    data-lightbox-alt="<?= e($img['alt_text'] ?: $project['title']) ?>"
+                    data-lightbox-alt="<?= e($alt) ?>"
                     aria-label="Open image <?= $i + 1 ?> of <?= count($images) ?>" data-reveal style="--i:<?= $i ?>">
-                <img src="<?= e($src) ?>" alt="<?= e($img['alt_text'] ?: $project['title']) ?>" loading="lazy" decoding="async">
+                <img src="<?= e($src) ?>" alt="<?= e($alt) ?>" loading="lazy" decoding="async">
                 <?php if (!empty($img['caption'])): ?>
                 <figcaption class="gallery__caption"><?= e($img['caption']) ?></figcaption>
                 <?php endif; ?>

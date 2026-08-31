@@ -76,20 +76,20 @@
                     <td class="actions">
                         <div class="row-actions">
                             <?php if ($row['status'] === 'published'): ?>
-                            <a class="icon-btn" target="_blank" rel="noopener" title="View"
+                            <a class="icon-btn" target="_blank" rel="noopener" title="View" aria-label="View"
                                href="<?= e(url('/blog/' . $row['slug'])) ?>"><?= icon('external') ?></a>
                             <?php endif; ?>
-                            <a class="icon-btn" title="Edit" href="<?= e(url('/admin/blog/' . (int) $row['id'] . '/edit')) ?>"><?= icon('edit') ?></a>
+                            <a class="icon-btn" title="Edit" aria-label="Edit" href="<?= e(url('/admin/blog/' . (int) $row['id'] . '/edit')) ?>"><?= icon('edit') ?></a>
                             <form method="post" style="display:inline" action="<?= e(url('/admin/blog/' . (int) $row['id'] . '/toggle')) ?>">
                                 <?= csrf_field() ?>
-                                <button class="icon-btn" type="submit" title="<?= $row['status'] === 'published' ? 'Unpublish' : 'Publish now' ?>">
+                                <button class="icon-btn" type="submit" title="<?= $row['status'] === 'published' ? 'Unpublish' : 'Publish now' ?>" aria-label="<?= $row['status'] === 'published' ? 'Unpublish' : 'Publish now' ?>">
                                     <?= icon($row['status'] === 'published' ? 'eye-off' : 'eye') ?>
                                 </button>
                             </form>
                             <form method="post" style="display:inline" action="<?= e(url('/admin/blog/' . (int) $row['id'] . '/delete')) ?>"
                                   data-confirm="Delete this post permanently?">
                                 <?= csrf_field() ?>
-                                <button class="icon-btn icon-btn--danger" type="submit" title="Delete"><?= icon('trash') ?></button>
+                                <button class="icon-btn icon-btn--danger" type="submit" title="Delete" aria-label="Delete"><?= icon('trash') ?></button>
                             </form>
                         </div>
                     </td>

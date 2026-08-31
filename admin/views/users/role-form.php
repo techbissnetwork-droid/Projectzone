@@ -25,8 +25,9 @@ $granted = (array) old('permissions', $granted);
                     <div class="field">
                         <label class="label" for="r-name">Role name <span class="req">*</span></label>
                         <input class="input<?= error_for('name') ? ' is-invalid' : '' ?>" id="r-name" type="text"
-                               name="name" value="<?= e($val('name')) ?>" required maxlength="80" <?= $isSuper ? 'readonly' : '' ?>>
-                        <?php if (error_for('name')): ?><span class="field-error"><?= e(error_for('name')) ?></span><?php endif; ?>
+                               name="name" value="<?= e($val('name')) ?>" required maxlength="80" <?= $isSuper ? 'readonly' : '' ?>
+                               <?= $view->partial('partials/field-invalid', ['key' => 'name']) ?>>
+                        <?= $view->partial('partials/field-error', ['key' => 'name', 'withIcon' => false]) ?>
                     </div>
                     <div class="field">
                         <label class="label" for="r-desc">Description</label>

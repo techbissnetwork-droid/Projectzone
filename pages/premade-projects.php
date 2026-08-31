@@ -14,6 +14,7 @@ $sorts    = ['featured' => 'Featured first', 'newest' => 'Newest', 'name' => 'A 
 
 <section class="section section--flush-top">
     <div class="container">
+        <h2 class="sr-only">Available projects</h2>
         <?php if ($categories || $industries): ?>
         <form class="filter-bar" method="get" action="<?= e(url('/premade-projects')) ?>" data-reveal>
             <div class="filter-bar__scroll">

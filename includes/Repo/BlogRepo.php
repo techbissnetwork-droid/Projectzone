@@ -46,7 +46,7 @@ final class BlogRepo extends BaseRepo
         $whereSql = implode(' AND ', $where);
 
         $total  = $this->db()->int("SELECT COUNT(DISTINCT p.id) $joins WHERE $whereSql", $params);
-        $offset = max(0, ($page - 1) * $perPage);
+        $offset = max(0, (min($page, 1000000) - 1) * $perPage); // clamp page: an absurd ?page must not overflow the int product into a float and corrupt the SQL OFFSET
         $items  = $this->db()->all(
             'SELECT DISTINCT ' . self::SELECT . " $joins WHERE $whereSql ORDER BY p.published_at DESC, p.id DESC LIMIT "
             . (int) $perPage . ' OFFSET ' . $offset,

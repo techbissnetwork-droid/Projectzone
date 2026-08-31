@@ -34,7 +34,7 @@
                         </label>
                     </td>
                     <td class="actions">
-                        <a class="icon-btn" title="Edit" href="<?= e(url('/admin/homepage/' . (int) $row['id'] . '/edit')) ?>"><?= icon('edit') ?></a>
+                        <a class="icon-btn" title="Edit" aria-label="Edit" href="<?= e(url('/admin/homepage/' . (int) $row['id'] . '/edit')) ?>"><?= icon('edit') ?></a>
                     </td>
                 </tr>
                 <?php endforeach; ?>

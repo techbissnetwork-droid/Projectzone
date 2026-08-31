@@ -83,7 +83,7 @@ final class PurchaseRepo
         }
         $w      = implode(' AND ', $where);
         $total  = $this->db()->int("SELECT COUNT(*) FROM package_purchases p JOIN customers c ON c.id = p.customer_id WHERE $w", $params);
-        $offset = max(0, ($page - 1) * $perPage);
+        $offset = max(0, (min($page, 1000000) - 1) * $perPage); // clamp page: an absurd ?page must not overflow the int product into a float and corrupt the SQL OFFSET
         $items  = $this->db()->all(
             "SELECT p.*, c.name AS customer_name, c.email AS customer_email, c.business_name
              FROM package_purchases p JOIN customers c ON c.id = p.customer_id

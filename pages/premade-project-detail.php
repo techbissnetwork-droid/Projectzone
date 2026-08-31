@@ -120,14 +120,14 @@ $meta = array_filter([
             <div>
                 <?php if (trim(strip_tags((string) $project['description'])) !== ''): ?>
                 <div class="case-block" data-reveal>
-                    <p class="eyebrow case-block__label">About it</p>
+                    <h2 class="eyebrow case-block__label" style="line-height:inherit">About it</h2>
                     <div class="prose"><?= $project['description'] ?></div>
                 </div>
                 <?php endif; ?>
 
                 <?php if ($features): ?>
                 <div class="case-block" data-reveal>
-                    <p class="eyebrow case-block__label">What you get</p>
+                    <h2 class="eyebrow case-block__label" style="line-height:inherit">What you get</h2>
                     <div class="mt-4">
                         <?php foreach ($features as $f): ?>
                         <div class="feature-row<?= (int) $f['is_included'] === 0 ? ' feature-row--excluded' : '' ?>">
@@ -146,7 +146,7 @@ $meta = array_filter([
 
                 <?php if (trim(strip_tags((string) $project['whats_included'])) !== ''): ?>
                 <div class="case-block" data-reveal>
-                    <p class="eyebrow case-block__label">Also included</p>
+                    <h2 class="eyebrow case-block__label" style="line-height:inherit">Also included</h2>
                     <div class="prose"><?= $project['whats_included'] ?></div>
                 </div>
                 <?php endif; ?>
@@ -251,12 +251,24 @@ $meta = array_filter([
             <span class="eyebrow">Screens</span>
             <h2>A look inside.</h2>
         </div>
+        <?php
+        // Alt text has to tell the images apart: the stored text is often the same
+        // line for every shot, so anything not unique to this image gets its
+        // position instead.
+        $altCounts = array_count_values(array_map(static fn ($im) => trim((string) $im['alt_text']), $images));
+        ?>
         <div class="gallery" data-reveal-stagger>
-            <?php foreach ($images as $i => $img): $src = media_url($img['path']); ?>
+            <?php foreach ($images as $i => $img):
+                $src = media_url($img['path']);
+                $alt = trim((string) $img['alt_text']);
+                if ($alt === '' || ($altCounts[$alt] ?? 0) !== 1) {
+                    $alt = ($alt !== '' ? $alt : $project['name'])
+                        . ', image ' . ($i + 1) . ' of ' . count($images);
+                } ?>
             <figure class="gallery__item" data-lightbox="<?= e($src) ?>"
-                    data-lightbox-alt="<?= e($img['alt_text'] ?: $project['name']) ?>"
+                    data-lightbox-alt="<?= e($alt) ?>"
                     aria-label="Open image <?= $i + 1 ?> of <?= count($images) ?>" data-reveal style="--i:<?= $i ?>">
-                <img src="<?= e($src) ?>" alt="<?= e($img['alt_text'] ?: $project['name']) ?>" loading="lazy" decoding="async">
+                <img src="<?= e($src) ?>" alt="<?= e($alt) ?>" loading="lazy" decoding="async">
                 <?php if (!empty($img['caption'])): ?>
                 <figcaption class="gallery__caption"><?= e($img['caption']) ?></figcaption>
                 <?php endif; ?>
@@ -296,8 +308,9 @@ $meta = array_filter([
                     <div class="field">
                         <label class="label" for="pe-name">Your name <span class="req" aria-hidden="true">*</span></label>
                         <input class="input<?= error_for('name') ? ' is-invalid' : '' ?>" id="pe-name" type="text" name="name"
-                               value="<?= e(old('name')) ?>" required maxlength="120" autocomplete="name">
-                        <?php if (error_for('name')): ?><span class="field-error"><?= icon('alert') ?><?= e(error_for('name')) ?></span><?php endif; ?>
+                               value="<?= e(old('name')) ?>" required maxlength="120" autocomplete="name"
+                               <?= $view->partial('partials/field-invalid', ['key' => 'name']) ?>>
+                        <?= $view->partial('partials/field-error', ['key' => 'name']) ?>
                     </div>
                     <div class="field">
                         <label class="label" for="pe-business">Business</label>
@@ -310,14 +323,16 @@ $meta = array_filter([
                     <div class="field">
                         <label class="label" for="pe-email">Email <span class="req" aria-hidden="true">*</span></label>
                         <input class="input<?= error_for('email') ? ' is-invalid' : '' ?>" id="pe-email" type="email" name="email"
-                               value="<?= e(old('email')) ?>" required maxlength="190" autocomplete="email">
-                        <?php if (error_for('email')): ?><span class="field-error"><?= icon('alert') ?><?= e(error_for('email')) ?></span><?php endif; ?>
+                               value="<?= e(old('email')) ?>" required maxlength="190" autocomplete="email"
+                               <?= $view->partial('partials/field-invalid', ['key' => 'email']) ?>>
+                        <?= $view->partial('partials/field-error', ['key' => 'email']) ?>
                     </div>
                     <div class="field">
                         <label class="label" for="pe-phone">Phone / WhatsApp</label>
                         <input class="input<?= error_for('phone') ? ' is-invalid' : '' ?>" id="pe-phone" type="tel" name="phone"
-                               value="<?= e(old('phone')) ?>" maxlength="32" autocomplete="tel">
-                        <?php if (error_for('phone')): ?><span class="field-error"><?= icon('alert') ?><?= e(error_for('phone')) ?></span><?php endif; ?>
+                               value="<?= e(old('phone')) ?>" maxlength="32" autocomplete="tel"
+                               <?= $view->partial('partials/field-invalid', ['key' => 'phone']) ?>>
+                        <?= $view->partial('partials/field-error', ['key' => 'phone']) ?>
                     </div>
                 </div>
 

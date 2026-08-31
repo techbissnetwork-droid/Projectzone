@@ -45,8 +45,9 @@ $stepLabels  = ['Business', 'Needs', 'Budget', 'Timeline', 'Details', 'Contact']
                             <div class="field">
                                 <label class="label" for="j-business">Business name <span class="req" aria-hidden="true">*</span></label>
                                 <input class="input<?= error_for('business_name') ? ' is-invalid' : '' ?>" id="j-business" type="text"
-                                       name="business_name" value="<?= e(old('business_name')) ?>" required maxlength="190" autocomplete="organization">
-                                <?php if (error_for('business_name')): ?><span class="field-error"><?= icon('alert') ?><?= e(error_for('business_name')) ?></span><?php endif; ?>
+                                       name="business_name" value="<?= e(old('business_name')) ?>" required maxlength="190" autocomplete="organization"
+                                       <?= $view->partial('partials/field-invalid', ['key' => 'business_name']) ?>>
+                                <?= $view->partial('partials/field-error', ['key' => 'business_name']) ?>
                             </div>
 
                             <?php if ($industries): ?>
@@ -192,14 +193,16 @@ $stepLabels  = ['Business', 'Needs', 'Budget', 'Timeline', 'Details', 'Contact']
                                 <div class="field">
                                     <label class="label" for="j-name">Your name <span class="req" aria-hidden="true">*</span></label>
                                     <input class="input<?= error_for('name') ? ' is-invalid' : '' ?>" id="j-name" type="text" name="name"
-                                           value="<?= e(old('name')) ?>" required maxlength="120" autocomplete="name">
-                                    <?php if (error_for('name')): ?><span class="field-error"><?= icon('alert') ?><?= e(error_for('name')) ?></span><?php endif; ?>
+                                           value="<?= e(old('name')) ?>" required maxlength="120" autocomplete="name"
+                                           <?= $view->partial('partials/field-invalid', ['key' => 'name']) ?>>
+                                    <?= $view->partial('partials/field-error', ['key' => 'name']) ?>
                                 </div>
                                 <div class="field">
                                     <label class="label" for="j-email">Email <span class="req" aria-hidden="true">*</span></label>
                                     <input class="input<?= error_for('email') ? ' is-invalid' : '' ?>" id="j-email" type="email" name="email"
-                                           value="<?= e(old('email')) ?>" required maxlength="190" autocomplete="email">
-                                    <?php if (error_for('email')): ?><span class="field-error"><?= icon('alert') ?><?= e(error_for('email')) ?></span><?php endif; ?>
+                                           value="<?= e(old('email')) ?>" required maxlength="190" autocomplete="email"
+                                           <?= $view->partial('partials/field-invalid', ['key' => 'email']) ?>>
+                                    <?= $view->partial('partials/field-error', ['key' => 'email']) ?>
                                 </div>
                             </div>
                             <div class="field--row">

@@ -28,8 +28,9 @@ $selTags = array_map('intval', (array) old('tags', $selectedTags));
                         <div class="field">
                             <label class="label" for="b-title">Title <span class="req">*</span></label>
                             <input class="input<?= error_for('title') ? ' is-invalid' : '' ?>" id="b-title" type="text"
-                                   name="title" value="<?= e($val('title')) ?>" required maxlength="190" data-counter>
-                            <?php if (error_for('title')): ?><span class="field-error"><?= e(error_for('title')) ?></span><?php endif; ?>
+                                   name="title" value="<?= e($val('title')) ?>" required maxlength="190" data-counter
+                                   <?= $view->partial('partials/field-invalid', ['key' => 'title']) ?>>
+                            <?= $view->partial('partials/field-error', ['key' => 'title', 'withIcon' => false]) ?>
                         </div>
 
                         <div class="field">
@@ -37,7 +38,8 @@ $selTags = array_map('intval', (array) old('tags', $selectedTags));
                             <div class="input-group">
                                 <input class="input" id="b-slug" type="text" name="slug" value="<?= e($val('slug')) ?>"
                                        maxlength="190" data-slug-from="title" spellcheck="false">
-                                <button class="btn btn--quiet btn--sm" type="button" data-slug-regenerate><?= icon('refresh') ?></button>
+                                <button class="btn btn--quiet btn--sm" type="button" data-slug-regenerate
+                                        aria-label="Regenerate slug from the title"><?= icon('refresh') ?></button>
                             </div>
                             <span class="hint">/blog/<?= e($val('slug') ?: 'article-slug') ?></span>
                         </div>
@@ -111,9 +113,10 @@ $selTags = array_map('intval', (array) old('tags', $selectedTags));
                         <div class="field">
                             <label class="label" for="b-date">Publish date &amp; time</label>
                             <input class="input<?= error_for('published_at') ? ' is-invalid' : '' ?>" id="b-date" type="datetime-local"
-                                   name="published_at" value="<?= e(str_replace(' ', 'T', substr((string) $val('published_at'), 0, 16))) ?>">
-                            <span class="hint">Required when scheduling. Left blank on publish, it uses the current time.</span>
-                            <?php if (error_for('published_at')): ?><span class="field-error"><?= e(error_for('published_at')) ?></span><?php endif; ?>
+                                   name="published_at" value="<?= e(str_replace(' ', 'T', substr((string) $val('published_at'), 0, 16))) ?>"
+                                   <?= $view->partial('partials/field-invalid', ['key' => 'published_at', 'describedBy' => 'hint-published_at']) ?>>
+                            <span class="hint" id="hint-published_at">Required when scheduling. Left blank on publish, it uses the current time.</span>
+                            <?= $view->partial('partials/field-error', ['key' => 'published_at', 'withIcon' => false]) ?>
                         </div>
                         <label class="switch">
                             <input type="checkbox" name="is_featured" value="1" <?= (int) $val('is_featured', 0) === 1 ? 'checked' : '' ?>>

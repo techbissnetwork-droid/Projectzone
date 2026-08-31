@@ -37,6 +37,13 @@ use Techbiss\Core\Auth;
                     $value = (string) old($key, $row['value'] ?? '');
                     $err   = error_for($key);
                     $id    = 's-' . preg_replace('/[^a-z0-9_]/i', '', $key);
+                    $errId = 'err-' . $id;
+                    $hintId = 'hint-' . $id;
+                    // The control points at whichever description is on screen: the error
+                    // replaces the hint below it, so pointing at a hidden hint would dangle.
+                    $describedBy = $err !== '' ? $errId : (!empty($row['hint']) ? $hintId : '');
+                    $aria = ($err !== '' ? ' aria-invalid="true"' : '')
+                        . ($describedBy !== '' ? ' aria-describedby="' . e($describedBy) . '"' : '');
                 ?>
                 <div class="field">
                     <?php if ($type !== 'bool'): ?>
@@ -45,15 +52,15 @@ use Techbiss\Core\Auth;
 
                     <?php if ($type === 'bool'): ?>
                         <label class="switch">
-                            <input type="checkbox" id="<?= e($id) ?>" name="<?= e($key) ?>" value="1" <?= $value === '1' ? 'checked' : '' ?>>
+                            <input type="checkbox" id="<?= e($id) ?>" name="<?= e($key) ?>" value="1" <?= $value === '1' ? 'checked' : '' ?><?= $aria ?>>
                             <span class="switch__track" aria-hidden="true"></span>
                             <span><?= e($row['label'] ?: $key) ?></span>
                         </label>
                     <?php elseif ($type === 'textarea'): ?>
                         <textarea class="textarea<?= $err ? ' is-invalid' : '' ?>" id="<?= e($id) ?>" name="<?= e($key) ?>"
-                                  maxlength="20000"><?= e($value) ?></textarea>
+                                  maxlength="20000"<?= $aria ?>><?= e($value) ?></textarea>
                     <?php elseif ($type === 'image'): ?>
-                        <div class="media-field" data-media-field>
+                        <div class="media-field" data-media-field<?= $aria ?>>
                             <div class="media-field__preview">
                                 <?php $img = media_url($value); ?>
                                 <?php if ($img !== ''): ?><img src="<?= e($img) ?>" alt=""><?php else: ?><?= icon('image') ?><?php endif; ?>
@@ -68,19 +75,19 @@ use Techbiss\Core\Auth;
                             </div>
                         </div>
                     <?php elseif ($type === 'select' && $key === 'theme_mode'): ?>
-                        <select class="select" id="<?= e($id) ?>" name="<?= e($key) ?>">
+                        <select class="select" id="<?= e($id) ?>" name="<?= e($key) ?>"<?= $aria ?>>
                             <option value="dark" <?= $value === 'dark' ? 'selected' : '' ?>>Dark (default)</option>
                             <option value="light" <?= $value === 'light' ? 'selected' : '' ?>>Light</option>
                         </select>
                     <?php else: ?>
                         <input class="input<?= $err ? ' is-invalid' : '' ?>" id="<?= e($id) ?>" type="text"
-                               name="<?= e($key) ?>" value="<?= e($value) ?>" maxlength="500">
+                               name="<?= e($key) ?>" value="<?= e($value) ?>" maxlength="500"<?= $aria ?>>
                     <?php endif; ?>
 
                     <?php if ($err): ?>
-                        <span class="field-error"><?= icon('alert') ?><?= e($err) ?></span>
+                        <span class="field-error" id="<?= e($errId) ?>" role="alert"><?= icon('alert') ?><?= e($err) ?></span>
                     <?php elseif (!empty($row['hint'])): ?>
-                        <span class="hint"><?= e($row['hint']) ?></span>
+                        <span class="hint" id="<?= e($hintId) ?>"><?= e($row['hint']) ?></span>
                     <?php endif; ?>
                 </div>
                 <?php endforeach; ?>

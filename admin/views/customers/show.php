@@ -35,8 +35,9 @@ $val = static fn (string $k, $d = '') => old($k, $row[$k] ?? $d);
                             <div class="field">
                                 <label class="label" for="cu-email">Email <span class="req">*</span></label>
                                 <input class="input<?= error_for('email') ? ' is-invalid' : '' ?>" id="cu-email" type="email"
-                                       name="email" value="<?= e($val('email')) ?>" required maxlength="190">
-                                <?php if (error_for('email')): ?><span class="field-error"><?= e(error_for('email')) ?></span><?php endif; ?>
+                                       name="email" value="<?= e($val('email')) ?>" required maxlength="190"
+                                       <?= $view->partial('partials/field-invalid', ['key' => 'email']) ?>>
+                                <?= $view->partial('partials/field-error', ['key' => 'email', 'withIcon' => false]) ?>
                             </div>
                             <div class="field">
                                 <label class="label" for="cu-phone">Phone</label>

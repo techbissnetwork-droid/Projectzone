@@ -64,6 +64,7 @@ if (!$showPrice) {
 
 <section class="section<?= ($anyPrepaid && $example !== null) ? '' : ' section--flush-top' ?>">
     <div class="container">
+        <h2 class="sr-only">Packages</h2>
         <?php if (!$packages): ?>
             <div class="empty-state">
                 <span class="empty-state__icon"><?= icon('package') ?></span>

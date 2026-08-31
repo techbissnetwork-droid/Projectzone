@@ -101,9 +101,12 @@ $hero = $sections['hero'] ?? [];
 <div class="section--tight" style="padding-block:2rem">
     <div class="marquee" aria-hidden="true">
         <div class="marquee__track">
-            <?php for ($pass = 0; $pass < 2; $pass++): ?>
+            <?php // The list runs twice so the scroll can loop seamlessly; the second
+                  // pass is marked so CSS can drop it when the animation is off and
+                  // the track wraps, which would otherwise show every name twice.
+            for ($pass = 0; $pass < 2; $pass++): ?>
                 <?php foreach ($services as $svc): ?>
-                <span class="marquee__item"><?= icon((string) ($svc['icon'] ?: 'spark')) ?><?= e($svc['name']) ?></span>
+                <span class="marquee__item<?= $pass === 1 ? ' marquee__item--dup' : '' ?>"><?= icon((string) ($svc['icon'] ?: 'spark')) ?><?= e($svc['name']) ?></span>
                 <?php endforeach; ?>
             <?php endfor; ?>
         </div>
@@ -481,7 +484,8 @@ $hero = $sections['hero'] ?? [];
                 <?php $img = media_url($post['featured_image']); ?>
                 <?php if ($img !== ''): ?>
                 <div class="post-card__media">
-                    <img src="<?= e($img) ?>" alt="<?= e($post['title']) ?>" loading="lazy" decoding="async" width="600" height="338">
+                    <?php /* Decorative: the post's title link below says exactly this. */ ?>
+                    <img src="<?= e($img) ?>" alt="" loading="lazy" decoding="async" width="600" height="338">
                 </div>
                 <?php endif; ?>
                 <div class="post-card__body">

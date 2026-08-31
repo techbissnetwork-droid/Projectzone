@@ -40,7 +40,7 @@ final class ActivityLog
         }
         $w      = implode(' AND ', $where);
         $total  = $db->int("SELECT COUNT(*) FROM activity_logs WHERE $w", $params);
-        $offset = max(0, ($page - 1) * $perPage);
+        $offset = max(0, (min($page, 1000000) - 1) * $perPage); // clamp page: an absurd ?page must not overflow the int product into a float and corrupt the SQL OFFSET
         $items  = $db->all(
             "SELECT * FROM activity_logs WHERE $w ORDER BY created_at DESC, id DESC LIMIT " . (int) $perPage . " OFFSET $offset",
             $params

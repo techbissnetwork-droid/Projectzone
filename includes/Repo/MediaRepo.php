@@ -43,7 +43,7 @@ final class MediaRepo
         }
         $w      = implode(' AND ', $where);
         $total  = $this->db()->int("SELECT COUNT(*) FROM media WHERE $w", $params);
-        $offset = max(0, ($page - 1) * $perPage);
+        $offset = max(0, (min($page, 1000000) - 1) * $perPage); // clamp page: an absurd ?page must not overflow the int product into a float and corrupt the SQL OFFSET
         $items  = $this->db()->all(
             "SELECT * FROM media WHERE $w ORDER BY created_at DESC, id DESC LIMIT " . (int) $perPage . " OFFSET $offset",
             $params

@@ -23,8 +23,9 @@ $val    = static fn (string $k, $d = '') => old($k, $row[$k] ?? $d);
                     <div class="field">
                         <label class="label" for="u-name">Name <span class="req">*</span></label>
                         <input class="input<?= error_for('name') ? ' is-invalid' : '' ?>" id="u-name" type="text"
-                               name="name" value="<?= e($val('name')) ?>" required maxlength="120">
-                        <?php if (error_for('name')): ?><span class="field-error"><?= e(error_for('name')) ?></span><?php endif; ?>
+                               name="name" value="<?= e($val('name')) ?>" required maxlength="120"
+                               <?= $view->partial('partials/field-invalid', ['key' => 'name']) ?>>
+                        <?= $view->partial('partials/field-error', ['key' => 'name', 'withIcon' => false]) ?>
                     </div>
                     <div class="field">
                         <label class="label" for="u-job">Job title</label>
@@ -35,20 +36,22 @@ $val    = static fn (string $k, $d = '') => old($k, $row[$k] ?? $d);
                 <div class="field">
                     <label class="label" for="u-email">Email <span class="req">*</span></label>
                     <input class="input<?= error_for('email') ? ' is-invalid' : '' ?>" id="u-email" type="email"
-                           name="email" value="<?= e($val('email')) ?>" required maxlength="190" autocomplete="off">
-                    <?php if (error_for('email')): ?><span class="field-error"><?= e(error_for('email')) ?></span><?php endif; ?>
+                           name="email" value="<?= e($val('email')) ?>" required maxlength="190" autocomplete="off"
+                           <?= $view->partial('partials/field-invalid', ['key' => 'email']) ?>>
+                    <?= $view->partial('partials/field-error', ['key' => 'email', 'withIcon' => false]) ?>
                 </div>
 
                 <div class="field">
                     <label class="label" for="u-role">Role <span class="req">*</span></label>
-                    <select class="select<?= error_for('role_id') ? ' is-invalid' : '' ?>" id="u-role" name="role_id" required>
+                    <select class="select<?= error_for('role_id') ? ' is-invalid' : '' ?>" id="u-role" name="role_id" required
+                            <?= $view->partial('partials/field-invalid', ['key' => 'role_id']) ?>>
                         <?php foreach ($roles as $role): ?>
                         <option value="<?= (int) $role['id'] ?>" <?= (int) $val('role_id') === (int) $role['id'] ? 'selected' : '' ?>>
                             <?= e($role['name']) ?> — <?= e($role['description']) ?>
                         </option>
                         <?php endforeach; ?>
                     </select>
-                    <?php if (error_for('role_id')): ?><span class="field-error"><?= e(error_for('role_id')) ?></span><?php endif; ?>
+                    <?= $view->partial('partials/field-error', ['key' => 'role_id', 'withIcon' => false]) ?>
                 </div>
 
                 <div class="field">
@@ -64,9 +67,10 @@ $val    = static fn (string $k, $d = '') => old($k, $row[$k] ?? $d);
                     <div class="field">
                         <label class="label" for="u-password"><?= $isNew ? 'Password' : 'New password' ?><?php if ($isNew): ?> <span class="req">*</span><?php endif; ?></label>
                         <input class="input<?= error_for('password') ? ' is-invalid' : '' ?>" id="u-password" type="password"
-                               name="password" <?= $isNew ? 'required' : '' ?> minlength="10" autocomplete="new-password">
-                        <span class="hint">At least 10 characters with letters and numbers.</span>
-                        <?php if (error_for('password')): ?><span class="field-error"><?= e(error_for('password')) ?></span><?php endif; ?>
+                               name="password" <?= $isNew ? 'required' : '' ?> minlength="10" autocomplete="new-password"
+                               <?= $view->partial('partials/field-invalid', ['key' => 'password', 'describedBy' => 'hint-password']) ?>>
+                        <span class="hint" id="hint-password">At least 10 characters with letters and numbers.</span>
+                        <?= $view->partial('partials/field-error', ['key' => 'password', 'withIcon' => false]) ?>
                     </div>
                     <div class="field">
                         <label class="label" for="u-confirm">Confirm password</label>

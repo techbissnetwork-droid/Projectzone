@@ -61,14 +61,14 @@ $query = array_filter(['q' => $search, 'status' => $status]);
                             <form method="post" style="display:inline" action="<?= e(url('/admin/subscribers/' . (int) $row['id'])) ?>">
                                 <?= csrf_field() ?>
                                 <input type="hidden" name="status" value="<?= $row['status'] === 'subscribed' ? 'unsubscribed' : 'subscribed' ?>">
-                                <button class="icon-btn" type="submit" title="<?= $row['status'] === 'subscribed' ? 'Mark unsubscribed' : 'Mark subscribed' ?>">
+                                <button class="icon-btn" type="submit" title="<?= $row['status'] === 'subscribed' ? 'Mark unsubscribed' : 'Mark subscribed' ?>" aria-label="<?= $row['status'] === 'subscribed' ? 'Mark unsubscribed' : 'Mark subscribed' ?>">
                                     <?= icon($row['status'] === 'subscribed' ? 'x-circle' : 'check-circle') ?>
                                 </button>
                             </form>
                             <form method="post" style="display:inline" action="<?= e(url('/admin/subscribers/' . (int) $row['id'] . '/delete')) ?>"
                                   data-confirm="Remove this subscriber permanently?">
                                 <?= csrf_field() ?>
-                                <button class="icon-btn icon-btn--danger" type="submit" title="Delete"><?= icon('trash') ?></button>
+                                <button class="icon-btn icon-btn--danger" type="submit" title="Delete" aria-label="Delete"><?= icon('trash') ?></button>
                             </form>
                         </div>
                         <?php endif; ?>

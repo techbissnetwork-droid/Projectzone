@@ -32,8 +32,9 @@ $selSvc  = array_map('intval', (array) old('services', $selectedSvc));
                         <div class="field">
                             <label class="label" for="p-title">Title <span class="req">*</span></label>
                             <input class="input<?= error_for('title') ? ' is-invalid' : '' ?>" id="p-title" type="text"
-                                   name="title" value="<?= e($val('title')) ?>" required maxlength="190" data-counter>
-                            <?php if (error_for('title')): ?><span class="field-error"><?= icon('alert') ?><?= e(error_for('title')) ?></span><?php endif; ?>
+                                   name="title" value="<?= e($val('title')) ?>" required maxlength="190" data-counter
+                                   <?= $view->partial('partials/field-invalid', ['key' => 'title']) ?>>
+                            <?= $view->partial('partials/field-error', ['key' => 'title']) ?>
                         </div>
 
                         <div class="field">
@@ -41,7 +42,8 @@ $selSvc  = array_map('intval', (array) old('services', $selectedSvc));
                             <div class="input-group">
                                 <input class="input" id="p-slug" type="text" name="slug" value="<?= e($val('slug')) ?>"
                                        maxlength="190" data-slug-from="title" spellcheck="false">
-                                <button class="btn btn--quiet btn--sm" type="button" data-slug-regenerate><?= icon('refresh') ?></button>
+                                <button class="btn btn--quiet btn--sm" type="button" data-slug-regenerate
+                                        aria-label="Regenerate slug from the title"><?= icon('refresh') ?></button>
                             </div>
                             <span class="hint">/portfolio/<?= e($val('slug') ?: 'project-name') ?></span>
                         </div>

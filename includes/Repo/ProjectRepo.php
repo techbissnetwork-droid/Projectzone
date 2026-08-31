@@ -66,7 +66,7 @@ final class ProjectRepo extends BaseRepo
         $order    = self::SORTS[$sort] ?? self::SORTS['featured'];
 
         $total  = $this->db()->int('SELECT COUNT(*) ' . self::JOINS . ' WHERE ' . $whereSql, $params);
-        $offset = max(0, ($page - 1) * $perPage);
+        $offset = max(0, (min($page, 1000000) - 1) * $perPage); // clamp page: an absurd ?page must not overflow the int product into a float and corrupt the SQL OFFSET
         $items  = $this->db()->all(
             'SELECT ' . self::SELECT_LIST . ' ' . self::JOINS . ' WHERE ' . $whereSql .
             ' ORDER BY ' . $order . ' LIMIT ' . (int) $perPage . ' OFFSET ' . $offset,

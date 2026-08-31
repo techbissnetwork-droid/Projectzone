@@ -103,8 +103,9 @@ $whatsapp = preg_replace('/[^0-9]/', '', $settings->get('whatsapp'));
                             <div class="field">
                                 <label class="label" for="c-name">Your name <span class="req" aria-hidden="true">*</span></label>
                                 <input class="input<?= error_for('name') ? ' is-invalid' : '' ?>" id="c-name" type="text" name="name"
-                                       value="<?= e(old('name')) ?>" required maxlength="120" autocomplete="name">
-                                <?php if (error_for('name')): ?><span class="field-error"><?= icon('alert') ?><?= e(error_for('name')) ?></span><?php endif; ?>
+                                       value="<?= e(old('name')) ?>" required maxlength="120" autocomplete="name"
+                                       <?= $view->partial('partials/field-invalid', ['key' => 'name']) ?>>
+                                <?= $view->partial('partials/field-error', ['key' => 'name']) ?>
                             </div>
                             <div class="field">
                                 <label class="label" for="c-company">Company</label>
@@ -117,8 +118,9 @@ $whatsapp = preg_replace('/[^0-9]/', '', $settings->get('whatsapp'));
                             <div class="field">
                                 <label class="label" for="c-email">Email <span class="req" aria-hidden="true">*</span></label>
                                 <input class="input<?= error_for('email') ? ' is-invalid' : '' ?>" id="c-email" type="email" name="email"
-                                       value="<?= e(old('email')) ?>" required maxlength="190" autocomplete="email">
-                                <?php if (error_for('email')): ?><span class="field-error"><?= icon('alert') ?><?= e(error_for('email')) ?></span><?php endif; ?>
+                                       value="<?= e(old('email')) ?>" required maxlength="190" autocomplete="email"
+                                       <?= $view->partial('partials/field-invalid', ['key' => 'email']) ?>>
+                                <?= $view->partial('partials/field-error', ['key' => 'email']) ?>
                             </div>
                             <div class="field">
                                 <label class="label" for="c-phone">Phone</label>
@@ -147,8 +149,9 @@ $whatsapp = preg_replace('/[^0-9]/', '', $settings->get('whatsapp'));
                         <div class="field">
                             <label class="label" for="c-message">Message <span class="req" aria-hidden="true">*</span></label>
                             <textarea class="textarea<?= error_for('message') ? ' is-invalid' : '' ?>" id="c-message" name="message"
-                                      required maxlength="5000" placeholder="Tell us about your business and what you are trying to solve."><?= e(old('message')) ?></textarea>
-                            <?php if (error_for('message')): ?><span class="field-error"><?= icon('alert') ?><?= e(error_for('message')) ?></span><?php endif; ?>
+                                      required maxlength="5000" placeholder="Tell us about your business and what you are trying to solve."
+                                      <?= $view->partial('partials/field-invalid', ['key' => 'message']) ?>><?= e(old('message')) ?></textarea>
+                            <?= $view->partial('partials/field-error', ['key' => 'message']) ?>
                         </div>
 
                         <div class="form-actions">

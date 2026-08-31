@@ -98,18 +98,18 @@
                     <td class="actions">
                         <div class="row-actions">
                             <?php if ((int) $row['is_published'] === 1): ?>
-                            <a class="icon-btn" title="View on the site" target="_blank" rel="noopener"
+                            <a class="icon-btn" title="View on the site" aria-label="View on the site" target="_blank" rel="noopener"
                                href="<?= e(url('/portfolio/' . $row['slug'])) ?>"><?= icon('external') ?></a>
                             <?php endif; ?>
-                            <a class="icon-btn" title="Edit" href="<?= e(url('/admin/portfolio/' . (int) $row['id'] . '/edit')) ?>"><?= icon('edit') ?></a>
+                            <a class="icon-btn" title="Edit" aria-label="Edit" href="<?= e(url('/admin/portfolio/' . (int) $row['id'] . '/edit')) ?>"><?= icon('edit') ?></a>
                             <form method="post" style="display:inline" action="<?= e(url('/admin/portfolio/' . (int) $row['id'] . '/duplicate')) ?>">
                                 <?= csrf_field() ?>
-                                <button class="icon-btn" type="submit" title="Duplicate as a draft"><?= icon('copy') ?></button>
+                                <button class="icon-btn" type="submit" title="Duplicate as a draft" aria-label="Duplicate as a draft"><?= icon('copy') ?></button>
                             </form>
                             <form method="post" style="display:inline" action="<?= e(url('/admin/portfolio/' . (int) $row['id'] . '/delete')) ?>"
                                   data-confirm="Delete this project and all of its images? This cannot be undone.">
                                 <?= csrf_field() ?>
-                                <button class="icon-btn icon-btn--danger" type="submit" title="Delete"><?= icon('trash') ?></button>
+                                <button class="icon-btn icon-btn--danger" type="submit" title="Delete" aria-label="Delete"><?= icon('trash') ?></button>
                             </form>
                         </div>
                     </td>

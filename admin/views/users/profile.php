@@ -29,8 +29,9 @@ $val = static fn (string $k, $d = '') => old($k, $row[$k] ?? $d);
                     <div class="field">
                         <label class="label" for="pr-email">Email</label>
                         <input class="input<?= error_for('email') ? ' is-invalid' : '' ?>" id="pr-email" type="email"
-                               name="email" value="<?= e($val('email')) ?>" required maxlength="190">
-                        <?php if (error_for('email')): ?><span class="field-error"><?= e(error_for('email')) ?></span><?php endif; ?>
+                               name="email" value="<?= e($val('email')) ?>" required maxlength="190"
+                               <?= $view->partial('partials/field-invalid', ['key' => 'email']) ?>>
+                        <?= $view->partial('partials/field-error', ['key' => 'email', 'withIcon' => false]) ?>
                     </div>
                 </div>
 
@@ -39,15 +40,17 @@ $val = static fn (string $k, $d = '') => old($k, $row[$k] ?? $d);
                     <div class="field">
                         <label class="label" for="pr-current">Current password</label>
                         <input class="input<?= error_for('current_password') ? ' is-invalid' : '' ?>" id="pr-current"
-                               type="password" name="current_password" autocomplete="current-password">
-                        <?php if (error_for('current_password')): ?><span class="field-error"><?= e(error_for('current_password')) ?></span><?php endif; ?>
+                               type="password" name="current_password" autocomplete="current-password"
+                               <?= $view->partial('partials/field-invalid', ['key' => 'current_password']) ?>>
+                        <?= $view->partial('partials/field-error', ['key' => 'current_password', 'withIcon' => false]) ?>
                     </div>
                     <div class="field--row">
                         <div class="field">
                             <label class="label" for="pr-password">New password</label>
                             <input class="input<?= error_for('password') ? ' is-invalid' : '' ?>" id="pr-password"
-                                   type="password" name="password" minlength="10" autocomplete="new-password">
-                            <?php if (error_for('password')): ?><span class="field-error"><?= e(error_for('password')) ?></span><?php endif; ?>
+                                   type="password" name="password" minlength="10" autocomplete="new-password"
+                                   <?= $view->partial('partials/field-invalid', ['key' => 'password']) ?>>
+                            <?= $view->partial('partials/field-error', ['key' => 'password', 'withIcon' => false]) ?>
                         </div>
                         <div class="field">
                             <label class="label" for="pr-confirm">Confirm new password</label>

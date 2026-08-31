@@ -6,7 +6,8 @@ $techs = $project['technologies'] ?? [];
 <article class="work-card" data-reveal style="--i:<?= (int) ($i ?? 0) ?>">
     <div class="work-card__media<?= $thumb === '' ? ' work-card__media--empty' : '' ?>">
         <?php if ($thumb !== ''): ?>
-            <img src="<?= e($thumb) ?>" alt="<?= e($project['title']) ?>" loading="lazy" decoding="async" width="640" height="400">
+            <?php /* Decorative: the card's title link below says exactly this. */ ?>
+            <img src="<?= e($thumb) ?>" alt="" loading="lazy" decoding="async" width="640" height="400">
         <?php else: ?>
             <?= icon('image') ?>
         <?php endif; ?>

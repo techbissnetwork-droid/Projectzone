@@ -24,8 +24,9 @@ $val    = static fn (string $k, $d = '') => old($k, $row[$k] ?? $d);
                 <div class="field">
                     <label class="label" for="n-label">Label <span class="req">*</span></label>
                     <input class="input<?= error_for('label') ? ' is-invalid' : '' ?>" id="n-label" type="text"
-                           name="label" value="<?= e($val('label')) ?>" required maxlength="120">
-                    <?php if (error_for('label')): ?><span class="field-error"><?= e(error_for('label')) ?></span><?php endif; ?>
+                           name="label" value="<?= e($val('label')) ?>" required maxlength="120"
+                           <?= $view->partial('partials/field-invalid', ['key' => 'label']) ?>>
+                    <?= $view->partial('partials/field-error', ['key' => 'label', 'withIcon' => false]) ?>
                 </div>
 
                 <div class="field--row">
@@ -60,8 +61,9 @@ $val    = static fn (string $k, $d = '') => old($k, $row[$k] ?? $d);
                     <div class="field">
                         <label class="label" for="n-url">Destination</label>
                         <input class="input<?= error_for('url') ? ' is-invalid' : '' ?>" id="n-url" type="text"
-                               name="url" value="<?= e($val('url')) ?>" maxlength="500" placeholder="/services">
-                        <?php if (error_for('url')): ?><span class="field-error"><?= e(error_for('url')) ?></span><?php endif; ?>
+                               name="url" value="<?= e($val('url')) ?>" maxlength="500" placeholder="/services"
+                               <?= $view->partial('partials/field-invalid', ['key' => 'url']) ?>>
+                        <?= $view->partial('partials/field-error', ['key' => 'url', 'withIcon' => false]) ?>
                     </div>
                 </div>
 

@@ -121,19 +121,19 @@ $query     = array_filter(['q' => $search, 'status' => $status]);
                         <td class="actions">
                             <div class="row-actions">
                                 <?php if (!empty($resource['public_url']) && (int) ($row['is_published'] ?? 1) === 1): ?>
-                                <a class="icon-btn" title="View on the site" target="_blank" rel="noopener"
+                                <a class="icon-btn" title="View on the site" aria-label="View on the site" target="_blank" rel="noopener"
                                    href="<?= e(url(str_replace('{slug}', (string) ($row['slug'] ?? ''), $resource['public_url']))) ?>">
                                     <?= icon('external') ?>
                                 </a>
                                 <?php endif; ?>
-                                <a class="icon-btn" title="Edit" href="<?= e(url('/admin/' . $key . '/' . (int) $row['id'] . '/edit')) ?>">
+                                <a class="icon-btn" title="Edit" aria-label="Edit" href="<?= e(url('/admin/' . $key . '/' . (int) $row['id'] . '/edit')) ?>">
                                     <?= icon('edit') ?>
                                 </a>
                                 <form method="post" style="display:inline"
                                       action="<?= e(url('/admin/' . $key . '/' . (int) $row['id'] . '/delete')) ?>"
                                       data-confirm="Delete this <?= e(strtolower($resource['singular'])) ?>? This cannot be undone.">
                                     <?= csrf_field() ?>
-                                    <button class="icon-btn icon-btn--danger" type="submit" title="Delete"><?= icon('trash') ?></button>
+                                    <button class="icon-btn icon-btn--danger" type="submit" title="Delete" aria-label="Delete"><?= icon('trash') ?></button>
                                 </form>
                             </div>
                         </td>

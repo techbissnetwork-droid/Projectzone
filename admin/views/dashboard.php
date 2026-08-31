@@ -242,7 +242,8 @@ foreach ($packageDemand as $d) { $maxDemand = max($maxDemand, (int) $d['total'])
         <?php endif; ?>
     </div>
 
-    <aside class="stack stack-5">
+    <!-- Secondary column: counts, demand and activity beside the main figures. -->
+    <aside class="stack stack-5" aria-label="At a glance">
         <!-- Content at a glance -->
         <div class="panel">
             <div class="panel__head"><span class="panel__title">Content</span></div>
