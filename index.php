@@ -49,6 +49,7 @@ $router->get('/portfolio/{slug}', [$site, 'portfolioDetail']);
 // --- Premade projects -------------------------------------------------
 $router->get('/premade-projects', [$site, 'projects']);
 $router->post('/premade-projects/{slug}/enquire', [$site, 'projectEnquiry']);
+$router->get('/premade-projects/{slug}/apk', [$site, 'projectApk']);
 $router->get('/premade-projects/{slug}', [$site, 'projectDetail']);
 
 // --- Industries -------------------------------------------------------

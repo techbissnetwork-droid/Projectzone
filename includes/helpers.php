@@ -99,6 +99,21 @@ function money(float|int|string|null $amount, ?string $symbol = null, bool $deci
     return $symbol . number_format($amount, $whole ? 2 : 0);
 }
 
+/** A file size a person can read: 512 KB, 4.2 MB. Never "0.0 MB". */
+function human_bytes(int $bytes): string
+{
+    if ($bytes <= 0) {
+        return '';
+    }
+    if ($bytes < 1024) {
+        return $bytes . ' B';
+    }
+    if ($bytes < 1048576) {
+        return round($bytes / 1024) . ' KB';
+    }
+    return rtrim(rtrim(number_format($bytes / 1048576, 1), '0'), '.') . ' MB';
+}
+
 function format_date(?string $date, string $format = 'j M Y'): string
 {
     if ($date === null || $date === '' || str_starts_with($date, '0000')) {

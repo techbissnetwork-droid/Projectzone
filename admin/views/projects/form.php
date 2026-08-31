@@ -21,7 +21,7 @@ $formFeatures = old('features', null);
     </div>
 </div>
 
-<form method="post" action="<?= e($action) ?>" data-dirty-guard>
+<form method="post" action="<?= e($action) ?>" enctype="multipart/form-data" data-dirty-guard>
     <?= csrf_field() ?>
     <div class="form-cols">
         <div>
@@ -122,6 +122,74 @@ $formFeatures = old('features', null);
                             <strong>These credentials are printed on the public page.</strong>
                             Only ever use a throwaway account on the demo site. Never a real login, and never a password
                             used anywhere else.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile app -->
+            <div class="panel">
+                <div class="panel__head">
+                    <div>
+                        <span class="panel__title">Mobile app</span>
+                        <div class="panel__sub">Only for builds that ship an app. Leave it all blank otherwise and nothing appears.</div>
+                    </div>
+                </div>
+                <div class="panel__body">
+                    <div class="form-section">
+                        <?php $apk = (string) $val('apk_path'); ?>
+                        <div class="field">
+                            <span class="label">Test APK</span>
+                            <?php if ($apk !== ''): ?>
+                            <div class="row row--tight">
+                                <span class="badge"><?= e(basename($apk)) ?></span>
+                                <span class="hint tabular"><?= e(human_bytes((int) $val('apk_size_bytes', 0))) ?></span>
+                                <label class="check">
+                                    <input type="checkbox" name="apk_remove" value="1">
+                                    <span class="check__box" aria-hidden="true"></span><span>Remove on save</span>
+                                </label>
+                            </div>
+                            <span class="hint">Uploading a new file replaces this one.</span>
+                            <?php endif; ?>
+                            <input class="input mt-2" type="file" name="apk" accept=".apk,application/vnd.android.package-archive">
+                            <span class="hint">
+                                Checked on upload for an Android manifest, so an archive renamed <code>.apk</code> is refused.
+                                It is served as a download, never run on the server.
+                            </span>
+                        </div>
+
+                        <div class="field--row">
+                            <div class="field">
+                                <label class="label" for="pr-apk-url">Or link to an APK hosted elsewhere</label>
+                                <input class="input" id="pr-apk-url" type="text" name="apk_external_url"
+                                       value="<?= e($val('apk_external_url')) ?>" maxlength="500" placeholder="builds.example.com/app.apk">
+                                <span class="hint">Used only when no file is uploaded above.</span>
+                            </div>
+                            <div class="field">
+                                <label class="label" for="pr-apk-ver">Version</label>
+                                <input class="input" id="pr-apk-ver" type="text" name="apk_version"
+                                       value="<?= e($val('apk_version')) ?>" maxlength="40" placeholder="e.g. 1.4.0">
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label class="label" for="pr-apk-note">Note shown with the download</label>
+                            <input class="input" id="pr-apk-note" type="text" name="apk_note"
+                                   value="<?= e($val('apk_note')) ?>" maxlength="255"
+                                   placeholder="e.g. Android 8 or newer. Allow install from unknown sources.">
+                        </div>
+
+                        <div class="field--row">
+                            <div class="field">
+                                <label class="label" for="pr-android">Google Play URL</label>
+                                <input class="input" id="pr-android" type="text" name="android_url"
+                                       value="<?= e($val('android_url')) ?>" maxlength="500">
+                            </div>
+                            <div class="field">
+                                <label class="label" for="pr-ios">App Store URL</label>
+                                <input class="input" id="pr-ios" type="text" name="ios_url"
+                                       value="<?= e($val('ios_url')) ?>" maxlength="500">
+                            </div>
                         </div>
                     </div>
                 </div>

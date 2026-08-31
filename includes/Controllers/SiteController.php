@@ -879,6 +879,61 @@ final class SiteController
     }
 
     /**
+     * Hand over the APK for a project.
+     *
+     * Served through here rather than as a bare link so it always arrives as a
+     * download with the right type and a sensible filename, and so the stored
+     * path is checked to be a real file inside uploads/ before anything is
+     * read — a value that escapes that directory is simply a 404.
+     */
+    public function projectApk(Request $request, array $params): void
+    {
+        $project = (new ProjectRepo())->publishedBySlug((string) $params['slug']);
+        if ($project === null) {
+            $this->notFound($request);
+            return;
+        }
+
+        // An externally hosted build is a redirect; we never proxy it.
+        $external = trim((string) $project['apk_external_url']);
+        if ((string) $project['apk_path'] === '' && $external !== '') {
+            redirect($external);
+        }
+
+        $stored = ltrim((string) $project['apk_path'], '/');
+        if ($stored === '') {
+            $this->notFound($request);
+            return;
+        }
+
+        $uploads = realpath(App::root() . '/uploads');
+        $real    = realpath(App::root() . '/' . $stored);
+        if ($uploads === false || $real === false
+            || !str_starts_with($real, $uploads . DIRECTORY_SEPARATOR)
+            || !is_file($real)) {
+            $this->notFound($request);
+            return;
+        }
+
+        $name = Str::slug((string) $project['name']);
+        if ((string) $project['apk_version'] !== '') {
+            $name .= '-' . Str::slug((string) $project['apk_version']);
+        }
+
+        while (ob_get_level() > 0) {
+            ob_end_clean();
+        }
+        header('Content-Type: application/vnd.android.package-archive');
+        header('Content-Disposition: attachment; filename="' . $name . '.apk"');
+        header('Content-Length: ' . (string) filesize($real));
+        header('X-Content-Type-Options: nosniff');
+        header('Content-Security-Policy: default-src \'none\'; sandbox');
+        header('Cache-Control: public, max-age=3600');
+        readfile($real);
+        exit;
+    }
+
+    /**
      * Record an enquiry about a premade project.
      *
      * Nothing is priced or charged here. The enquiry reaches the admin with the

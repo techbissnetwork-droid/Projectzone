@@ -12,6 +12,7 @@ $techs = $project['technologies'] ?? [];
 $href  = url('/premade-projects/' . $project['slug']);
 $demo  = trim((string) ($project['demo_url'] ?? ''));
 $days  = (int) ($project['delivery_days'] ?? 0);
+$hasApk = trim((string) ($project['apk_path'] ?? '')) !== '' || trim((string) ($project['apk_external_url'] ?? '')) !== '';
 $pages = (int) ($project['page_count'] ?? 0);
 ?>
 <article class="work-card project-card" data-reveal style="--i:<?= (int) ($i ?? 0) ?>">
@@ -66,6 +67,11 @@ $pages = (int) ($project['page_count'] ?? 0);
             <?php if ($demo !== ''): ?>
             <a class="btn btn--ghost btn--sm" href="<?= e($demo) ?>" target="_blank" rel="noopener noreferrer nofollow">
                 <?= icon('external') ?>Live demo
+            </a>
+            <?php endif; ?>
+            <?php if ($hasApk): ?>
+            <a class="btn btn--ghost btn--sm" href="<?= e(url('/premade-projects/' . $project['slug'] . '/apk')) ?>">
+                <?= icon('download') ?>APK
             </a>
             <?php endif; ?>
         </div>

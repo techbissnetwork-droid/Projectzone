@@ -108,6 +108,11 @@ final class ProjectController extends BaseAdminController
             ->text('customisation_note', 500, false, 'Customisation note')
             ->url('demo_url')
             ->url('demo_admin_url')
+            ->url('apk_external_url')
+            ->url('android_url')
+            ->url('ios_url')
+            ->optional('apk_version', 40)
+            ->optional('apk_note', 255)
             ->optional('demo_username', 120)
             ->optional('demo_password', 120)
             ->optional('demo_note', 255)
@@ -152,6 +157,11 @@ final class ProjectController extends BaseAdminController
             'demo_note'          => $v->get('demo_note', ''),
             'thumbnail'          => $mediaOk($request->str('thumbnail')),
             'hero_image'         => $mediaOk($request->str('hero_image')),
+            'apk_external_url'   => $v->get('apk_external_url', ''),
+            'apk_version'        => $v->get('apk_version', ''),
+            'apk_note'           => $v->get('apk_note', ''),
+            'android_url'        => $v->get('android_url', ''),
+            'ios_url'            => $v->get('ios_url', ''),
             'licence'            => $v->get('licence', ''),
             'delivery_days'      => max(0, (int) $v->get('delivery_days', 0)),
             'revisions'          => $v->get('revisions', ''),
@@ -178,6 +188,7 @@ final class ProjectController extends BaseAdminController
             $message = 'Premade project updated.';
         }
 
+        $this->handleApk($request, $id);
         $this->repo->replaceFeatures($id, $request->rows('features'));
         $this->repo->syncTechnologies($id, array_map('intval', $request->arr('technologies')));
 
@@ -192,6 +203,50 @@ final class ProjectController extends BaseAdminController
 
         Cache::flush();
         $this->ok($message, '/admin/projects/' . $id . '/edit');
+    }
+
+    /**
+     * Store or clear the APK attached to a project.
+     *
+     * Accepted through the uploader with an allow-list of one type, so the
+     * media library still refuses packages while this field does not, and the
+     * file is verified to be a real Android package rather than any archive
+     * wearing the extension.
+     */
+    private function handleApk(Request $request, int $id): void
+    {
+        if ($request->str('apk_remove') === '1') {
+            $existing = $this->repo->find($id);
+            if ($existing !== null && (string) $existing['apk_path'] !== '') {
+                $abs = \Techbiss\Core\App::root() . '/' . ltrim((string) $existing['apk_path'], '/');
+                if (is_file($abs) && str_starts_with(realpath($abs) ?: '', \Techbiss\Core\App::root() . '/uploads/')) {
+                    @unlink($abs);
+                }
+            }
+            $this->repo->updateRow($id, ['apk_path' => '', 'apk_size_bytes' => 0]);
+            return;
+        }
+
+        $file = $request->file('apk');
+        if ($file === null || (int) ($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+            return;
+        }
+
+        $result = \Techbiss\Core\App::uploader()->store($file, 'apk', [
+            'application/vnd.android.package-archive' => 'apk',
+            'application/java-archive'                => 'apk',
+            'application/zip'                         => 'apk',
+            'application/octet-stream'                => 'apk',
+        ]);
+
+        if (!$result['ok']) {
+            flash('error', 'The APK was not saved: ' . $result['error']);
+            return;
+        }
+        $this->repo->updateRow($id, [
+            'apk_path'       => (string) $result['data']['path'],
+            'apk_size_bytes' => (int) $result['data']['size_bytes'],
+        ]);
     }
 
     public function destroy(Request $request, array $params): never

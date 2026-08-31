@@ -26,7 +26,12 @@ final class Uploader
     /**
      * @return array{ok:bool,error:string,data:array<string,mixed>}
      */
-    public function store(array $file, string $folder = 'general'): array
+    /**
+     * @param array<string,string>|null $allowedOverride MIME => extension, replacing the
+     *        configured allow-list for this one call. Used by the APK field, which accepts
+     *        a type the media library deliberately does not.
+     */
+    public function store(array $file, string $folder = 'general', ?array $allowedOverride = null): array
     {
         $fail = static fn (string $msg): array => ['ok' => false, 'error' => $msg, 'data' => []];
 
@@ -55,11 +60,18 @@ final class Uploader
         // Trust the file contents, never the client-supplied type.
         $finfo = new \finfo(FILEINFO_MIME_TYPE);
         $mime  = (string) $finfo->file($tmp);
-        $allowed = $this->cfg['allowed_mime'];
+        $allowed = $allowedOverride ?? $this->cfg['allowed_mime'];
         if (!isset($allowed[$mime])) {
-            return $fail('That file type is not allowed. Accepted types: ' . implode(', ', array_values($allowed)) . '.');
+            return $fail('That file type is not allowed. Accepted types: ' . implode(', ', array_unique(array_values($allowed))) . '.');
         }
         $ext = (string) $allowed[$mime];
+
+        // An APK is a ZIP, and so are a great many other things. Reading the
+        // MIME type alone would let any archive through under an .apk name, so
+        // the contents are checked for the manifest every Android package has.
+        if ($ext === 'apk' && !self::looksLikeApk($tmp)) {
+            return $fail('That file is not an Android package. An APK must contain AndroidManifest.xml.');
+        }
 
         $width = $height = null;
         if (str_starts_with($mime, 'image/') && $mime !== 'image/svg+xml') {
@@ -123,6 +135,45 @@ final class Uploader
                 'folder'        => $folder,
             ],
         ];
+    }
+
+    /**
+     * Does this archive actually contain an Android manifest?
+     *
+     * Every APK holds AndroidManifest.xml, and the ZIP central directory stores
+     * entry names uncompressed, so the name is present verbatim in the bytes.
+     * Read in chunks rather than loading the whole file, since an APK can be
+     * large.
+     */
+    private static function looksLikeApk(string $path): bool
+    {
+        $fh = @fopen($path, 'rb');
+        if ($fh === false) {
+            return false;
+        }
+        // ZIP local file header, so we know it is an archive at all.
+        $magic = (string) fread($fh, 4);
+        if (!in_array($magic, ["PK\x03\x04", "PK\x05\x06", "PK\x07\x08"], true)) {
+            fclose($fh);
+            return false;
+        }
+        $needle = 'AndroidManifest.xml';
+        $tail   = '';
+        $found  = false;
+        while (!feof($fh)) {
+            $chunk = (string) fread($fh, 262144);
+            if ($chunk === '') {
+                break;
+            }
+            if (str_contains($tail . $chunk, $needle)) {
+                $found = true;
+                break;
+            }
+            // Carry the overlap so a name split across two reads is still seen.
+            $tail = substr($chunk, -strlen($needle));
+        }
+        fclose($fh);
+        return $found;
     }
 
     /** Generate a smaller preview for the media library. Returns a relative path or ''. */

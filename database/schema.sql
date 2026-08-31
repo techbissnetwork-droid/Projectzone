@@ -607,6 +607,17 @@ CREATE TABLE IF NOT EXISTS `premade_projects` (
   `thumbnail`        VARCHAR(500) NOT NULL DEFAULT '',
   `hero_image`       VARCHAR(500) NOT NULL DEFAULT '',
 
+  -- Mobile builds. apk_path is a file inside uploads/; apk_external_url points
+  -- at one hosted elsewhere. Only one is used, and the download is served
+  -- through a route so it always arrives as an attachment.
+  `apk_path`         VARCHAR(500) NOT NULL DEFAULT '',
+  `apk_external_url` VARCHAR(500) NOT NULL DEFAULT '',
+  `apk_version`      VARCHAR(40)  NOT NULL DEFAULT '',
+  `apk_size_bytes`   INT UNSIGNED NOT NULL DEFAULT 0,
+  `apk_note`         VARCHAR(255) NOT NULL DEFAULT '',
+  `android_url`      VARCHAR(500) NOT NULL DEFAULT '',
+  `ios_url`          VARCHAR(500) NOT NULL DEFAULT '',
+
   -- No price is stored or shown. Every premade project is priced in
   -- conversation over WhatsApp or email, so there is no figure here to fall
   -- out of date or to advertise a saving that was never agreed.

@@ -14,6 +14,10 @@ $features = $project['features'] ?? [];
 $techs    = $project['technologies'] ?? [];
 
 $demo      = trim((string) $project['demo_url']);
+$apk       = trim((string) $project['apk_path']) !== '' || trim((string) $project['apk_external_url']) !== '';
+$apkSize   = (int) $project['apk_size_bytes'];
+$android   = trim((string) $project['android_url']);
+$ios       = trim((string) $project['ios_url']);
 $demoAdmin = trim((string) $project['demo_admin_url']);
 $demoUser  = trim((string) $project['demo_username']);
 $demoPass  = trim((string) $project['demo_password']);
@@ -69,7 +73,12 @@ $meta = array_filter([
                 <?= icon('external') ?>See it live
             </a>
             <?php endif; ?>
-            <a class="btn btn--ghost" href="#ask"><?= e($project['cta_label'] ?: 'Enquire about this') ?></a>
+            <?php if ($apk): ?>
+            <a class="btn btn--ghost" href="<?= e(url('/premade-projects/' . $project['slug'] . '/apk')) ?>">
+                <?= icon('download') ?>Download the test APK
+            </a>
+            <?php endif; ?>
+            <a class="btn btn--quiet" href="#ask"><?= e($project['cta_label'] ?: 'Enquire about this') ?></a>
         </div>
 
         <?php if ($hero !== ''): ?>
@@ -177,6 +186,37 @@ $meta = array_filter([
 
                     <?php if (!empty($project['demo_note'])): ?>
                     <p class="hint mt-3"><?= e($project['demo_note']) ?></p>
+                    <?php endif; ?>
+                </div>
+                <?php endif; ?>
+
+                <?php if ($apk || $android !== '' || $ios !== ''): ?>
+                <div class="card" data-reveal="right">
+                    <h3 class="card__title" style="font-size:var(--fs-sm)">Try the app</h3>
+                    <div class="card__footer stack stack-2">
+                        <?php if ($apk): ?>
+                        <a class="btn btn--primary btn--block" href="<?= e(url('/premade-projects/' . $project['slug'] . '/apk')) ?>">
+                            <?= icon('download') ?>Download APK<?php if ($apkSize > 0): ?>
+                            <span class="hint" style="margin-left:.35rem"><?= e(human_bytes($apkSize)) ?></span>
+                            <?php endif; ?>
+                        </a>
+                        <?php endif; ?>
+                        <?php if ($android !== ''): ?>
+                        <a class="btn btn--ghost btn--block" href="<?= e($android) ?>" target="_blank" rel="noopener noreferrer nofollow">
+                            <?= icon('device') ?>Google Play
+                        </a>
+                        <?php endif; ?>
+                        <?php if ($ios !== ''): ?>
+                        <a class="btn btn--ghost btn--block" href="<?= e($ios) ?>" target="_blank" rel="noopener noreferrer nofollow">
+                            <?= icon('device') ?>App Store
+                        </a>
+                        <?php endif; ?>
+                    </div>
+                    <?php if ((string) $project['apk_version'] !== '' || (string) $project['apk_note'] !== ''): ?>
+                    <p class="hint mt-3">
+                        <?php if ((string) $project['apk_version'] !== ''): ?>Version <?= e($project['apk_version']) ?>.<?php endif; ?>
+                        <?= e($project['apk_note']) ?>
+                    </p>
                     <?php endif; ?>
                 </div>
                 <?php endif; ?>
