@@ -91,10 +91,7 @@ final class SiteController
             'services'     => (new ServiceRepo())->featured(6),
             'projects'     => (new PortfolioRepo())->featured(3),
             'industries'   => (new IndustryRepo())->featured(8),
-            'steps'        => (new ProcessRepo())->published(6),
             'testimonials' => (new TestimonialRepo())->publishedWithProject(3),
-            'faqs'         => (new FaqRepo())->publishedFlat(6),
-            'posts'        => (new BlogRepo())->latest(3),
             'stats'        => (new StatRepo())->published(4),
             'bodyClass'    => 'page-home',
         ]);

@@ -4,8 +4,7 @@
  * tables or by a content repository — nothing on this page is hard-coded copy.
  *
  * @var array $sections @var array $services @var array $projects
- * @var array $industries @var array $steps @var array $testimonials @var array $faqs
- * @var array $posts @var array $stats
+ * @var array $industries @var array $testimonials @var array $stats
  */
 $s = static fn (string $key, string $field, string $fallback = ''): string
     => (string) ($sections[$key][$field] ?? $fallback);
@@ -213,78 +212,6 @@ $hero = $sections['hero'] ?? [];
 </section>
 <?php endif; ?>
 
-<!-- ================= TRUST / CREDIBILITY ================= -->
-<?php if (isset($sections['trust']) && $items('trust')): ?>
-<section class="section">
-    <div class="container">
-        <div class="split">
-            <div data-reveal="left">
-                <p class="eyebrow"><?= e($s('trust', 'eyebrow')) ?></p>
-                <h2 class="mt-4"><?= e($s('trust', 'heading')) ?></h2>
-                <p class="lead mt-4"><?= e($s('trust', 'subheading')) ?></p>
-                <div class="notice notice--accent mt-6">
-                    <?= icon('info') ?>
-                    <span>A professional digital presence changes how a business is found, judged and contacted.
-                    It is a foundation, not a guarantee — we will never promise you a specific level of sales or growth.</span>
-                </div>
-            </div>
-
-            <div class="stack stack-3" data-reveal="right">
-                <?php foreach ($items('trust') as $i => $item): ?>
-                <div class="card card--interactive card--spotlight" style="padding:1.1rem 1.25rem;--i:<?= $i ?>">
-                    <div class="row row--nowrap" style="align-items:flex-start;gap:.85rem">
-                        <span class="icon-plate icon-plate--sm"><?= icon((string) ($item['icon'] ?: 'check')) ?></span>
-                        <div>
-                            <div class="card__title" style="font-size:var(--fs-sm);margin-bottom:.2rem"><?= e($item['title']) ?></div>
-                            <?php if (!empty($item['description'])): ?>
-                            <p class="card__text" style="font-size:var(--fs-xs)"><?= e($item['description']) ?></p>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                </div>
-                <?php endforeach; ?>
-            </div>
-        </div>
-    </div>
-</section>
-<?php endif; ?>
-
-<!-- ================= PROCESS ================= -->
-<?php if ($steps): ?>
-<section class="section">
-    <div class="container">
-        <div class="section-head" data-reveal>
-            <p class="eyebrow"><?= e($s('process', 'eyebrow', 'How it works')) ?></p>
-            <h2 class="mt-4"><?= e($s('process', 'heading', 'Six stages from first conversation to ongoing growth.')) ?></h2>
-            <p class="lead"><?= e($s('process', 'subheading')) ?></p>
-        </div>
-
-        <div class="process">
-            <?php foreach ($steps as $step): ?>
-            <div class="process__step" data-reveal>
-                <div class="process__num"><?= e($step['step_number']) ?></div>
-                <div class="process__body">
-                    <h3 class="process__title"><?= e($step['title']) ?></h3>
-                    <p class="process__text"><?= e($step['description']) ?></p>
-                    <?php if (!empty($step['duration'])): ?>
-                    <div class="process__duration"><span class="badge"><?= icon('clock') ?><?= e($step['duration']) ?></span></div>
-                    <?php endif; ?>
-                </div>
-            </div>
-            <?php endforeach; ?>
-        </div>
-
-        <?php if ($s('process', 'cta_label') !== ''): ?>
-        <div class="row mt-6" data-reveal>
-            <a class="link" href="<?= e(url($s('process', 'cta_url', '/how-it-works'))) ?>">
-                <?= e($s('process', 'cta_label')) ?><?= icon('arrow-right') ?>
-            </a>
-        </div>
-        <?php endif; ?>
-    </div>
-</section>
-<?php endif; ?>
-
 <!-- ================= WORK ================= -->
 <?php if ($projects): ?>
 <section class="section">
@@ -382,72 +309,6 @@ $hero = $sections['hero'] ?? [];
                         <div class="quote-card__role">
                             <?= e(trim(($t['position'] ?? '') . (($t['position'] ?? '') && ($t['company'] ?? '') ? ', ' : '') . ($t['company'] ?? ''), ', ')) ?>
                         </div>
-                    </div>
-                </div>
-            </article>
-            <?php endforeach; ?>
-        </div>
-        </div>
-    </div>
-</section>
-<?php endif; ?>
-
-<!-- ================= FAQ ================= -->
-<?php if ($faqs): ?>
-<section class="section">
-    <div class="container">
-        <div class="split">
-            <div data-reveal="left">
-                <p class="eyebrow">Questions</p>
-                <h2 class="mt-4">The things businesses ask us first.</h2>
-                <p class="lead mt-4">If your question is not here, ask it directly — we answer honestly, including when the answer is “that is not something we do”.</p>
-                <div class="row mt-6">
-                    <a class="btn btn--ghost btn--arrow" href="<?= e(url('/faqs')) ?>">All questions<?= icon('arrow-right') ?></a>
-                    <a class="btn btn--quiet" href="<?= e(url('/contact')) ?>">Ask us directly</a>
-                </div>
-            </div>
-            <div data-reveal="right">
-                <?= $view->partial('partials/faq-accordion', ['faqs' => $faqs, 'groupId' => 'home']) ?>
-            </div>
-        </div>
-    </div>
-</section>
-<?php endif; ?>
-
-<!-- ================= BLOG ================= -->
-<?php if ($posts): ?>
-<section class="section">
-    <div class="container">
-        <div class="row row--between mb-6" data-reveal>
-            <div>
-                <p class="eyebrow">From the blog</p>
-                <h2 class="mt-4">Practical writing on going digital.</h2>
-            </div>
-            <a class="link hide-sm" href="<?= e(url('/blog')) ?>">All articles<?= icon('arrow-right') ?></a>
-        </div>
-
-        <div class="slider" data-slider>
-            <div class="slider__track slider__track--cards" data-reveal-stagger>
-            <?php foreach ($posts as $i => $post): ?>
-            <article class="card card--interactive post-card" style="--i:<?= $i ?>" data-reveal>
-                <?php $img = media_url($post['featured_image']); ?>
-                <?php if ($img !== ''): ?>
-                <div class="post-card__media">
-                    <?php /* Decorative: the post's title link below says exactly this. */ ?>
-                    <img src="<?= e($img) ?>" alt="" loading="lazy" decoding="async" width="600" height="338">
-                </div>
-                <?php endif; ?>
-                <div class="post-card__body">
-                    <div class="post-card__meta">
-                        <?php if (!empty($post['category_name'])): ?>
-                        <span class="badge badge--accent"><?= e($post['category_name']) ?></span>
-                        <?php endif; ?>
-                        <span><?= e(format_date($post['published_at'])) ?></span>
-                    </div>
-                    <h3 class="post-card__title"><a href="<?= e(url('/blog/' . $post['slug'])) ?>"><?= e($post['title']) ?></a></h3>
-                    <p class="post-card__excerpt"><?= e(str_limit($post['excerpt'], 120)) ?></p>
-                    <div class="post-card__foot">
-                        <span class="hint"><?= (int) $post['reading_minutes'] ?> min read</span>
                     </div>
                 </div>
             </article>
