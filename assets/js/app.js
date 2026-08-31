@@ -16,6 +16,33 @@
 
   function on(el, evt, fn, opts) { if (el) el.addEventListener(evt, fn, opts); }
 
+  // Anything focusable that a real Tab press would land on. Kept in one place
+  // because both modal surfaces below have to walk the same list.
+  var FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), ' +
+                  'textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+  // A dialog with aria-modal="true" still lets Tab walk into the page behind
+  // it — the attribute is a promise to assistive tech, not a browser feature —
+  // so the wrap has to be done by hand.
+  function trapTab(container, e) {
+    if (e.key !== 'Tab') return;
+    var nodes = $$(FOCUSABLE, container).filter(function (el) {
+      return el.offsetWidth || el.offsetHeight || el.getClientRects().length;
+    });
+    if (!nodes.length) return;
+    var first = nodes[0];
+    var last  = nodes[nodes.length - 1];
+    var active = document.activeElement;
+    var outside = !container.contains(active);
+    if (e.shiftKey && (active === first || outside)) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && (active === last || outside)) {
+      e.preventDefault();
+      first.focus();
+    }
+  }
+
   function throttleFrame(fn) {
     var queued = false;
     return function () {
@@ -57,11 +84,22 @@
   function initTheme() {
     var toggle = $('[data-theme-toggle]');
     if (!toggle) return;
+
+    // The markup ships a state-free "Switch theme", which tells a screen reader
+    // nothing about what is on now or what the press will do. Describe both
+    // from the first render, not only after someone has already clicked once.
+    function syncLabel() {
+      var light = document.documentElement.getAttribute('data-theme') === 'light';
+      toggle.setAttribute('aria-pressed', light ? 'false' : 'true');
+      toggle.setAttribute('aria-label', light ? 'Switch to dark theme' : 'Switch to light theme');
+    }
+    syncLabel();
+
     on(toggle, 'click', function () {
       var next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
       document.documentElement.setAttribute('data-theme', next);
       try { localStorage.setItem('techbiss-theme', next); } catch (e) { /* private mode */ }
-      toggle.setAttribute('aria-label', next === 'light' ? 'Switch to dark theme' : 'Switch to light theme');
+      syncLabel();
     });
   }
 
@@ -134,11 +172,36 @@
     var toggle = $('[data-nav-toggle]');
     var drawer = $('.mobile-nav');
     if (toggle && drawer) {
+      // While the drawer is open everything behind it is inert, or Tab walks
+      // off into a page nobody can see. The catch is that the control which
+      // closes the drawer is the same toggle that opened it, and it lives
+      // inside the header — inerting the header outright would leave it
+      // unclickable. So we inert every sibling along the path from the body
+      // down to the toggle, which leaves exactly the toggle and the drawer
+      // reachable. The toast stack is spared so an open toast stays dismissable.
+      var inerted = [];
+      var lockBackground = function (lock) {
+        inerted.forEach(function (el) { el.removeAttribute('inert'); });
+        inerted = [];
+        if (!lock) return;
+        var node = toggle;
+        while (node && node !== document.body && node.parentNode) {
+          Array.prototype.forEach.call(node.parentNode.children, function (sib) {
+            if (sib === node || sib === drawer || sib.hasAttribute('inert')) return;
+            if (sib.classList && sib.classList.contains('toast-stack')) return;
+            sib.setAttribute('inert', '');
+            inerted.push(sib);
+          });
+          node = node.parentNode;
+        }
+      };
+
       var setOpen = function (open) {
         drawer.classList.toggle('is-open', open);
         toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
         document.body.classList.toggle('no-scroll', open);
         drawer.setAttribute('aria-hidden', open ? 'false' : 'true');
+        lockBackground(open);
       };
       on(toggle, 'click', function () { setOpen(!drawer.classList.contains('is-open')); });
       on(document, 'keydown', function (e) {
@@ -184,6 +247,16 @@
       });
     }, { rootMargin: '0px 0px -8% 0px', threshold: 0.05 });
     targets.forEach(function (el) { io.observe(el); });
+
+    // Keyboard users can reach a section before it has scrolled into view —
+    // without this they would be focusing something still at opacity: 0.
+    on(document, 'focusin', function (e) {
+      var el = e.target.closest && e.target.closest('[data-reveal]');
+      while (el) {
+        el.classList.add('is-visible');
+        el = el.parentNode && el.parentNode.closest ? el.parentNode.closest('[data-reveal]') : null;
+      }
+    });
   }
 
   /* -------------------------------------------------------------------
@@ -316,6 +389,55 @@
      Accordion — animated, keyboard accessible, deep-linkable
      ------------------------------------------------------------------- */
   function initAccordion() {
+    // A collapsed panel is only squashed to 0fr, which still leaves every
+    // answer in the accessibility tree, so `hidden` has to come along for the
+    // ride. It cannot be set straight away on collapse — `hidden` is
+    // display:none and would cut the row-track transition dead — so it waits
+    // for the transition to end, with a timeout for the cases where
+    // transitionend never fires (reduced motion, a background tab).
+    var HIDE_AFTER = 400; // comfortably past --t-base (240ms)
+
+    // `hidden` alone is not enough here: .accordion__panel carries a class-level
+    // display:grid, which outranks the user-agent [hidden] rule, so the panel
+    // would stay laid out and its text would stay in the accessibility tree.
+    // The inline display does the actual hiding; the attribute keeps the
+    // semantics right and stays correct if a [hidden] rule ever lands in CSS.
+    function reveal(panel) {
+      panel.hidden = false;
+      panel.style.display = '';
+    }
+    function conceal(panel) {
+      panel.hidden = true;
+      panel.style.display = 'none';
+    }
+
+    function setPanel(trigger, panel, open) {
+      trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (open) {
+        reveal(panel);
+        // Read back a layout value so the panel animates out of 0fr instead of
+        // snapping open straight from display:none.
+        void panel.offsetHeight;
+        panel.setAttribute('data-open', 'true');
+        return;
+      }
+      panel.setAttribute('data-open', 'false');
+      var hide = function () {
+        // It may have been reopened while the collapse was still running.
+        if (panel.getAttribute('data-open') === 'false') conceal(panel);
+      };
+      var done = function (e) {
+        if (e.target !== panel || e.propertyName !== 'grid-template-rows') return;
+        panel.removeEventListener('transitionend', done);
+        hide();
+      };
+      panel.addEventListener('transitionend', done);
+      window.setTimeout(function () {
+        panel.removeEventListener('transitionend', done);
+        hide();
+      }, HIDE_AFTER);
+    }
+
     $$('[data-accordion]').forEach(function (root) {
       var single = root.getAttribute('data-accordion') === 'single';
       var triggers = $$('.accordion__trigger', root);
@@ -323,17 +445,16 @@
       triggers.forEach(function (trigger) {
         var panel = document.getElementById(trigger.getAttribute('aria-controls'));
         if (!panel) return;
+        if (trigger.getAttribute('aria-expanded') !== 'true') conceal(panel);
         on(trigger, 'click', function () {
           var open = trigger.getAttribute('aria-expanded') === 'true';
           if (single && !open) {
             triggers.forEach(function (t) {
               var p = document.getElementById(t.getAttribute('aria-controls'));
-              t.setAttribute('aria-expanded', 'false');
-              if (p) p.setAttribute('data-open', 'false');
+              if (p && t !== trigger) setPanel(t, p, false);
             });
           }
-          trigger.setAttribute('aria-expanded', open ? 'false' : 'true');
-          panel.setAttribute('data-open', open ? 'false' : 'true');
+          setPanel(trigger, panel, !open);
         });
       });
 
@@ -361,14 +482,18 @@
 
   function toast(message, type, timeout) {
     type = type || 'info';
+    // The layout ships an empty .toast-stack so the live region has been in the
+    // DOM long before anything is written into it — a region created and filled
+    // in the same tick is routinely missed by screen readers. Building one here
+    // is only the fallback for pages that do not use that layout.
     var stack = $('.toast-stack');
     if (!stack) {
       stack = document.createElement('div');
       stack.className = 'toast-stack';
-      stack.setAttribute('role', 'status');
-      stack.setAttribute('aria-live', 'polite');
       document.body.appendChild(stack);
     }
+    if (!stack.hasAttribute('role')) stack.setAttribute('role', 'status');
+    if (!stack.hasAttribute('aria-live')) stack.setAttribute('aria-live', 'polite');
     var el = document.createElement('div');
     el.className = 'toast toast--' + type;
     el.innerHTML = (ICONS[type] || ICONS.info) + '<div>' + String(message).replace(/[<>]/g, '') + '</div>';
@@ -651,7 +776,7 @@
         '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>' +
         (items.length > 1 ? '<button class="lightbox__nav lightbox__nav--prev" type="button" aria-label="Previous image"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg></button>' +
         '<button class="lightbox__nav lightbox__nav--next" type="button" aria-label="Next image"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></button>' +
-        '<span class="lightbox__count"></span>' : '') +
+        '<span class="lightbox__count" aria-live="polite"></span>' : '') +
         '<img alt="">';
       document.body.appendChild(box);
       document.body.classList.add('no-scroll');
@@ -682,7 +807,8 @@
 
     function keys(e) {
       if (!box) return;
-      if (e.key === 'Escape') close();
+      if (e.key === 'Tab') trapTab(box, e);
+      else if (e.key === 'Escape') close();
       else if (e.key === 'ArrowRight' && items.length > 1) { current = (current + 1) % items.length; render(); }
       else if (e.key === 'ArrowLeft' && items.length > 1) { current = (current - 1 + items.length) % items.length; render(); }
     }
@@ -843,23 +969,36 @@
       next.setAttribute('aria-label', 'Next');
       next.innerHTML = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>';
 
+      // These were tabs without tabpanels, which promises a screen reader a
+      // relationship that does not exist and implies arrow-key navigation the
+      // widget does not implement. They are what they look like: buttons that
+      // scroll the row, with the current one marked.
       var dots = document.createElement('div');
       dots.className = 'slider__dots';
-      dots.setAttribute('role', 'tablist');
+      dots.setAttribute('role', 'group');
       dots.setAttribute('aria-label', 'Choose a card');
 
       var dotEls = slides.map(function (slide, i) {
         var dot = document.createElement('button');
         dot.type = 'button';
         dot.className = 'slider__dot';
-        dot.setAttribute('role', 'tab');
         dot.setAttribute('aria-label', 'Card ' + (i + 1) + ' of ' + slides.length);
         on(dot, 'click', function () {
-          track.scrollTo({ left: slide.offsetLeft - track.offsetLeft, behavior: 'smooth' });
+          track.scrollTo({
+            left: slide.offsetLeft - track.offsetLeft,
+            behavior: reduceMotion.matches ? 'auto' : 'smooth'
+          });
         });
         dots.appendChild(dot);
         return dot;
       });
+
+      var PAUSE_ICON = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 5v14M14 5v14"/></svg>';
+      var PLAY_ICON  = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5l11 7-11 7Z"/></svg>';
+
+      var playBtn = document.createElement('button');
+      playBtn.type = 'button';
+      playBtn.className = 'slider__btn slider__btn--play';
 
       controls.appendChild(prev);
       controls.appendChild(dots);
@@ -868,15 +1007,30 @@
 
       function step(dir) {
         var by = slides[0].getBoundingClientRect().width + 16;
-        track.scrollBy({ left: dir * by, behavior: 'smooth' });
+        track.scrollBy({ left: dir * by, behavior: reduceMotion.matches ? 'auto' : 'smooth' });
       }
       on(prev, 'click', function () { step(-1); });
       on(next, 'click', function () { step(1); });
+
+      // Named so several rows on one page do not all announce the same thing.
+      var heading = slider.closest('section') && slider.closest('section').querySelector('h2, h3');
+      var headingText = heading ? heading.textContent.replace(/\s+/g, ' ').trim() : '';
+      track.setAttribute('role', 'group');
+      track.setAttribute('aria-label', (headingText && headingText.length <= 60 ? headingText + ' — cards' : 'Cards'));
 
       var sync = throttleFrame(function () {
         var max = track.scrollWidth - track.clientWidth;
         prev.disabled = track.scrollLeft <= 2;
         next.disabled = track.scrollLeft >= max - 2;
+
+        // The track scrolls with overflow-x, so it has to be focusable for
+        // anyone scrolling it by keyboard — but only while it really scrolls,
+        // or every row leaves a dead tab stop on the desktop grid layout.
+        if (track.scrollWidth > track.clientWidth + 2) {
+          track.setAttribute('tabindex', '0');
+        } else if (document.activeElement !== track) {
+          track.removeAttribute('tabindex');
+        }
 
         // Whichever slide sits nearest the track's left edge is the current one.
         var best = 0;
@@ -887,7 +1041,8 @@
         });
         dotEls.forEach(function (dot, i) {
           dot.classList.toggle('is-active', i === best);
-          dot.setAttribute('aria-selected', i === best ? 'true' : 'false');
+          if (i === best) dot.setAttribute('aria-current', 'true');
+          else dot.removeAttribute('aria-current');
         });
       });
 
@@ -930,7 +1085,33 @@
       function stopForGood() {
         stopped = true;
         pause();
+        syncPlayBtn();
       }
+
+      /* Hovering out and focusing away are not mechanisms anyone can find, and
+         2.2.2 asks for one that is. The button doubles as the way back: once
+         a swipe or an arrow has stopped the row for good, pressing it starts
+         the motion again. It is only offered where the row would actually move
+         on its own, which reduced motion rules out entirely. */
+      function syncPlayBtn() {
+        if (reduceMotion.matches) {
+          if (playBtn.parentNode) playBtn.parentNode.removeChild(playBtn);
+          return;
+        }
+        if (!playBtn.parentNode) controls.appendChild(playBtn);
+        playBtn.innerHTML = stopped ? PLAY_ICON : PAUSE_ICON;
+        playBtn.setAttribute('aria-label', stopped ? 'Resume automatic sliding' : 'Pause automatic sliding');
+      }
+
+      on(playBtn, 'click', function () {
+        if (stopped) {
+          stopped = false;
+          play();
+          syncPlayBtn();
+        } else {
+          stopForGood();
+        }
+      });
 
       on(slider, 'pointerenter', pause);
       on(slider, 'pointerleave', play);
@@ -948,8 +1129,10 @@
       dotEls.forEach(function (dot) { on(dot, 'click', stopForGood); });
       on(reduceMotion, 'change', function () {
         if (reduceMotion.matches) { pause(); } else { play(); }
+        syncPlayBtn();
       });
 
+      syncPlayBtn();
       play();
     });
   }

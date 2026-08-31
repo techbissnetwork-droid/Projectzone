@@ -81,6 +81,10 @@ $gaId       = $settings->get('google_analytics_id');
 
 <?= $view->partial('partials/footer') ?>
 
+<?php /* Live region for toasts. Present from first paint, because a region
+   created and filled in the same tick is routinely missed by screen readers. */ ?>
+<div class="toast-stack" role="status" aria-live="polite"></div>
+
 <?php foreach ($flash as $item): ?>
 <div data-flash="<?= e($item['type']) ?>" data-flash-message="<?= e($item['message']) ?>" hidden></div>
 <?php endforeach; ?>

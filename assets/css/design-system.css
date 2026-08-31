@@ -29,16 +29,19 @@
   --text:          #e9ecf6;
   --text-soft:     #b4bccd;
   --text-muted:    #838da3;
-  --text-faint:    #5d667b;
+  --text-faint:    #7b8499;
   --text-invert:   #06070c;
 
   /* Accents — used with restraint */
   --accent:        #4f8cff;
   --accent-soft:   #7aabff;
   --accent-deep:   #2f6ae0;
-  --accent-ink:    #ffffff;
+  --accent-ink:    #06070c;
   --accent-tint:   rgba(79, 140, 255, 0.12);
   --accent-glow:   rgba(79, 140, 255, 0.28);
+  /* Accent text sitting on its own tint has less to work with than accent text
+     on the page, so it gets its own value rather than reusing --accent. */
+  --accent-on-tint: var(--accent);
 
   --cyan:    #34d3e0;
   --violet:  #a78bfa;
@@ -67,7 +70,7 @@
   --fs-body:   1rem;
   --fs-sm:     0.9125rem;
   --fs-xs:     0.8125rem;
-  --fs-label:  0.7375rem;
+  --fs-label:  0.75rem;
 
   --lh-tight: 1.06;
   --lh-snug:  1.28;
@@ -126,21 +129,32 @@
   --text:          #0d1220;
   --text-soft:     #38415a;
   --text-muted:    #5c6580;
-  --text-faint:    #8c94a8;
+  --text-faint:    #666e82;
   --text-invert:   #ffffff;
 
   --accent:        #2563eb;
   --accent-soft:   #3b7dff;
   --accent-deep:   #1d4ed8;
+  /* The light accents are dark enough to carry white text, so the ink flips
+     back to white here — on the dark theme's bright accents it must not. */
+  --accent-ink:    #ffffff;
   --accent-tint:   rgba(37, 99, 235, 0.09);
   --accent-glow:   rgba(37, 99, 235, 0.2);
+  --accent-on-tint: #1d4ed8;
 
-  --cyan:    #0891b2;
+  /* Each of these is used both as body text on a pale surface and as a filled
+     button behind white text, so every one clears 4.5:1 in both directions. */
+  --cyan:    #0e7490;
   --violet:  #7c3aed;
-  --emerald: #059669;
+  --emerald: #047857;
   --amber:   #b45309;
-  --rose:    #e11d48;
+  --rose:    #be123c;
   --blue:    #2563eb;
+
+  --success: #047857;
+  --warning: #b45309;
+  --danger:  #be123c;
+  --info:    #0e7490;
 
   --sh-sm: 0 1px 2px rgba(11, 16, 32, 0.06);
   --sh-md: 0 4px 14px -4px rgba(11, 16, 32, 0.1), 0 1px 3px rgba(11, 16, 32, 0.05);
@@ -533,6 +547,10 @@ h4 { font-size: var(--fs-h4); letter-spacing: -0.012em; }
   display: inline-flex; align-items: center; gap: 0.4rem;
   color: var(--accent); font-weight: 550; font-size: var(--fs-sm);
   position: relative;
+  /* Text-only links were a 25px-tall tap target. The padding is vertical only
+     so the link still sits flush with the text it follows. */
+  padding-block: 0.35rem;
+  min-height: 32px;
 }
 .link::after {
   content: ""; position: absolute; left: 0; bottom: -2px;
@@ -653,7 +671,7 @@ h4 { font-size: var(--fs-h4); letter-spacing: -0.012em; }
   color: var(--text-muted);
   white-space: nowrap;
 }
-.badge--accent  { background: var(--accent-tint); border-color: transparent; color: var(--accent); }
+.badge--accent  { background: var(--accent-tint); border-color: transparent; color: var(--accent-on-tint); }
 .badge--success { background: rgba(52, 211, 153, 0.12); color: var(--success); border-color: transparent; }
 .badge--warning { background: rgba(251, 191, 36, 0.13); color: var(--warning); border-color: transparent; }
 .badge--danger  { background: rgba(248, 113, 113, 0.12); color: var(--danger); border-color: transparent; }
@@ -666,7 +684,8 @@ h4 { font-size: var(--fs-h4); letter-spacing: -0.012em; }
 
 .pill {
   display: inline-flex; align-items: center; gap: 0.4rem;
-  padding: 0.42rem 0.85rem;
+  padding: 0.5rem 0.9rem;
+  min-height: 36px;
   font-size: var(--fs-xs); font-weight: 500;
   border-radius: var(--r-full);
   background: var(--surface);
@@ -716,7 +735,8 @@ a.pill:hover, button.pill:hover { border-color: var(--border-strong); color: var
   display: flex; align-items: center; gap: 0.35rem;
 }
 .label .req { color: var(--danger); font-weight: 400; }
-.hint { font-size: var(--fs-xs); color: var(--text-faint); line-height: 1.5; }
+/* Capped so a hint under a wide field does not run to a 90+ character line. */
+.hint { font-size: var(--fs-xs); color: var(--text-faint); line-height: 1.5; max-width: 68ch; }
 
 .input, .textarea, .select {
   width: 100%;
@@ -940,6 +960,9 @@ a.pill:hover, button.pill:hover { border-color: var(--border-strong); color: var
   transition: grid-template-rows var(--t-base) var(--ease-out);
 }
 .accordion__panel[data-open="true"] { grid-template-rows: 1fr; }
+/* The panel's own display:grid outranks the user-agent [hidden] rule, so
+   without this a collapsed answer stays in the accessibility tree. */
+.accordion__panel[hidden] { display: none; }
 .accordion__panel > div { overflow: hidden; }
 .accordion__body {
   padding-bottom: 1.5rem;
@@ -1169,7 +1192,7 @@ a.pill:hover, button.pill:hover { border-color: var(--border-strong); color: var
 
 
 .theme-toggle {
-  width: 38px; height: 38px;
+  width: 40px; height: 40px;
   display: grid; place-items: center;
   border-radius: 50%;
   border: 1px solid var(--border);
@@ -1197,7 +1220,7 @@ a.pill:hover, button.pill:hover { border-color: var(--border-strong); color: var
   font-weight: 600;
   color: var(--text-muted);
 }
-.avatar--sm { width: 32px; height: 32px; font-size: 0.7rem; }
+.avatar--sm { width: 32px; height: 32px; font-size: 0.75rem; }
 .avatar--lg { width: 56px; height: 56px; font-size: var(--fs-sm); }
 
 .rating { display: inline-flex; gap: 0.1rem; color: var(--amber); }
@@ -1240,3 +1263,24 @@ a.pill:hover, button.pill:hover { border-color: var(--border-strong); color: var
 .plain-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.3rem; }
 .plain-list li::before { content: "·"; margin-right: 0.5rem; opacity: 0.55; }
 
+
+/* ---------------------------------------------------------------------
+   Touch pointers
+   On a finger, the compact desktop sizing is too small to hit reliably, so
+   every interactive control grows to the 44px comfortable minimum. Mouse and
+   trackpad users keep the tighter layout the design is drawn for.
+   --------------------------------------------------------------------- */
+@media (pointer: coarse) {
+  .btn--sm { min-height: 44px; padding-inline: 1rem; }
+  .btn--icon.btn--sm { width: 44px; min-height: 44px; }
+  .theme-toggle { width: 44px; height: 44px; }
+  .pill { min-height: 44px; }
+  .link { min-height: 44px; }
+  .checkbox, .radio, .switch { min-height: 44px; }
+}
+
+/* On iOS a form control under 16px makes Safari zoom the whole page the moment
+   it is focused, which throws the layout off and is hard to recover from. */
+@media (max-width: 640px) {
+  .input, .select, .textarea { font-size: 16px; }
+}

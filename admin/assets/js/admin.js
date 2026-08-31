@@ -11,6 +11,32 @@
   var BASE = (window.TECHBISS_ADMIN || {}).base || '/';
 
   function on(el, evt, fn, opts) { if (el) el.addEventListener(evt, fn, opts); }
+
+  // Anything a real Tab press would land on.
+  var FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), ' +
+                  'textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+  // aria-modal="true" is a promise to assistive tech, not a browser feature:
+  // without this, Tab walks straight out of the dialog and into the form behind.
+  function trapTab(container, e) {
+    if (e.key !== 'Tab') return;
+    var nodes = $$(FOCUSABLE, container).filter(function (el) {
+      return el.offsetWidth || el.offsetHeight || el.getClientRects().length;
+    });
+    if (!nodes.length) return;
+    var first = nodes[0];
+    var last  = nodes[nodes.length - 1];
+    var active = document.activeElement;
+    var outside = !container.contains(active);
+    if (e.shiftKey && (active === first || outside)) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && (active === last || outside)) {
+      e.preventDefault();
+      first.focus();
+    }
+  }
+
   function toast(msg, type) { if (window.techbissToast) window.techbissToast(msg, type || 'info'); }
 
   function post(url, data) {
@@ -233,9 +259,14 @@
      Media picker modal
      ------------------------------------------------------------------- */
   var picker = null;
+  var pickerReturn = null;
 
   function openPicker(onChoose, multiple) {
     if (picker) closePicker();
+
+    // Whatever opened the dialog gets focus back when it closes; without it the
+    // browser drops focus to the top of the document or to a random field.
+    pickerReturn = document.activeElement;
 
     picker = document.createElement('div');
     picker.className = 'modal';
@@ -332,23 +363,34 @@
 
     $$('[data-picker-close]', picker).forEach(function (b) { on(b, 'click', closePicker); });
     on(picker, 'click', function (e) { if (e.target === picker) closePicker(); });
-    on(document, 'keydown', escClose);
+    on(document, 'keydown', pickerKeys);
     on(confirm, 'click', function () {
       if (selected.length) onChoose(multiple ? selected : selected[0]);
       closePicker();
     });
 
     load('');
+
+    // Focus has to move into the dialog, or the first Tab carries on through
+    // the page behind it as if the dialog were not there.
+    var closeBtn = $('[data-picker-close]', picker);
+    if (closeBtn) closeBtn.focus();
   }
 
-  function escClose(e) { if (e.key === 'Escape') closePicker(); }
+  function pickerKeys(e) {
+    if (!picker) return;
+    if (e.key === 'Escape') closePicker();
+    else if (e.key === 'Tab') trapTab(picker, e);
+  }
 
   function closePicker() {
     if (!picker) return;
-    document.removeEventListener('keydown', escClose);
+    document.removeEventListener('keydown', pickerKeys);
     document.body.classList.remove('no-scroll');
     if (picker.parentNode) picker.parentNode.removeChild(picker);
     picker = null;
+    if (pickerReturn && document.contains(pickerReturn)) pickerReturn.focus();
+    pickerReturn = null;
   }
 
   function escapeHtml(s) {

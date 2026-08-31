@@ -51,7 +51,7 @@ body.admin {
 .sidebar__nav { padding: .85rem .7rem 2rem; flex: 1; }
 .sidebar__group + .sidebar__group { margin-top: 1.15rem; }
 .sidebar__label {
-  font-size: .655rem;
+  font-size: .75rem;
   font-weight: 650;
   letter-spacing: .12em;
   text-transform: uppercase;
@@ -73,7 +73,7 @@ body.admin {
 .sidebar__link:hover { background: var(--surface); color: var(--text); }
 .sidebar__link.is-active {
   background: var(--accent-tint);
-  color: var(--accent);
+  color: var(--accent-on-tint);
   font-weight: 550;
 }
 .sidebar__link .icon { width: 17px; height: 17px; flex: none; opacity: .85; }
@@ -86,7 +86,7 @@ body.admin {
   border-radius: var(--r-full);
   background: var(--accent);
   color: var(--accent-ink);
-  font-size: .66rem;
+  font-size: .75rem;
   font-weight: 650;
   display: grid;
   place-items: center;
@@ -246,12 +246,13 @@ a.tile:hover { border-color: var(--border-strong); transform: translateY(-2px); 
 .toolbar .select, .toolbar .input { min-height: 38px; font-size: var(--fs-xs); }
 .toolbar__spacer { flex: 1; }
 
-.tabs { display: flex; gap: .35rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.tabs { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 1rem; }
 .tab {
   display: inline-flex;
   align-items: center;
   gap: .4rem;
-  padding: .42rem .8rem;
+  padding: .5rem .85rem;
+  min-height: 36px;
   border-radius: var(--r-full);
   font-size: var(--fs-xs);
   font-weight: 500;
@@ -260,9 +261,9 @@ a.tile:hover { border-color: var(--border-strong); transform: translateY(-2px); 
   transition: all var(--t-fast) var(--ease);
 }
 .tab:hover { background: var(--surface); color: var(--text); }
-.tab.is-active { background: var(--accent-tint); color: var(--accent); border-color: transparent; font-weight: 600; }
+.tab.is-active { background: var(--accent-tint); color: var(--accent-on-tint); border-color: transparent; font-weight: 600; }
 .tab__count {
-  font-size: .65rem;
+  font-size: .75rem;
   padding: .05rem .35rem;
   border-radius: var(--r-full);
   background: var(--surface-hover);
@@ -276,7 +277,7 @@ a.tile:hover { border-color: var(--border-strong); transform: translateY(-2px); 
 .data-table { width: 100%; font-size: var(--fs-sm); }
 .data-table th, .data-table td { padding: .72rem 1.15rem; text-align: left; vertical-align: middle; }
 .data-table thead th {
-  font-size: .655rem;
+  font-size: .75rem;
   font-weight: 650;
   letter-spacing: .085em;
   text-transform: uppercase;
@@ -293,7 +294,8 @@ a.tile:hover { border-color: var(--border-strong); transform: translateY(-2px); 
 .data-table tbody tr:hover { background: var(--surface-hover); }
 .data-table td { color: var(--text-soft); }
 .data-table .cell-title { color: var(--text); font-weight: 550; display: block; }
-.data-table .cell-sub { font-size: var(--fs-xs); color: var(--text-faint); display: block; margin-top: .1rem; }
+/* Table rows tint their own ground, so the faint tone falls under 4.5:1 here. */
+.data-table .cell-sub { font-size: var(--fs-xs); color: var(--text-muted); display: block; margin-top: .1rem; }
 .data-table .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .data-table .actions { text-align: right; white-space: nowrap; }
 .data-table .drag-handle {
@@ -308,7 +310,10 @@ a.tile:hover { border-color: var(--border-strong); transform: translateY(-2px); 
 
 .row-actions { display: inline-flex; gap: .25rem; }
 .icon-btn {
-  width: 30px; height: 30px;
+  width: 32px; height: 32px;
+  /* Without this the flexible topbar title squeezes the sidebar toggle down to
+     14px on a phone — and it is the only way to open the admin menu. */
+  flex: none;
   display: grid; place-items: center;
   border-radius: var(--r-xs);
   border: 1px solid transparent;
@@ -326,20 +331,24 @@ a.tile:hover { border-color: var(--border-strong); transform: translateY(-2px); 
   align-items: center;
   gap: .4rem;
   font-size: var(--fs-xs);
-  color: var(--text-muted);
+  /* The status colour belongs to the dot, not the word. Painting the label in
+     it put amber-on-paper at 1.5:1 in the light theme — unreadable, and the
+     word already carries the meaning without the colour. */
+  color: var(--text);
+  --dot: var(--text-muted);
   white-space: nowrap;
 }
 .status-dot::before {
   content: "";
   width: 6px; height: 6px;
   border-radius: 50%;
-  background: currentColor;
+  background: var(--dot);
 }
-.status-dot--live { color: var(--success); }
-.status-dot--draft { color: var(--text-faint); }
-.status-dot--warn { color: var(--warning); }
-.status-dot--danger { color: var(--danger); }
-.status-dot--info { color: var(--info); }
+.status-dot--live { --dot: var(--success); }
+.status-dot--draft { --dot: var(--text-faint); }
+.status-dot--warn { --dot: var(--warning); }
+.status-dot--danger { --dot: var(--danger); }
+.status-dot--info { --dot: var(--info); }
 
 /* ---------------------------------------------------------------------
    Forms
@@ -396,7 +405,7 @@ a.tile:hover { border-color: var(--border-strong); transform: translateY(-2px); 
 .media-field__body { flex: 1; min-width: 0; }
 .media-field__path {
   font-family: var(--font-mono);
-  font-size: .72rem;
+  font-size: .75rem;
   color: var(--text-muted);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -419,7 +428,7 @@ a.tile:hover { border-color: var(--border-strong); transform: translateY(-2px); 
   transition: all var(--t-fast) var(--ease);
 }
 .icon-picker__item:hover { background: var(--surface-hover); color: var(--text); }
-.icon-picker__item.is-selected { background: var(--accent-tint); color: var(--accent); border-color: var(--accent); }
+.icon-picker__item.is-selected { background: var(--accent-tint); color: var(--accent-on-tint); border-color: var(--accent); }
 .icon-picker__item .icon { width: 18px; height: 18px; }
 
 /* Accent picker */
@@ -511,7 +520,7 @@ a.tile:hover { border-color: var(--border-strong); transform: translateY(-2px); 
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.media-item__meta { font-size: .68rem; color: var(--text-faint); margin-top: .15rem; }
+.media-item__meta { font-size: .75rem; color: var(--text-faint); margin-top: .15rem; }
 
 .dropzone {
   border: 1px dashed var(--border-strong);
@@ -595,16 +604,28 @@ a.tile:hover { border-color: var(--border-strong); transform: translateY(-2px); 
 }
 .timeline__icon .icon { width: 13px; height: 13px; }
 .timeline__text { font-size: var(--fs-xs); color: var(--text-soft); line-height: 1.5; }
-.timeline__meta { font-size: .68rem; color: var(--text-faint); margin-top: .1rem; }
+.timeline__meta { font-size: .75rem; color: var(--text-faint); margin-top: .1rem; }
 
 .perm-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1.25rem; }
 .perm-group__title { font-size: .8rem; font-weight: 650; color: var(--text); margin-bottom: .6rem; }
 
-.mono-sm { font-family: var(--font-mono); font-size: .74rem; color: var(--text-muted); }
+.mono-sm { font-family: var(--font-mono); font-size: .75rem; color: var(--text-muted); }
 
-.help-text { font-size: var(--fs-xs); color: var(--text-faint); line-height: 1.55; }
+/* Capped so panel help does not run to a 200+ character line on a wide screen. */
+.help-text { font-size: var(--fs-xs); color: var(--text-faint); line-height: 1.55; max-width: 68ch; }
 
 @media (max-width: 720px) {
   .data-table th, .data-table td { padding: .6rem .75rem; }
   .content { padding-inline: .85rem; }
+}
+
+/* A link laid out as a full-width row was only as tall as its text. */
+a.row--between { min-height: 36px; }
+
+/* Touch pointers — see the matching block in design-system.css. */
+@media (pointer: coarse) {
+  .icon-btn { width: 44px; height: 44px; }
+  .tab { min-height: 44px; }
+  .toolbar .select, .toolbar .input { min-height: 44px; font-size: 16px; }
+  a.row--between { min-height: 44px; }
 }
