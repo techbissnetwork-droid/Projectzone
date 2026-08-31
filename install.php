@@ -497,7 +497,16 @@ function tb_upgrade(bool $dryRun = false): int
     $count = count($pending['tables']) + count($pending['columns'])
            + count($pending['indexes']) + count($pending['data']);
 
-    if ($count === 0) {
+    // Counted against the live data but rolled back, so the plan below reports
+    // what will really change rather than an estimate.
+    try {
+        $copyPlan = $migrator->refreshCopy(true);
+    } catch (Throwable $e) {
+        fwrite(STDERR, "The copy refresh could not run: " . $e->getMessage() . "\n");
+        return 1;
+    }
+
+    if ($count === 0 && $copyPlan['rows'] === 0) {
         echo "Database is already up to date. Nothing to do.\n";
         if ($pending['mismatched'] !== []) {
             echo "\nWorth a look — these columns exist but no longer match schema.sql:\n";
@@ -522,6 +531,10 @@ function tb_upgrade(bool $dryRun = false): int
     foreach ($pending['data'] as $d) {
         echo "  · " . $d['label'] . "\n";
     }
+    if ($copyPlan['rows'] > 0) {
+        echo "  · " . $copyPlan['rows'] . " piece" . ($copyPlan['rows'] === 1 ? '' : 's')
+            . " of seeded copy brought up to the current wording\n";
+    }
     echo "\n";
 
     if ($dryRun) {
@@ -540,6 +553,18 @@ function tb_upgrade(bool $dryRun = false): int
 
     foreach ($log as $line) {
         echo "  ✓ $line\n";
+    }
+
+    try {
+        $copy = $migrator->refreshCopy(false);
+    } catch (Throwable $e) {
+        fwrite(STDERR, "The schema changes were applied, but the copy refresh failed: "
+            . $e->getMessage() . "\nRun the upgrade again to finish it.\n");
+        return 1;
+    }
+    if ($copy['rows'] > 0) {
+        echo "  ✓ Updated " . $copy['rows'] . " piece" . ($copy['rows'] === 1 ? '' : 's')
+            . " of seeded copy (anything you had edited yourself was left alone)\n";
     }
 
     tb_clear_cache();

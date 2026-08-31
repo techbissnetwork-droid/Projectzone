@@ -280,6 +280,9 @@ final class SystemController extends BaseAdminController
                 App::root() . '/database/schema.sql'
             );
             $log = $migrator->apply();
+            // Seeded wording this release changed, but only where the text is
+            // still exactly as installed — anything edited here is left alone.
+            $copy = $migrator->refreshCopy();
         } catch (\Throwable $e) {
             ActivityLog::record('migrate', 'system', null, 'Database update failed: ' . $e->getMessage());
             flash('error', 'The update stopped: ' . $e->getMessage()
@@ -289,13 +292,22 @@ final class SystemController extends BaseAdminController
 
         \Techbiss\Core\Cache::flush();
 
-        if ($log === []) {
+        if ($log === [] && $copy['rows'] === 0) {
             flash('success', 'The database was already up to date.');
             redirect('/admin/system');
         }
 
-        ActivityLog::record('migrate', 'system', null, 'Applied ' . count($log) . ' database updates');
-        $this->ok(count($log) . ' database ' . (count($log) === 1 ? 'update' : 'updates') . ' applied.', '/admin/system');
+        $parts = [];
+        if ($log !== []) {
+            $parts[] = count($log) . ' database ' . (count($log) === 1 ? 'update' : 'updates');
+        }
+        if ($copy['rows'] > 0) {
+            $parts[] = $copy['rows'] . ' ' . ($copy['rows'] === 1 ? 'piece' : 'pieces')
+                . ' of wording brought up to date';
+        }
+
+        ActivityLog::record('migrate', 'system', null, 'Applied ' . implode(' and ', $parts));
+        $this->ok(ucfirst(implode(' and ', $parts)) . ' applied.', '/admin/system');
     }
 
     public function clearCache(Request $request): never

@@ -19,16 +19,136 @@ use PDO;
  * cannot lose data. A column that exists but whose definition has since changed
  * is reported rather than altered, because rewriting a populated column is a
  * decision for a person, not for a script.
+ *
+ * refreshCopy() is a second, separate operation that does rewrite content — the
+ * seeded wording only, and only where it is still exactly as installed. It is
+ * never part of apply(); a caller asks for it deliberately.
  */
 final class Migrator
 {
     private PDO $pdo;
     private string $schemaFile;
+    private string $copyFile;
 
-    public function __construct(PDO $pdo, string $schemaFile)
+    public function __construct(PDO $pdo, string $schemaFile, ?string $copyFile = null)
     {
         $this->pdo        = $pdo;
         $this->schemaFile = $schemaFile;
+        $this->copyFile   = $copyFile ?? dirname($schemaFile) . '/copy-refresh.sql';
+    }
+
+    /**
+     * Bring seeded copy up to the current wording.
+     *
+     * seed.sql only runs at install time, so a site set up on an earlier release
+     * keeps the text it was installed with — including, at one point, sentences
+     * telling visitors to look for prices the site no longer publishes. Every
+     * statement in copy-refresh.sql is guarded on the original text, so a
+     * sentence the owner has rewritten themselves is never overwritten.
+     *
+     * A dry run does the same work inside a transaction and rolls it back, so
+     * the number it reports is the real one rather than an estimate.
+     *
+     * @return array{rows:int,statements:int}
+     */
+    public function refreshCopy(bool $dryRun = false): array
+    {
+        if (!is_file($this->copyFile)) {
+            return ['rows' => 0, 'statements' => 0];
+        }
+
+        $statements = array_values(array_filter(
+            self::splitScript((string) file_get_contents($this->copyFile)),
+            static fn (string $sql): bool => stripos($sql, 'UPDATE') === 0
+        ));
+        if ($statements === []) {
+            return ['rows' => 0, 'statements' => 0];
+        }
+
+        $rows = 0;
+        $this->pdo->beginTransaction();
+        try {
+            foreach ($statements as $statement) {
+                $rows += (int) $this->pdo->exec($statement);
+            }
+            if ($dryRun) {
+                $this->pdo->rollBack();
+            } else {
+                $this->pdo->commit();
+            }
+        } catch (\Throwable $e) {
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
+            throw $e;
+        }
+
+        return ['rows' => $rows, 'statements' => count($statements)];
+    }
+
+    /**
+     * Split a plain SQL script into statements, respecting quoted strings so a
+     * semicolon inside a sentence does not cut a statement in half.
+     *
+     * @return list<string>
+     */
+    private static function splitScript(string $sql): array
+    {
+        $out     = [];
+        $buf     = '';
+        $inQuote = false;
+        $len     = strlen($sql);
+
+        for ($i = 0; $i < $len; $i++) {
+            $c = $sql[$i];
+
+            if ($inQuote) {
+                $buf .= $c;
+                if ($c === '\\' && $i + 1 < $len) {
+                    $buf .= $sql[++$i];
+                } elseif ($c === "'") {
+                    if ($i + 1 < $len && $sql[$i + 1] === "'") {
+                        $buf .= $sql[++$i];
+                    } else {
+                        $inQuote = false;
+                    }
+                }
+                continue;
+            }
+
+            if ($c === "'") {
+                $inQuote = true;
+                $buf    .= $c;
+                continue;
+            }
+
+            // A comment runs to the end of its line and never holds a statement.
+            if ($c === '-' && $i + 1 < $len && $sql[$i + 1] === '-') {
+                while ($i < $len && $sql[$i] !== "\n") {
+                    $i++;
+                }
+                $buf .= "\n";
+                continue;
+            }
+
+            if ($c === ';') {
+                $stmt = trim($buf);
+                if ($stmt !== '') {
+                    $out[] = $stmt;
+                }
+                $buf = '';
+                continue;
+            }
+
+            $buf .= $c;
+        }
+
+        $stmt = trim($buf);
+        if ($stmt !== '') {
+            $out[] = $stmt;
+        }
+
+        return $out;
     }
 
     /**
