@@ -38,6 +38,15 @@ $gaId       = $settings->get('google_analytics_id');
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"></noscript>
 
+    <?php /* Everything below is undone by JavaScript: the loader is removed and
+             the reveal animations fade content in. Without JavaScript the
+             loading screen would cover the site for good and every section
+             would stay at zero opacity, so the page is handed over intact. */ ?>
+    <noscript><style>
+        .loader, .page-veil { display: none !important; }
+        [data-reveal] { opacity: 1 !important; transform: none !important; }
+    </style></noscript>
+
     <link rel="stylesheet" href="<?= e(asset('assets/css/design-system.css')) ?>">
     <link rel="stylesheet" href="<?= e(asset('assets/css/site.css')) ?>">
 

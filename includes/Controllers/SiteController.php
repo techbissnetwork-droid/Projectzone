@@ -12,14 +12,12 @@ use Techbiss\Core\Session;
 use Techbiss\Core\Str;
 use Techbiss\Core\Validator;
 use Techbiss\Core\View;
-use Techbiss\Repo\AddonRepo;
 use Techbiss\Repo\BlogRepo;
 use Techbiss\Repo\CustomerRepo;
 use Techbiss\Repo\FaqRepo;
 use Techbiss\Repo\IndustryRepo;
 use Techbiss\Repo\LeadRepo;
 use Techbiss\Repo\NavigationRepo;
-use Techbiss\Repo\PackageRepo;
 use Techbiss\Repo\PageRepo;
 use Techbiss\Repo\PortfolioRepo;
 use Techbiss\Repo\ProcessRepo;
@@ -93,7 +91,6 @@ final class SiteController
         $this->view->render('home', [
             'sections'     => $sections,
             'services'     => (new ServiceRepo())->featured(6),
-            'packages'     => (new PackageRepo())->publishedWithFeatures(),
             'projects'     => (new PortfolioRepo())->featured(3),
             'industries'   => (new IndustryRepo())->featured(8),
             'steps'        => (new ProcessRepo())->published(6),
@@ -163,7 +160,6 @@ final class SiteController
             'features'  => $repo->features((int) $service['id']),
             'related'   => array_slice(array_filter($repo->published(), static fn ($s) => (int) $s['id'] !== (int) $service['id']), 0, 3),
             'projects'  => (new PortfolioRepo())->featured(3),
-            'packages'  => (new PackageRepo())->publishedWithFeatures(),
             'steps'     => (new ProcessRepo())->published(6),
         ]);
     }
@@ -171,74 +167,155 @@ final class SiteController
     // =================================================================
     // Packages
     // =================================================================
-    public function packages(Request $request): void
+    // =================================================================
+    // Request — the one way to ask for work
+    // =================================================================
+
+    /**
+     * One page: tick what you need, add anything missing, send it.
+     *
+     * There are no packages and no published prices. The visitor builds a
+     * short message here and it is handed to WhatsApp or their email client,
+     * where the figure is agreed. A copy is kept so a request is not lost if
+     * the message never gets sent, but nothing is paid for here and there is
+     * no step between choosing and talking to a person.
+     */
+    public function request(Request $request): void
     {
-        $repo     = new PackageRepo();
-        $packages = $repo->publishedWithFeatures();
-
-        $seo = App::seo();
-        $seo->title('Packages — Pick What You Need');
-        $seo->description('Complete digital setups — domain, hosting, website, email, SEO. Tell us what you need included and we send the figure directly.');
-        $seo->canonical(absolute_url('/packages'));
-        $seo->breadcrumbs([['label' => 'Home', 'url' => '/'], ['label' => 'Packages', 'url' => '/packages']]);
-
-        $this->view->render('packages', [
-            'packages'   => $packages,
-            'addons'     => (new AddonRepo())->publishedAll(),
-            'compareRows'=> $repo->comparisonRows(),
-        ]);
-    }
-
-    public function packageDetail(Request $request, array $params): void
-    {
-        $repo    = new PackageRepo();
-        $package = $repo->publishedBySlug((string) $params['slug']);
-        if ($package === null) {
-            $this->notFound($request);
+        if ($request->isPost()) {
+            $this->handleRequest($request);
             return;
         }
 
-        $pricing  = $package['pricing'];
-        $currency = App::settings()->get('currency', 'USD');
-
         $seo = App::seo();
-        $seo->title($package['seo_title'] !== '' ? $package['seo_title'] : $package['name'] . ' Package');
-        $seo->description($package['seo_description'] !== '' ? $package['seo_description'] : $package['short_description']);
-        $seo->canonical(absolute_url('/packages/' . $package['slug']));
-        $seo->ogImage($package['og_image'] !== '' ? $package['og_image'] : $package['image']);
-        $seo->breadcrumbs([
-            ['label' => 'Home', 'url' => '/'],
-            ['label' => 'Packages', 'url' => '/packages'],
-            ['label' => (string) $package['name'], 'url' => '/packages/' . $package['slug']],
-        ]);
-        // Structured data is published to search engines, so it follows the same
-        // rule as the page: a figure only ever appears if the owner has turned
-        // public pricing on. Otherwise the price is settled in conversation and
-        // an Offer here would put it in the index anyway.
-        if (setting_bool('public_pricing', false) && !$pricing['is_custom'] && $pricing['payable'] > 0) {
-            $seo->addSchema([
-                '@type'       => 'Product',
-                'name'        => $package['name'] . ' Package',
-                'description' => $package['short_description'],
-                'brand'       => ['@type' => 'Brand', 'name' => App::settings()->get('site_name', 'TECHBISS')],
-                'offers'      => [
-                    '@type'         => 'Offer',
-                    'price'         => number_format($pricing['payable'], 2, '.', ''),
-                    'priceCurrency' => $currency,
-                    'availability'  => 'https://schema.org/InStock',
-                    'url'           => absolute_url('/packages/' . $package['slug']),
-                ],
-            ]);
-        }
+        $seo->title('Tell Us What You Need');
+        $seo->description('Tick what you want built, add anything missing, and send it on WhatsApp or by email. We reply with a price.');
+        $seo->canonical(absolute_url('/request'));
+        $seo->breadcrumbs([['label' => 'Home', 'url' => '/'], ['label' => 'Request', 'url' => '/request']]);
 
-        $this->view->render('package-detail', [
-            'package'  => $package,
-            'packages' => $repo->publishedWithFeatures(),
-            'steps'    => (new ProcessRepo())->published(6),
+        $this->renderRequest($request);
+    }
+
+    /** @param array<string,mixed> $ready */
+    private function renderRequest(Request $request, array $ready = []): void
+    {
+        $this->view->render('request', [
+            'services'  => (new ServiceRepo())->published(),
+            'preselect' => Str::slugFilter($request->queryString('service')),
+            'ready'     => $ready,
         ]);
     }
 
-    /** @return array<int,array<string,mixed>> */
+    /**
+     * Turn the ticked boxes into a sentence and hand it to the chosen channel.
+     *
+     * The page comes back with the finished message and a link to open it,
+     * rather than redirecting straight out: a form submission that redirects
+     * to another origin is blocked by the site's own form-action policy, and
+     * weakening that policy to save one click is not a trade worth making.
+     * Anyone with JavaScript never sees the step — the link opens itself.
+     */
+    private function handleRequest(Request $request): void
+    {
+        Csrf::verify($request);
+
+        $names = (new ServiceRepo())->published();
+        $bySlug = [];
+        foreach ($names as $service) {
+            $bySlug[(string) $service['slug']] = (string) $service['name'];
+        }
+
+        $picked = [];
+        foreach ($request->arr('services') as $slug) {
+            if (isset($bySlug[$slug])) {
+                $picked[] = $bySlug[$slug];
+            }
+        }
+
+        $message = self::requestMessage(
+            mb_substr($request->str('name'), 0, 120),
+            mb_substr($request->str('business_name'), 0, 190),
+            $picked,
+            mb_substr($request->str('details'), 0, 2000)
+        );
+
+        $via = $request->str('via') === 'email' ? 'email' : 'whatsapp';
+        $to  = $via === 'email'
+            ? email_link('Request from the website', $message)
+            : whatsapp_link($message);
+
+        if ($to === '') {
+            // The channel is not configured, so there is nowhere to send them.
+            flash('error', 'That channel is not set up yet. Please use the contact page.');
+            redirect('/contact');
+        }
+
+        $this->recordRequest($request, $picked, $via);
+
+        $this->renderRequest($request, [
+            'link'    => $to,
+            'channel' => $via,
+            'message' => $message,
+        ]);
+    }
+
+    /**
+     * Keep a copy of the request.
+     *
+     * The conversation moves to WhatsApp or email from here, and either can
+     * fail to open. A row costs the visitor nothing and means the enquiry is
+     * still in the admin if the message never arrives. A failure to write it
+     * must never block the redirect — being sent to the chat is the thing the
+     * visitor asked for.
+     *
+     * @param array<int,string> $picked
+     */
+    private function recordRequest(Request $request, array $picked, string $via): void
+    {
+        try {
+            (new LeadRepo())->createQuote([
+                'source'          => 'quote',
+                'name'            => mb_substr($request->str('name'), 0, 190),
+                'business_name'   => mb_substr($request->str('business_name'), 0, 190),
+                'email'           => '',
+                'phone'           => '',
+                'country'         => '',
+                'website'         => '',
+                'business_stage'  => '',
+                'services_needed' => implode(', ', $picked),
+                'budget_range'    => '',
+                'timeline'        => '',
+                'project_details' => mb_substr($request->str('details'), 0, 2000),
+                'status'          => 'new',
+                'priority'        => 'normal',
+                'ip_address'      => $request->ip(),
+                'user_agent'      => $request->userAgent(),
+            ]);
+        } catch (\Throwable) {
+            // Deliberately silent: the visitor is on their way to the chat.
+        }
+    }
+
+    /** The message both channels send, so the two never drift apart. */
+    public static function requestMessage(string $name, string $business, array $picked, string $details): string
+    {
+        $who = trim($name . ($business !== '' ? ' (' . $business . ')' : ''));
+
+        $lines = ['Hi ' . App::settings()->get('site_name', 'TECHBISS') . ','];
+        if ($who !== '') {
+            $lines[] = 'I am ' . $who . '.';
+        }
+        if ($picked !== []) {
+            $lines[] = 'I need: ' . implode(', ', $picked) . '.';
+        }
+        if ($details !== '') {
+            $lines[] = $details;
+        }
+        $lines[] = 'Please send me a price.';
+
+        return implode("\n", $lines);
+    }
+
     // =================================================================
     // Portfolio
     // =================================================================
@@ -366,7 +443,6 @@ final class SiteController
             'industry' => $industry,
             'services' => (new ServiceRepo())->forIndustry((int) $industry['id']),
             'projects' => $projects['items'],
-            'packages' => (new PackageRepo())->publishedWithFeatures(),
             'others'   => array_slice(array_filter($repo->published(), static fn ($i) => (int) $i['id'] !== (int) $industry['id']), 0, 6),
         ]);
     }
@@ -384,7 +460,6 @@ final class SiteController
 
         $this->view->render('how-it-works', [
             'steps'    => (new ProcessRepo())->published(),
-            'packages' => (new PackageRepo())->publishedWithFeatures(),
             'faqs'     => (new FaqRepo())->grouped()['Getting Started'] ?? (new FaqRepo())->publishedFlat(6),
         ]);
     }
@@ -591,200 +666,6 @@ final class SiteController
     // =================================================================
     // Quote request
     // =================================================================
-    public function quote(Request $request): void
-    {
-        if ($request->isPost()) {
-            $this->handleQuote($request);
-            return;
-        }
-
-        $seo = App::seo();
-        $seo->title('Request a Quote');
-        $seo->description('Tell us what you need and we will come back with a scope, a schedule and a price. No obligation.');
-        $seo->canonical(absolute_url('/quote'));
-        $seo->breadcrumbs([['label' => 'Home', 'url' => '/'], ['label' => 'Request a Quote', 'url' => '/quote']]);
-
-        $this->view->render('quote', [
-            'services'   => (new ServiceRepo())->published(),
-            'packages'   => (new PackageRepo())->publishedWithFeatures(),
-            'industries' => (new IndustryRepo())->options(),
-            'countries'  => self::countries(),
-            'budgets'    => self::budgets(),
-            'timelines'  => self::timelines(),
-            'preselect'  => $request->queryString('package'),
-        ]);
-    }
-
-    private function handleQuote(Request $request): void
-    {
-        Csrf::verify($request);
-        $leads = new LeadRepo();
-
-        if ($leads->recentSubmissionCount($request->ip()) >= 5) {
-            $this->formFail($request, '/quote', 'You have submitted several requests recently. Please wait a few minutes.', []);
-            return;
-        }
-
-        $serviceSlugs = array_column((new ServiceRepo())->published(), 'slug');
-
-        $v = Validator::make($request->all())
-            ->honeypot()
-            ->required('name', 'Your name', 2, 120)
-            ->optional('business_name', 190)
-            ->email('email')
-            ->phone('phone')
-            ->in('country', self::countries(), 'Country', false)
-            ->url('website')
-            ->int('industry_id')
-            ->int('package_id')
-            ->multi('services_needed', array_merge($serviceSlugs, ['complete-digital-setup']))
-            ->in('budget_range', self::budgets(), 'Budget', false)
-            ->in('timeline', self::timelines(), 'Timeline', false)
-            ->text('project_details', 5000, true, 'Project details');
-
-        if ($v->fails()) {
-            $this->formFail($request, '/quote', $v->firstError(), $v->errors());
-            return;
-        }
-
-        $id = $this->storeRequest($request, $v, 'quote');
-        $this->formSuccess($request, '/thank-you?ref=' . urlencode($this->lastReference), 'Your request has been received.');
-        unset($id);
-    }
-
-    // =================================================================
-    // Start Your Digital Journey (multi-step)
-    // =================================================================
-    public function journey(Request $request): void
-    {
-        if ($request->isPost()) {
-            $this->handleJourney($request);
-            return;
-        }
-
-        $seo = App::seo();
-        $seo->title('Start Your Digital Journey');
-        $seo->description('Six short steps. Tell us about your business, what you need, your budget and timeline — and we will come back with a clear plan.');
-        $seo->canonical(absolute_url('/start'));
-        $seo->breadcrumbs([['label' => 'Home', 'url' => '/'], ['label' => 'Start Your Digital Journey', 'url' => '/start']]);
-
-        $this->view->render('journey', [
-            'services'   => (new ServiceRepo())->published(),
-            'industries' => (new IndustryRepo())->options(),
-            'countries'  => self::countries(),
-            'budgets'    => self::budgets(),
-            'timelines'  => self::timelines(),
-            'stages'     => self::businessStages(),
-            'bodyClass'  => 'page-journey',
-        ]);
-    }
-
-    private function handleJourney(Request $request): void
-    {
-        Csrf::verify($request);
-        $leads = new LeadRepo();
-
-        if ($leads->recentSubmissionCount($request->ip()) >= 5) {
-            $this->formFail($request, '/start', 'You have submitted several requests recently. Please wait a few minutes.', []);
-            return;
-        }
-
-        $serviceSlugs = array_merge(array_column((new ServiceRepo())->published(), 'slug'), ['complete-digital-setup']);
-
-        $v = Validator::make($request->all())
-            ->honeypot()
-            ->required('business_name', 'Business name', 2, 190)
-            ->in('business_stage', self::businessStages(), 'Business stage', false)
-            ->int('industry_id')
-            ->url('website')
-            ->multi('services_needed', $serviceSlugs)
-            ->in('budget_range', self::budgets(), 'Budget', false)
-            ->in('timeline', self::timelines(), 'Timeline', false)
-            ->text('project_details', 5000, false, 'Project details')
-            ->required('name', 'Your name', 2, 120)
-            ->email('email')
-            ->phone('phone')
-            ->in('country', self::countries(), 'Country', false);
-
-        if ($v->get('services_needed') === []) {
-            $v->addError('services_needed', 'Please choose at least one thing you need.');
-        }
-
-        if ($v->fails()) {
-            $this->formFail($request, '/start', $v->firstError(), $v->errors());
-            return;
-        }
-
-        $this->storeRequest($request, $v, 'journey');
-        $this->formSuccess($request, '/thank-you?ref=' . urlencode($this->lastReference), 'Your details have been received.');
-    }
-
-    private string $lastReference = '';
-
-    /** Shared persistence for quote and journey submissions. */
-    private function storeRequest(Request $request, Validator $v, string $source): int
-    {
-        $leads     = new LeadRepo();
-        $reference = $leads->nextReference($source === 'journey' ? 'TBJ' : 'TBQ', 'quote_requests');
-        $this->lastReference = $reference;
-
-        $servicesNeeded = $v->get('services_needed', []);
-        $industryId     = $v->get('industry_id');
-        $packageId      = $v->get('package_id');
-
-        $id = $leads->createQuote([
-            'reference'       => $reference,
-            'source'          => $source,
-            'name'            => $v->get('name'),
-            'business_name'   => $v->get('business_name', ''),
-            'email'           => $v->get('email'),
-            'phone'           => $v->get('phone', ''),
-            'country'         => $v->get('country', ''),
-            'website'         => $v->get('website', ''),
-            'industry_id'     => $industryId > 0 ? $industryId : null,
-            'business_stage'  => $v->get('business_stage', ''),
-            'services_needed' => is_array($servicesNeeded) ? implode(', ', $servicesNeeded) : '',
-            'package_id'      => $packageId > 0 ? $packageId : null,
-            'budget_range'    => $v->get('budget_range', ''),
-            'timeline'        => $v->get('timeline', ''),
-            'project_details' => $v->get('project_details', ''),
-            'status'          => 'new',
-            'priority'        => 'normal',
-            'ip_address'      => $request->ip(),
-            'user_agent'      => $request->userAgent(),
-        ]);
-
-        // Keep a customer record so the sales pipeline has one view of a contact.
-        (new CustomerRepo())->upsert([
-            'name'          => $v->get('name'),
-            'business_name' => $v->get('business_name', ''),
-            'email'         => $v->get('email'),
-            'phone'         => $v->get('phone', ''),
-            'country'       => $v->get('country', ''),
-            'industry_id'   => $industryId > 0 ? $industryId : null,
-        ]);
-
-        $this->notify(
-            'New ' . ($source === 'journey' ? 'digital journey' : 'quote') . ' request ' . $reference,
-            sprintf(
-                "Reference: %s\nName: %s\nBusiness: %s\nEmail: %s\nPhone: %s\nCountry: %s\nNeeds: %s\nBudget: %s\nTimeline: %s\n\n%s",
-                $reference,
-                $v->get('name'),
-                $v->get('business_name', '') ?: '—',
-                $v->get('email'),
-                $v->get('phone', '') ?: '—',
-                $v->get('country', '') ?: '—',
-                is_array($servicesNeeded) ? implode(', ', $servicesNeeded) : '—',
-                $v->get('budget_range', '') ?: '—',
-                $v->get('timeline', '') ?: '—',
-                $v->get('project_details', '') ?: '—'
-            ),
-            (string) $v->get('email')
-        );
-
-        return $id;
-    }
-
     // =================================================================
     // Premade projects
     // =================================================================
@@ -1025,170 +906,6 @@ final class SiteController
     // =================================================================
     // Package checkout / request
     // =================================================================
-    public function checkout(Request $request, array $params): void
-    {
-        $repo    = new PackageRepo();
-        $package = $repo->publishedBySlug((string) $params['slug']);
-        if ($package === null) {
-            $this->notFound($request);
-            return;
-        }
-        if (!App::settings()->bool('checkout_enabled', true)) {
-            redirect('/quote?package=' . $package['slug']);
-        }
-
-        if ($request->isPost()) {
-            $this->handleCheckout($request, $package);
-            return;
-        }
-
-        $seo = App::seo();
-        $seo->title('Request the ' . $package['name'] . ' Package');
-        $seo->description('Confirm your details and requirements. No payment is taken here — we confirm the scope with you and send a secure invoice.');
-        $seo->canonical(absolute_url('/checkout/' . $package['slug']));
-        $seo->noindex(true);
-        $seo->breadcrumbs([
-            ['label' => 'Home', 'url' => '/'],
-            ['label' => 'Packages', 'url' => '/packages'],
-            ['label' => (string) $package['name'], 'url' => '/packages/' . $package['slug']],
-            ['label' => 'Request', 'url' => '/checkout/' . $package['slug']],
-        ]);
-
-        $this->view->render('checkout', [
-            'package'        => $package,
-            'addons'         => $repo->addonsFor((int) $package['id']),
-            'countries'      => self::countries(),
-            'paymentMethods' => self::paymentMethods(),
-            'bodyClass'      => 'page-checkout',
-        ]);
-    }
-
-    private function handleCheckout(Request $request, array $package): void
-    {
-        Csrf::verify($request);
-        $leads = new LeadRepo();
-        $slug  = (string) $package['slug'];
-
-        if ($leads->recentSubmissionCount($request->ip()) >= 5) {
-            $this->formFail($request, '/checkout/' . $slug, 'You have submitted several requests recently. Please wait a few minutes.', []);
-            return;
-        }
-
-        $channels = array_keys(\Techbiss\Repo\ProjectOrderRepo::contactLabels());
-
-        $v = Validator::make($request->all())
-            ->honeypot()
-            ->required('name', 'Your name', 2, 120)
-            ->required('business_name', 'Business name', 2, 190)
-            ->email('email')
-            ->phone('phone', true)
-            ->in('country', self::countries(), 'Country', false)
-            ->in('preferred_contact', $channels, 'Reply channel', false)
-            ->text('business_details', 3000, false, 'Business details')
-            ->text('requirements', 3000, false, 'Requirements')
-            ->multi('addons')
-            ->multi('features');
-
-        if ($v->fails()) {
-            $this->formFail($request, '/checkout/' . $slug, $v->firstError(), $v->errors());
-            return;
-        }
-
-        // Prices are recalculated here from the database. Anything posted by the
-        // browser about money is ignored entirely.
-        $pricing      = PackageRepo::pricing($package);
-        $selectedIds  = array_map('intval', (array) $v->get('addons', []));
-        $offeredIds   = (new PackageRepo())->addonIds((int) $package['id']);
-        $selectedIds  = array_values(array_intersect($selectedIds, $offeredIds));
-        $addons       = (new AddonRepo())->byIds($selectedIds);
-        $addonsTotal  = 0.0;
-        $addonRows    = [];
-        foreach ($addons as $addon) {
-            $addonsTotal += (float) $addon['price'];
-            $addonRows[]  = ['id' => (int) $addon['id'], 'name' => (string) $addon['name'], 'price' => (float) $addon['price']];
-        }
-
-        // The picked list is a choice from what this package offers, so
-        // anything else posted is discarded rather than stored.
-        $offeredFeatures = [];
-        foreach ($package['features'] ?? [] as $f) {
-            if ((int) $f['is_included'] === 1) {
-                $offeredFeatures[] = (string) $f['title'];
-            }
-        }
-        $chosenFeatures = array_values(array_intersect(
-            array_map('strval', (array) $v->get('features', [])),
-            $offeredFeatures
-        ));
-        if ($chosenFeatures === [] && $request->arr('features') === []) {
-            // Nothing posted at all: the form went untouched, and every
-            // included line was ticked when it rendered.
-            $chosenFeatures = $offeredFeatures;
-        }
-        $droppedFeatures = array_values(array_diff($offeredFeatures, $chosenFeatures));
-
-        $customerId = (new CustomerRepo())->upsert([
-            'name'          => $v->get('name'),
-            'business_name' => $v->get('business_name'),
-            'email'         => $v->get('email'),
-            'phone'         => $v->get('phone', ''),
-            'country'       => $v->get('country', ''),
-        ]);
-
-        $reference = $leads->nextReference('TBP', 'package_purchases');
-        $months    = max(1, (int) $package['duration_months']);
-
-        (new \Techbiss\Repo\PurchaseRepo())->create([
-            'reference'        => $reference,
-            'customer_id'      => $customerId,
-            'package_id'       => (int) $package['id'],
-            'package_name'     => (string) $package['name'],
-            'currency'         => (string) $package['currency'],
-            'regular_price'    => $pricing['regular'],
-            'prepaid_price'    => $pricing['payable'],
-            'addons_total'     => round($addonsTotal, 2),
-            'discount_amount'  => $pricing['saving'],
-            'total_amount'     => round($pricing['payable'] + $addonsTotal, 2),
-            'duration_months'  => $months,
-            'billing_period'   => (string) $package['billing_period'],
-            'payment_method'   => 'manual',
-            'payment_status'   => 'pending',
-            'package_status'   => 'pending',
-            'renewal_status'   => 'not_due',
-            'purchased_at'     => date('Y-m-d H:i:s'),
-            'starts_at'        => null,
-            'expires_at'       => null,
-            'business_details' => $v->get('business_details', ''),
-            'requirements'     => $v->get('requirements', ''),
-            'selected_features' => implode("\n", $chosenFeatures),
-            'preferred_contact' => $v->get('preferred_contact', '') ?: 'whatsapp',
-            'ip_address'       => $request->ip(),
-        ], $addonRows);
-
-        $this->notify(
-            'New package request ' . $reference,
-            sprintf(
-                "Reference: %s\nPackage: %s\nCustomer: %s (%s)\nBusiness: %s\nPhone: %s\nCountry: %s\n"
-                . "Reply on: %s\nAdd-ons: %s\n\nWants:\n%s\n\nDoes not want:\n%s\n\nIn their own words:\n%s",
-                $reference,
-                $package['name'],
-                $v->get('name'),
-                $v->get('email'),
-                $v->get('business_name'),
-                $v->get('phone', '') ?: '—',
-                $v->get('country', '') ?: '—',
-                $v->get('preferred_contact', '') ?: 'whatsapp',
-                $addonRows === [] ? '—' : implode(', ', array_column($addonRows, 'name')),
-                $chosenFeatures === [] ? '—' : '· ' . implode("\n· ", $chosenFeatures),
-                $droppedFeatures === [] ? '—' : '· ' . implode("\n· ", $droppedFeatures),
-                $v->get('requirements', '') ?: '—'
-            ),
-            (string) $v->get('email')
-        );
-
-        $this->formSuccess($request, '/thank-you?ref=' . urlencode($reference), 'Your package request has been received.');
-    }
-
     public function thankYou(Request $request): void
     {
         $ref = preg_replace('/[^A-Z0-9-]/', '', strtoupper($request->queryString('ref'))) ?? '';
@@ -1290,7 +1007,7 @@ final class SiteController
         $urls = [
             ['loc' => absolute_url('/'), 'priority' => '1.0', 'changefreq' => 'weekly'],
             ['loc' => absolute_url('/services'), 'priority' => '0.9', 'changefreq' => 'monthly'],
-            ['loc' => absolute_url('/packages'), 'priority' => '0.9', 'changefreq' => 'monthly'],
+            ['loc' => absolute_url('/request'), 'priority' => '0.9', 'changefreq' => 'yearly'],
             ['loc' => absolute_url('/portfolio'), 'priority' => '0.8', 'changefreq' => 'weekly'],
             ['loc' => absolute_url('/premade-projects'), 'priority' => '0.9', 'changefreq' => 'weekly'],
             ['loc' => absolute_url('/industries'), 'priority' => '0.8', 'changefreq' => 'monthly'],
@@ -1299,8 +1016,6 @@ final class SiteController
             ['loc' => absolute_url('/testimonials'), 'priority' => '0.6', 'changefreq' => 'monthly'],
             ['loc' => absolute_url('/faqs'), 'priority' => '0.6', 'changefreq' => 'monthly'],
             ['loc' => absolute_url('/contact'), 'priority' => '0.7', 'changefreq' => 'yearly'],
-            ['loc' => absolute_url('/quote'), 'priority' => '0.7', 'changefreq' => 'yearly'],
-            ['loc' => absolute_url('/start'), 'priority' => '0.8', 'changefreq' => 'yearly'],
         ];
 
         $add = static function (array $rows, string $prefix, string $priority) use (&$urls): void {
@@ -1315,7 +1030,6 @@ final class SiteController
         };
 
         $add((new ServiceRepo())->forSitemap(), '/services', '0.8');
-        $add((new PackageRepo())->forSitemap(), '/packages', '0.8');
         $add((new PortfolioRepo())->forSitemap(), '/portfolio', '0.7');
         $add((new ProjectRepo())->forSitemap(), '/premade-projects', '0.8');
         $add((new IndustryRepo())->forSitemap(), '/industries', '0.7');

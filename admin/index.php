@@ -17,11 +17,9 @@ use Techbiss\Controllers\Admin\DashboardController;
 use Techbiss\Controllers\Admin\LeadController;
 use Techbiss\Controllers\Admin\MediaController;
 use Techbiss\Controllers\Admin\NavigationController;
-use Techbiss\Controllers\Admin\PackageController;
 use Techbiss\Controllers\Admin\PortfolioController;
 use Techbiss\Controllers\Admin\ProjectController;
 use Techbiss\Controllers\Admin\ProjectOrderController;
-use Techbiss\Controllers\Admin\PurchaseController;
 use Techbiss\Controllers\Admin\ResourceController;
 use Techbiss\Controllers\Admin\SettingsController;
 use Techbiss\Controllers\Admin\SystemController;
@@ -66,8 +64,6 @@ if (!in_array($path, ['/admin/login', '/admin/logout'], true)) {
     $portfolio  = new PortfolioController();
     $projects   = new ProjectController();
     $prjOrders  = new ProjectOrderController();
-    $packages   = new PackageController();
-    $purchases  = new PurchaseController();
     $customers  = new CustomerController();
     $leads      = new LeadController();
     $media      = new MediaController();
@@ -115,22 +111,6 @@ if (!in_array($path, ['/admin/login', '/admin/logout'], true)) {
     $router->post('/admin/project-orders/{id:\d+}/delete', [$prjOrders, 'destroy']);
 
     // --- Packages -----------------------------------------------------
-    $router->get('/admin/packages', [$packages, 'index']);
-    $router->get('/admin/packages/create', [$packages, 'create']);
-    $router->post('/admin/packages', [$packages, 'store']);
-    $router->post('/admin/packages/reorder', [$packages, 'reorder']);
-    $router->get('/admin/packages/{id:\d+}/edit', [$packages, 'edit']);
-    $router->post('/admin/packages/{id:\d+}', [$packages, 'update']);
-    $router->post('/admin/packages/{id:\d+}/delete', [$packages, 'destroy']);
-    $router->post('/admin/packages/{id:\d+}/toggle', [$packages, 'toggle']);
-
-    // --- Purchases & customers ---------------------------------------
-    $router->get('/admin/purchases', [$purchases, 'index']);
-    $router->get('/admin/purchases/export', [$purchases, 'export']);
-    $router->get('/admin/purchases/{id:\d+}', [$purchases, 'show']);
-    $router->post('/admin/purchases/{id:\d+}', [$purchases, 'update']);
-    $router->post('/admin/purchases/{id:\d+}/extend', [$purchases, 'extend']);
-    $router->post('/admin/purchases/{id:\d+}/delete', [$purchases, 'destroy']);
 
     $router->get('/admin/customers', [$customers, 'index']);
     $router->get('/admin/customers/export', [$customers, 'export']);
@@ -243,7 +223,7 @@ $router->fallback(static function (Request $request): void {
         'user'        => Auth::user(),
         'flash'       => App::flashMessages(),
         'currentPath' => App::currentPath(),
-        'badges'      => ['messages' => 0, 'quotes' => 0, 'purchases' => 0],
+        'badges'      => ['messages' => 0, 'quotes' => 0],
     ]);
     $view->render('404', ['title' => 'Page not found']);
 });

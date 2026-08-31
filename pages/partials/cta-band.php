@@ -4,7 +4,7 @@ $heading = $heading ?? ($section['heading'] ?? "Let's build your digital busines
 $lead    = $lead    ?? ($section['subheading'] ?? 'Tell us about the business. We will come back with a clear scope, a schedule and a price — no obligation.');
 $eyebrow = $eyebrow ?? ($section['eyebrow'] ?? 'Ready when you are');
 $primaryLabel = $primaryLabel ?? ($section['cta_label'] ?? 'Start Your Digital Journey');
-$primaryUrl   = $primaryUrl   ?? ($section['cta_url'] ?? '/start');
+$primaryUrl   = $primaryUrl   ?? ($section['cta_url'] ?? '/request');
 
 // Where a caller passes a message, the band asks on WhatsApp and by email
 // instead of sending people to a form — the price is settled in conversation.
@@ -43,7 +43,7 @@ $chat     = $waHref !== '' || $mailHref !== '';
                     <a class="btn btn--primary btn--lg btn--arrow" href="<?= e(url($primaryUrl)) ?>" data-magnetic="0.24">
                         <?= e($primaryLabel) ?><?= icon('arrow-right') ?>
                     </a>
-                    <a class="btn btn--ghost btn--lg" href="<?= e(url('/packages')) ?>">Explore Packages</a>
+                    <a class="btn btn--ghost btn--lg" href="<?= e(url('/services')) ?>">See what we do</a>
                 <?php endif; ?>
             </div>
             <p class="cta-band__note">No payment is taken on this website. We confirm scope and pricing with you first.</p>

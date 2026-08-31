@@ -10,7 +10,6 @@ use Techbiss\Core\Request;
 use Techbiss\Core\Session;
 use Techbiss\Core\View;
 use Techbiss\Repo\LeadRepo;
-use Techbiss\Repo\PurchaseRepo;
 
 abstract class BaseAdminController
 {
@@ -63,11 +62,10 @@ abstract class BaseAdminController
             return [
                 'messages'  => $db->int("SELECT COUNT(*) FROM contact_messages WHERE status = 'new'"),
                 'quotes'    => $db->int("SELECT COUNT(*) FROM quote_requests WHERE status = 'new'"),
-                'purchases' => $db->int("SELECT COUNT(*) FROM package_purchases WHERE payment_status = 'pending'"),
                 'project_orders' => $db->int("SELECT COUNT(*) FROM project_orders WHERE order_status = 'new'"),
             ];
         } catch (\Throwable) {
-            return ['messages' => 0, 'quotes' => 0, 'purchases' => 0, 'project_orders' => 0];
+            return ['messages' => 0, 'quotes' => 0, 'project_orders' => 0];
         }
     }
 

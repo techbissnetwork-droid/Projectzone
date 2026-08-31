@@ -77,7 +77,7 @@
                                 <a class="btn btn--ghost btn--sm btn--arrow" href="<?= e(url('/services/' . $service['slug'])) ?>">
                                     Full details<?= icon('arrow-right') ?>
                                 </a>
-                                <a class="btn btn--quiet btn--sm" href="<?= e(url('/quote')) ?>">Request a quote</a>
+                                <a class="btn btn--quiet btn--sm" href="<?= e(url('/request')) ?>">Ask about this</a>
                             </div>
                         </div>
                     </div>

@@ -81,8 +81,7 @@ $whatsapp = preg_replace('/[^0-9]/', '', $settings->get('whatsapp'));
                     <h3 class="card__title" style="font-size:var(--fs-sm)">Would a quote be more useful?</h3>
                     <p class="card__text">If you already know roughly what you need, the quote form captures the detail in one go.</p>
                     <div class="card__footer stack stack-2">
-                        <a class="btn btn--ghost btn--block btn--sm" href="<?= e(url('/quote')) ?>">Request a quote</a>
-                        <a class="btn btn--quiet btn--block btn--sm" href="<?= e(url('/start')) ?>">Start Your Digital Journey</a>
+                        <a class="btn btn--ghost btn--block btn--sm" href="<?= e(url('/request')) ?>">Tell us what you need</a>
                     </div>
                 </div>
             </aside>

@@ -1,5 +1,5 @@
 <?php
-/** @var array $service @var array $features @var array $related @var array $projects @var array $packages @var array $steps */
+/** @var array $service @var array $features @var array $related @var array $projects @var array $steps */
 $deliverables = lines_to_list($service['deliverables']);
 $image        = media_url($service['image']);
 ?>
@@ -7,8 +7,7 @@ $image        = media_url($service['image']);
     'eyebrow' => $service['tagline'] ?: 'Service',
     'heading' => (string) $service['name'],
     'lead'    => (string) $service['short_description'],
-    'actions' => '<a class="btn btn--primary btn--arrow" href="' . e(url('/quote')) . '">Request a quote' . icon('arrow-right') . '</a>'
-               . '<a class="btn btn--ghost" href="' . e(url('/start')) . '">Start Your Digital Journey</a>',
+    'actions' => '<a class="btn btn--primary btn--arrow" href="' . e(url('/request?service=' . $service['slug'])) . '">Ask about this' . icon('arrow-right') . '</a>',
 ]) ?>
 
 <section class="section section--flush-top">
@@ -69,16 +68,15 @@ $image        = media_url($service['image']);
                     <p class="price__note mt-2"><?= e($service['price_note']) ?></p>
                     <?php endif; ?>
                     <div class="card__footer">
-                        <a class="btn btn--primary btn--block" href="<?= e(url('/quote')) ?>">Get an exact quote</a>
+                        <a class="btn btn--primary btn--block" href="<?= e(url('/request?service=' . $service['slug'])) ?>">Ask about this</a>
                     </div>
                 </div>
                 <?php else: ?>
                 <div class="card">
-                    <h3 class="card__title">Pricing</h3>
-                    <p class="card__text">This service is scoped to your requirements. Packages that include it are published with full pricing.</p>
-                    <div class="card__footer stack stack-2">
-                        <a class="btn btn--primary btn--block" href="<?= e(url('/packages')) ?>">See packages</a>
-                        <a class="btn btn--ghost btn--block" href="<?= e(url('/quote')) ?>">Request a custom quote</a>
+                    <h3 class="card__title">Price</h3>
+                    <p class="card__text">Scoped to what you actually need, then agreed on WhatsApp or by email.</p>
+                    <div class="card__footer">
+                        <a class="btn btn--primary btn--block" href="<?= e(url('/request?service=' . $service['slug'])) ?>">Ask about this</a>
                     </div>
                 </div>
                 <?php endif; ?>

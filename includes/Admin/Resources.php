@@ -353,33 +353,6 @@ final class Resources
                 ],
             ],
 
-            // -------------------------------------------------------------
-            'package_addons' => [
-                'table'      => 'package_addons',
-                'singular'   => 'Add-on',
-                'plural'     => 'Add-ons',
-                'icon'       => 'plus',
-                'permission' => 'packages.manage',
-                'group'      => 'Packages',
-                'orderable'  => true,
-                'searchable' => ['name', 'description'],
-                'columns'    => [
-                    ['key' => 'name', 'label' => 'Add-on', 'primary' => true, 'sub' => 'description'],
-                    ['key' => 'price', 'label' => 'Price', 'type' => 'money'],
-                    ['key' => 'billing_period', 'label' => 'Billing', 'type' => 'badge'],
-                    ['key' => 'is_published', 'label' => 'Status', 'type' => 'status'],
-                ],
-                'fields' => [
-                    ['key' => 'name', 'label' => 'Name', 'type' => 'text', 'required' => true, 'max' => 190],
-                    ['key' => 'slug', 'label' => 'URL slug', 'type' => 'slug', 'from' => 'name'],
-                    ['key' => 'description', 'label' => 'Description', 'type' => 'textarea', 'max' => 500],
-                    ['key' => 'price', 'label' => 'Price', 'type' => 'decimal', 'required' => true],
-                    ['key' => 'currency', 'label' => 'Currency', 'type' => 'text', 'max' => 6, 'default' => 'USD'],
-                    ['key' => 'billing_period', 'label' => 'Billing period', 'type' => 'select', 'options' => ['one-time' => 'One-time', 'monthly' => 'Monthly', 'yearly' => 'Yearly']],
-                    ['key' => 'icon', 'label' => 'Icon', 'type' => 'icon'],
-                    ['key' => 'is_published', 'label' => 'Published', 'type' => 'bool', 'default' => 1],
-                ],
-            ],
         ];
     }
 

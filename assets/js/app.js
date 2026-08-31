@@ -635,165 +635,6 @@
   }
 
   /* -------------------------------------------------------------------
-     Multi-step wizard
-     ------------------------------------------------------------------- */
-  function initWizard() {
-    var wizard = $('[data-wizard]');
-    if (!wizard) return;
-
-    var panels = $$('.wizard__panel', wizard);
-    var pips   = $$('.wizard__pip', wizard);
-    var bar    = $('.wizard__bar-fill', wizard);
-    var form   = wizard.closest('form') || $('form', wizard);
-    var index  = 0;
-
-    function validatePanel(panel) {
-      var fields = $$('input, textarea, select', panel);
-      var valid = true;
-      fields.forEach(function (f) {
-        if (f.type === 'hidden' || f.disabled) return;
-        if (!f.checkValidity()) {
-          f.classList.add('is-invalid');
-          if (valid) { f.focus(); f.reportValidity && f.reportValidity(); }
-          valid = false;
-        }
-      });
-      // Groups marked as required need at least one checkbox selected.
-      $$('[data-require-one]', panel).forEach(function (group) {
-        var checked = $$('input[type="checkbox"]', group).some(function (c) { return c.checked; });
-        var msg = $('.field-error', group);
-        var boxes = $$('input[type="checkbox"]', group);
-        if (!checked) {
-          valid = false;
-          if (!msg) {
-            msg = document.createElement('span');
-            msg.className = 'field-error';
-            msg.id = errorId(boxes.length ? boxes[0].name : 'group');
-            msg.setAttribute('role', 'alert');
-            msg.textContent = 'Please choose at least one option.';
-            group.appendChild(msg);
-          }
-          // The requirement is on the group, so every box in it points at the
-          // one message rather than each carrying its own.
-          boxes.forEach(function (box) { describe(box, msg.id); });
-        } else if (msg) {
-          boxes.forEach(function (box) { undescribe(box, msg.id); });
-          msg.remove();
-        }
-      });
-      return valid;
-    }
-
-    function show(next, skipValidation) {
-      if (next > index && !skipValidation && !validatePanel(panels[index])) return;
-      index = Math.max(0, Math.min(panels.length - 1, next));
-      panels.forEach(function (p, i) { p.classList.toggle('is-active', i === index); });
-      pips.forEach(function (pip, i) {
-        pip.setAttribute('data-state', i === index ? 'current' : (i < index ? 'done' : 'todo'));
-      });
-      if (bar) bar.style.setProperty('--progress', (((index + 1) / panels.length) * 100).toFixed(2) + '%');
-      updateSummary();
-      var head = $('.wizard__panel-head', panels[index]);
-      if (head) {
-        wizard.scrollIntoView({ block: 'start', behavior: reduceMotion.matches ? 'auto' : 'smooth' });
-        var focusable = panels[index].querySelector('input:not([type=hidden]), textarea, select, button');
-        if (focusable && canHover.matches) window.setTimeout(function () { focusable.focus({ preventScroll: true }); }, 260);
-      }
-    }
-
-    function updateSummary() {
-      var summary = $('[data-wizard-summary]', wizard);
-      if (!summary || !form) return;
-      var rows = [];
-      var add = function (label, value) {
-        if (value) rows.push('<div class="wizard__summary-row"><span class="wizard__summary-label">' + label +
-          '</span><span class="wizard__summary-value">' + String(value).replace(/[<>]/g, '') + '</span></div>');
-      };
-      var val = function (name) { var f = form.querySelector('[name="' + name + '"]'); return f ? f.value.trim() : ''; };
-      add('Business', val('business_name'));
-      add('Contact', val('name'));
-      var services = $$('[name="services_needed[]"]:checked', form).map(function (c) {
-        var lbl = c.closest('.option-card');
-        var t = lbl && lbl.querySelector('.option-card__title');
-        return t ? t.textContent.trim() : c.value;
-      });
-      add('Needs', services.join(', '));
-      add('Budget', (form.querySelector('[name="budget_range"]:checked') || {}).value || '');
-      add('Timeline', (form.querySelector('[name="timeline"]:checked') || {}).value || '');
-      summary.innerHTML = rows.length ? rows.join('') :
-        '<p class="text-muted" style="font-size:var(--fs-sm)">Complete the earlier steps and your answers will appear here.</p>';
-    }
-
-    $$('[data-wizard-next]', wizard).forEach(function (btn) {
-      on(btn, 'click', function (e) { e.preventDefault(); show(index + 1); });
-    });
-    $$('[data-wizard-prev]', wizard).forEach(function (btn) {
-      on(btn, 'click', function (e) { e.preventDefault(); show(index - 1, true); });
-    });
-    pips.forEach(function (pip, i) {
-      on(pip, 'click', function () { if (i < index) show(i, true); });
-    });
-    if (form) {
-      on(form, 'change', updateSummary);
-      on(form, 'submit', function (e) {
-        // Validate every panel before the final submission.
-        for (var i = 0; i < panels.length; i++) {
-          if (!validatePanel(panels[i])) { e.preventDefault(); show(i, true); return; }
-        }
-      });
-    }
-    show(0, true);
-  }
-
-  /* -------------------------------------------------------------------
-     Package selection highlight + checkout totals
-     ------------------------------------------------------------------- */
-  function initCheckout() {
-    var root = $('[data-checkout]');
-    if (!root) return;
-
-    var currency = root.getAttribute('data-currency') || '$';
-    var base     = parseFloat(root.getAttribute('data-base')) || 0;
-    var regular  = parseFloat(root.getAttribute('data-regular')) || 0;
-
-    function fmt(n) {
-      return currency + n.toLocaleString(undefined, {
-        minimumFractionDigits: n % 1 === 0 ? 0 : 2,
-        maximumFractionDigits: 2
-      });
-    }
-
-    function recalc() {
-      var addonTotal = 0;
-      $$('input[name="addons[]"]:checked', root).forEach(function (c) {
-        addonTotal += parseFloat(c.getAttribute('data-price')) || 0;
-      });
-      var total = base + addonTotal;
-      var setText = function (sel, value) { var el = $(sel, root); if (el) el.textContent = value; };
-      setText('[data-total-addons]', fmt(addonTotal));
-      setText('[data-total-final]', fmt(total));
-      var savingEl = $('[data-total-saving]', root);
-      if (savingEl && regular > base) savingEl.textContent = fmt(regular - base);
-    }
-
-    $$('input[name="addons[]"]', root).forEach(function (c) { on(c, 'change', recalc); });
-    recalc();
-
-    // Highlight the chosen package card
-    $$('[data-package-option]', document).forEach(function (input) {
-      on(input, 'change', function () {
-        $$('.package-card').forEach(function (card) { card.classList.remove('package-card--selected'); });
-        var card = input.closest('.package-card');
-        if (card) card.classList.add('package-card--selected');
-      });
-      if (input.checked) {
-        var card = input.closest('.package-card');
-        if (card) card.classList.add('package-card--selected');
-      }
-    });
-  }
-
-  /* -------------------------------------------------------------------
      Gallery lightbox — keyboard and swipe friendly
      ------------------------------------------------------------------- */
   function initLightbox() {
@@ -968,8 +809,6 @@
     initCounters();
     initAccordion();
     initForms();
-    initWizard();
-    initCheckout();
     initLightbox();
     initCopy();
     initFilters();
@@ -978,6 +817,7 @@
     if (cfg.cursor !== false) initCursor();
     initMagnetic();
     initSliders();
+    initAutoOpen();
   }
 
   /* ---------------------------------------------------------------------
@@ -1157,6 +997,19 @@
 
       play();
     });
+  }
+
+  /* -------------------------------------------------------------------
+     A finished request message
+     The page comes back with the message and a link to open it, because a
+     form cannot redirect to another origin under our own form-action policy.
+     Following the link here spares anyone with JavaScript the extra click.
+     ------------------------------------------------------------------- */
+  function initAutoOpen() {
+    var link = $('[data-auto-open]');
+    if (!link) return;
+    // A short beat so the message is on screen before the app takes over.
+    window.setTimeout(function () { window.location.href = link.href; }, 400);
   }
 
   if (document.readyState === 'loading') {

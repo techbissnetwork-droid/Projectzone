@@ -1,4 +1,4 @@
-<?php /** @var array $steps @var array $packages @var array $faqs */ ?>
+<?php /** @var array $steps @var array $faqs */ ?>
 <?= $view->partial('partials/page-head', [
     'eyebrow' => 'How it works',
     'heading' => 'Six stages from first conversation to ongoing growth.',
@@ -69,25 +69,6 @@
         </div>
     </div>
 </section>
-
-<?php if ($packages): ?>
-<section class="section">
-    <div class="container">
-        <div class="section-head section-head--center" data-reveal>
-            <p class="eyebrow eyebrow--plain">Stage 02</p>
-            <h2 class="mt-4">Choose your setup</h2>
-            <p class="lead">Pick a package, or ask for a custom scope. Either way you see the full price before deciding.</p>
-        </div>
-        <div class="slider" data-slider>
-            <div class="slider__track slider__track--packages" data-reveal-stagger>
-            <?php foreach ($packages as $package): ?>
-                <?= $view->partial('partials/package-card', ['package' => $package, 'compact' => true]) ?>
-            <?php endforeach; ?>
-        </div>
-    </div>
-    </div>
-</section>
-<?php endif; ?>
 
 <?php if ($faqs): ?>
 <section class="section">

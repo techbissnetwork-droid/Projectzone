@@ -41,9 +41,6 @@ $groups = [
     [
         'label' => 'Commerce',
         'items' => [
-            ['label' => 'Packages',          'url' => '/admin/packages',       'icon' => 'package',  'permission' => 'packages.manage'],
-            ['label' => 'Add-ons',           'url' => '/admin/package_addons', 'icon' => 'plus',     'permission' => 'packages.manage'],
-            ['label' => 'Purchases',         'url' => '/admin/purchases',      'icon' => 'money',    'permission' => 'purchases.manage', 'badge' => 'purchases'],
             ['label' => 'Premade projects',  'url' => '/admin/projects',       'icon' => 'rocket',   'permission' => 'projects.manage'],
             ['label' => 'Project enquiries', 'url' => '/admin/project-orders', 'icon' => 'inbox',    'permission' => 'project_orders.manage', 'badge' => 'project_orders'],
             ['label' => 'Customers',         'url' => '/admin/customers',      'icon' => 'users',    'permission' => 'customers.manage'],

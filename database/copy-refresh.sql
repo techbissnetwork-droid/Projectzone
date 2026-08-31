@@ -126,3 +126,26 @@ UPDATE `pages` SET `content` = REPLACE(`content`, '<h2>Pricing</h2><p>Prices pub
 -- The cache holds rendered settings and navigation, so clear it afterwards:
 --     rm -f storage/cache/*.cache
 -- or use Admin → System → Tools → Clear cache.
+
+-- ---------------------------------------------------------------------
+-- The packages are gone. There is one page now: tick what you need and
+-- send it on WhatsApp or by email, which is where the price is agreed.
+-- The old paths still redirect, but the menus should point at the real one.
+-- ---------------------------------------------------------------------
+
+-- The header already carries the request as its call to action, so the menu
+-- link for it would be the same destination twice.
+DELETE FROM `navigation` WHERE `url` = '/packages' AND `menu` = 'primary';
+
+UPDATE `navigation` SET `label` = 'Tell us what you need', `url` = '/request'
+  WHERE `url` = '/packages' AND `menu` = 'footer';
+
+UPDATE `navigation` SET `label` = 'Tell us what you need', `url` = '/request'
+  WHERE `url` = '/start' AND `menu` = 'primary';
+
+DELETE FROM `navigation` WHERE `url` = '/quote';
+
+UPDATE `page_sections` SET `cta_label` = 'Tell Us What You Need', `cta_url` = '/request'
+  WHERE `cta_url` IN ('/start', '/quote', '/packages');
+
+UPDATE `page_sections` SET `is_published` = 0 WHERE `section_key` = 'packages';

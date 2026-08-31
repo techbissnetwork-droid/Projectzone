@@ -19,7 +19,7 @@
         <div class="grid grid-4" data-reveal-stagger>
             <?php foreach ([
                 ['Services', '/services', 'layers', 'Everything we build and run.'],
-                ['Packages', '/packages', 'package', 'Complete setups, clearly priced.'],
+                ['Tell us what you need', '/request', 'package', 'Pick what you want and send it over.'],
                 ['Our work', '/portfolio', 'image', 'Projects and case studies.'],
                 ['Contact', '/contact', 'mail', 'Talk to a person.'],
             ] as $i => $link): ?>

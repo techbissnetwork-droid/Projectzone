@@ -9,7 +9,6 @@ use Techbiss\Core\Request;
 use Techbiss\Core\Validator;
 use Techbiss\Repo\CustomerRepo;
 use Techbiss\Repo\IndustryRepo;
-use Techbiss\Repo\PurchaseRepo;
 
 final class CustomerController extends BaseAdminController
 {
@@ -55,7 +54,6 @@ final class CustomerController extends BaseAdminController
         $this->view->render('customers/show', [
             'title'      => (string) $row['name'],
             'row'        => $row,
-            'purchases'  => (new PurchaseRepo())->forCustomer($id),
             'industries' => (new IndustryRepo())->options(),
             'quotes'     => \Techbiss\Core\Database::instance()->all(
                 'SELECT * FROM quote_requests WHERE email = ? ORDER BY created_at DESC', [$row['email']]
@@ -109,7 +107,7 @@ final class CustomerController extends BaseAdminController
         $row = $this->repo->find($id);
         $this->repo->delete($id);
         ActivityLog::record('delete', 'customers', $id, 'Deleted customer: ' . ($row['name'] ?? $id));
-        $this->ok('Customer deleted along with their purchase records.', '/admin/customers');
+        $this->ok('Customer deleted.', '/admin/customers');
     }
 
     public function export(Request $request): never

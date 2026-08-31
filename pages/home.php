@@ -3,7 +3,7 @@
  * Homepage. Every band below is driven by the page_sections / section_items
  * tables or by a content repository — nothing on this page is hard-coded copy.
  *
- * @var array $sections @var array $services @var array $packages @var array $projects
+ * @var array $sections @var array $services @var array $projects
  * @var array $industries @var array $steps @var array $testimonials @var array $faqs
  * @var array $posts @var array $stats
  */
@@ -50,10 +50,10 @@ $hero = $sections['hero'] ?? [];
                 </p>
 
                 <div class="hero__actions" data-reveal style="--reveal-delay:150ms">
-                    <a class="btn btn--primary btn--lg btn--arrow" href="<?= e(url($s('hero', 'cta_url', '/start'))) ?>" data-magnetic="0.25">
+                    <a class="btn btn--primary btn--lg btn--arrow" href="<?= e(url($s('hero', 'cta_url', '/request'))) ?>" data-magnetic="0.25">
                         <?= e($s('hero', 'cta_label', 'Start Your Digital Journey')) ?><?= icon('arrow-right') ?>
                     </a>
-                    <a class="btn btn--ghost btn--lg" href="<?= e(url('/packages')) ?>">Explore Packages</a>
+                    <a class="btn btn--ghost btn--lg" href="<?= e(url('/request')) ?>">Tell Us What You Need</a>
                     <?php if ($projects): ?>
                     <a class="btn btn--quiet btn--lg" href="<?= e(url('/portfolio')) ?>">View Our Work</a>
                     <?php endif; ?>
@@ -149,7 +149,7 @@ $hero = $sections['hero'] ?? [];
                     <h3 class="mt-3"><?= e($s('chain', 'heading')) ?></h3>
                 </div>
                 <?php if ($s('chain', 'cta_label') !== ''): ?>
-                <a class="link hide-sm" href="<?= e(url($s('chain', 'cta_url', '/packages'))) ?>">
+                <a class="link hide-sm" href="<?= e(url($s('chain', 'cta_url', '/request'))) ?>">
                     <?= e($s('chain', 'cta_label')) ?><?= icon('arrow-right') ?>
                 </a>
                 <?php endif; ?>
@@ -174,7 +174,7 @@ $hero = $sections['hero'] ?? [];
 
         <?php if ($s('problem', 'cta_label') !== ''): ?>
         <div class="row mt-6" data-reveal>
-            <a class="btn btn--primary btn--lg btn--arrow" href="<?= e(url($s('problem', 'cta_url', '/start'))) ?>">
+            <a class="btn btn--primary btn--lg btn--arrow" href="<?= e(url($s('problem', 'cta_url', '/request'))) ?>">
                 <?= e($s('problem', 'cta_label')) ?><?= icon('arrow-right') ?>
             </a>
         </div>
@@ -305,33 +305,6 @@ $hero = $sections['hero'] ?? [];
             </a>
         </div>
         <?php endif; ?>
-    </div>
-</section>
-<?php endif; ?>
-
-<!-- ================= PACKAGES ================= -->
-<?php if ($packages): ?>
-<section class="section" id="packages">
-    <div class="container">
-        <div class="section-head section-head--center" data-reveal>
-            <p class="eyebrow eyebrow--plain"><?= e($s('packages', 'eyebrow', 'Packages')) ?></p>
-            <h2 class="mt-4"><?= e($s('packages', 'heading', 'Pick what you need. We price it with you.')) ?></h2>
-            <p class="lead"><?= e($s('packages', 'subheading')) ?></p>
-        </div>
-
-        <div class="slider" data-slider>
-            <div class="slider__track slider__track--packages" data-reveal-stagger>
-            <?php foreach ($packages as $package): ?>
-                <?= $view->partial('partials/package-card', ['package' => $package, 'compact' => true]) ?>
-            <?php endforeach; ?>
-        </div>
-    </div>
-
-        <div class="row row--center mt-6" data-reveal>
-            <a class="btn btn--ghost btn--arrow" href="<?= e(url($s('packages', 'cta_url', '/packages'))) ?>">
-                <?= e($s('packages', 'cta_label', 'Compare all packages')) ?><?= icon('arrow-right') ?>
-            </a>
-        </div>
     </div>
 </section>
 <?php endif; ?>

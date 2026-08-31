@@ -1,5 +1,5 @@
 <?php
-/** @var array $industry @var array $services @var array $projects @var array $packages @var array $others */
+/** @var array $industry @var array $services @var array $projects @var array $others */
 $challenges = lines_to_list($industry['challenges']);
 $solutions  = lines_to_list($industry['solutions']);
 $image      = media_url($industry['image']);
@@ -8,8 +8,8 @@ $image      = media_url($industry['image']);
     'eyebrow' => 'Industries',
     'heading' => 'Digital solutions for ' . strtolower((string) $industry['name']),
     'lead'    => (string) $industry['short_description'],
-    'actions' => '<a class="btn btn--primary btn--arrow" href="' . e(url('/start')) . '">Start Your Digital Journey' . icon('arrow-right') . '</a>'
-               . '<a class="btn btn--ghost" href="' . e(url('/packages')) . '">Explore Packages</a>',
+    'actions' => '<a class="btn btn--primary btn--arrow" href="' . e(url('/request')) . '">Tell Us What You Need' . icon('arrow-right') . '</a>'
+               . '<a class="btn btn--ghost" href="' . e(url('/request')) . '">Tell Us What You Need</a>',
 ]) ?>
 
 <section class="section section--flush-top">
@@ -82,24 +82,6 @@ $image      = media_url($industry['image']);
             <div class="slider__track slider__track--work" data-reveal-stagger>
             <?php foreach ($projects as $i => $project): ?>
                 <?= $view->partial('partials/work-card', ['project' => $project, 'i' => $i]) ?>
-            <?php endforeach; ?>
-        </div>
-    </div>
-    </div>
-</section>
-<?php endif; ?>
-
-<?php if ($packages): ?>
-<section class="section">
-    <div class="container">
-        <div class="section-head section-head--center" data-reveal>
-            <p class="eyebrow eyebrow--plain">Where to start</p>
-            <h2 class="mt-4">Packages that suit <?= e(strtolower((string) $industry['name'])) ?>.</h2>
-        </div>
-        <div class="slider" data-slider>
-            <div class="slider__track slider__track--packages" data-reveal-stagger>
-            <?php foreach (array_slice($packages, 0, 3) as $package): ?>
-                <?= $view->partial('partials/package-card', ['package' => $package, 'compact' => true]) ?>
             <?php endforeach; ?>
         </div>
     </div>

@@ -2,7 +2,7 @@
 /**
  * Dashboard. Every figure below is a live count from the database — nothing
  * on this screen is illustrative or placeholder data.
- * @var array $counts @var array $summary @var array $series
+ * @var array $counts @var array $series
  */
 use Techbiss\Core\Auth;
 
@@ -14,8 +14,6 @@ $hasLeadData = false;
 foreach ($series as $point) {
     if ((int) $point['messages'] + (int) $point['quotes'] > 0) { $hasLeadData = true; break; }
 }
-$maxDemand = 1;
-foreach ($packageDemand as $d) { $maxDemand = max($maxDemand, (int) $d['total']); }
 ?>
 <div class="page-header">
     <div>
@@ -55,41 +53,7 @@ foreach ($packageDemand as $d) { $maxDemand = max($maxDemand, (int) $d['total'])
     </a>
     <?php endif; ?>
 
-    <?php if (Auth::can('purchases.manage')): ?>
-    <a class="tile" href="<?= e(url('/admin/purchases')) ?>">
-        <span class="tile__label"><?= icon('money') ?>Package requests</span>
-        <span class="tile__value"><?= (int) $summary['total'] ?></span>
-        <span class="tile__meta"><?= $summary['pending'] > 0 ? '<strong>' . (int) $summary['pending'] . ' awaiting payment</strong>' : 'None pending' ?></span>
-    </a>
-    <?php endif; ?>
 </div>
-
-<?php if (Auth::can('purchases.manage') && (int) $summary['total'] > 0): ?>
-<div class="tiles">
-    <div class="tile">
-        <span class="tile__label"><?= icon('check-circle') ?>Confirmed revenue</span>
-        <span class="tile__value"><?= e(money($summary['revenue'])) ?></span>
-        <span class="tile__meta">From <?= (int) $summary['paid'] ?> paid purchase<?= (int) $summary['paid'] === 1 ? '' : 's' ?></span>
-    </div>
-    <div class="tile">
-        <span class="tile__label"><?= icon('clock') ?>Awaiting payment</span>
-        <span class="tile__value"><?= e(money($summary['pipeline'])) ?></span>
-        <span class="tile__meta"><?= (int) $summary['pending'] ?> request<?= (int) $summary['pending'] === 1 ? '' : 's' ?> not yet paid</span>
-    </div>
-    <div class="tile">
-        <span class="tile__label"><?= icon('target') ?>Active packages</span>
-        <span class="tile__value"><?= (int) $summary['active'] ?></span>
-        <span class="tile__meta">
-            <?= (int) $summary['expiring'] > 0 ? '<strong>' . (int) $summary['expiring'] . ' expiring soon</strong>' : 'None expiring soon' ?>
-        </span>
-    </div>
-    <div class="tile">
-        <span class="tile__label"><?= icon('tag') ?>Prepaid savings given</span>
-        <span class="tile__value"><?= e(money($summary['savings'])) ?></span>
-        <span class="tile__meta">Across paid prepaid packages</span>
-    </div>
-</div>
-<?php endif; ?>
 
 <div class="grid-2-1">
     <div>
@@ -176,7 +140,7 @@ foreach ($packageDemand as $d) { $maxDemand = max($maxDemand, (int) $d['total'])
                     <div class="empty-state" style="border:0;background:none;padding:1.5rem 1rem">
                         <span class="empty-state__icon"><?= icon('inbox') ?></span>
                         <h3 style="font-size:1rem">No enquiries yet</h3>
-                        <p>Submissions from the contact, quote and journey forms land here.</p>
+                        <p>Requests from the contact page and the request page land here.</p>
                     </div>
                 </div>
             <?php else: ?>
@@ -213,33 +177,6 @@ foreach ($packageDemand as $d) { $maxDemand = max($maxDemand, (int) $d['total'])
         </div>
         <?php endif; ?>
 
-        <?php if (Auth::can('purchases.manage') && $expiring): ?>
-        <div class="panel">
-            <div class="panel__head">
-                <div>
-                    <span class="panel__title">Needs attention</span>
-                    <div class="panel__sub">Packages expiring or already expired</div>
-                </div>
-            </div>
-            <div class="table-wrap" style="border:0;border-radius:0;background:none">
-                <table class="data-table" style="min-width:520px">
-                    <thead><tr><th>Customer</th><th>Package</th><th>Status</th><th class="num">Expires</th></tr></thead>
-                    <tbody>
-                        <?php foreach ($expiring as $row): ?>
-                        <tr>
-                            <td><a href="<?= e(url('/admin/purchases/' . (int) $row['id'])) ?>"><span class="cell-title"><?= e($row['customer_name']) ?></span>
-                                <span class="cell-sub mono-sm"><?= e($row['reference']) ?></span></a></td>
-                            <td><?= e($row['package_name']) ?></td>
-                            <td><span class="status-dot status-dot--<?= $row['package_status'] === 'expired' ? 'danger' : 'warn' ?>">
-                                <?= e(ucfirst((string) $row['package_status'])) ?></span></td>
-                            <td class="num"><?= e(format_date($row['expires_at'])) ?></td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <?php endif; ?>
     </div>
 
     <!-- Secondary column: counts, demand and activity beside the main figures. -->
@@ -253,8 +190,7 @@ foreach ($packageDemand as $d) { $maxDemand = max($maxDemand, (int) $d['total'])
                         ['Services',     $counts['services'],     '/admin/services',     'layers',   'content.manage'],
                         ['Portfolio',    $counts['projects'],     '/admin/portfolio',    'image',    'portfolio.manage'],
                         ['Industries',   $counts['industries'],   '/admin/industries',   'building', 'content.manage'],
-                        ['Packages',     $counts['packages'],     '/admin/packages',     'package',  'packages.manage'],
-                        ['Blog posts',   $counts['posts'],        '/admin/blog',         'edit',     'blog.manage'],
+                                    ['Blog posts',   $counts['posts'],        '/admin/blog',         'edit',     'blog.manage'],
                         ['Testimonials', $counts['testimonials'], '/admin/testimonials', 'quote',    'content.manage'],
                         ['Media files',  $counts['media'],        '/admin/media',        'image',    'media.manage'],
                     ] as $item):
@@ -275,31 +211,6 @@ foreach ($packageDemand as $d) { $maxDemand = max($maxDemand, (int) $d['total'])
             </div>
         </div>
 
-        <?php if (Auth::can('purchases.manage') && $packageDemand): ?>
-        <div class="panel">
-            <div class="panel__head">
-                <div>
-                    <span class="panel__title">Package demand</span>
-                    <div class="panel__sub">Requests received per package</div>
-                </div>
-            </div>
-            <div class="panel__body">
-                <div class="bar-list">
-                    <?php foreach ($packageDemand as $d): ?>
-                    <div class="bar-list__row">
-                        <div class="bar-list__head">
-                            <span class="bar-list__label"><?= e($d['name']) ?></span>
-                            <span class="bar-list__value"><?= (int) $d['total'] ?></span>
-                        </div>
-                        <div class="bar-list__track">
-                            <div class="bar-list__fill" style="width:<?= (int) $d['total'] === 0 ? 0 : round(((int) $d['total'] / $maxDemand) * 100) ?>%"></div>
-                        </div>
-                    </div>
-                    <?php endforeach; ?>
-                </div>
-            </div>
-        </div>
-        <?php endif; ?>
 
         <?php if ($activity): ?>
         <div class="panel">

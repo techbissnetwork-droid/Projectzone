@@ -37,10 +37,17 @@ $router->get('/', [$site, 'home']);
 $router->get('/services', [$site, 'services']);
 $router->get('/services/{slug}', [$site, 'serviceDetail']);
 
-// --- Packages ---------------------------------------------------------
-$router->get('/packages', [$site, 'packages']);
-$router->get('/packages/{slug}', [$site, 'packageDetail']);
-$router->any('/checkout/{slug}', [$site, 'checkout']);
+// --- Request ----------------------------------------------------------
+// One page replaces the packages, the quote form, the per-package checkout
+// and the six-step wizard. The old paths are kept as permanent redirects so
+// existing links, bookmarks and search results still land somewhere useful.
+$router->any('/request', [$site, 'request']);
+
+$moved = static fn (): never => redirect('/request', 301);
+$router->get('/packages', $moved);
+$router->get('/packages/{slug}', $moved);
+$router->any('/checkout', $moved);
+$router->any('/checkout/{slug}', $moved);
 
 // --- Portfolio --------------------------------------------------------
 $router->get('/portfolio', [$site, 'portfolio']);
@@ -65,8 +72,8 @@ $router->get('/blog/{slug}', [$site, 'blogDetail']);
 
 // --- Conversion -------------------------------------------------------
 $router->any('/contact', [$site, 'contact']);
-$router->any('/quote', [$site, 'quote']);
-$router->any('/start', [$site, 'journey']);
+$router->any('/quote', $moved);
+$router->any('/start', $moved);
 $router->get('/thank-you', [$site, 'thankYou']);
 
 // --- Machine-readable -------------------------------------------------

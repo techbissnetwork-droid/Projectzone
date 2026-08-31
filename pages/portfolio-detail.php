@@ -135,8 +135,7 @@ $blocks = array_filter([
                     <h3 class="card__title" style="font-size:var(--fs-sm)">Want something like this?</h3>
                     <p class="card__text">Tell us about your business and we will scope an equivalent build.</p>
                     <div class="card__footer stack stack-2">
-                        <a class="btn btn--primary btn--block" href="<?= e(url('/start')) ?>">Start Your Digital Journey</a>
-                        <a class="btn btn--ghost btn--block" href="<?= e(url('/quote')) ?>">Request a quote</a>
+                        <a class="btn btn--primary btn--block" href="<?= e(url('/request')) ?>">Tell Us What You Need</a>
                     </div>
                 </div>
             </aside>

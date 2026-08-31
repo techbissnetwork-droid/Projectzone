@@ -131,14 +131,13 @@ INSERT INTO `settings` (`group_name`, `key_name`, `value`, `type`, `label`, `hin
 -- ---------------------------------------------------------------------
 INSERT INTO `navigation` (`menu`,`parent_id`,`label`,`url`,`link_type`,`description`,`target`,`is_active`,`is_button`,`sort_order`,`created_at`,`updated_at`) VALUES
 ('primary',NULL,'Services','/services','internal','What we build and run for you','_self',1,0,1,NOW(),NOW()),
-('primary',NULL,'Packages','/packages','internal','Complete setups, priced with you','_self',1,0,2,NOW(),NOW()),
 ('primary',NULL,'Ready Projects','/premade-projects','internal','Live builds you can launch fast','_self',1,0,3,NOW(),NOW()),
 ('primary',NULL,'Work','/portfolio','internal','Projects we have delivered','_self',1,0,4,NOW(),NOW()),
 ('primary',NULL,'Industries','/industries','internal','Built around your sector','_self',1,0,5,NOW(),NOW()),
 ('primary',NULL,'Company','','internal','','_self',1,0,6,NOW(),NOW()),
-('primary',NULL,'Start Your Digital Journey','/start','internal','','_self',1,1,9,NOW(),NOW()),
+('primary',NULL,'Tell Us What You Need','/request','internal','','_self',1,1,9,NOW(),NOW()),
 ('footer',NULL,'Services','/services','internal','','_self',1,0,1,NOW(),NOW()),
-('footer',NULL,'Packages','/packages','internal','','_self',1,0,2,NOW(),NOW()),
+('footer',NULL,'Tell us what you need','/request','internal','','_self',1,0,2,NOW(),NOW()),
 ('footer',NULL,'Ready Projects','/premade-projects','internal','','_self',1,0,3,NOW(),NOW()),
 ('footer',NULL,'Portfolio','/portfolio','internal','','_self',1,0,4,NOW(),NOW()),
 ('footer',NULL,'Industries','/industries','internal','','_self',1,0,5,NOW(),NOW()),
@@ -149,7 +148,6 @@ INSERT INTO `navigation` (`menu`,`parent_id`,`label`,`url`,`link_type`,`descript
 ('footer',NULL,'Testimonials','/testimonials','internal','','_self',1,0,10,NOW(),NOW()),
 ('footer',NULL,'FAQs','/faqs','internal','','_self',1,0,11,NOW(),NOW()),
 ('footer',NULL,'Contact','/contact','internal','','_self',1,0,12,NOW(),NOW()),
-('footer',NULL,'Request a Quote','/quote','internal','','_self',1,0,13,NOW(),NOW()),
 ('legal',NULL,'Privacy Policy','/privacy-policy','internal','','_self',1,0,1,NOW(),NOW()),
 ('legal',NULL,'Terms & Conditions','/terms-and-conditions','internal','','_self',1,0,2,NOW(),NOW());
 
@@ -417,16 +415,15 @@ INSERT INTO `pages` (`slug`,`title`,`eyebrow`,`subtitle`,`content`,`template`,`s
 -- Homepage sections
 -- ---------------------------------------------------------------------
 INSERT INTO `page_sections` (`page_key`,`section_key`,`eyebrow`,`heading`,`subheading`,`body`,`cta_label`,`cta_url`,`is_published`,`sort_order`,`created_at`,`updated_at`) VALUES
-('home','hero','One partner. Websites and apps.','Your Digital Business Starts Here.','We take offline businesses online — domain, website, email, branding, SEO — and build the custom app you have in mind.','','Start Your Digital Journey','/start',1,1,NOW(),NOW()),
-('home','problem','The starting point','Still running your business mostly offline?','You have the customers and the reputation. What is missing is the part that makes you easy to find and easy to buy from.','','Build My Digital Business','/start',1,2,NOW(),NOW()),
-('home','chain','The transformation','From offline business to digital brand.','Each piece depends on the one before. We build them in order.','','Explore Packages','/packages',1,3,NOW(),NOW()),
+('home','hero','One partner. Websites and apps.','Your Digital Business Starts Here.','We take offline businesses online — domain, website, email, branding, SEO — and build the custom app you have in mind.','','Tell Us What You Need','/request',1,1,NOW(),NOW()),
+('home','problem','The starting point','Still running your business mostly offline?','You have the customers and the reputation. What is missing is the part that makes you easy to find and easy to buy from.','','Build My Digital Business','/request',1,2,NOW(),NOW()),
+('home','chain','The transformation','From offline business to digital brand.','Each piece depends on the one before. We build them in order.','','See what we do','/services',1,3,NOW(),NOW()),
 ('home','services','What we do','Everything your business needs to operate online.','Ten services — your domain and website, custom web and mobile apps, and the work that keeps them running.','','View all services','/services',1,4,NOW(),NOW()),
 ('home','trust','Credibility','What this actually changes.','Not guaranteed sales. How established you look, how easily customers find you, and how far past your front door you reach.','','','',1,5,NOW(),NOW()),
 ('home','process','How it works','Six stages, first call to ongoing support.','A defined process, with a schedule you see before we start.','','See the full process','/how-it-works',1,6,NOW(),NOW()),
-('home','packages','Packages','Pick what you need. We price it with you.','Complete setups. Tell us what you want included and we send the figure.','','Compare all packages','/packages',1,7,NOW(),NOW()),
 ('home','work','Selected work','Built the same way yours will be.','Case studies covering websites, applications, commerce and brand systems.','','View all work','/portfolio',1,8,NOW(),NOW()),
 ('home','industries','Industries','Built around your sector.','A restaurant and a law firm need different things. We start from your sector, not a template.','','All industries','/industries',1,9,NOW(),NOW()),
-('home','cta','Ready when you are','Let''s build your digital business.','Tell us about the business. You get a scope, a schedule and a price. No obligation.','','Start Your Digital Journey','/start',1,10,NOW(),NOW());
+('home','cta','Ready when you are','Let''s build your digital business.','Tell us about the business. You get a scope, a schedule and a price. No obligation.','','Tell Us What You Need','/request',1,10,NOW(),NOW());
 
 INSERT INTO `section_items` (`section_id`,`title`,`description`,`icon`,`value`,`sort_order`)
 SELECT s.id, i.title, i.descr, i.icon, i.val, i.ord

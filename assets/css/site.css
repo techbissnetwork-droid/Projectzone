@@ -1441,3 +1441,18 @@ body.has-cursor-fx.cursor-hidden .cursor-ring { opacity: 0; }
   .contact-item__value a { min-height: 44px; }
   .brand { padding-block: 0.4rem; }
 }
+
+/* The finished request message, shown so it can be read before it is sent. */
+.request-preview {
+  margin: 0;
+  padding: 1rem 1.15rem;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--text-soft);
+  font-family: inherit;
+  font-size: var(--fs-sm);
+  line-height: 1.65;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

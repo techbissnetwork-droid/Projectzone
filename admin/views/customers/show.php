@@ -1,5 +1,5 @@
 <?php
-/** @var array $row @var array $purchases @var array $quotes @var array $industries */
+/** @var array $row @var array $quotes @var array $industries */
 $val = static fn (string $k, $d = '') => old($k, $row[$k] ?? $d);
 ?>
 <div class="page-header">
@@ -89,28 +89,6 @@ $val = static fn (string $k, $d = '') => old($k, $row[$k] ?? $d);
             </div>
         </form>
 
-        <?php if ($purchases): ?>
-        <div class="panel">
-            <div class="panel__head"><span class="panel__title">Purchases</span></div>
-            <div class="table-wrap" style="border:0;border-radius:0;background:none">
-                <table class="data-table" style="min-width:520px">
-                    <thead><tr><th>Reference</th><th>Package</th><th class="num">Total</th><th>Payment</th><th class="num">Expires</th></tr></thead>
-                    <tbody>
-                        <?php foreach ($purchases as $p): ?>
-                        <tr>
-                            <td><a class="mono-sm" href="<?= e(url('/admin/purchases/' . (int) $p['id'])) ?>"><?= e($p['reference']) ?></a></td>
-                            <td><?= e($p['package_name']) ?></td>
-                            <td class="num"><?= e(money($p['total_amount'])) ?></td>
-                            <td><span class="status-dot status-dot--<?= $p['payment_status'] === 'paid' ? 'live' : 'warn' ?>"><?= e(ucfirst((string) $p['payment_status'])) ?></span></td>
-                            <td class="num"><span class="hint"><?= $p['expires_at'] ? e(format_date($p['expires_at'])) : '—' ?></span></td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <?php endif; ?>
-
         <?php if ($quotes): ?>
         <div class="panel">
             <div class="panel__head"><span class="panel__title">Requests from this email</span></div>
@@ -139,7 +117,6 @@ $val = static fn (string $k, $d = '') => old($k, $row[$k] ?? $d);
                 <div class="kv-list">
                     <div class="kv"><span class="kv__label">Record created</span><span class="kv__value"><?= e(format_date($row['created_at'], 'j M Y')) ?></span></div>
                     <div class="kv"><span class="kv__label">Last updated</span><span class="kv__value"><?= e(time_ago($row['updated_at'])) ?></span></div>
-                    <div class="kv"><span class="kv__label">Purchases</span><span class="kv__value"><?= count($purchases) ?></span></div>
                     <div class="kv"><span class="kv__label">Requests</span><span class="kv__value"><?= count($quotes) ?></span></div>
                 </div>
             </div>

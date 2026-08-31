@@ -103,8 +103,7 @@ $allowTheme = $allowTheme ?? true;
     <?php endforeach; ?>
 
     <div class="mobile-nav__footer">
-        <a class="btn btn--primary btn--block btn--lg" href="<?= e(url('/start')) ?>">Start Your Digital Journey</a>
-        <a class="btn btn--ghost btn--block" href="<?= e(url('/packages')) ?>">Explore Packages</a>
+        <a class="btn btn--primary btn--block btn--lg" href="<?= e(url('/request')) ?>">Tell Us What You Need</a>
     </div>
 
     <div class="mobile-nav__meta">
