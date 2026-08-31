@@ -53,7 +53,7 @@ final class ResourceController extends BaseAdminController
         if (!empty($this->resource['order_by'])) {
             return $this->resource['order_by'];
         }
-        return !empty($this->resource['orderable']) ? 'sort_order ASC, id ASC' : 'id DESC';
+        return !empty($this->resource['orderable']) ? 't.sort_order ASC, t.id ASC' : 't.id DESC';
     }
 
     // =================================================================
@@ -72,7 +72,7 @@ final class ResourceController extends BaseAdminController
             $parts = [];
             foreach ($this->resource['searchable'] as $col) {
                 if (preg_match('/^[a-z_]+$/', $col)) {
-                    $parts[]  = "`$col` LIKE ?";
+                    $parts[]  = "t.`$col` LIKE ?";
                     $params[] = '%' . $search . '%';
                 }
             }
@@ -81,16 +81,20 @@ final class ResourceController extends BaseAdminController
             }
         }
         if ($status === 'published' && $this->hasColumn('is_published')) {
-            $where[] = 'is_published = 1';
+            $where[] = 't.is_published = 1';
         } elseif ($status === 'draft' && $this->hasColumn('is_published')) {
-            $where[] = 'is_published = 0';
+            $where[] = 't.is_published = 0';
         }
 
         $whereSql = implode(' AND ', $where);
-        $total    = $this->db()->int('SELECT COUNT(*) FROM `' . $this->table() . "` WHERE $whereSql", $params);
+        $total    = $this->db()->int(
+            'SELECT COUNT(*) FROM `' . $this->table() . '` t' . $this->listJoinSql() . " WHERE $whereSql",
+            $params
+        );
         $pager    = new Paginator($page, $perPage, $total);
         $rows     = $this->db()->all(
-            'SELECT * FROM `' . $this->table() . "` WHERE $whereSql ORDER BY " . $this->orderBy()
+            'SELECT t.*' . $this->listJoinSelect() . ' FROM `' . $this->table() . '` t'
+            . $this->listJoinSql() . " WHERE $whereSql ORDER BY " . $this->orderBy()
             . ' LIMIT ' . $perPage . ' OFFSET ' . $pager->offset(),
             $params
         );
@@ -305,6 +309,19 @@ final class ResourceController extends BaseAdminController
                     $data[$key] = $v->get($key) ?? ($field['default'] ?? 0);
                     break;
 
+                case 'date':
+                    // A date input posts YYYY-MM-DD or nothing. Anything else is
+                    // someone hand-editing the request, and becomes nothing.
+                    $value = $request->str($key);
+                    $valid = $value !== ''
+                        && preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) === 1
+                        && checkdate((int) substr($value, 5, 2), (int) substr($value, 8, 2), (int) substr($value, 0, 4));
+                    $data[$key] = $valid ? $value : null;
+                    if (!$valid && $value !== '') {
+                        $v->addError($key, $label . ' is not a valid date.');
+                    }
+                    break;
+
                 case 'bool':
                     $v->boolean($key);
                     $data[$key] = (int) $v->get($key, 0);
@@ -417,6 +434,41 @@ final class ResourceController extends BaseAdminController
             $extras['repeater_rows'] = [];
         }
         return $extras;
+    }
+
+    /**
+     * A resource may name one table to read a label from — a client's name
+     * beside the project, say. Both identifiers are whitelisted here, because
+     * they end up in the SQL text rather than in a bound parameter.
+     *
+     * @return array{table:string,on:string,column:string,alias:string}|null
+     */
+    private function listJoin(): ?array
+    {
+        $join = $this->resource['list_join'] ?? null;
+        if (!is_array($join)) {
+            return null;
+        }
+        $ok = static fn (string $v): bool => preg_match('/^[a-z_][a-z0-9_]*$/', $v) === 1;
+        foreach (['table', 'on', 'column', 'alias'] as $part) {
+            if (!isset($join[$part]) || !is_string($join[$part]) || !$ok($join[$part])) {
+                return null;
+            }
+        }
+
+        return $join;
+    }
+
+    private function listJoinSelect(): string
+    {
+        $join = $this->listJoin();
+        return $join === null ? '' : ", j.`{$join['column']}` AS `{$join['alias']}`";
+    }
+
+    private function listJoinSql(): string
+    {
+        $join = $this->listJoin();
+        return $join === null ? '' : " LEFT JOIN `{$join['table']}` j ON j.id = t.`{$join['on']}`";
     }
 
     private function hasColumn(string $column): bool

@@ -2,7 +2,7 @@
 /**
  * Dashboard. Every figure below is a live count from the database — nothing
  * on this screen is illustrative or placeholder data.
- * @var array $counts @var array $series
+ * @var array $counts @var array $series @var array $dueSoon
  */
 use Techbiss\Core\Auth;
 
@@ -174,6 +174,49 @@ foreach ($series as $point) {
                 </table>
             </div>
             <?php endif; ?>
+        </div>
+        <?php endif; ?>
+
+        <?php if ($dueSoon): ?>
+        <!-- Work that needs a conversation before it lapses. -->
+        <div class="panel">
+            <div class="panel__head">
+                <div>
+                    <span class="panel__title">Maintenance coming due</span>
+                    <div class="panel__sub">Client projects due in the next 45 days, or already past</div>
+                </div>
+                <a class="btn btn--quiet btn--sm" href="<?= e(url('/admin/client_projects')) ?>">All projects</a>
+            </div>
+            <div class="table-wrap" style="border:0;border-radius:0;background:none">
+                <table class="data-table" style="min-width:560px">
+                    <thead><tr><th>Project</th><th>Client</th><th>Due</th><th class="actions">Get in touch</th></tr></thead>
+                    <tbody>
+                        <?php foreach ($dueSoon as $row):
+                            $overdue = strtotime((string) $row['maintenance_due']) < strtotime('today');
+                            $phone   = preg_replace('/[^0-9]/', '', (string) ($row['customer_phone'] ?? '')); ?>
+                        <tr>
+                            <td><a href="<?= e(url('/admin/client_projects/' . (int) $row['id'] . '/edit')) ?>">
+                                <span class="cell-title"><?= e($row['name']) ?></span>
+                                <span class="cell-sub"><?= e(ucfirst((string) $row['status'])) ?></span></a></td>
+                            <td><?= e($row['customer_name'] ?: '—') ?></td>
+                            <td><span class="status-dot status-dot--<?= $overdue ? 'danger' : 'warn' ?>">
+                                <?= e(format_date($row['maintenance_due'])) ?></span></td>
+                            <td class="actions">
+                                <?php if (filter_var($row['customer_email'] ?? '', FILTER_VALIDATE_EMAIL)): ?>
+                                <a class="icon-btn" title="Email <?= e($row['customer_name']) ?>" aria-label="Email <?= e($row['customer_name']) ?>"
+                                   href="mailto:<?= e($row['customer_email']) ?>?subject=<?= rawurlencode($row['name'] . ' — maintenance') ?>"><?= icon('mail') ?></a>
+                                <?php endif; ?>
+                                <?php if (strlen((string) $phone) >= 8): ?>
+                                <a class="icon-btn" title="WhatsApp <?= e($row['customer_name']) ?>" aria-label="WhatsApp <?= e($row['customer_name']) ?>"
+                                   target="_blank" rel="noopener noreferrer"
+                                   href="https://wa.me/<?= e($phone) ?>"><?= icon('whatsapp') ?></a>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
         </div>
         <?php endif; ?>
 

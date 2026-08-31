@@ -61,6 +61,65 @@ final class CustomerController extends BaseAdminController
         ]);
     }
 
+    /**
+     * Add a client by hand.
+     *
+     * Customers only ever arrived here from an enquiry, which is no use when
+     * the work came in over WhatsApp or in person — and the job book needs a
+     * client to attach a project to.
+     */
+    public function create(Request $request): void
+    {
+        $this->authorize('customers.manage');
+        $this->view->render('customers/create', [
+            'title'      => 'New customer',
+            'industries' => (new IndustryRepo())->options(),
+        ]);
+    }
+
+    public function store(Request $request): never
+    {
+        $this->authorize('customers.manage');
+        $this->verify($request);
+
+        $v = Validator::make($request->all())
+            ->required('name', 'Name', 2, 190)
+            ->optional('business_name', 190)
+            ->email('email')
+            ->phone('phone')
+            ->optional('country', 80)
+            ->optional('city', 120)
+            ->url('website')
+            ->int('industry_id')
+            ->in('status', ['lead', 'active', 'inactive'], 'Status')
+            ->text('notes', 5000, false, 'Notes');
+
+        if ($v->fails()) {
+            $this->fail($request, $v->errors(), $v->firstError(), '/admin/customers/create');
+        }
+
+        $existing = $this->repo->findByEmail((string) $v->get('email'));
+        if ($existing !== null) {
+            $this->fail($request, ['email' => 'A customer with that email address already exists.'],
+                'A customer with that email address already exists.', '/admin/customers/' . (int) $existing['id']);
+        }
+
+        $id = $this->repo->create([
+            'name'          => $v->get('name'),
+            'business_name' => $v->get('business_name', ''),
+            'email'         => $v->get('email'),
+            'phone'         => $v->get('phone', ''),
+            'country'       => $v->get('country', ''),
+            'city'          => $v->get('city', ''),
+            'website'       => $v->get('website', ''),
+            'industry_id'   => $v->get('industry_id') > 0 ? $v->get('industry_id') : null,
+            'status'        => $v->get('status'),
+            'notes'         => $v->get('notes', ''),
+        ]);
+        ActivityLog::record('create', 'customers', $id, 'Added customer: ' . $v->get('name'));
+        $this->ok('Customer added.', '/admin/customers/' . $id);
+    }
+
     public function update(Request $request, array $params): never
     {
         $this->authorize('customers.manage');

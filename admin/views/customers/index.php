@@ -6,13 +6,14 @@ $query = array_filter(['q' => $search, 'status' => $status]);
 <div class="page-header">
     <div>
         <h1>Customers</h1>
-        <p>Everyone who has submitted a quote request, journey form or package request, in one list.</p>
+        <p>Everyone who has sent a request through the website, plus anyone you have added yourself.</p>
     </div>
-    <?php if (Auth::can('export.manage')): ?>
     <div class="page-header__actions">
+        <?php if (Auth::can('export.manage')): ?>
         <a class="btn btn--ghost btn--sm" href="<?= e(url('/admin/customers/export')) ?>"><?= icon('download') ?>Export CSV</a>
+        <?php endif; ?>
+        <a class="btn btn--primary btn--sm" href="<?= e(url('/admin/customers/create')) ?>"><?= icon('plus') ?>New customer</a>
     </div>
-    <?php endif; ?>
 </div>
 
 <div class="tabs">

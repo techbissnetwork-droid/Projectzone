@@ -517,6 +517,36 @@ CREATE TABLE IF NOT EXISTS `customers` (
   CONSTRAINT `fk_customers_industry` FOREIGN KEY (`industry_id`) REFERENCES `industries` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ---------------------------------------------------------------------
+-- Client projects — the work actually taken on and built.
+--
+-- Separate from `portfolio` (what the website shows the public) and from
+-- `premade_projects` (what is for sale). This is the job book: who it was
+-- for, what was built, where it lives, and when maintenance is next due,
+-- so the client can be contacted about it a year later.
+-- ---------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `client_projects` (
+  `id`               INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `customer_id`      INT UNSIGNED NULL,
+  `name`             VARCHAR(190) NOT NULL,
+  `summary`          TEXT         NULL,
+  `live_url`         VARCHAR(255) NOT NULL DEFAULT '',
+  `hosting`          VARCHAR(190) NOT NULL DEFAULT '',
+  `domain_renews_on` DATE         NULL,
+  `started_on`       DATE         NULL,
+  `launched_on`      DATE         NULL,
+  `maintenance_due`  DATE         NULL,
+  `status`           ENUM('building','delivered','maintained','ended') NOT NULL DEFAULT 'building',
+  `notes`            TEXT         NULL,
+  `created_at`       DATETIME     NOT NULL,
+  `updated_at`       DATETIME     NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_client_projects_customer` (`customer_id`),
+  KEY `ix_client_projects_status` (`status`),
+  KEY `ix_client_projects_due` (`maintenance_due`),
+  CONSTRAINT `fk_client_projects_customer` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `package_purchases` (
   `id`               INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `reference`        VARCHAR(30)  NOT NULL,

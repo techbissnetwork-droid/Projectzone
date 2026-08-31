@@ -43,7 +43,8 @@ $groups = [
         'items' => [
             ['label' => 'Premade projects',  'url' => '/admin/projects',       'icon' => 'rocket',   'permission' => 'projects.manage'],
             ['label' => 'Project enquiries', 'url' => '/admin/project-orders', 'icon' => 'inbox',    'permission' => 'project_orders.manage', 'badge' => 'project_orders'],
-            ['label' => 'Customers',         'url' => '/admin/customers',      'icon' => 'users',    'permission' => 'customers.manage'],
+            ['label' => 'Customers',         'url' => '/admin/customers',      'icon' => 'users',     'permission' => 'customers.manage'],
+            ['label' => 'Client projects',   'url' => '/admin/client_projects','icon' => 'briefcase', 'permission' => 'customers.manage'],
         ],
     ],
     [

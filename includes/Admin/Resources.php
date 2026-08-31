@@ -165,6 +165,42 @@ final class Resources
             ],
 
             // -------------------------------------------------------------
+            'client_projects' => [
+                'table'      => 'client_projects',
+                'singular'   => 'Client project',
+                'plural'     => 'Client projects',
+                'icon'       => 'briefcase',
+                'permission' => 'customers.manage',
+                'group'      => 'Commerce',
+                'searchable' => ['name', 'summary', 'live_url', 'hosting', 'notes'],
+                'order_by'   => 'COALESCE(t.maintenance_due, \'9999-12-31\') ASC, t.id DESC',
+                'list_join'  => ['table' => 'customers', 'on' => 'customer_id', 'column' => 'name', 'alias' => 'customer_name'],
+                'notice'     => 'The work you have actually taken on and built. Kept so you can come back to a client about renewals and maintenance — it is never shown on the website.',
+                'columns'    => [
+                    ['key' => 'name', 'label' => 'Project', 'primary' => true, 'sub' => 'live_url'],
+                    ['key' => 'customer_name', 'label' => 'Client'],
+                    ['key' => 'status', 'label' => 'Stage', 'type' => 'badge'],
+                    ['key' => 'launched_on', 'label' => 'Launched', 'type' => 'date'],
+                    ['key' => 'maintenance_due', 'label' => 'Maintenance due', 'type' => 'date', 'warn_when_past' => true],
+                ],
+                'fields' => [
+                    ['key' => 'name', 'label' => 'Project name', 'type' => 'text', 'required' => true, 'max' => 190],
+                    ['key' => 'customer_id', 'label' => 'Client', 'type' => 'lookup', 'lookup' => ['table' => 'customers', 'label' => 'name'], 'hint' => 'Add the client under Customers first, so their email and phone are on file.'],
+                    ['key' => 'summary', 'label' => 'What you built', 'type' => 'textarea', 'max' => 2000],
+                    ['key' => 'live_url', 'label' => 'Live address', 'type' => 'text', 'max' => 255],
+                    ['key' => 'hosting', 'label' => 'Hosting and domain', 'type' => 'text', 'max' => 190, 'hint' => 'Where it runs and with which registrar, so you are not hunting for it in a year.'],
+                    ['key' => 'status', 'label' => 'Stage', 'type' => 'select', 'default' => 'building', 'options' => [
+                        'building' => 'Building', 'delivered' => 'Delivered', 'maintained' => 'Under maintenance', 'ended' => 'Ended',
+                    ]],
+                    ['key' => 'started_on', 'label' => 'Started', 'type' => 'date'],
+                    ['key' => 'launched_on', 'label' => 'Launched', 'type' => 'date'],
+                    ['key' => 'domain_renews_on', 'label' => 'Domain renews', 'type' => 'date'],
+                    ['key' => 'maintenance_due', 'label' => 'Maintenance due', 'type' => 'date', 'hint' => 'What the dashboard watches, so you can contact the client before it lapses.'],
+                    ['key' => 'notes', 'label' => 'Notes', 'type' => 'textarea', 'max' => 5000],
+                ],
+            ],
+
+            // -------------------------------------------------------------
             'faqs' => [
                 'table'      => 'faqs',
                 'singular'   => 'FAQ',
@@ -342,7 +378,7 @@ final class Resources
                 'orderable'  => false,
                 'timestamps' => false,
                 'searchable' => ['name'],
-                'order_by'   => 'name ASC',
+                'order_by'   => 't.name ASC',
                 'columns'    => [
                     ['key' => 'name', 'label' => 'Tag', 'primary' => true],
                     ['key' => 'slug', 'label' => 'Slug', 'type' => 'mono'],

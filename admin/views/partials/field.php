@@ -96,6 +96,11 @@ $accents = ['cyan' => '#34d3e0', 'violet' => '#a78bfa', 'emerald' => '#34d399', 
                    <?= isset($field['max_value']) ? 'max="' . (int) $field['max_value'] . '"' : '' ?><?= $ariaReq ?><?= $aria ?>>
         <?php break;
 
+        case 'date': ?>
+            <input class="input<?= $err ? ' is-invalid' : '' ?>" id="<?= e($id) ?>" type="date" name="<?= e($key) ?>"
+                   value="<?= e(substr((string) $value, 0, 10)) ?>"<?= $ariaReq ?><?= $aria ?>>
+        <?php break;
+
         case 'bool': ?>
             <label class="switch">
                 <input type="checkbox" id="<?= e($id) ?>" name="<?= e($key) ?>" value="1" <?= (int) $value === 1 ? 'checked' : '' ?><?= $aria ?>>

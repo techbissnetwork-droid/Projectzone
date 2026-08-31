@@ -46,6 +46,13 @@ final class CustomerRepo
         return $this->db()->insert('customers', $data + ['status' => 'lead', 'created_at' => $now, 'updated_at' => $now]);
     }
 
+    /** Add a customer the admin typed in, rather than one an enquiry created. */
+    public function create(array $data): int
+    {
+        $now = date('Y-m-d H:i:s');
+        return $this->db()->insert('customers', $data + ['created_at' => $now, 'updated_at' => $now]);
+    }
+
     public function update(int $id, array $data): void
     {
         $data['updated_at'] = date('Y-m-d H:i:s');

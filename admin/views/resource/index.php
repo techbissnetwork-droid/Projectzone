@@ -102,6 +102,13 @@ $query     = array_filter(['q' => $search, 'status' => $status]);
                                            aria-label="Toggle <?= e($col['label']) ?>">
                                     <span class="switch__track" aria-hidden="true"></span>
                                 </label>
+                            <?php elseif ($type === 'date'): ?>
+                                <?php if ((string) $value !== '' && (string) $value !== '0000-00-00'): ?>
+                                    <?php $overdue = !empty($col['warn_when_past']) && strtotime((string) $value) < strtotime('today'); ?>
+                                    <span class="status-dot status-dot--<?= $overdue ? 'warn' : 'draft' ?>"><?= e(format_date($value)) ?></span>
+                                <?php else: ?>
+                                    <span class="hint">—</span>
+                                <?php endif; ?>
                             <?php elseif ($type === 'mono'): ?>
                                 <span class="mono-sm"><?= e((string) $value) ?></span>
                             <?php elseif ($type === 'badge'): ?>

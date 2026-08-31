@@ -113,6 +113,8 @@ if (!in_array($path, ['/admin/login', '/admin/logout'], true)) {
     // --- Packages -----------------------------------------------------
 
     $router->get('/admin/customers', [$customers, 'index']);
+    $router->get('/admin/customers/create', [$customers, 'create']);
+    $router->post('/admin/customers', [$customers, 'store']);
     $router->get('/admin/customers/export', [$customers, 'export']);
     $router->get('/admin/customers/{id:\d+}', [$customers, 'show']);
     $router->post('/admin/customers/{id:\d+}', [$customers, 'update']);
