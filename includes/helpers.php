@@ -44,13 +44,18 @@ function url(string $path = '/'): string
     return $base . '/' . ltrim($path, '/');
 }
 
-/** Absolute URL — used for canonicals, Open Graph and the sitemap. */
+/**
+ * Absolute URL — used for canonicals, Open Graph and the sitemap.
+ *
+ * Built from the origin rather than siteUrl(), because url() already applies
+ * the sub-directory; using siteUrl() here would emit it twice.
+ */
 function absolute_url(string $path = '/'): string
 {
     if (preg_match('#^https?://#i', $path)) {
         return $path;
     }
-    return rtrim(App::siteUrl(), '/') . url($path);
+    return rtrim(App::origin(), '/') . url($path);
 }
 
 /** Versioned asset URL so browsers pick up CSS/JS changes immediately. */

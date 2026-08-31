@@ -26,62 +26,85 @@ no framework. Upload it to an Apache host and it runs.
 
 ## Requirements
 
-- PHP **8.1** or newer, with `pdo_mysql`, `mbstring`, `json`, `gd`, `fileinfo`
+- PHP **8.1** or newer, with `pdo_mysql`, `mbstring`, `json` and `fileinfo`
+  (`gd` for image thumbnails, `intl` for accented slugs — both optional)
 - MySQL **5.7+** or MariaDB **10.4+**
 - Apache with `mod_rewrite` (an nginx equivalent is given below)
+- `config/`, `storage/` and `uploads/` writable by PHP
+
+The setup wizard checks all of this for you and tells you exactly what is
+missing, so you do not need to verify it by hand.
 
 ---
 
 ## Installation
 
-**1. Upload the files** to your web root.
+Upload the files to your web root and open the site in a browser. There is no
+config file to edit — you are redirected into a setup wizard that detects your
+site address, writes the configuration and builds the database for you.
 
-**2. Create a database** and a user with full rights on it.
+### 1. Open your site
 
-**3. Copy the config and fill it in:**
+```
+https://yourdomain.com/
+```
+
+Any request made before setup is complete redirects to
+`/database/install.php`. You can also go there directly.
+
+### 2. Work through the wizard
+
+| Step | What happens |
+|---|---|
+| **Requirements** | Checks the PHP version, the extensions it needs and that `config/`, `storage/` and `uploads/` are writable. Shows you the **site address, sub-directory, HTTPS status and timezone it detected**. |
+| **Database** | Enter the details from your hosting panel. The connection is tested before anything is written, and the wizard can create the database for you if your user has the rights. |
+| **Your site** | Company name, the pre-filled site address, and your administrator account. Optionally load the demo content. |
+
+The wizard then writes `config/config.php` for you, containing:
+
+- your database credentials
+- a freshly generated 64-character `app_key`
+- the **detected site URL and sub-directory**
+- `cookie_secure` set from whether it reached you over HTTPS
+- the server's timezone
+
+### 3. Delete the installer
 
 ```bash
-cp config/config.sample.php config/config.php
+rm database/install.php
 ```
 
-Edit `config/config.php`:
+It refuses to run once an administrator exists, but there is no reason to leave
+it on the server. Then sign in at `/admin/login`.
 
-```php
-'db' => [
-    'host' => '127.0.0.1',
-    'name' => 'techbiss',
-    'user' => 'your_db_user',
-    'pass' => 'your_db_password',
-],
-'security' => [
-    // Generate one with:  php -r "echo bin2hex(random_bytes(32));"
-    'app_key'       => 'a-long-random-string',
-    'cookie_secure' => true,   // once you are serving over HTTPS
-],
-'site' => [
-    'url'   => 'https://yourdomain.com',
-    'debug' => false,
-],
-```
+### Sub-directory installs
 
-**4. Run the installer** — either in a browser at `/database/install.php`, or
-from the command line:
+The URL is detected from the request, so serving the site from
+`https://example.com/clients/acme/` works with no configuration — links, assets,
+canonicals and the sitemap all pick up the prefix automatically.
+
+If you later move the site to a different domain or directory, you can blank
+`url` and `base_path` in `config/config.php` and both will be detected per
+request again.
+
+### Command line
+
+For scripted deployments:
 
 ```bash
-php database/install.php --name="Your Name" --email=you@example.com --password='a-strong-password'
+php database/install.php \
+    --db-name=techbiss --db-user=USER --db-pass=SECRET \
+    --name="Your Name" --email=you@example.com --password='a-strong-password' \
+    --site-url=https://yourdomain.com
 ```
 
-This creates the schema, loads the baseline content and creates your
-administrator account.
-
-**5. Delete `database/install.php`.** It refuses to run twice, but there is no
-reason to leave it there.
-
-**6. Sign in** at `/admin/login`.
+Useful flags: `--check` reports requirements and exits, `--create-db` creates
+the database, `--demo` loads the demo content, `--db-socket=` connects through a
+Unix socket, `--force` reloads the schema over an existing install (destructive).
 
 ### Optional demo content
 
-To explore a populated CMS before you have real case studies:
+Tick the box in the wizard, or load it later:
 
 ```bash
 mysql -u USER -p DATABASE < database/demo-content.sql
@@ -156,12 +179,15 @@ The measures actually implemented, not a checklist:
 ### Before going live
 
 1. Delete `database/install.php`
-2. Set `cookie_secure => true` and serve everything over HTTPS
-3. Set `debug => false`
-4. Set a unique `app_key`
-5. Confirm `config/`, `includes/`, `database/` and `storage/` are not
+2. Serve everything over HTTPS. If you installed over HTTP, set
+   `cookie_secure => true` in `config/config.php` afterwards — the wizard sets
+   it automatically when it reaches you over HTTPS
+3. Confirm `config/`, `includes/`, `database/` and `storage/` are not
    web-accessible (the shipped `.htaccess` files handle this on Apache)
-6. Replace or remove the demo content
+4. Replace or remove the demo content
+
+`debug` is already `false` and `app_key` is already unique — the wizard
+generates a fresh key for every installation.
 
 ---
 

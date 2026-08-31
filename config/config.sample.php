@@ -2,8 +2,12 @@
 /**
  * TECHBISS — application configuration.
  *
- * Copy this file to config/config.php and adjust the values for your server.
- * config/config.php is gitignored so credentials never reach the repository.
+ * You do not normally need this file: open the site in a browser and the setup
+ * wizard writes config/config.php for you, with the site URL detected and an
+ * application key generated.
+ *
+ * Copy it manually only if you would rather configure by hand. Either way
+ * config/config.php is gitignored, so credentials never reach the repository.
  */
 
 return [
@@ -24,10 +28,13 @@ return [
     // Site
     // ---------------------------------------------------------------------
     'site' => [
-        // Absolute base URL without trailing slash, e.g. https://techbiss.com
-        // Leave empty to auto-detect from the request.
+        // Absolute base URL without a trailing slash, e.g. https://techbiss.com
+        // or https://example.com/clients/acme for a sub-directory install.
+        // Leave empty to detect scheme, host and sub-directory per request —
+        // useful while a site is moving between domains or environments.
         'url'      => '',
-        // Sub-directory the app is served from, e.g. '/techbiss'. Empty for domain root.
+        // Normally left empty: taken from 'url' above, or detected. Set it only
+        // to override both, e.g. behind a proxy that rewrites the path.
         'base_path' => '',
         'timezone' => 'UTC',
         'locale'   => 'en',

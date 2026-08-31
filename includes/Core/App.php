@@ -13,7 +13,8 @@ final class App
     private static array $config = [];
     private static string $root = '';
     private static string $basePath = '';
-    private static string $siteUrl = '';
+    /** Scheme and host only — never includes the sub-directory. */
+    private static string $origin = '';
     private static ?SettingsRepo $settings = null;
     private static ?Seo $seo = null;
     private static ?Mailer $mailer = null;
@@ -49,14 +50,35 @@ final class App
             ini_set('error_log', $logDir . '/php-error.log');
         }
 
-        self::$basePath = rtrim((string) ($site['base_path'] ?? ''), '/');
-        self::$siteUrl  = rtrim((string) ($site['url'] ?? ''), '/');
-        if (self::$siteUrl === '') {
-            $https  = (($_SERVER['HTTPS'] ?? '') !== '' && $_SERVER['HTTPS'] !== 'off')
-                || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
-            $host   = (string) ($_SERVER['HTTP_HOST'] ?? 'localhost');
-            $host   = preg_replace('/[^A-Za-z0-9:.\-]/', '', $host) ?: 'localhost';
-            self::$siteUrl = ($https ? 'https://' : 'http://') . $host;
+        // site.url may be given as a bare origin or with the sub-directory
+        // included. Split it so the base path is stored exactly once; otherwise
+        // it ends up prepended by url(), by siteUrl() and again by the caller.
+        $configuredUrl  = rtrim((string) ($site['url'] ?? ''), '/');
+        $configuredBase = (string) ($site['base_path'] ?? '');
+        $urlPath        = '';
+
+        if ($configuredUrl !== '') {
+            $parts  = parse_url($configuredUrl);
+            $scheme = $parts['scheme'] ?? 'https';
+            $host   = $parts['host'] ?? '';
+            if ($host !== '') {
+                $port         = isset($parts['port']) ? ':' . (int) $parts['port'] : '';
+                self::$origin = $scheme . '://' . $host . $port;
+                $urlPath      = rtrim((string) ($parts['path'] ?? ''), '/');
+            }
+        }
+        if (self::$origin === '') {
+            self::$origin = self::detectOrigin();
+        }
+
+        // Precedence: explicit base_path, then whatever site.url carried, then
+        // detection from the running script.
+        if ($configuredBase !== '') {
+            self::$basePath = '/' . trim($configuredBase, '/');
+        } elseif ($urlPath !== '') {
+            self::$basePath = '/' . trim($urlPath, '/');
+        } else {
+            self::$basePath = self::detectBasePath();
         }
 
         Cache::boot($config['cache'] ?? []);
@@ -93,9 +115,16 @@ final class App
         return self::$basePath;
     }
 
+    /** Scheme and host, with no sub-directory and no trailing slash. */
+    public static function origin(): string
+    {
+        return self::$origin;
+    }
+
+    /** The public root of the site: origin plus sub-directory, exactly once. */
     public static function siteUrl(): string
     {
-        return self::$siteUrl . self::$basePath;
+        return self::$origin . self::$basePath;
     }
 
     public static function version(): string
@@ -174,16 +203,67 @@ final class App
         }
     }
 
+    /**
+     * Scheme and host for this request, honouring a reverse proxy when one is
+     * in front. Used when config/config.php leaves site.url empty.
+     */
+    public static function detectOrigin(): string
+    {
+        $https = (($_SERVER['HTTPS'] ?? '') !== '' && strtolower((string) $_SERVER['HTTPS']) !== 'off')
+            || (int) ($_SERVER['SERVER_PORT'] ?? 0) === 443
+            || strtolower((string) ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '')) === 'https'
+            || strtolower((string) ($_SERVER['HTTP_X_FORWARDED_SSL'] ?? '')) === 'on';
+
+        $host = (string) ($_SERVER['HTTP_X_FORWARDED_HOST'] ?? $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? 'localhost');
+        // A forwarded header can carry a list; the first entry is the client-facing host.
+        $host = trim(explode(',', $host)[0]);
+        $host = preg_replace('/[^A-Za-z0-9:._\-\[\]]/', '', $host) ?: 'localhost';
+
+        return ($https ? 'https://' : 'http://') . $host;
+    }
+
+    /**
+     * The sub-directory the application is served from, derived from the
+     * running script rather than configuration — so /, /techbiss and
+     * /clients/techbiss all work with the same config file.
+     */
+    public static function detectBasePath(): string
+    {
+        $script = (string) ($_SERVER['SCRIPT_NAME'] ?? '');
+        if ($script === '') {
+            return '';
+        }
+        $dir = str_replace('\\', '/', dirname($script));
+        // The admin front controller sits one level deeper; so does the installer.
+        foreach (['/admin', '/database'] as $suffix) {
+            if (str_ends_with($dir, $suffix)) {
+                $dir = substr($dir, 0, -strlen($suffix));
+                break;
+            }
+        }
+        $dir = rtrim($dir, '/');
+        return ($dir === '' || $dir === '.') ? '' : $dir;
+    }
+
     private static function fatalConfig(): never
     {
         http_response_code(503);
         header('Content-Type: text/html; charset=utf-8');
+        // If the installer is still present, send them straight to it.
+        $installer = self::$root . '/database/install.php';
+        if (is_file($installer)) {
+            $base = self::detectBasePath();
+            header('Location: ' . self::detectOrigin() . $base . '/database/install.php', true, 302);
+            exit;
+        }
+
         echo '<!doctype html><meta charset="utf-8"><title>Configuration required</title>'
             . '<body style="font:16px/1.7 ui-sans-serif,system-ui;background:#0a0c12;color:#e6e9f2;padding:56px;max-width:46rem;margin:auto">'
             . '<h1 style="font-size:1.6rem;margin:0 0 .5rem">Configuration required</h1>'
             . '<p style="color:#9aa3b8">TECHBISS cannot start because <code>config/config.php</code> is missing.</p>'
-            . '<p style="color:#9aa3b8">Copy <code>config/config.sample.php</code> to <code>config/config.php</code>, '
-            . 'fill in your database credentials, then open <code>/database/install.php</code> to create the tables.</p>'
+            . '<p style="color:#9aa3b8">Copy <code>config/config.sample.php</code> to <code>config/config.php</code> and '
+            . 'fill in your database credentials, or restore <code>database/install.php</code> and reload this page '
+            . 'to run the setup wizard again.</p>'
             . '</body>';
         exit;
     }
