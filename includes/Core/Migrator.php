@@ -409,6 +409,29 @@ final class Migrator
             }
         }
 
+        // Settings are read from the database, so a key that only exists in
+        // seed.sql is invisible on an upgraded site — the toggle it controls
+        // can never be reached. Values are only ever inserted, never updated,
+        // so a setting already tuned in the admin is left alone.
+        $settings = [
+            ['commerce', 'public_pricing', '0', 'bool', 'Show prices on the website',
+             'Off by default: packages and services are priced in conversation. Turn on only if you want figures published.', 0],
+        ];
+        if (isset($existing['settings'])) {
+            foreach ($settings as [$group, $key, $value, $type, $label, $hint, $order]) {
+                if (!$needed('settings', 'WHERE key_name = ?', [$key])) {
+                    continue;
+                }
+                $out[] = [
+                    'label'  => 'Added the "' . $label . '" setting',
+                    'sql'    => 'INSERT IGNORE INTO `settings`
+                                 (`group_name`,`key_name`,`value`,`type`,`label`,`hint`,`sort_order`,`updated_at`)
+                                 VALUES (?,?,?,?,?,?,?,NOW())',
+                    'params' => [$group, $key, $value, $type, $label, $hint, $order],
+                ];
+            }
+        }
+
         if (isset($existing['project_categories'])) {
             $categories = [
                 ['business-website', 'Business Website',       'Company sites ready to brand and launch.', 'globe',     1],
