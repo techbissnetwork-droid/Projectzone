@@ -5,7 +5,30 @@ namespace Techbiss\Core;
 
 final class Str
 {
+    /**
+     * Slug for naming a record. Never empty: a record needs an address, so an
+     * unusable title falls back to "item".
+     */
     public static function slug(string $value, string $separator = '-'): string
+    {
+        $slug = self::slugify($value, $separator);
+        return $slug === '' ? 'item' : $slug;
+    }
+
+    /**
+     * Slug for a value arriving in a query string.
+     *
+     * Empty in, empty out — the opposite of slug(), and the difference matters:
+     * running a blank ?category= through slug() yields "item", which then filters
+     * a listing down to the nothing that matches it.
+     */
+    public static function slugFilter(string $value, string $separator = '-'): string
+    {
+        return self::slugify($value, $separator);
+    }
+
+    /** The shared transliterate-and-clean step. May return an empty string. */
+    private static function slugify(string $value, string $separator = '-'): string
     {
         $value = trim($value);
         if (function_exists('transliterator_transliterate')) {
@@ -16,8 +39,7 @@ final class Str
         }
         $value = strtolower($value);
         $value = preg_replace('/[^a-z0-9]+/u', $separator, $value) ?? '';
-        $value = trim($value, $separator);
-        return $value === '' ? 'item' : $value;
+        return trim($value, $separator);
     }
 
     public static function excerpt(string $html, int $length = 160): string

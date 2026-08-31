@@ -26,6 +26,8 @@ DELETE FROM `blog_posts` WHERE `slug` IN
   ('who-actually-owns-your-domain','business-email-deliverability','what-a-website-costs');
 DELETE FROM `stats` WHERE `label` IN
   ('Services under one partner','Industries we build for','Ownership stays with you');
+DELETE FROM `premade_projects` WHERE `slug` IN
+  ('demo-clinic-booking','demo-restaurant-menu','demo-shop-starter');
 
 -- ---------------------------------------------------------------------
 -- Portfolio projects — FICTIONAL CLIENTS
@@ -247,3 +249,79 @@ VALUES
 ('Industries we build for',CAST((SELECT COUNT(*) FROM industries WHERE is_published=1) AS CHAR),'','',
  'Each approached on its own terms',1,2,NOW(),NOW()),
 ('Ownership stays with you','100','','%','Domain, code, designs and accounts',1,3,NOW(),NOW());
+
+-- ---------------------------------------------------------------------
+-- Premade projects — FICTIONAL LISTINGS
+--
+-- The demo URLs point at example.com, which is reserved for documentation and
+-- will not load. Replace them with your real demos, or unpublish these, before
+-- the site goes live. No price is stored: that is by design.
+-- ---------------------------------------------------------------------
+INSERT INTO `premade_projects`
+  (`slug`,`name`,`tagline`,`short_description`,`description`,`whats_included`,`customisation_note`,
+   `category_id`,`industry_id`,`demo_url`,`demo_admin_url`,`demo_username`,`demo_password`,`demo_note`,
+   `licence`,`delivery_days`,`revisions`,`support_months`,`page_count`,
+   `badge`,`cta_label`,`accent`,`is_featured`,`is_published`,`sort_order`,
+   `seo_title`,`seo_description`,`created_at`,`updated_at`)
+VALUES
+('demo-clinic-booking','Clinic Booking Site (demo)',
+ 'Appointments, staff profiles and opening hours.',
+ 'A booking site for a single-location clinic. Patients pick a slot; you get an email.',
+ '<p>Built for clinics that still take every booking by phone. Patients choose a time against your real opening hours, and the front desk sees the day at a glance.</p>',
+ '<p>Setup on your domain, your logo and colours, and your services and staff loaded before handover.</p>',
+ 'Colours, logo, services and staff are set up for you. Extra pages can be added.',
+ (SELECT id FROM project_categories WHERE slug='booking'),
+ (SELECT id FROM industries WHERE slug='healthcare'),
+ 'https://example.com/demo/clinic','https://example.com/demo/clinic/admin','demo','demo1234',
+ 'Demo data resets every night.',
+ 'One business, one domain',5,'2 rounds',3,7,
+ 'Demo','Ask about this','cyan',1,1,1,
+ 'Clinic Booking Website (demo listing)','A ready-made appointment booking site for a single-location clinic.',NOW(),NOW()),
+
+('demo-restaurant-menu','Restaurant & Menu Site (demo)',
+ 'Menu, photos, table booking and directions.',
+ 'A restaurant site with a menu you can edit yourself, plus table booking requests by email.',
+ '<p>For places whose menu changes and whose current site cannot keep up. Edit dishes and prices from the admin; the site updates immediately.</p>',
+ '<p>Menu loaded from what you send us, plus Google Maps directions and your opening hours.</p>',
+ 'We load your first menu and photos before handover.',
+ (SELECT id FROM project_categories WHERE slug='restaurant'),
+ (SELECT id FROM industries WHERE slug='restaurants'),
+ 'https://example.com/demo/restaurant','','','',
+ '',
+ 'One business, one domain',4,'2 rounds',3,5,
+ 'Demo','Ask about this','amber',1,1,2,
+ 'Restaurant Website with Menu (demo listing)','A ready-made restaurant site with an editable menu and table booking requests.',NOW(),NOW()),
+
+('demo-shop-starter','Small Shop Starter (demo)',
+ 'Products, cart and checkout, ready to stock.',
+ 'A storefront for a shop moving online for the first time. Add products, take orders.',
+ '<p>For a shop selling in person that wants a straightforward online catalogue. Products, categories, a cart and an order list you can work from.</p>',
+ '<p>Your first twenty products loaded, payment and delivery options configured with you.</p>',
+ 'Payment provider, delivery rules and product import are set up during handover.',
+ (SELECT id FROM project_categories WHERE slug='online-store'),
+ (SELECT id FROM industries WHERE slug='retail'),
+ 'https://example.com/demo/shop','https://example.com/demo/shop/admin','demo','demo1234',
+ 'Orders placed in the demo are discarded.',
+ 'One business, one domain',7,'2 rounds',3,9,
+ '','Ask about this','emerald',0,1,3,
+ 'Small Online Shop (demo listing)','A ready-made storefront for a shop selling online for the first time.',NOW(),NOW());
+
+INSERT INTO `project_features` (`project_id`,`title`,`description`,`is_included`,`sort_order`)
+SELECT p.id, v.title, v.descr, v.inc, v.ord FROM `premade_projects` p
+JOIN (
+            SELECT 'demo-clinic-booking' AS slug,'Online appointment booking' AS title,'Patients pick a slot against your real opening hours.' AS descr,1 AS inc,1 AS ord
+  UNION ALL SELECT 'demo-clinic-booking','Staff profiles','A page per practitioner, with their hours.',1,2
+  UNION ALL SELECT 'demo-clinic-booking','Email alerts on every booking','',1,3
+  UNION ALL SELECT 'demo-clinic-booking','Mobile-first layout','',1,4
+  UNION ALL SELECT 'demo-clinic-booking','Online payments','Can be added — ask us.',0,5
+  UNION ALL SELECT 'demo-restaurant-menu','Menu you edit yourself','Dishes, prices and sections, from the admin.',1,1
+  UNION ALL SELECT 'demo-restaurant-menu','Table booking requests','Arrive by email; no gateway involved.',1,2
+  UNION ALL SELECT 'demo-restaurant-menu','Photo gallery','',1,3
+  UNION ALL SELECT 'demo-restaurant-menu','Directions and opening hours','',1,4
+  UNION ALL SELECT 'demo-restaurant-menu','Online ordering','Not part of this build.',0,5
+  UNION ALL SELECT 'demo-shop-starter','Product catalogue with categories','',1,1
+  UNION ALL SELECT 'demo-shop-starter','Cart and checkout','',1,2
+  UNION ALL SELECT 'demo-shop-starter','Order list in the admin','',1,3
+  UNION ALL SELECT 'demo-shop-starter','Stock counts','',1,4
+  UNION ALL SELECT 'demo-shop-starter','Multi-currency','Not part of this build.',0,5
+) v ON v.slug = p.slug;

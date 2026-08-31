@@ -283,6 +283,31 @@ final class Resources
             ],
 
             // -------------------------------------------------------------
+            'project_categories' => [
+                'table'      => 'project_categories',
+                'singular'   => 'Project category',
+                'plural'     => 'Project categories',
+                'icon'       => 'grid',
+                'permission' => 'projects.manage',
+                'group'      => 'Commerce',
+                'public_url' => '/premade-projects?category={slug}',
+                'orderable'  => true,
+                'searchable' => ['name'],
+                'columns'    => [
+                    ['key' => 'name', 'label' => 'Category', 'primary' => true, 'sub' => 'description'],
+                    ['key' => 'slug', 'label' => 'Slug', 'type' => 'mono'],
+                    ['key' => 'is_published', 'label' => 'Status', 'type' => 'status'],
+                ],
+                'fields' => [
+                    ['key' => 'name', 'label' => 'Name', 'type' => 'text', 'required' => true, 'max' => 120],
+                    ['key' => 'slug', 'label' => 'URL slug', 'type' => 'slug', 'from' => 'name'],
+                    ['key' => 'description', 'label' => 'Description', 'type' => 'textarea', 'max' => 500, 'hint' => 'One short line. Shown under the category name.'],
+                    ['key' => 'icon', 'label' => 'Icon', 'type' => 'icon'],
+                    ['key' => 'is_published', 'label' => 'Published', 'type' => 'bool', 'default' => 1],
+                ],
+            ],
+
+            // -------------------------------------------------------------
             'blog_categories' => [
                 'table'      => 'blog_categories',
                 'singular'   => 'Blog category',

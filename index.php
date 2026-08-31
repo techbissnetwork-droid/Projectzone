@@ -46,6 +46,11 @@ $router->any('/checkout/{slug}', [$site, 'checkout']);
 $router->get('/portfolio', [$site, 'portfolio']);
 $router->get('/portfolio/{slug}', [$site, 'portfolioDetail']);
 
+// --- Premade projects -------------------------------------------------
+$router->get('/premade-projects', [$site, 'projects']);
+$router->post('/premade-projects/{slug}/enquire', [$site, 'projectEnquiry']);
+$router->get('/premade-projects/{slug}', [$site, 'projectDetail']);
+
 // --- Industries -------------------------------------------------------
 $router->get('/industries', [$site, 'industries']);
 $router->get('/industries/{slug}', [$site, 'industryDetail']);

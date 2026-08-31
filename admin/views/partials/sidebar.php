@@ -31,19 +31,22 @@ $groups = [
     [
         'label' => 'Taxonomies',
         'items' => [
-            ['label' => 'Project categories', 'url' => '/admin/portfolio_categories',   'icon' => 'grid', 'permission' => 'portfolio.manage'],
+            ['label' => 'Portfolio categories', 'url' => '/admin/portfolio_categories',   'icon' => 'grid', 'permission' => 'portfolio.manage'],
             ['label' => 'Technologies',       'url' => '/admin/portfolio_technologies', 'icon' => 'tag',  'permission' => 'portfolio.manage'],
             ['label' => 'Blog categories',    'url' => '/admin/blog_categories',        'icon' => 'grid', 'permission' => 'blog.manage'],
             ['label' => 'Blog tags',          'url' => '/admin/blog_tags',              'icon' => 'tag',  'permission' => 'blog.manage'],
+            ['label' => 'Project categories', 'url' => '/admin/project_categories',     'icon' => 'grid', 'permission' => 'projects.manage'],
         ],
     ],
     [
-        'label' => 'Packages',
+        'label' => 'Commerce',
         'items' => [
-            ['label' => 'Packages',  'url' => '/admin/packages',       'icon' => 'package',  'permission' => 'packages.manage'],
-            ['label' => 'Add-ons',   'url' => '/admin/package_addons', 'icon' => 'plus',     'permission' => 'packages.manage'],
-            ['label' => 'Purchases', 'url' => '/admin/purchases',      'icon' => 'money',    'permission' => 'purchases.manage', 'badge' => 'purchases'],
-            ['label' => 'Customers', 'url' => '/admin/customers',      'icon' => 'users',    'permission' => 'customers.manage'],
+            ['label' => 'Packages',          'url' => '/admin/packages',       'icon' => 'package',  'permission' => 'packages.manage'],
+            ['label' => 'Add-ons',           'url' => '/admin/package_addons', 'icon' => 'plus',     'permission' => 'packages.manage'],
+            ['label' => 'Purchases',         'url' => '/admin/purchases',      'icon' => 'money',    'permission' => 'purchases.manage', 'badge' => 'purchases'],
+            ['label' => 'Premade projects',  'url' => '/admin/projects',       'icon' => 'rocket',   'permission' => 'projects.manage'],
+            ['label' => 'Project enquiries', 'url' => '/admin/project-orders', 'icon' => 'inbox',    'permission' => 'project_orders.manage', 'badge' => 'project_orders'],
+            ['label' => 'Customers',         'url' => '/admin/customers',      'icon' => 'users',    'permission' => 'customers.manage'],
         ],
     ],
     [

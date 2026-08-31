@@ -248,6 +248,38 @@ body.has-cursor-fx.cursor-hidden .cursor-ring { opacity: 0; }
   .header-actions { margin-left: auto; }
 }
 
+/* Premade project cards and demo credentials ------------------------- */
+.project-card__facts {
+  display: flex; flex-wrap: wrap; gap: 0.35rem 1rem;
+  margin-top: 0.85rem;
+  font-size: var(--fs-xs); color: var(--text-muted);
+}
+.project-card__facts span { display: inline-flex; align-items: center; gap: 0.35rem; }
+.project-card__facts .icon { width: 0.95em; height: 0.95em; opacity: 0.75; }
+
+.project-card__actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.1rem; }
+
+.work-card__tag--accent { color: var(--accent-ink, #fff); background: var(--accent); border-color: transparent; }
+
+/* Public demo logins. Shown deliberately, so they read as data, not secrets. */
+.demo-creds { display: grid; gap: 0.4rem; margin: 0; }
+.demo-creds > div { display: flex; align-items: baseline; gap: 0.6rem; }
+.demo-creds dt {
+  flex: none; min-width: 3.2rem;
+  font-size: var(--fs-xs); color: var(--text-muted);
+}
+.demo-creds dd {
+  margin: 0;
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: var(--fs-xs);
+  color: var(--text-soft);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xs, 6px);
+  padding: 0.15em 0.45em;
+  overflow-wrap: anywhere;
+}
+
 /* Reading progress bar on article pages */
 .read-progress {
   position: fixed; top: 0; left: 0;

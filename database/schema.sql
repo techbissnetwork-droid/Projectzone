@@ -568,6 +568,144 @@ CREATE TABLE IF NOT EXISTS `purchase_addons` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ---------------------------------------------------------------------
+-- Premade projects — ready-made builds a customer can buy as-is
+-- ---------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `project_categories` (
+  `id`          INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `slug`        VARCHAR(190) NOT NULL,
+  `name`        VARCHAR(120) NOT NULL,
+  `description` VARCHAR(500) NOT NULL DEFAULT '',
+  `icon`        VARCHAR(60)  NOT NULL DEFAULT 'grid',
+  `is_published` TINYINT(1)  NOT NULL DEFAULT 1,
+  `sort_order`  INT          NOT NULL DEFAULT 0,
+  `created_at`  DATETIME     NOT NULL,
+  `updated_at`  DATETIME     NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_project_categories_slug` (`slug`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `premade_projects` (
+  `id`               INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `slug`             VARCHAR(190) NOT NULL,
+  `name`             VARCHAR(190) NOT NULL,
+  `tagline`          VARCHAR(255) NOT NULL DEFAULT '',
+  `short_description` VARCHAR(500) NOT NULL DEFAULT '',
+  `description`      LONGTEXT     NULL,
+  `whats_included`   LONGTEXT     NULL,
+  `customisation_note` VARCHAR(500) NOT NULL DEFAULT '',
+  `category_id`      INT UNSIGNED NULL,
+  `industry_id`      INT UNSIGNED NULL,
+
+  -- Live demo. demo_username / demo_password are shown publicly on the
+  -- project page, so only ever throwaway credentials belong here.
+  `demo_url`         VARCHAR(500) NOT NULL DEFAULT '',
+  `demo_admin_url`   VARCHAR(500) NOT NULL DEFAULT '',
+  `demo_username`    VARCHAR(120) NOT NULL DEFAULT '',
+  `demo_password`    VARCHAR(120) NOT NULL DEFAULT '',
+  `demo_note`        VARCHAR(255) NOT NULL DEFAULT '',
+
+  `thumbnail`        VARCHAR(500) NOT NULL DEFAULT '',
+  `hero_image`       VARCHAR(500) NOT NULL DEFAULT '',
+
+  -- No price is stored or shown. Every premade project is priced in
+  -- conversation over WhatsApp or email, so there is no figure here to fall
+  -- out of date or to advertise a saving that was never agreed.
+  `licence`          VARCHAR(80)  NOT NULL DEFAULT '',
+  `delivery_days`    INT UNSIGNED NOT NULL DEFAULT 0,
+  `revisions`        VARCHAR(60)  NOT NULL DEFAULT '',
+  `support_months`   INT UNSIGNED NOT NULL DEFAULT 0,
+  `page_count`       INT UNSIGNED NOT NULL DEFAULT 0,
+
+  `badge`            VARCHAR(40)  NOT NULL DEFAULT '',
+  `cta_label`        VARCHAR(60)  NOT NULL DEFAULT 'Enquire about this',
+  `accent`           VARCHAR(20)  NOT NULL DEFAULT 'cyan',
+  `view_count`       INT UNSIGNED NOT NULL DEFAULT 0,
+
+  `seo_title`        VARCHAR(190) NOT NULL DEFAULT '',
+  `seo_description`  VARCHAR(320) NOT NULL DEFAULT '',
+  `og_image`         VARCHAR(500) NOT NULL DEFAULT '',
+  `is_featured`      TINYINT(1)   NOT NULL DEFAULT 0,
+  `is_published`     TINYINT(1)   NOT NULL DEFAULT 1,
+  `sort_order`       INT          NOT NULL DEFAULT 0,
+  `created_at`       DATETIME     NOT NULL,
+  `updated_at`       DATETIME     NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_premade_projects_slug` (`slug`),
+  KEY `ix_premade_projects_published` (`is_published`, `sort_order`),
+  KEY `ix_premade_projects_category` (`category_id`),
+  KEY `ix_premade_projects_industry` (`industry_id`),
+  CONSTRAINT `fk_pp_category` FOREIGN KEY (`category_id`) REFERENCES `project_categories` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_pp_industry` FOREIGN KEY (`industry_id`) REFERENCES `industries` (`id`)         ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `project_features` (
+  `id`          INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `project_id`  INT UNSIGNED NOT NULL,
+  `title`       VARCHAR(190) NOT NULL,
+  `description` VARCHAR(500) NOT NULL DEFAULT '',
+  `is_included` TINYINT(1)   NOT NULL DEFAULT 1,
+  `sort_order`  INT          NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`),
+  KEY `ix_prf_project` (`project_id`, `sort_order`),
+  CONSTRAINT `fk_prf_project` FOREIGN KEY (`project_id`) REFERENCES `premade_projects` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `project_images` (
+  `id`         INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `project_id` INT UNSIGNED NOT NULL,
+  `path`       VARCHAR(500) NOT NULL,
+  `alt_text`   VARCHAR(255) NOT NULL DEFAULT '',
+  `caption`    VARCHAR(255) NOT NULL DEFAULT '',
+  `sort_order` INT          NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`),
+  KEY `ix_pri_project` (`project_id`, `sort_order`),
+  CONSTRAINT `fk_pri_project` FOREIGN KEY (`project_id`) REFERENCES `premade_projects` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `project_technology_map` (
+  `project_id`    INT UNSIGNED NOT NULL,
+  `technology_id` INT UNSIGNED NOT NULL,
+  PRIMARY KEY (`project_id`, `technology_id`),
+  KEY `ix_ptm_tech` (`technology_id`),
+  CONSTRAINT `fk_prtm_project` FOREIGN KEY (`project_id`)    REFERENCES `premade_projects` (`id`)       ON DELETE CASCADE,
+  CONSTRAINT `fk_prtm_tech`    FOREIGN KEY (`technology_id`) REFERENCES `portfolio_technologies` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- An enquiry about a premade project. The customer never sees or agrees a
+-- price on the website; quoted_amount is filled in by an administrator after
+-- the conversation, and stays NULL until then.
+CREATE TABLE IF NOT EXISTS `project_orders` (
+  `id`               INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `reference`        VARCHAR(30)  NOT NULL,
+  `customer_id`      INT UNSIGNED NOT NULL,
+  `project_id`       INT UNSIGNED NULL,
+  `project_name`     VARCHAR(190) NOT NULL,
+  `preferred_contact` ENUM('whatsapp','email','phone') NOT NULL DEFAULT 'whatsapp',
+  `currency`         VARCHAR(6)   NOT NULL DEFAULT 'USD',
+  `quoted_amount`    DECIMAL(10,2) NULL,
+  `payment_status`   ENUM('pending','paid','refunded','cancelled') NOT NULL DEFAULT 'pending',
+  `order_status`     ENUM('new','discussing','quoted','in_setup','delivered','cancelled') NOT NULL DEFAULT 'new',
+  `payment_reference` VARCHAR(120) NOT NULL DEFAULT '',
+  `domain_name`      VARCHAR(190) NOT NULL DEFAULT '',
+  `business_details` TEXT         NULL,
+  `requirements`     TEXT         NULL,
+  `admin_notes`      TEXT         NULL,
+  `ordered_at`       DATETIME     NOT NULL,
+  `delivered_at`     DATETIME     NULL,
+  `ip_address`       VARCHAR(45)  NOT NULL DEFAULT '',
+  `created_at`       DATETIME     NOT NULL,
+  `updated_at`       DATETIME     NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_project_order_reference` (`reference`),
+  KEY `ix_project_order_customer` (`customer_id`),
+  KEY `ix_project_order_project` (`project_id`),
+  KEY `ix_project_order_status` (`order_status`),
+  KEY `ix_project_order_payment` (`payment_status`),
+  CONSTRAINT `fk_po_customer` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`id`)         ON DELETE CASCADE,
+  CONSTRAINT `fk_po_project`  FOREIGN KEY (`project_id`)  REFERENCES `premade_projects` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ---------------------------------------------------------------------
 -- Blog
 -- ---------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `blog_categories` (

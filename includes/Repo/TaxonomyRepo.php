@@ -3,14 +3,14 @@ declare(strict_types=1);
 
 namespace Techbiss\Repo;
 
-/** Simple lookup tables: portfolio categories, technologies, blog categories and tags. */
+/** Simple lookup tables: portfolio and project categories, technologies, blog categories and tags. */
 final class TaxonomyRepo extends BaseRepo
 {
     protected string $table;
 
     public function __construct(string $table)
     {
-        $allowed = ['portfolio_categories', 'portfolio_technologies', 'blog_categories', 'blog_tags'];
+        $allowed = ['portfolio_categories', 'portfolio_technologies', 'project_categories', 'blog_categories', 'blog_tags'];
         if (!in_array($table, $allowed, true)) {
             throw new \InvalidArgumentException('Unknown taxonomy table: ' . $table);
         }

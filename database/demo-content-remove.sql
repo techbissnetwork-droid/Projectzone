@@ -23,6 +23,10 @@ DELETE FROM `blog_posts` WHERE `slug` IN
 DELETE FROM `stats` WHERE `label` IN
   ('Services under one partner','Industries we build for','Ownership stays with you');
 
+-- Demo premade projects (cascades to their features, images and technologies)
+DELETE FROM `premade_projects` WHERE `slug` IN
+  ('demo-clinic-booking','demo-restaurant-menu','demo-shop-starter');
+
 -- Media rows pointing at the generated demo images, if they were imported
 DELETE FROM `media` WHERE `path` LIKE 'uploads/media/demo/%';
 

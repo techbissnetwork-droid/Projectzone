@@ -19,6 +19,8 @@ use Techbiss\Controllers\Admin\MediaController;
 use Techbiss\Controllers\Admin\NavigationController;
 use Techbiss\Controllers\Admin\PackageController;
 use Techbiss\Controllers\Admin\PortfolioController;
+use Techbiss\Controllers\Admin\ProjectController;
+use Techbiss\Controllers\Admin\ProjectOrderController;
 use Techbiss\Controllers\Admin\PurchaseController;
 use Techbiss\Controllers\Admin\ResourceController;
 use Techbiss\Controllers\Admin\SettingsController;
@@ -62,6 +64,8 @@ if (!in_array($path, ['/admin/login', '/admin/logout'], true)) {
 
     $dashboard  = new DashboardController();
     $portfolio  = new PortfolioController();
+    $projects   = new ProjectController();
+    $prjOrders  = new ProjectOrderController();
     $packages   = new PackageController();
     $purchases  = new PurchaseController();
     $customers  = new CustomerController();
@@ -89,6 +93,26 @@ if (!in_array($path, ['/admin/login', '/admin/logout'], true)) {
     $router->post('/admin/portfolio/{id:\d+}/toggle', [$portfolio, 'toggle']);
     $router->post('/admin/portfolio/{id:\d+}/images/reorder', [$portfolio, 'reorderImages']);
     $router->post('/admin/portfolio/{id:\d+}/images/{imageId:\d+}/delete', [$portfolio, 'deleteImage']);
+
+    // Premade projects
+    $router->get('/admin/projects', [$projects, 'index']);
+    $router->get('/admin/projects/create', [$projects, 'create']);
+    $router->post('/admin/projects', [$projects, 'store']);
+    $router->post('/admin/projects/reorder', [$projects, 'reorder']);
+    $router->get('/admin/projects/{id:\d+}/edit', [$projects, 'edit']);
+    $router->post('/admin/projects/{id:\d+}', [$projects, 'update']);
+    $router->post('/admin/projects/{id:\d+}/delete', [$projects, 'destroy']);
+    $router->post('/admin/projects/{id:\d+}/duplicate', [$projects, 'duplicate']);
+    $router->post('/admin/projects/{id:\d+}/toggle', [$projects, 'toggle']);
+    $router->post('/admin/projects/{id:\d+}/images/reorder', [$projects, 'reorderImages']);
+    $router->post('/admin/projects/{id:\d+}/images/{imageId:\d+}/delete', [$projects, 'deleteImage']);
+
+    // Premade project enquiries
+    $router->get('/admin/project-orders', [$prjOrders, 'index']);
+    $router->get('/admin/project-orders/export', [$prjOrders, 'export']);
+    $router->get('/admin/project-orders/{id:\d+}', [$prjOrders, 'show']);
+    $router->post('/admin/project-orders/{id:\d+}', [$prjOrders, 'update']);
+    $router->post('/admin/project-orders/{id:\d+}/delete', [$prjOrders, 'destroy']);
 
     // --- Packages -----------------------------------------------------
     $router->get('/admin/packages', [$packages, 'index']);

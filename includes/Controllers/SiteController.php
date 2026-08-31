@@ -23,6 +23,7 @@ use Techbiss\Repo\PackageRepo;
 use Techbiss\Repo\PageRepo;
 use Techbiss\Repo\PortfolioRepo;
 use Techbiss\Repo\ProcessRepo;
+use Techbiss\Repo\ProjectRepo;
 use Techbiss\Repo\SectionRepo;
 use Techbiss\Repo\ServiceRepo;
 use Techbiss\Repo\StatRepo;
@@ -251,8 +252,8 @@ final class SiteController
         $repo    = new PortfolioRepo();
         $perPage = max(3, App::settings()->int('items_per_page', 9));
         $page    = max(1, $request->queryInt('page', 1));
-        $cat     = Str::slug($request->queryString('category'));
-        $ind     = Str::slug($request->queryString('industry'));
+        $cat     = Str::slugFilter($request->queryString('category'));
+        $ind     = Str::slugFilter($request->queryString('industry'));
         $search  = mb_substr($request->queryString('q'), 0, 80);
 
         $result    = $repo->paginate($page, $perPage, $cat, $ind, $search);
@@ -442,8 +443,8 @@ final class SiteController
         $repo    = new BlogRepo();
         $perPage = max(3, App::settings()->int('items_per_page', 9));
         $page    = max(1, $request->queryInt('page', 1));
-        $cat     = Str::slug($request->queryString('category'));
-        $tag     = Str::slug($request->queryString('tag'));
+        $cat     = Str::slugFilter($request->queryString('category'));
+        $tag     = Str::slugFilter($request->queryString('tag'));
         $search  = mb_substr($request->queryString('q'), 0, 80);
 
         $result    = $repo->paginate($page, $perPage, $cat, $tag, $search);
@@ -790,6 +791,188 @@ final class SiteController
     }
 
     // =================================================================
+    // Premade projects
+    // =================================================================
+
+    /**
+     * Catalogue of ready-made builds.
+     *
+     * No price is shown anywhere: each one is priced in conversation, so the
+     * cards carry what a buyer actually needs to judge it — a live demo, what
+     * is included, and how long setup takes.
+     */
+    public function projects(Request $request): void
+    {
+        $repo    = new ProjectRepo();
+        $perPage = max(3, App::settings()->int('items_per_page', 9));
+        $page    = max(1, $request->queryInt('page', 1));
+        $cat     = Str::slugFilter($request->queryString('category'));
+        $ind     = Str::slugFilter($request->queryString('industry'));
+        $search  = mb_substr($request->queryString('q'), 0, 80);
+        $sort    = $request->queryString('sort');
+        if (!in_array($sort, ProjectRepo::sortKeys(), true)) {
+            $sort = 'featured';
+        }
+
+        $result    = $repo->paginate($page, $perPage, $cat, $ind, $search, $sort);
+        $paginator = new Paginator($page, $perPage, $result['total']);
+
+        $seo = App::seo();
+        $seo->title('Premade Projects — Ready-Made Websites You Can Launch Fast');
+        $seo->description('Working builds you can see live, then have set up on your own domain. Ask about any of them and we agree the price with you directly.');
+        $seo->canonical(absolute_url('/premade-projects'));
+        $seo->breadcrumbs([
+            ['label' => 'Home', 'url' => '/'],
+            ['label' => 'Premade Projects', 'url' => '/premade-projects'],
+        ]);
+        if ($page > 1) {
+            $seo->noindex(true);
+        }
+
+        $this->view->render('premade-projects', [
+            'projects'   => $result['items'],
+            'paginator'  => $paginator,
+            'categories' => $repo->activeCategories(),
+            'industries' => (new IndustryRepo())->options(),
+            'activeCat'  => $cat,
+            'activeInd'  => $ind,
+            'activeSort' => $sort,
+            'search'     => $search,
+        ]);
+    }
+
+    public function projectDetail(Request $request, array $params): void
+    {
+        $repo    = new ProjectRepo();
+        $project = $repo->publishedBySlug((string) $params['slug']);
+        if ($project === null) {
+            $this->notFound($request);
+            return;
+        }
+        $repo->incrementViews((int) $project['id']);
+
+        $seo = App::seo();
+        $seo->title($project['seo_title'] !== '' ? $project['seo_title'] : $project['name'] . ' — Premade Project');
+        $seo->description($project['seo_description'] !== '' ? $project['seo_description'] : $project['short_description']);
+        $seo->canonical(absolute_url('/premade-projects/' . $project['slug']));
+        $seo->ogImage($project['og_image'] !== '' ? $project['og_image'] : ($project['hero_image'] !== '' ? $project['hero_image'] : $project['thumbnail']));
+        $seo->breadcrumbs([
+            ['label' => 'Home', 'url' => '/'],
+            ['label' => 'Premade Projects', 'url' => '/premade-projects'],
+            ['label' => (string) $project['name'], 'url' => '/premade-projects/' . $project['slug']],
+        ]);
+        // Described as a creative work rather than a Product: with no price and
+        // no checkout, an Offer would be a claim we cannot back.
+        $seo->addSchema([
+            '@type'       => 'CreativeWork',
+            'name'        => $project['name'],
+            'description' => $project['short_description'],
+            'creator'     => ['@type' => 'Organization', 'name' => App::settings()->get('site_name', 'TECHBISS')],
+        ]);
+
+        $this->view->render('premade-project-detail', [
+            'project'   => $project,
+            'related'   => $repo->related($project, 3),
+            'countries' => self::countries(),
+            'sent'      => $request->queryString('sent') === '1',
+        ]);
+    }
+
+    /**
+     * Record an enquiry about a premade project.
+     *
+     * Nothing is priced or charged here. The enquiry reaches the admin with the
+     * customer's preferred channel so the conversation can start where they
+     * asked for it.
+     */
+    public function projectEnquiry(Request $request, array $params): void
+    {
+        $repo    = new ProjectRepo();
+        $project = $repo->publishedBySlug((string) $params['slug']);
+        if ($project === null) {
+            $this->notFound($request);
+            return;
+        }
+        if (!$request->isPost()) {
+            redirect('/premade-projects/' . $project['slug']);
+        }
+
+        Csrf::verify($request);
+        $leads  = new LeadRepo();
+        $target = '/premade-projects/' . $project['slug'];
+
+        if ($leads->recentSubmissionCount($request->ip()) >= 5) {
+            $this->formFail($request, $target, 'You have submitted several requests recently. Please wait a few minutes.', []);
+            return;
+        }
+
+        $channels = array_keys(\Techbiss\Repo\ProjectOrderRepo::contactLabels());
+
+        $v = Validator::make($request->all())
+            ->honeypot()
+            ->required('name', 'Your name', 2, 120)
+            ->optional('business_name', 190)
+            ->email('email')
+            ->phone('phone', true)
+            ->in('country', self::countries(), 'Country', false)
+            ->in('preferred_contact', $channels, 'Preferred contact', false)
+            ->optional('domain_name', 190)
+            ->text('requirements', 3000, false, 'What you need');
+
+        if ($v->fails()) {
+            $this->formFail($request, $target, $v->firstError(), $v->errors());
+            return;
+        }
+
+        $customerId = (new CustomerRepo())->upsert([
+            'name'          => $v->get('name'),
+            'business_name' => $v->get('business_name', ''),
+            'email'         => $v->get('email'),
+            'phone'         => $v->get('phone', ''),
+            'country'       => $v->get('country', ''),
+        ]);
+
+        $reference = $leads->nextReference('TBR', 'project_orders');
+
+        (new \Techbiss\Repo\ProjectOrderRepo())->create([
+            'reference'         => $reference,
+            'customer_id'       => $customerId,
+            'project_id'        => (int) $project['id'],
+            'project_name'      => (string) $project['name'],
+            'preferred_contact' => $v->get('preferred_contact', '') ?: 'whatsapp',
+            'currency'          => App::settings()->get('currency', 'USD'),
+            'quoted_amount'     => null,
+            'payment_status'    => 'pending',
+            'order_status'      => 'new',
+            'domain_name'       => $v->get('domain_name', ''),
+            'business_details'  => $v->get('business_name', ''),
+            'requirements'      => $v->get('requirements', ''),
+            'ordered_at'        => date('Y-m-d H:i:s'),
+            'ip_address'        => $request->ip(),
+        ]);
+
+        $this->notify(
+            'Premade project enquiry ' . $reference,
+            sprintf(
+                "Reference: %s\nProject: %s\nName: %s (%s)\nBusiness: %s\nPhone: %s\nCountry: %s\nPreferred contact: %s\nDomain: %s\n\nWhat they need:\n%s",
+                $reference,
+                $project['name'],
+                $v->get('name'),
+                $v->get('email'),
+                $v->get('business_name', '') ?: '—',
+                $v->get('phone', '') ?: '—',
+                $v->get('country', '') ?: '—',
+                $v->get('preferred_contact', '') ?: 'whatsapp',
+                $v->get('domain_name', '') ?: '—',
+                $v->get('requirements', '') ?: '—'
+            ),
+            (string) $v->get('email')
+        );
+
+        $this->formSuccess($request, $target . '?sent=1', 'Thanks — we have your enquiry and will be in touch shortly.');
+    }
+
+    // =================================================================
     // Package checkout / request
     // =================================================================
     public function checkout(Request $request, array $params): void
@@ -1036,6 +1219,7 @@ final class SiteController
             ['loc' => absolute_url('/services'), 'priority' => '0.9', 'changefreq' => 'monthly'],
             ['loc' => absolute_url('/packages'), 'priority' => '0.9', 'changefreq' => 'monthly'],
             ['loc' => absolute_url('/portfolio'), 'priority' => '0.8', 'changefreq' => 'weekly'],
+            ['loc' => absolute_url('/premade-projects'), 'priority' => '0.9', 'changefreq' => 'weekly'],
             ['loc' => absolute_url('/industries'), 'priority' => '0.8', 'changefreq' => 'monthly'],
             ['loc' => absolute_url('/how-it-works'), 'priority' => '0.7', 'changefreq' => 'yearly'],
             ['loc' => absolute_url('/blog'), 'priority' => '0.8', 'changefreq' => 'weekly'],
@@ -1060,6 +1244,7 @@ final class SiteController
         $add((new ServiceRepo())->forSitemap(), '/services', '0.8');
         $add((new PackageRepo())->forSitemap(), '/packages', '0.8');
         $add((new PortfolioRepo())->forSitemap(), '/portfolio', '0.7');
+        $add((new ProjectRepo())->forSitemap(), '/premade-projects', '0.8');
         $add((new IndustryRepo())->forSitemap(), '/industries', '0.7');
         $add((new BlogRepo())->forSitemap(), '/blog', '0.6');
 

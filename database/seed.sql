@@ -30,6 +30,8 @@ INSERT INTO `permissions` (`name`, `slug`, `group_name`, `sort_order`) VALUES
 ('Manage SEO',            'seo.manage',        'Website',   21),
 ('Manage global settings','settings.manage',   'Website',   22),
 ('Manage packages',       'packages.manage',   'Commerce',  30),
+('Manage premade projects','projects.manage',  'Commerce',  33),
+('Manage project enquiries','project_orders.manage','Commerce', 34),
 ('Manage purchases',      'purchases.manage',  'Commerce',  31),
 ('Manage customers',      'customers.manage',  'Commerce',  32),
 ('View leads',            'leads.view',        'Leads',     40),
@@ -46,19 +48,19 @@ SELECT r.id, p.id FROM `roles` r CROSS JOIN `permissions` p WHERE r.slug = 'supe
 -- Content Manager
 INSERT INTO `role_permissions` (`role_id`, `permission_id`)
 SELECT r.id, p.id FROM `roles` r JOIN `permissions` p
-  ON p.slug IN ('dashboard.view','content.view','content.manage','portfolio.manage','blog.manage','media.manage','seo.manage')
+  ON p.slug IN ('dashboard.view','content.view','content.manage','portfolio.manage','projects.manage','blog.manage','media.manage','seo.manage')
 WHERE r.slug = 'content-manager';
 
 -- Sales Manager
 INSERT INTO `role_permissions` (`role_id`, `permission_id`)
 SELECT r.id, p.id FROM `roles` r JOIN `permissions` p
-  ON p.slug IN ('dashboard.view','leads.view','leads.manage','packages.manage','purchases.manage','customers.manage','export.manage','content.view')
+  ON p.slug IN ('dashboard.view','leads.view','leads.manage','packages.manage','purchases.manage','project_orders.manage','customers.manage','export.manage','content.view')
 WHERE r.slug = 'sales-manager';
 
 -- Support Manager
 INSERT INTO `role_permissions` (`role_id`, `permission_id`)
 SELECT r.id, p.id FROM `roles` r JOIN `permissions` p
-  ON p.slug IN ('dashboard.view','leads.view','customers.manage','purchases.manage','content.view')
+  ON p.slug IN ('dashboard.view','leads.view','customers.manage','purchases.manage','project_orders.manage','content.view')
 WHERE r.slug = 'support-manager';
 
 -- ---------------------------------------------------------------------
@@ -128,22 +130,24 @@ INSERT INTO `settings` (`group_name`, `key_name`, `value`, `type`, `label`, `hin
 INSERT INTO `navigation` (`menu`,`parent_id`,`label`,`url`,`link_type`,`description`,`target`,`is_active`,`is_button`,`sort_order`,`created_at`,`updated_at`) VALUES
 ('primary',NULL,'Services','/services','internal','What we build and run for you','_self',1,0,1,NOW(),NOW()),
 ('primary',NULL,'Packages','/packages','internal','Prepaid setups with clear pricing','_self',1,0,2,NOW(),NOW()),
-('primary',NULL,'Work','/portfolio','internal','Selected projects and case studies','_self',1,0,3,NOW(),NOW()),
-('primary',NULL,'Industries','/industries','internal','Built around how your sector works','_self',1,0,4,NOW(),NOW()),
-('primary',NULL,'Company','','internal','','_self',1,0,5,NOW(),NOW()),
+('primary',NULL,'Ready Projects','/premade-projects','internal','Live builds you can launch fast','_self',1,0,3,NOW(),NOW()),
+('primary',NULL,'Work','/portfolio','internal','Projects we have delivered','_self',1,0,4,NOW(),NOW()),
+('primary',NULL,'Industries','/industries','internal','Built around your sector','_self',1,0,5,NOW(),NOW()),
+('primary',NULL,'Company','','internal','','_self',1,0,6,NOW(),NOW()),
 ('primary',NULL,'Start Your Digital Journey','/start','internal','','_self',1,1,9,NOW(),NOW()),
 ('footer',NULL,'Services','/services','internal','','_self',1,0,1,NOW(),NOW()),
 ('footer',NULL,'Packages','/packages','internal','','_self',1,0,2,NOW(),NOW()),
-('footer',NULL,'Portfolio','/portfolio','internal','','_self',1,0,3,NOW(),NOW()),
-('footer',NULL,'Industries','/industries','internal','','_self',1,0,4,NOW(),NOW()),
-('footer',NULL,'How It Works','/how-it-works','internal','','_self',1,0,5,NOW(),NOW()),
-('footer',NULL,'Why TECHBISS','/why-techbiss','internal','','_self',1,0,6,NOW(),NOW()),
-('footer',NULL,'Blog','/blog','internal','','_self',1,0,7,NOW(),NOW()),
-('footer',NULL,'About','/about','internal','','_self',1,0,8,NOW(),NOW()),
-('footer',NULL,'Testimonials','/testimonials','internal','','_self',1,0,9,NOW(),NOW()),
-('footer',NULL,'FAQs','/faqs','internal','','_self',1,0,10,NOW(),NOW()),
-('footer',NULL,'Contact','/contact','internal','','_self',1,0,11,NOW(),NOW()),
-('footer',NULL,'Request a Quote','/quote','internal','','_self',1,0,12,NOW(),NOW()),
+('footer',NULL,'Ready Projects','/premade-projects','internal','','_self',1,0,3,NOW(),NOW()),
+('footer',NULL,'Portfolio','/portfolio','internal','','_self',1,0,4,NOW(),NOW()),
+('footer',NULL,'Industries','/industries','internal','','_self',1,0,5,NOW(),NOW()),
+('footer',NULL,'How It Works','/how-it-works','internal','','_self',1,0,6,NOW(),NOW()),
+('footer',NULL,'Why TECHBISS','/why-techbiss','internal','','_self',1,0,7,NOW(),NOW()),
+('footer',NULL,'Blog','/blog','internal','','_self',1,0,8,NOW(),NOW()),
+('footer',NULL,'About','/about','internal','','_self',1,0,9,NOW(),NOW()),
+('footer',NULL,'Testimonials','/testimonials','internal','','_self',1,0,10,NOW(),NOW()),
+('footer',NULL,'FAQs','/faqs','internal','','_self',1,0,11,NOW(),NOW()),
+('footer',NULL,'Contact','/contact','internal','','_self',1,0,12,NOW(),NOW()),
+('footer',NULL,'Request a Quote','/quote','internal','','_self',1,0,13,NOW(),NOW()),
 ('legal',NULL,'Privacy Policy','/privacy-policy','internal','','_self',1,0,1,NOW(),NOW()),
 ('legal',NULL,'Terms & Conditions','/terms-and-conditions','internal','','_self',1,0,2,NOW(),NOW());
 
@@ -249,6 +253,19 @@ INSERT INTO `portfolio_categories` (`slug`,`name`,`description`,`is_published`,`
 ('saas','SaaS','Multi-tenant software products.',1,7,NOW(),NOW()),
 ('ai','AI','Applied AI and machine learning work.',1,8,NOW(),NOW()),
 ('automation','Automation','Workflow and process automation.',1,9,NOW(),NOW());
+
+-- Premade project categories. Structural only: no projects are seeded, because
+-- inventing products TECHBISS does not actually sell would be a lie on the
+-- storefront. Add real ones in Commerce → Premade projects.
+INSERT INTO `project_categories` (`slug`,`name`,`description`,`icon`,`is_published`,`sort_order`,`created_at`,`updated_at`) VALUES
+('business-website','Business Website','Company sites ready to brand and launch.','globe',1,1,NOW(),NOW()),
+('online-store','Online Store','Product catalogues, cart and checkout.','cart',1,2,NOW(),NOW()),
+('booking','Booking & Appointments','Calendars, slots and reminders.','calendar',1,3,NOW(),NOW()),
+('portfolio-site','Portfolio & Personal','Single-person and studio sites.','image',1,4,NOW(),NOW()),
+('restaurant','Restaurant & Cafe','Menus, orders and table booking.','utensils',1,5,NOW(),NOW()),
+('directory','Directory & Listings','Searchable listings with profiles.','list',1,6,NOW(),NOW()),
+('dashboard','Admin & Dashboard','Internal tools and back offices.','dashboard',1,7,NOW(),NOW()),
+('landing','Landing Page','One-page sites built to convert.','rocket',1,8,NOW(),NOW());
 
 INSERT INTO `portfolio_technologies` (`slug`,`name`,`sort_order`) VALUES
 ('php','PHP',1),('mysql','MySQL',2),('javascript','JavaScript',3),('typescript','TypeScript',4),

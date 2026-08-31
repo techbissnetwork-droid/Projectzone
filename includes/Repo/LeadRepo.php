@@ -221,7 +221,11 @@ final class LeadRepo
     /** Sequential, human-readable reference such as TBQ-2026-0042. */
     public function nextReference(string $prefix, string $table): string
     {
-        $allowed = ['quote_requests' => 'quote_requests', 'package_purchases' => 'package_purchases'];
+        $allowed = [
+            'quote_requests'    => 'quote_requests',
+            'package_purchases' => 'package_purchases',
+            'project_orders'    => 'project_orders',
+        ];
         $t       = $allowed[$table] ?? 'quote_requests';
         $year    = date('Y');
         $count   = $this->db()->int("SELECT COUNT(*) FROM `$t` WHERE YEAR(created_at) = ?", [(int) $year]);
