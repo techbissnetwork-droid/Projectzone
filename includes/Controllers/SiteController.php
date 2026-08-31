@@ -1,0 +1,1252 @@
+<?php
+declare(strict_types=1);
+
+namespace Techbiss\Controllers;
+
+use Techbiss\Core\App;
+use Techbiss\Core\Csrf;
+use Techbiss\Core\Icons;
+use Techbiss\Core\Paginator;
+use Techbiss\Core\Request;
+use Techbiss\Core\Session;
+use Techbiss\Core\Str;
+use Techbiss\Core\Validator;
+use Techbiss\Core\View;
+use Techbiss\Repo\AddonRepo;
+use Techbiss\Repo\BlogRepo;
+use Techbiss\Repo\CustomerRepo;
+use Techbiss\Repo\FaqRepo;
+use Techbiss\Repo\IndustryRepo;
+use Techbiss\Repo\LeadRepo;
+use Techbiss\Repo\NavigationRepo;
+use Techbiss\Repo\PackageRepo;
+use Techbiss\Repo\PageRepo;
+use Techbiss\Repo\PortfolioRepo;
+use Techbiss\Repo\ProcessRepo;
+use Techbiss\Repo\SectionRepo;
+use Techbiss\Repo\ServiceRepo;
+use Techbiss\Repo\StatRepo;
+use Techbiss\Repo\TaxonomyRepo;
+use Techbiss\Repo\TestimonialRepo;
+
+/**
+ * Every public page. Each action gathers data from the repositories and hands
+ * it to a template — no SQL and no business rules live in the views.
+ */
+final class SiteController
+{
+    private View $view;
+
+    public function __construct()
+    {
+        $this->view = new View(App::root() . '/pages', App::root() . '/pages/layouts/base.php');
+
+        $settings = App::settings();
+        $nav      = new NavigationRepo();
+
+        $this->view->shareMany([
+            'settings'    => $settings,
+            'seo'         => App::seo(),
+            'primaryNav'  => $nav->tree('primary'),
+            'footerNav'   => $nav->tree('footer'),
+            'legalNav'    => $nav->tree('legal'),
+            'socialLinks' => $settings->socialLinks(),
+            'flash'       => App::flashMessages(),
+            'currentPath' => App::currentPath(),
+        ]);
+    }
+
+    // =================================================================
+    // Home
+    // =================================================================
+    public function home(Request $request): void
+    {
+        $sections = (new SectionRepo())->forPage('home');
+        $settings = App::settings();
+
+        $seo = App::seo();
+        $seo->title($settings->get('seo_default_title', 'TECHBISS — Your Digital Business Starts Here'));
+        $seo->description($settings->get('seo_default_description'));
+        $seo->canonical(absolute_url('/'));
+        $seo->ogImage($settings->get('seo_og_image'));
+        $seo->addSchema([
+            '@type'       => 'Organization',
+            '@id'         => absolute_url('/') . '#organization',
+            'name'        => $settings->get('site_name', 'TECHBISS'),
+            'url'         => absolute_url('/'),
+            'description' => $settings->get('seo_default_description'),
+            'slogan'      => $settings->get('tagline'),
+            'email'       => $settings->get('contact_email'),
+            'telephone'   => $settings->get('contact_phone'),
+            'sameAs'      => array_column($settings->socialLinks(), 'url'),
+        ]);
+        $seo->addSchema([
+            '@type'           => 'WebSite',
+            '@id'             => absolute_url('/') . '#website',
+            'url'             => absolute_url('/'),
+            'name'            => $settings->get('site_name', 'TECHBISS'),
+            'publisher'       => ['@id' => absolute_url('/') . '#organization'],
+            'inLanguage'      => 'en',
+        ]);
+
+        $this->view->render('home', [
+            'sections'     => $sections,
+            'services'     => (new ServiceRepo())->featured(6),
+            'packages'     => (new PackageRepo())->publishedWithFeatures(),
+            'projects'     => (new PortfolioRepo())->featured(3),
+            'industries'   => (new IndustryRepo())->featured(8),
+            'steps'        => (new ProcessRepo())->published(6),
+            'testimonials' => (new TestimonialRepo())->publishedWithProject(3),
+            'faqs'         => (new FaqRepo())->publishedFlat(6),
+            'posts'        => (new BlogRepo())->latest(3),
+            'stats'        => (new StatRepo())->published(4),
+            'bodyClass'    => 'page-home',
+        ]);
+    }
+
+    // =================================================================
+    // Services
+    // =================================================================
+    public function services(Request $request): void
+    {
+        $repo     = new ServiceRepo();
+        $services = $repo->published();
+
+        $seo = App::seo();
+        $seo->title('Services — Everything Your Business Needs Online');
+        $seo->description('Domain and hosting, business websites, web and mobile applications, business email, branding, e-commerce, SEO, automation and maintenance — delivered by one partner.');
+        $seo->canonical(absolute_url('/services'));
+        $seo->breadcrumbs([['label' => 'Home', 'url' => '/'], ['label' => 'Services', 'url' => '/services']]);
+
+        foreach ($services as &$s) {
+            $s['features'] = $repo->features((int) $s['id']);
+        }
+        unset($s);
+
+        $this->view->render('services', [
+            'services' => $services,
+            'faqs'     => (new FaqRepo())->publishedFlat(5),
+            'steps'    => (new ProcessRepo())->published(6),
+        ]);
+    }
+
+    public function serviceDetail(Request $request, array $params): void
+    {
+        $repo    = new ServiceRepo();
+        $service = $repo->publishedBySlug((string) $params['slug']);
+        if ($service === null) {
+            $this->notFound($request);
+            return;
+        }
+
+        $seo = App::seo();
+        $seo->title($service['seo_title'] !== '' ? $service['seo_title'] : $service['name'] . ' Services');
+        $seo->description($service['seo_description'] !== '' ? $service['seo_description'] : $service['short_description']);
+        $seo->canonical(absolute_url('/services/' . $service['slug']));
+        $seo->ogImage($service['og_image'] !== '' ? $service['og_image'] : $service['image']);
+        $seo->breadcrumbs([
+            ['label' => 'Home', 'url' => '/'],
+            ['label' => 'Services', 'url' => '/services'],
+            ['label' => (string) $service['name'], 'url' => '/services/' . $service['slug']],
+        ]);
+        $seo->addSchema([
+            '@type'       => 'Service',
+            'name'        => $service['name'],
+            'description' => $service['short_description'],
+            'provider'    => ['@type' => 'Organization', 'name' => App::settings()->get('site_name', 'TECHBISS')],
+            'areaServed'  => App::settings()->get('country') ?: 'Worldwide',
+        ]);
+
+        $this->view->render('service-detail', [
+            'service'   => $service,
+            'features'  => $repo->features((int) $service['id']),
+            'related'   => array_slice(array_filter($repo->published(), static fn ($s) => (int) $s['id'] !== (int) $service['id']), 0, 3),
+            'projects'  => (new PortfolioRepo())->featured(3),
+            'packages'  => (new PackageRepo())->publishedWithFeatures(),
+            'steps'     => (new ProcessRepo())->published(6),
+        ]);
+    }
+
+    // =================================================================
+    // Packages
+    // =================================================================
+    public function packages(Request $request): void
+    {
+        $repo     = new PackageRepo();
+        $packages = $repo->publishedWithFeatures();
+
+        $seo = App::seo();
+        $seo->title('Packages — Pay Upfront. Save More. Build Better.');
+        $seo->description('Complete digital setups with published pricing. Where a prepaid discount applies you see the regular price, the prepaid price and the exact saving.');
+        $seo->canonical(absolute_url('/packages'));
+        $seo->breadcrumbs([['label' => 'Home', 'url' => '/'], ['label' => 'Packages', 'url' => '/packages']]);
+
+        $this->view->render('packages', [
+            'packages'   => $packages,
+            'addons'     => (new AddonRepo())->publishedAll(),
+            'compareRows'=> $repo->comparisonRows(),
+            'faqs'       => $this->pricingFaqs(),
+        ]);
+    }
+
+    public function packageDetail(Request $request, array $params): void
+    {
+        $repo    = new PackageRepo();
+        $package = $repo->publishedBySlug((string) $params['slug']);
+        if ($package === null) {
+            $this->notFound($request);
+            return;
+        }
+
+        $pricing  = $package['pricing'];
+        $currency = App::settings()->get('currency', 'USD');
+
+        $seo = App::seo();
+        $seo->title($package['seo_title'] !== '' ? $package['seo_title'] : $package['name'] . ' Package');
+        $seo->description($package['seo_description'] !== '' ? $package['seo_description'] : $package['short_description']);
+        $seo->canonical(absolute_url('/packages/' . $package['slug']));
+        $seo->ogImage($package['og_image'] !== '' ? $package['og_image'] : $package['image']);
+        $seo->breadcrumbs([
+            ['label' => 'Home', 'url' => '/'],
+            ['label' => 'Packages', 'url' => '/packages'],
+            ['label' => (string) $package['name'], 'url' => '/packages/' . $package['slug']],
+        ]);
+        // Only publish a price in structured data when there is a real one.
+        if (!$pricing['is_custom'] && $pricing['payable'] > 0) {
+            $seo->addSchema([
+                '@type'       => 'Product',
+                'name'        => $package['name'] . ' Package',
+                'description' => $package['short_description'],
+                'brand'       => ['@type' => 'Brand', 'name' => App::settings()->get('site_name', 'TECHBISS')],
+                'offers'      => [
+                    '@type'         => 'Offer',
+                    'price'         => number_format($pricing['payable'], 2, '.', ''),
+                    'priceCurrency' => $currency,
+                    'availability'  => 'https://schema.org/InStock',
+                    'url'           => absolute_url('/packages/' . $package['slug']),
+                ],
+            ]);
+        }
+
+        $this->view->render('package-detail', [
+            'package'  => $package,
+            'packages' => $repo->publishedWithFeatures(),
+            'steps'    => (new ProcessRepo())->published(6),
+            'faqs'     => $this->pricingFaqs(),
+        ]);
+    }
+
+    /** @return array<int,array<string,mixed>> */
+    private function pricingFaqs(): array
+    {
+        $grouped = (new FaqRepo())->grouped();
+        return $grouped['Pricing'] ?? (new FaqRepo())->publishedFlat(5);
+    }
+
+    // =================================================================
+    // Portfolio
+    // =================================================================
+    public function portfolio(Request $request): void
+    {
+        $repo    = new PortfolioRepo();
+        $perPage = max(3, App::settings()->int('items_per_page', 9));
+        $page    = max(1, $request->queryInt('page', 1));
+        $cat     = Str::slug($request->queryString('category'));
+        $ind     = Str::slug($request->queryString('industry'));
+        $search  = mb_substr($request->queryString('q'), 0, 80);
+
+        $result    = $repo->paginate($page, $perPage, $cat, $ind, $search);
+        $paginator = new Paginator($page, $perPage, $result['total']);
+
+        $seo = App::seo();
+        $seo->title('Our Work — Selected Projects & Case Studies');
+        $seo->description('Websites, web applications, mobile apps, commerce platforms and brand systems built by TECHBISS.');
+        $seo->canonical(absolute_url('/portfolio'));
+        $seo->breadcrumbs([['label' => 'Home', 'url' => '/'], ['label' => 'Work', 'url' => '/portfolio']]);
+        if ($page > 1) {
+            $seo->noindex(true);
+        }
+
+        $this->view->render('portfolio', [
+            'projects'   => $result['items'],
+            'paginator'  => $paginator,
+            'categories' => $repo->activeCategories(),
+            'industries' => (new IndustryRepo())->options(),
+            'activeCat'  => $cat,
+            'activeInd'  => $ind,
+            'search'     => $search,
+        ]);
+    }
+
+    public function portfolioDetail(Request $request, array $params): void
+    {
+        $repo    = new PortfolioRepo();
+        $project = $repo->publishedBySlug((string) $params['slug']);
+        if ($project === null) {
+            $this->notFound($request);
+            return;
+        }
+        $repo->incrementViews((int) $project['id']);
+
+        $seo = App::seo();
+        $seo->title($project['seo_title'] !== '' ? $project['seo_title'] : $project['title'] . ' — Case Study');
+        $seo->description($project['seo_description'] !== '' ? $project['seo_description'] : $project['short_description']);
+        $seo->canonical(absolute_url('/portfolio/' . $project['slug']));
+        $seo->ogImage($project['og_image'] !== '' ? $project['og_image'] : ($project['hero_image'] !== '' ? $project['hero_image'] : $project['thumbnail']));
+        $seo->ogType('article');
+        $seo->breadcrumbs([
+            ['label' => 'Home', 'url' => '/'],
+            ['label' => 'Work', 'url' => '/portfolio'],
+            ['label' => (string) $project['title'], 'url' => '/portfolio/' . $project['slug']],
+        ]);
+        $seo->addSchema([
+            '@type'       => 'CreativeWork',
+            'name'        => $project['title'],
+            'description' => $project['short_description'],
+            'creator'     => ['@type' => 'Organization', 'name' => App::settings()->get('site_name', 'TECHBISS')],
+        ]);
+
+        $this->view->render('portfolio-detail', [
+            'project'      => $project,
+            'images'       => $repo->images((int) $project['id']),
+            'technologies' => $repo->technologyNames((int) $project['id']),
+            'servicesUsed' => (new ServiceRepo())->forPortfolio((int) $project['id']),
+            'related'      => $repo->related($project, 3),
+            'testimonial'  => $this->testimonialForProject((int) $project['id']),
+        ]);
+    }
+
+    private function testimonialForProject(int $projectId): ?array
+    {
+        foreach ((new TestimonialRepo())->publishedWithProject() as $t) {
+            if ((int) ($t['portfolio_id'] ?? 0) === $projectId) {
+                return $t;
+            }
+        }
+        return null;
+    }
+
+    // =================================================================
+    // Industries
+    // =================================================================
+    public function industries(Request $request): void
+    {
+        $seo = App::seo();
+        $seo->title('Industries — Built Around How Your Sector Works');
+        $seo->description('Restaurants, hotels, retail, education, healthcare, real estate and more. Digital foundations designed around the way each sector actually operates.');
+        $seo->canonical(absolute_url('/industries'));
+        $seo->breadcrumbs([['label' => 'Home', 'url' => '/'], ['label' => 'Industries', 'url' => '/industries']]);
+
+        $this->view->render('industries', [
+            'industries' => (new IndustryRepo())->published(),
+            'services'   => (new ServiceRepo())->featured(6),
+        ]);
+    }
+
+    public function industryDetail(Request $request, array $params): void
+    {
+        $repo     = new IndustryRepo();
+        $industry = $repo->publishedBySlug((string) $params['slug']);
+        if ($industry === null) {
+            $this->notFound($request);
+            return;
+        }
+
+        $seo = App::seo();
+        $seo->title($industry['seo_title'] !== '' ? $industry['seo_title'] : 'Digital Solutions for ' . $industry['name']);
+        $seo->description($industry['seo_description'] !== '' ? $industry['seo_description'] : $industry['short_description']);
+        $seo->canonical(absolute_url('/industries/' . $industry['slug']));
+        $seo->ogImage($industry['og_image'] !== '' ? $industry['og_image'] : $industry['image']);
+        $seo->breadcrumbs([
+            ['label' => 'Home', 'url' => '/'],
+            ['label' => 'Industries', 'url' => '/industries'],
+            ['label' => (string) $industry['name'], 'url' => '/industries/' . $industry['slug']],
+        ]);
+
+        $portfolio = new PortfolioRepo();
+        $projects  = $portfolio->paginate(1, 3, '', (string) $industry['slug']);
+
+        $this->view->render('industry-detail', [
+            'industry' => $industry,
+            'services' => (new ServiceRepo())->forIndustry((int) $industry['id']),
+            'projects' => $projects['items'],
+            'packages' => (new PackageRepo())->publishedWithFeatures(),
+            'others'   => array_slice(array_filter($repo->published(), static fn ($i) => (int) $i['id'] !== (int) $industry['id']), 0, 6),
+        ]);
+    }
+
+    // =================================================================
+    // Editorial
+    // =================================================================
+    public function howItWorks(Request $request): void
+    {
+        $seo = App::seo();
+        $seo->title('How It Works — Six Stages From Offline to Online');
+        $seo->description('Tell us about your business, choose a setup, build the foundation, design the presence, launch, then grow. A defined process with a schedule you see before we start.');
+        $seo->canonical(absolute_url('/how-it-works'));
+        $seo->breadcrumbs([['label' => 'Home', 'url' => '/'], ['label' => 'How It Works', 'url' => '/how-it-works']]);
+
+        $this->view->render('how-it-works', [
+            'steps'    => (new ProcessRepo())->published(),
+            'packages' => (new PackageRepo())->publishedWithFeatures(),
+            'faqs'     => (new FaqRepo())->grouped()['Getting Started'] ?? (new FaqRepo())->publishedFlat(6),
+        ]);
+    }
+
+    public function testimonials(Request $request): void
+    {
+        $seo = App::seo();
+        $seo->title('Testimonials — What Clients Say');
+        $seo->description('Feedback from businesses TECHBISS has taken from offline operations to a professional digital presence.');
+        $seo->canonical(absolute_url('/testimonials'));
+        $seo->breadcrumbs([['label' => 'Home', 'url' => '/'], ['label' => 'Testimonials', 'url' => '/testimonials']]);
+
+        $this->view->render('testimonials', [
+            'testimonials' => (new TestimonialRepo())->publishedWithProject(),
+            'projects'     => (new PortfolioRepo())->featured(3),
+        ]);
+    }
+
+    public function faqs(Request $request): void
+    {
+        $grouped = (new FaqRepo())->grouped();
+
+        $seo = App::seo();
+        $seo->title('Frequently Asked Questions');
+        $seo->description('Answers about getting started, pricing, prepaid packages, ownership, technical support, SEO and working with TECHBISS.');
+        $seo->canonical(absolute_url('/faqs'));
+        $seo->breadcrumbs([['label' => 'Home', 'url' => '/'], ['label' => 'FAQs', 'url' => '/faqs']]);
+
+        $entities = [];
+        foreach ($grouped as $items) {
+            foreach ($items as $faq) {
+                $entities[] = [
+                    '@type'          => 'Question',
+                    'name'           => $faq['question'],
+                    'acceptedAnswer' => ['@type' => 'Answer', 'text' => strip_tags((string) $faq['answer'])],
+                ];
+            }
+        }
+        if ($entities !== []) {
+            $seo->addSchema(['@type' => 'FAQPage', 'mainEntity' => $entities]);
+        }
+
+        $this->view->render('faqs', ['grouped' => $grouped]);
+    }
+
+    // =================================================================
+    // Blog
+    // =================================================================
+    public function blog(Request $request): void
+    {
+        $repo    = new BlogRepo();
+        $perPage = max(3, App::settings()->int('items_per_page', 9));
+        $page    = max(1, $request->queryInt('page', 1));
+        $cat     = Str::slug($request->queryString('category'));
+        $tag     = Str::slug($request->queryString('tag'));
+        $search  = mb_substr($request->queryString('q'), 0, 80);
+
+        $result    = $repo->paginate($page, $perPage, $cat, $tag, $search);
+        $paginator = new Paginator($page, $perPage, $result['total']);
+
+        $seo = App::seo();
+        $seo->title('Blog — Guides on Taking a Business Digital');
+        $seo->description('Practical writing on domains, hosting, websites, business email, SEO, e-commerce and automation for businesses moving online.');
+        $seo->canonical(absolute_url('/blog'));
+        $seo->breadcrumbs([['label' => 'Home', 'url' => '/'], ['label' => 'Blog', 'url' => '/blog']]);
+        if ($page > 1) {
+            $seo->noindex(true);
+        }
+
+        $this->view->render('blog', [
+            'posts'      => $result['items'],
+            'paginator'  => $paginator,
+            'categories' => $repo->activeCategories(),
+            'activeCat'  => $cat,
+            'activeTag'  => $tag,
+            'search'     => $search,
+        ]);
+    }
+
+    public function blogDetail(Request $request, array $params): void
+    {
+        $repo = new BlogRepo();
+        $post = $repo->publishedBySlug((string) $params['slug']);
+        if ($post === null) {
+            $this->notFound($request);
+            return;
+        }
+        $repo->incrementViews((int) $post['id']);
+
+        $seo = App::seo();
+        $seo->title($post['seo_title'] !== '' ? $post['seo_title'] : (string) $post['title']);
+        $seo->description($post['seo_description'] !== '' ? $post['seo_description'] : (string) $post['excerpt']);
+        $seo->canonical(absolute_url('/blog/' . $post['slug']));
+        $seo->ogImage($post['og_image'] !== '' ? $post['og_image'] : (string) $post['featured_image']);
+        $seo->ogType('article');
+        $seo->breadcrumbs([
+            ['label' => 'Home', 'url' => '/'],
+            ['label' => 'Blog', 'url' => '/blog'],
+            ['label' => (string) $post['title'], 'url' => '/blog/' . $post['slug']],
+        ]);
+        $seo->addSchema([
+            '@type'         => 'BlogPosting',
+            'headline'      => $post['title'],
+            'description'   => $post['excerpt'],
+            'datePublished' => $post['published_at'] ? date('c', (int) strtotime((string) $post['published_at'])) : null,
+            'dateModified'  => date('c', (int) strtotime((string) $post['updated_at'])),
+            'author'        => ['@type' => 'Person', 'name' => $post['author_name'] ?: App::settings()->get('site_name', 'TECHBISS')],
+            'publisher'     => ['@type' => 'Organization', 'name' => App::settings()->get('site_name', 'TECHBISS')],
+            'mainEntityOfPage' => absolute_url('/blog/' . $post['slug']),
+        ]);
+
+        $this->view->render('blog-detail', [
+            'post'    => $post,
+            'related' => $repo->related($post, 3),
+        ]);
+    }
+
+    // =================================================================
+    // Contact
+    // =================================================================
+    public function contact(Request $request): void
+    {
+        if ($request->isPost()) {
+            $this->handleContact($request);
+            return;
+        }
+
+        $seo = App::seo();
+        $seo->title('Contact TECHBISS');
+        $seo->description('Talk to the team about taking your business digital. Tell us where you are today and we will come back with a clear next step.');
+        $seo->canonical(absolute_url('/contact'));
+        $seo->breadcrumbs([['label' => 'Home', 'url' => '/'], ['label' => 'Contact', 'url' => '/contact']]);
+        $seo->addSchema([
+            '@type'    => 'ContactPage',
+            'name'     => 'Contact TECHBISS',
+            'url'      => absolute_url('/contact'),
+        ]);
+
+        $this->view->render('contact', [
+            'countries' => self::countries(),
+            'faqs'      => (new FaqRepo())->publishedFlat(5),
+        ]);
+    }
+
+    private function handleContact(Request $request): void
+    {
+        Csrf::verify($request);
+        $leads = new LeadRepo();
+
+        if ($leads->recentSubmissionCount($request->ip()) >= 5) {
+            $this->formFail($request, '/contact', 'You have sent several messages recently. Please wait a few minutes before sending another.', []);
+            return;
+        }
+
+        $v = Validator::make($request->all())
+            ->honeypot()
+            ->required('name', 'Your name', 2, 120)
+            ->optional('company', 190)
+            ->email('email')
+            ->phone('phone')
+            ->in('country', self::countries(), 'Country', false)
+            ->optional('subject', 190)
+            ->text('message', 5000, true, 'Message');
+
+        if ($v->fails()) {
+            $this->formFail($request, '/contact', $v->firstError(), $v->errors());
+            return;
+        }
+
+        $id = $leads->createMessage([
+            'name'       => $v->get('name'),
+            'company'    => $v->get('company', ''),
+            'email'      => $v->get('email'),
+            'phone'      => $v->get('phone', ''),
+            'country'    => $v->get('country', ''),
+            'subject'    => $v->get('subject', '') ?: 'Website enquiry',
+            'message'    => $v->get('message'),
+            'status'     => 'new',
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+        ]);
+
+        $this->notify(
+            'New contact message #' . $id,
+            sprintf(
+                "Name: %s\nCompany: %s\nEmail: %s\nPhone: %s\nCountry: %s\n\n%s",
+                $v->get('name'),
+                $v->get('company', '') ?: '—',
+                $v->get('email'),
+                $v->get('phone', '') ?: '—',
+                $v->get('country', '') ?: '—',
+                $v->get('message')
+            ),
+            (string) $v->get('email')
+        );
+
+        $this->formSuccess(
+            $request,
+            '/contact?sent=1',
+            'Thank you — your message has been received. We usually reply within one business day.'
+        );
+    }
+
+    // =================================================================
+    // Quote request
+    // =================================================================
+    public function quote(Request $request): void
+    {
+        if ($request->isPost()) {
+            $this->handleQuote($request);
+            return;
+        }
+
+        $seo = App::seo();
+        $seo->title('Request a Quote');
+        $seo->description('Tell us what you need and we will come back with a scope, a schedule and a price. No obligation.');
+        $seo->canonical(absolute_url('/quote'));
+        $seo->breadcrumbs([['label' => 'Home', 'url' => '/'], ['label' => 'Request a Quote', 'url' => '/quote']]);
+
+        $this->view->render('quote', [
+            'services'   => (new ServiceRepo())->published(),
+            'packages'   => (new PackageRepo())->publishedWithFeatures(),
+            'industries' => (new IndustryRepo())->options(),
+            'countries'  => self::countries(),
+            'budgets'    => self::budgets(),
+            'timelines'  => self::timelines(),
+            'preselect'  => $request->queryString('package'),
+        ]);
+    }
+
+    private function handleQuote(Request $request): void
+    {
+        Csrf::verify($request);
+        $leads = new LeadRepo();
+
+        if ($leads->recentSubmissionCount($request->ip()) >= 5) {
+            $this->formFail($request, '/quote', 'You have submitted several requests recently. Please wait a few minutes.', []);
+            return;
+        }
+
+        $serviceSlugs = array_column((new ServiceRepo())->published(), 'slug');
+
+        $v = Validator::make($request->all())
+            ->honeypot()
+            ->required('name', 'Your name', 2, 120)
+            ->optional('business_name', 190)
+            ->email('email')
+            ->phone('phone')
+            ->in('country', self::countries(), 'Country', false)
+            ->url('website')
+            ->int('industry_id')
+            ->int('package_id')
+            ->multi('services_needed', array_merge($serviceSlugs, ['complete-digital-setup']))
+            ->in('budget_range', self::budgets(), 'Budget', false)
+            ->in('timeline', self::timelines(), 'Timeline', false)
+            ->text('project_details', 5000, true, 'Project details');
+
+        if ($v->fails()) {
+            $this->formFail($request, '/quote', $v->firstError(), $v->errors());
+            return;
+        }
+
+        $id = $this->storeRequest($request, $v, 'quote');
+        $this->formSuccess($request, '/thank-you?ref=' . urlencode($this->lastReference), 'Your request has been received.');
+        unset($id);
+    }
+
+    // =================================================================
+    // Start Your Digital Journey (multi-step)
+    // =================================================================
+    public function journey(Request $request): void
+    {
+        if ($request->isPost()) {
+            $this->handleJourney($request);
+            return;
+        }
+
+        $seo = App::seo();
+        $seo->title('Start Your Digital Journey');
+        $seo->description('Six short steps. Tell us about your business, what you need, your budget and timeline — and we will come back with a clear plan.');
+        $seo->canonical(absolute_url('/start'));
+        $seo->breadcrumbs([['label' => 'Home', 'url' => '/'], ['label' => 'Start Your Digital Journey', 'url' => '/start']]);
+
+        $this->view->render('journey', [
+            'services'   => (new ServiceRepo())->published(),
+            'industries' => (new IndustryRepo())->options(),
+            'countries'  => self::countries(),
+            'budgets'    => self::budgets(),
+            'timelines'  => self::timelines(),
+            'stages'     => self::businessStages(),
+            'bodyClass'  => 'page-journey',
+        ]);
+    }
+
+    private function handleJourney(Request $request): void
+    {
+        Csrf::verify($request);
+        $leads = new LeadRepo();
+
+        if ($leads->recentSubmissionCount($request->ip()) >= 5) {
+            $this->formFail($request, '/start', 'You have submitted several requests recently. Please wait a few minutes.', []);
+            return;
+        }
+
+        $serviceSlugs = array_merge(array_column((new ServiceRepo())->published(), 'slug'), ['complete-digital-setup']);
+
+        $v = Validator::make($request->all())
+            ->honeypot()
+            ->required('business_name', 'Business name', 2, 190)
+            ->in('business_stage', self::businessStages(), 'Business stage', false)
+            ->int('industry_id')
+            ->url('website')
+            ->multi('services_needed', $serviceSlugs)
+            ->in('budget_range', self::budgets(), 'Budget', false)
+            ->in('timeline', self::timelines(), 'Timeline', false)
+            ->text('project_details', 5000, false, 'Project details')
+            ->required('name', 'Your name', 2, 120)
+            ->email('email')
+            ->phone('phone')
+            ->in('country', self::countries(), 'Country', false);
+
+        if ($v->get('services_needed') === []) {
+            $v->addError('services_needed', 'Please choose at least one thing you need.');
+        }
+
+        if ($v->fails()) {
+            $this->formFail($request, '/start', $v->firstError(), $v->errors());
+            return;
+        }
+
+        $this->storeRequest($request, $v, 'journey');
+        $this->formSuccess($request, '/thank-you?ref=' . urlencode($this->lastReference), 'Your details have been received.');
+    }
+
+    private string $lastReference = '';
+
+    /** Shared persistence for quote and journey submissions. */
+    private function storeRequest(Request $request, Validator $v, string $source): int
+    {
+        $leads     = new LeadRepo();
+        $reference = $leads->nextReference($source === 'journey' ? 'TBJ' : 'TBQ', 'quote_requests');
+        $this->lastReference = $reference;
+
+        $servicesNeeded = $v->get('services_needed', []);
+        $industryId     = $v->get('industry_id');
+        $packageId      = $v->get('package_id');
+
+        $id = $leads->createQuote([
+            'reference'       => $reference,
+            'source'          => $source,
+            'name'            => $v->get('name'),
+            'business_name'   => $v->get('business_name', ''),
+            'email'           => $v->get('email'),
+            'phone'           => $v->get('phone', ''),
+            'country'         => $v->get('country', ''),
+            'website'         => $v->get('website', ''),
+            'industry_id'     => $industryId > 0 ? $industryId : null,
+            'business_stage'  => $v->get('business_stage', ''),
+            'services_needed' => is_array($servicesNeeded) ? implode(', ', $servicesNeeded) : '',
+            'package_id'      => $packageId > 0 ? $packageId : null,
+            'budget_range'    => $v->get('budget_range', ''),
+            'timeline'        => $v->get('timeline', ''),
+            'project_details' => $v->get('project_details', ''),
+            'status'          => 'new',
+            'priority'        => 'normal',
+            'ip_address'      => $request->ip(),
+            'user_agent'      => $request->userAgent(),
+        ]);
+
+        // Keep a customer record so the sales pipeline has one view of a contact.
+        (new CustomerRepo())->upsert([
+            'name'          => $v->get('name'),
+            'business_name' => $v->get('business_name', ''),
+            'email'         => $v->get('email'),
+            'phone'         => $v->get('phone', ''),
+            'country'       => $v->get('country', ''),
+            'industry_id'   => $industryId > 0 ? $industryId : null,
+        ]);
+
+        $this->notify(
+            'New ' . ($source === 'journey' ? 'digital journey' : 'quote') . ' request ' . $reference,
+            sprintf(
+                "Reference: %s\nName: %s\nBusiness: %s\nEmail: %s\nPhone: %s\nCountry: %s\nNeeds: %s\nBudget: %s\nTimeline: %s\n\n%s",
+                $reference,
+                $v->get('name'),
+                $v->get('business_name', '') ?: '—',
+                $v->get('email'),
+                $v->get('phone', '') ?: '—',
+                $v->get('country', '') ?: '—',
+                is_array($servicesNeeded) ? implode(', ', $servicesNeeded) : '—',
+                $v->get('budget_range', '') ?: '—',
+                $v->get('timeline', '') ?: '—',
+                $v->get('project_details', '') ?: '—'
+            ),
+            (string) $v->get('email')
+        );
+
+        return $id;
+    }
+
+    // =================================================================
+    // Package checkout / request
+    // =================================================================
+    public function checkout(Request $request, array $params): void
+    {
+        $repo    = new PackageRepo();
+        $package = $repo->publishedBySlug((string) $params['slug']);
+        if ($package === null) {
+            $this->notFound($request);
+            return;
+        }
+        if (!App::settings()->bool('checkout_enabled', true)) {
+            redirect('/quote?package=' . $package['slug']);
+        }
+
+        if ($request->isPost()) {
+            $this->handleCheckout($request, $package);
+            return;
+        }
+
+        $seo = App::seo();
+        $seo->title('Request the ' . $package['name'] . ' Package');
+        $seo->description('Confirm your details and requirements. No payment is taken here — we confirm the scope with you and send a secure invoice.');
+        $seo->canonical(absolute_url('/checkout/' . $package['slug']));
+        $seo->noindex(true);
+        $seo->breadcrumbs([
+            ['label' => 'Home', 'url' => '/'],
+            ['label' => 'Packages', 'url' => '/packages'],
+            ['label' => (string) $package['name'], 'url' => '/packages/' . $package['slug']],
+            ['label' => 'Request', 'url' => '/checkout/' . $package['slug']],
+        ]);
+
+        $this->view->render('checkout', [
+            'package'        => $package,
+            'addons'         => $repo->addonsFor((int) $package['id']),
+            'countries'      => self::countries(),
+            'paymentMethods' => self::paymentMethods(),
+            'bodyClass'      => 'page-checkout',
+        ]);
+    }
+
+    private function handleCheckout(Request $request, array $package): void
+    {
+        Csrf::verify($request);
+        $leads = new LeadRepo();
+        $slug  = (string) $package['slug'];
+
+        if ($leads->recentSubmissionCount($request->ip()) >= 5) {
+            $this->formFail($request, '/checkout/' . $slug, 'You have submitted several requests recently. Please wait a few minutes.', []);
+            return;
+        }
+
+        $methods = array_column(self::paymentMethods(), 'key');
+
+        $v = Validator::make($request->all())
+            ->honeypot()
+            ->required('name', 'Your name', 2, 120)
+            ->required('business_name', 'Business name', 2, 190)
+            ->email('email')
+            ->phone('phone', true)
+            ->in('country', self::countries(), 'Country', false)
+            ->in('payment_method', $methods, 'Payment method', $methods !== [])
+            ->text('business_details', 3000, false, 'Business details')
+            ->text('requirements', 3000, false, 'Requirements')
+            ->multi('addons');
+
+        if ($v->fails()) {
+            $this->formFail($request, '/checkout/' . $slug, $v->firstError(), $v->errors());
+            return;
+        }
+
+        // Prices are recalculated here from the database. Anything posted by the
+        // browser about money is ignored entirely.
+        $pricing      = PackageRepo::pricing($package);
+        $selectedIds  = array_map('intval', (array) $v->get('addons', []));
+        $offeredIds   = (new PackageRepo())->addonIds((int) $package['id']);
+        $selectedIds  = array_values(array_intersect($selectedIds, $offeredIds));
+        $addons       = (new AddonRepo())->byIds($selectedIds);
+        $addonsTotal  = 0.0;
+        $addonRows    = [];
+        foreach ($addons as $addon) {
+            $addonsTotal += (float) $addon['price'];
+            $addonRows[]  = ['id' => (int) $addon['id'], 'name' => (string) $addon['name'], 'price' => (float) $addon['price']];
+        }
+
+        $customerId = (new CustomerRepo())->upsert([
+            'name'          => $v->get('name'),
+            'business_name' => $v->get('business_name'),
+            'email'         => $v->get('email'),
+            'phone'         => $v->get('phone', ''),
+            'country'       => $v->get('country', ''),
+        ]);
+
+        $reference = $leads->nextReference('TBP', 'package_purchases');
+        $months    = max(1, (int) $package['duration_months']);
+
+        (new \Techbiss\Repo\PurchaseRepo())->create([
+            'reference'        => $reference,
+            'customer_id'      => $customerId,
+            'package_id'       => (int) $package['id'],
+            'package_name'     => (string) $package['name'],
+            'currency'         => (string) $package['currency'],
+            'regular_price'    => $pricing['regular'],
+            'prepaid_price'    => $pricing['payable'],
+            'addons_total'     => round($addonsTotal, 2),
+            'discount_amount'  => $pricing['saving'],
+            'total_amount'     => round($pricing['payable'] + $addonsTotal, 2),
+            'duration_months'  => $months,
+            'billing_period'   => (string) $package['billing_period'],
+            'payment_method'   => (string) $v->get('payment_method', 'manual'),
+            'payment_status'   => 'pending',
+            'package_status'   => 'pending',
+            'renewal_status'   => 'not_due',
+            'purchased_at'     => date('Y-m-d H:i:s'),
+            'starts_at'        => null,
+            'expires_at'       => null,
+            'business_details' => $v->get('business_details', ''),
+            'requirements'     => $v->get('requirements', ''),
+            'ip_address'       => $request->ip(),
+        ], $addonRows);
+
+        $this->notify(
+            'New package request ' . $reference,
+            sprintf(
+                "Reference: %s\nPackage: %s\nCustomer: %s (%s)\nBusiness: %s\nPhone: %s\nCountry: %s\nAdd-ons: %s\nTotal: %s %s\nPayment method: %s\n\nRequirements:\n%s",
+                $reference,
+                $package['name'],
+                $v->get('name'),
+                $v->get('email'),
+                $v->get('business_name'),
+                $v->get('phone', '') ?: '—',
+                $v->get('country', '') ?: '—',
+                $addonRows === [] ? '—' : implode(', ', array_column($addonRows, 'name')),
+                $package['currency'],
+                number_format($pricing['payable'] + $addonsTotal, 2),
+                $v->get('payment_method', 'manual'),
+                $v->get('requirements', '') ?: '—'
+            ),
+            (string) $v->get('email')
+        );
+
+        $this->formSuccess($request, '/thank-you?ref=' . urlencode($reference), 'Your package request has been received.');
+    }
+
+    public function thankYou(Request $request): void
+    {
+        $ref = preg_replace('/[^A-Z0-9-]/', '', strtoupper($request->queryString('ref'))) ?? '';
+
+        $seo = App::seo();
+        $seo->title('Thank You');
+        $seo->description('We have received your request.');
+        $seo->noindex(true);
+        $seo->canonical(absolute_url('/thank-you'));
+
+        $this->view->render('thank-you', [
+            'reference' => mb_substr($ref, 0, 30),
+            'steps'     => (new ProcessRepo())->published(3),
+            'posts'     => (new BlogRepo())->latest(3),
+        ]);
+    }
+
+    // =================================================================
+    // CMS pages (About, Why, Privacy, Terms and anything else)
+    // =================================================================
+    public function page(Request $request, array $params): void
+    {
+        $slug = Str::slug((string) ($params['slug'] ?? ''));
+        $page = (new PageRepo())->publishedBySlug($slug);
+        if ($page === null) {
+            $this->notFound($request);
+            return;
+        }
+
+        $seo = App::seo();
+        $seo->title($page['seo_title'] !== '' ? $page['seo_title'] : (string) $page['title']);
+        $seo->description($page['seo_description'] !== '' ? $page['seo_description'] : (string) $page['subtitle']);
+        $seo->canonical(absolute_url('/' . $page['slug']));
+        $seo->ogImage((string) $page['og_image']);
+        if ((int) $page['noindex'] === 1) {
+            $seo->noindex(true);
+        }
+        $seo->breadcrumbs([
+            ['label' => 'Home', 'url' => '/'],
+            ['label' => (string) $page['title'], 'url' => '/' . $page['slug']],
+        ]);
+
+        $extra = [];
+        if ($slug === 'about') {
+            $extra = [
+                'stats'    => (new StatRepo())->published(4),
+                'steps'    => (new ProcessRepo())->published(6),
+                'services' => (new ServiceRepo())->featured(6),
+            ];
+        } elseif ($slug === 'why-techbiss') {
+            $extra = [
+                'services'     => (new ServiceRepo())->featured(6),
+                'testimonials' => (new TestimonialRepo())->publishedWithProject(3),
+                'stats'        => (new StatRepo())->published(4),
+            ];
+        }
+
+        $template = (string) $page['template'] === 'legal' ? 'page-legal' : 'page';
+        $this->view->render($template, array_merge(['page' => $page], $extra));
+    }
+
+    // =================================================================
+    // Newsletter (async)
+    // =================================================================
+    public function newsletter(Request $request): void
+    {
+        Csrf::verify($request);
+
+        $v = Validator::make($request->all())
+            ->honeypot()
+            ->email('email')
+            ->optional('name', 190);
+
+        if ($v->fails()) {
+            json_response(['ok' => false, 'message' => $v->firstError(), 'errors' => $v->errors()], 422);
+        }
+
+        $result = (new LeadRepo())->subscribe(
+            (string) $v->get('email'),
+            (string) $v->get('name', ''),
+            mb_substr($request->str('source', 'footer'), 0, 60),
+            $request->ip()
+        );
+
+        $message = $result['status'] === 'already'
+            ? 'You are already subscribed — thank you.'
+            : 'Thank you. You are subscribed to occasional updates.';
+
+        json_response(['ok' => true, 'message' => $message]);
+    }
+
+    // =================================================================
+    // Sitemap & robots
+    // =================================================================
+    public function sitemap(Request $request): void
+    {
+        header('Content-Type: application/xml; charset=utf-8');
+
+        $urls = [
+            ['loc' => absolute_url('/'), 'priority' => '1.0', 'changefreq' => 'weekly'],
+            ['loc' => absolute_url('/services'), 'priority' => '0.9', 'changefreq' => 'monthly'],
+            ['loc' => absolute_url('/packages'), 'priority' => '0.9', 'changefreq' => 'monthly'],
+            ['loc' => absolute_url('/portfolio'), 'priority' => '0.8', 'changefreq' => 'weekly'],
+            ['loc' => absolute_url('/industries'), 'priority' => '0.8', 'changefreq' => 'monthly'],
+            ['loc' => absolute_url('/how-it-works'), 'priority' => '0.7', 'changefreq' => 'yearly'],
+            ['loc' => absolute_url('/blog'), 'priority' => '0.8', 'changefreq' => 'weekly'],
+            ['loc' => absolute_url('/testimonials'), 'priority' => '0.6', 'changefreq' => 'monthly'],
+            ['loc' => absolute_url('/faqs'), 'priority' => '0.6', 'changefreq' => 'monthly'],
+            ['loc' => absolute_url('/contact'), 'priority' => '0.7', 'changefreq' => 'yearly'],
+            ['loc' => absolute_url('/quote'), 'priority' => '0.7', 'changefreq' => 'yearly'],
+            ['loc' => absolute_url('/start'), 'priority' => '0.8', 'changefreq' => 'yearly'],
+        ];
+
+        $add = static function (array $rows, string $prefix, string $priority) use (&$urls): void {
+            foreach ($rows as $row) {
+                $urls[] = [
+                    'loc'      => absolute_url($prefix . '/' . $row['slug']),
+                    'lastmod'  => $row['updated_at'] ? date('Y-m-d', (int) strtotime((string) $row['updated_at'])) : null,
+                    'priority' => $priority,
+                    'changefreq' => 'monthly',
+                ];
+            }
+        };
+
+        $add((new ServiceRepo())->forSitemap(), '/services', '0.8');
+        $add((new PackageRepo())->forSitemap(), '/packages', '0.8');
+        $add((new PortfolioRepo())->forSitemap(), '/portfolio', '0.7');
+        $add((new IndustryRepo())->forSitemap(), '/industries', '0.7');
+        $add((new BlogRepo())->forSitemap(), '/blog', '0.6');
+
+        foreach ((new PageRepo())->forSitemap() as $row) {
+            $urls[] = [
+                'loc'      => absolute_url('/' . $row['slug']),
+                'lastmod'  => $row['updated_at'] ? date('Y-m-d', (int) strtotime((string) $row['updated_at'])) : null,
+                'priority' => '0.5',
+                'changefreq' => 'yearly',
+            ];
+        }
+
+        echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+        echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+        foreach ($urls as $u) {
+            echo '  <url>' . "\n";
+            echo '    <loc>' . e($u['loc']) . '</loc>' . "\n";
+            if (!empty($u['lastmod'])) {
+                echo '    <lastmod>' . e($u['lastmod']) . '</lastmod>' . "\n";
+            }
+            echo '    <changefreq>' . e($u['changefreq']) . '</changefreq>' . "\n";
+            echo '    <priority>' . e($u['priority']) . '</priority>' . "\n";
+            echo '  </url>' . "\n";
+        }
+        echo '</urlset>';
+    }
+
+    public function robots(Request $request): void
+    {
+        header('Content-Type: text/plain; charset=utf-8');
+        $lines = [
+            'User-agent: *',
+            'Disallow: /admin/',
+            'Disallow: /api/',
+            'Disallow: /config/',
+            'Disallow: /includes/',
+            'Disallow: /database/',
+            'Disallow: /storage/',
+            'Disallow: /checkout/',
+            'Disallow: /thank-you',
+            'Allow: /',
+            '',
+            'Sitemap: ' . absolute_url('/sitemap.xml'),
+        ];
+        $extra = App::settings()->get('robots_extra');
+        if ($extra !== '') {
+            $lines[] = '';
+            $lines[] = trim(strip_tags($extra));
+        }
+        echo implode("\n", $lines) . "\n";
+    }
+
+    // =================================================================
+    // 404
+    // =================================================================
+    public function notFound(Request $request): void
+    {
+        http_response_code(404);
+        $seo = App::seo();
+        $seo->title('Page Not Found');
+        $seo->description('The page you are looking for does not exist or has moved.');
+        $seo->noindex(true);
+
+        $this->view->render('404', [
+            'services' => (new ServiceRepo())->featured(3),
+            'projects' => (new PortfolioRepo())->featured(2),
+        ]);
+    }
+
+    public function maintenance(): void
+    {
+        http_response_code(503);
+        header('Retry-After: 3600');
+        $settings = App::settings();
+        $this->view->render('maintenance', [
+            'message' => $settings->get('maintenance_message', 'We will be back shortly.'),
+        ], App::root() . '/pages/layouts/bare.php');
+    }
+
+    // =================================================================
+    // Helpers
+    // =================================================================
+    private function formFail(Request $request, string $redirectTo, string $message, array $errors): void
+    {
+        if ($request->wantsJson()) {
+            json_response(['ok' => false, 'message' => $message, 'errors' => $errors], 422);
+        }
+        Session::flashInput($request->all());
+        Session::flashErrors($errors);
+        flash('error', $message);
+        redirect($redirectTo);
+    }
+
+    private function formSuccess(Request $request, string $redirectTo, string $message): void
+    {
+        if ($request->wantsJson()) {
+            json_response(['ok' => true, 'message' => $message, 'redirect' => url($redirectTo)]);
+        }
+        flash('success', $message);
+        redirect($redirectTo);
+    }
+
+    private function notify(string $subject, string $body, string $replyTo = ''): void
+    {
+        $settings = App::settings();
+        if (!$settings->bool('notify_new_lead', true)) {
+            return;
+        }
+        $to = $settings->get('notification_email') ?: $settings->get('contact_email');
+        if ($to === '') {
+            return;
+        }
+        App::mailer()->send($to, $subject, $body, $replyTo);
+    }
+
+    /** @return array<int,string> */
+    public static function countries(): array
+    {
+        static $list = null;
+        if ($list !== null) {
+            return $list;
+        }
+        $file = App::root() . '/includes/data/countries.php';
+        $list = is_file($file) ? (array) require $file : [];
+        return $list;
+    }
+
+    /** @return array<int,string> */
+    public static function budgets(): array
+    {
+        return [
+            'Under $1,000',
+            '$1,000 – $2,500',
+            '$2,500 – $5,000',
+            '$5,000 – $10,000',
+            '$10,000 – $25,000',
+            'Over $25,000',
+            'Not sure yet',
+        ];
+    }
+
+    /** @return array<int,string> */
+    public static function timelines(): array
+    {
+        return [
+            'As soon as possible',
+            'Within 1 month',
+            '1 – 3 months',
+            '3 – 6 months',
+            'Just exploring',
+        ];
+    }
+
+    /** @return array<int,string> */
+    public static function businessStages(): array
+    {
+        return [
+            'Not started yet — planning the business',
+            'Running offline only',
+            'Some online presence, needs rebuilding',
+            'Established online, looking to grow',
+        ];
+    }
+
+    /**
+     * Payment methods that are actually configured. Nothing is offered here
+     * unless an administrator has enabled it — the site never implies a gateway
+     * exists when it does not.
+     *
+     * @return array<int,array{key:string,label:string,description:string,icon:string}>
+     */
+    public static function paymentMethods(): array
+    {
+        $catalogue = [
+            'bank_transfer' => ['label' => 'Bank transfer', 'description' => 'We send an invoice with bank details and confirm once the transfer clears.', 'icon' => 'database'],
+            'manual'        => ['label' => 'Invoice me', 'description' => 'We confirm the scope, then send a formal invoice with payment instructions.', 'icon' => 'file'],
+            'stripe'        => ['label' => 'Card payment', 'description' => 'A secure card payment link is sent with your invoice.', 'icon' => 'money'],
+            'paypal'        => ['label' => 'PayPal', 'description' => 'A PayPal invoice is sent to your email address.', 'icon' => 'money'],
+            'local'         => ['label' => 'Local payment methods', 'description' => 'Regional payment options confirmed with you before invoicing.', 'icon' => 'globe'],
+        ];
+        $enabled = App::settings()->list('payment_methods');
+        $out     = [];
+        foreach ($enabled as $key) {
+            if (isset($catalogue[$key])) {
+                $out[] = ['key' => $key] + $catalogue[$key];
+            }
+        }
+        return $out;
+    }
+}

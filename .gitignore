@@ -1,0 +1,27 @@
+# Local configuration — contains database credentials and the app key
+/config/config.php
+
+# Runtime state
+/storage/cache/*
+/storage/logs/*
+!/storage/cache/.gitkeep
+!/storage/logs/.gitkeep
+
+# Uploaded media (user content, not source)
+/uploads/media/*
+!/uploads/media/demo/
+/uploads/thumbs/*
+!/uploads/media/.gitkeep
+!/uploads/thumbs/.gitkeep
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.idea/
+.vscode/
+
+# Dependency directories (none are required, but keep them out if added)
+/node_modules/
+/vendor/
