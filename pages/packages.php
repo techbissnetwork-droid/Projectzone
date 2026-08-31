@@ -1,5 +1,5 @@
 <?php
-/** @var array $packages @var array $addons @var array $compareRows @var array $faqs */
+/** @var array $packages @var array $addons @var array $compareRows */
 $showSave  = setting_bool('show_prepaid_savings', true);
 $showPrice = setting_bool('public_pricing', false);
 // Only advertise the prepaid model when prices are published at all, and at
@@ -204,20 +204,10 @@ if (!$showPrice) {
     </div>
 </section>
 
-<?php if ($faqs): ?>
-<section class="section section--tight">
-    <div class="container container--narrow">
-        <div class="section-head section-head--center" data-reveal>
-            <p class="eyebrow eyebrow--plain">Pricing questions</p>
-            <h2 class="mt-4">What people ask about cost</h2>
-        </div>
-        <?= $view->partial('partials/faq-accordion', ['faqs' => $faqs, 'groupId' => 'pkg']) ?>
-    </div>
-</section>
-<?php endif; ?>
-
 <?= $view->partial('partials/cta-band', [
-    'eyebrow' => 'Not sure which one?',
-    'heading' => 'Tell us about the business and we will recommend one.',
-    'lead'    => 'Six short questions. We suggest the package that fits, or say a custom scope makes more sense.',
+    'eyebrow'    => 'Not sure which one?',
+    'heading'    => 'Message us and we will tell you which one fits.',
+    'lead'       => 'Say what the business does and what you want online. We reply with the package and the price.',
+    'waMessage'  => 'Hi, I am looking at your packages. Which one fits my business?',
+    'mailSubject'=> 'Packages — which one fits?',
 ]) ?>

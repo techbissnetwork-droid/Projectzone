@@ -6,6 +6,12 @@ $features = $package['features'] ?? [];
 $showSave = setting_bool('show_prepaid_savings', true);
 $showPrice = setting_bool('public_pricing', false);
 $limit    = $compact ? 6 : count($features);
+
+// The figure is agreed in conversation, so the card carries no price block at
+// all — one line saying where the number comes from, then the two ways to ask.
+$ask   = 'Hi, I am interested in the ' . $package['name'] . ' package. Can you send me a price?';
+$wa    = whatsapp_link($ask);
+$mail  = email_link($package['name'] . ' package — request', $ask);
 ?>
 <article class="package-card<?= (int) $package['is_featured'] === 1 ? ' package-card--featured' : '' ?>"
          data-accent="<?= e($package['accent'] ?: 'cyan') ?>" data-reveal>
@@ -25,10 +31,7 @@ $limit    = $compact ? 6 : count($features);
 
     <div class="price">
         <?php if (!$showPrice): ?>
-            <div class="price__custom">Priced with you</div>
-            <p class="price__note">
-                <?= !empty($package['best_for']) ? e($package['best_for']) : 'Tell us what you need and we agree the figure directly.' ?>
-            </p>
+            <p class="price__note">Price agreed on WhatsApp or email.</p>
         <?php elseif ($p['is_custom']): ?>
             <div class="price__custom">Custom quote</div>
             <p class="price__note">Scoped and priced from your requirements.</p>
@@ -69,12 +72,21 @@ $limit    = $compact ? 6 : count($features);
     <?php endif; ?>
 
     <div class="package-card__cta stack stack-2">
-        <?php if (!setting_bool('checkout_enabled', true)): ?>
-            <a class="btn <?= (int) $package['is_featured'] === 1 ? 'btn--primary' : 'btn--ghost' ?> btn--block"
-               href="<?= e(url('/quote?package=' . $package['slug'])) ?>"><?= e($package['cta_label'] ?: 'Request a Quote') ?></a>
-        <?php else: ?>
-            <a class="btn <?= (int) $package['is_featured'] === 1 ? 'btn--primary' : 'btn--ghost' ?> btn--block"
-               href="<?= e(url('/checkout/' . $package['slug'])) ?>"><?= e($package['cta_label'] ?: 'Choose what you need') ?></a>
+        <?php if ($wa !== ''): ?>
+        <a class="btn <?= (int) $package['is_featured'] === 1 ? 'btn--primary' : 'btn--ghost' ?> btn--block"
+           href="<?= e($wa) ?>" target="_blank" rel="noopener noreferrer">
+            <?= icon('whatsapp') ?>Ask on WhatsApp
+        </a>
+        <?php endif; ?>
+        <?php if ($mail !== ''): ?>
+        <a class="btn <?= ($wa === '' && (int) $package['is_featured'] === 1) ? 'btn--primary' : 'btn--ghost' ?> btn--block"
+           href="<?= e($mail) ?>">
+            <?= icon('mail') ?>Ask by email
+        </a>
+        <?php endif; ?>
+        <?php if ($wa === '' && $mail === ''): ?>
+        <a class="btn <?= (int) $package['is_featured'] === 1 ? 'btn--primary' : 'btn--ghost' ?> btn--block"
+           href="<?= e(url('/contact')) ?>">Ask about <?= e($package['name']) ?></a>
         <?php endif; ?>
         <a class="btn btn--quiet btn--block btn--sm" href="<?= e(url('/packages/' . $package['slug'])) ?>">
             See what's included

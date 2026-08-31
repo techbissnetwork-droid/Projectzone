@@ -90,6 +90,35 @@ function setting_bool(string $key, bool $default = false): bool
     return App::settings()->bool($key, $default);
 }
 
+/**
+ * A wa.me link with the message already written, or '' if no number is set.
+ *
+ * Returning '' rather than a dead link matters: a WhatsApp button that opens
+ * nothing is worse than no button, so callers hide the button instead.
+ */
+function whatsapp_link(string $message = ''): string
+{
+    $number = preg_replace('/[^0-9]/', '', setting('whatsapp')) ?? '';
+    if (strlen($number) < 8) {
+        return '';
+    }
+
+    return 'https://wa.me/' . $number . ($message === '' ? '' : '?text=' . rawurlencode($message));
+}
+
+/** A mailto: link with the subject filled in, or '' if no address is set. */
+function email_link(string $subject = '', string $body = ''): string
+{
+    $address = setting('sales_email') ?: setting('contact_email');
+    if (!filter_var($address, FILTER_VALIDATE_EMAIL)) {
+        return '';
+    }
+
+    $query = array_filter(['subject' => $subject, 'body' => $body], static fn (string $v): bool => $v !== '');
+
+    return 'mailto:' . $address . ($query === [] ? '' : '?' . http_build_query($query, '', '&', PHP_QUERY_RFC3986));
+}
+
 /** Format a money amount using the configured currency symbol. */
 function money(float|int|string|null $amount, ?string $symbol = null, bool $decimals = false): string
 {

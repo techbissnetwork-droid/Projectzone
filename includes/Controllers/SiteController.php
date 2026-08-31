@@ -186,7 +186,6 @@ final class SiteController
             'packages'   => $packages,
             'addons'     => (new AddonRepo())->publishedAll(),
             'compareRows'=> $repo->comparisonRows(),
-            'faqs'       => $this->pricingFaqs(),
         ]);
     }
 
@@ -236,17 +235,10 @@ final class SiteController
             'package'  => $package,
             'packages' => $repo->publishedWithFeatures(),
             'steps'    => (new ProcessRepo())->published(6),
-            'faqs'     => $this->pricingFaqs(),
         ]);
     }
 
     /** @return array<int,array<string,mixed>> */
-    private function pricingFaqs(): array
-    {
-        $grouped = (new FaqRepo())->grouped();
-        return $grouped['Pricing'] ?? (new FaqRepo())->publishedFlat(5);
-    }
-
     // =================================================================
     // Portfolio
     // =================================================================

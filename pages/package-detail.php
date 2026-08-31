@@ -1,11 +1,17 @@
 <?php
-/** @var array $package @var array $packages @var array $steps @var array $faqs */
+/** @var array $package @var array $packages @var array $steps */
 $p        = $package['pricing'];
 $features = $package['features'] ?? [];
 $addons   = $package['addons'] ?? [];
 $showSave = setting_bool('show_prepaid_savings', true);
 $showPrice = setting_bool('public_pricing', false);
 $others   = array_values(array_filter($packages, static fn ($x) => (int) $x['id'] !== (int) $package['id']));
+
+// No figure is published, so the aside offers the two ways to ask for one
+// rather than a price block.
+$ask  = 'Hi, I am interested in the ' . $package['name'] . ' package. Can you send me a price?';
+$wa   = whatsapp_link($ask);
+$mail = email_link($package['name'] . ' package — request', $ask);
 ?>
 <?= $view->partial('partials/page-head', [
     'eyebrow' => $package['tagline'] ?: 'Package',
@@ -81,8 +87,7 @@ $others   = array_values(array_filter($packages, static fn ($x) => (int) $x['id'
 
                     <div class="price" style="padding-top:0">
                         <?php if (!$showPrice): ?>
-                            <div class="price__custom">Priced with you</div>
-                            <p class="price__note">Tell us what you want included and we come back with a figure, usually within one business day.</p>
+                            <p class="price__note">Price agreed on WhatsApp or email, usually within one business day.</p>
                         <?php elseif ($p['is_custom']): ?>
                             <div class="price__custom">Custom quote</div>
                             <p class="price__note">Priced from your requirements after a short scoping conversation.</p>
@@ -106,19 +111,28 @@ $others   = array_values(array_filter($packages, static fn ($x) => (int) $x['id'
                     <?php endif; ?>
 
                     <div class="card__footer stack stack-2">
-                        <?php if (!setting_bool('checkout_enabled', true)): ?>
-                        <a class="btn btn--primary btn--lg btn--block btn--arrow" href="<?= e(url('/quote?package=' . $package['slug'])) ?>">
-                            <?= e($package['cta_label'] ?: 'Request a Quote') ?><?= icon('arrow-right') ?>
-                        </a>
-                        <?php else: ?>
-                        <a class="btn btn--primary btn--lg btn--block btn--arrow" href="<?= e(url('/checkout/' . $package['slug'])) ?>" data-magnetic="0.2">
-                            <?= e($package['cta_label'] ?: 'Choose what you need') ?><?= icon('arrow-right') ?>
+                        <?php if ($wa !== ''): ?>
+                        <a class="btn btn--primary btn--lg btn--block" href="<?= e($wa) ?>"
+                           target="_blank" rel="noopener noreferrer" data-magnetic="0.2">
+                            <?= icon('whatsapp') ?>Ask on WhatsApp
                         </a>
                         <?php endif; ?>
-                        <a class="btn btn--ghost btn--block" href="<?= e(url('/contact')) ?>">Ask a question first</a>
+                        <?php if ($mail !== ''): ?>
+                        <a class="btn <?= $wa === '' ? 'btn--primary btn--lg' : 'btn--ghost' ?> btn--block" href="<?= e($mail) ?>">
+                            <?= icon('mail') ?>Ask by email
+                        </a>
+                        <?php endif; ?>
+                        <?php if ($wa === '' && $mail === ''): ?>
+                        <a class="btn btn--primary btn--lg btn--block btn--arrow" href="<?= e(url('/contact')) ?>">
+                            Ask about <?= e($package['name']) ?><?= icon('arrow-right') ?>
+                        </a>
+                        <?php endif; ?>
+                        <?php if (setting_bool('checkout_enabled', true)): ?>
+                        <a class="btn btn--quiet btn--block btn--sm" href="<?= e(url('/checkout/' . $package['slug'])) ?>">
+                            Or send your list in a form
+                        </a>
+                        <?php endif; ?>
                     </div>
-
-                    <p class="hint mt-4"><?= icon('shield') ?> No payment is taken here. We confirm the scope, then invoice.</p>
                 </div>
 
                 <?php if ($others): ?>
@@ -146,22 +160,10 @@ $others   = array_values(array_filter($packages, static fn ($x) => (int) $x['id'
     </div>
 </section>
 
-<?php if ($faqs): ?>
-<section class="section">
-    <div class="container container--narrow">
-        <div class="section-head section-head--center" data-reveal>
-            <p class="eyebrow eyebrow--plain">Questions</p>
-            <h2 class="mt-4">About pricing and payment</h2>
-        </div>
-        <?= $view->partial('partials/faq-accordion', ['faqs' => $faqs, 'groupId' => 'pkgd']) ?>
-    </div>
-</section>
-<?php endif; ?>
-
 <?= $view->partial('partials/cta-band', [
-    'eyebrow'      => $package['name'] . ' package',
-    'heading'      => 'Ready to start?',
-    'lead'         => 'Send your details. We confirm everything in writing before any money changes hands.',
-    'primaryLabel' => $p['is_custom'] ? 'Request a Quote' : 'Request ' . $package['name'],
-    'primaryUrl'   => $p['is_custom'] ? '/quote?package=' . $package['slug'] : '/checkout/' . $package['slug'],
+    'eyebrow'     => $package['name'] . ' package',
+    'heading'     => 'Ready to start?',
+    'lead'        => 'Message us with what you want included. We reply with the price in writing.',
+    'waMessage'   => $ask,
+    'mailSubject' => $package['name'] . ' package — request',
 ]) ?>

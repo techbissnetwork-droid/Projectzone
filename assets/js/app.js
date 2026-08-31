@@ -1039,13 +1039,6 @@
         return dot;
       });
 
-      var PAUSE_ICON = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 5v14M14 5v14"/></svg>';
-      var PLAY_ICON  = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5l11 7-11 7Z"/></svg>';
-
-      var playBtn = document.createElement('button');
-      playBtn.type = 'button';
-      playBtn.className = 'slider__btn slider__btn--play';
-
       controls.appendChild(prev);
       controls.appendChild(dots);
       controls.appendChild(next);
@@ -1097,22 +1090,25 @@
       sync();
 
       /* Auto-advance ------------------------------------------------
-         Only where the track actually scrolls, which is the same
-         condition under which the controls are visible. It stops for
-         anyone who has asked for reduced motion, pauses while the tab is
-         hidden or a pointer is over the row, and stops for good the
-         moment someone takes control themselves — a row that keeps
-         moving under a finger is worse than one that never moved. */
-      var DELAY = 5000;
-      var timer = null;
-      var stopped = false;
+         The row moves on its own without being asked to, and can still be
+         moved by hand. Taking hold of it — a swipe, an arrow, a dot — only
+         holds the motion while you are working with it: a row that keeps
+         sliding under a finger is worse than one that never moved, but a
+         row that never starts again is not what was asked for either. It
+         does not run at all for anyone who has asked for reduced motion,
+         and it stops while the tab is hidden or a pointer is over it. */
+      var DELAY  = 5000;
+      var RESUME = 12000;
+      var timer  = null;
+      var resumeTimer = null;
+      var held   = false;
 
       function scrollable() {
         return track.scrollWidth > track.clientWidth + 2;
       }
 
       function advance() {
-        if (stopped || !scrollable() || document.hidden) return;
+        if (held || !scrollable() || document.hidden) return;
         var max = track.scrollWidth - track.clientWidth;
         if (track.scrollLeft >= max - 2) {
           track.scrollTo({ left: 0, behavior: 'smooth' });
@@ -1122,42 +1118,24 @@
       }
 
       function play() {
-        if (stopped || timer || reduceMotion.matches || !scrollable()) return;
+        if (held || timer || reduceMotion.matches || !scrollable()) return;
         timer = window.setInterval(advance, DELAY);
       }
       function pause() {
         if (timer) { window.clearInterval(timer); timer = null; }
       }
-      function stopForGood() {
-        stopped = true;
+
+      // Someone is moving the row themselves: hold the motion, then let it
+      // pick up again once they have stopped.
+      function hold() {
+        held = true;
         pause();
-        syncPlayBtn();
-      }
-
-      /* Hovering out and focusing away are not mechanisms anyone can find, and
-         2.2.2 asks for one that is. The button doubles as the way back: once
-         a swipe or an arrow has stopped the row for good, pressing it starts
-         the motion again. It is only offered where the row would actually move
-         on its own, which reduced motion rules out entirely. */
-      function syncPlayBtn() {
-        if (reduceMotion.matches) {
-          if (playBtn.parentNode) playBtn.parentNode.removeChild(playBtn);
-          return;
-        }
-        if (!playBtn.parentNode) controls.appendChild(playBtn);
-        playBtn.innerHTML = stopped ? PLAY_ICON : PAUSE_ICON;
-        playBtn.setAttribute('aria-label', stopped ? 'Resume automatic sliding' : 'Pause automatic sliding');
-      }
-
-      on(playBtn, 'click', function () {
-        if (stopped) {
-          stopped = false;
+        if (resumeTimer) window.clearTimeout(resumeTimer);
+        resumeTimer = window.setTimeout(function () {
+          held = false;
           play();
-          syncPlayBtn();
-        } else {
-          stopForGood();
-        }
-      });
+        }, RESUME);
+      }
 
       on(slider, 'pointerenter', pause);
       on(slider, 'pointerleave', play);
@@ -1168,17 +1146,15 @@
       });
 
       // Any deliberate move — a swipe, an arrow, a dot — hands control over.
-      on(track, 'pointerdown', stopForGood);
-      on(track, 'wheel', stopForGood, { passive: true });
-      on(prev, 'click', stopForGood);
-      on(next, 'click', stopForGood);
-      dotEls.forEach(function (dot) { on(dot, 'click', stopForGood); });
+      on(track, 'pointerdown', hold);
+      on(track, 'wheel', hold, { passive: true });
+      on(prev, 'click', hold);
+      on(next, 'click', hold);
+      dotEls.forEach(function (dot) { on(dot, 'click', hold); });
       on(reduceMotion, 'change', function () {
         if (reduceMotion.matches) { pause(); } else { play(); }
-        syncPlayBtn();
       });
 
-      syncPlayBtn();
       play();
     });
   }
