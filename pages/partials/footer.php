@@ -62,6 +62,9 @@ $columns = array_chunk($links, $perCol);
                         <?php if ($settings->get('sales_email') !== '' && $settings->get('sales_email') !== $settings->get('contact_email')): ?>
                         <li><a href="mailto:<?= e($settings->get('sales_email')) ?>"><?= icon('send') ?><?= e($settings->get('sales_email')) ?></a></li>
                         <?php endif; ?>
+                        <?php if ($settings->get('support_email') !== '' && $settings->get('support_email') !== $settings->get('contact_email')): ?>
+                        <li><a href="mailto:<?= e($settings->get('support_email')) ?>"><?= icon('shield') ?><?= e($settings->get('support_email')) ?></a></li>
+                        <?php endif; ?>
                         <?php if ($settings->get('contact_phone') !== ''): ?>
                         <li><a href="tel:<?= e(preg_replace('/[^0-9+]/', '', $settings->get('contact_phone'))) ?>"><?= icon('phone') ?><?= e($settings->get('contact_phone')) ?></a></li>
                         <?php endif; ?>

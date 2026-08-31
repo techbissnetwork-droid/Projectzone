@@ -310,12 +310,14 @@ PHP;
 /** Apply the settings the wizard collected to the seeded settings table. */
 function tb_apply_settings(PDO $pdo, array $site): void
 {
+    // The address someone signs in with, the address the site shows visitors and
+    // the address the site emails when an enquiry arrives are three different
+    // things. Copying one into all of them, as this used to, meant an owner who
+    // wanted a support@ address had to notice and undo it first.
     $map = [
         'site_name'          => $site['name'],
-        'contact_email'      => $site['email'],
-        'sales_email'        => $site['email'],
-        'support_email'      => $site['email'],
-        'notification_email' => $site['email'],
+        'contact_email'      => $site['contact_email'] ?? $site['email'],
+        'notification_email' => $site['notification_email'] ?? $site['email'],
         'seo_default_title'  => $site['name'] . ' — Your Digital Business Starts Here',
         // Otherwise a renamed company still gets "| TECHBISS" appended to every title.
         'seo_title_suffix'   => ' | ' . $site['name'],
@@ -489,6 +491,26 @@ function tb_lock_installer(): array
     }
 
     return ['ok' => true, 'error' => ''];
+}
+
+/**
+ * Does this database already hold a TECHBISS site?
+ *
+ * Re-uploading the files to a server whose database is already populated is a
+ * normal way to move or restore a site, and it arrives here with no config.php
+ * at all. Deciding "installed or not" from the config file alone missed that
+ * case entirely and walked the owner into a fresh setup over live data.
+ */
+function tb_database_has_install(PDO $pdo): bool
+{
+    try {
+        if (!$pdo->query("SHOW TABLES LIKE 'admins'")->fetchColumn()) {
+            return false;
+        }
+        return (int) $pdo->query('SELECT COUNT(*) FROM admins')->fetchColumn() > 0;
+    } catch (Throwable) {
+        return false;
+    }
 }
 
 function tb_already_installed(): bool
@@ -724,6 +746,7 @@ if ($cli) {
     $args = getopt('', [
         'db-host::', 'db-port::', 'db-name::', 'db-user::', 'db-pass::', 'db-socket::',
         'name::', 'email::', 'password::', 'site-name::', 'site-url::',
+        'contact-email::', 'notification-email::',
         'demo', 'create-db', 'force', 'check', 'upgrade', 'dry-run',
     ]);
 
@@ -778,7 +801,8 @@ if ($cli) {
            . "    --db-name=techbiss --db-user=USER --db-pass=SECRET \\\n"
            . "    --name=\"Your Name\" --email=you@example.com --password='a-strong-password' \\\n"
            . "    [--db-host=127.0.0.1] [--db-port=3306] [--db-socket=/path/mysqld.sock] \\\n"
-           . "    [--site-name=TECHBISS] [--site-url=https://example.com] [--create-db] [--demo]\n\n"
+           . "    [--site-name=TECHBISS] [--site-url=https://example.com] [--create-db] [--demo]\n"
+           . "    [--contact-email=hello@example.com] [--notification-email=you@example.com]\n\n"
            . "  --check     report requirements only\n"
            . "  --upgrade   bring an existing install's database up to date (additive, safe)\n"
            . "  --dry-run   with --upgrade, list what would change and stop\n"
@@ -802,6 +826,9 @@ if ($cli) {
         'https'       => str_starts_with((string) ($args['site-url'] ?? ''), 'https://'),
         'name'        => $siteName,
         'email'       => mb_strtolower($email),
+        // Both optional; each falls back to the sign-in address.
+        'contact_email'      => mb_strtolower((string) ($args['contact-email'] ?? '')) ?: mb_strtolower($email),
+        'notification_email' => mb_strtolower((string) ($args['notification-email'] ?? '')) ?: mb_strtolower($email),
         'mail_driver' => 'log',
         'mail_from'   => 'no-reply@' . (parse_url((string) ($args['site-url'] ?? 'http://localhost'), PHP_URL_HOST) ?: 'localhost'),
     ];
@@ -849,11 +876,20 @@ $justFinished = ($_GET['step'] ?? '') === 'done' && isset($_SESSION['tb_done']);
 // wizard offers that instead of refusing outright — the database needs to
 // gain new tables and columns after an update, and asking people to find a
 // command line for it is how a site ends up half-migrated.
-$upgradeMode = !$justFinished && tb_already_installed();
+$upgradeMode  = !$justFinished && tb_already_installed();
+$upgradeDb    = $_SESSION['tb_upgrade_db'] ?? null;   // set at step 2, see below
+$needsConfig  = false;
+
+if (!$upgradeMode && is_array($upgradeDb) && !$justFinished) {
+    // The files are new but the database is not. Same screen, except the
+    // upgrade also has to write the config file this install is missing.
+    $upgradeMode = true;
+    $needsConfig = !is_file(TB_CONFIG);
+}
 
 if ($upgradeMode) {
-    $cfg  = require TB_CONFIG;
-    $conn = tb_connect($cfg['db'] ?? []);
+    $dbConfig = is_array($upgradeDb) ? $upgradeDb : ((require TB_CONFIG)['db'] ?? []);
+    $conn = tb_connect($dbConfig);
     $pdo  = $conn['ok'] ? $conn['pdo'] : null;
 
     $uErrors  = [];
@@ -905,6 +941,24 @@ if ($upgradeMode) {
                     }
                 }
 
+                if ($uErrors === [] && $needsConfig) {
+                    $written = tb_write_config($dbConfig, [
+                        'url'         => rtrim($detectedUrl, '/'),
+                        'base_path'   => rtrim((string) (parse_url($detectedUrl, PHP_URL_PATH) ?: ''), '/'),
+                        'timezone'    => $detected['timezone'],
+                        'https'       => $detected['https'],
+                        'name'        => 'TECHBISS',
+                        'email'       => $uEmail,
+                        'mail_driver' => 'log',
+                        'mail_from'   => 'no-reply@' . (parse_url($detectedUrl, PHP_URL_HOST) ?: 'localhost'),
+                    ]);
+                    if ($written['ok']) {
+                        $uSteps[] = 'Wrote config/config.php with a generated application key';
+                    } else {
+                        $uErrors['upgrade'] = $written['error'];
+                    }
+                }
+
                 if ($uErrors === []) {
                     try {
                         foreach ($migrator->apply() as $line) {
@@ -931,6 +985,7 @@ if ($upgradeMode) {
                     if ($uErrors === []) {
                         tb_clear_cache();
                         $uSteps[] = 'Cleared the cache';
+                        unset($_SESSION['tb_upgrade_db'], $_SESSION['tb_setup']);
                         if ($uSteps === ['Cleared the cache']) {
                             $uSteps = ['The database was already up to date — nothing needed changing'];
                         }
@@ -1000,6 +1055,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $conn = tb_connect($db, isset($_POST['create_db']));
             if (!$conn['ok']) {
                 $errors['db'] = $conn['error'];
+            } elseif ($conn['pdo'] instanceof PDO && tb_database_has_install($conn['pdo'])) {
+                // This database already has a site in it. Setting it up again
+                // would seed over live content, so offer the upgrade instead.
+                $_SESSION['tb_upgrade_db'] = $db;
+                header('Location: ?upgrade=1');
+                exit;
             } elseif ($action === 'test-db') {
                 $_SESSION['tb_setup']['db_ok'] = true;
                 header('Location: ?step=3');
@@ -1016,6 +1077,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $siteUrl  = rtrim($post('site_url', $detectedUrl), '/');
         $adminName  = $post('admin_name');
         $adminEmail = mb_strtolower($post('admin_email'));
+        $contactEmail = mb_strtolower($post('contact_email'));
+        $notifyEmail  = mb_strtolower($post('notification_email'));
         $pw   = (string) ($_POST['admin_password'] ?? '');
         $pw2  = (string) ($_POST['admin_password_confirm'] ?? '');
 
@@ -1035,6 +1098,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($siteUrl !== '' && !filter_var($siteUrl, FILTER_VALIDATE_URL)) {
             $errors['site_url'] = 'That does not look like a valid URL.';
         }
+        // Both are optional; each falls back to the sign-in address.
+        if ($contactEmail !== '' && !filter_var($contactEmail, FILTER_VALIDATE_EMAIL)) {
+            $errors['contact_email'] = 'That does not look like a valid email address.';
+        }
+        if ($notifyEmail !== '' && !filter_var($notifyEmail, FILTER_VALIDATE_EMAIL)) {
+            $errors['notification_email'] = 'That does not look like a valid email address.';
+        }
 
         if ($errors === []) {
             $host = parse_url($siteUrl, PHP_URL_HOST) ?: 'localhost';
@@ -1045,6 +1115,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'https'       => str_starts_with($siteUrl, 'https://'),
                 'name'        => $siteName,
                 'email'       => $adminEmail,
+                'contact_email'      => $contactEmail !== '' ? $contactEmail : $adminEmail,
+                'notification_email' => $notifyEmail !== '' ? $notifyEmail : $adminEmail,
                 'mail_driver' => 'log',
                 'mail_from'   => 'no-reply@' . $host,
             ];
@@ -1280,7 +1352,7 @@ $e = static fn (?string $s): string => htmlspecialchars((string) $s, ENT_QUOTES,
                         <?php if (isset($errors['admin_email'])): ?>
                             <em class="err"><?= $e($errors['admin_email']) ?></em>
                         <?php else: ?>
-                            <em>You will sign in with this, and site enquiries go here.</em>
+                            <em>You sign in with this. It is not shown on the website.</em>
                         <?php endif; ?>
                     </label>
                 </div>
@@ -1301,6 +1373,40 @@ $e = static fn (?string $s): string => htmlspecialchars((string) $s, ENT_QUOTES,
                         <input name="admin_password_confirm" type="password" required autocomplete="new-password"
                                class="<?= isset($errors['admin_password_confirm']) ? 'bad' : '' ?>">
                         <?php if (isset($errors['admin_password_confirm'])): ?><em class="err"><?= $e($errors['admin_password_confirm']) ?></em><?php endif; ?>
+                    </label>
+                </div>
+
+                <hr>
+
+                <p class="muted" style="margin:0 0 1rem;font-size:.9rem">
+                    <strong style="color:var(--text)">Site email addresses.</strong>
+                    Separate from your sign-in address, and separate from each other. Leave either
+                    blank to use your sign-in address. You can change these, and add sales and
+                    support addresses, under Settings → Contact.
+                </p>
+
+                <div class="row">
+                    <label class="field">
+                        <span>Public contact email</span>
+                        <input name="contact_email" type="email" value="<?= $e($post('contact_email')) ?>" maxlength="190"
+                               placeholder="hello@yourbusiness.com"
+                               class="<?= isset($errors['contact_email']) ? 'bad' : '' ?>">
+                        <?php if (isset($errors['contact_email'])): ?>
+                            <em class="err"><?= $e($errors['contact_email']) ?></em>
+                        <?php else: ?>
+                            <em>Shown on the website and used on the contact page.</em>
+                        <?php endif; ?>
+                    </label>
+                    <label class="field">
+                        <span>Send notifications to</span>
+                        <input name="notification_email" type="email" value="<?= $e($post('notification_email')) ?>" maxlength="190"
+                               placeholder="you@yourbusiness.com"
+                               class="<?= isset($errors['notification_email']) ? 'bad' : '' ?>">
+                        <?php if (isset($errors['notification_email'])): ?>
+                            <em class="err"><?= $e($errors['notification_email']) ?></em>
+                        <?php else: ?>
+                            <em>Where the site emails you when an enquiry arrives. Never shown publicly.</em>
+                        <?php endif; ?>
                     </label>
                 </div>
 

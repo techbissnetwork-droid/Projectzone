@@ -8,7 +8,7 @@
  *
  * @var PDO|null $pdo @var array $uErrors @var array $uSteps @var bool $uDone
  * @var array|null $uLocked @var string $uEmail @var bool $uAuthed @var string $uName
- * @var array|null $uPlan @var string $installedUrl @var callable $eh
+ * @var array|null $uPlan @var string $installedUrl @var callable $eh @var bool $needsConfig
  */
 $hasWork = $uPlan !== null
     && ($uPlan['tables'] + $uPlan['columns'] + $uPlan['indexes'] + $uPlan['data'] + $uPlan['copy']) > 0;
@@ -77,12 +77,23 @@ if ($uPlan !== null) {
             </form>
 
         <?php else: ?>
+            <?php if ($needsConfig): ?>
+            <h1>That database already has a site in it</h1>
+            <p class="muted">
+                These files are new but the database is not, so this is a move or a restore rather
+                than a first install. Setting it up again would seed over your content. Instead the
+                upgrade writes the missing <code>config/config.php</code> and brings the database up
+                to date: only new tables, columns and settings are added, nothing is dropped or
+                overwritten, and wording you have edited yourself is left alone.
+            </p>
+            <?php else: ?>
             <h1>This site is already installed</h1>
             <p class="muted">
                 Setup will not run again over a live site. What you can do here is bring the database
                 up to date after an update. Only new tables, columns and settings are added — nothing
                 is dropped, renamed or overwritten, and wording you have edited yourself is left alone.
             </p>
+            <?php endif; ?>
 
             <?php if (!$pdo instanceof PDO): ?>
                 <div class="alert alert--warn">
@@ -165,7 +176,7 @@ if ($uPlan !== null) {
                     </div>
 
                     <div class="actions">
-                        <button class="btn btn--primary" type="submit">Run the upgrade</button>
+                        <button class="btn btn--primary" type="submit"><?= $needsConfig ? 'Connect and upgrade' : 'Run the upgrade' ?></button>
                         <a class="btn btn--quiet" href="<?= $eh($installedUrl) ?>">Go to the admin</a>
                     </div>
                 </form>

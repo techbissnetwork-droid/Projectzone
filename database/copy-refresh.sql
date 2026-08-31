@@ -206,3 +206,29 @@ DELETE FROM `page_sections` WHERE `page_key` = 'home' AND `section_key` = 'packa
 -- own "View all services" link; the band below carries a third.
 UPDATE `page_sections` SET `cta_label` = '', `cta_url` = ''
   WHERE `section_key` = 'chain' AND `cta_url` = '/services';
+
+-- ---------------------------------------------------------------------
+-- The sign-in address, the address shown on the site and the address the
+-- site emails are three different things. Setup used to copy one into all
+-- of them, and support_email was never read by anything at all.
+-- ---------------------------------------------------------------------
+
+UPDATE `settings` SET `label` = 'Public contact email', `hint` = 'Shown on the website and used on the contact page. Not your sign-in address.'
+  WHERE `key_name` = 'contact_email';
+
+UPDATE `settings` SET `label` = 'Sales email', `hint` = 'For new enquiries. Leave blank to use the public contact email.'
+  WHERE `key_name` = 'sales_email';
+
+UPDATE `settings` SET `label` = 'Support email', `hint` = 'For existing clients. Shown on the contact page only when it differs from the public one.'
+  WHERE `key_name` = 'support_email';
+
+UPDATE `settings` SET `label` = 'Send notifications to', `hint` = 'Where the site emails you when an enquiry arrives. Never shown publicly. Defaults to the public contact email.'
+  WHERE `key_name` = 'notification_email';
+
+-- Setup wrote the administrator's own sign-in address into these two. Clearing
+-- them where they still match makes them inherit instead of quietly pretending
+-- to be separate addresses.
+UPDATE `settings` s
+  JOIN (SELECT value AS contact FROM `settings` WHERE `key_name` = 'contact_email') c
+  SET s.value = ''
+  WHERE s.key_name IN ('sales_email', 'support_email') AND s.value = c.contact;

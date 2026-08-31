@@ -35,6 +35,16 @@ $whatsapp = preg_replace('/[^0-9]/', '', $settings->get('whatsapp'));
                         </div>
                         <?php endif; ?>
 
+                        <?php if ($settings->get('support_email') !== '' && $settings->get('support_email') !== $settings->get('contact_email')): ?>
+                        <div class="contact-item">
+                            <span class="icon-plate icon-plate--sm"><?= icon('shield') ?></span>
+                            <div>
+                                <div class="contact-item__label">Existing clients</div>
+                                <div class="contact-item__value"><a href="mailto:<?= e($settings->get('support_email')) ?>"><?= e($settings->get('support_email')) ?></a></div>
+                            </div>
+                        </div>
+                        <?php endif; ?>
+
                         <?php if ($settings->get('contact_phone') !== ''): ?>
                         <div class="contact-item">
                             <span class="icon-plate icon-plate--sm"><?= icon('phone') ?></span>

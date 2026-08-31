@@ -76,9 +76,9 @@ INSERT INTO `settings` (`group_name`, `key_name`, `value`, `type`, `label`, `hin
 ('general','footer_text','One partner for everything your business needs online: domain, hosting, website, apps, email, branding, SEO and support.','textarea','Footer intro',' ',7,NOW()),
 ('general','copyright','© {year} TECHBISS. All rights reserved.','text','Copyright line','Use {year} for the current year.',8,NOW()),
 -- Contact
-('contact','contact_email','hello@techbiss.com','text','Primary email','',1,NOW()),
-('contact','sales_email','sales@techbiss.com','text','Sales email','',2,NOW()),
-('contact','support_email','support@techbiss.com','text','Support email','',3,NOW()),
+('contact','contact_email','hello@techbiss.com','text','Public contact email','Shown on the website and used on the contact page. Not your sign-in address.',1,NOW()),
+('contact','sales_email','','text','Sales email','For new enquiries. Leave blank to use the public contact email.',2,NOW()),
+('contact','support_email','','text','Support email','For existing clients. Shown on the contact page only when it differs from the public one.',3,NOW()),
 ('contact','contact_phone','','text','Phone number','',4,NOW()),
 ('contact','whatsapp','','text','WhatsApp number','Digits only, with country code.',5,NOW()),
 ('contact','address','','textarea','Address','',6,NOW()),
@@ -117,7 +117,7 @@ INSERT INTO `settings` (`group_name`, `key_name`, `value`, `type`, `label`, `hin
 ('system','maintenance_message','We are performing scheduled maintenance and will be back shortly.','textarea','Maintenance message','',2,NOW()),
 ('system','items_per_page','9','text','Items per page','Public listings.',3,NOW()),
 ('system','notify_new_lead','1','bool','Email me about new leads','',4,NOW()),
-('system','notification_email','','text','Notification email','Defaults to the primary email.',5,NOW());
+('system','notification_email','','text','Send notifications to','Where the site emails you when an enquiry arrives. Never shown publicly. Defaults to the public contact email.',5,NOW());
 
 -- ---------------------------------------------------------------------
 -- Navigation
