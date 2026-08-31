@@ -212,8 +212,11 @@ final class SiteController
             ['label' => 'Packages', 'url' => '/packages'],
             ['label' => (string) $package['name'], 'url' => '/packages/' . $package['slug']],
         ]);
-        // Only publish a price in structured data when there is a real one.
-        if (!$pricing['is_custom'] && $pricing['payable'] > 0) {
+        // Structured data is published to search engines, so it follows the same
+        // rule as the page: a figure only ever appears if the owner has turned
+        // public pricing on. Otherwise the price is settled in conversation and
+        // an Offer here would put it in the index anyway.
+        if (setting_bool('public_pricing', false) && !$pricing['is_custom'] && $pricing['payable'] > 0) {
             $seo->addSchema([
                 '@type'       => 'Product',
                 'name'        => $package['name'] . ' Package',
