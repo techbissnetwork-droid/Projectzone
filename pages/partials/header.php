@@ -11,7 +11,7 @@ $allowTheme = $allowTheme ?? true;
                 <?php if ($logo !== ''): ?>
                     <img class="brand__logo" src="<?= e($logo) ?>" alt="<?= e($siteName) ?>" width="140" height="30">
                 <?php else: ?>
-                    <span class="brand__glyph" aria-hidden="true">T</span>
+                    <svg class="brand__mark" aria-hidden="true" focusable="false"><use href="#tb-mark"/></svg>
                     <span class="brand__text"><?= e($siteName) ?></span>
                 <?php endif; ?>
             </a>

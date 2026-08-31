@@ -37,8 +37,8 @@ body {
 }
 .brand { display: flex; align-items: center; gap: .6rem; margin-bottom: 1.75rem; }
 .glyph {
-  width: 32px; height: 32px; border-radius: 9px; display: grid; place-items: center;
-  background: linear-gradient(140deg, var(--accent), #34d3e0); color: #fff; font-weight: 700; font-size: .9rem;
+  width: 32px; height: 32px; flex: none; border-radius: 9px;
+  box-shadow: 0 6px 18px -8px rgba(79,140,255,.85);
 }
 .name { font-weight: 650; letter-spacing: .14em; font-size: 1.02rem; }
 

@@ -11,7 +11,6 @@
 $siteName   = $settings->get('site_name', 'TECHBISS');
 $themeMode  = $settings->get('theme_mode', 'dark') === 'light' ? 'light' : 'dark';
 $allowTheme = $settings->bool('allow_theme_toggle', true);
-$favicon    = media_url($settings->get('favicon'));
 $bodyClass  = $bodyClass ?? '';
 $gaId       = $settings->get('google_analytics_id');
 ?><!doctype html>
@@ -32,11 +31,7 @@ $gaId       = $settings->get('google_analytics_id');
     <meta name="msvalidate.01" content="<?= e($settings->get('bing_site_verification')) ?>">
     <?php endif; ?>
 
-    <?php if ($favicon !== ''): ?>
-    <link rel="icon" href="<?= e($favicon) ?>">
-    <?php else: ?>
-    <link rel="icon" href="data:image/svg+xml,<?= rawurlencode('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#4f8cff"/><text x="16" y="22" font-family="system-ui,sans-serif" font-size="16" font-weight="700" fill="#fff" text-anchor="middle">T</text></svg>') ?>">
-    <?php endif; ?>
+    <?= $view->partial('partials/favicons') ?>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -59,6 +54,8 @@ $gaId       = $settings->get('google_analytics_id');
     </script>
 </head>
 <body class="<?= e($bodyClass) ?><?= $settings->bool('enable_loader', true) ? ' is-loading' : '' ?>">
+
+<?= $view->partial('partials/brand-sprite') ?>
 
 <?php if ($settings->bool('enable_loader', true)): ?>
 <div class="loader" role="status" aria-live="polite">

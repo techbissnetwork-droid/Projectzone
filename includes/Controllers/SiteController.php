@@ -1087,6 +1087,54 @@ final class SiteController
         echo '</urlset>';
     }
 
+    /**
+     * Web app manifest.
+     *
+     * Generated rather than shipped as a static file so the icon paths follow
+     * the install's base path and the name follows the configured site name.
+     */
+    public function manifest(Request $request): void
+    {
+        header('Content-Type: application/manifest+json; charset=utf-8');
+        $settings = App::settings();
+        $name     = $settings->get('site_name');
+        if ($name === '') {
+            $name = 'TECHBISS';
+        }
+        $short = mb_substr($name, 0, 12);
+
+        $manifest = [
+            'name'             => $name,
+            'short_name'       => $short,
+            'description'      => $settings->get('tagline'),
+            'start_url'        => url('/'),
+            'scope'            => url('/'),
+            'display'          => 'standalone',
+            'theme_color'      => '#06070c',
+            'background_color' => '#06070c',
+            'icons'            => [
+                [
+                    'src'   => asset('assets/images/brand/icon-192.png'),
+                    'sizes' => '192x192',
+                    'type'  => 'image/png',
+                ],
+                [
+                    'src'   => asset('assets/images/brand/icon-512.png'),
+                    'sizes' => '512x512',
+                    'type'  => 'image/png',
+                ],
+                [
+                    'src'     => asset('assets/images/brand/icon-maskable-512.png'),
+                    'sizes'   => '512x512',
+                    'type'    => 'image/png',
+                    'purpose' => 'maskable',
+                ],
+            ],
+        ];
+
+        echo json_encode($manifest, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    }
+
     public function robots(Request $request): void
     {
         header('Content-Type: text/plain; charset=utf-8');

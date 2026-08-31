@@ -576,9 +576,9 @@ if (!$justFinished && tb_already_installed()) {
     $installedUrl = $detectedUrl . '/admin/login';
     ?><!doctype html><html lang="en"><head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">
-    <title>Already installed</title><?php require __DIR__ . '/../pages/partials/_installer-style.php'; ?></head>
+    <title>Already installed</title><link rel="icon" type="image/svg+xml" href="../assets/images/brand/favicon.svg"><?php require __DIR__ . '/../pages/partials/_installer-style.php'; ?></head>
     <body><main class="wrap"><div class="card">
-        <div class="brand"><span class="glyph">T</span><span class="name">TECHBISS</span></div>
+        <div class="brand"><img class="glyph" src="../assets/images/brand/logo-mark.svg" width="32" height="32" alt=""><span class="name">TECHBISS</span></div>
         <h1>Already installed</h1>
         <p class="muted">An administrator account already exists, so the wizard will not run again.</p>
         <div class="alert alert--warn"><strong>Delete <code>database/install.php</code> now.</strong>
@@ -714,12 +714,14 @@ $e = static fn (?string $s): string => htmlspecialchars((string) $s, ENT_QUOTES,
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex, nofollow">
     <title>Install TECHBISS</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/images/brand/favicon.svg">
+    <link rel="shortcut icon" href="../assets/images/brand/favicon.ico">
     <?php require __DIR__ . '/../pages/partials/_installer-style.php'; ?>
 </head>
 <body>
 <main class="wrap">
     <div class="card">
-        <div class="brand"><span class="glyph">T</span><span class="name">TECHBISS</span></div>
+        <div class="brand"><img class="glyph" src="../assets/images/brand/logo-mark.svg" width="32" height="32" alt=""><span class="name">TECHBISS</span></div>
 
         <?php if ($step < 4): ?>
         <ol class="steps" aria-label="Setup progress">

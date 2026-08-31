@@ -1,6 +1,6 @@
 <div class="auth-card">
     <div class="auth-card__brand">
-        <span class="brand__glyph" aria-hidden="true">T</span>
+        <svg class="brand__mark" aria-hidden="true" focusable="false"><use href="#tb-mark"/></svg>
         <span class="brand__text"><?= e($settings->get('site_name', 'TECHBISS')) ?></span>
     </div>
 

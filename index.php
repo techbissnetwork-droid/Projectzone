@@ -66,6 +66,7 @@ $router->get('/thank-you', [$site, 'thankYou']);
 // --- Machine-readable -------------------------------------------------
 $router->get('/sitemap.xml', [$site, 'sitemap']);
 $router->get('/robots.txt', [$site, 'robots']);
+$router->get('/site.webmanifest', [$site, 'manifest']);
 $router->post('/api/newsletter', [$site, 'newsletter']);
 
 // --- CMS pages, then 404 ---------------------------------------------

@@ -1132,18 +1132,17 @@ a.pill:hover, button.pill:hover { border-color: var(--border-strong); color: var
   letter-spacing: 0.14em;
   color: var(--text);
 }
-.brand__glyph {
-  width: 32px; height: 32px;
-  border-radius: 9px;
-  display: grid; place-items: center;
-  background: linear-gradient(140deg, var(--accent), var(--cyan));
-  color: #fff;
-  font-weight: 700;
-  font-size: 0.9rem;
-  letter-spacing: 0;
-  box-shadow: 0 6px 18px -8px var(--accent-glow);
+/* The mark itself carries its own gradient, so it needs no theme handling —
+   only the wordmark next to it follows the theme, via currentColor. */
+.brand__mark {
+  width: 32px;
+  height: 32px;
   flex: none;
+  border-radius: 9px;
+  box-shadow: 0 6px 18px -8px var(--accent-glow);
 }
+.brand__mark--lg { width: 44px; height: 44px; border-radius: 12px; }
+.brand__mark--sm { width: 26px; height: 26px; border-radius: 7px; }
 
 
 .theme-toggle {

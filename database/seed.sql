@@ -96,7 +96,7 @@ INSERT INTO `settings` (`group_name`, `key_name`, `value`, `type`, `label`, `hin
 ('seo','seo_default_title','TECHBISS — Your Digital Business Starts Here','text','Default SEO title','',1,NOW()),
 ('seo','seo_default_description','TECHBISS turns offline businesses into premium digital brands. Domain, hosting, websites, apps, business email, branding, SEO and ongoing support from one partner.','textarea','Default meta description','Aim for 150–160 characters.',2,NOW()),
 ('seo','seo_title_suffix',' | TECHBISS','text','Title suffix','Appended to page titles.',3,NOW()),
-('seo','seo_og_image','','image','Default social share image','1200×630 recommended.',4,NOW()),
+('seo','seo_og_image','assets/images/brand/og-image.png','image','Default social share image','1200×630 recommended.',4,NOW()),
 ('seo','google_analytics_id','','text','Google Analytics ID','e.g. G-XXXXXXXXXX',5,NOW()),
 ('seo','google_site_verification','','text','Google Search Console token','',6,NOW()),
 ('seo','bing_site_verification','','text','Bing verification token','',7,NOW()),

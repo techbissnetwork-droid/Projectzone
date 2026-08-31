@@ -14,7 +14,9 @@ $title    = $title ?? 'Admin';
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex, nofollow">
     <title><?= e($title) ?> · <?= e($siteName) ?> Admin</title>
-    <link rel="icon" href="data:image/svg+xml,<?= rawurlencode('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#4f8cff"/><text x="16" y="22" font-family="system-ui,sans-serif" font-size="16" font-weight="700" fill="#fff" text-anchor="middle">T</text></svg>') ?>">
+    <link rel="icon" type="image/svg+xml" href="<?= e(asset('assets/images/brand/favicon.svg')) ?>">
+    <link rel="icon" type="image/png" sizes="32x32" href="<?= e(asset('assets/images/brand/favicon-32.png')) ?>">
+    <link rel="apple-touch-icon" sizes="180x180" href="<?= e(asset('assets/images/brand/apple-touch-icon.png')) ?>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'">
@@ -30,6 +32,8 @@ $title    = $title ?? 'Admin';
     </script>
 </head>
 <body class="admin">
+
+<?php require \Techbiss\Core\App::root() . '/pages/partials/brand-sprite.php'; ?>
 <a class="skip-link" href="#admin-main">Skip to content</a>
 
 <div class="app">

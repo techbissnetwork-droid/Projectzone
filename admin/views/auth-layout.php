@@ -14,6 +14,8 @@
     <link rel="stylesheet" href="<?= e(asset('admin/assets/css/admin.css')) ?>">
 </head>
 <body class="admin">
+
+<?php require \Techbiss\Core\App::root() . '/pages/partials/brand-sprite.php'; ?>
 <main class="auth-screen">
     <div class="page-head__bg" aria-hidden="true"><span class="glow"></span><span class="grid-pattern grid-pattern--center"></span></div>
     <?= $content ?>

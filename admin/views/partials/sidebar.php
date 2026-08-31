@@ -85,7 +85,7 @@ $isActive = static function (array $item) use ($currentPath): bool {
 <aside class="sidebar" id="admin-sidebar">
     <div class="sidebar__head">
         <a class="brand" href="<?= e(url('/admin')) ?>">
-            <span class="brand__glyph" aria-hidden="true">T</span>
+            <svg class="brand__mark" aria-hidden="true" focusable="false"><use href="#tb-mark"/></svg>
             <span class="brand__text" style="font-size:.92rem"><?= e($settings->get('site_name', 'TECHBISS')) ?></span>
         </a>
     </div>
