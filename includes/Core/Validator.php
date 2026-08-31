@@ -247,32 +247,6 @@ final class Validator
         return $this;
     }
 
-    /** Accept an array of scalars, keep only the allowed ones. */
-    public function multi(string $field, ?array $allowed = null, int $maxItems = 40): self
-    {
-        $raw = $this->raw($field);
-        $out = [];
-        if (is_array($raw)) {
-            foreach ($raw as $item) {
-                if (!is_scalar($item)) {
-                    continue;
-                }
-                $v = trim((string) $item);
-                if ($v === '') {
-                    continue;
-                }
-                if ($allowed !== null && !in_array($v, $allowed, true)) {
-                    continue;
-                }
-                $out[] = $v;
-                if (count($out) >= $maxItems) {
-                    break;
-                }
-            }
-        }
-        $this->clean[$field] = array_values(array_unique($out));
-        return $this;
-    }
 
     /** Rich text from the admin editor, sanitised against a tag whitelist. */
     public function html(string $field, bool $required = false, string $label = 'Content'): self
@@ -334,10 +308,6 @@ final class Validator
         return $this;
     }
 
-    public function passes(): bool
-    {
-        return $this->errors === [];
-    }
 
     public function fails(): bool
     {
@@ -355,26 +325,10 @@ final class Validator
         return $this->errors === [] ? '' : (string) reset($this->errors);
     }
 
-    /** @return array<string,mixed> */
-    public function valid(): array
-    {
-        return $this->clean;
-    }
 
     public function get(string $field, mixed $default = null): mixed
     {
         return $this->clean[$field] ?? $default;
     }
 
-    /** @return array<string,mixed> only the listed keys, in order */
-    public function only(array $fields): array
-    {
-        $out = [];
-        foreach ($fields as $f) {
-            if (array_key_exists($f, $this->clean)) {
-                $out[$f] = $this->clean[$f];
-            }
-        }
-        return $out;
-    }
 }

@@ -4,12 +4,10 @@ declare(strict_types=1);
 namespace Techbiss\Controllers\Admin;
 
 use Techbiss\Core\ActivityLog;
-use Techbiss\Core\App;
 use Techbiss\Core\Cache;
 use Techbiss\Core\Request;
 use Techbiss\Core\Validator;
 use Techbiss\Repo\IndustryRepo;
-use Techbiss\Repo\MediaRepo;
 use Techbiss\Repo\PortfolioRepo;
 use Techbiss\Repo\ServiceRepo;
 use Techbiss\Repo\TaxonomyRepo;

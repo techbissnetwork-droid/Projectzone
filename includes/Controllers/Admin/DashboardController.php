@@ -43,15 +43,10 @@ final class DashboardController extends BaseAdminController
             ];
         }
 
-        $sourceBreakdown = $db->all(
-            'SELECT source, COUNT(*) AS total FROM quote_requests GROUP BY source ORDER BY total DESC'
-        );
-
         $this->view->render('dashboard', [
             'title'           => 'Dashboard',
             'counts'          => $counts,
             'series'          => $series,
-            'sourceBreakdown' => $sourceBreakdown,
             'recentMessages'  => $db->all('SELECT * FROM contact_messages ORDER BY created_at DESC LIMIT 5'),
             'recentQuotes'    => $db->all('SELECT * FROM quote_requests ORDER BY created_at DESC LIMIT 5'),
             'activity'        => \Techbiss\Core\Auth::can('logs.view') ? ActivityLog::recent(8) : [],

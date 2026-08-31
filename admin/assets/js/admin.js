@@ -533,48 +533,7 @@
     });
   }
 
-  /* -------------------------------------------------------------------
-     Status colour preview on package pricing
-     ------------------------------------------------------------------- */
-  function initPricingPreview() {
-    var root = $('[data-pricing-preview]');
-    if (!root) return;
-    var regular = $('[name="regular_price"]');
-    var prepaid = $('[name="prepaid_price"]');
-    var custom = $('[name="is_custom_quote"]');
-    var out = $('[data-pricing-output]', root);
-    if (!regular || !prepaid || !out) return;
-
-    function update() {
-      if (custom && custom.checked) {
-        out.innerHTML = '<span class="status-dot status-dot--info">Shown as “Custom quote” — no price is published.</span>';
-        return;
-      }
-      var r = parseFloat(regular.value) || 0;
-      var p = parseFloat(prepaid.value);
-      if (!r) {
-        out.innerHTML = '<span class="status-dot status-dot--warn">Enter a regular price, or mark this as a custom quote.</span>';
-      } else if (isNaN(p) || p <= 0) {
-        out.innerHTML = '<span class="status-dot status-dot--draft">No prepaid discount. The site will show ' + fmt(r) + ' only.</span>';
-      } else if (p >= r) {
-        out.innerHTML = '<span class="status-dot status-dot--danger">The prepaid price must be below the regular price, or left empty.</span>';
-      } else {
-        var save = r - p;
-        var pct = Math.round((save / r) * 100);
-        out.innerHTML = '<span class="status-dot status-dot--live">Visitors see ' + fmt(p) + ', was ' + fmt(r) +
-          ', saving ' + fmt(save) + ' (' + pct + '%).</span>';
-      }
-    }
-    function fmt(n) {
-      var sym = root.getAttribute('data-currency') || '$';
-      return sym + n.toLocaleString(undefined, { maximumFractionDigits: 2 });
-    }
-    [regular, prepaid, custom].forEach(function (el) {
-      if (el) { on(el, 'input', update); on(el, 'change', update); }
-    });
-    update();
-  }
-
+  
   /* -------------------------------------------------------------------
      Boot
      ------------------------------------------------------------------- */
@@ -591,7 +550,6 @@
     initToggles();
     initFilters();
     initDirtyGuard();
-    initPricingPreview();
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);

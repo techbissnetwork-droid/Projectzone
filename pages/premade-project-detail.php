@@ -78,7 +78,6 @@ $meta = array_filter([
                 <?= icon('download') ?>Download the test APK
             </a>
             <?php endif; ?>
-            <a class="btn btn--quiet" href="#ask"><?= e($project['cta_label'] ?: 'Enquire about this') ?></a>
         </div>
 
         <?php if ($hero !== ''): ?>

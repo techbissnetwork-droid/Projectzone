@@ -27,13 +27,6 @@
                     </a>
                     <?php endforeach; ?>
                 </div>
-                <div class="card mt-6">
-                    <h3 class="card__title" style="font-size:var(--fs-sm)">Still unclear?</h3>
-                    <p class="card__text">Ask directly — we would rather answer a question than lose a good fit over confusion.</p>
-                    <div class="card__footer">
-                        <a class="btn btn--ghost btn--sm btn--block" href="<?= e(url('/contact')) ?>">Contact us</a>
-                    </div>
-                </div>
             </aside>
 
             <div>

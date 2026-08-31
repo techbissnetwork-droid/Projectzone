@@ -53,7 +53,6 @@ $hero = $sections['hero'] ?? [];
                     <a class="btn btn--primary btn--lg btn--arrow" href="<?= e(url($s('hero', 'cta_url', '/request'))) ?>" data-magnetic="0.25">
                         <?= e($s('hero', 'cta_label', 'Start Your Digital Journey')) ?><?= icon('arrow-right') ?>
                     </a>
-                    <a class="btn btn--ghost btn--lg" href="<?= e(url('/request')) ?>">Tell Us What You Need</a>
                     <?php if ($projects): ?>
                     <a class="btn btn--quiet btn--lg" href="<?= e(url('/portfolio')) ?>">View Our Work</a>
                     <?php endif; ?>
@@ -248,29 +247,6 @@ $hero = $sections['hero'] ?? [];
         </div>
     </div>
 </section>
-<?php endif; ?>
-
-<!-- ================= STATS ================= -->
-<?php if ($stats): ?>
-<div class="stats-band" data-reveal>
-    <?php foreach ($stats as $stat): ?>
-    <div class="stat">
-        <div class="stat__value">
-            <?= e($stat['prefix']) ?><?php
-                if (is_numeric($stat['value'])) {
-                    echo '<span data-count="' . e($stat['value']) . '">0</span>';
-                } else {
-                    echo e($stat['value']);
-                }
-            ?><?= e($stat['suffix']) ?>
-        </div>
-        <div class="stat__label"><?= e($stat['label']) ?></div>
-        <?php if (!empty($stat['description'])): ?>
-        <div class="stat__desc"><?= e($stat['description']) ?></div>
-        <?php endif; ?>
-    </div>
-    <?php endforeach; ?>
-</div>
 <?php endif; ?>
 
 <!-- ================= PROCESS ================= -->

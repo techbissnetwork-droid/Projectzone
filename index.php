@@ -74,7 +74,6 @@ $router->get('/blog/{slug}', [$site, 'blogDetail']);
 $router->any('/contact', [$site, 'contact']);
 $router->any('/quote', $moved);
 $router->any('/start', $moved);
-$router->get('/thank-you', [$site, 'thankYou']);
 
 // --- Machine-readable -------------------------------------------------
 $router->get('/sitemap.xml', [$site, 'sitemap']);

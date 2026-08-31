@@ -121,11 +121,6 @@ final class SettingsController extends BaseAdminController
                 $n = (int) $value;
                 $value = (string) max(3, min(48, $n === 0 ? 9 : $n));
             }
-            if ($key === 'payment_methods') {
-                $allowed = ['bank_transfer', 'manual', 'stripe', 'paypal', 'local'];
-                $picked  = array_values(array_intersect(array_map('trim', explode(',', $value)), $allowed));
-                $value   = implode(',', $picked);
-            }
             if ($key === 'theme_mode' && !in_array($value, ['dark', 'light'], true)) {
                 $value = 'dark';
             }

@@ -25,14 +25,6 @@ function ejs(mixed $value): string
     );
 }
 
-/**
- * Encode a value for a JSON-carrying HTML attribute, e.g. data-config="...".
- * Here entities ARE correct, because attribute values are entity-decoded.
- */
-function ejs_attr(mixed $value): string
-{
-    return htmlspecialchars(ejs($value), ENT_QUOTES, 'UTF-8');
-}
 
 /** Site-relative URL, honouring an installation sub-directory. */
 function url(string $path = '/'): string
@@ -249,10 +241,6 @@ function error_for(string $key): string
     return (string) ($errors[$key] ?? '');
 }
 
-function has_errors(): bool
-{
-    return App::errors() !== [];
-}
 
 /** Build a query string preserving current filters. */
 function query_with(array $overrides, array $current = []): string

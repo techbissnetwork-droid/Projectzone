@@ -1,4 +1,4 @@
-<?php /** @var array $steps @var array $faqs */ ?>
+<?php /** @var array $steps */ ?>
 <?= $view->partial('partials/page-head', [
     'eyebrow' => 'How it works',
     'heading' => 'Six stages from first conversation to ongoing growth.',
@@ -70,17 +70,6 @@
     </div>
 </section>
 
-<?php if ($faqs): ?>
-<section class="section">
-    <div class="container container--narrow">
-        <div class="section-head section-head--center" data-reveal>
-            <p class="eyebrow eyebrow--plain">Getting started</p>
-            <h2 class="mt-4">Common questions</h2>
-        </div>
-        <?= $view->partial('partials/faq-accordion', ['faqs' => $faqs, 'groupId' => 'hiw']) ?>
-    </div>
-</section>
-<?php endif; ?>
 
 <?= $view->partial('partials/cta-band', [
     'eyebrow' => 'Stage 01',

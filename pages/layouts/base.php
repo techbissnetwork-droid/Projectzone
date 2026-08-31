@@ -109,11 +109,11 @@ if ($whatsapp !== '' && strlen($whatsapp) >= 8):
 <?php endif; ?>
 
 <script nonce="<?= e(\Techbiss\Core\App::nonce()) ?>">
+/* Only what app.js reads. The CSRF token was published into a global here
+   and never used — the forms carry it in a hidden field. */
 window.TECHBISS = {
-    base: <?= ejs(url('/')) ?>,
     cursor: <?= $settings->bool('enable_cursor', true) ? 'true' : 'false' ?>,
-    transitions: <?= $settings->bool('enable_transitions', true) ? 'true' : 'false' ?>,
-    csrf: <?= ejs(csrf_token()) ?>
+    transitions: <?= $settings->bool('enable_transitions', true) ? 'true' : 'false' ?>
 };
 </script>
 <script src="<?= e(asset('assets/js/app.js')) ?>" defer></script>

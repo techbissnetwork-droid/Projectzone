@@ -149,3 +149,60 @@ UPDATE `page_sections` SET `cta_label` = 'Tell Us What You Need', `cta_url` = '/
   WHERE `cta_url` IN ('/start', '/quote', '/packages');
 
 UPDATE `page_sections` SET `is_published` = 0 WHERE `section_key` = 'packages';
+
+-- The footer called /portfolio "Portfolio" while the header called it "Work".
+UPDATE `navigation` SET `label` = 'Work' WHERE `menu` = 'footer' AND `url` = '/portfolio' AND `label` = 'Portfolio';
+
+-- ---------------------------------------------------------------------
+-- There are no packages any more, and no six-step wizard. These answers
+-- still sent people looking for both.
+-- ---------------------------------------------------------------------
+
+UPDATE `faqs` SET `answer` = 'With a conversation about the business, not about technology. We work out what your customers need to see, then build the foundation — domain, hosting, email — and the site on top of it. Starting from nothing is the situation we set up for most often.'
+  WHERE `question` = 'I have no website at all. Where do we start?'
+    AND `answer` LIKE '%Starter package exists for exactly this situation.';
+
+UPDATE `faqs` SET `answer` = 'A first website is usually live in two to three weeks. A larger build with SEO, analytics and automation typically runs four to eight weeks depending on content and scope. Custom applications are scoped individually. We give you a schedule before starting, not after.'
+  WHERE `question` = 'How long does a typical project take?'
+    AND `answer` LIKE 'A Starter setup is usually live%';
+
+UPDATE `faqs` SET `answer` = 'Where maintenance is part of what we agreed, that covers patching, backups and monitoring, and you have a support channel with a stated response time. Without it, support is available on request.'
+  WHERE `question` = 'What happens if something breaks?'
+    AND `answer` LIKE 'Packages including maintenance cover%';
+
+UPDATE `faqs` SET `question` = 'What if I need something unusual?',
+                  `answer`   = 'Ask. Most of what we build is a combination of the same services; plenty of businesses need something outside them. Custom scoping is a normal part of what we do.'
+  WHERE `question` = 'What if I need something that is not in a package?';
+
+UPDATE `process_steps` SET `description` = 'Tell us what you want included, in your own words if it is easier. We come back with the scope and the price in writing.'
+  WHERE `step_number` = '02'
+    AND `description` LIKE 'Select a package that fits%';
+
+UPDATE `pages` SET `content` = REPLACE(`content`, 'enquiry, quote request or package request', 'enquiry or request')
+  WHERE `slug` IN ('privacy-policy', 'terms-and-conditions');
+UPDATE `pages` SET `content` = REPLACE(`content`, 'an enquiry, quote request or package request', 'a request')
+  WHERE `slug` = 'terms-and-conditions';
+
+-- Settings whose readers went with the packages.
+DELETE FROM `settings` WHERE `key_name` IN ('show_prepaid_savings', 'checkout_enabled', 'payment_note', 'bank_transfer_details', 'payment_methods');
+
+-- Permissions nothing checks any more.
+DELETE FROM `role_permissions` WHERE `permission_id` IN (SELECT id FROM `permissions` WHERE `slug` IN ('packages.manage','purchases.manage'));
+DELETE FROM `permissions` WHERE `slug` IN ('packages.manage','purchases.manage');
+
+-- The homepage offered the same button, with the same words and the same
+-- destination, four times down one page. The hero and the closing band keep
+-- it; the two mid-page sections point somewhere that moves the reader on.
+UPDATE `page_sections` SET `cta_label` = '', `cta_url` = ''
+  WHERE `section_key` = 'problem' AND `cta_url` = '/request';
+
+UPDATE `page_sections` SET `cta_label` = 'See what we do', `cta_url` = '/services'
+  WHERE `section_key` = 'chain' AND `cta_url` = '/request';
+
+-- home.php never read this section; publishing it rendered nothing.
+DELETE FROM `page_sections` WHERE `page_key` = 'home' AND `section_key` = 'packages';
+
+-- The chain section sits directly above the services section, which carries its
+-- own "View all services" link; the band below carries a third.
+UPDATE `page_sections` SET `cta_label` = '', `cta_url` = ''
+  WHERE `section_key` = 'chain' AND `cta_url` = '/services';

@@ -26,10 +26,6 @@ abstract class BaseRepo
         return $this->db()->first("SELECT * FROM `{$this->table}` WHERE id = ?", [$id]);
     }
 
-    public function findBySlug(string $slug): ?array
-    {
-        return $this->db()->first("SELECT * FROM `{$this->table}` WHERE slug = ?", [$slug]);
-    }
 
     /** @return array<int,array<string,mixed>> */
     public function all(): array

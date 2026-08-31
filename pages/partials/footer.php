@@ -71,7 +71,6 @@ $columns = array_chunk($links, $perCol);
                         <?php if ($settings->get('business_hours') !== ''): ?>
                         <li><span style="display:inline-flex;gap:.4rem;align-items:center;font-size:var(--fs-sm);color:var(--text-muted)"><?= icon('clock') ?><?= e($settings->get('business_hours')) ?></span></li>
                         <?php endif; ?>
-                        <li><a href="<?= e(url('/contact')) ?>"><?= icon('arrow-right') ?>Contact page</a></li>
                     </ul>
                 </div>
             </div>

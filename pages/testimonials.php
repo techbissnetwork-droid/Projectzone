@@ -1,4 +1,4 @@
-<?php /** @var array $testimonials @var array $projects */ ?>
+<?php /** @var array $testimonials */ ?>
 <?= $view->partial('partials/page-head', [
     'eyebrow' => 'Testimonials',
     'heading' => 'What clients say about working with us.',
@@ -59,23 +59,5 @@
         <?php endif; ?>
     </div>
 </section>
-
-<?php if ($projects): ?>
-<section class="section">
-    <div class="container">
-        <div class="row row--between mb-6" data-reveal>
-            <h2>The work behind the words</h2>
-            <a class="link hide-sm" href="<?= e(url('/portfolio')) ?>">All projects<?= icon('arrow-right') ?></a>
-        </div>
-        <div class="slider" data-slider>
-            <div class="slider__track slider__track--work" data-reveal-stagger>
-            <?php foreach ($projects as $i => $project): ?>
-                <?= $view->partial('partials/work-card', ['project' => $project, 'i' => $i]) ?>
-            <?php endforeach; ?>
-        </div>
-    </div>
-    </div>
-</section>
-<?php endif; ?>
 
 <?= $view->partial('partials/cta-band') ?>

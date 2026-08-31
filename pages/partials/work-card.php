@@ -23,11 +23,12 @@ $techs = $project['technologies'] ?? [];
         <?php endif; ?>
     </div>
     <div class="work-card__body">
-        <?php if (!empty($project['client_name']) || !empty($project['category_name'])): ?>
+        <?php /* The category is already on the overlay tag above, and the client
+                 name usually repeats the title a few pixels below it — printing
+                 both again here said the same two things twice per card. */ ?>
+        <?php if (!empty($project['client_name']) && stripos((string) $project['title'], (string) $project['client_name']) === false): ?>
         <div class="work-card__meta">
-            <?php if (!empty($project['client_name'])): ?><span><?= e($project['client_name']) ?></span><?php endif; ?>
-            <?php if (!empty($project['client_name']) && !empty($project['category_name'])): ?><span class="dot"></span><?php endif; ?>
-            <?php if (!empty($project['category_name'])): ?><span><?= e($project['category_name']) ?></span><?php endif; ?>
+            <span><?= e($project['client_name']) ?></span>
         </div>
         <?php endif; ?>
         <h3 class="work-card__title"><a href="<?= e(url('/portfolio/' . $project['slug'])) ?>"><?= e($project['title']) ?></a></h3>

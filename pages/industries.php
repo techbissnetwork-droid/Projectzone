@@ -1,4 +1,4 @@
-<?php /** @var array $industries @var array $services */ ?>
+<?php /** @var array $industries */ ?>
 <?= $view->partial('partials/page-head', [
     'eyebrow' => 'Industries',
     'heading' => 'Built around how your sector actually works.',
@@ -39,25 +39,6 @@
         <?php endif; ?>
     </div>
 </section>
-
-<?php if ($services): ?>
-<section class="section">
-    <div class="container">
-        <div class="section-head" data-reveal>
-            <p class="eyebrow">Common ground</p>
-            <h2 class="mt-4">What every sector needs regardless.</h2>
-            <p class="lead">The foundation is the same everywhere. What changes is what gets built on top of it.</p>
-        </div>
-        <div class="slider" data-slider>
-            <div class="slider__track slider__track--cards" data-reveal-stagger>
-            <?php foreach ($services as $i => $service): ?>
-                <?= $view->partial('partials/service-card', ['service' => $service, 'i' => $i]) ?>
-            <?php endforeach; ?>
-        </div>
-        </div>
-    </div>
-</section>
-<?php endif; ?>
 
 <?= $view->partial('partials/cta-band', [
     'eyebrow' => 'Your industry',

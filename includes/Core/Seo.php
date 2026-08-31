@@ -78,17 +78,7 @@ final class Seo
         $this->noindex = $flag;
     }
 
-    public function isNoindex(): bool
-    {
-        return $this->noindex;
-    }
 
-    public function metaTag(string $name, string $content): void
-    {
-        if ($content !== '') {
-            $this->meta[$name] = $content;
-        }
-    }
 
     /** @param array<int,array{label:string,url:string}> $crumbs */
     public function breadcrumbs(array $crumbs): void

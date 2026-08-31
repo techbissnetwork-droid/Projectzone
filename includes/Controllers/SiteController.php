@@ -5,7 +5,6 @@ namespace Techbiss\Controllers;
 
 use Techbiss\Core\App;
 use Techbiss\Core\Csrf;
-use Techbiss\Core\Icons;
 use Techbiss\Core\Paginator;
 use Techbiss\Core\Request;
 use Techbiss\Core\Session;
@@ -25,7 +24,6 @@ use Techbiss\Repo\ProjectRepo;
 use Techbiss\Repo\SectionRepo;
 use Techbiss\Repo\ServiceRepo;
 use Techbiss\Repo\StatRepo;
-use Techbiss\Repo\TaxonomyRepo;
 use Techbiss\Repo\TestimonialRepo;
 
 /**
@@ -123,8 +121,6 @@ final class SiteController
 
         $this->view->render('services', [
             'services' => $services,
-            'faqs'     => (new FaqRepo())->publishedFlat(5),
-            'steps'    => (new ProcessRepo())->published(6),
         ]);
     }
 
@@ -158,8 +154,11 @@ final class SiteController
         $this->view->render('service-detail', [
             'service'   => $service,
             'features'  => $repo->features((int) $service['id']),
-            'related'   => array_slice(array_filter($repo->published(), static fn ($s) => (int) $s['id'] !== (int) $service['id']), 0, 3),
-            'projects'  => (new PortfolioRepo())->featured(3),
+            // Both of these used to ignore the service being viewed: the same
+            // three "related" services and the same three featured projects
+            // appeared on all ten pages, which is worse than showing neither.
+            'related'   => $repo->pairedWith((int) $service['id'], 3),
+            'projects'  => (new PortfolioRepo())->forService((int) $service['id'], 3),
             'steps'     => (new ProcessRepo())->published(6),
         ]);
     }
@@ -236,7 +235,8 @@ final class SiteController
             mb_substr($request->str('name'), 0, 120),
             mb_substr($request->str('business_name'), 0, 190),
             $picked,
-            mb_substr($request->str('details'), 0, 2000)
+            mb_substr($request->str('details'), 0, 2000),
+            mb_substr($request->str('reply_to'), 0, 190)
         );
 
         $via = $request->str('via') === 'email' ? 'email' : 'whatsapp';
@@ -273,12 +273,18 @@ final class SiteController
     private function recordRequest(Request $request, array $picked, string $via): void
     {
         try {
+            // One field takes either, because asking for the right one is a
+            // question nobody wants at this point. Whichever it is, it is the
+            // only way to answer someone whose WhatsApp never opened.
+            $replyTo = mb_substr($request->str('reply_to'), 0, 190);
+            $isEmail = filter_var($replyTo, FILTER_VALIDATE_EMAIL) !== false;
+
             (new LeadRepo())->createQuote([
                 'source'          => 'quote',
                 'name'            => mb_substr($request->str('name'), 0, 190),
                 'business_name'   => mb_substr($request->str('business_name'), 0, 190),
-                'email'           => '',
-                'phone'           => '',
+                'email'           => $isEmail ? $replyTo : '',
+                'phone'           => $isEmail ? '' : $replyTo,
                 'country'         => '',
                 'website'         => '',
                 'business_stage'  => '',
@@ -297,7 +303,7 @@ final class SiteController
     }
 
     /** The message both channels send, so the two never drift apart. */
-    public static function requestMessage(string $name, string $business, array $picked, string $details): string
+    public static function requestMessage(string $name, string $business, array $picked, string $details, string $replyTo = ''): string
     {
         $who = trim($name . ($business !== '' ? ' (' . $business . ')' : ''));
 
@@ -310,6 +316,9 @@ final class SiteController
         }
         if ($details !== '') {
             $lines[] = $details;
+        }
+        if ($replyTo !== '') {
+            $lines[] = 'You can also reach me on ' . $replyTo . '.';
         }
         $lines[] = 'Please send me a price.';
 
@@ -412,7 +421,6 @@ final class SiteController
 
         $this->view->render('industries', [
             'industries' => (new IndustryRepo())->published(),
-            'services'   => (new ServiceRepo())->featured(6),
         ]);
     }
 
@@ -459,8 +467,7 @@ final class SiteController
         $seo->breadcrumbs([['label' => 'Home', 'url' => '/'], ['label' => 'How It Works', 'url' => '/how-it-works']]);
 
         $this->view->render('how-it-works', [
-            'steps'    => (new ProcessRepo())->published(),
-            'faqs'     => (new FaqRepo())->grouped()['Getting Started'] ?? (new FaqRepo())->publishedFlat(6),
+            'steps' => (new ProcessRepo())->published(),
         ]);
     }
 
@@ -474,7 +481,6 @@ final class SiteController
 
         $this->view->render('testimonials', [
             'testimonials' => (new TestimonialRepo())->publishedWithProject(),
-            'projects'     => (new PortfolioRepo())->featured(3),
         ]);
     }
 
@@ -906,26 +912,6 @@ final class SiteController
     // =================================================================
     // Package checkout / request
     // =================================================================
-    public function thankYou(Request $request): void
-    {
-        $ref = preg_replace('/[^A-Z0-9-]/', '', strtoupper($request->queryString('ref'))) ?? '';
-
-        $seo = App::seo();
-        $seo->title('Thank You');
-        $seo->description('We have received your request.');
-        $seo->noindex(true);
-        $seo->canonical(absolute_url('/thank-you'));
-
-        $this->view->render('thank-you', [
-            'reference' => mb_substr($ref, 0, 30),
-            'steps'     => (new ProcessRepo())->published(3),
-            'posts'     => (new BlogRepo())->latest(3),
-        ]);
-    }
-
-    // =================================================================
-    // CMS pages (About, Why, Privacy, Terms and anything else)
-    // =================================================================
     public function page(Request $request, array $params): void
     {
         $slug = Str::slug((string) ($params['slug'] ?? ''));
@@ -948,19 +934,15 @@ final class SiteController
             ['label' => (string) $page['title'], 'url' => '/' . $page['slug']],
         ]);
 
+        // These two pages used to borrow the same three sections — the stats,
+        // the service grid and the six-step process — so the bottom two thirds
+        // of each was identical to the other, and to /services and
+        // /how-it-works. Each now carries only what it is the page for.
         $extra = [];
         if ($slug === 'about') {
-            $extra = [
-                'stats'    => (new StatRepo())->published(4),
-                'steps'    => (new ProcessRepo())->published(6),
-                'services' => (new ServiceRepo())->featured(6),
-            ];
+            $extra = ['stats' => (new StatRepo())->published(4)];
         } elseif ($slug === 'why-techbiss') {
-            $extra = [
-                'services'     => (new ServiceRepo())->featured(6),
-                'testimonials' => (new TestimonialRepo())->publishedWithProject(3),
-                'stats'        => (new StatRepo())->published(4),
-            ];
+            $extra = ['testimonials' => (new TestimonialRepo())->publishedWithProject(3)];
         }
 
         $template = (string) $page['template'] === 'legal' ? 'page-legal' : 'page';
@@ -1118,8 +1100,6 @@ final class SiteController
             'Disallow: /includes/',
             'Disallow: /database/',
             'Disallow: /storage/',
-            'Disallow: /checkout/',
-            'Disallow: /thank-you',
             'Allow: /',
             '',
             'Sitemap: ' . absolute_url('/sitemap.xml'),
@@ -1207,73 +1187,7 @@ final class SiteController
         return $list;
     }
 
-    /** @return array<int,string> */
-    /**
-     * How ready someone is to spend, rather than how much.
-     *
-     * Deliberately carries no figures: we do not publish prices, and a bracket
-     * on the page is a price on the page — it anchors the conversation before
-     * anyone has told us what they actually need. Whoever wants to name a
-     * number can do it in their own words in the message field.
-     *
-     * @return array<int,string>
-     */
-    public static function budgets(): array
-    {
-        return [
-            'I have a budget set',
-            'I have a rough figure in mind',
-            'I want to know what it costs first',
-            'Not sure yet',
-        ];
-    }
 
-    /** @return array<int,string> */
-    public static function timelines(): array
-    {
-        return [
-            'As soon as possible',
-            'Within 1 month',
-            '1 – 3 months',
-            '3 – 6 months',
-            'Just exploring',
-        ];
-    }
 
-    /** @return array<int,string> */
-    public static function businessStages(): array
-    {
-        return [
-            'Not started yet — planning the business',
-            'Running offline only',
-            'Some online presence, needs rebuilding',
-            'Established online, looking to grow',
-        ];
-    }
 
-    /**
-     * Payment methods that are actually configured. Nothing is offered here
-     * unless an administrator has enabled it — the site never implies a gateway
-     * exists when it does not.
-     *
-     * @return array<int,array{key:string,label:string,description:string,icon:string}>
-     */
-    public static function paymentMethods(): array
-    {
-        $catalogue = [
-            'bank_transfer' => ['label' => 'Bank transfer', 'description' => 'We send an invoice with bank details and confirm once the transfer clears.', 'icon' => 'database'],
-            'manual'        => ['label' => 'Invoice me', 'description' => 'We confirm the scope, then send a formal invoice with payment instructions.', 'icon' => 'file'],
-            'stripe'        => ['label' => 'Card payment', 'description' => 'A secure card payment link is sent with your invoice.', 'icon' => 'money'],
-            'paypal'        => ['label' => 'PayPal', 'description' => 'A PayPal invoice is sent to your email address.', 'icon' => 'money'],
-            'local'         => ['label' => 'Local payment methods', 'description' => 'Regional payment options confirmed with you before invoicing.', 'icon' => 'globe'],
-        ];
-        $enabled = App::settings()->list('payment_methods');
-        $out     = [];
-        foreach ($enabled as $key) {
-            if (isset($catalogue[$key])) {
-                $out[] = ['key' => $key] + $catalogue[$key];
-            }
-        }
-        return $out;
-    }
 }

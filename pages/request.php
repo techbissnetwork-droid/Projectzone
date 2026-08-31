@@ -36,7 +36,7 @@ $mail = email_link('Request from the website');
         </div>
         <?php endif; ?>
 
-        <form class="card card--pad-lg" method="post" action="<?= e(url('/request')) ?>" data-request-form data-reveal>
+        <form class="card card--pad-lg" method="post" action="<?= e(url('/request')) ?>" data-reveal>
             <?= csrf_field() ?>
 
             <fieldset style="border:0;padding:0;margin:0">
@@ -73,6 +73,13 @@ $mail = email_link('Request from the website');
                     <label class="label" for="req-business">Business name</label>
                     <input class="input" type="text" id="req-business" name="business_name" maxlength="190" autocomplete="organization">
                 </div>
+            </div>
+
+            <div class="field mt-2">
+                <label class="label" for="req-reply">Email or phone <span class="hint" style="font-weight:400">— optional</span></label>
+                <input class="input" type="text" id="req-reply" name="reply_to" maxlength="190" autocomplete="email"
+                       aria-describedby="req-reply-hint">
+                <p class="hint mt-2" id="req-reply-hint">Only so we can reach you if the message does not send. We reply wherever you wrote from.</p>
             </div>
 
             <div class="card__footer stack stack-2">

@@ -76,6 +76,33 @@ final class ServiceRepo extends BaseRepo
         );
     }
 
+    /**
+     * Services that genuinely go with this one.
+     *
+     * Ranked by how many industries recommend both, which is a relationship the
+     * admin already maintains. Before this, every service page showed the first
+     * three services in sort order — so SEO "paired with" the same three things
+     * as maintenance did.
+     *
+     * @return array<int,array<string,mixed>>
+     */
+    public function pairedWith(int $serviceId, int $limit = 3): array
+    {
+        $rows = $this->db()->all(
+            'SELECT s.*, COUNT(*) AS shared
+             FROM services s
+             JOIN industry_services a ON a.service_id = s.id
+             JOIN industry_services b ON b.industry_id = a.industry_id
+             WHERE b.service_id = ? AND s.id <> ? AND s.is_published = 1
+             GROUP BY s.id
+             ORDER BY shared DESC, s.sort_order ASC
+             LIMIT ' . max(1, $limit),
+            [$serviceId, $serviceId]
+        );
+
+        return $rows;
+    }
+
     /** Services credited on a portfolio project. @return array<int,array<string,mixed>> */
     public function forPortfolio(int $portfolioId): array
     {

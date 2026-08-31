@@ -1,4 +1,4 @@
-<?php /** @var array $services @var array $faqs @var array $steps */ ?>
+<?php /** @var array $services */ ?>
 <?= $view->partial('partials/page-head', [
     'eyebrow' => 'Services',
     'heading' => 'Everything your business needs to operate online.',
@@ -16,20 +16,6 @@
                 <a class="btn btn--primary mt-4" href="<?= e(url('/contact')) ?>">Get in touch</a>
             </div>
         <?php else: ?>
-            <div class="slider" data-slider>
-                <div class="slider__track slider__track--cards" data-reveal-stagger>
-                <?php foreach ($services as $i => $service): ?>
-                    <?= $view->partial('partials/service-card', ['service' => $service, 'i' => $i]) ?>
-                <?php endforeach; ?>
-            </div>
-            </div>
-        <?php endif; ?>
-    </div>
-</section>
-
-<?php if ($services): ?>
-<section class="section">
-    <div class="container">
         <div class="section-head" data-reveal>
             <p class="eyebrow">In detail</p>
             <h2 class="mt-4">What each service actually includes.</h2>
@@ -77,7 +63,7 @@
                                 <a class="btn btn--ghost btn--sm btn--arrow" href="<?= e(url('/services/' . $service['slug'])) ?>">
                                     Full details<?= icon('arrow-right') ?>
                                 </a>
-                                <a class="btn btn--quiet btn--sm" href="<?= e(url('/request')) ?>">Ask about this</a>
+                                <a class="btn btn--quiet btn--sm" href="<?= e(url('/request?service=' . $service['slug'])) ?>">Ask about this</a>
                             </div>
                         </div>
                     </div>
@@ -85,43 +71,10 @@
             </div>
             <?php endforeach; ?>
         </div>
+        <?php endif; ?>
     </div>
 </section>
-<?php endif; ?>
 
-<?php if ($steps): ?>
-<section class="section">
-    <div class="container">
-        <div class="section-head" data-reveal>
-            <p class="eyebrow">The process</p>
-            <h2 class="mt-4">However many services you take, the process is the same.</h2>
-        </div>
-        <div class="slider" data-slider>
-            <div class="slider__track slider__track--cards" data-reveal-stagger>
-            <?php foreach ($steps as $i => $step): ?>
-            <div class="card" style="--i:<?= $i ?>" data-reveal>
-                <div class="process__num" style="font-size:1.5rem"><?= e($step['step_number']) ?></div>
-                <h3 class="card__title mt-3"><?= e($step['title']) ?></h3>
-                <p class="card__text"><?= e(str_limit($step['description'], 130)) ?></p>
-            </div>
-            <?php endforeach; ?>
-        </div>
-        </div>
-    </div>
-</section>
-<?php endif; ?>
-
-<?php if ($faqs): ?>
-<section class="section">
-    <div class="container container--narrow">
-        <div class="section-head section-head--center" data-reveal>
-            <p class="eyebrow eyebrow--plain">Questions</p>
-            <h2 class="mt-4">Before you commit</h2>
-        </div>
-        <?= $view->partial('partials/faq-accordion', ['faqs' => $faqs, 'groupId' => 'svc-faq']) ?>
-    </div>
-</section>
-<?php endif; ?>
 
 <?= $view->partial('partials/cta-band', [
     'eyebrow' => 'Next step',

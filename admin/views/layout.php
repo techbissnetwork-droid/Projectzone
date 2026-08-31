@@ -3,7 +3,6 @@
  * Admin shell.
  * @var string $content @var array|null $user @var array $flash @var array $badges
  */
-use Techbiss\Core\Auth;
 
 $siteName = $settings->get('site_name', 'TECHBISS');
 $title    = $title ?? 'Admin';

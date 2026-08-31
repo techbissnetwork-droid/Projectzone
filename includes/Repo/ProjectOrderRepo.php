@@ -94,14 +94,6 @@ final class ProjectOrderRepo
         return ['items' => $items, 'total' => $total];
     }
 
-    /** @return array<int,array<string,mixed>> */
-    public function forCustomer(int $customerId): array
-    {
-        return $this->db()->all(
-            'SELECT * FROM project_orders WHERE customer_id = ? ORDER BY created_at DESC',
-            [$customerId]
-        );
-    }
 
     public function update(int $id, array $data): void
     {

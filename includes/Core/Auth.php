@@ -55,6 +55,10 @@ final class Auth
 
         self::$repo->recordAttempt($email, $ip, true);
         self::$repo->clearAttempts($email, $ip);
+        // Nothing else ever removed old rows, so the table grew for the life of
+        // the site. A successful sign-in is a cheap, naturally rare moment to
+        // drop anything older than a day.
+        self::$repo->pruneAttempts();
         self::login($user, $ip);
 
         return ['ok' => true, 'message' => '', 'user' => $user];

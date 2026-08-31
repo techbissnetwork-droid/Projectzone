@@ -8,8 +8,7 @@ $image      = media_url($industry['image']);
     'eyebrow' => 'Industries',
     'heading' => 'Digital solutions for ' . strtolower((string) $industry['name']),
     'lead'    => (string) $industry['short_description'],
-    'actions' => '<a class="btn btn--primary btn--arrow" href="' . e(url('/request')) . '">Tell Us What You Need' . icon('arrow-right') . '</a>'
-               . '<a class="btn btn--ghost" href="' . e(url('/request')) . '">Tell Us What You Need</a>',
+    'actions' => '<a class="btn btn--primary btn--arrow" href="' . e(url('/request')) . '">Tell Us What You Need' . icon('arrow-right') . '</a>',
 ]) ?>
 
 <section class="section section--flush-top">

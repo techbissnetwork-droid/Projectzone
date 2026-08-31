@@ -269,7 +269,7 @@ VALUES
  'A booking site for a single-location clinic. Patients pick a slot; you get an email.',
  '<p>Built for clinics that still take every booking by phone. Patients choose a time against your real opening hours, and the front desk sees the day at a glance.</p>',
  '<p>Setup on your domain, your logo and colours, and your services and staff loaded before handover.</p>',
- 'Colours, logo, services and staff are set up for you. Extra pages can be added.',
+ 'What we cannot change without rebuilding: the booking flow itself and the appointment reminder schedule.',
  (SELECT id FROM project_categories WHERE slug='booking'),
  (SELECT id FROM industries WHERE slug='healthcare'),
  'https://example.com/demo/clinic','https://example.com/demo/clinic/admin','demo','demo1234',

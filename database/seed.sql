@@ -16,7 +16,7 @@ SET NAMES utf8mb4;
 INSERT INTO `roles` (`name`, `slug`, `description`, `is_system`, `created_at`, `updated_at`) VALUES
 ('Super Admin',      'super-admin',      'Full access to every area of the platform.',                 1, NOW(), NOW()),
 ('Content Manager',  'content-manager',  'Pages, services, portfolio, blog, testimonials and FAQs.',   1, NOW(), NOW()),
-('Sales Manager',    'sales-manager',    'Leads, quotes, customers, packages and purchases.',          1, NOW(), NOW()),
+('Sales Manager',    'sales-manager',    'Leads, requests and customers.',          1, NOW(), NOW()),
 ('Support Manager',  'support-manager',  'Customer records, purchases and support information.',       1, NOW(), NOW());
 
 INSERT INTO `permissions` (`name`, `slug`, `group_name`, `sort_order`) VALUES
@@ -29,10 +29,8 @@ INSERT INTO `permissions` (`name`, `slug`, `group_name`, `sort_order`) VALUES
 ('Manage navigation',     'navigation.manage', 'Website',   20),
 ('Manage SEO',            'seo.manage',        'Website',   21),
 ('Manage global settings','settings.manage',   'Website',   22),
-('Manage packages',       'packages.manage',   'Commerce',  30),
 ('Manage premade projects','projects.manage',  'Commerce',  33),
 ('Manage project enquiries','project_orders.manage','Commerce', 34),
-('Manage purchases',      'purchases.manage',  'Commerce',  31),
 ('Manage customers',      'customers.manage',  'Commerce',  32),
 ('View leads',            'leads.view',        'Leads',     40),
 ('Manage leads',          'leads.manage',      'Leads',     41),
@@ -55,13 +53,13 @@ WHERE r.slug = 'content-manager';
 -- Sales Manager
 INSERT INTO `role_permissions` (`role_id`, `permission_id`)
 SELECT r.id, p.id FROM `roles` r JOIN `permissions` p
-  ON p.slug IN ('dashboard.view','leads.view','leads.manage','packages.manage','purchases.manage','project_orders.manage','customers.manage','export.manage','content.view')
+  ON p.slug IN ('dashboard.view','leads.view','leads.manage','project_orders.manage','customers.manage','export.manage','content.view')
 WHERE r.slug = 'sales-manager';
 
 -- Support Manager
 INSERT INTO `role_permissions` (`role_id`, `permission_id`)
 SELECT r.id, p.id FROM `roles` r JOIN `permissions` p
-  ON p.slug IN ('dashboard.view','leads.view','customers.manage','purchases.manage','project_orders.manage','content.view')
+  ON p.slug IN ('dashboard.view','leads.view','customers.manage','project_orders.manage','content.view')
 WHERE r.slug = 'support-manager';
 
 -- ---------------------------------------------------------------------
@@ -111,14 +109,9 @@ INSERT INTO `settings` (`group_name`, `key_name`, `value`, `type`, `label`, `hin
 ('appearance','enable_cursor','1','bool','Desktop cursor enhancement','Automatically disabled on touch devices.',4,NOW()),
 ('appearance','enable_transitions','1','bool','Page transitions','',5,NOW()),
 -- Commerce
-('commerce','public_pricing','0','bool','Show prices on the website','Off by default: packages and services are priced in conversation. Turn on only if you want figures published.',0,NOW()),
+('commerce','public_pricing','0','bool','Show prices on the website','Off by default: work is priced in conversation. Turn on only if you want figures published.',0,NOW()),
 ('commerce','currency','USD','text','Currency code','',1,NOW()),
 ('commerce','currency_symbol','$','text','Currency symbol','',2,NOW()),
-('commerce','show_prepaid_savings','1','bool','Show prepaid savings','Displays the saving on packages that have a prepaid price.',3,NOW()),
-('commerce','checkout_enabled','1','bool','Enable package requests','',4,NOW()),
-('commerce','payment_methods','bank_transfer,manual','text','Enabled payment methods','Comma separated. Only configured methods are offered.',5,NOW()),
-('commerce','payment_note','No payment is taken on this website. A member of the team confirms your requirements and sends a secure invoice with payment instructions.','textarea','Payment note','Shown at checkout.',6,NOW()),
-('commerce','bank_transfer_details','','textarea','Bank transfer details','Shown only when bank transfer is enabled.',7,NOW()),
 -- System
 ('system','maintenance_mode','0','bool','Maintenance mode','',1,NOW()),
 ('system','maintenance_message','We are performing scheduled maintenance and will be back shortly.','textarea','Maintenance message','',2,NOW()),
@@ -139,7 +132,7 @@ INSERT INTO `navigation` (`menu`,`parent_id`,`label`,`url`,`link_type`,`descript
 ('footer',NULL,'Services','/services','internal','','_self',1,0,1,NOW(),NOW()),
 ('footer',NULL,'Tell us what you need','/request','internal','','_self',1,0,2,NOW(),NOW()),
 ('footer',NULL,'Ready Projects','/premade-projects','internal','','_self',1,0,3,NOW(),NOW()),
-('footer',NULL,'Portfolio','/portfolio','internal','','_self',1,0,4,NOW(),NOW()),
+('footer',NULL,'Work','/portfolio','internal','','_self',1,0,4,NOW(),NOW()),
 ('footer',NULL,'Industries','/industries','internal','','_self',1,0,5,NOW(),NOW()),
 ('footer',NULL,'How It Works','/how-it-works','internal','','_self',1,0,6,NOW(),NOW()),
 ('footer',NULL,'Why TECHBISS','/why-techbiss','internal','','_self',1,0,7,NOW(),NOW()),
@@ -289,92 +282,11 @@ INSERT INTO `blog_tags` (`slug`,`name`) VALUES
 ('mobile','Mobile'),('conversion','Conversion'),('security','Security');
 
 -- ---------------------------------------------------------------------
--- Packages
--- ---------------------------------------------------------------------
-INSERT INTO `packages` (`slug`,`name`,`tagline`,`short_description`,`description`,`best_for`,`currency`,`regular_price`,`prepaid_price`,`billing_period`,`duration_months`,`badge`,`cta_label`,`icon`,`accent`,`is_custom_quote`,`is_featured`,`is_published`,`sort_order`,`seo_title`,`seo_description`,`created_at`,`updated_at`) VALUES
-('starter','Starter','Everything needed to exist online, properly.','Domain, hosting, SSL, a professional website and business email — the complete foundation for a business going digital for the first time.','<p>Starter covers the pieces every business needs before anything else works: an address you own, infrastructure that stays up, a site that explains what you do, and an email address that does not undermine you.</p>','Small and offline businesses beginning their digital journey','USD',999.00,799.00,'one-time',12,'','Request Starter','rocket','cyan',0,0,1,1,'Starter Package','Domain, hosting, SSL, a professional website and business email for businesses going digital.',NOW(),NOW()),
-('business','Business','For established businesses that need to perform.','A premium website with advanced SEO, analytics, a lead system, basic automation and ongoing maintenance.','<p>Business is for a company that already has customers and now needs the digital side to carry weight — to be found, to capture enquiries reliably and to keep running without attention.</p>','Established businesses ready to grow online','USD',2499.00,1999.00,'one-time',12,'Most Popular','Request Business','layers','violet',0,1,1,2,'Business Package','Premium website, advanced SEO, analytics, lead capture, automation and maintenance.',NOW(),NOW()),
-('premium','Premium','A complete premium digital presence.','Custom website, branding, advanced features, SEO, analytics, automation and priority support.','<p>Premium is the full build: brand identity, a custom site rather than a system template, the integrations that connect it to how you operate, and a support channel with priority response.</p>','Businesses that want to lead their market online','USD',4999.00,3999.00,'one-time',12,'','Request Premium','crown','amber',0,0,1,3,'Premium Package','Custom website, branding, SEO, analytics, automation and priority support.',NOW(),NOW()),
-('custom','Custom','Built entirely around your requirements.','Web applications, mobile applications, custom backends, API integrations, AI and dedicated support — scoped and priced to your project.','<p>Custom is scoped from your requirements rather than a list. Web and mobile applications, bespoke backends, integrations with the systems you already run, and a dedicated team.</p>','Advanced businesses with specific technical requirements','USD',0.00,NULL,'project',12,'Tailored','Request a Quote','settings','emerald',1,0,1,4,'Custom Development','Web applications, mobile apps, custom backends, API integrations and AI, scoped to your project.',NOW(),NOW());
-
-INSERT INTO `package_features` (`package_id`,`title`,`description`,`is_included`,`is_highlight`,`sort_order`)
-SELECT p.id, f.title, f.descr, f.inc, f.hl, f.ord FROM `packages` p JOIN (
-  SELECT 'starter' AS pk,'Domain registration' AS title,'Registered in your business name for the first year.' AS descr,1 AS inc,1 AS hl,1 AS ord
-  UNION ALL SELECT 'starter','Managed hosting','Provisioned, patched and monitored.',1,1,2
-  UNION ALL SELECT 'starter','SSL certificate','HTTPS on every page, renewals automated.',1,0,3
-  UNION ALL SELECT 'starter','Website','Up to 5 pages, responsive, content-managed.',1,1,4
-  UNION ALL SELECT 'starter','Business email','2 mailboxes on your domain, authentication configured.',1,0,5
-  UNION ALL SELECT 'starter','Search optimisation','Titles, descriptions, sitemap and Search Console.',1,0,6
-  UNION ALL SELECT 'starter','Standard support','Email support, next business day.',1,0,7
-  UNION ALL SELECT 'starter','Web application','',0,0,8
-  UNION ALL SELECT 'starter','Mobile application','',0,0,9
-
-  UNION ALL SELECT 'business','Domain registration','Registered in your business name.',1,0,1
-  UNION ALL SELECT 'business','Managed hosting','Higher resources with daily verified backups.',1,1,2
-  UNION ALL SELECT 'business','Website','Up to 12 pages with a custom design system.',1,1,3
-  UNION ALL SELECT 'business','Business email','5 mailboxes with migration included.',1,0,4
-  UNION ALL SELECT 'business','Search optimisation','Technical audit, on-page work and local listings.',1,1,5
-  UNION ALL SELECT 'business','Analytics','Goals, events and a monthly report.',1,0,6
-  UNION ALL SELECT 'business','Lead system','Enquiry capture, routing and notifications.',1,1,7
-  UNION ALL SELECT 'business','Automation','Automated follow-ups and internal alerts.',1,0,8
-  UNION ALL SELECT 'business','Maintenance','12 months of patching, backups and monitoring.',1,0,9
-  UNION ALL SELECT 'business','Mobile application','',0,0,10
-
-  UNION ALL SELECT 'premium','Domain registration','Registration or transfer, DNS fully configured.',1,0,1
-  UNION ALL SELECT 'premium','Managed hosting','Performance tier with staging environment.',1,0,2
-  UNION ALL SELECT 'premium','Website','Designed from scratch, no template.',1,1,3
-  UNION ALL SELECT 'premium','Advanced features','Booking, portals, calculators or integrations.',1,1,4
-  UNION ALL SELECT 'premium','Business email','10 mailboxes with shared aliases.',1,0,5
-  UNION ALL SELECT 'premium','Branding','Logo, colour, typography and guidelines.',1,1,6
-  UNION ALL SELECT 'premium','Search optimisation','Full technical and content programme.',1,0,7
-  UNION ALL SELECT 'premium','Analytics','Dashboards and conversion tracking.',1,0,8
-  UNION ALL SELECT 'premium','Automation','Workflow automation across your tools.',1,0,9
-  UNION ALL SELECT 'premium','Priority support','Named contact with priority response.',1,1,10
-
-  UNION ALL SELECT 'custom','Website','Scoped to your requirements.',1,0,1
-  UNION ALL SELECT 'custom','Web application','Built around your workflows.',1,1,2
-  UNION ALL SELECT 'custom','Mobile application','Android and iOS.',1,1,3
-  UNION ALL SELECT 'custom','Custom backend','APIs, services and admin tooling.',1,0,4
-  UNION ALL SELECT 'custom','API integrations','Connect the systems you already run.',1,0,5
-  UNION ALL SELECT 'custom','Advanced database','Modelled for your data and reporting.',1,0,6
-  UNION ALL SELECT 'custom','Automation','Process automation across the business.',1,0,7
-  UNION ALL SELECT 'custom','AI solutions','Applied where it measurably helps.',1,1,8
-  UNION ALL SELECT 'custom','Dedicated support','A named team with an agreed SLA.',1,1,9
-  UNION ALL SELECT 'custom','Domain registration','Registration or transfer, DNS fully configured.',1,0,10
-  UNION ALL SELECT 'custom','Managed hosting','Sized to the build, with staging.',1,0,11
-  UNION ALL SELECT 'custom','SSL certificate','HTTPS everywhere, renewals automated.',1,0,12
-  UNION ALL SELECT 'custom','Business email','Mailboxes on your domain, as many as you need.',1,0,13
-  UNION ALL SELECT 'custom','Search optimisation','Technical foundation built in from the start.',1,0,14
-  UNION ALL SELECT 'custom','Analytics','Dashboards and conversion tracking.',1,0,15
-  UNION ALL SELECT 'custom','Lead system','Enquiry capture, routing and notifications.',1,0,16
-  UNION ALL SELECT 'custom','Maintenance','Ongoing patching, backups and monitoring.',1,0,17
-  UNION ALL SELECT 'premium','SSL certificate','HTTPS on every page, renewals automated.',1,0,11
-  UNION ALL SELECT 'premium','Lead system','Enquiry capture, routing and notifications.',1,0,12
-  UNION ALL SELECT 'premium','Maintenance','12 months of patching, backups and monitoring.',1,0,13
-  UNION ALL SELECT 'business','SSL certificate','HTTPS on every page, renewals automated.',1,0,11
-) f ON f.pk = p.slug;
-
-INSERT INTO `package_addons` (`slug`,`name`,`description`,`price`,`currency`,`billing_period`,`is_published`,`sort_order`,`created_at`,`updated_at`) VALUES
-('extra-pages','Additional website pages','Five additional designed and built pages.',350.00,'USD','one-time',1,1,NOW(),NOW()),
-('extra-mailboxes','Additional mailboxes','Five additional business email accounts for a year.',120.00,'USD','yearly',1,2,NOW(),NOW()),
-('ecommerce-module','E-commerce module','Catalogue, checkout and payment gateway integration.',900.00,'USD','one-time',1,3,NOW(),NOW()),
-('booking-system','Online booking system','Availability, bookings and automated reminders.',650.00,'USD','one-time',1,4,NOW(),NOW()),
-('multilingual','Additional language','A second language across the whole site.',480.00,'USD','one-time',1,5,NOW(),NOW()),
-('content-writing','Professional copywriting','Written content for up to 8 pages.',420.00,'USD','one-time',1,6,NOW(),NOW()),
-('logo-design','Logo & identity','Logo design with variants and usage guidance.',550.00,'USD','one-time',1,7,NOW(),NOW()),
-('seo-retainer','Monthly SEO retainer','Ongoing technical and content SEO work.',400.00,'USD','monthly',1,8,NOW(),NOW()),
-('priority-support','Priority support upgrade','Faster response times and a named contact.',250.00,'USD','yearly',1,9,NOW(),NOW()),
-('whatsapp-integration','WhatsApp Business integration','Enquiries and notifications through WhatsApp.',180.00,'USD','one-time',1,10,NOW(),NOW());
-
-INSERT INTO `package_addon_map` (`package_id`,`addon_id`)
-SELECT p.id, a.id FROM `packages` p CROSS JOIN `package_addons` a WHERE p.slug IN ('starter','business','premium');
-
--- ---------------------------------------------------------------------
 -- Process steps
 -- ---------------------------------------------------------------------
 INSERT INTO `process_steps` (`step_number`,`title`,`description`,`icon`,`duration`,`is_published`,`sort_order`,`created_at`,`updated_at`) VALUES
 ('01','Tell Us About Your Business','We start by understanding what the business actually does, who it sells to and what is getting in the way today. No jargon, no assumptions.','chat','Day 1',1,1,NOW(),NOW()),
-('02','Choose Your Setup','Select a package that fits, or ask for a custom scope. You see exactly what is included, and we send the price before you decide.','list','Day 1–3',1,2,NOW(),NOW()),
+('02','Choose Your Setup','Tell us what you want included, in your own words if it is easier. We come back with the scope and the price in writing.','list','Day 1–3',1,2,NOW(),NOW()),
 ('03','Build Your Foundation','Domain, hosting, SSL, DNS and business email. The infrastructure your business will own and run on, configured correctly from the start.','server','Week 1',1,3,NOW(),NOW()),
 ('04','Design Your Digital Presence','Website, branding and the user experience around them — designed for how your customers actually decide, reviewed with you before build.','palette','Week 2–4',1,4,NOW(),NOW()),
 ('05','Launch','Testing, performance, accessibility and search setup. Then everything goes live properly, with the handover and credentials that make it yours.','rocket','Week 4–6',1,5,NOW(),NOW()),
@@ -385,8 +297,8 @@ INSERT INTO `process_steps` (`step_number`,`title`,`description`,`icon`,`duratio
 -- ---------------------------------------------------------------------
 INSERT INTO `faqs` (`question`,`answer`,`category`,`is_published`,`sort_order`,`created_at`,`updated_at`) VALUES
 ('Do I own my domain and hosting?','Yes. The domain is registered in your business name and you receive the registrar credentials. Hosting is provisioned for you and you get access. If you ever choose to work with someone else, everything moves with you.','Getting Started',1,1,NOW(),NOW()),
-('I have no website at all. Where do we start?','With a conversation about the business, not about technology. We work out what your customers need to see, then build the foundation — domain, hosting, email — and the site on top of it. The Starter package exists for exactly this situation.','Getting Started',1,2,NOW(),NOW()),
-('How long does a typical project take?','A Starter setup is usually live in two to three weeks. Business and Premium builds typically run four to eight weeks depending on content and scope. Custom applications are scoped individually. We give you a schedule before starting, not after.','Getting Started',1,3,NOW(),NOW()),
+('I have no website at all. Where do we start?','With a conversation about the business, not about technology. We work out what your customers need to see, then build the foundation — domain, hosting, email — and the site on top of it. Starting from nothing is the situation we set up for most often.','Getting Started',1,2,NOW(),NOW()),
+('How long does a typical project take?','A first website is usually live in two to three weeks. A larger build with SEO, analytics and automation typically runs four to eight weeks depending on content and scope. Custom applications are scoped individually. We give you a schedule before starting, not after.','Getting Started',1,3,NOW(),NOW()),
 ('What do I need to provide?','Information about your business, any existing brand assets, and someone who can approve decisions. If you do not have content or photography, we can produce those as part of the project.','Getting Started',1,4,NOW(),NOW()),
 ('Can I pay less by paying upfront?','Sometimes settling upfront rather than in stages reduces the total. We tell you both figures in writing when we quote.','Pricing',1,10,NOW(),NOW()),
 ('Are there any recurring costs?','Domain registration and hosting renew annually, and some add-ons are billed monthly or yearly. Renewal costs are stated in writing before you commit — nothing renews at a price you have not seen.','Pricing',1,11,NOW(),NOW()),
@@ -394,12 +306,12 @@ INSERT INTO `faqs` (`question`,`answer`,`category`,`is_published`,`sort_order`,`
 ('Do you take payment through the website?','No. This website records your request. A member of the team confirms the scope with you and sends a formal invoice with payment instructions. Nothing is charged automatically.','Pricing',1,13,NOW(),NOW()),
 ('Will my website work on mobile?','Every site we build is designed for mobile first and tested across phones, tablets and desktop. For most businesses the majority of visitors arrive on a phone, so that is where the design decisions start.','Technical',1,20,NOW(),NOW()),
 ('Can I update the content myself?','Yes. Every site ships with an admin panel where you can edit text, images, pages, blog posts and SEO settings without touching code. We train your team on it at handover.','Technical',1,21,NOW(),NOW()),
-('What happens if something breaks?','Packages including maintenance cover patching, backups and monitoring, and you have a support channel with a stated response time. Without a maintenance plan, support is available on request.','Technical',1,22,NOW(),NOW()),
+('What happens if something breaks?','Where maintenance is part of what we agreed, that covers patching, backups and monitoring, and you have a support channel with a stated response time. Without it, support is available on request.','Technical',1,22,NOW(),NOW()),
 ('Do you migrate an existing website?','Yes. We migrate content, set up redirects so existing search rankings are preserved, and move email across with minimal downtime.','Technical',1,23,NOW(),NOW()),
 ('Will SEO get me to the top of Google?','No one can honestly promise a specific ranking. What we can do is fix what is technically holding the site back, structure content around what your customers actually search for, and report the real numbers each month. Positions improve over months, not days.','SEO & Growth',1,30,NOW(),NOW()),
 ('How do you measure results?','Analytics with defined goals, search performance data and enquiry volume. You see the same dashboard we do.','SEO & Growth',1,31,NOW(),NOW()),
 ('Do you work with businesses outside your country?','Yes. Projects run remotely with scheduled calls, and we work across time zones regularly.','Working Together',1,40,NOW(),NOW()),
-('What if I need something that is not in a package?','Ask. Packages cover common situations; plenty of businesses need something different. Custom scoping is a normal part of what we do.','Working Together',1,41,NOW(),NOW()),
+('What if I need something unusual?','Ask. Most of what we build is a combination of the same services; plenty of businesses need something outside them. Custom scoping is a normal part of what we do.','Working Together',1,41,NOW(),NOW()),
 ('Who owns the work once it is finished?','You do. Code, designs, content and accounts are yours, and we hand over the credentials at launch.','Working Together',1,42,NOW(),NOW());
 
 -- ---------------------------------------------------------------------
@@ -408,16 +320,16 @@ INSERT INTO `faqs` (`question`,`answer`,`category`,`is_published`,`sort_order`,`
 INSERT INTO `pages` (`slug`,`title`,`eyebrow`,`subtitle`,`content`,`template`,`seo_title`,`seo_description`,`is_published`,`is_system`,`sort_order`,`created_at`,`updated_at`) VALUES
 ('about','About TECHBISS','The company behind the work.','We exist to take businesses that work — real businesses, with real customers — and give them a digital presence that matches.','<h2>Why we started</h2><p>Most businesses do not fail online because they chose the wrong shade of blue. They fail because nobody ever assembled the pieces: the domain sits with a former web designer, the email is a personal address, the site was built once and never touched again, and there is no one to call when something breaks.</p><p>TECHBISS was built to be the partner that handles all of it. One relationship covering domain, hosting, website, applications, email, branding, search and support — so a business owner can go back to running the business.</p><h2>How we work</h2><p>We start with the business, not the technology. What does it sell, who buys it, and what is currently getting in the way? Only then do we decide what to build. That order matters: it is the difference between a website that looks expensive and one that actually earns.</p><h2>What we will not do</h2><p>We do not promise rankings we cannot control, invent statistics, or quote a price that changes once work begins. If something is outside what we do well, we will say so.</p>','default','About TECHBISS','TECHBISS is a complete digital transformation partner for offline businesses — domain, hosting, websites, apps, email, branding, SEO and support.',1,1,1,NOW(),NOW()),
 ('why-techbiss','Why TECHBISS','From offline business to digital brand.','Most agencies build a website and leave. We build the whole digital foundation and stay to run it.','<h2>One partner, not five vendors</h2><p>The usual path is a registrar for the domain, a host, a designer, a developer, someone for email, someone else for SEO — and no one accountable when they do not fit together. TECHBISS covers the whole stack under one relationship.</p><h2>Business first, technology second</h2><p>Every project starts with how the business earns. The technical decisions follow from that, which is why our work tends to look different from business to business even though the standard is constant.</p><h2>You own everything</h2><p>Domain in your name. Hosting in your account. Credentials handed over. Code and designs yours. There is no lock-in, because a client who stays by choice is worth more than one who cannot leave.</p><h2>Priced in conversation</h2><p>We do not publish prices, because the work changes with what you actually need. Tell us the list and we send a written figure, usually within one business day.</p><h2>Honest about outcomes</h2><p>A professional digital presence helps a business look established, makes information easy to find, extends reach beyond a physical location and creates a foundation to build on. It is not a guarantee of sales, and we will never present it as one.</p>','default','Why TECHBISS','One partner for domain, hosting, website, apps, email, branding and SEO — with full ownership and a written price before you commit.',1,1,2,NOW(),NOW()),
-('privacy-policy','Privacy Policy','Legal','How TECHBISS collects, uses and protects the information you share with us.','<p><em>Please review this policy with your legal advisor and adjust it to reflect how your business actually operates and the jurisdictions you serve. It is provided as a starting structure, not as legal advice.</em></p><h2>Information we collect</h2><p>We collect information you provide directly: name, business name, email address, phone number, country and any details you include in an enquiry, quote request or package request. We also collect limited technical information such as IP address and browser user agent when you submit a form, which we use to prevent abuse.</p><h2>How we use information</h2><p>To respond to your enquiry, prepare quotes, deliver services you have requested, send service-related communications, and — where you have opted in — send occasional updates. We do not sell your information.</p><h2>Analytics</h2><p>If analytics is enabled on this site, aggregate usage data is collected to understand how the site performs. Details of the provider are available on request.</p><h2>Data retention</h2><p>Enquiries and quote requests are retained for as long as needed to serve you and to meet legal and accounting obligations, then deleted.</p><h2>Your rights</h2><p>You may request a copy of the information we hold about you, ask for corrections, or ask us to delete it. Contact us using the details on the contact page.</p><h2>Security</h2><p>Data is transmitted over encrypted connections and stored on access-controlled systems. No system is perfectly secure, but we take reasonable technical and organisational measures to protect your information.</p><h2>Changes</h2><p>We may update this policy. The current version is always published on this page.</p>','legal','Privacy Policy','How TECHBISS collects, uses, retains and protects personal information.',1,1,90,NOW(),NOW()),
-('terms-and-conditions','Terms & Conditions','Legal','The terms that apply to using this website and engaging TECHBISS for services.','<p><em>Please review these terms with your legal advisor and adjust them to reflect your actual contracting practice and jurisdiction. They are provided as a starting structure, not as legal advice.</em></p><h2>Using this website</h2><p>You may use this website for legitimate business purposes. You may not attempt to gain unauthorised access to any part of it, interfere with its operation, or submit content that is unlawful or misleading.</p><h2>Enquiries and requests</h2><p>Submitting an enquiry, quote request or package request does not create a contract. It is a request for us to respond. A project begins only when a written proposal or agreement is signed by both parties.</p><h2>Pricing</h2><p>We do not publish prices on this website. The price that applies to your project is the one stated in your written proposal.</p><h2>Payment</h2><p>No payment is taken through this website. Invoices are issued separately with payment instructions and terms.</p><h2>Ownership</h2><p>On full payment, ownership of the deliverables produced for you transfers to you, excluding third-party components which remain under their own licences. Domains are registered in your name.</p><h2>Third-party services</h2><p>Some deliverables depend on third-party services such as registrars, hosting providers, payment gateways and app stores. Their terms and availability are outside our control.</p><h2>Limitation of liability</h2><p>To the extent permitted by law, our liability arising from a project is limited to the fees paid for that project. We are not liable for indirect or consequential loss.</p><h2>Contact</h2><p>Questions about these terms can be sent using the details on the contact page.</p>','legal','Terms & Conditions','Terms applying to the use of the TECHBISS website and engagement for services.',1,1,91,NOW(),NOW());
+('privacy-policy','Privacy Policy','Legal','How TECHBISS collects, uses and protects the information you share with us.','<p><em>Please review this policy with your legal advisor and adjust it to reflect how your business actually operates and the jurisdictions you serve. It is provided as a starting structure, not as legal advice.</em></p><h2>Information we collect</h2><p>We collect information you provide directly: name, business name, email address, phone number, country and any details you include in an enquiry or request. We also collect limited technical information such as IP address and browser user agent when you submit a form, which we use to prevent abuse.</p><h2>How we use information</h2><p>To respond to your enquiry, prepare quotes, deliver services you have requested, send service-related communications, and — where you have opted in — send occasional updates. We do not sell your information.</p><h2>Analytics</h2><p>If analytics is enabled on this site, aggregate usage data is collected to understand how the site performs. Details of the provider are available on request.</p><h2>Data retention</h2><p>Enquiries and quote requests are retained for as long as needed to serve you and to meet legal and accounting obligations, then deleted.</p><h2>Your rights</h2><p>You may request a copy of the information we hold about you, ask for corrections, or ask us to delete it. Contact us using the details on the contact page.</p><h2>Security</h2><p>Data is transmitted over encrypted connections and stored on access-controlled systems. No system is perfectly secure, but we take reasonable technical and organisational measures to protect your information.</p><h2>Changes</h2><p>We may update this policy. The current version is always published on this page.</p>','legal','Privacy Policy','How TECHBISS collects, uses, retains and protects personal information.',1,1,90,NOW(),NOW()),
+('terms-and-conditions','Terms & Conditions','Legal','The terms that apply to using this website and engaging TECHBISS for services.','<p><em>Please review these terms with your legal advisor and adjust them to reflect your actual contracting practice and jurisdiction. They are provided as a starting structure, not as legal advice.</em></p><h2>Using this website</h2><p>You may use this website for legitimate business purposes. You may not attempt to gain unauthorised access to any part of it, interfere with its operation, or submit content that is unlawful or misleading.</p><h2>Enquiries and requests</h2><p>Submitting an enquiry or request does not create a contract. It is a request for us to respond. A project begins only when a written proposal or agreement is signed by both parties.</p><h2>Pricing</h2><p>We do not publish prices on this website. The price that applies to your project is the one stated in your written proposal.</p><h2>Payment</h2><p>No payment is taken through this website. Invoices are issued separately with payment instructions and terms.</p><h2>Ownership</h2><p>On full payment, ownership of the deliverables produced for you transfers to you, excluding third-party components which remain under their own licences. Domains are registered in your name.</p><h2>Third-party services</h2><p>Some deliverables depend on third-party services such as registrars, hosting providers, payment gateways and app stores. Their terms and availability are outside our control.</p><h2>Limitation of liability</h2><p>To the extent permitted by law, our liability arising from a project is limited to the fees paid for that project. We are not liable for indirect or consequential loss.</p><h2>Contact</h2><p>Questions about these terms can be sent using the details on the contact page.</p>','legal','Terms & Conditions','Terms applying to the use of the TECHBISS website and engagement for services.',1,1,91,NOW(),NOW());
 
 -- ---------------------------------------------------------------------
 -- Homepage sections
 -- ---------------------------------------------------------------------
 INSERT INTO `page_sections` (`page_key`,`section_key`,`eyebrow`,`heading`,`subheading`,`body`,`cta_label`,`cta_url`,`is_published`,`sort_order`,`created_at`,`updated_at`) VALUES
 ('home','hero','One partner. Websites and apps.','Your Digital Business Starts Here.','We take offline businesses online — domain, website, email, branding, SEO — and build the custom app you have in mind.','','Tell Us What You Need','/request',1,1,NOW(),NOW()),
-('home','problem','The starting point','Still running your business mostly offline?','You have the customers and the reputation. What is missing is the part that makes you easy to find and easy to buy from.','','Build My Digital Business','/request',1,2,NOW(),NOW()),
-('home','chain','The transformation','From offline business to digital brand.','Each piece depends on the one before. We build them in order.','','See what we do','/services',1,3,NOW(),NOW()),
+('home','problem','The starting point','Still running your business mostly offline?','You have the customers and the reputation. What is missing is the part that makes you easy to find and easy to buy from.','','','',1,2,NOW(),NOW()),
+('home','chain','The transformation','From offline business to digital brand.','Each piece depends on the one before. We build them in order.','','','',1,3,NOW(),NOW()),
 ('home','services','What we do','Everything your business needs to operate online.','Ten services — your domain and website, custom web and mobile apps, and the work that keeps them running.','','View all services','/services',1,4,NOW(),NOW()),
 ('home','trust','Credibility','What this actually changes.','Not guaranteed sales. How established you look, how easily customers find you, and how far past your front door you reach.','','','',1,5,NOW(),NOW()),
 ('home','process','How it works','Six stages, first call to ongoing support.','A defined process, with a schedule you see before we start.','','See the full process','/how-it-works',1,6,NOW(),NOW()),

@@ -219,11 +219,6 @@ final class Migrator
         ];
     }
 
-    public function hasWork(): bool
-    {
-        $p = $this->pending();
-        return $p['tables'] !== [] || $p['columns'] !== [] || $p['indexes'] !== [] || $p['data'] !== [];
-    }
 
     /**
      * Apply everything pending. Returns one line per change made.

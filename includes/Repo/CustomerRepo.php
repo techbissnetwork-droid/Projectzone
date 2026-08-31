@@ -75,9 +75,7 @@ final class CustomerRepo
         $total  = $this->db()->int("SELECT COUNT(*) FROM customers c WHERE $w", $params);
         $offset = max(0, (min($page, 1000000) - 1) * $perPage); // clamp page: an absurd ?page must not overflow the int product into a float and corrupt the SQL OFFSET
         $items  = $this->db()->all(
-            "SELECT c.*, i.name AS industry_name,
-                    (SELECT COUNT(*) FROM package_purchases p WHERE p.customer_id = c.id) AS purchase_count,
-                    (SELECT COALESCE(SUM(p.total_amount),0) FROM package_purchases p WHERE p.customer_id = c.id AND p.payment_status = 'paid') AS lifetime_value
+            "SELECT c.*, i.name AS industry_name
              FROM customers c LEFT JOIN industries i ON i.id = c.industry_id
              WHERE $w ORDER BY c.created_at DESC, c.id DESC LIMIT " . (int) $perPage . " OFFSET $offset",
             $params

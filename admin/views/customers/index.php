@@ -48,7 +48,7 @@ $query = array_filter(['q' => $search, 'status' => $status]);
         <table class="data-table" style="min-width:820px">
             <thead>
                 <tr><th>Customer</th><th>Business</th><th>Country</th><th>Industry</th>
-                    <th class="num">Purchases</th><th class="num">Value</th><th>Status</th><th class="num">Added</th></tr>
+                    <th>Status</th><th class="num">Added</th></tr>
             </thead>
             <tbody>
                 <?php foreach ($rows as $row): ?>
@@ -62,8 +62,6 @@ $query = array_filter(['q' => $search, 'status' => $status]);
                     <td><?= e($row['business_name'] ?: '—') ?></td>
                     <td><span class="hint"><?= e($row['country'] ?: '—') ?></span></td>
                     <td><span class="hint"><?= e($row['industry_name'] ?: '—') ?></span></td>
-                    <td class="num"><?= (int) $row['purchase_count'] ?></td>
-                    <td class="num"><?= (float) $row['lifetime_value'] > 0 ? e(money($row['lifetime_value'])) : '<span class="hint">—</span>' ?></td>
                     <td>
                         <span class="status-dot status-dot--<?= $row['status'] === 'active' ? 'live' : ($row['status'] === 'lead' ? 'info' : 'draft') ?>">
                             <?= e(ucfirst((string) $row['status'])) ?>

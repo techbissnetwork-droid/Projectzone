@@ -7,13 +7,20 @@ $needs = array_filter(array_map('trim', explode(',', (string) $row['services_nee
 <div class="page-header">
     <div>
         <h1><?= e($row['reference']) ?></h1>
-        <p><?= e(ucfirst((string) $row['source'])) ?> request from <?= e($row['name']) ?> · <?= e(format_date($row['created_at'], 'j F Y, H:i')) ?></p>
+        <p>Request from <?= e($row['name'] ?: 'someone who left no name') ?> · <?= e(format_date($row['created_at'], 'j F Y, H:i')) ?></p>
     </div>
     <div class="page-header__actions">
         <a class="btn btn--ghost btn--sm" href="<?= e(url('/admin/quotes')) ?>"><?= icon('arrow-left') ?>Back</a>
+        <?php if (filter_var($row['email'], FILTER_VALIDATE_EMAIL)): ?>
         <a class="btn btn--primary btn--sm" href="mailto:<?= e($row['email']) ?>?subject=<?= rawurlencode('Your TECHBISS request ' . $row['reference']) ?>">
-            <?= icon('send') ?>Reply
+            <?= icon('send') ?>Reply by email
         </a>
+        <?php elseif (($row['phone'] ?? '') !== ''): ?>
+        <a class="btn btn--primary btn--sm" target="_blank" rel="noopener noreferrer"
+           href="https://wa.me/<?= e(preg_replace('/[^0-9]/', '', (string) $row['phone'])) ?>">
+            <?= icon('whatsapp') ?>Reply on WhatsApp
+        </a>
+        <?php endif; ?>
     </div>
 </div>
 
@@ -23,12 +30,8 @@ $needs = array_filter(array_map('trim', explode(',', (string) $row['services_nee
             <div class="panel__head"><span class="panel__title">What they asked for</span></div>
             <div class="panel__body">
                 <div class="kv-list kv-list--2">
-                    <div class="kv"><span class="kv__label">Business stage</span><span class="kv__value"><?= e($row['business_stage'] ?: '—') ?></span></div>
-                    <div class="kv"><span class="kv__label">Industry</span><span class="kv__value"><?= e($row['industry_name'] ?: '—') ?></span></div>
-                    <div class="kv"><span class="kv__label">Budget</span><span class="kv__value"><?= e($row['budget_range'] ?: '—') ?></span></div>
-                    <div class="kv"><span class="kv__label">Timeline</span><span class="kv__value"><?= e($row['timeline'] ?: '—') ?></span></div>
-                    <?php if (!empty($row['package_name'])): ?>
-                    <div class="kv"><span class="kv__label">Package of interest</span><span class="kv__value"><?= e($row['package_name']) ?></span></div>
+                    <?php if (!empty($row['industry_name'])): ?>
+                    <div class="kv"><span class="kv__label">Industry</span><span class="kv__value"><?= e($row['industry_name']) ?></span></div>
                     <?php endif; ?>
                     <?php if (!empty($row['website'])): ?>
                     <div class="kv"><span class="kv__label">Existing website</span>

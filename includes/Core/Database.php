@@ -158,11 +158,6 @@ final class Database
         }
     }
 
-    public function tableExists(string $table): bool
-    {
-        $sql = 'SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?';
-        return $this->int($sql, [$table]) > 0;
-    }
 
     /** Identifiers never come from user input, but be strict regardless. */
     private function guard(string $identifier): string

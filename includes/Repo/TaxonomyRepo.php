@@ -18,20 +18,6 @@ final class TaxonomyRepo extends BaseRepo
         $this->orderBy = in_array($table, ['blog_tags'], true) ? 'name ASC' : 'sort_order ASC, name ASC';
     }
 
-    /** @return array<int,array<string,mixed>> */
-    public function withCounts(string $countTable, string $foreignKey): array
-    {
-        $t  = $this->table;
-        $ct = preg_match('/^[a-z_]+$/', $countTable) ? $countTable : '';
-        $fk = preg_match('/^[a-z_]+$/', $foreignKey) ? $foreignKey : '';
-        if ($ct === '' || $fk === '') {
-            return $this->all();
-        }
-        return $this->db()->all(
-            "SELECT t.*, (SELECT COUNT(*) FROM `$ct` x WHERE x.`$fk` = t.id) AS usage_count
-             FROM `$t` t ORDER BY {$this->orderBy}"
-        );
-    }
 
     /** Find an existing row by name or create it — used for free-text tag entry. */
     public function findOrCreate(string $name): int

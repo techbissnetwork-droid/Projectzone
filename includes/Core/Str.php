@@ -155,18 +155,4 @@ final class Str
         return trim($out);
     }
 
-    /** Convert plain textarea content into safe paragraphs. */
-    public static function autoParagraph(string $text): string
-    {
-        $text  = str_replace(["\r\n", "\r"], "\n", trim($text));
-        if ($text === '') {
-            return '';
-        }
-        $blocks = preg_split('/\n{2,}/', $text) ?: [];
-        $html   = '';
-        foreach ($blocks as $block) {
-            $html .= '<p>' . nl2br(htmlspecialchars(trim($block), ENT_QUOTES, 'UTF-8'), false) . '</p>';
-        }
-        return $html;
-    }
 }

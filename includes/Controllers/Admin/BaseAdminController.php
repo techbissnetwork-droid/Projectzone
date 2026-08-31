@@ -9,7 +9,6 @@ use Techbiss\Core\Csrf;
 use Techbiss\Core\Request;
 use Techbiss\Core\Session;
 use Techbiss\Core\View;
-use Techbiss\Repo\LeadRepo;
 
 abstract class BaseAdminController
 {

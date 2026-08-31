@@ -306,10 +306,6 @@ final class ProjectRepo extends BaseRepo
         );
     }
 
-    public function publishedCount(): int
-    {
-        return $this->db()->int('SELECT COUNT(*) FROM premade_projects WHERE is_published = 1');
-    }
 
     /** Copy a project with its features, images and technologies. */
     public function duplicate(int $id): ?int

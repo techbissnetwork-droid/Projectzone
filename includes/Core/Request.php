@@ -81,10 +81,6 @@ final class Request
         return is_numeric($v) ? (int) $v : $default;
     }
 
-    public function allQuery(): array
-    {
-        return $this->query;
-    }
 
     public function post(string $key, mixed $default = null): mixed
     {
@@ -214,9 +210,4 @@ final class Request
         return $this->isAjax() || str_contains($accept, 'application/json');
     }
 
-    public function referer(): string
-    {
-        $r = $this->server['HTTP_REFERER'] ?? '';
-        return is_string($r) ? $r : '';
-    }
 }

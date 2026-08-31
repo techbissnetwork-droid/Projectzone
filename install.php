@@ -541,7 +541,7 @@ function tb_install(array $db, array $site, array $admin, bool $demo, bool $crea
         $seeded = (int) $pdo->query('SELECT COUNT(*) FROM roles')->fetchColumn() > 0;
         if (!$seeded) {
             $n = tb_run_sql($pdo, TB_ROOT . '/database/seed.sql');
-            $steps[] = 'Loaded roles, permissions, settings, navigation, services, industries, packages and FAQs';
+            $steps[] = 'Loaded roles, permissions, settings, navigation, services, industries and FAQs';
         } else {
             $steps[] = 'Baseline content already present — left untouched';
         }

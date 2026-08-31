@@ -68,6 +68,32 @@ final class PortfolioRepo extends BaseRepo
         return $rows;
     }
 
+    /**
+     * Projects that actually used this service.
+     *
+     * The service pages used to show the same three featured projects on every
+     * one of them, which told a visitor nothing about the service they were
+     * reading. This uses the mapping the admin already maintains, and returns
+     * nothing rather than filler when a service has no work behind it yet.
+     *
+     * @return array<int,array<string,mixed>>
+     */
+    public function forService(int $serviceId, int $limit = 3): array
+    {
+        $rows = $this->db()->all(
+            'SELECT ' . self::SELECT_LIST . ' ' . self::JOINS .
+            ' JOIN portfolio_services ps ON ps.portfolio_id = p.id
+             WHERE ps.service_id = ? AND p.is_published = 1
+             ORDER BY p.is_featured DESC, p.sort_order ASC, p.id DESC LIMIT ' . max(1, $limit),
+            [$serviceId]
+        );
+        foreach ($rows as &$row) {
+            $row['technologies'] = $this->technologyNames((int) $row['id']);
+        }
+        unset($row);
+        return $rows;
+    }
+
     public function publishedBySlug(string $slug): ?array
     {
         return $this->db()->first(

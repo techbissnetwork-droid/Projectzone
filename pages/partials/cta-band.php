@@ -43,7 +43,10 @@ $chat     = $waHref !== '' || $mailHref !== '';
                     <a class="btn btn--primary btn--lg btn--arrow" href="<?= e(url($primaryUrl)) ?>" data-magnetic="0.24">
                         <?= e($primaryLabel) ?><?= icon('arrow-right') ?>
                     </a>
+                    <?php /* Not on the services page itself, where it links nowhere new. */ ?>
+                    <?php if (\Techbiss\Core\App::currentPath() !== '/services'): ?>
                     <a class="btn btn--ghost btn--lg" href="<?= e(url('/services')) ?>">See what we do</a>
+                    <?php endif; ?>
                 <?php endif; ?>
             </div>
             <p class="cta-band__note">No payment is taken on this website. We confirm scope and pricing with you first.</p>
