@@ -152,7 +152,11 @@ final class Uploader
         $probe = preg_replace('/[\x00-\x20]+/', ' ', $probe) ?? $probe;
 
         // Elements and constructs that can run code or pull in a remote document.
-        if (preg_match('/<\s*(script|foreignObject|iframe|embed|object|handler|set|animate|animateTransform|animateMotion)\b/i', $probe)) {
+        // The optional "prefix:" allows for a namespaced spelling such as
+        // <s:script xmlns:s="http://www.w3.org/2000/svg">: that is still a real
+        // SVG script element and executes, so it must be caught here too — a
+        // bare "script" match alone would let the prefixed form straight through.
+        if (preg_match('/<\s*(?:[a-z][\w.\-]*:)?(script|foreignObject|iframe|embed|object|handler|set|animate|animateTransform|animateMotion)\b/i', $probe)) {
             return false;
         }
         // An inline DTD can define entities that expand into anything.
