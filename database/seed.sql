@@ -80,7 +80,7 @@ INSERT INTO `settings` (`group_name`, `key_name`, `value`, `type`, `label`, `hin
 ('contact','sales_email','','text','Sales email','For new enquiries. Leave blank to use the public contact email.',2,NOW()),
 ('contact','support_email','','text','Support email','For existing clients. Shown on the contact page only when it differs from the public one.',3,NOW()),
 ('contact','contact_phone','','text','Phone number','',4,NOW()),
-('contact','whatsapp','','text','WhatsApp number','Digits only, with country code.',5,NOW()),
+('contact','whatsapp','','text','WhatsApp number or chat link','A phone number with country code (e.g. 8801711223344), or a full chat link (wa.me/… or a WhatsApp Business link) — either works.',5,NOW()),
 ('contact','address','','textarea','Address','',6,NOW()),
 ('contact','country','','text','Country','',7,NOW()),
 ('contact','business_hours','Monday – Friday, 09:00 – 18:00','text','Business hours','',8,NOW()),

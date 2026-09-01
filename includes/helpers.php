@@ -83,19 +83,38 @@ function setting_bool(string $key, bool $default = false): bool
 }
 
 /**
- * A wa.me link with the message already written, or '' if no number is set.
+ * A WhatsApp chat link with the message already written, or '' if nothing
+ * usable is configured.
+ *
+ * The Settings field takes either a plain phone number (with country code)
+ * or a ready-made chat link — a wa.me URL, an api.whatsapp.com link, or a
+ * WhatsApp Business short link. Whichever was pasted in, this hands back a
+ * link the message can be attached to.
  *
  * Returning '' rather than a dead link matters: a WhatsApp button that opens
  * nothing is worse than no button, so callers hide the button instead.
  */
 function whatsapp_link(string $message = ''): string
 {
-    $number = preg_replace('/[^0-9]/', '', setting('whatsapp')) ?? '';
-    if (strlen($number) < 8) {
+    $raw = trim(setting('whatsapp'));
+    if ($raw === '') {
         return '';
     }
 
-    return 'https://wa.me/' . $number . ($message === '' ? '' : '?text=' . rawurlencode($message));
+    if (preg_match('#^https?://#i', $raw)) {
+        $url = $raw;
+    } else {
+        $number = preg_replace('/[^0-9]/', '', $raw) ?? '';
+        if (strlen($number) < 8) {
+            return '';
+        }
+        $url = 'https://wa.me/' . $number;
+    }
+
+    if ($message === '') {
+        return $url;
+    }
+    return $url . (str_contains($url, '?') ? '&' : '?') . 'text=' . rawurlencode($message);
 }
 
 /** A mailto: link with the subject filled in, or '' if no address is set. */

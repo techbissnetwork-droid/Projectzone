@@ -24,14 +24,9 @@ $demoPass  = trim((string) $project['demo_password']);
 
 // Each channel appears only when it is configured, so the page never offers a
 // way to reach us that does not work.
-$whatsapp  = preg_replace('/[^0-9]/', '', $settings->get('whatsapp'));
-$waNumber  = ($whatsapp !== '' && strlen($whatsapp) >= 8) ? $whatsapp : '';
-$salesMail = $settings->get('sales_email') ?: $settings->get('contact_email');
-$askText   = 'Hi, I am interested in the "' . $project['name'] . '" project on your website.';
-$waLink    = $waNumber !== '' ? 'https://wa.me/' . $waNumber . '?text=' . rawurlencode($askText) : '';
-$mailLink  = $salesMail !== ''
-    ? 'mailto:' . $salesMail . '?subject=' . rawurlencode($project['name'] . ' — enquiry') . '&body=' . rawurlencode($askText)
-    : '';
+$askText  = 'Hi, I am interested in the "' . $project['name'] . '" project on your website.';
+$waLink   = whatsapp_link($askText);
+$mailLink = email_link($project['name'] . ' — enquiry', $askText);
 
 $meta = array_filter([
     'Pages'      => (int) $project['page_count'] > 0 ? (string) (int) $project['page_count'] : '',

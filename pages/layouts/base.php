@@ -98,11 +98,8 @@ $gaId       = $settings->get('google_analytics_id');
 <div data-flash="<?= e($item['type']) ?>" data-flash-message="<?= e($item['message']) ?>" hidden></div>
 <?php endforeach; ?>
 
-<?php
-$whatsapp = preg_replace('/[^0-9]/', '', $settings->get('whatsapp'));
-if ($whatsapp !== '' && strlen($whatsapp) >= 8):
-?>
-<a class="float-action" href="https://wa.me/<?= e($whatsapp) ?>" target="_blank" rel="noopener noreferrer"
+<?php $waFloat = whatsapp_link(); if ($waFloat !== ''): ?>
+<a class="float-action" href="<?= e($waFloat) ?>" target="_blank" rel="noopener noreferrer"
    aria-label="Message us on WhatsApp" data-no-transition>
     <?= icon('whatsapp') ?>
 </a>

@@ -1,6 +1,6 @@
 <?php
 /** @var array $countries @var array $faqs @var \Techbiss\Repo\SettingsRepo $settings */
-$whatsapp = preg_replace('/[^0-9]/', '', $settings->get('whatsapp'));
+$whatsapp = whatsapp_link();
 ?>
 <?= $view->partial('partials/page-head', [
     'eyebrow' => 'Contact',
@@ -60,7 +60,7 @@ $whatsapp = preg_replace('/[^0-9]/', '', $settings->get('whatsapp'));
                             <span class="icon-plate icon-plate--sm"><?= icon('whatsapp') ?></span>
                             <div>
                                 <div class="contact-item__label">WhatsApp</div>
-                                <div class="contact-item__value"><a href="https://wa.me/<?= e($whatsapp) ?>" target="_blank" rel="noopener noreferrer">Message us</a></div>
+                                <div class="contact-item__value"><a href="<?= e($whatsapp) ?>" target="_blank" rel="noopener noreferrer">Message us</a></div>
                             </div>
                         </div>
                         <?php endif; ?>

@@ -252,3 +252,9 @@ DELETE FROM `page_sections` WHERE `page_key` = 'home' AND `section_key` IN ('cha
 -- problem grid used to be the whole section.
 UPDATE `page_sections` SET `cta_label` = 'See how it works', `cta_url` = '/how-it-works'
   WHERE `page_key` = 'home' AND `section_key` = 'problem' AND `cta_label` = '' AND `cta_url` = '';
+
+-- The field now also accepts a ready-made WhatsApp chat link, not just a
+-- bare number — whatsapp_link() in includes/helpers.php reads either.
+UPDATE `settings` SET `label` = 'WhatsApp number or chat link',
+  `hint` = 'A phone number with country code (e.g. 8801711223344), or a full chat link (wa.me/… or a WhatsApp Business link) — either works.'
+  WHERE `key_name` = 'whatsapp';
