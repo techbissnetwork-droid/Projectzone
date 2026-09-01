@@ -15,7 +15,7 @@ $days  = (int) ($project['delivery_days'] ?? 0);
 $hasApk = trim((string) ($project['apk_path'] ?? '')) !== '' || trim((string) ($project['apk_external_url'] ?? '')) !== '';
 $pages = (int) ($project['page_count'] ?? 0);
 ?>
-<article class="work-card project-card" data-reveal style="--i:<?= (int) ($i ?? 0) ?>">
+<article class="card card--interactive card--spotlight work-card project-card" data-reveal style="--i:<?= (int) ($i ?? 0) ?>">
     <div class="work-card__media<?= $thumb === '' ? ' work-card__media--empty' : '' ?>">
         <?php if ($thumb !== ''): ?>
             <?php /* Decorative: the card's title link below says exactly this. */ ?>

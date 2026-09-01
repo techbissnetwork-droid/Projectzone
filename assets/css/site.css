@@ -248,7 +248,69 @@ body.has-cursor-fx.cursor-hidden .cursor-ring { opacity: 0; }
   .header-actions { margin-left: auto; }
 }
 
-/* Premade project cards and demo credentials ------------------------- */
+/* Work / project cards — portfolio and ready-project listings share this
+   component (.work-card is the base; .project-card layers the extra facts
+   and action row a ready project needs). Built on .card/.card--interactive/
+   .card--spotlight rather than beside them, so the border, lift and cursor
+   glow are the same ones every other interactive card on the site uses —
+   only the full-bleed thumbnail above the body is specific to this one. */
+.work-card { padding: 0; }
+.work-card__media {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background: var(--bg-elev-2);
+  overflow: hidden;
+}
+.work-card__media img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  transition: transform 620ms var(--ease-out);
+}
+.work-card:hover .work-card__media img,
+.work-card:focus-within .work-card__media img { transform: scale(1.05); }
+.work-card__media--empty { display: grid; place-items: center; color: var(--text-faint); }
+.work-card__media--empty .icon { width: 30px; height: 30px; }
+
+.work-card__overlay {
+  position: absolute; top: 0.9rem; left: 0.9rem; right: 0.9rem; z-index: 1;
+  display: flex; flex-wrap: wrap; gap: 0.4rem;
+  opacity: 0; transform: translateY(-6px);
+  transition: opacity var(--t-base) var(--ease), transform var(--t-base) var(--ease-out);
+}
+.work-card:hover .work-card__overlay,
+.work-card:focus-within .work-card__overlay { opacity: 1; transform: none; }
+
+.work-card__tag {
+  display: inline-flex; align-items: center;
+  padding: 0.3rem 0.65rem;
+  border-radius: var(--r-full);
+  font-size: var(--fs-xs); font-weight: 600;
+  background: var(--glass);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--border);
+  color: var(--text-soft);
+}
+.work-card__tag--accent { color: var(--accent-ink, #fff); background: var(--accent); border-color: transparent; }
+
+.work-card__body { padding: 1.15rem 1.35rem 1.4rem; display: flex; flex-direction: column; flex: 1; }
+.work-card__meta { font-size: var(--fs-xs); color: var(--text-faint); margin-bottom: 0.3rem; }
+.work-card__title { font-size: var(--fs-h4); margin-bottom: 0.4rem; }
+.work-card__title a { color: var(--text); }
+.work-card__title a::after { content: ""; position: absolute; inset: 0; }
+.work-card__text { font-size: var(--fs-sm); color: var(--text-muted); line-height: 1.6; flex: 1; }
+.work-card__foot { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 1rem; position: relative; z-index: 1; }
+
+.tech-chip {
+  display: inline-flex; align-items: center;
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--r-sm);
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
 .project-card__facts {
   display: flex; flex-wrap: wrap; gap: 0.35rem 1rem;
   margin-top: 0.85rem;
@@ -257,9 +319,10 @@ body.has-cursor-fx.cursor-hidden .cursor-ring { opacity: 0; }
 .project-card__facts span { display: inline-flex; align-items: center; gap: 0.35rem; }
 .project-card__facts .icon { width: 0.95em; height: 0.95em; opacity: 0.75; }
 
-.project-card__actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.1rem; }
-
-.work-card__tag--accent { color: var(--accent-ink, #fff); background: var(--accent); border-color: transparent; }
+/* Above the card's own stretched title link (.work-card__title a::after),
+   so Live demo/APK — destinations the title link does not share — stay
+   independently clickable rather than being swallowed by it. */
+.project-card__actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.1rem; position: relative; z-index: 1; }
 
 /* Public demo logins. Shown deliberately, so they read as data, not secrets. */
 .demo-creds { display: grid; gap: 0.4rem; margin: 0; }
@@ -780,6 +843,87 @@ body.has-cursor-fx.cursor-hidden .cursor-ring { opacity: 0; }
 .breadcrumbs a:hover { color: var(--accent); }
 .breadcrumbs .icon { width: 12px; height: 12px; opacity: 0.55; }
 
+/* Case-study hero — a page-head variant with a preview image and an
+   optional per-project accent ([data-accent] itself is defined once in
+   design-system.css; this just uses var(--accent) like everything else). */
+.case-hero {
+  position: relative;
+  padding-top: clamp(2.5rem, 1.75rem + 3vw, 4.5rem);
+  padding-bottom: clamp(1.5rem, 1rem + 1.5vw, 2.5rem);
+  overflow: hidden;
+  isolation: isolate;
+}
+.case-hero__image {
+  margin-top: clamp(2rem, 1.5rem + 2vw, 3rem);
+  border-radius: var(--r-xl);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  aspect-ratio: 5 / 3;
+  background: var(--bg-elev);
+}
+.case-hero__image img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.case-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1.5rem 2rem;
+  padding: clamp(1.5rem, 1rem + 2vw, 2.25rem);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+}
+.case-meta__cell { min-width: 0; }
+.case-meta__label {
+  font-size: var(--fs-label);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-faint);
+  margin-bottom: 0.4rem;
+  font-weight: 600;
+}
+.case-meta__value { font-size: var(--fs-sm); color: var(--text); font-weight: 550; }
+
+.case-block { padding-block: clamp(1.75rem, 1.25rem + 1.5vw, 2.5rem); border-top: 1px solid var(--border-faint); }
+.case-block:first-child { padding-top: 0; border-top: 0; }
+.case-block__label { display: block; margin-bottom: 0.9rem; }
+
+/* Image gallery — the lightbox behaviour (initLightbox in app.js) is already
+   wired up via data-lightbox; this is just the tile grid it opens from. */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  gap: 1rem;
+  margin-top: clamp(1.5rem, 1rem + 2vw, 2.25rem);
+}
+.gallery__item {
+  position: relative;
+  margin: 0;
+  border-radius: var(--r-md);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  aspect-ratio: 4 / 3;
+  cursor: zoom-in;
+  transition: border-color var(--t-base) var(--ease);
+}
+.gallery__item:hover, .gallery__item:focus-visible { border-color: var(--border-strong); }
+.gallery__item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.gallery__caption {
+  position: absolute; inset: auto 0 0 0;
+  margin: 0;
+  padding: 0.6rem 0.8rem;
+  font-size: var(--fs-xs); color: var(--text-soft);
+  background: linear-gradient(to top, rgba(6, 7, 12, 0.85), transparent);
+}
+
+/* Client quote — the ready-project/portfolio sidebar testimonial card */
+.quote-card { position: relative; }
+.quote-card__mark { color: var(--accent); opacity: 0.5; display: block; }
+.quote-card__mark .icon { width: 26px; height: 26px; }
+.quote-card__text { margin-top: 0.75rem; color: var(--text-soft); line-height: 1.6; font-style: italic; }
+.quote-card__author { display: flex; align-items: center; gap: 0.7rem; margin-top: 1.1rem; }
+.quote-card__name { font-size: var(--fs-sm); font-weight: 600; color: var(--text); }
+.quote-card__role { font-size: var(--fs-xs); color: var(--text-muted); }
+
 /* Filter bar above listings */
 .filter-bar {
   display: flex; align-items: center; gap: 0.6rem;
@@ -797,6 +941,13 @@ body.has-cursor-fx.cursor-hidden .cursor-ring { opacity: 0; }
 }
 .filter-bar__scroll::-webkit-scrollbar { display: none; }
 .filter-bar__count { margin-left: auto; font-size: var(--fs-xs); color: var(--text-faint); white-space: nowrap; }
+
+/* The listing grid that follows the filter bar — portfolio and ready projects */
+.work-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 360px), 1fr));
+  gap: clamp(1.35rem, 1rem + 1.2vw, 1.9rem);
+}
 
 /* Pagination */
 .pagination { display: flex; align-items: center; justify-content: center; gap: 0.35rem; margin-top: clamp(2.25rem, 1.75rem + 2vw, 3.5rem); flex-wrap: wrap; }

@@ -3,7 +3,7 @@
 $thumb = media_url($project['thumbnail'] ?: ($project['hero_image'] ?? ''));
 $techs = $project['technologies'] ?? [];
 ?>
-<article class="work-card" data-reveal style="--i:<?= (int) ($i ?? 0) ?>">
+<article class="card card--interactive card--spotlight work-card" data-reveal style="--i:<?= (int) ($i ?? 0) ?>">
     <div class="work-card__media<?= $thumb === '' ? ' work-card__media--empty' : '' ?>">
         <?php if ($thumb !== ''): ?>
             <?php /* Decorative: the card's title link below says exactly this. */ ?>
