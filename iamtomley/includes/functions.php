@@ -94,7 +94,7 @@ function security_headers(array $extraFrameSrc = []): void
  * appended. Returning visitors get the new file the moment it changes instead
  * of a stale cached copy.
  */
-function asset(string $path): string
+function asset_url(string $path): string
 {
     $file = APP_ROOT . $path;
     $stamp = is_file($file) ? (int) @filemtime($file) : 0;
@@ -294,6 +294,19 @@ function game_sources(): array
 function game_source_key(string $k): string
 {
     return array_key_exists($k, game_sources()) ? $k : 'builtin';
+}
+
+/**
+ * Trim a value to what its database column can hold.
+ *
+ * SQLite ignores column widths, MySQL in its default strict mode rejects the
+ * whole row — so a long title typed into the admin would save on one and error
+ * on the other. Clipping here keeps both behaving the same way.
+ */
+function clip(string $value, int $max): string
+{
+    $value = trim($value);
+    return mb_strlen($value) > $max ? mb_substr($value, 0, $max) : $value;
 }
 
 /** Turn free text into a short url/attribute-safe key ("Retro Arcade" → "retro-arcade"). */

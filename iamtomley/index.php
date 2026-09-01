@@ -133,7 +133,7 @@ function coming_soon_card(): string
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="<?= e(asset('/assets/css/styles.css')) ?>" />
+  <link rel="stylesheet" href="<?= e(asset_url('/assets/css/styles.css')) ?>" />
 
   <script type="application/ld+json">
   {
@@ -481,7 +481,7 @@ function coming_soon_card(): string
     window.GAMES = <?= json_encode($gamesPayload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
     window.GAME_CATS = <?= json_encode(game_categories(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
   </script>
-  <script src="<?= e(asset('/assets/js/games-data.js')) ?>" defer></script>
-  <script src="<?= e(asset('/assets/js/app.js')) ?>" defer></script>
+  <script src="<?= e(asset_url('/assets/js/games-data.js')) ?>" defer></script>
+  <script src="<?= e(asset_url('/assets/js/app.js')) ?>" defer></script>
 </body>
 </html>

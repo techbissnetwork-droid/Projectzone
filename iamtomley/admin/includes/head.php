@@ -16,7 +16,7 @@ $__user = current_user();
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="<?= e(asset('/admin/assets/admin.css')) ?>" />
+  <link rel="stylesheet" href="<?= e(asset_url('/admin/assets/admin.css')) ?>" />
   <script>
     window.ADMIN = {
       csrf: <?= json_encode(csrf_token()) ?>,
@@ -24,7 +24,7 @@ $__user = current_user();
       base: <?= json_encode(BASE_URL) ?>
     };
   </script>
-  <script src="<?= e(asset('/admin/assets/admin.js')) ?>" defer></script>
+  <script src="<?= e(asset_url('/admin/assets/admin.js')) ?>" defer></script>
 </head>
 <body>
 <div class="layout">

@@ -74,17 +74,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($action === 'save') {
         $id     = (int) ($_POST['id'] ?? 0);
         $status = project_status_key((string) ($_POST['status'] ?? 'live'));
-        $price  = trim((string) ($_POST['price'] ?? ''));
+        $price  = clip((string) ($_POST['price'] ?? ''), 40);
         $ts     = in_array((string) ($_POST['tag_style'] ?? ''), ['', 'pink', 'violet'], true) ? (string) $_POST['tag_style'] : '';
         $active = $status === 'hidden' ? 0 : 1;   // kept in sync for compatibility
-        $title  = trim((string) ($_POST['title'] ?? ''));
-        $link   = trim((string) ($_POST['url'] ?? '#')) ?: '#';
+        $title  = clip((string) ($_POST['title'] ?? ''), 120);
+        $link   = clip((string) ($_POST['url'] ?? '#'), 255) ?: '#';
 
         // ── The card image ────────────────────────────────────────────────
         // Three ways to get one, in order: a file you picked, a path you typed
         // (or that Detect filled in), or — if you left it blank and gave a real
         // link — the site's own logo, fetched automatically.
-        $image = trim((string) ($_POST['image'] ?? ''));
+        $image = clip((string) ($_POST['image'] ?? ''), 255);
         $notes = [];
         if ($HAS_IMAGE) {
             $prefix = slugify($title, 24) ?: 'project';
@@ -120,11 +120,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $cols = ['title','tag','tag_style','description','url','link_label','sort_order','is_active'];
         $vals = [
             $title,
-            trim((string) ($_POST['tag'] ?? '')),
+            clip((string) ($_POST['tag'] ?? ''), 60),
             $ts,
             trim((string) ($_POST['description'] ?? '')),
             $link,
-            trim((string) ($_POST['link_label'] ?? 'Visit Site')) ?: 'Visit Site',
+            clip((string) ($_POST['link_label'] ?? 'Visit Site'), 40) ?: 'Visit Site',
             (int) ($_POST['sort_order'] ?? 0),
             $active,
         ];

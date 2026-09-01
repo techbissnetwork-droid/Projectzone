@@ -59,9 +59,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         foreach ($ids as $i => $id) {
             $cat = slugify((string) ($_POST['cat'][$i] ?? 'arcade')) ?: 'arcade';
             $st->execute([
-                trim((string) ($_POST['title'][$i] ?? '')),
+                clip((string) ($_POST['title'][$i] ?? ''), 80),
                 $cat,
-                trim((string) ($_POST['emoji'][$i] ?? '🎮')),
+                clip((string) ($_POST['emoji'][$i] ?? '🎮'), 16),
                 (int) ($_POST['sort_order'][$i] ?? 0),
                 isset($_POST['is_active'][$id]) ? 1 : 0,
                 (int) $id,
@@ -73,9 +73,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($action === 'save_one' && $CAN_ADD) {
         $id     = (int) ($_POST['id'] ?? 0);
         $source = game_source_key((string) ($_POST['source'] ?? 'url'));
-        $gTitle = trim((string) ($_POST['title'] ?? ''));
+        $gTitle = clip((string) ($_POST['title'] ?? ''), 80);
         $cat    = slugify((string) ($_POST['cat_custom'] ?? '') ?: (string) ($_POST['cat'] ?? 'arcade')) ?: 'arcade';
-        $emoji  = trim((string) ($_POST['emoji'] ?? '')) ?: '🎮';
+        $emoji  = clip((string) ($_POST['emoji'] ?? ''), 16) ?: '🎮';
         $embed  = trim((string) ($_POST['embed_url'] ?? ''));
         $html   = (string) ($_POST['html_code'] ?? '');
         $codeRef = (int) ($_POST['code_ref'] ?? 0);
@@ -87,6 +87,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($gTitle === '') {
             $error = 'Give the game a title.';
+        } elseif (mb_strlen($embed) > 255) {
+            // MySQL would refuse the row outright; say so instead of failing.
+            $error = 'That game address is too long (255 characters maximum).';
+        } elseif (mb_strlen($cover) > 255) {
+            $error = 'That cover image path is too long (255 characters maximum).';
         } elseif ($source === 'url') {
             if ($embed === '') {
                 $error = 'Paste the address the game is played at.';
