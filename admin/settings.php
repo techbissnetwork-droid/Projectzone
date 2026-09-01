@@ -265,6 +265,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // not a count that means different things on different hosts.
             'fullscan_batch' => fn($v) => (string)max(1, min(5000, (int)$v)),
             'fullscan_max_seconds' => fn($v) => (string)max(0, min(3600, (int)$v)),
+            // Wall-clock budget for one NewsFetcher::refreshIfStale() sweep -
+            // see the class docblock. 0 disables the cap outright (the old,
+            // unbounded behaviour) rather than "work it out", because unlike
+            // the scan there is no natural fallback figure to derive; the
+            // shipped default of 20 is the safety net and this only needs
+            // touching on an install with many sources or a slow feed.
+            'news_fetch_max_seconds' => fn($v) => (string)max(0, min(300, (int)$v)),
             'scan_autodisable_fails' => fn($v) => (string)max(0, min(50, (int)$v)),
             'cron_interval_min' => fn($v) => (string)max(0, min(1440, (int)$v)),
             'store_neutral' => fn($v) => $v === '1' ? '1' : '0',
@@ -2450,6 +2457,14 @@ $smaShow = static function (string $s): string {
           (<?= (int)ini_get('max_execution_time') > 0 ? sma_e((string)(int)ini_get('max_execution_time')) . 's here'
               : 'unlimited here, so 50s' ?>). Watched pairs and the default chart are analysed first
           and are never cut short &mdash; only the background rotation yields to the clock.</p></div>
+      <div><label>Seconds one news refresh may spend fetching (0 = unlimited)</label>
+        <input type="number" name="news_fetch_max_seconds" min="0" max="300"
+               value="<?= $s('news_fetch_max_seconds', '20') ?>">
+        <p class="hint">Every enabled source in <a href="news.php" style="color:var(--accent)">News</a>
+          gets its own 12s timeout, tried one after another with no shared cap before this setting -
+          a handful of slow or unreachable feeds could burn a minute or more of a single cron run,
+          <strong>before the scan above even starts counting its own budget</strong>. A source not
+          reached within this budget is simply due again next time; nothing is lost.</p></div>
     </div>
     <div class="row2">
       <div><label>How often your host runs cron.php</label>

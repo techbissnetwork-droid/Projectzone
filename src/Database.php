@@ -1492,6 +1492,20 @@ class Database
             'liq_stop_min_weight'  => '0.5',
             'news_enabled'     => '1',
             'news_cache_ttl'   => '300',
+            // Wall-clock budget for one refreshIfStale() sweep. Every enabled
+            // source gets its own 12s/6s curl timeout with no combined cap
+            // before this existed, so a handful of slow or unreachable feeds
+            // could burn 30-60+ seconds sequentially - on cron.php that ran
+            // BEFORE the signal scan's own time budget even started counting,
+            // so a host with a modest max_execution_time (or a plain wall-clock
+            // limit on the cron job itself) could be killed here and never
+            // reach the scan loop at all: every run "ran", nothing was ever
+            // analysed, and nothing in the error log said why. On api.php's
+            // on-demand lazy refresh the same unbounded loop sat in the
+            // request path of an ordinary page view. A source not reached
+            // within the budget is simply due again next call - nothing is
+            // lost, only deferred, exactly like the scan loop below.
+            'news_fetch_max_seconds' => '20',
             'news_max_items'   => '30',
             'news_retention_days' => '30',
             'news_poll_seconds'=> '90',

@@ -16,6 +16,29 @@ use SignalMasterAi\Database;
 use SignalMasterAi\MarketData;
 use SignalMasterAi\NewsFetcher;
 
+// THIS SCRIPT'S OWN BUDGETS ARE THE THING THAT IS SUPPOSED TO END IT.
+//
+// The scan loop below rations itself against the host's max_execution_time
+// (80% of it, so there is room left for everything after the scan), and the
+// long-job step does the same. Both exist so a run ends itself cleanly at a
+// safe point - between coins, between writes - rather than being killed
+// mid-write by the SAPI, which the long-job comment below calls "the one
+// outcome worse than being slow". None of that self-discipline matters if
+// PHP's own enforcement of that same limit is still live: news fetching (next)
+// has no budget of its own and runs BEFORE the scan loop's budget even starts
+// counting, so on a host with a real max_execution_time a handful of slow or
+// unreachable news sources could burn through it first and get the whole
+// process killed before the scan - the part that actually analyses anything -
+// ever gets a turn. Every run "ran"; nothing was ever scanned; nothing in the
+// error log said why, because a kill is not a thrown exception.
+//
+// So the host's ceiling is captured here, once, for the self-imposed budgets
+// below to keep measuring themselves against - and PHP's own enforcement of
+// it is then switched off, so a run that stays inside its own budgets is
+// never cut off by the one mechanism the budgets exist to make unnecessary.
+$cronHostExecLimit = (int)ini_get('max_execution_time');
+@set_time_limit(0);
+
 /**
  * Is this an actual web request, or a shell running the file?
  *
@@ -544,7 +567,9 @@ if (\SignalMasterAi\Master::on('signals', 'scan')
 // when it allows unlimited, leaving room for the rest of the cron to finish.
 $budget = (int)Database::setting('fullscan_max_seconds', '0');
 if ($budget <= 0) {
-    $limit = (int)ini_get('max_execution_time');
+    // The host's real ceiling, captured near the top of this file before
+    // set_time_limit(0) made ini_get() answer 0 for the rest of the run.
+    $limit = $cronHostExecLimit;
     $budget = $limit > 0 ? (int)max(10, $limit * 0.8) : 50;
 }
 // A MEASUREMENT THAT NEVER GETS A TURN IS A MEASUREMENT THAT DOES NOT EXIST.
@@ -1153,8 +1178,11 @@ if (\SignalMasterAi\LongJob::pending()) {
             $jobSlice = (int)max(6, min(30, $budget * 0.25));
         }
         // Never run past the host's own execution limit - being killed
-        // mid-write is the one outcome worse than being slow.
-        $hardLimit = (int)ini_get('max_execution_time');
+        // mid-write is the one outcome worse than being slow. Same captured
+        // value as the scan budget above, for the same reason: ini_get()
+        // answers 0 here now that set_time_limit(0) near the top of this
+        // file has turned PHP's own enforcement off.
+        $hardLimit = $cronHostExecLimit;
         if ($hardLimit > 0) {
             $usedSoFar = microtime(true) - $jobStarted;
             $jobSlice = (int)min($jobSlice, max(0, $hardLimit * 0.9 - $usedSoFar));

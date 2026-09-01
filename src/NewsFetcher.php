@@ -29,14 +29,50 @@ class NewsFetcher
         $this->ttl = max(60, (int)Database::setting('news_cache_ttl', '300'));
     }
 
-    /** Refresh every enabled source whose cache has expired. Never throws. */
+    /**
+     * Refresh every enabled source whose cache has expired. Never throws.
+     *
+     * BUDGETED, LIKE THE SCAN LOOP THAT OFTEN RUNS RIGHT AFTER IT.
+     *
+     * Each source gets its own 12s/6s curl timeout, and nothing capped how
+     * many of them this loop could burn through in one call - so on an
+     * install with several sources and one gone slow or unreachable, a
+     * single refresh could run for a minute or more. Called from cron.php,
+     * that happened BEFORE the signal scan's own time budget starts
+     * counting, so a host with a modest max_execution_time (or a wall-clock
+     * limit on the cron job itself, independent of PHP's own) could kill the
+     * whole run here and the scan loop - the part that actually analyses
+     * anything - never got a turn. Every cron run "ran"; nothing was ever
+     * scanned; nothing in the error log said why, because the process was
+     * killed, not thrown from. Called from api.php's on-demand lazy refresh,
+     * the same unbounded loop sat directly in an ordinary page view's
+     * request path.
+     *
+     * A source not reached within the budget is simply due again on the next
+     * call - its own fetched_at is untouched, so nothing here is lost, only
+     * deferred, exactly as the scan loop below defers what it cannot reach.
+     */
     public function refreshIfStale(): array
     {
         $report = [];
         $now = time();
-        $stmt = $this->pdo->query('SELECT * FROM news_sources WHERE enabled = 1');
+        $budget = max(0, (float)Database::setting('news_fetch_max_seconds', '20'));
+        $deadline = microtime(true) + ($budget > 0 ? $budget : PHP_INT_MAX);
+        // Oldest-due first. Once the budget can cut a run short, insertion
+        // order would let one chronically slow source at the front starve
+        // every source behind it forever - each retry spends the whole
+        // budget on the same offender and never reaches the rest. Sorting on
+        // fetched_at means a source that got skipped is the most overdue one
+        // and sorts first on the next call, but so does every other source
+        // once it is equally overdue, so a bad feed costs itself, not its
+        // neighbours.
+        $stmt = $this->pdo->query('SELECT * FROM news_sources WHERE enabled = 1 ORDER BY fetched_at ASC');
         foreach ($stmt->fetchAll() as $src) {
             if ($now - (int)$src['fetched_at'] < $this->ttl) {
+                continue;
+            }
+            if (microtime(true) >= $deadline) {
+                $report[$src['name']] = 'skipped: out of time this run, due again next call';
                 continue;
             }
             // Mark first so parallel requests don't hammer a slow feed.
