@@ -76,6 +76,19 @@ Only public `http`/`https` addresses are ever opened, redirects are limited, and
 downloads are capped — the lookup cannot be pointed at your own server's private
 network. SVGs containing scripts are refused outright.
 
+### Motion
+
+**Site Settings → How much the site moves** sets the whole feel:
+
+| Level | What happens |
+|---|---|
+| **Cinematic** | The sliders play themselves — the bar under each one fills as its timeline — and stop while you hover, while off screen, and while the tab is in the background. The page opens on a title card (once a session), the headline rises from behind a mask, each slide deals its cards out in turn, section numbers settle into place, buttons lean toward the pointer, headings drift as you scroll, the cursor names what it is over ("Visit", "Play"), and a ticker of your project names runs between the sections. |
+| **Subtle** | Things fade in as you reach them. Nothing moves on its own. |
+| **Off** | A still page. |
+
+Whichever you pick, a visitor whose device asks for reduced motion always gets
+the still version — that check is made in both the stylesheet and the script.
+
 ### Everything slides
 
 Projects, sold projects and games each slide four (or eight) to a view, with

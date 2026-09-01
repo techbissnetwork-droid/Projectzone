@@ -66,6 +66,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     set_setting('projects_coming_soon', isset($_POST['projects_coming_soon']) ? '1' : '0');
     set_setting('seo_noindex', isset($_POST['seo_noindex']) ? '1' : '0');
     set_setting('sold_show_price', isset($_POST['sold_show_price']) ? '1' : '0');
+    $motion = (string) ($_POST['motion_level'] ?? 'cinematic');
+    set_setting('motion_level', in_array($motion, ['cinematic', 'subtle', 'off'], true) ? $motion : 'cinematic');
     $mode = (string) ($_POST['clean_urls_mode'] ?? 'auto');
     set_setting('clean_urls_mode', in_array($mode, ['auto', 'on', 'off'], true) ? $mode : 'auto');
     flash('Settings saved.');
@@ -110,6 +112,18 @@ function s(string $k): string { return e(setting($k)); }
           <?php endforeach; ?>
         </select>
         <div class="hint">Visitors can switch themes themselves; this is the default. 11 animated options.</div>
+      </div>
+      <div class="field">
+        <label>How much the site moves</label>
+        <select name="motion_level">
+          <option value="cinematic" <?= setting('motion_level','cinematic')==='cinematic'?'selected':'' ?>>Cinematic — it plays itself</option>
+          <option value="subtle"    <?= setting('motion_level','cinematic')==='subtle'   ?'selected':'' ?>>Subtle — things fade in, nothing moves on its own</option>
+          <option value="off"       <?= setting('motion_level','cinematic')==='off'      ?'selected':'' ?>>Off — a still page</option>
+        </select>
+        <div class="hint"><strong>Cinematic</strong> plays the sliders by themselves (they stop while you hover,
+        while off screen, and while the tab is in the background), deals the cards of each slide out one after
+        another, leans the buttons toward the pointer and drifts the headings as you scroll. Whichever you pick,
+        a visitor whose device asks for reduced motion always gets the still version.</div>
       </div>
       <div class="field"><label>Faint photo backdrop</label>
         <div class="row-inline" style="margin-top:.35rem">

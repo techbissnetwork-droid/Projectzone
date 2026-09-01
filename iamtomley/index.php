@@ -92,6 +92,11 @@ $soldSlides = chunk_slides($soldProjects, 4);
 $soldSlideCount = count($soldSlides);
 $showSoldPrice = setting('sold_show_price', '1') === '1';
 
+// How much the site moves. Anyone whose system asks for reduced motion gets
+// the still version regardless — app.js and the stylesheet both honour that.
+$motion = setting('motion_level', 'cinematic');
+if (!in_array($motion, ['cinematic', 'subtle', 'off'], true)) { $motion = 'cinematic'; }
+
 /** A single "coming soon" placeholder card. */
 function coming_soon_card(): string
 {
@@ -102,7 +107,7 @@ function coming_soon_card(): string
 }
 ?>
 <!DOCTYPE html>
-<html lang="en" data-theme="<?= e($theme) ?>" data-bg="<?= e($bgTheme) ?>" data-backdrop="<?= e($backdrop) ?>">
+<html lang="en" data-theme="<?= e($theme) ?>" data-bg="<?= e($bgTheme) ?>" data-backdrop="<?= e($backdrop) ?>" data-motion="<?= e($motion) ?>">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -187,6 +192,15 @@ function coming_soon_card(): string
 
   <a href="#projects" class="skip-link">Skip to content</a>
 
+  <!-- Lifts away once, on the first visit of a session. app.js removes it
+       entirely afterwards so it can never sit over the page. -->
+  <div class="intro" id="intro" aria-hidden="true">
+    <span class="intro-inner">
+      <span class="intro-mark"></span>
+      <span class="intro-name"><?= e(setting('brand_name', 'iamtomley')) ?></span>
+    </span>
+  </div>
+
   <div class="bg" aria-hidden="true" style="--backdrop-image:url('<?= e($backdropImg) ?>')">
     <span class="bg-photo"></span>
     <span class="bg-grad"></span>
@@ -199,7 +213,7 @@ function coming_soon_card(): string
   <div class="grain" aria-hidden="true"></div>
 
   <div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
-  <div class="cursor-ring" id="cursorRing" aria-hidden="true"></div>
+  <div class="cursor-ring" id="cursorRing" aria-hidden="true"><span class="cursor-label" id="cursorLabel"></span></div>
   <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
 
   <header class="header" id="header">
@@ -254,8 +268,8 @@ function coming_soon_card(): string
       <div class="hero-left">
         <span class="eyebrow reveal"><span class="eyebrow-dot" aria-hidden="true"></span><?= e(setting('hero_eyebrow')) ?></span>
         <h1 class="hero-title reveal">
-          <span class="line"><?= e(setting('hero_title_1')) ?></span>
-          <span class="line grad-text"><?= e(setting('hero_title_2')) ?></span>
+          <span class="line"><span class="line-in"><?= e(setting('hero_title_1')) ?></span></span>
+          <span class="line"><span class="line-in grad-text"><?= e(setting('hero_title_2')) ?></span></span>
         </h1>
         <p class="hero-sub reveal"><?= e(setting('hero_sub')) ?></p>
         <div class="hero-ctas reveal">
@@ -358,6 +372,25 @@ function coming_soon_card(): string
       <div class="slider-progress"><div class="slider-progress-fill" style="width:<?= $slideCount > 0 ? round(100 / $slideCount, 3) : 100 ?>%"></div></div>
       </div>
     </section>
+
+    <?php
+      // Decorative ticker: the names of the actual work, running past.
+      $tickerItems = array_values(array_filter(array_map(
+          static fn($p) => trim((string) $p['title']),
+          array_merge($projects, $soldProjects)
+      )));
+      if (count($tickerItems) >= 2):
+    ?>
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee-track">
+        <?php for ($pass = 0; $pass < 2; $pass++): ?>
+          <?php foreach ($tickerItems as $t): ?>
+            <span class="marquee-item"><?= e($t) ?></span><span class="marquee-dot">◆</span>
+          <?php endforeach; ?>
+        <?php endfor; ?>
+      </div>
+    </div>
+    <?php endif; ?>
 
     <?php if (!empty($soldProjects)): ?>
     <!-- Sold -->

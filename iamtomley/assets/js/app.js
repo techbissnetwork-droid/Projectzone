@@ -14,7 +14,36 @@
   const $  = (s, c = document) => c.querySelector(s);
   const $$ = (s, c = document) => Array.from(c.querySelectorAll(s));
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /**
+   * How much the site moves. Set from the admin on <html data-motion>, but a
+   * visitor who has asked their system for less motion always wins.
+   *   cinematic — sliders play themselves, buttons pull toward the pointer,
+   *               headings drift on scroll, cards arrive one after another
+   *   subtle    — things fade in, nothing moves on its own
+   *   off       — everything appears immediately
+   */
+  const MOTION = prefersReduced ? 'off' : (document.documentElement.dataset.motion || 'cinematic');
+  const CINEMATIC = MOTION === 'cinematic';
   const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+  /* ── Opening title card ────────────────────────────────────────────────── */
+  (function intro() {
+    const el = $('#intro');
+    if (!el) return;
+    // Once per session, and never when motion is turned down — nobody wants a
+    // curtain every time they come back to a page.
+    let seen = false;
+    try { seen = sessionStorage.getItem('introSeen') === '1'; } catch (e) { seen = false; }
+    if (!CINEMATIC || seen) { el.remove(); return; }
+    try { sessionStorage.setItem('introSeen', '1'); } catch (e) { /* private mode */ }
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => {
+      el.classList.add('lift');
+      document.body.style.overflow = '';
+      setTimeout(() => el.remove(), 900);
+    }, 850);
+  })();
 
   /* ── Theme toggle ──────────────────────────────────────────────────────── */
   (function theme() {
@@ -201,6 +230,43 @@
     }, { passive: true });
   })();
 
+  /* ── Buttons lean toward the pointer ───────────────────────────────────── */
+  (function magnetic() {
+    if (!CINEMATIC || !canHover) return;
+    $$('.btn-lg, .slider-btn, .to-top, .icon-btn').forEach(btn => {
+      btn.addEventListener('mousemove', e => {
+        const r = btn.getBoundingClientRect();
+        const x = (e.clientX - r.left - r.width / 2) / r.width;
+        const y = (e.clientY - r.top - r.height / 2) / r.height;
+        btn.style.transform = `translate(${x * 9}px, ${y * 9}px)`;
+      });
+      btn.addEventListener('mouseleave', () => { btn.style.transform = ''; });
+    });
+  })();
+
+  /* ── Section headings drift as they pass ───────────────────────────────── */
+  (function headingDrift() {
+    if (!CINEMATIC) return;
+    const heads = $$('.section-head');
+    if (!heads.length) return;
+    let ticking = false;
+    const onScroll = () => {
+      const h = innerHeight;
+      heads.forEach(el => {
+        const r = el.getBoundingClientRect();
+        if (r.bottom < 0 || r.top > h) return;
+        // -1 at the bottom of the screen, +1 at the top
+        const p = 1 - (r.top + r.height / 2) / (h / 2);
+        el.style.transform = `translateY(${(-p * 10).toFixed(2)}px)`;
+      });
+      ticking = false;
+    };
+    addEventListener('scroll', () => {
+      if (!ticking) { requestAnimationFrame(onScroll); ticking = true; }
+    }, { passive: true });
+    onScroll();
+  })();
+
   /* ── Custom cursor ─────────────────────────────────────────────────────── */
   (function cursor() {
     if (!canHover || prefersReduced) return;
@@ -223,6 +289,56 @@
     document.addEventListener('mouseout', e => { if (e.target.closest('a, button, input, .card, .game-card')) hoverOut(); });
     document.addEventListener('mouseleave', () => { dot.style.opacity = ring.style.opacity = '0'; });
     document.addEventListener('mouseenter', () => { dot.style.opacity = ring.style.opacity = '1'; });
+  })();
+
+  /* ── The cursor says what a thing does ─────────────────────────────────── */
+  (function cursorLabels() {
+    const ring = $('#cursorRing'), label = $('#cursorLabel');
+    if (!ring || !label || !CINEMATIC || !canHover) return;
+
+    // What each kind of target is called, most specific first.
+    const kinds = [
+      ['.game-card', 'Play'],
+      ['.card[data-href]', 'Visit'],
+      ['.project-link.buy', 'Buy'],
+      ['.theme-opt', 'Set'],
+    ];
+
+    document.addEventListener('mouseover', e => {
+      for (const [sel, word] of kinds) {
+        if (e.target.closest(sel)) {
+          label.textContent = word;
+          ring.classList.add('labelled');
+          return;
+        }
+      }
+      ring.classList.remove('labelled');
+      label.textContent = '';
+    });
+  })();
+
+  /* ── Section numbers settle into place ─────────────────────────────────── */
+  (function scramble() {
+    if (!CINEMATIC) return;
+    const CHARS = '01234567890ABCDEF/·';
+    $$('.section-num').forEach(el => {
+      const final = el.textContent;
+      const obs = new IntersectionObserver(entries => {
+        if (!entries[0].isIntersecting) return;
+        obs.disconnect();
+        let frame = 0;
+        const total = 16;
+        const tick = () => {
+          frame += 1;
+          const settled = Math.floor((frame / total) * final.length);
+          el.textContent = final.slice(0, settled) + final.slice(settled).replace(/\S/g,
+            () => CHARS[Math.floor(Math.random() * CHARS.length)]);
+          if (frame < total) { setTimeout(tick, 34); } else { el.textContent = final; }
+        };
+        tick();
+      }, { threshold: 0.6 });
+      obs.observe(el);
+    });
   })();
 
   /* ── Toast helper ──────────────────────────────────────────────────────── */
@@ -307,6 +423,101 @@
     return (i) => { index = i; fit(); };
   }
 
+  /**
+   * Play a slider by itself, like a video.
+   *
+   * The progress bar doubles as the timeline: it fills across the dwell of the
+   * slide you are on. It stops while you hover, while the section is off
+   * screen, and while the tab is in the background — nothing runs unwatched —
+   * and picks up where it left off rather than restarting.
+   */
+  const DWELL = 6500;
+
+  function makeAutoplay(root, fill, next, count, index) {
+    if (!CINEMATIC) {
+      return { kick() {}, };
+    }
+    let timer = null, startedAt = 0, remaining = DWELL;
+    let hovered = false, onScreen = false;
+
+    const pct = (i) => (count() > 0 ? (i / count()) * 100 : 100);
+
+    function paint(from, to, ms) {
+      if (!fill) return;
+      fill.style.transition = 'none';
+      fill.style.width = from + '%';
+      void fill.offsetWidth;                       // commit before animating
+      fill.style.transition = 'width ' + ms + 'ms linear';
+      fill.style.width = to + '%';
+    }
+
+    function freeze() {
+      if (!fill || !fill.parentElement) return;
+      const w = fill.getBoundingClientRect().width;
+      const outer = fill.parentElement.getBoundingClientRect().width || 1;
+      fill.style.transition = 'none';
+      fill.style.width = (w / outer) * 100 + '%';
+    }
+
+    function stop() {
+      clearTimeout(timer);
+      timer = null;
+    }
+
+    function run(ms) {
+      stop();
+      if (count() < 2 || hovered || !onScreen || document.hidden) { freeze(); return; }
+      startedAt = Date.now();
+      remaining = ms;
+      const here = fill ? (fill.getBoundingClientRect().width /
+        ((fill.parentElement && fill.parentElement.getBoundingClientRect().width) || 1)) * 100 : 0;
+      paint(here, pct(index() + 1), ms);
+      timer = setTimeout(next, ms);
+    }
+
+    function pause() {
+      if (!timer) return;
+      remaining = Math.max(600, DWELL - (Date.now() - startedAt));
+      stop();
+      freeze();
+    }
+
+    root.addEventListener('mouseenter', () => { hovered = true; pause(); });
+    root.addEventListener('mouseleave', () => { hovered = false; run(remaining); });
+    root.addEventListener('focusin',    () => { hovered = true; pause(); });
+    root.addEventListener('touchstart', () => { hovered = true; pause(); }, { passive: true });
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) { pause(); } else { run(remaining); }
+    });
+
+    if (window.IntersectionObserver) {
+      new IntersectionObserver(entries => {
+        onScreen = entries[0].isIntersecting;
+        if (onScreen) { run(remaining); } else { pause(); }
+      }, { threshold: 0.25 }).observe(root);
+    } else {
+      onScreen = true;
+    }
+
+    // Called after every move, by hand or by the timer.
+    return { kick() { remaining = DWELL; run(DWELL); } };
+  }
+
+  /**
+   * Deal the cards of the slide you just moved to, one after another.
+   * The class is removed and re-added so the animation replays each time.
+   */
+  function playSlide(track, index) {
+    if (!CINEMATIC) return;
+    Array.from(track.children).forEach(sl => sl.classList.remove('playing'));
+    const slide = track.children[index];
+    if (!slide) return;
+    const grid = slide.firstElementChild || slide;
+    Array.from(grid.children).forEach((c, i) => c.style.setProperty('--i', i));
+    void slide.offsetWidth;                       // restart the animation
+    slide.classList.add('playing');
+  }
+
   /** Move a slider on a horizontal swipe. */
   function bindSwipe(track, move) {
     let sx = 0;
@@ -350,13 +561,16 @@
       if (totalEl) totalEl.textContent = total;
       let cur = 0;
       const fitTo = heightFitter(root, track);
+      const player = makeAutoplay(root, fill, () => goTo(cur + 1), () => total, () => cur);
 
       function goTo(i) {
         cur = (i + total) % total;
         track.style.transform = `translateX(-${cur * 100}%)`;
         if (activeEl) activeEl.textContent = cur + 1;
-        if (fill) fill.style.width = ((cur + 1) / total * 100) + '%';
+        if (!CINEMATIC && fill) fill.style.width = ((cur + 1) / total * 100) + '%';
         fitTo(cur);
+        playSlide(track, cur);
+        player.kick();
       }
 
       const next = $('.slider-next', root), prev = $('.slider-prev', root);
@@ -408,13 +622,18 @@
     }
 
     let fitTo = () => {};
+    const gamesPlayer = makeAutoplay(root, $('.slider-progress-fill', root),
+      () => goTo(cur + 1), () => total, () => cur);
+
     function goTo(i) {
       cur = (i + total) % total;
       track.style.transform = `translateX(-${cur * 100}%)`;
       const activeEl = $('.slider-active', root), fill = $('.slider-progress-fill', root);
       if (activeEl) activeEl.textContent = cur + 1;
-      if (fill) fill.style.width = ((cur + 1) / total * 100) + '%';
+      if (!CINEMATIC && fill) fill.style.width = ((cur + 1) / total * 100) + '%';
       fitTo(cur);
+      playSlide(track, cur);
+      gamesPlayer.kick();
     }
 
     function skeletons() {
