@@ -2,6 +2,12 @@
 /** @var array $service @var array $features @var array $related @var array $projects @var array $steps */
 $deliverables = lines_to_list($service['deliverables']);
 $image        = media_url($service['image']);
+
+// A quick way to start the conversation without going through /request first —
+// each channel appears only when it is actually configured.
+$askText  = 'Hi, I am interested in your "' . $service['name'] . '" service.';
+$waLink   = whatsapp_link($askText);
+$mailLink = email_link($service['name'] . ' — enquiry', $askText);
 ?>
 <?php
 /* No CTA here: the price card a little further down the page ends in the
@@ -72,16 +78,30 @@ $image        = media_url($service['image']);
                     <?php if (!empty($service['price_note'])): ?>
                     <p class="price__note mt-2"><?= e($service['price_note']) ?></p>
                     <?php endif; ?>
-                    <div class="card__footer">
+                    <div class="card__footer stack stack-2">
+                        <?php if ($waLink !== ''): ?>
+                        <a class="btn btn--primary btn--block" href="<?= e($waLink) ?>" target="_blank" rel="noopener noreferrer">
+                            <?= icon('whatsapp') ?>Ask on WhatsApp
+                        </a>
+                        <a class="btn btn--ghost btn--block" href="<?= e(url('/request?service=' . $service['slug'])) ?>">Ask about this</a>
+                        <?php else: ?>
                         <a class="btn btn--primary btn--block" href="<?= e(url('/request?service=' . $service['slug'])) ?>">Ask about this</a>
+                        <?php endif; ?>
                     </div>
                 </div>
                 <?php else: ?>
                 <div class="card">
                     <h3 class="card__title">Price</h3>
                     <p class="card__text">Scoped to what you actually need, then agreed on WhatsApp or by email.</p>
-                    <div class="card__footer">
+                    <div class="card__footer stack stack-2">
+                        <?php if ($waLink !== ''): ?>
+                        <a class="btn btn--primary btn--block" href="<?= e($waLink) ?>" target="_blank" rel="noopener noreferrer">
+                            <?= icon('whatsapp') ?>Ask on WhatsApp
+                        </a>
+                        <a class="btn btn--ghost btn--block" href="<?= e(url('/request?service=' . $service['slug'])) ?>">Ask about this</a>
+                        <?php else: ?>
                         <a class="btn btn--primary btn--block" href="<?= e(url('/request?service=' . $service['slug'])) ?>">Ask about this</a>
+                        <?php endif; ?>
                     </div>
                 </div>
                 <?php endif; ?>
