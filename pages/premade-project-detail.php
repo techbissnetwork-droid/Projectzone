@@ -158,19 +158,24 @@ $meta = array_filter([
             </div>
 
             <aside class="stack stack-4" style="position:sticky;top:6.5rem">
-                <?php if ($demo !== ''): ?>
+                <?php
+                // "Open the demo" already sits right under the headline above —
+                // repeating it here too, right next to that first button once the
+                // page is scrolled, was the same link twice on one screen. This
+                // card's own job is what is not up there yet: admin access and
+                // the credentials to use it, so it only appears when it has one.
+                $hasDemoExtras = $demoAdmin !== '' || $demoUser !== '' || $demoPass !== '' || !empty($project['demo_note']);
+                ?>
+                <?php if ($hasDemoExtras): ?>
                 <div class="card" data-reveal="right">
-                    <h3 class="card__title" style="font-size:var(--fs-sm)">Try it first</h3>
+                    <h3 class="card__title" style="font-size:var(--fs-sm)">Demo access</h3>
+                    <?php if ($demoAdmin !== ''): ?>
                     <div class="card__footer stack stack-2">
-                        <a class="btn btn--primary btn--block" href="<?= e($demo) ?>" target="_blank" rel="noopener noreferrer nofollow">
-                            <?= icon('external') ?>Open the demo
-                        </a>
-                        <?php if ($demoAdmin !== ''): ?>
                         <a class="btn btn--ghost btn--block" href="<?= e($demoAdmin) ?>" target="_blank" rel="noopener noreferrer nofollow">
                             Admin demo
                         </a>
-                        <?php endif; ?>
                     </div>
+                    <?php endif; ?>
 
                     <?php if ($demoUser !== '' || $demoPass !== ''): ?>
                     <dl class="demo-creds mt-4">
