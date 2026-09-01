@@ -494,42 +494,14 @@ footer .ic-svg { width: 12px; height: 12px; vertical-align: -1px; margin-right: 
   </p>
   <p><?= sma_e(sma_setting('site_notice')) ?></p>
 </footer>
-<style>
-.feat, .step, .price { transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.22,1,0.36,1); }
-.sec.reveal:not(.in) .feat, .sec.reveal:not(.in) .step, .sec.reveal:not(.in) .price { opacity: 0; transform: translateY(22px); }
-.sec.reveal.in .feat:nth-child(2), .sec.reveal.in .step:nth-child(2), .sec.reveal.in .price:nth-child(2) { transition-delay: 0.08s; }
-.sec.reveal.in .feat:nth-child(3), .sec.reveal.in .step:nth-child(3), .sec.reveal.in .price:nth-child(3) { transition-delay: 0.16s; }
-.sec.reveal.in .feat:nth-child(4), .sec.reveal.in .price:nth-child(4) { transition-delay: 0.24s; }
-.sec.reveal.in .feat:nth-child(5) { transition-delay: 0.32s; }
-.sec.reveal.in .feat:nth-child(6) { transition-delay: 0.4s; }
-</style>
-<script<?= sma_nonce() ?>>
-(function () {
-  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  // Scroll reveals
-  var els = document.querySelectorAll('.reveal');
-  if ('IntersectionObserver' in window && !reduced) {
-    var io = new IntersectionObserver(function (es) {
-      es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
-    }, { threshold: 0.1 });
-    els.forEach(function (el) { io.observe(el); });
-  } else { els.forEach(function (el) { el.classList.add('in'); }); }
-  // Count-up hero stats
-  document.querySelectorAll('.cnt').forEach(function (el) {
-    var target = parseInt(el.dataset.n, 10) || 0;
-    if (reduced || target === 0) { el.textContent = target.toLocaleString(); return; }
-    var t0 = null, dur = 1400;
-    function tick(ts) {
-      if (!t0) t0 = ts;
-      var p = Math.min(1, (ts - t0) / dur);
-      var eased = 1 - Math.pow(1 - p, 3);
-      el.textContent = Math.round(target * eased).toLocaleString();
-      if (p < 1) requestAnimationFrame(tick);
-    }
-    requestAnimationFrame(tick);
-  });
-})();
-</script>
+<?php // The scroll-reveal observer, the per-card stagger and the hero
+      // count-up used to each have their own copy sitting right here -
+      // this page's own <style>/<script>, independent of and slightly out
+      // of step with the same three things ui.js and style.css already do
+      // for every other page. All three now live once, shared, in
+      // assets/ui.js and assets/style.css's "ALIVE" section - nothing
+      // page-specific was lost, .feat/.step/.price get the same staggered
+      // reveal and .cnt[data-n] the same count-up as before. ?>
 <script src="assets/ui.js?v=<?= @filemtime(__DIR__ . '/assets/ui.js') ?: 1 ?>" defer></script>
 </body>
 </html>

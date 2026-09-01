@@ -161,6 +161,104 @@
       }
     });
   });
+
+  // ---------------------------------------------- animated stat counters
+  // Shared home for what used to be index.php's own inline copy of this -
+  // one page had a working counter and every other stat on the site (admin
+  // dashboard cards, the track-record headline number) had none, because
+  // there was nowhere to reuse it from. data-n carries the target so the
+  // element's real text content works with JS disabled or failed; .cnt just
+  // opts an element in without a class-name collision with anything else
+  // that happens to carry data-n for its own reasons.
+  document.querySelectorAll('.cnt[data-n]').forEach(function (el) {
+    var target = parseInt(el.getAttribute('data-n'), 10) || 0;
+    if (reduced || target === 0 || el.dataset.counted) { el.textContent = target.toLocaleString(); return; }
+    el.dataset.counted = '1';
+    var t0 = null, dur = 1400;
+    function tick(ts) {
+      if (!t0) t0 = ts;
+      var p = Math.min(1, (ts - t0) / dur);
+      var eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(target * eased).toLocaleString();
+      if (p < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  });
+
+  // ---------------------------------------------- presence: cursor glow + magnetic buttons
+  // One delegated, rAF-throttled pointermove listener for every hover-glow
+  // and magnetic-pull effect on the page (see the "ALIVE" section of
+  // style.css) - each of those reads --mx/--my/--card-mx/--card-my/--pull-x/
+  // --pull-y rather than wiring its own listener, which is how one nice
+  // cursor effect turns into five competing scroll-jank sources. Skipped
+  // entirely with no pointer to react to (touch) or when motion is reduced,
+  // matching the CSS's own (hover: hover) and (pointer: fine) gate exactly -
+  // an event listener the matching styles can never show is pure waste.
+  var finePointer = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  if (finePointer && !reduced) {
+    var heroEl = document.querySelector('.hero-split');
+    var raf = 0, lastX = 0, lastY = 0;
+    function paint() {
+      raf = 0;
+      if (heroEl) {
+        var r = heroEl.getBoundingClientRect();
+        if (lastX >= r.left && lastX <= r.right && lastY >= r.top && lastY <= r.bottom) {
+          heroEl.style.setProperty('--mx', ((lastX - r.left) / r.width * 100) + '%');
+          heroEl.style.setProperty('--my', ((lastY - r.top) / r.height * 100) + '%');
+          heroEl.classList.add('warm');
+        } else {
+          heroEl.classList.remove('warm');
+        }
+      }
+      var card = document.elementFromPoint(lastX, lastY);
+      card = card && card.closest ? card.closest('.feat, .price, .step') : null;
+      if (card) {
+        var cr = card.getBoundingClientRect();
+        card.style.setProperty('--card-mx', ((lastX - cr.left) / cr.width * 100) + '%');
+        card.style.setProperty('--card-my', ((lastY - cr.top) / cr.height * 100) + '%');
+      }
+      var btn = document.elementFromPoint(lastX, lastY);
+      btn = btn && btn.closest ? btn.closest('.cta-main, .btn-primary') : null;
+      document.querySelectorAll('.cta-main, .btn-primary').forEach(function (b) {
+        if (b === btn) {
+          var br = b.getBoundingClientRect();
+          // Pull toward the pointer, clamped to a few px either way - a
+          // button that leans is inviting; one that chases the cursor across
+          // the screen is a bug report.
+          var px = Math.max(-6, Math.min(6, (lastX - (br.left + br.width / 2)) * 0.18));
+          var py = Math.max(-4, Math.min(4, (lastY - (br.top + br.height / 2)) * 0.18));
+          b.style.setProperty('--pull-x', px.toFixed(1) + 'px');
+          b.style.setProperty('--pull-y', py.toFixed(1) + 'px');
+        } else if (b.style.getPropertyValue('--pull-x')) {
+          b.style.setProperty('--pull-x', '0px');
+          b.style.setProperty('--pull-y', '0px');
+        }
+      });
+    }
+    window.addEventListener('pointermove', function (e) {
+      lastX = e.clientX; lastY = e.clientY;
+      if (!raf) raf = requestAnimationFrame(paint);
+    }, { passive: true });
+  }
+
+  // ---------------------------------------------- nav-loading bar
+  // The scroll-progress bar already drawn above gets a second job: on a
+  // same-origin, same-tab link click it races to most-of-the-way-there
+  // immediately, so the instant before a full page unload - which nothing
+  // the departing page renders can otherwise animate - still reads as "in
+  // progress" rather than the page simply going inert. Browsers that support
+  // cross-document view transitions (see style.css's @view-transition rule)
+  // crossfade on top of this; browsers that do not still get a bar that
+  // moved instead of a dead click.
+  document.addEventListener('click', function (e) {
+    if (reduced || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
+    if (!a || a.target === '_blank' || a.hasAttribute('download')) return;
+    var href = a.getAttribute('href') || '';
+    if (href === '' || href.charAt(0) === '#' || /^(mailto:|tel:|javascript:)/i.test(href)) return;
+    try { if (new URL(a.href, location.href).origin !== location.origin) return; } catch (e2) { return; }
+    bar.classList.add('navigating');
+  }, { passive: true });
 })();
 
 /* Upgrade prompt.

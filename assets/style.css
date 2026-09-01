@@ -1715,16 +1715,20 @@ button.primary:active, .cta-main:active, .tf:active, .fav-btn:active { transform
 }
 @keyframes shimmer { from { background-position: 120% 0; } to { background-position: -120% 0; } }
 
-/* Landing hero motion */
-.hero h1 {
-  background-size: 220% auto;
-  animation: heroShimmer 7s ease-in-out infinite alternate;
-}
-@keyframes heroShimmer { from { background-position: 0% center; } to { background-position: 100% center; } }
-.hero-ctas { animation: riseIn 0.7s 0.15s cubic-bezier(0.22, 1, 0.36, 1) both; }
-.hero-stats { animation: riseIn 0.7s 0.3s cubic-bezier(0.22, 1, 0.36, 1) both; }
-.hstat { transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.25s ease; }
-.hstat:hover { transform: translateY(-4px); border-color: color-mix(in srgb, var(--accent) 50%, var(--border)); }
+/* Landing hero motion. index.php's own <style> block deliberately keeps the
+ * em-highlighted word (.hero-copy h1 em) a single flat --brass colour, not a
+ * gradient clip - that trick smears on low-DPI screens and reads as generic
+ * SaaS-template polish, per the comment on .hero-copy h1 right above it in
+ * that file. Respecting that: the word still gets to breathe, just through
+ * filter (a brightness pulse), the same solid-colour-safe technique the
+ * signal badge already uses a few rules up - not a technique this file just
+ * argued against two lines away from where it would apply.
+ * .hero-stats/.hstat below were a stat-pill layout .trust-row replaced and
+ * are dead everywhere .trust-row's own hover (further down) now covers. */
+.hero-copy h1 em { display: inline-block; animation: heroEmBreathe 4.5s ease-in-out .6s infinite; }
+@keyframes heroEmBreathe { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.28); } }
+.trust-row > div { transition: transform var(--dur) var(--ease-out); }
+.trust-row > div:hover { transform: translateY(-3px); }
 
 /* Watch/news chips micro-motion */
 .fav-chip, .h-chip, .tf, .admin-link { transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.18s ease, background 0.18s ease, color 0.18s ease; }
@@ -1732,6 +1736,107 @@ button.primary:active, .cta-main:active, .tf:active, .fav-btn:active { transform
 
 /* Smooth in-page scrolling (anchors, back-to-top) */
 html { scroll-behavior: smooth; }
+
+/* ============================================================
+   ALIVE: presence, choreography, continuity between page loads.
+   Everything below is additive polish on top of the motion system
+   above - same tokens (--ease/--ease-out/--dur*), same reduced-motion
+   and touch gating, nothing here replaces an existing effect.
+   ============================================================ */
+
+/* Cross-document view transitions: a same-origin navigation (clicking to
+ * /charts, /account, back/forward) crossfades the old page into the new one
+ * instead of the hard flash-to-white a full page load normally is - the
+ * single highest-leverage "feels alive between pages" change available to a
+ * multi-page app, and it costs zero JS. Chromium supports it today; every
+ * other engine ignores the unknown at-rule and gets the old hard cut, which
+ * is exactly the same progressive-enhancement contract prefers-reduced-motion
+ * already uses below. */
+@view-transition { navigation: auto; }
+@media (prefers-reduced-motion: reduce) { @view-transition { navigation: none; } }
+
+/* Cursor-reactive hero glow. --mx/--my are percentages written by ui.js's
+ * one shared rAF-throttled pointermove listener (see "presence" there) -
+ * every glow effect on the page reads those same two properties rather than
+ * each wiring its own listener, which is how one nice hover effect turns
+ * into five competing scroll-jank sources. Gated to fine pointers: a phone
+ * has no cursor to react to, and the property is simply never written there,
+ * so the fallback gradient position (center) is what phones always see. */
+@media (hover: hover) and (pointer: fine) {
+  .hero-split { position: relative; isolation: isolate; }
+  .hero-split::after {
+    content: ""; position: absolute; inset: -1px; z-index: -1; border-radius: inherit;
+    background: radial-gradient(480px circle at var(--mx, 50%) var(--my, 15%),
+                color-mix(in srgb, var(--accent) 15%, transparent), transparent 65%);
+    opacity: 0; transition: opacity var(--dur-slow) var(--ease);
+  }
+  .hero-split:hover::after, .hero-split.warm::after { opacity: 1; }
+
+  /* Same idea, one card at a time: --card-mx/--card-my are set inline on
+   * whichever card the pointer is actually over (delegated in ui.js), so a
+   * grid of a dozen cards costs one listener, not a dozen. */
+  .feat, .price, .step { position: relative; isolation: isolate; }
+  .feat::before, .price::before, .step::before {
+    content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit;
+    background: radial-gradient(220px circle at var(--card-mx, 50%) var(--card-my, 0%),
+                color-mix(in srgb, var(--accent) 13%, transparent), transparent 72%);
+    opacity: 0; transition: opacity var(--dur) var(--ease);
+  }
+  .feat:hover::before, .price:hover::before, .step:hover::before { opacity: 1; }
+
+  /* Magnetic pull: cta-main/btn-primary lean a few px toward the cursor
+   * while hovered (ui.js sets --pull-x/--pull-y, clamped small so it reads
+   * as "responsive material", not a jumping button) and spring back on
+   * leave via the transition below. */
+  .cta-main, .btn-primary { transition: transform var(--dur) var(--ease-out); }
+  .cta-main:hover, .btn-primary:hover {
+    transform: translate(var(--pull-x, 0px), var(--pull-y, 0px));
+  }
+}
+
+/* Per-card choreography: a revealed grid steps its children in one after
+ * another instead of fading as one flat rectangle - the difference between
+ * "a section appeared" and "each idea arrived on its own". Ancestor-scoped
+ * off .sec.reveal so no markup change was needed to opt every existing
+ * feature/step/price grid in at once. */
+.sec.reveal .feat-grid > .feat,
+.sec.reveal .steps > .step,
+.sec.reveal .price-grid > .price {
+  opacity: 0; transform: translateY(18px);
+  transition: opacity var(--dur-slow) var(--ease-out), transform var(--dur-slow) var(--ease-out);
+}
+.sec.reveal.in .feat-grid > .feat,
+.sec.reveal.in .steps > .step,
+.sec.reveal.in .price-grid > .price { opacity: 1; transform: none; }
+.feat-grid > .feat:nth-child(1), .steps > .step:nth-child(1), .price-grid > .price:nth-child(1) { transition-delay: .03s; }
+.feat-grid > .feat:nth-child(2), .steps > .step:nth-child(2), .price-grid > .price:nth-child(2) { transition-delay: .10s; }
+.feat-grid > .feat:nth-child(3), .steps > .step:nth-child(3), .price-grid > .price:nth-child(3) { transition-delay: .17s; }
+.feat-grid > .feat:nth-child(4) { transition-delay: .24s; }
+.feat-grid > .feat:nth-child(5) { transition-delay: .31s; }
+.feat-grid > .feat:nth-child(6) { transition-delay: .38s; }
+
+/* Nav-loading bar: the .scroll-progress bar ui.js already draws for scroll
+ * position is reused (not duplicated) for a second job - on a same-origin
+ * navigation click it races to 78% immediately, so the moment before a full
+ * page unload (which nothing on the departing page can otherwise animate)
+ * still reads as "in progress" rather than the page just going inert. The
+ * arriving page resets and draws it normally. */
+.scroll-progress { transition: transform 0.25s ease; }
+.scroll-progress.navigating { transform: scaleX(0.78) !important; transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1); }
+
+/* Ambient "reading the market" pulse: a slow-breathing ring behind the live
+ * indicator dot(s), reinforcing that analysis keeps running with nobody
+ * watching rather than only on a click - the same story the product already
+ * tells in words ("keeps learning from what happens next"). */
+.live-dot { position: relative; }
+.live-dot::after {
+  content: ""; position: absolute; inset: -5px; border-radius: 50%;
+  border: 1px solid var(--up); opacity: 0; animation: livePulseRing 2.4s var(--ease) infinite;
+}
+@keyframes livePulseRing {
+  0% { opacity: 0.55; transform: scale(0.4); }
+  100% { opacity: 0; transform: scale(1.9); }
+}
 
 /* Thin scroll progress bar under the topbar */
 .scroll-progress {
