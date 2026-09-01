@@ -130,6 +130,13 @@ function email_link(string $subject = '', string $body = ''): string
     return 'mailto:' . $address . ($query === [] ? '' : '?' . http_build_query($query, '', '&', PHP_QUERY_RFC3986));
 }
 
+/** A tel: link from the configured phone number, or '' if none is set. */
+function phone_link(): string
+{
+    $digits = preg_replace('/[^0-9+]/', '', setting('contact_phone')) ?? '';
+    return $digits === '' ? '' : 'tel:' . $digits;
+}
+
 /** Format a money amount using the configured currency symbol. */
 function money(float|int|string|null $amount, ?string $symbol = null, bool $decimals = false): string
 {

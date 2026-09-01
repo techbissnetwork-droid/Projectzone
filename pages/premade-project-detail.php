@@ -24,9 +24,10 @@ $demoPass  = trim((string) $project['demo_password']);
 
 // Each channel appears only when it is configured, so the page never offers a
 // way to reach us that does not work.
-$askText  = 'Hi, I am interested in the "' . $project['name'] . '" project on your website.';
-$waLink   = whatsapp_link($askText);
-$mailLink = email_link($project['name'] . ' — enquiry', $askText);
+$askText   = 'Hi, I am interested in the "' . $project['name'] . '" project on your website.';
+$waLink    = whatsapp_link($askText);
+$mailLink  = email_link($project['name'] . ' — enquiry', $askText);
+$phoneLink = phone_link();
 
 $meta = array_filter([
     'Pages'      => (int) $project['page_count'] > 0 ? (string) (int) $project['page_count'] : '',
@@ -234,6 +235,9 @@ $meta = array_filter([
                         <?php endif; ?>
                         <?php if ($mailLink !== ''): ?>
                         <a class="btn btn--ghost btn--block" href="<?= e($mailLink) ?>"><?= icon('mail') ?>Email us</a>
+                        <?php endif; ?>
+                        <?php if ($phoneLink !== ''): ?>
+                        <a class="btn btn--ghost btn--block" href="<?= e($phoneLink) ?>"><?= icon('phone') ?>Call us</a>
                         <?php endif; ?>
                         <a class="btn btn--quiet btn--block" href="#ask">Use the form</a>
                     </div>

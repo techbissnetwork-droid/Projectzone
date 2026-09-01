@@ -5,9 +5,10 @@ $image        = media_url($service['image']);
 
 // A quick way to start the conversation without going through /request first —
 // each channel appears only when it is actually configured.
-$askText  = 'Hi, I am interested in your "' . $service['name'] . '" service.';
-$waLink   = whatsapp_link($askText);
-$mailLink = email_link($service['name'] . ' — enquiry', $askText);
+$askText   = 'Hi, I am interested in your "' . $service['name'] . '" service.';
+$waLink    = whatsapp_link($askText);
+$mailLink  = email_link($service['name'] . ' — enquiry', $askText);
+$phoneLink = phone_link();
 ?>
 <?php
 /* No CTA here: the price card a little further down the page ends in the
@@ -83,6 +84,12 @@ $mailLink = email_link($service['name'] . ' — enquiry', $askText);
                         <a class="btn btn--primary btn--block" href="<?= e($waLink) ?>" target="_blank" rel="noopener noreferrer">
                             <?= icon('whatsapp') ?>Ask on WhatsApp
                         </a>
+                        <?php if ($phoneLink !== ''): ?>
+                        <a class="btn btn--ghost btn--block" href="<?= e($phoneLink) ?>"><?= icon('phone') ?>Call us</a>
+                        <?php endif; ?>
+                        <a class="btn btn--ghost btn--block" href="<?= e(url('/request?service=' . $service['slug'])) ?>">Ask about this</a>
+                        <?php elseif ($phoneLink !== ''): ?>
+                        <a class="btn btn--primary btn--block" href="<?= e($phoneLink) ?>"><?= icon('phone') ?>Call us</a>
                         <a class="btn btn--ghost btn--block" href="<?= e(url('/request?service=' . $service['slug'])) ?>">Ask about this</a>
                         <?php else: ?>
                         <a class="btn btn--primary btn--block" href="<?= e(url('/request?service=' . $service['slug'])) ?>">Ask about this</a>
@@ -98,6 +105,12 @@ $mailLink = email_link($service['name'] . ' — enquiry', $askText);
                         <a class="btn btn--primary btn--block" href="<?= e($waLink) ?>" target="_blank" rel="noopener noreferrer">
                             <?= icon('whatsapp') ?>Ask on WhatsApp
                         </a>
+                        <?php if ($phoneLink !== ''): ?>
+                        <a class="btn btn--ghost btn--block" href="<?= e($phoneLink) ?>"><?= icon('phone') ?>Call us</a>
+                        <?php endif; ?>
+                        <a class="btn btn--ghost btn--block" href="<?= e(url('/request?service=' . $service['slug'])) ?>">Ask about this</a>
+                        <?php elseif ($phoneLink !== ''): ?>
+                        <a class="btn btn--primary btn--block" href="<?= e($phoneLink) ?>"><?= icon('phone') ?>Call us</a>
                         <a class="btn btn--ghost btn--block" href="<?= e(url('/request?service=' . $service['slug'])) ?>">Ask about this</a>
                         <?php else: ?>
                         <a class="btn btn--primary btn--block" href="<?= e(url('/request?service=' . $service['slug'])) ?>">Ask about this</a>
