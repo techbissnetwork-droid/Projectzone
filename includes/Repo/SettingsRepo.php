@@ -126,4 +126,30 @@ final class SettingsRepo extends BaseRepo
         }
         return $out;
     }
+
+    /**
+     * Settings worth filling in that are still empty, each pointing at the
+     * admin group that holds it. Purely informational — nothing here is
+     * required, and the admin checklist that reads this is dismissible.
+     *
+     * @return array<int,array{key:string,label:string,group:string}>
+     */
+    public function setupChecklist(): array
+    {
+        $items = [
+            'logo'          => ['label' => 'Company logo', 'group' => 'general'],
+            'favicon'       => ['label' => 'Favicon', 'group' => 'general'],
+            'whatsapp'      => ['label' => 'WhatsApp number or chat link', 'group' => 'contact'],
+            'contact_phone' => ['label' => 'Phone number', 'group' => 'contact'],
+            'address'       => ['label' => 'Business address', 'group' => 'contact'],
+            'seo_og_image'  => ['label' => 'Social share image', 'group' => 'seo'],
+        ];
+        $missing = [];
+        foreach ($items as $key => $meta) {
+            if ($this->get($key) === '') {
+                $missing[] = ['key' => $key, 'label' => $meta['label'], 'group' => $meta['group']];
+            }
+        }
+        return $missing;
+    }
 }

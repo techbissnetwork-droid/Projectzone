@@ -533,7 +533,24 @@
     });
   }
 
-  
+  /* -------------------------------------------------------------------
+     Setup checklist — dismissed for the current browser session only, so
+     it quietly reappears next time rather than being silenced for good.
+     ------------------------------------------------------------------- */
+  function initSetupChecklist() {
+    var banner = $('[data-setup-checklist]');
+    if (!banner) return;
+    var KEY = 'techbiss-admin-setup-dismissed';
+    try {
+      if (sessionStorage.getItem(KEY) === '1') return;
+    } catch (e) { /* private-browsing storage block — just show it */ }
+    banner.hidden = false;
+    on($('[data-setup-checklist-dismiss]', banner), 'click', function () {
+      banner.hidden = true;
+      try { sessionStorage.setItem(KEY, '1'); } catch (e) {}
+    });
+  }
+
   /* -------------------------------------------------------------------
      Boot
      ------------------------------------------------------------------- */
@@ -550,6 +567,7 @@
     initToggles();
     initFilters();
     initDirtyGuard();
+    initSetupChecklist();
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);

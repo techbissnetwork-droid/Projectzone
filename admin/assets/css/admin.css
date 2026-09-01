@@ -629,3 +629,10 @@ a.row--between { min-height: 36px; }
   .toolbar .select, .toolbar .input { min-height: 44px; font-size: 16px; }
   a.row--between { min-height: 44px; }
 }
+
+/* Dismissible setup reminder — hidden by default (see setup-checklist.php)
+   until admin.js confirms it was not already dismissed this session, so
+   there is no flash of it appearing then disappearing on every page load. */
+.setup-checklist { align-items: flex-start; margin-bottom: var(--s-6); }
+.setup-checklist__body { flex: 1; min-width: 0; }
+.setup-checklist__dismiss { flex: none; margin: -0.3rem -0.3rem 0 0; }

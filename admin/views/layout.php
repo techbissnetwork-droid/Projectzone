@@ -60,6 +60,9 @@ $title    = $title ?? 'Admin';
         </header>
 
         <main class="content" id="admin-main" tabindex="-1">
+            <?php if (\Techbiss\Core\Auth::can('settings.manage')): ?>
+            <?= $view->partial('partials/setup-checklist', ['missingSetup' => $settings->setupChecklist()]) ?>
+            <?php endif; ?>
             <?= $content ?>
         </main>
     </div>
