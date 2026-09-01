@@ -2,7 +2,7 @@
 <?= $view->partial('partials/page-head', [
     'eyebrow' => 'Services',
     'heading' => 'Everything your business needs to operate online.',
-    'lead'    => 'Ten services, from infrastructure to the work that keeps it running. Take one, or take the lot.',
+    'lead'    => 'Domain, hosting, the website and email come as one setup — not separate purchases. Branding, SEO, apps, automation and maintenance are the work you add around it.',
 ]) ?>
 
 <section class="section section--flush-top">

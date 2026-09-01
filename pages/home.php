@@ -148,12 +148,10 @@ $hero = $sections['hero'] ?? [];
             </div>
         </div>
 
-        <div class="slider" data-slider>
-            <div class="slider__track slider__track--cards" data-reveal-stagger>
+        <div class="grid grid-3" data-reveal-stagger>
             <?php foreach ($services as $i => $service): ?>
                 <?= $view->partial('partials/service-card', ['service' => $service, 'i' => $i]) ?>
             <?php endforeach; ?>
-        </div>
         </div>
 
         <?php if ($s('services', 'cta_label') !== ''): ?>

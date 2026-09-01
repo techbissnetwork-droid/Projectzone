@@ -258,3 +258,9 @@ UPDATE `page_sections` SET `cta_label` = 'See how it works', `cta_url` = '/how-i
 UPDATE `settings` SET `label` = 'WhatsApp number or chat link',
   `hint` = 'A phone number with country code (e.g. 8801711223344), or a full chat link (wa.me/… or a WhatsApp Business link) — either works.'
   WHERE `key_name` = 'whatsapp';
+
+-- Wording only — doesn't assert a specific service count, so it reads
+-- correctly whether or not the services themselves have been consolidated.
+UPDATE `page_sections` SET `subheading` = 'Everything you need to run your business online, delivered as one setup — domain, hosting, the site, email, and the app you have in mind.'
+  WHERE `page_key` = 'home' AND `section_key` = 'services'
+    AND `subheading` = 'Ten services — your domain and website, custom web and mobile apps, and the work that keeps them running.';

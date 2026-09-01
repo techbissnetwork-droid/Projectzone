@@ -163,13 +163,13 @@ WHERE p.slug = 'verdant-wellness';
 
 -- Services credited on each project
 INSERT IGNORE INTO `portfolio_services` (`portfolio_id`,`service_id`)
-SELECT p.id, s.id FROM `portfolio` p JOIN `services` s ON s.slug IN ('business-website','domain-hosting','business-email')
+SELECT p.id, s.id FROM `portfolio` p JOIN `services` s ON s.slug = 'business-website'
 WHERE p.slug IN ('meridian-bakehouse','stonebridge-construction');
 INSERT IGNORE INTO `portfolio_services` (`portfolio_id`,`service_id`)
 SELECT p.id, s.id FROM `portfolio` p JOIN `services` s ON s.slug IN ('web-applications','business-website','maintenance')
 WHERE p.slug IN ('northgate-dental','alloy-fabrication');
 INSERT IGNORE INTO `portfolio_services` (`portfolio_id`,`service_id`)
-SELECT p.id, s.id FROM `portfolio` p JOIN `services` s ON s.slug IN ('ecommerce','seo','automation-ai')
+SELECT p.id, s.id FROM `portfolio` p JOIN `services` s ON s.slug IN ('business-website','seo','automation-ai')
 WHERE p.slug = 'harbour-supply-co';
 INSERT IGNORE INTO `portfolio_services` (`portfolio_id`,`service_id`)
 SELECT p.id, s.id FROM `portfolio` p JOIN `services` s ON s.slug IN ('branding','business-website','web-applications')
