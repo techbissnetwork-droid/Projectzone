@@ -3,8 +3,10 @@
  * The installer's upgrade screen.
  *
  * Shown instead of a dead "already installed" refusal. An existing site can
- * bring its database up to date here, optionally add another administrator,
- * and — the step people otherwise skip — delete the installer afterwards.
+ * bring its database up to date here. Signing in for the upgrade already
+ * proves who you are, so a successful run removes install.php in the same
+ * step rather than asking for a second confirmation afterwards — leaving
+ * the installer in place is the actual risk, not deleting it automatically.
  *
  * @var PDO|null $pdo @var array $uErrors @var array $uSteps @var bool $uDone
  * @var array|null $uLocked @var string $uEmail @var bool $uAuthed @var string $uName
@@ -40,41 +42,26 @@ if ($uPlan !== null) {
             <span class="name">TECHBISS</span>
         </div>
 
-        <?php if ($uLocked !== null): ?>
-            <h1><?= $uLocked['ok'] ? 'Installer removed' : 'The installer is still there' ?></h1>
-            <?php if ($uLocked['ok']): ?>
-                <p class="muted">install.php has been deleted. Setup can no longer be reached from a browser.</p>
-            <?php else: ?>
-                <div class="alert alert--warn"><?= $eh($uLocked['error']) ?></div>
-            <?php endif; ?>
-            <div class="actions">
-                <a class="btn btn--primary" href="<?= $eh($installedUrl) ?>">Go to the admin sign-in page</a>
-            </div>
-
-        <?php elseif ($uDone): ?>
-            <h1>Upgrade complete</h1>
+        <?php if ($uDone): ?>
+            <h1><?= ($uLocked['ok'] ?? false) ? 'Upgrade complete — installer removed' : 'Upgrade complete' ?></h1>
             <p class="muted">Signed in as <?= $eh($uName) ?>.</p>
             <div class="check-list">
                 <?php foreach ($uSteps as $line): ?>
                 <div class="check ok"><span class="mark">✓</span><span><?= $eh($line) ?></span></div>
                 <?php endforeach; ?>
+                <?php if ($uLocked['ok'] ?? false): ?>
+                <div class="check ok"><span class="mark">✓</span><span>Deleted install.php — setup can no longer be reached from a browser</span></div>
+                <?php endif; ?>
             </div>
+            <?php if (!($uLocked['ok'] ?? false)): ?>
             <div class="alert alert--warn">
-                <strong>Delete <code>install.php</code> now.</strong>
-                Leaving the installer in place is a security risk.
+                <strong>install.php is still on the server.</strong> <?= $eh($uLocked['error'] ?? '') ?>
+                Delete the file yourself — leaving it in place is a security risk.
             </div>
-            <form method="post">
-                <input type="hidden" name="action" value="lock">
-                <input type="hidden" name="upgrade_email" value="<?= $eh($uEmail) ?>">
-                <label class="field">
-                    <span>Confirm your password to remove it</span>
-                    <input type="password" name="upgrade_password" autocomplete="current-password" required>
-                </label>
-                <div class="actions">
-                    <button class="btn btn--primary" type="submit">Delete install.php</button>
-                    <a class="btn btn--quiet" href="<?= $eh($installedUrl) ?>">I will delete it myself</a>
-                </div>
-            </form>
+            <?php endif; ?>
+            <div class="actions">
+                <a class="btn btn--primary" href="<?= $eh($installedUrl) ?>">Go to the admin sign-in page</a>
+            </div>
 
         <?php else: ?>
             <?php if ($needsConfig): ?>
@@ -117,7 +104,7 @@ if ($uPlan !== null) {
                 <div class="check-list">
                     <div class="check ok"><span class="mark">✓</span><span>The database is already up to date</span></div>
                 </div>
-                <p class="muted">You can still add an administrator here, or remove the installer.</p>
+                <p class="muted">Signing in below still removes the installer.</p>
                 <?php endif; ?>
 
                 <?php if (isset($uErrors['upgrade'])): ?>
@@ -145,35 +132,8 @@ if ($uPlan !== null) {
                         <span>Password</span>
                         <input type="password" name="upgrade_password" autocomplete="current-password" required
                                class="<?= isset($uErrors['auth']) ? 'bad' : '' ?>">
+                        <em>Running the upgrade also removes install.php once it succeeds — no separate confirmation step.</em>
                     </label>
-
-                    <label class="check-inline">
-                        <input type="checkbox" name="add_admin" value="1" <?= isset($_POST['add_admin']) ? 'checked' : '' ?>>
-                        <span>Also create a new administrator
-                            <em>Leave this unticked to keep the administrators you already have. Nothing is removed either way.</em>
-                        </span>
-                    </label>
-
-                    <label class="field">
-                        <span>New administrator name</span>
-                        <input type="text" name="new_admin_name" value="<?= $eh($_POST['new_admin_name'] ?? '') ?>" autocomplete="name"
-                               class="<?= isset($uErrors['new_admin_name']) ? 'bad' : '' ?>">
-                        <?php if (isset($uErrors['new_admin_name'])): ?><em class="err"><?= $eh($uErrors['new_admin_name']) ?></em><?php endif; ?>
-                    </label>
-                    <div class="row">
-                        <label class="field">
-                            <span>Email</span>
-                            <input type="email" name="new_admin_email" value="<?= $eh($_POST['new_admin_email'] ?? '') ?>"
-                                   class="<?= isset($uErrors['new_admin_email']) ? 'bad' : '' ?>">
-                            <?php if (isset($uErrors['new_admin_email'])): ?><em class="err"><?= $eh($uErrors['new_admin_email']) ?></em><?php endif; ?>
-                        </label>
-                        <label class="field">
-                            <span>Password</span>
-                            <input type="password" name="new_admin_password" autocomplete="new-password"
-                                   class="<?= isset($uErrors['new_admin_password']) ? 'bad' : '' ?>">
-                            <?php if (isset($uErrors['new_admin_password'])): ?><em class="err"><?= $eh($uErrors['new_admin_password']) ?></em><?php endif; ?>
-                        </label>
-                    </div>
 
                     <div class="actions">
                         <button class="btn btn--primary" type="submit"><?= $needsConfig ? 'Connect and upgrade' : 'Run the upgrade' ?></button>

@@ -103,7 +103,13 @@ function tb_requirements(): array
 
 /**
  * Open a PDO connection, optionally creating the database first.
- * @return array{ok:bool,pdo:?PDO,error:string}
+ *
+ * `missing` is only ever true on a failure caused specifically by the
+ * database not existing — the one case the caller can offer to fix by
+ * retrying with $createIfMissing, rather than a credentials or network
+ * problem retrying would not help with.
+ *
+ * @return array{ok:bool,pdo:?PDO,error:string,missing?:bool}
  */
 function tb_connect(array $db, bool $createIfMissing = false): array
 {
@@ -136,8 +142,8 @@ function tb_connect(array $db, bool $createIfMissing = false): array
 
     if (!$exists) {
         if (!$createIfMissing) {
-            return ['ok' => false, 'pdo' => null,
-                    'error' => 'The database "' . $name . '" does not exist. Tick “Create it for me” or create it yourself first.'];
+            return ['ok' => false, 'pdo' => null, 'missing' => true,
+                    'error' => 'The database "' . $name . '" does not exist yet.'];
         }
         try {
             $server->exec('CREATE DATABASE `' . str_replace('`', '', $name) . '` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
@@ -435,37 +441,6 @@ function tb_record_attempt(PDO $pdo, string $email, string $ip, bool $success): 
     } catch (Throwable) {
         // Recording is best effort; it must never block a legitimate upgrade.
     }
-}
-
-/**
- * Add an administrator to a database that already has one.
- *
- * @return array{ok:bool,error:string}
- */
-function tb_add_admin(PDO $pdo, string $name, string $email, string $password): array
-{
-    try {
-        $roleId = (int) $pdo->query("SELECT id FROM roles WHERE slug = 'super-admin'")->fetchColumn();
-        if ($roleId === 0) {
-            return ['ok' => false, 'error' => 'The super-admin role is missing from this database.'];
-        }
-
-        $check = $pdo->prepare('SELECT COUNT(*) FROM admins WHERE email = ?');
-        $check->execute([$email]);
-        if ((int) $check->fetchColumn() > 0) {
-            return ['ok' => false, 'error' => 'An administrator with that email address already exists.'];
-        }
-
-        $now = date('Y-m-d H:i:s');
-        $pdo->prepare(
-            'INSERT INTO admins (role_id, name, email, password_hash, is_active, created_at, updated_at)
-             VALUES (?, ?, ?, ?, 1, ?, ?)'
-        )->execute([$roleId, $name, $email, password_hash($password, PASSWORD_DEFAULT), $now, $now]);
-    } catch (Throwable $e) {
-        return ['ok' => false, 'error' => $e->getMessage()];
-    }
-
-    return ['ok' => true, 'error' => ''];
 }
 
 /**
@@ -916,32 +891,8 @@ if ($upgradeMode) {
             $uAuthed = true;
             $uName   = $auth['name'];
 
-            if ($action === 'lock') {
-                $uLocked = tb_lock_installer();
-                $uDone   = true;
-            } elseif ($action === 'upgrade') {
-                // A new administrator is optional: most upgrades keep the ones
-                // that are already there.
-                $addAdmin   = isset($_POST['add_admin']);
-                $newName    = trim((string) ($_POST['new_admin_name'] ?? ''));
-                $newEmail   = mb_strtolower(trim((string) ($_POST['new_admin_email'] ?? '')));
-                $newPass    = (string) ($_POST['new_admin_password'] ?? '');
-
-                if ($addAdmin) {
-                    if ($newName === '') {
-                        $uErrors['new_admin_name'] = 'Enter a name for the new administrator.';
-                    }
-                    if (!filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
-                        $uErrors['new_admin_email'] = 'Enter a valid email address.';
-                    }
-                    if (strlen($newPass) < 10) {
-                        $uErrors['new_admin_password'] = 'Use at least 10 characters.';
-                    } elseif (!preg_match('/[A-Za-z]/', $newPass) || !preg_match('/[0-9]/', $newPass)) {
-                        $uErrors['new_admin_password'] = 'Include both letters and numbers.';
-                    }
-                }
-
-                if ($uErrors === [] && $needsConfig) {
+            if ($action === 'upgrade') {
+                if ($needsConfig) {
                     $written = tb_write_config($dbConfig, [
                         'url'         => rtrim($detectedUrl, '/'),
                         'base_path'   => rtrim((string) (parse_url($detectedUrl, PHP_URL_PATH) ?: ''), '/'),
@@ -973,15 +924,6 @@ if ($upgradeMode) {
                         $uErrors['upgrade'] = $e->getMessage();
                     }
 
-                    if ($uErrors === [] && $addAdmin) {
-                        $added = tb_add_admin($pdo, $newName, $newEmail, $newPass);
-                        if ($added['ok']) {
-                            $uSteps[] = 'Created the administrator ' . $newEmail;
-                        } else {
-                            $uErrors['new_admin_email'] = $added['error'];
-                        }
-                    }
-
                     if ($uErrors === []) {
                         tb_clear_cache();
                         $uSteps[] = 'Cleared the cache';
@@ -990,6 +932,12 @@ if ($upgradeMode) {
                             $uSteps = ['The database was already up to date — nothing needed changing'];
                         }
                         $uDone = true;
+                        // Signed in as a real administrator to get this far, so
+                        // there is nothing left for a second password prompt to
+                        // confirm — remove the installer immediately rather than
+                        // leaving it sitting there until someone comes back to a
+                        // separate "are you sure" step.
+                        $uLocked = tb_lock_installer();
                     }
                 }
             }
@@ -1055,6 +1003,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $conn = tb_connect($db, isset($_POST['create_db']));
             if (!$conn['ok']) {
                 $errors['db'] = $conn['error'];
+                if ($conn['missing'] ?? false) {
+                    $errors['db_missing'] = true;
+                }
             } elseif ($conn['pdo'] instanceof PDO && tb_database_has_install($conn['pdo'])) {
                 // This database already has a site in it. Setting it up again
                 // would seed over live content, so offer the upgrade instead.
@@ -1237,8 +1188,14 @@ $e = static fn (?string $s): string => htmlspecialchars((string) $s, ENT_QUOTES,
             <p class="muted">Enter the details from your hosting panel. The wizard tests the connection
                before writing anything.</p>
 
-            <?php if (isset($errors['db'])): ?>
+            <?php if (isset($errors['db']) && !isset($errors['db_missing'])): ?>
             <div class="alert alert--bad"><?= $e($errors['db']) ?></div>
+            <?php elseif (isset($errors['db_missing'])): ?>
+            <div class="alert alert--warn">
+                <?= $e($errors['db']) ?> Either create it yourself in your hosting panel and try again,
+                or let the installer create it now — needs a database user with <code>CREATE</code> rights,
+                which many shared hosts do not grant.
+            </div>
             <?php endif; ?>
 
             <form method="post" action="?step=2">
@@ -1275,12 +1232,6 @@ $e = static fn (?string $s): string => htmlspecialchars((string) $s, ENT_QUOTES,
                     </label>
                 </div>
 
-                <label class="check-inline">
-                    <input type="checkbox" name="create_db" <?= isset($_POST['create_db']) ? 'checked' : '' ?>>
-                    <span>Create the database for me if it does not exist
-                        <em>Needs a user with CREATE rights — many shared hosts do not allow this.</em></span>
-                </label>
-
                 <details class="advanced">
                     <summary>Connecting through a socket instead?</summary>
                     <label class="field">
@@ -1292,7 +1243,11 @@ $e = static fn (?string $s): string => htmlspecialchars((string) $s, ENT_QUOTES,
 
                 <div class="actions">
                     <a class="btn btn--quiet" href="?step=1">← Back</a>
+                    <?php if (isset($errors['db_missing'])): ?>
+                    <button class="btn btn--primary" type="submit" name="create_db" value="1">Create it &amp; try again →</button>
+                    <?php else: ?>
                     <button class="btn btn--primary" type="submit">Test connection &amp; continue →</button>
+                    <?php endif; ?>
                 </div>
             </form>
 
