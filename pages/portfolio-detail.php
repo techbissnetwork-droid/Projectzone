@@ -26,6 +26,9 @@ $blocks = array_filter([
         </nav>
 
         <div class="row row--tight mt-5">
+            <?php if (($project['status'] ?? 'completed') === 'in_progress'): ?>
+            <span class="badge badge--warning">In progress</span>
+            <?php endif; ?>
             <?php if (!empty($project['category_name'])): ?>
             <span class="badge badge--accent"><?= e($project['category_name']) ?></span>
             <?php endif; ?>

@@ -11,8 +11,11 @@ $techs = $project['technologies'] ?? [];
         <?php else: ?>
             <?= icon('image') ?>
         <?php endif; ?>
-        <?php if (!empty($project['category_name']) || !empty($project['industry_name'])): ?>
+        <?php if (!empty($project['category_name']) || !empty($project['industry_name']) || ($project['status'] ?? 'completed') === 'in_progress'): ?>
         <div class="work-card__overlay">
+            <?php if (($project['status'] ?? 'completed') === 'in_progress'): ?>
+            <span class="work-card__tag work-card__tag--accent">In progress</span>
+            <?php endif; ?>
             <?php if (!empty($project['category_name'])): ?>
             <span class="work-card__tag"><?= e($project['category_name']) ?></span>
             <?php endif; ?>

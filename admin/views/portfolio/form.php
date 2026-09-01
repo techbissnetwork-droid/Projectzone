@@ -60,6 +60,24 @@ $selSvc  = array_map('intval', (array) old('services', $selectedSvc));
                             </div>
                         </div>
 
+                        <div class="field--row">
+                            <div class="field">
+                                <label class="label" for="p-client-email">Client email</label>
+                                <input class="input<?= error_for('client_email') ? ' is-invalid' : '' ?>" id="p-client-email" type="email"
+                                       name="client_email" value="<?= e($val('client_email')) ?>" maxlength="190"
+                                       <?= $view->partial('partials/field-invalid', ['key' => 'client_email']) ?>>
+                                <?= $view->partial('partials/field-error', ['key' => 'client_email']) ?>
+                                <span class="hint">Kept on file so you can reach them again — never shown on the public case study.</span>
+                            </div>
+                            <div class="field">
+                                <label class="label" for="p-client-phone">Client phone</label>
+                                <input class="input<?= error_for('client_phone') ? ' is-invalid' : '' ?>" id="p-client-phone" type="tel"
+                                       name="client_phone" value="<?= e($val('client_phone')) ?>" maxlength="40"
+                                       <?= $view->partial('partials/field-invalid', ['key' => 'client_phone']) ?>>
+                                <?= $view->partial('partials/field-error', ['key' => 'client_phone']) ?>
+                            </div>
+                        </div>
+
                         <div class="field">
                             <label class="label" for="p-short">Short description</label>
                             <textarea class="textarea" id="p-short" name="short_description" maxlength="500" data-counter><?= e($val('short_description')) ?></textarea>
@@ -194,8 +212,31 @@ $selSvc  = array_map('intval', (array) old('services', $selectedSvc));
                             <span class="switch__track" aria-hidden="true"></span><span>Feature on the homepage</span>
                         </label>
                     </div>
+                    <div class="form-section">
+                        <div class="field">
+                            <label class="label" for="p-status">Project stage</label>
+                            <select class="select" id="p-status" name="status">
+                                <option value="completed" <?= $val('status', 'completed') === 'completed' ? 'selected' : '' ?>>Completed</option>
+                                <option value="in_progress" <?= $val('status', 'completed') === 'in_progress' ? 'selected' : '' ?>>In progress</option>
+                            </select>
+                            <span class="hint">Shown as a badge on the public case study, alongside "Published" above.</span>
+                        </div>
+                    </div>
                 </div>
             </div>
+
+            <?php if (!$isNew && $val('client_email') !== ''): ?>
+            <div class="panel">
+                <div class="panel__head"><span class="panel__title">Client contact</span></div>
+                <div class="panel__body">
+                    <div class="form-section">
+                        <a class="btn btn--ghost btn--block" href="<?= e(url('/admin/portfolio/' . $id . '/email')) ?>">
+                            <?= icon('mail') ?>Email <?= e($val('client_name') ?: 'client') ?>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <?php endif; ?>
 
             <div class="panel">
                 <div class="panel__head"><span class="panel__title">Images</span></div>

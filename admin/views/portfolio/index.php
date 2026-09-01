@@ -74,7 +74,12 @@
                                 <?php else: ?><?= icon('image') ?><?php endif; ?>
                             </span>
                             <a href="<?= e(url('/admin/portfolio/' . (int) $row['id'] . '/edit')) ?>">
-                                <span class="cell-title"><?= e(str_limit($row['title'], 46)) ?></span>
+                                <span class="cell-title">
+                                    <?= e(str_limit($row['title'], 46)) ?>
+                                    <?php if (($row['status'] ?? 'completed') === 'in_progress'): ?>
+                                    <span class="badge badge--warning">In progress</span>
+                                    <?php endif; ?>
+                                </span>
                                 <span class="cell-sub"><?= e($row['client_name'] ?: 'No client set') ?></span>
                             </a>
                         </div>

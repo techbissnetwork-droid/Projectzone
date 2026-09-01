@@ -84,6 +84,8 @@ if (!in_array($path, ['/admin/login', '/admin/logout'], true)) {
     $router->post('/admin/portfolio/reorder', [$portfolio, 'reorder']);
     $router->get('/admin/portfolio/{id:\d+}/edit', [$portfolio, 'edit']);
     $router->post('/admin/portfolio/{id:\d+}', [$portfolio, 'update']);
+    $router->get('/admin/portfolio/{id:\d+}/email', [$portfolio, 'emailForm']);
+    $router->post('/admin/portfolio/{id:\d+}/email', [$portfolio, 'sendEmail']);
     $router->post('/admin/portfolio/{id:\d+}/delete', [$portfolio, 'destroy']);
     $router->post('/admin/portfolio/{id:\d+}/duplicate', [$portfolio, 'duplicate']);
     $router->post('/admin/portfolio/{id:\d+}/toggle', [$portfolio, 'toggle']);

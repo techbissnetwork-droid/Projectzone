@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Techbiss\Controllers\Admin;
 
 use Techbiss\Core\ActivityLog;
+use Techbiss\Core\App;
 use Techbiss\Core\Cache;
 use Techbiss\Core\Request;
 use Techbiss\Core\Validator;
@@ -97,6 +98,9 @@ final class PortfolioController extends BaseAdminController
             ->required('title', 'Project title', 2, 190)
             ->slug('slug', 'title')
             ->optional('client_name', 190)
+            ->email('client_email', 'Client email', false)
+            ->phone('client_phone', false)
+            ->in('status', ['in_progress', 'completed'], 'Status', false)
             ->text('short_description', 500, false, 'Short description')
             ->html('overview')
             ->html('challenge')
@@ -130,6 +134,9 @@ final class PortfolioController extends BaseAdminController
             'category_id'       => $v->get('category_id') > 0 ? $v->get('category_id') : null,
             'industry_id'       => $v->get('industry_id') > 0 ? $v->get('industry_id') : null,
             'client_name'       => $v->get('client_name', ''),
+            'client_email'      => $v->get('client_email', ''),
+            'client_phone'      => $v->get('client_phone', ''),
+            'status'            => $v->get('status', '') ?: 'completed',
             'short_description' => $v->get('short_description', ''),
             'overview'          => $v->get('overview', ''),
             'challenge'         => $v->get('challenge', ''),
@@ -176,6 +183,50 @@ final class PortfolioController extends BaseAdminController
 
         Cache::flush();
         $this->ok($message, '/admin/portfolio/' . $id . '/edit');
+    }
+
+    /**
+     * A way to reach a past client again — the address is on file precisely
+     * so a conversation can restart without having to go dig it up.
+     */
+    public function emailForm(Request $request, array $params): void
+    {
+        $this->authorize('portfolio.manage');
+        $id  = (int) $params['id'];
+        $row = $this->repo->find($id);
+        if ($row === null || (string) $row['client_email'] === '') {
+            flash('error', 'That project has no client email on file.');
+            redirect('/admin/portfolio');
+        }
+        $this->view->render('portfolio/email', ['row' => $row, 'title' => 'Email ' . ($row['client_name'] ?: 'client')]);
+    }
+
+    public function sendEmail(Request $request, array $params): never
+    {
+        $this->authorize('portfolio.manage');
+        $this->verify($request);
+        $id  = (int) $params['id'];
+        $row = $this->repo->find($id);
+        if ($row === null || (string) $row['client_email'] === '') {
+            flash('error', 'That project has no client email on file.');
+            redirect('/admin/portfolio');
+        }
+
+        $v = Validator::make($request->all())
+            ->required('subject', 'Subject', 2, 180)
+            ->text('message', 5000, true, 'Message');
+        if ($v->fails()) {
+            $this->fail($request, $v->errors(), $v->firstError(), '/admin/portfolio/' . $id . '/email');
+        }
+
+        $sender  = App::settings()->get('sales_email') ?: App::settings()->get('contact_email');
+        $sent    = App::mailer()->send((string) $row['client_email'], $v->get('subject'), $v->get('message'), $sender);
+        if (!$sent) {
+            $this->fail($request, [], 'The message could not be sent. Check the mail settings and try again.', '/admin/portfolio/' . $id . '/email');
+        }
+
+        ActivityLog::record('email', 'portfolio', $id, 'Emailed client about: ' . $row['title']);
+        $this->ok('Email sent to ' . $row['client_email'] . '.', '/admin/portfolio/' . $id . '/edit');
     }
 
     public function destroy(Request $request, array $params): never
