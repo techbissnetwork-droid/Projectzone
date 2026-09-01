@@ -163,6 +163,29 @@ function tb_connect(array $db, bool $createIfMissing = false): array
     return ['ok' => true, 'pdo' => $pdo, 'error' => ''];
 }
 
+/**
+ * Drop every table in the database so a fresh install can rebuild it from
+ * schema.sql.
+ *
+ * Only reachable after an administrator has authenticated and typed the
+ * confirmation phrase — this destroys all existing data with no way back.
+ */
+function tb_wipe_database(PDO $pdo, string $name): void
+{
+    $tables = $pdo->query(
+        'SELECT table_name FROM information_schema.tables WHERE table_schema = ' . $pdo->quote($name)
+    )->fetchAll(PDO::FETCH_COLUMN);
+
+    if ($tables === []) {
+        return;
+    }
+    $pdo->exec('SET FOREIGN_KEY_CHECKS = 0');
+    foreach ($tables as $table) {
+        $pdo->exec('DROP TABLE `' . str_replace('`', '', (string) $table) . '`');
+    }
+    $pdo->exec('SET FOREIGN_KEY_CHECKS = 1');
+}
+
 /** Execute a .sql file statement by statement. */
 function tb_run_sql(PDO $pdo, string $file): int
 {
@@ -938,6 +961,32 @@ if ($upgradeMode) {
                         // leaving it sitting there until someone comes back to a
                         // separate "are you sure" step.
                         $uLocked = tb_lock_installer();
+                    }
+                }
+            } elseif ($action === 'fresh') {
+                // Same authentication bar as the upgrade, plus a typed
+                // phrase — this drops every table, so a signed-in session
+                // alone (which a stolen cookie could produce) is not
+                // enough on its own to trigger it.
+                if (trim((string) ($_POST['confirm_wipe'] ?? '')) !== 'DELETE') {
+                    $uErrors['fresh'] = 'Type DELETE (in capitals) to confirm. This cannot be undone.';
+                } else {
+                    try {
+                        tb_wipe_database($pdo, (string) $dbConfig['name']);
+                        $_SESSION['tb_setup'] = [
+                            'db_host'   => (string) ($dbConfig['host'] ?? '127.0.0.1'),
+                            'db_port'   => (string) ($dbConfig['port'] ?? 3306),
+                            'db_name'   => (string) ($dbConfig['name'] ?? ''),
+                            'db_user'   => (string) ($dbConfig['user'] ?? ''),
+                            'db_pass'   => (string) ($dbConfig['pass'] ?? ''),
+                            'db_socket' => (string) ($dbConfig['socket'] ?? ''),
+                            'db_ok'     => true,
+                        ];
+                        unset($_SESSION['tb_upgrade_db']);
+                        header('Location: ?step=3');
+                        exit;
+                    } catch (Throwable $e) {
+                        $uErrors['fresh'] = 'The database could not be wiped: ' . $e->getMessage();
                     }
                 }
             }

@@ -153,6 +153,10 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 1.6rem 0; }
 .btn--quiet { background: none; border-color: transparent; color: var(--muted); }
 .btn--quiet:hover { color: var(--text); background: rgba(255,255,255,.04); }
 .actions .btn--quiet { margin-right: auto; }
+.btn--bad {
+  background: rgba(248,113,113,.12); border-color: rgba(248,113,113,.35); color: var(--bad); font-weight: 600;
+}
+.btn--bad:hover { background: rgba(248,113,113,.2); }
 
 /* Alerts ------------------------------------------------------------ */
 .alert {

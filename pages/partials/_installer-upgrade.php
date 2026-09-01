@@ -140,6 +140,45 @@ if ($uPlan !== null) {
                         <a class="btn btn--quiet" href="<?= $eh($installedUrl) ?>">Go to the admin</a>
                     </div>
                 </form>
+
+                <details class="advanced">
+                    <summary>Want a fresh install instead? (destroys existing data)</summary>
+                    <p class="muted small">
+                        This drops every table in this database and walks you through setup again from
+                        scratch — new site details, a new administrator, everything currently in it gone.
+                        Use this only if you mean to start over, not to upgrade.
+                    </p>
+
+                    <?php if (isset($uErrors['fresh'])): ?>
+                    <div class="alert alert--bad"><?= $eh($uErrors['fresh']) ?></div>
+                    <?php endif; ?>
+
+                    <form method="post">
+                        <input type="hidden" name="action" value="fresh">
+
+                        <label class="field">
+                            <span>Administrator email</span>
+                            <input type="email" name="upgrade_email" autocomplete="username" required
+                                   class="<?= isset($uErrors['auth']) ? 'bad' : '' ?>">
+                            <em>Sign in as an existing super administrator — wiping a live database is not open to anyone who finds this page.</em>
+                        </label>
+                        <label class="field">
+                            <span>Password</span>
+                            <input type="password" name="upgrade_password" autocomplete="current-password" required
+                                   class="<?= isset($uErrors['auth']) ? 'bad' : '' ?>">
+                        </label>
+                        <label class="field">
+                            <span>Type DELETE to confirm</span>
+                            <input type="text" name="confirm_wipe" autocomplete="off" required
+                                   placeholder="DELETE" class="<?= isset($uErrors['fresh']) ? 'bad' : '' ?>">
+                            <em>Case-sensitive. There is no undo once this runs.</em>
+                        </label>
+
+                        <div class="actions">
+                            <button class="btn btn--bad" type="submit">Wipe database and start fresh</button>
+                        </div>
+                    </form>
+                </details>
             <?php endif; ?>
         <?php endif; ?>
     </div>
