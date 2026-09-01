@@ -1037,8 +1037,13 @@
       });
 
       // Any deliberate move — a swipe, an arrow, a dot — hands control over.
+      // A wheel event fires on the track just as often from someone merely
+      // scrolling the page past it, though: only a gesture that is actually
+      // more sideways than vertical is someone trying to move the row.
       on(track, 'pointerdown', hold);
-      on(track, 'wheel', hold, { passive: true });
+      on(track, 'wheel', function (e) {
+        if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) hold();
+      }, { passive: true });
       on(prev, 'click', hold);
       on(next, 'click', hold);
       dotEls.forEach(function (dot) { on(dot, 'click', hold); });

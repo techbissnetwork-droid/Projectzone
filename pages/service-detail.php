@@ -3,11 +3,16 @@
 $deliverables = lines_to_list($service['deliverables']);
 $image        = media_url($service['image']);
 ?>
+<?php
+/* No CTA here: the price card a little further down the page ends in the
+   exact same "Ask about this" — right next to it on a wide screen, since
+   this page-head sits above a two-column split. One button, next to the
+   price it's asking about, beats the same one twice. */
+?>
 <?= $view->partial('partials/page-head', [
     'eyebrow' => $service['tagline'] ?: 'Service',
     'heading' => (string) $service['name'],
     'lead'    => (string) $service['short_description'],
-    'actions' => '<a class="btn btn--primary btn--arrow" href="' . e(url('/request?service=' . $service['slug'])) . '">Ask about this' . icon('arrow-right') . '</a>',
 ]) ?>
 
 <section class="section section--flush-top">
