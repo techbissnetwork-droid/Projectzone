@@ -5,6 +5,7 @@ namespace Techbiss\Controllers;
 
 use Techbiss\Core\App;
 use Techbiss\Core\Csrf;
+use Techbiss\Core\CustomerAuth;
 use Techbiss\Core\Paginator;
 use Techbiss\Core\Request;
 use Techbiss\Core\Session;
@@ -18,6 +19,7 @@ use Techbiss\Repo\IndustryRepo;
 use Techbiss\Repo\LeadRepo;
 use Techbiss\Repo\NavigationRepo;
 use Techbiss\Repo\PageRepo;
+use Techbiss\Repo\PortalRepo;
 use Techbiss\Repo\PortfolioRepo;
 use Techbiss\Repo\ProcessRepo;
 use Techbiss\Repo\ProjectRepo;
@@ -672,6 +674,228 @@ final class SiteController
     // =================================================================
     // Quote request
     // =================================================================
+
+    // =================================================================
+    // Client portal
+    //
+    // For a client we already built something for: sign in with a code
+    // emailed to the address on file, no password to set or forget, then
+    // ask for an upgrade, an update, maintenance or support on it. Signing
+    // in requires a `customers` row with a matching email AND at least one
+    // `client_projects` row against it — an enquiry alone is not enough.
+    // =================================================================
+
+    public function portalLogin(Request $request): void
+    {
+        if (CustomerAuth::check()) {
+            redirect('/portal');
+        }
+        if ($request->isPost()) {
+            $this->handlePortalLogin($request);
+            return;
+        }
+
+        $seo = App::seo();
+        $seo->title('Client Sign In');
+        $seo->noindex(true);
+        $seo->canonical(absolute_url('/portal/login'));
+
+        $this->view->render('portal-login', []);
+    }
+
+    private function handlePortalLogin(Request $request): void
+    {
+        Csrf::verify($request);
+        $portal = new PortalRepo();
+        $ip     = $request->ip();
+
+        $v = Validator::make($request->all())->email('email');
+        if ($v->fails()) {
+            $this->formFail($request, '/portal/login', $v->firstError(), $v->errors());
+            return;
+        }
+        $email = (string) $v->get('email');
+
+        if ($portal->recentOtpCount($email, $ip, 600) >= 3) {
+            $this->formFail($request, '/portal/login', 'Too many codes requested for that address. Please wait a few minutes and try again.', []);
+            return;
+        }
+
+        // Whether or not this email is eligible, the visitor sees the same
+        // response — telling them otherwise would let anyone probe which
+        // email addresses have a project on file with us.
+        $customer = $portal->eligibleCustomer($email);
+        if ($customer !== null) {
+            $code = (string) random_int(100000, 999999);
+            $portal->createOtp($email, password_hash($code, PASSWORD_DEFAULT), 600, $ip);
+            $portal->pruneOtps();
+
+            $siteName = App::settings()->get('site_name', 'TECHBISS');
+            App::mailer()->send(
+                $email,
+                'Your ' . $siteName . ' sign-in code',
+                "Your sign-in code is: {$code}\n\nIt expires in 10 minutes and works once.\n\nIf you did not request this, ignore this email — nobody can sign in without the code."
+            );
+        }
+
+        Session::set('portal_pending_email', $email);
+        $this->formSuccess($request, '/portal/verify', 'If that email has a project with us, a sign-in code is on its way. Check your inbox.');
+    }
+
+    public function portalVerify(Request $request): void
+    {
+        if (CustomerAuth::check()) {
+            redirect('/portal');
+        }
+        $email = (string) Session::get('portal_pending_email', '');
+        if ($email === '') {
+            redirect('/portal/login');
+        }
+        if ($request->isPost()) {
+            $this->handlePortalVerify($request, $email);
+            return;
+        }
+
+        $seo = App::seo();
+        $seo->title('Enter Your Code');
+        $seo->noindex(true);
+
+        $this->view->render('portal-verify', ['email' => self::maskEmail($email)]);
+    }
+
+    private function handlePortalVerify(Request $request, string $email): void
+    {
+        Csrf::verify($request);
+        $portal = new PortalRepo();
+        $code   = preg_replace('/\D/', '', $request->str('code')) ?? '';
+
+        if (strlen($code) !== 6) {
+            $this->formFail($request, '/portal/verify', 'Enter the 6-digit code we emailed you.', []);
+            return;
+        }
+
+        $otp = $portal->latestOtp($email);
+        if ($otp === null || strtotime((string) $otp['expires_at']) < time()) {
+            Session::forget('portal_pending_email');
+            $this->formFail($request, '/portal/login', 'That code has expired. Request a new one.', []);
+            return;
+        }
+        if ((int) $otp['attempts'] >= 5) {
+            Session::forget('portal_pending_email');
+            $this->formFail($request, '/portal/login', 'Too many attempts on that code. Request a new one.', []);
+            return;
+        }
+        if (!password_verify($code, (string) $otp['code_hash'])) {
+            $portal->recordOtpAttempt((int) $otp['id']);
+            $this->formFail($request, '/portal/verify', 'That code is not right. Try again.', []);
+            return;
+        }
+
+        $customer = $portal->eligibleCustomer($email);
+        if ($customer === null) {
+            // The project was removed from the account between the two steps.
+            Session::forget('portal_pending_email');
+            $this->formFail($request, '/portal/login', 'We could not sign you in. Please try again.', []);
+            return;
+        }
+
+        $portal->consumeOtp((int) $otp['id']);
+        Session::forget('portal_pending_email');
+        CustomerAuth::login((int) $customer['id']);
+        $this->formSuccess($request, '/portal', 'Signed in.');
+    }
+
+    public function portalLogout(Request $request): void
+    {
+        Csrf::verify($request);
+        CustomerAuth::logout();
+        flash('success', 'Signed out.');
+        redirect('/portal/login');
+    }
+
+    public function portal(Request $request): void
+    {
+        if (!CustomerAuth::check()) {
+            redirect('/portal/login');
+        }
+        $customer = CustomerAuth::customer();
+        $portal   = new PortalRepo();
+
+        $seo = App::seo();
+        $seo->title('My Projects');
+        $seo->noindex(true);
+
+        $this->view->render('portal', [
+            'customer' => $customer,
+            'projects' => $portal->projectsForCustomer((int) $customer['id']),
+            'requests' => $portal->requestsForCustomer((int) $customer['id']),
+        ]);
+    }
+
+    public function portalRequest(Request $request): void
+    {
+        Csrf::verify($request);
+        if (!CustomerAuth::check()) {
+            redirect('/portal/login');
+        }
+        $customer = CustomerAuth::customer();
+        $portal   = new PortalRepo();
+
+        if ($portal->recentRequestCount((int) $customer['id']) >= 3) {
+            $this->formFail($request, '/portal', 'You have sent several requests recently. Please wait a few minutes before sending another.', []);
+            return;
+        }
+
+        $projects   = $portal->projectsForCustomer((int) $customer['id']);
+        $projectIds = array_map(static fn (array $p) => (string) $p['id'], $projects);
+
+        $v = Validator::make($request->all())
+            ->in('request_type', ['upgrade', 'update', 'maintenance', 'support', 'other'], 'Type')
+            ->text('message', 3000, true, 'Message')
+            ->in('client_project_id', array_merge([''], $projectIds), 'Project', false);
+
+        if ($v->fails()) {
+            $this->formFail($request, '/portal', $v->firstError(), $v->errors());
+            return;
+        }
+
+        $projectId = $v->get('client_project_id', '');
+
+        $id = $portal->createRequest([
+            'customer_id'       => (int) $customer['id'],
+            'client_project_id' => $projectId !== '' ? (int) $projectId : null,
+            'request_type'      => $v->get('request_type'),
+            'message'           => $v->get('message'),
+            'status'            => 'new',
+            'ip_address'        => $request->ip(),
+        ]);
+        $reference = $portal->find($id)['reference'] ?? '';
+
+        $this->notify(
+            'New client request ' . $reference,
+            sprintf(
+                "From: %s (%s)\nType: %s\n\n%s",
+                $customer['name'],
+                $customer['email'],
+                ucfirst((string) $v->get('request_type')),
+                $v->get('message')
+            ),
+            (string) $customer['email']
+        );
+
+        $this->formSuccess($request, '/portal', 'Request sent — reference ' . $reference . '. We will be in touch.');
+    }
+
+    private static function maskEmail(string $email): string
+    {
+        [$name, $domain] = array_pad(explode('@', $email, 2), 2, '');
+        if ($name === '') {
+            return $email;
+        }
+        $visible = mb_substr($name, 0, 1);
+        return $visible . str_repeat('*', max(1, mb_strlen($name) - 1)) . '@' . $domain;
+    }
+
     // =================================================================
     // Premade projects
     // =================================================================

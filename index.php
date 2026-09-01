@@ -75,6 +75,15 @@ $router->any('/contact', [$site, 'contact']);
 $router->any('/quote', $moved);
 $router->any('/start', $moved);
 
+// --- Client portal ------------------------------------------------------
+// For a client with a project already on file: sign in with an emailed
+// code, no password, then ask for upgrade/update/maintenance/support work.
+$router->any('/portal/login', [$site, 'portalLogin']);
+$router->any('/portal/verify', [$site, 'portalVerify']);
+$router->post('/portal/logout', [$site, 'portalLogout']);
+$router->get('/portal', [$site, 'portal']);
+$router->post('/portal/requests', [$site, 'portalRequest']);
+
 // --- Machine-readable -------------------------------------------------
 $router->get('/sitemap.xml', [$site, 'sitemap']);
 $router->get('/robots.txt', [$site, 'robots']);

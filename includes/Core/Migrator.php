@@ -486,6 +486,7 @@ final class Migrator
             ['Manage premade projects',  'projects.manage',       'Commerce', 33],
             ['Manage project enquiries', 'project_orders.manage', 'Commerce', 34],
             ['Download a full database backup', 'system.backup', 'System', 54],
+            ['Manage client portal requests', 'client_requests.manage', 'Commerce', 35],
         ];
         if (isset($existing['permissions'])) {
             foreach ($permissions as [$name, $slug, $group, $order]) {
@@ -504,10 +505,10 @@ final class Migrator
         // everything by definition; the others get only what suits them.
         if (isset($existing['role_permissions'], $existing['roles'], $existing['permissions'])) {
             $grants = [
-                'super-admin'     => ['projects.manage', 'project_orders.manage', 'system.backup'],
+                'super-admin'     => ['projects.manage', 'project_orders.manage', 'system.backup', 'client_requests.manage'],
                 'content-manager' => ['projects.manage'],
                 'sales-manager'   => ['project_orders.manage'],
-                'support-manager' => ['project_orders.manage'],
+                'support-manager' => ['project_orders.manage', 'client_requests.manage'],
             ];
             foreach ($grants as $role => $slugs) {
                 foreach ($slugs as $slug) {

@@ -55,6 +55,10 @@ $allowTheme = $allowTheme ?? true;
             </nav>
 
             <div class="header-actions">
+                <a class="header-icon-link" href="<?= e(url('/portal')) ?>" aria-label="Client sign in" title="Client sign in">
+                    <?= icon('user') ?>
+                </a>
+
                 <?php if ($allowTheme): ?>
                 <button type="button" class="theme-toggle" data-theme-toggle aria-label="Switch theme">
                     <?= icon('sun', 'icon icon--sun') ?>
@@ -116,5 +120,6 @@ $allowTheme = $allowTheme ?? true;
         <?php if ($settings->get('business_hours') !== ''): ?>
         <span><?= e($settings->get('business_hours')) ?></span>
         <?php endif; ?>
+        <a href="<?= e(url('/portal')) ?>"><?= icon('user') ?>Client sign in</a>
     </div>
 </nav>

@@ -45,6 +45,7 @@ $groups = [
             ['label' => 'Project enquiries', 'url' => '/admin/project-orders', 'icon' => 'inbox',    'permission' => 'project_orders.manage', 'badge' => 'project_orders'],
             ['label' => 'Customers',         'url' => '/admin/customers',      'icon' => 'users',     'permission' => 'customers.manage'],
             ['label' => 'Client projects',   'url' => '/admin/client_projects','icon' => 'briefcase', 'permission' => 'customers.manage'],
+            ['label' => 'Client requests',   'url' => '/admin/client-requests','icon' => 'inbox',     'permission' => 'client_requests.manage', 'badge' => 'client_requests'],
         ],
     ],
     [

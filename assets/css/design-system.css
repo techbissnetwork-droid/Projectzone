@@ -1358,6 +1358,18 @@ a.pill:hover, button.pill:hover { border-color: var(--border-strong); color: var
 [data-theme="light"] .theme-toggle .icon--sun { display: none; }
 [data-theme="light"] .theme-toggle .icon--moon { display: block; }
 
+.header-icon-link {
+  width: 40px; height: 40px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  transition: all var(--t-base) var(--ease);
+}
+.header-icon-link:hover { color: var(--text); border-color: var(--border-strong); background: var(--surface); }
+.header-icon-link .icon { width: 17px; height: 17px; }
+
 
 .avatar {
   width: 42px; height: 42px;

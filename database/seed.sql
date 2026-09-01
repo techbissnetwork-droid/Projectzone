@@ -31,6 +31,7 @@ INSERT INTO `permissions` (`name`, `slug`, `group_name`, `sort_order`) VALUES
 ('Manage global settings','settings.manage',   'Website',   22),
 ('Manage premade projects','projects.manage',  'Commerce',  33),
 ('Manage project enquiries','project_orders.manage','Commerce', 34),
+('Manage client portal requests','client_requests.manage','Commerce', 35),
 ('Manage customers',      'customers.manage',  'Commerce',  32),
 ('View leads',            'leads.view',        'Leads',     40),
 ('Manage leads',          'leads.manage',      'Leads',     41),
@@ -59,7 +60,7 @@ WHERE r.slug = 'sales-manager';
 -- Support Manager
 INSERT INTO `role_permissions` (`role_id`, `permission_id`)
 SELECT r.id, p.id FROM `roles` r JOIN `permissions` p
-  ON p.slug IN ('dashboard.view','leads.view','customers.manage','project_orders.manage','content.view')
+  ON p.slug IN ('dashboard.view','leads.view','customers.manage','project_orders.manage','client_requests.manage','content.view')
 WHERE r.slug = 'support-manager';
 
 -- ---------------------------------------------------------------------

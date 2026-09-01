@@ -12,6 +12,7 @@ require dirname(__DIR__) . '/includes/bootstrap.php';
 use Techbiss\Admin\Resources;
 use Techbiss\Controllers\Admin\AuthController;
 use Techbiss\Controllers\Admin\BlogController;
+use Techbiss\Controllers\Admin\ClientRequestController;
 use Techbiss\Controllers\Admin\CustomerController;
 use Techbiss\Controllers\Admin\DashboardController;
 use Techbiss\Controllers\Admin\LeadController;
@@ -65,6 +66,7 @@ if (!in_array($path, ['/admin/login', '/admin/logout'], true)) {
     $projects   = new ProjectController();
     $prjOrders  = new ProjectOrderController();
     $customers  = new CustomerController();
+    $clientReqs = new ClientRequestController();
     $leads      = new LeadController();
     $media      = new MediaController();
     $navigation = new NavigationController();
@@ -121,6 +123,13 @@ if (!in_array($path, ['/admin/login', '/admin/logout'], true)) {
     $router->get('/admin/customers/{id:\d+}', [$customers, 'show']);
     $router->post('/admin/customers/{id:\d+}', [$customers, 'update']);
     $router->post('/admin/customers/{id:\d+}/delete', [$customers, 'destroy']);
+
+    // --- Client portal requests -----------------------------------------
+    $router->get('/admin/client-requests', [$clientReqs, 'index']);
+    $router->get('/admin/client-requests/{id:\d+}', [$clientReqs, 'show']);
+    $router->post('/admin/client-requests/{id:\d+}', [$clientReqs, 'update']);
+    $router->post('/admin/client-requests/{id:\d+}/reply', [$clientReqs, 'reply']);
+    $router->post('/admin/client-requests/{id:\d+}/delete', [$clientReqs, 'destroy']);
 
     // --- Leads --------------------------------------------------------
     $router->get('/admin/messages', [$leads, 'messages']);

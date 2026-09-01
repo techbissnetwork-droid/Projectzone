@@ -552,6 +552,46 @@ CREATE TABLE IF NOT EXISTS `client_projects` (
   CONSTRAINT `fk_client_projects_customer` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ---------------------------------------------------------------------
+-- Client portal — a client who already has a project on file can sign in
+-- with a one-time code sent to the email held in `customers`, without a
+-- password to remember or for us to store.
+-- ---------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `customer_otps` (
+  `id`          INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `email`       VARCHAR(190) NOT NULL,
+  `code_hash`   VARCHAR(255) NOT NULL,
+  `attempts`    TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  `expires_at`  DATETIME     NOT NULL,
+  `consumed_at` DATETIME     NULL,
+  `ip_address`  VARCHAR(45)  NOT NULL DEFAULT '',
+  `created_at`  DATETIME     NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_customer_otps_email` (`email`, `created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- A client asking for upgrades, updates, maintenance or support on a
+-- project we already built for them, raised from inside the portal.
+CREATE TABLE IF NOT EXISTS `client_requests` (
+  `id`                INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `reference`         VARCHAR(30)  NOT NULL,
+  `customer_id`       INT UNSIGNED NOT NULL,
+  `client_project_id` INT UNSIGNED NULL,
+  `request_type`      ENUM('upgrade','update','maintenance','support','other') NOT NULL DEFAULT 'other',
+  `message`           TEXT         NOT NULL,
+  `status`            ENUM('new','in_progress','resolved') NOT NULL DEFAULT 'new',
+  `admin_notes`       TEXT         NULL,
+  `ip_address`        VARCHAR(45)  NOT NULL DEFAULT '',
+  `created_at`        DATETIME     NOT NULL,
+  `updated_at`        DATETIME     NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_client_requests_reference` (`reference`),
+  KEY `ix_client_requests_customer` (`customer_id`),
+  KEY `ix_client_requests_status` (`status`),
+  CONSTRAINT `fk_client_requests_customer` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_client_requests_project`  FOREIGN KEY (`client_project_id`) REFERENCES `client_projects` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `package_purchases` (
   `id`               INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `reference`        VARCHAR(30)  NOT NULL,

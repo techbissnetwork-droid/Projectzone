@@ -62,9 +62,10 @@ abstract class BaseAdminController
                 'messages'  => $db->int("SELECT COUNT(*) FROM contact_messages WHERE status = 'new'"),
                 'quotes'    => $db->int("SELECT COUNT(*) FROM quote_requests WHERE status = 'new'"),
                 'project_orders' => $db->int("SELECT COUNT(*) FROM project_orders WHERE order_status = 'new'"),
+                'client_requests' => $db->int("SELECT COUNT(*) FROM client_requests WHERE status = 'new'"),
             ];
         } catch (\Throwable) {
-            return ['messages' => 0, 'quotes' => 0, 'project_orders' => 0];
+            return ['messages' => 0, 'quotes' => 0, 'project_orders' => 0, 'client_requests' => 0];
         }
     }
 
