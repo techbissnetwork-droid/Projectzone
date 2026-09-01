@@ -1,0 +1,10 @@
+/data/*.db
+/data/*.db-wal
+/data/*.db-shm
+/data/*.sqlite
+/data/config.local.php
+/data/installed.lock
+/uploads/*
+!/uploads/.gitkeep
+!/uploads/.htaccess
+.DS_Store

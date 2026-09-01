@@ -1,0 +1,7 @@
+# Uploaded media only — never execute code from here.
+Options -Indexes
+<FilesMatch "\.(?:php|phtml|phar|pht|cgi|pl|py|sh)$">
+  <IfModule mod_authz_core.c>Require all denied</IfModule>
+  <IfModule !mod_authz_core.c>Order allow,deny
+  Deny from all</IfModule>
+</FilesMatch>
