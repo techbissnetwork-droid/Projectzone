@@ -32,6 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $pdo->prepare("DELETE FROM stats WHERE id=?")->execute([(int) ($_POST['id'] ?? 0)]);
         flash('Stat deleted.');
     }
+    touch_content();
     header('Location: ' . url('/admin/stats.php'));
     exit;
 }

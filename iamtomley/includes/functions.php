@@ -52,8 +52,11 @@ function canonical_url(): string
  * Send hardening HTTP headers (CSP, anti-clickjacking, nosniff, …).
  * The CSP intentionally allows blob: frames + inline scripts so the
  * self-contained games keep working.
+ *
+ * $extraFrameSrc lets the public page name the exact origins of any games the
+ * admin has linked to, so those — and only those — may be framed.
  */
-function security_headers(): void
+function security_headers(array $extraFrameSrc = []): void
 {
     if (headers_sent()) {
         return;
@@ -63,18 +66,49 @@ function security_headers(): void
     header('Referrer-Policy: strict-origin-when-cross-origin');
     header('Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=(), usb=()');
     header('X-XSS-Protection: 0');
+
+    $frames = "'self' blob:";
+    foreach (array_unique($extraFrameSrc) as $origin) {
+        // Only well-formed https?://host[:port] origins ever reach the header.
+        if (preg_match('#^https?://[A-Za-z0-9\.\-]+(?::\d{1,5})?$#', (string) $origin)) {
+            $frames .= ' ' . $origin;
+        }
+    }
+
     header(
         "Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; "
-        . "img-src 'self' data: blob:; media-src 'self' data: blob:; "
+        . "img-src 'self' data: blob: https:; media-src 'self' data: blob:; "
         . "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
         . "font-src 'self' https://fonts.gstatic.com data:; "
         . "script-src 'self' 'unsafe-inline' blob:; "
-        . "frame-src 'self' blob:; child-src 'self' blob:; connect-src 'self'; "
+        . "frame-src $frames; child-src $frames; connect-src 'self'; "
         . "form-action 'self'; frame-ancestors 'self'"
     );
     if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
         header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
     }
+}
+
+/**
+ * URL for a CSS/JS/image file in the app, with the file's modification time
+ * appended. Returning visitors get the new file the moment it changes instead
+ * of a stale cached copy.
+ */
+function asset(string $path): string
+{
+    $file = APP_ROOT . $path;
+    $stamp = is_file($file) ? (int) @filemtime($file) : 0;
+    return url($path) . ($stamp > 0 ? '?v=' . $stamp : '');
+}
+
+/** The scheme://host[:port] part of a URL, or '' if it isn't a web address. */
+function url_origin(string $url): string
+{
+    $p = parse_url(trim($url));
+    if (!$p || empty($p['scheme']) || empty($p['host'])) { return ''; }
+    $scheme = strtolower((string) $p['scheme']);
+    if ($scheme !== 'http' && $scheme !== 'https') { return ''; }
+    return $scheme . '://' . $p['host'] . (isset($p['port']) ? ':' . (int) $p['port'] : '');
 }
 
 /**
@@ -140,6 +174,28 @@ function setting(string $key, string $default = ''): string
     return array_key_exists($key, $all) ? (string) $all[$key] : $default;
 }
 
+/**
+ * Record that the site's content just changed. The sitemap publishes this as
+ * the page's <lastmod>, so a crawler can tell there is something new without
+ * re-reading the whole page.
+ */
+function touch_content(): void
+{
+    try {
+        set_setting('content_updated', (string) time());
+    } catch (Throwable $e) { /* never block a save over this */ }
+}
+
+/** When the content last changed, as a Unix timestamp (0 if never recorded). */
+function content_updated_at(): int
+{
+    $t = (int) setting('content_updated', '0');
+    if ($t > 0) { return $t; }
+    // Nothing recorded yet — fall back to when the site itself was last built.
+    $f = APP_ROOT . '/index.php';
+    return is_file($f) ? (int) @filemtime($f) : 0;
+}
+
 /** Persist one setting (upsert). */
 function set_setting(string $key, string $value): void
 {
@@ -159,11 +215,12 @@ function set_setting(string $key, string $value): void
 function project_statuses(): array
 {
     return [
-        'live'        => ['Live',        ''],
-        'for_sale'    => ['For Sale',    'FOR SALE'],
-        'sold'        => ['Sold',        'SOLD'],
-        'coming_soon' => ['Coming Soon', 'SOON'],
-        'hidden'      => ['Hidden',      ''],
+        'live'         => ['Live',         ''],
+        'for_sale'     => ['For Sale',     'FOR SALE'],
+        'not_for_sale' => ['Not For Sale', 'NOT FOR SALE'],
+        'sold'         => ['Sold',         'SOLD'],
+        'coming_soon'  => ['Coming Soon',  'SOON'],
+        'hidden'       => ['Hidden',       ''],
     ];
 }
 function project_status_key(string $k): string
@@ -186,12 +243,12 @@ function projects_active(): array
     }
 }
 
-/** Projects for the main slider (live + for sale + coming soon; NOT sold, NOT hidden). */
+/** Projects for the main slider (everything still on show; NOT sold, NOT hidden). */
 function projects_slider(): array
 {
     try {
         return db()->query(
-            "SELECT * FROM projects WHERE COALESCE(status,'live') IN ('live','for_sale','coming_soon') ORDER BY sort_order, id"
+            "SELECT * FROM projects WHERE COALESCE(status,'live') IN ('live','for_sale','not_for_sale','coming_soon') ORDER BY sort_order, id"
         )->fetchAll();
     } catch (Throwable $e) {
         return db()->query(
@@ -217,6 +274,76 @@ function games_active(): array
     return db()->query(
         "SELECT * FROM games WHERE is_active = 1 ORDER BY sort_order, id"
     )->fetchAll();
+}
+
+/**
+ * Where a game's playable code comes from:
+ *  - builtin: one of the 20 shipped games, looked up by its code_ref in games-data.js
+ *  - url:     any game on the web, shown in a frame
+ *  - html:    a single-file HTML game pasted into the admin
+ */
+function game_sources(): array
+{
+    return [
+        'builtin' => 'Built-in game',
+        'url'     => 'Link to a game',
+        'html'    => 'Pasted HTML game',
+    ];
+}
+
+function game_source_key(string $k): string
+{
+    return array_key_exists($k, game_sources()) ? $k : 'builtin';
+}
+
+/** Turn free text into a short url/attribute-safe key ("Retro Arcade" → "retro-arcade"). */
+function slugify(string $s, int $max = 20): string
+{
+    $s = strtolower(trim($s));
+    $s = preg_replace('/[^a-z0-9]+/', '-', $s) ?? '';
+    return substr(trim($s, '-'), 0, $max);
+}
+
+/** The five shipped game categories, in the order they appear as filters. */
+function builtin_game_categories(): array
+{
+    return ['arcade' => 'Arcade', 'puzzle' => 'Puzzle', 'action' => 'Action', 'sports' => 'Sports', 'casual' => 'Casual'];
+}
+
+/**
+ * Every category to offer in the admin and use for the public filters: the five
+ * built-ins plus any the admin has typed on a game of their own.
+ */
+function game_categories(): array
+{
+    $cats = builtin_game_categories();
+    try {
+        foreach (db()->query("SELECT DISTINCT cat FROM games") as $row) {
+            $key = slugify((string) ($row['cat'] ?? ''));
+            if ($key !== '' && !isset($cats[$key])) {
+                $cats[$key] = ucwords(str_replace('-', ' ', $key));
+            }
+        }
+    } catch (Throwable $e) { /* fall back to the built-ins */ }
+    return $cats;
+}
+
+/** Display label for a category key. */
+function game_cat_label(string $key): string
+{
+    $cats = game_categories();
+    return $cats[$key] ?? ucwords(str_replace('-', ' ', $key));
+}
+
+/**
+ * Resolve a stored media path for display: a root-relative path gets the
+ * base-URL prefix, a full URL is left alone, and an empty value yields ''.
+ */
+function media(string $p): string
+{
+    $p = trim($p);
+    if ($p === '') { return ''; }
+    return $p[0] === '/' ? url($p) : $p;
 }
 
 function stats_all(): array

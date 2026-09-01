@@ -7,9 +7,8 @@
 declare(strict_types=1);
 require_once __DIR__ . '/includes/auth.php';   // pulls functions.php + session helpers
 
-security_headers();
-
 // Not set up yet → show a "down / under construction" page (503).
+// (down_page() sends the security headers itself before it prints anything.)
 if (!is_installed()) {
     down_page('We\'re getting things ready', 'This site is being set up and will be live soon. Please check back shortly.');
 }
@@ -21,12 +20,10 @@ if (setting('maintenance_mode', '0') === '1' && !current_user()) {
     down_page(setting('brand_name', 'iamtomley') . ' — back soon', 'We\'re briefly down for maintenance and improvements. Please check back in a little while.');
 }
 
-/** media(): resolve a stored path (root-relative → base-prefixed). */
-function media(string $p): string
+/** media() with the shipped photo as a fallback, for the two decorative images. */
+function media_or_bg(string $p): string
 {
-    $p = trim($p);
-    if ($p === '') return url('/bg.jpg');
-    return $p[0] === '/' ? url($p) : $p;
+    return media($p) ?: url('/bg.jpg');
 }
 
 $projects = projects_slider();
@@ -52,17 +49,37 @@ $buy_link = function (array $p) use ($saleChat, $saleEmail): string {
 $theme    = setting('theme_default', 'dark') === 'light' ? 'light' : 'dark';
 $bgTheme  = bg_theme_key(setting('bg_theme', 'aurora'));
 $backdrop = setting('backdrop_on', '1') === '1' ? 'on' : 'off';
-$backdropImg = media(setting('backdrop_image', '/bg.jpg'));
+$backdropImg = media_or_bg(setting('backdrop_image', '/bg.jpg'));
 
 // Games payload for the client (grid render + filter/search/pagination).
+// 'src' tells the player where the game comes from:
+//   builtin → the shipped code in games-data.js, looked up by 'id'
+//   html    → HTML pasted into the admin, served by game.php
+//   url     → a game hosted elsewhere, shown in a frame
 $gamesPayload = array_map(static function (array $g): array {
-    return [
+    $src = game_source_key((string) ($g['source'] ?? 'builtin'));
+    $row = [
         'id'    => (int) $g['code_ref'],   // maps to gHTML()
+        'row'   => (int) $g['id'],
         'title' => $g['title'],
         'cat'   => $g['cat'],
         'emoji' => $g['emoji'],
+        'src'   => $src,
+        'cover' => media((string) ($g['cover'] ?? '')),
     ];
+    if ($src === 'url')  { $row['url']  = (string) $g['embed_url']; }
+    if ($src === 'html') { $row['play'] = url('/game.php?g=' . (int) $g['id']); }
+    return $row;
 }, $games);
+
+// Games linked to another site may be framed — name their origins in the CSP.
+$gameFrameOrigins = [];
+foreach ($games as $g) {
+    if (game_source_key((string) ($g['source'] ?? 'builtin')) !== 'url') { continue; }
+    $origin = url_origin((string) ($g['embed_url'] ?? ''));
+    if ($origin !== '') { $gameFrameOrigins[] = $origin; }
+}
+security_headers($gameFrameOrigins);
 
 // Slides grow automatically with the number of active projects (4 per slide).
 $slides = chunk_slides($projects, 4);
@@ -90,6 +107,9 @@ function coming_soon_card(): string
   <meta name="author" content="<?= e(setting('brand_name', 'iamtomley')) ?>" />
   <?php $canonical = canonical_url(); ?>
   <link rel="canonical" href="<?= e($canonical) ?>" />
+  <?php if (setting('seo_noindex', '0') === '1'): ?>
+  <meta name="robots" content="noindex, nofollow" />
+  <?php endif; ?>
   <meta name="theme-color" content="#05060d" id="theme-color-meta" />
 
   <meta property="og:type" content="website" />
@@ -113,7 +133,7 @@ function coming_soon_card(): string
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="<?= e(url('/assets/css/styles.css')) ?>" />
+  <link rel="stylesheet" href="<?= e(asset('/assets/css/styles.css')) ?>" />
 
   <script type="application/ld+json">
   {
@@ -126,6 +146,37 @@ function coming_soon_card(): string
     "description": <?= json_encode(setting('seo_description')) ?>
   }
   </script>
+
+  <?php
+    // Search engines get the project list as structured data, so the work shows
+    // up as more than one line of page text.
+    $ld = [];
+    foreach (array_merge($projects, $soldProjects) as $p) {
+        $item = [
+            '@type'    => 'CreativeWork',
+            'position' => count($ld) + 1,
+            'name'     => (string) $p['title'],
+        ];
+        if (trim((string) $p['description']) !== '') { $item['description'] = (string) $p['description']; }
+        if (preg_match('#^https?://#i', (string) $p['url'])) { $item['url'] = (string) $p['url']; }
+        $pImg = trim((string) ($p['image'] ?? ''));
+        if ($pImg !== '') { $item['image'] = str_starts_with($pImg, '/') ? site_url($pImg) : $pImg; }
+        if (trim((string) $p['tag']) !== '') { $item['genre'] = (string) $p['tag']; }
+        $ld[] = $item;
+    }
+    if ($ld):
+  ?>
+  <script type="application/ld+json">
+<?= json_encode([
+      '@context'        => 'https://schema.org',
+      '@type'           => 'ItemList',
+      'name'            => 'Projects by ' . setting('brand_name', 'iamtomley'),
+      'numberOfItems'   => count($ld),
+      'itemListElement' => $ld,
+    ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) ?>
+
+  </script>
+  <?php endif; ?>
 </head>
 <body>
 
@@ -215,7 +266,7 @@ function coming_soon_card(): string
       </div>
       <div class="hero-right reveal" data-reveal="scale">
         <div class="hero-photo" id="heroPhoto">
-          <img src="<?= e(media(setting('hero_photo', '/bg.jpg'))) ?>" alt="Portrait of <?= e(setting('brand_name')) ?>" loading="eager" />
+          <img src="<?= e(media_or_bg(setting('hero_photo', '/bg.jpg'))) ?>" alt="Portrait of <?= e(setting('brand_name')) ?>" loading="eager" />
           <div class="hero-badge">
             <div class="badge-label"><?= e(setting('hero_badge_label', 'Status')) ?></div>
             <div class="badge-value"><?= e(setting('hero_badge_value')) ?></div>
@@ -258,9 +309,11 @@ function coming_soon_card(): string
               $ts = $p['tag_style'] ? ' ' . e($p['tag_style']) : '';
               $st = project_status_key($p['status'] ?? 'live');
               $badge = project_statuses()[$st][1] ?? '';
+              $img = media((string) ($p['image'] ?? ''));
             ?>
-            <article class="card status-<?= e($st) ?>">
+            <article class="card status-<?= e($st) ?><?= $img !== '' ? ' has-shot' : '' ?>">
               <?php if ($badge !== ''): ?><span class="project-ribbon ribbon-<?= e($st) ?>"><?= e($badge) ?></span><?php endif; ?>
+              <?php if ($img !== ''): ?><span class="project-shot"><img src="<?= e($img) ?>" alt="<?= e($p['title']) ?> logo" loading="lazy" decoding="async" /></span><?php endif; ?>
               <?php if ($p['tag'] !== ''): ?><span class="project-tag<?= $ts ?>"><?= e($p['tag']) ?></span><?php endif; ?>
               <h3 class="project-name"><?= e($p['title']) ?></h3>
               <p class="project-desc"><?= e($p['description']) ?></p>
@@ -305,9 +358,10 @@ function coming_soon_card(): string
         <h2 class="section-title">Sold &amp; delivered</h2>
       </div>
       <div class="sold-grid reveal" data-stagger>
-        <?php foreach ($soldProjects as $p): $ts = $p['tag_style'] ? ' ' . e($p['tag_style']) : ''; ?>
-        <article class="card status-sold">
+        <?php foreach ($soldProjects as $p): $ts = $p['tag_style'] ? ' ' . e($p['tag_style']) : ''; $img = media((string) ($p['image'] ?? '')); ?>
+        <article class="card status-sold<?= $img !== '' ? ' has-shot' : '' ?>">
           <span class="project-ribbon ribbon-sold">SOLD</span>
+          <?php if ($img !== ''): ?><span class="project-shot"><img src="<?= e($img) ?>" alt="<?= e($p['title']) ?> logo" loading="lazy" decoding="async" /></span><?php endif; ?>
           <?php if ($p['tag'] !== ''): ?><span class="project-tag<?= $ts ?>"><?= e($p['tag']) ?></span><?php endif; ?>
           <h3 class="project-name"><?= e($p['title']) ?></h3>
           <p class="project-desc"><?= e($p['description']) ?></p>
@@ -342,7 +396,7 @@ function coming_soon_card(): string
       <div class="games-controls reveal">
         <div class="filters" role="group" aria-label="Filter games by category">
           <button class="filter-btn active" data-cat="all" aria-pressed="true">All</button>
-          <?php foreach (['arcade'=>'Arcade','puzzle'=>'Puzzle','action'=>'Action','sports'=>'Sports','casual'=>'Casual'] as $ck => $cl): ?>
+          <?php foreach (game_categories() as $ck => $cl): ?>
             <?php if (in_array($ck, $cats, true)): ?>
             <button class="filter-btn" data-cat="<?= e($ck) ?>" aria-pressed="false"><?= e($cl) ?></button>
             <?php endif; ?>
@@ -398,6 +452,9 @@ function coming_soon_card(): string
           <div class="modal-name" id="modalName">Game</div>
           <div class="modal-cat" id="modalCat">arcade</div>
         </div>
+        <a class="icon-btn" id="modalOpen" href="#" target="_blank" rel="noopener" aria-label="Open this game in a new tab" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6"/><path d="M10 14L21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+        </a>
         <button class="icon-btn" id="modalFs" type="button" aria-label="Toggle fullscreen">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
         </button>
@@ -420,8 +477,11 @@ function coming_soon_card(): string
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="18 15 12 9 6 15"/></svg>
   </button>
 
-  <script>window.GAMES = <?= json_encode($gamesPayload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;</script>
-  <script src="<?= e(url('/assets/js/games-data.js')) ?>" defer></script>
-  <script src="<?= e(url('/assets/js/app.js')) ?>" defer></script>
+  <script>
+    window.GAMES = <?= json_encode($gamesPayload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+    window.GAME_CATS = <?= json_encode(game_categories(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+  </script>
+  <script src="<?= e(asset('/assets/js/games-data.js')) ?>" defer></script>
+  <script src="<?= e(asset('/assets/js/app.js')) ?>" defer></script>
 </body>
 </html>

@@ -7,15 +7,19 @@ The public site is fully content-managed; the design is never touched by the adm
 
 ```
 index.php                 Public site (renders from the database)
+game.php                  Serves a game whose HTML you pasted into the admin (sandboxed)
+sitemap.php · robots.php  Generated sitemap.xml and robots.txt
 config.php                Configuration (storage driver, base URL)
-includes/                 db.php · functions.php · auth.php   (app internals — web-protected)
+includes/                 db.php · functions.php · auth.php · imagefetch.php
+                          (app internals — web-protected)
 admin/                    Admin panel (login, dashboard, settings, projects, stats, games, account)
+admin/detect-image.php    Finds a site's logo from its address, for the Detect buttons
 assets/css/styles.css     Public design system  (do NOT edit from admin — this is the look)
 assets/js/app.js          Public interactions
 assets/js/games-data.js   The 20 self-contained HTML5 games (code, mapped by ID)
 favicon/ · bg.jpg         Static assets
 data/                     SQLite database (auto-created, git-ignored)
-uploads/                  Uploaded media (git-ignored)
+uploads/                  Uploaded media, incl. uploads/logos (git-ignored)
 ```
 
 ## Requirements
@@ -41,9 +45,38 @@ The database is created and seeded automatically on first load.
 
 You can edit from the admin: brand & default theme, the entire hero (text, buttons,
 status badge, photo upload), the project cards & their tags, the four stat widgets,
-the games list (rename / recategorise / reorder / show-hide), the contact block,
-footer and SEO meta. The 20 playable games are self-contained and fixed by ID —
-adding a brand-new *playable* game means adding its code to `assets/js/games-data.js`.
+the games list, the contact block, footer and SEO meta.
+
+### Project card images, found for you
+
+Every project card can carry a picture. You do not have to go looking for one:
+paste the project's address into **Link URL** and press **Detect**, and the site
+is read for its own artwork — the Open Graph image first, then the Twitter card
+image, then the apple-touch-icon, then the favicon — and a copy is saved locally
+so your page never depends on someone else's server.
+
+Leave the image blank on a new project and the same lookup runs by itself when
+you save. You can always upload your own file or paste a path instead, and
+**Clear** removes it.
+
+Only public `http`/`https` addresses are ever opened, redirects are limited, and
+downloads are capped — the lookup cannot be pointed at your own server's private
+network. SVGs containing scripts are refused outright.
+
+### Adding your own games
+
+The twenty shipped games are self-contained and mapped by ID, but the games list
+is no longer limited to them. **Admin → Games → Add a game** takes:
+
+| Source | What it is |
+|---|---|
+| **Link to a game** | Paste the address a game is played at and it opens inside your site. If that site refuses to be framed, visitors get an "open in a new tab" button instead, so the game always works. |
+| **Pasted HTML game** | Paste a whole single-file HTML game. It is stored in the database and served by `game.php` inside a sandbox — it can play, draw and read the keyboard, but cannot touch the rest of your site. |
+| **Built-in game** | One of the twenty in `assets/js/games-data.js`, chosen by its number (1–20). |
+
+Each game can have a **cover image** in place of its emoji — upload one, or use
+the same **Detect** button to take the cover from the game's own site. Typing a
+new **category** on a game adds it as a filter button on the public page.
 
 ## Storage
 
@@ -77,6 +110,32 @@ Tables and seed data are created automatically for either driver.
   server block.)
 - **Auto-detected site URL**: canonical/OG tags use the current host automatically
   (override in Site Settings if needed).
+- **Outbound lookups are fenced in**: the image detector only opens public
+  http/https addresses on standard ports, follows at most four redirects,
+  caps every download, and re-checks safety on each hop.
+
+## Search engines
+
+`sitemap.xml` and `robots.txt` are generated from the database, so they are never
+out of date. Submit `https://yourdomain.com/sitemap.xml` once in Google Search
+Console and nothing further is needed.
+
+- The sitemap carries a `lastmod` that moves whenever you save anything in the
+  admin, and lists every project image against the page — that is how those
+  images get indexed at all.
+- `robots.txt` opens the public page and keeps `admin/`, `install/`, `includes/`,
+  `data/` and `game.php` out of the index.
+- Turn on **Discourage search engines** (Admin → Site Settings), or switch on
+  maintenance mode, and both files close the site off while the page itself
+  carries `noindex`.
+- Projects are published as `ItemList` structured data alongside the existing
+  `Person` markup.
+- CSS and JavaScript URLs carry the file's timestamp, so a returning visitor
+  never gets a stale cached copy after you change something.
+
+Both files are served through the `.htaccess` rewrite. Without `mod_rewrite`
+they are still reachable at `/sitemap.php` and `/robots.php` — on Nginx, map
+`/sitemap.xml` and `/robots.txt` to those two scripts.
 
 ## Clean URLs
 

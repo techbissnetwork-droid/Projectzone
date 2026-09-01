@@ -832,3 +832,50 @@ body.cursor-on .card, body.cursor-on .game-card { cursor: none; }
   .reveal, [data-stagger] > * { opacity: 1 !important; transform: none !important; }
   body.cursor-on, body.cursor-on * { cursor: auto; }
 }
+
+/* ============================================================================
+   PROJECT CARD IMAGES  ·  added by the "detect the site's logo" upgrade
+   Detected artwork varies wildly — a wide Open Graph banner one time, a 32px
+   favicon the next — so the frame is a fixed band and the image is contained
+   inside it rather than cropped. Nothing is ever stretched.
+   ========================================================================== */
+.project-shot {
+  display: grid; place-items: center; overflow: hidden;
+  width: 100%; height: 104px; margin: 0 0 1.1rem; padding: 0.7rem;
+  border-radius: var(--r-md); border: 1px solid var(--border);
+  background:
+    radial-gradient(120% 120% at 50% 0%, rgba(0,255,179,0.07), transparent 62%),
+    linear-gradient(160deg, #0d0f1a, #12142a);
+}
+.project-shot img {
+  max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain;
+  filter: drop-shadow(0 6px 16px rgba(0,0,0,0.45));
+  transition: transform var(--dur-2) var(--ease);
+}
+.card.has-shot:hover .project-shot img { transform: scale(1.06); }
+
+/* "Not For Sale" — the one status that says a project is staying put, so it
+   gets a deliberately quiet, metallic ribbon rather than a loud one. */
+.ribbon-not_for_sale {
+  background: linear-gradient(135deg, #c3c6d6, #8b90a8);
+  color: #0a0b12; width: 178px; right: -52px;
+}
+.card.status-not_for_sale { border-color: rgba(195,198,214,0.22); }
+
+/* Cover images on game cards, for games added from the admin. */
+.game-thumb.has-cover { padding: 0.9rem; }
+.game-cover {
+  max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain;
+  filter: drop-shadow(0 6px 16px rgba(0,0,0,0.45));
+  transition: transform var(--dur-2) var(--ease);
+}
+.game-card:hover .game-cover { transform: scale(1.05); }
+
+/* The modal's "open in a new tab" button, shown for games hosted elsewhere. */
+#modalOpen { text-decoration: none; }
+#modalOpen[hidden] { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .project-shot img, .game-cover { transition: none; }
+  .card.has-shot:hover .project-shot img, .game-card:hover .game-cover { transform: none; }
+}

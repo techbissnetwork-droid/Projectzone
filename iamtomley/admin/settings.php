@@ -31,6 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } catch (Throwable $e) { /* stats optional */ }
         }
         flash('Latest premium copy loaded — your projects were left untouched.');
+        touch_content();
         header('Location: ' . url('/admin/settings.php'));
         exit;
     }
@@ -63,7 +64,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     set_setting('backdrop_on', isset($_POST['backdrop_on']) ? '1' : '0');
     set_setting('maintenance_mode', isset($_POST['maintenance_mode']) ? '1' : '0');
     set_setting('projects_coming_soon', isset($_POST['projects_coming_soon']) ? '1' : '0');
+    set_setting('seo_noindex', isset($_POST['seo_noindex']) ? '1' : '0');
     flash('Settings saved.');
+    touch_content();
     header('Location: ' . url('/admin/settings.php'));
     exit;
 }
@@ -172,6 +175,17 @@ function s(string $k): string { return e(setting($k)); }
     <div class="grid-2">
       <div class="field"><label>Canonical URL</label><input type="url" name="seo_canonical" value="<?= s('seo_canonical') ?>" placeholder="<?= e(site_url('/')) ?>" /><div class="hint">Leave empty to auto-detect from the visitor's address. Detected now: <?= e(site_url('/')) ?></div></div>
       <div class="field"><label>Footer text</label><input type="text" name="footer_text" value="<?= s('footer_text') ?>" /></div>
+    </div>
+    <div class="field row-inline" style="margin-top:.4rem">
+      <label class="switch"><input type="checkbox" name="seo_noindex" <?= setting('seo_noindex','0')==='1'?'checked':'' ?> /><span class="track"></span></label>
+      <span class="small">Discourage search engines — keeps the site out of Google while you are still working on it.</span>
+    </div>
+    <div class="hint" style="margin-top:.85rem">
+      Your <a href="<?= e(site_url('/sitemap.xml')) ?>" target="_blank" rel="noopener">sitemap.xml</a> and
+      <a href="<?= e(site_url('/robots.txt')) ?>" target="_blank" rel="noopener">robots.txt</a> are generated for you and
+      always match what is on the site — including every project image, so those get indexed too. Submit the sitemap
+      address once in Google Search Console and you are done. While maintenance mode or the switch above is on, both
+      tell search engines to stay away.
     </div>
   </div>
 

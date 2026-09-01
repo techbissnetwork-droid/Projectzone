@@ -291,8 +291,16 @@
     if (!grid || !GAMES.length) return null;
 
     const PER_PAGE = 8;
+    const CATS = window.GAME_CATS || {};
     let filtered = [...GAMES];
     let page = 1, catFilter = 'all', searchQ = '';
+
+    // Titles, categories and cover paths are admin-entered — escape before
+    // they go anywhere near innerHTML.
+    const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g,
+      c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const catLabel = (k) => CATS[k] || k;
+    const keyOf = (g) => String(g.row != null ? 'r' + g.row : 'b' + g.id);
 
     function skeletons(n) {
       grid.innerHTML = Array.from({ length: n }, () =>
@@ -313,20 +321,25 @@
       const items = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
       grid.style.opacity = '0';
       grid.innerHTML = items.map(g => `
-        <button class="game-card" data-id="${g.id}" data-title="${g.title}" data-cat="${g.cat}" data-emoji="${g.emoji}" aria-label="Play ${g.title}">
-          <span class="game-thumb">
-            <span aria-hidden="true">${g.emoji}</span>
+        <button class="game-card" data-key="${esc(keyOf(g))}" aria-label="Play ${esc(g.title)}">
+          <span class="game-thumb${g.cover ? ' has-cover' : ''}">
+            ${g.cover
+              ? `<img class="game-cover" src="${esc(g.cover)}" alt="" loading="lazy" decoding="async">`
+              : `<span aria-hidden="true">${esc(g.emoji)}</span>`}
             <span class="game-play"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></span>
           </span>
           <span class="game-info">
-            <span class="game-title">${g.title}</span>
-            <span class="game-badge ${g.cat}">${g.cat}</span>
+            <span class="game-title">${esc(g.title)}</span>
+            <span class="game-badge ${esc(g.cat)}">${esc(catLabel(g.cat))}</span>
           </span>
         </button>`).join('');
       requestAnimationFrame(() => { grid.style.opacity = '1'; });
 
-      $$('.game-card', grid).forEach(card =>
-        card.addEventListener('click', () => openGame(card.dataset)));
+      const byKey = new Map(items.map(g => [keyOf(g), g]));
+      $$('.game-card', grid).forEach(card => card.addEventListener('click', () => {
+        const g = byKey.get(card.dataset.key);
+        if (g) openGame(g);
+      }));
 
       // pagination UI
       if (pager) {
@@ -380,34 +393,80 @@
   const mLoader = $('#modalLoader');
   let lastFocus = null;
 
-  function openGame({ id, title, cat, emoji }) {
-    if (!modal || typeof gHTML === 'undefined') return;
+  let frameWatchdog = null;
+
+  /**
+   * Open a game. Where its code lives depends on how it was added in the admin:
+   *   builtin — the shipped code in games-data.js, wrapped in a blob URL
+   *   html    — HTML pasted into the admin, served (sandboxed) by game.php
+   *   url     — a game hosted elsewhere, loaded straight into the frame
+   */
+  function openGame(g) {
+    if (!modal || !g) return;
+    const cats = window.GAME_CATS || {};
+    const src = g.src || 'builtin';
+
     lastFocus = document.activeElement;
-    $('#modalName').textContent = title;
-    $('#modalCat').textContent = cat;
-    $('#modalEmoji').textContent = emoji;
-    if (mLoader) mLoader.classList.remove('hide');
+    $('#modalName').textContent = g.title || 'Game';
+    $('#modalCat').textContent = cats[g.cat] || g.cat || '';
+    $('#modalEmoji').textContent = g.emoji || '🎮';
+    if (mLoader) { mLoader.classList.remove('hide'); setLoaderMessage('Loading game…'); }
+    clearTimeout(frameWatchdog);
     gFrame.src = '';
     modal.classList.add('open');
     document.body.style.overflow = 'hidden';
-
-    const extra = (window.EXTRA_GAMES && window.EXTRA_GAMES[+id]) ? window.EXTRA_GAMES[+id] : null;
-    const html = extra || (typeof gHTML === 'function' ? gHTML(+id) : '');
-    const blob = new Blob([html], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    gFrame.onload = () => { if (mLoader) mLoader.classList.add('hide'); };
-    gFrame.src = url;
     const closeBtn = $('#modalClose');
     if (closeBtn) closeBtn.focus();
+
+    // A game that lives elsewhere can be opened in its own tab as well.
+    const openBtn = $('#modalOpen');
+    const away = src === 'url' ? g.url : (src === 'html' ? g.play : '');
+    if (openBtn) {
+      openBtn.hidden = !away;
+      if (away) openBtn.href = away;
+    }
+
+    gFrame.onload = () => { clearTimeout(frameWatchdog); if (mLoader) mLoader.classList.add('hide'); };
+
+    if (src === 'url' && g.url) {
+      gFrame.src = g.url;
+      // Some sites refuse to be framed and fail silently — say so rather than
+      // leaving the visitor watching a spinner forever.
+      frameWatchdog = setTimeout(() => {
+        setLoaderMessage('This game would not load here — use the ↗ button to open it in a new tab.');
+      }, 7000);
+      return;
+    }
+
+    if (src === 'html' && g.play) {
+      gFrame.src = g.play;
+      return;
+    }
+
+    // Built-in game: build the page in the browser and hand it to the frame.
+    const id = +g.id;
+    const extra = (window.EXTRA_GAMES && window.EXTRA_GAMES[id]) ? window.EXTRA_GAMES[id] : null;
+    const html = extra || (typeof gHTML === 'function' ? gHTML(id) : '');
+    if (!html) { setLoaderMessage('This game is not available.'); return; }
+    gFrame.src = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
+  }
+
+  function setLoaderMessage(text) {
+    const label = mLoader && mLoader.querySelector('.spinner-label');
+    if (label) label.textContent = text;
   }
 
   function closeModal() {
     if (!modal) return;
+    clearTimeout(frameWatchdog);
     modal.classList.remove('open', 'fs');
     document.body.style.overflow = '';
+    const openBtn = $('#modalOpen');
+    if (openBtn) openBtn.hidden = true;
     setTimeout(() => {
       if (gFrame.src.startsWith('blob:')) URL.revokeObjectURL(gFrame.src);
       gFrame.src = '';
+      setLoaderMessage('Loading game…');
     }, 350);
     if (lastFocus) lastFocus.focus();
   }

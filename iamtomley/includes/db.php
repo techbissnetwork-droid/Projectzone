@@ -135,21 +135,32 @@ function migrate(PDO $pdo): void
         sort_order  INTEGER      NOT NULL DEFAULT 0,
         is_active   INTEGER      NOT NULL DEFAULT 1,
         status      VARCHAR(20)  NOT NULL DEFAULT 'live',
-        price       VARCHAR(40)  NOT NULL DEFAULT ''
+        price       VARCHAR(40)  NOT NULL DEFAULT '',
+        image       VARCHAR(255) NOT NULL DEFAULT ''
     )" . table_opts());
     // Upgrade older installs that predate these columns.
     ensure_column($pdo, 'projects', 'status', "VARCHAR(20) NOT NULL DEFAULT 'live'");
     ensure_column($pdo, 'projects', 'price', "VARCHAR(40) NOT NULL DEFAULT ''");
+    ensure_column($pdo, 'projects', 'image', "VARCHAR(255) NOT NULL DEFAULT ''");
 
     $pdo->exec("CREATE TABLE IF NOT EXISTS games (
         id $pk,
-        code_ref   INTEGER     NOT NULL DEFAULT 0,
-        title      VARCHAR(80) NOT NULL DEFAULT '',
-        cat        VARCHAR(20) NOT NULL DEFAULT 'arcade',
-        emoji      VARCHAR(16) NOT NULL DEFAULT '',
-        sort_order INTEGER     NOT NULL DEFAULT 0,
-        is_active  INTEGER     NOT NULL DEFAULT 1
+        code_ref   INTEGER      NOT NULL DEFAULT 0,
+        title      VARCHAR(80)  NOT NULL DEFAULT '',
+        cat        VARCHAR(32)  NOT NULL DEFAULT 'arcade',
+        emoji      VARCHAR(16)  NOT NULL DEFAULT '',
+        sort_order INTEGER      NOT NULL DEFAULT 0,
+        is_active  INTEGER      NOT NULL DEFAULT 1,
+        source     VARCHAR(10)  NOT NULL DEFAULT 'builtin',
+        embed_url  VARCHAR(255) NOT NULL DEFAULT '',
+        html_code  TEXT,
+        cover      VARCHAR(255) NOT NULL DEFAULT ''
     )" . table_opts());
+    // Columns added by the "add your own games" upgrade.
+    ensure_column($pdo, 'games', 'source',    "VARCHAR(10) NOT NULL DEFAULT 'builtin'");
+    ensure_column($pdo, 'games', 'embed_url', "VARCHAR(255) NOT NULL DEFAULT ''");
+    ensure_column($pdo, 'games', 'html_code', "TEXT");
+    ensure_column($pdo, 'games', 'cover',     "VARCHAR(255) NOT NULL DEFAULT ''");
 
     seed($pdo);
 }
