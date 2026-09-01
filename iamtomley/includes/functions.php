@@ -16,10 +16,74 @@ function is_installed(): bool
     return is_file(INSTALL_LOCK);
 }
 
-/** Prefix a root-relative path with the auto-detected base URL. */
+/**
+ * Prefix a root-relative path with the auto-detected base URL, dropping the
+ * .php where the server serves pretty URLs.
+ */
 function url(string $path = ''): string
 {
-    return BASE_URL . $path;
+    // Assets and directories have no extension to drop, and this keeps the
+    // pre-install pages from touching the database.
+    if (strpos($path, '.php') === false) {
+        return BASE_URL . $path;
+    }
+    return BASE_URL . pretty_path($path);
+}
+
+/**
+ * Does this host serve /admin/login as well as /admin/login.php?
+ *
+ * It is proved rather than assumed: the .htaccess redirects a .php address to
+ * its clean form, and when that redirected request arrives its address has no
+ * .php while the running script does. The first time that happens the answer is
+ * remembered. Until then — and forever on a host without mod_rewrite — links
+ * keep their .php and everything works exactly as before.
+ */
+function clean_urls(): bool
+{
+    static $on = null;
+    if ($on !== null) {
+        return $on;
+    }
+    $on = false;
+    try {
+        if (setting('clean_urls', '') === '1') {
+            $on = true;
+            return $on;
+        }
+        $uri    = (string) parse_url((string) ($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_PATH);
+        $script = basename((string) ($_SERVER['SCRIPT_NAME'] ?? ''));
+        $asked  = basename($uri);
+        if ($script !== '' && str_ends_with($script, '.php') && $asked !== '' && $asked . '.php' === $script) {
+            set_setting('clean_urls', '1');
+            $on = true;
+        }
+    } catch (Throwable $e) {
+        // No database yet (or it is unreachable) — .php links are the safe answer.
+    }
+    return $on;
+}
+
+/** "/admin/login.php" → "/admin/login", "/admin/index.php" → "/admin/". */
+function pretty_path(string $path): string
+{
+    if (!clean_urls()) {
+        return $path;
+    }
+    $tail = '';
+    foreach (['#', '?'] as $mark) {
+        $at = strpos($path, $mark);
+        if ($at !== false) {
+            $tail = substr($path, $at) . $tail;
+            $path = substr($path, 0, $at);
+        }
+    }
+    if (str_ends_with($path, '/index.php')) {
+        $path = substr($path, 0, -strlen('index.php'));   // keep the trailing slash
+    } elseif (str_ends_with($path, '.php')) {
+        $path = substr($path, 0, -4);
+    }
+    return $path . $tail;
 }
 
 /** Scheme + host of the current request (auto-detected, proxy-aware). */

@@ -85,6 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // (or that Detect filled in), or — if you left it blank and gave a real
         // link — the site's own logo, fetched automatically.
         $image = clip((string) ($_POST['image'] ?? ''), 255);
+        $description = trim((string) ($_POST['description'] ?? ''));
         $notes = [];
         if ($HAS_IMAGE) {
             $prefix = slugify($title, 24) ?: 'project';
@@ -98,10 +99,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
             if ($image === '' && preg_match('#^https?://#i', $link)) {
-                $found = detect_site_image($link, $prefix);
-                if ($found['ok']) {
+                $found = detect_site_info($link, $prefix);
+                if ($found['path'] !== '') {
                     $image = $found['path'];
                     $notes[] = 'Picked up the ' . strtolower($found['kind']) . ' from ' . parse_url($link, PHP_URL_HOST) . '.';
+                }
+                // A blank description gets the site's own summary; anything
+                // you typed is left exactly as you wrote it.
+                if ($description === '' && $found['description'] !== '') {
+                    $description = $found['description'];
+                    $notes[] = 'Filled the description in from the site.';
                 }
             }
 
@@ -122,7 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $title,
             clip((string) ($_POST['tag'] ?? ''), 60),
             $ts,
-            trim((string) ($_POST['description'] ?? '')),
+            $description,
             $link,
             clip((string) ($_POST['link_label'] ?? 'Visit Site'), 40) ?: 'Visit Site',
             (int) ($_POST['sort_order'] ?? 0),
@@ -280,7 +287,7 @@ $shown = $filter === 'all'
       <div class="field"><label>Sort order</label><input type="number" name="sort_order" value="<?= (int) $form['sort_order'] ?>" /></div>
     </div>
     <div class="field"><label>Price <span class="muted">(shown when status is “For Sale”)</span></label><input type="text" name="price" value="<?= e($form['price'] ?? '') ?>" placeholder="e.g. $1,499 or Make an offer" /></div>
-    <div class="field"><label>Description</label><textarea name="description"><?= e($form['description']) ?></textarea></div>
+    <div class="field"><label>Description</label><textarea name="description" id="projDesc"><?= e($form['description']) ?></textarea></div>
     <div class="grid-2">
       <div class="field"><label>Link URL</label><input type="text" id="projUrl" name="url" value="<?= e($form['url']) ?>" placeholder="https://… (leave as # to hide the link)" /></div>
       <div class="field"><label>Link label</label><input type="text" name="link_label" value="<?= e($form['link_label']) ?>" /></div>
@@ -299,6 +306,7 @@ $shown = $filter === 'all'
             <button class="btn btn-ghost btn-sm" type="button"
                     data-detect="#projUrl" data-detect-target="#projImage"
                     data-detect-preview="#projPreview" data-detect-prefix="#projTitle"
+                    data-detect-title="#projTitle" data-detect-desc="#projDesc"
                     data-detect-note="#projImageNote">Detect from the link</button>
             <button class="btn btn-ghost btn-sm" type="button"
                     data-clear-image="#projImage" data-clear-preview="#projPreview"
@@ -306,10 +314,12 @@ $shown = $filter === 'all'
           </div>
           <div class="detect-note" id="projImageNote"></div>
           <div class="hint" style="margin-top:.55rem">
-            <strong>Detect</strong> reads the site in the Link URL box and grabs its logo or
-            preview image — its Open Graph image first, then its touch icon or favicon — and
-            saves a copy here. Leave this blank when adding a project and it happens by itself
-            on save. You can also upload your own image instead:
+            <strong>Detect</strong> reads the site in the Link URL box and fills in what it
+            finds: its logo or preview image (Open Graph image first, then touch icon or
+            favicon), its name, and its description. A copy of the image is saved here, so
+            your page never depends on their server. Anything you have already typed is left
+            alone — it only fills empty boxes. Leave the image blank when adding a project
+            and the same lookup runs by itself on save. You can also upload your own image:
           </div>
           <input type="file" name="image_file" accept="image/*" style="margin-top:.5rem" />
         </div>

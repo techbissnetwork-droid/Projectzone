@@ -49,19 +49,33 @@ the games list, the contact block, footer and SEO meta.
 
 ### Project card images, found for you
 
-Every project card can carry a picture. You do not have to go looking for one:
-paste the project's address into **Link URL** and press **Detect**, and the site
-is read for its own artwork — the Open Graph image first, then the Twitter card
-image, then the apple-touch-icon, then the favicon — and a copy is saved locally
-so your page never depends on someone else's server.
+### Project cards filled in from a link
 
-Leave the image blank on a new project and the same lookup runs by itself when
-you save. You can always upload your own file or paste a path instead, and
-**Clear** removes it.
+Paste the project's address into **Link URL**, press **Detect**, and the site is
+read for everything the card needs:
+
+- its **picture** — the Open Graph image first, then the Twitter card image,
+  then the apple-touch-icon, then the favicon. A copy is saved locally, so your
+  page never depends on someone else's server and nothing is fetched again on a
+  page load.
+- its **name** — from `og:site_name`, falling back to the page title.
+- its **description** — from `og:description` or the page's meta description.
+
+Only empty boxes are filled: anything you have already typed is left exactly as
+you wrote it, and you can overwrite any of it afterwards. Leave the image blank
+on a new project and the same lookup runs by itself when you save. You can
+always upload your own file or paste a path instead, and **Clear** removes it.
 
 Only public `http`/`https` addresses are ever opened, redirects are limited, and
 downloads are capped — the lookup cannot be pointed at your own server's private
 network. SVGs containing scripts are refused outright.
+
+### Sold projects
+
+Anything marked **Sold** gets its own sliding section under the main one, four
+to a slide, working exactly like the projects slider — arrow keys drive
+whichever slider you are looking at. A switch in **Site Settings** decides
+whether the figure each one sold for is shown publicly or kept to yourself.
 
 ### Adding your own games
 
@@ -139,9 +153,14 @@ they are still reachable at `/sitemap.php` and `/robots.php` — on Nginx, map
 
 ## Clean URLs
 
-With Apache + mod_rewrite, `.php` is hidden automatically (e.g. `/admin/login`),
-and any `…/x.php` GET is 301-redirected to the clean URL. The app still works
-without mod_rewrite (URLs just keep `.php`).
+With Apache + mod_rewrite, `.php` never appears: the site writes its own links
+without it, so there is no redirect hop and nothing shows in the address bar.
+
+It works this out rather than assuming it. The `.htaccess` redirects a `.php`
+address to its clean form; when that redirected request arrives, the app can see
+its address has no `.php` while the running script does, and remembers the
+answer. On a host without `mod_rewrite` nothing is ever proved, links keep their
+`.php`, and the site works exactly as before.
 
 ## Deployment notes
 

@@ -87,6 +87,11 @@ if (empty($slides)) { $slides = [[]]; }          // no projects yet → one plac
 $slideCount = count($slides);
 $fillLast = setting('projects_coming_soon', '1') !== '0'; // fill last slide's empty spots
 
+// Sold projects slide in exactly the same way, 4 to a slide.
+$soldSlides = chunk_slides($soldProjects, 4);
+$soldSlideCount = count($soldSlides);
+$showSoldPrice = setting('sold_show_price', '1') === '1';
+
 /** A single "coming soon" placeholder card. */
 function coming_soon_card(): string
 {
@@ -293,16 +298,17 @@ function coming_soon_card(): string
         <?php endforeach; ?>
       </div>
 
+      <div data-slider>
       <div class="slider-top reveal">
-        <div class="slider-counter">Slide <b id="slideActive">1</b> / <b id="slideTotal"><?= (int) $slideCount ?></b></div>
+        <div class="slider-counter">Slide <b class="slider-active">1</b> / <b class="slider-total"><?= (int) $slideCount ?></b></div>
         <div class="slider-btns">
-          <button class="slider-btn" id="btnPrev" type="button" aria-label="Previous projects"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
-          <button class="slider-btn" id="btnNext" type="button" aria-label="Next projects"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
+          <button class="slider-btn slider-prev" type="button" aria-label="Previous projects"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
+          <button class="slider-btn slider-next" type="button" aria-label="Next projects"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
         </div>
       </div>
 
       <div class="slider-view">
-        <div class="slider-track" id="sliderTrack">
+        <div class="slider-track">
           <?php foreach ($slides as $idx => $slide): ?>
           <div class="slide"><div class="slide-grid">
             <?php foreach ($slide as $p):
@@ -346,7 +352,8 @@ function coming_soon_card(): string
           <?php endforeach; ?>
         </div>
       </div>
-      <div class="slider-progress"><div class="slider-progress-fill" id="progressFill" style="width:<?= $slideCount > 0 ? round(100 / $slideCount, 3) : 100 ?>%"></div></div>
+      <div class="slider-progress"><div class="slider-progress-fill" style="width:<?= $slideCount > 0 ? round(100 / $slideCount, 3) : 100 ?>%"></div></div>
+      </div>
     </section>
 
     <?php if (!empty($soldProjects)): ?>
@@ -357,19 +364,39 @@ function coming_soon_card(): string
         <div class="section-line"></div>
         <h2 class="section-title">Sold &amp; delivered</h2>
       </div>
-      <div class="sold-grid reveal" data-stagger>
-        <?php foreach ($soldProjects as $p): $ts = $p['tag_style'] ? ' ' . e($p['tag_style']) : ''; $img = media((string) ($p['image'] ?? '')); ?>
-        <article class="card status-sold<?= $img !== '' ? ' has-shot' : '' ?>">
-          <span class="project-ribbon ribbon-sold">SOLD</span>
-          <?php if ($img !== ''): ?><span class="project-shot"><img src="<?= e($img) ?>" alt="<?= e($p['title']) ?> logo" loading="lazy" decoding="async" /></span><?php endif; ?>
-          <?php if ($p['tag'] !== ''): ?><span class="project-tag<?= $ts ?>"><?= e($p['tag']) ?></span><?php endif; ?>
-          <h3 class="project-name"><?= e($p['title']) ?></h3>
-          <p class="project-desc"><?= e($p['description']) ?></p>
-          <?php $sp = trim((string) ($p['price'] ?? '')); ?>
-          <?php if ($sp !== ''): ?><div class="project-price sold"><span class="price-label">Sold for</span><span class="price-val"><?= e($sp) ?></span></div><?php endif; ?>
-          <span class="project-link disabled" aria-disabled="true">Sold</span>
-        </article>
-        <?php endforeach; ?>
+      <div data-slider>
+      <div class="slider-top reveal">
+        <div class="slider-counter">Slide <b class="slider-active">1</b> / <b class="slider-total"><?= (int) $soldSlideCount ?></b></div>
+        <div class="slider-btns">
+          <button class="slider-btn slider-prev" type="button" aria-label="Previous sold projects"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
+          <button class="slider-btn slider-next" type="button" aria-label="Next sold projects"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
+        </div>
+      </div>
+
+      <div class="slider-view">
+        <div class="slider-track">
+          <?php foreach ($soldSlides as $slide): ?>
+          <div class="slide"><div class="slide-grid">
+            <?php foreach ($slide as $p):
+              $ts = $p['tag_style'] ? ' ' . e($p['tag_style']) : '';
+              $img = media((string) ($p['image'] ?? ''));
+              $sp = trim((string) ($p['price'] ?? ''));
+            ?>
+            <article class="card status-sold<?= $img !== '' ? ' has-shot' : '' ?>">
+              <span class="project-ribbon ribbon-sold">SOLD</span>
+              <?php if ($img !== ''): ?><span class="project-shot"><img src="<?= e($img) ?>" alt="<?= e($p['title']) ?> logo" loading="lazy" decoding="async" /></span><?php endif; ?>
+              <?php if ($p['tag'] !== ''): ?><span class="project-tag<?= $ts ?>"><?= e($p['tag']) ?></span><?php endif; ?>
+              <h3 class="project-name"><?= e($p['title']) ?></h3>
+              <p class="project-desc"><?= e($p['description']) ?></p>
+              <?php if ($showSoldPrice && $sp !== ''): ?><div class="project-price sold"><span class="price-label">Sold for</span><span class="price-val"><?= e($sp) ?></span></div><?php endif; ?>
+              <span class="project-link disabled" aria-disabled="true">Sold</span>
+            </article>
+            <?php endforeach; ?>
+          </div></div>
+          <?php endforeach; ?>
+        </div>
+      </div>
+      <div class="slider-progress"><div class="slider-progress-fill" style="width:<?= $soldSlideCount > 0 ? round(100 / $soldSlideCount, 3) : 100 ?>%"></div></div>
       </div>
     </section>
     <?php endif; ?>

@@ -319,6 +319,7 @@ $coverNow = media((string) ($form['cover'] ?? ''));
             <button class="btn btn-ghost btn-sm" type="button"
                     data-detect="#gameUrl" data-detect-target="#gameCover"
                     data-detect-preview="#gameCoverPreview" data-detect-prefix="#gameTitle"
+                    data-detect-title="#gameTitle"
                     data-detect-note="#gameCoverNote">Detect from the game address</button>
             <button class="btn btn-ghost btn-sm" type="button"
                     data-clear-image="#gameCover" data-clear-preview="#gameCoverPreview"

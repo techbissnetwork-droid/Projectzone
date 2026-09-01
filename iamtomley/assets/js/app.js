@@ -249,39 +249,60 @@
     });
   });
 
-  /* ── Project slider ────────────────────────────────────────────────────── */
-  (function slider() {
-    const track = $('#sliderTrack');
-    if (!track) return;
-    const slides = $$('.slide', track);
-    const total = slides.length;
-    const fill = $('#progressFill');
-    const activeEl = $('#slideActive');
-    const totalEl = $('#slideTotal');
-    if (totalEl) totalEl.textContent = total;
-    let cur = 0;
+  /* ── Sliders (projects, and sold projects) ─────────────────────────────── */
+  (function sliders() {
+    const roots = $$('[data-slider]');
+    if (!roots.length) return;
     const modal = $('#gameModal');
-    function goTo(i) {
-      cur = (i + total) % total;
-      track.style.transform = `translateX(-${cur * 100}%)`;
-      if (activeEl) activeEl.textContent = cur + 1;
-      if (fill) fill.style.width = ((cur + 1) / total * 100) + '%';
-    }
-    const next = $('#btnNext'), prev = $('#btnPrev');
-    if (next) next.addEventListener('click', () => goTo(cur + 1));
-    if (prev) prev.addEventListener('click', () => goTo(cur - 1));
-    let sx = 0;
-    track.addEventListener('touchstart', e => { sx = e.touches[0].clientX; }, { passive: true });
-    track.addEventListener('touchend', e => {
-      const d = sx - e.changedTouches[0].clientX;
-      if (Math.abs(d) > 50) goTo(d > 0 ? cur + 1 : cur - 1);
+    const made = [];
+
+    roots.forEach(root => {
+      const track = $('.slider-track', root);
+      if (!track) return;
+      const total = $$('.slide', track).length;
+      if (!total) return;
+
+      const fill     = $('.slider-progress-fill', root);
+      const activeEl = $('.slider-active', root);
+      const totalEl  = $('.slider-total', root);
+      if (totalEl) totalEl.textContent = total;
+      let cur = 0;
+
+      function goTo(i) {
+        cur = (i + total) % total;
+        track.style.transform = `translateX(-${cur * 100}%)`;
+        if (activeEl) activeEl.textContent = cur + 1;
+        if (fill) fill.style.width = ((cur + 1) / total * 100) + '%';
+      }
+
+      const next = $('.slider-next', root), prev = $('.slider-prev', root);
+      if (next) next.addEventListener('click', () => goTo(cur + 1));
+      if (prev) prev.addEventListener('click', () => goTo(cur - 1));
+
+      let sx = 0;
+      track.addEventListener('touchstart', e => { sx = e.touches[0].clientX; }, { passive: true });
+      track.addEventListener('touchend', e => {
+        const d = sx - e.changedTouches[0].clientX;
+        if (Math.abs(d) > 50) goTo(d > 0 ? cur + 1 : cur - 1);
+      });
+
+      goTo(0);
+      made.push({ root, goTo, get cur() { return cur; } });
     });
+
+    // Arrow keys drive whichever slider the reader is actually looking at,
+    // so two sliders on one page never move together.
     document.addEventListener('keydown', e => {
       if (modal && modal.classList.contains('open')) return;
-      if (e.key === 'ArrowRight') goTo(cur + 1);
-      if (e.key === 'ArrowLeft') goTo(cur - 1);
+      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+      let best = null, bestSeen = 0;
+      made.forEach(s => {
+        const r = s.root.getBoundingClientRect();
+        const seen = Math.max(0, Math.min(r.bottom, innerHeight) - Math.max(r.top, 0));
+        if (seen > bestSeen) { bestSeen = seen; best = s; }
+      });
+      if (best) best.goTo(best.cur + (e.key === 'ArrowRight' ? 1 : -1));
     });
-    goTo(0);
   })();
 
   /* ── Games: render + filter + search + pagination ──────────────────────── */

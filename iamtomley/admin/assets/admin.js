@@ -38,6 +38,8 @@
     var prevEl = pick(btn.dataset.detectPreview);
     var nameEl = pick(btn.dataset.detectPrefix);
     var noteEl = pick(btn.dataset.detectNote);
+    var titleEl = pick(btn.dataset.detectTitle);
+    var descEl  = pick(btn.dataset.detectDesc);
 
     btn.addEventListener('click', function () {
       if (!urlEl || !pathEl) return;
@@ -66,13 +68,33 @@
       })
         .then(function (r) { return r.json().catch(function () { return { ok: false, error: 'The server sent back an unexpected response.' }; }); })
         .then(function (data) {
-          if (data && data.ok) {
+          if (!data || !data.ok) {
+            say(noteEl, (data && data.error) || 'Nothing could be found at that address.', 'warn');
+            return;
+          }
+          // Fill what is empty; never overwrite something already typed.
+          var filled = [];
+          if (data.path) {
             pathEl.value = data.path;
             preview(prevEl, data.src);
-            say(noteEl, 'Found the ' + (data.kind || 'image').toLowerCase() + ' — save the form to keep it.', 'ok');
-          } else {
-            say(noteEl, (data && data.error) || 'Nothing could be found at that address.', 'warn');
+            filled.push('the ' + (data.kind || 'image').toLowerCase());
           }
+          if (titleEl && data.title && !titleEl.value.trim()) {
+            titleEl.value = data.title;
+            filled.push('the name');
+          }
+          if (descEl && data.description && !descEl.value.trim()) {
+            descEl.value = data.description;
+            filled.push('the description');
+          }
+          if (!filled.length) {
+            say(noteEl, data.note || 'Nothing new to fill in — your fields are already filled.', 'warn');
+            return;
+          }
+          var list = filled.length > 1
+            ? filled.slice(0, -1).join(', ') + ' and ' + filled[filled.length - 1]
+            : filled[0];
+          say(noteEl, 'Filled in ' + list + (data.note ? ' (' + data.note + ')' : '') + ' — save the form to keep it.', 'ok');
         })
         .catch(function () {
           say(noteEl, 'Could not reach the server. Check your connection and try again.', 'warn');

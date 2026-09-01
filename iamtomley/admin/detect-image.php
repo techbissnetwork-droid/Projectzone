@@ -33,15 +33,18 @@ if (!isset($_POST['csrf'], $_SESSION['csrf']) || !hash_equals((string) $_SESSION
 $url    = trim((string) ($_POST['url'] ?? ''));
 $prefix = slugify((string) ($_POST['prefix'] ?? 'site'), 24) ?: 'site';
 
-$result = detect_site_image($url, $prefix);
+$result = detect_site_info($url, $prefix);
 if (!$result['ok']) {
     reply(['ok' => false, 'error' => $result['error']]);
 }
 
 reply([
-    'ok'     => true,
-    'path'   => $result['path'],                 // what to store on the record
-    'src'    => media($result['path']),          // what to show in the preview
-    'source' => $result['source'],               // where the image came from
-    'kind'   => $result['kind'],                 // "Open Graph image", "Favicon", …
+    'ok'          => true,
+    'title'       => $result['title'],                  // the site's own name
+    'description' => $result['description'],            // its own summary
+    'path'        => $result['path'],                   // what to store on the record
+    'src'         => $result['path'] === '' ? '' : media($result['path']),
+    'source'      => $result['source'],                 // where the image came from
+    'kind'        => $result['kind'],                   // "Open Graph image", "Favicon", …
+    'note'        => $result['error'],                  // e.g. no image, but text found
 ]);

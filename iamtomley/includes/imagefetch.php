@@ -208,6 +208,69 @@ function absolute_url(string $link, string $base): ?string
 //  Finding the image inside a page
 // ─────────────────────────────────────────────────────────────────────
 
+/**
+ * Every <meta> tag in the page as name/property => content, first one wins.
+ * Shared by the image lookup and the name/description lookup.
+ */
+function meta_tags(string $html): array
+{
+    $meta = [];
+    if (preg_match_all('#<meta\b[^>]*>#i', $html, $tags)) {
+        foreach ($tags[0] as $tag) {
+            if (!preg_match('#\b(?:property|name|itemprop)\s*=\s*["\']([^"\']+)["\']#i', $tag, $k)) { continue; }
+            if (!preg_match('#\bcontent\s*=\s*["\']([^"\']*)["\']#i', $tag, $v)) { continue; }
+            $key = strtolower(trim($k[1]));
+            if (!isset($meta[$key]) && trim($v[1]) !== '') { $meta[$key] = trim($v[1]); }
+        }
+    }
+    return $meta;
+}
+
+/** Collapse runs of whitespace and trim, so admin fields get one tidy line. */
+function tidy_text(string $s): string
+{
+    $s = html_entity_decode($s, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    return trim(preg_replace('/\s+/u', ' ', $s) ?? '');
+}
+
+/**
+ * The site's own name and description, as it presents itself to link previews.
+ *
+ * For the name we prefer og:site_name — that is the brand rather than the title
+ * of whichever page was fetched — and fall back through og:title to <title>.
+ */
+function page_meta(string $html): array
+{
+    $meta = meta_tags($html);
+
+    $title = '';
+    foreach (['og:site_name', 'application-name', 'apple-mobile-web-app-title', 'og:title', 'twitter:title'] as $k) {
+        if (!empty($meta[$k])) { $title = $meta[$k]; break; }
+    }
+    if ($title === '' && preg_match('#<title\b[^>]*>(.*?)</title>#is', $html, $m)) {
+        $title = $m[1];
+        // "Acme — Home" or "Home | Acme": keep the shorter half, which is the name.
+        foreach ([' | ', ' — ', ' – ', ' - ', ' · '] as $sep) {
+            if (strpos($title, $sep) !== false) {
+                $parts = array_map('trim', explode($sep, $title));
+                usort($parts, static fn($a, $b) => mb_strlen($a) <=> mb_strlen($b));
+                $title = $parts[0];
+                break;
+            }
+        }
+    }
+
+    $description = '';
+    foreach (['og:description', 'twitter:description', 'description'] as $k) {
+        if (!empty($meta[$k])) { $description = $meta[$k]; break; }
+    }
+
+    return [
+        'title'       => clip(tidy_text($title), 120),
+        'description' => clip(tidy_text($description), 400),
+    ];
+}
+
 /** The "sizes" attribute ("180x180") as a single number, for ranking icons. */
 function icon_size_score(string $sizes): int
 {
@@ -229,15 +292,7 @@ function image_candidates(string $html, string $pageUrl): array
         if ($rebased !== null) { $pageUrl = $rebased; }
     }
 
-    $meta = [];    // property/name (lowercased) => content
-    if (preg_match_all('#<meta\b[^>]*>#i', $html, $tags)) {
-        foreach ($tags[0] as $tag) {
-            if (!preg_match('#\b(?:property|name|itemprop)\s*=\s*["\']([^"\']+)["\']#i', $tag, $k)) { continue; }
-            if (!preg_match('#\bcontent\s*=\s*["\']([^"\']*)["\']#i', $tag, $v)) { continue; }
-            $key = strtolower(trim($k[1]));
-            if (!isset($meta[$key]) && trim($v[1]) !== '') { $meta[$key] = trim($v[1]); }
-        }
-    }
+    $meta = meta_tags($html);
 
     $links = [];   // ['rel' => …, 'href' => …, 'sizes' => …]
     if (preg_match_all('#<link\b[^>]*>#i', $html, $tags)) {
@@ -347,19 +402,26 @@ function store_image_bytes(string $bytes, string $ext, string $prefix = 'img'): 
 }
 
 /**
- * The whole job: given a site address, find its logo/preview image, download
- * it and keep a local copy.
+ * Everything the admin needs about a site, from one fetch: its name, its
+ * description, and a local copy of its logo or preview image.
  *
- * Returns ['ok' => bool, 'path' => saved path, 'source' => image URL,
- *          'kind' => what was found, 'error' => message when ok is false].
+ * Returns ok=true when at least one of those was found. 'error' explains what
+ * is missing; the caller decides whether that matters.
  */
-function detect_site_image(string $url, string $prefix = 'site'): array
+function detect_site_info(string $url, string $prefix = 'site'): array
 {
-    $fail = static fn(string $msg): array => ['ok' => false, 'path' => '', 'source' => '', 'kind' => '', 'error' => $msg];
+    $blank = [
+        'ok' => false, 'title' => '', 'description' => '',
+        'path' => '', 'source' => '', 'kind' => '', 'error' => '',
+    ];
+    $fail = static function (string $msg) use ($blank): array {
+        $blank['error'] = $msg;
+        return $blank;
+    };
 
     $url = trim($url);
     if ($url === '' || $url === '#') {
-        return $fail('Add a link first, then detect the image.');
+        return $fail('Add a link first, then press Detect.');
     }
     if (!preg_match('#^[a-z][a-z0-9+.\-]*://#i', $url)) {
         $url = 'https://' . ltrim($url, '/');
@@ -369,23 +431,24 @@ function detect_site_image(string $url, string $prefix = 'site'): array
     }
 
     $page = fetch_url($url, FETCH_MAX_HTML);
+    $out  = $blank;
     $candidates = [];
+
     if ($page !== null && (str_contains($page[2], 'html') || $page[2] === '')) {
         $candidates = image_candidates($page[0], $page[1]);
+        $text = page_meta($page[0]);
+        $out['title']       = $text['title'];
+        $out['description'] = $text['description'];
     } elseif ($page !== null && str_starts_with($page[2], 'image/')) {
         // The link points straight at an image.
-        $candidates = [['url' => $page[1], 'kind' => 'Linked image']];
+        $candidates = [['url' => $page[1], 'kind' => 'Linked image', 'guess' => false]];
     } else {
-        // The page itself would not load; still try the conventional favicon.
+        // The page would not load; the conventional favicon is still worth a try.
         $root = absolute_url('/favicon.ico', $url);
         if ($root !== null) { $candidates = [['url' => $root, 'kind' => 'Favicon', 'guess' => true]]; }
     }
 
-    if (!$candidates) {
-        return $fail('No logo or preview image was found on that site.');
-    }
-
-    // Did the page actually point at any artwork, or are we only guessing?
+    // Did the page name any artwork, or are we only guessing at /favicon.ico?
     $named = false;
     foreach ($candidates as $c) {
         if (empty($c['guess'])) { $named = true; break; }
@@ -399,14 +462,39 @@ function detect_site_image(string $url, string $prefix = 'site'): array
         if ($ext === null) { continue; }
         $path = store_image_bytes($res[0], $ext, $prefix);
         if ($path === null) {
-            return $fail('Found an image, but uploads/ is not writable.');
+            $out['error'] = 'Found an image, but uploads/ is not writable.';
+            break;
         }
-        return ['ok' => true, 'path' => $path, 'source' => $c['url'], 'kind' => $c['kind'], 'error' => ''];
+        $out['path']   = $path;
+        $out['source'] = $c['url'];
+        $out['kind']   = $c['kind'];
+        break;
     }
 
-    return $fail($named
-        ? 'That site lists an image, but it could not be downloaded.'
-        : 'No logo or preview image was found on that site.');
+    if ($out['path'] === '' && $out['error'] === '') {
+        $out['error'] = $named
+            ? 'That site lists an image, but it could not be downloaded.'
+            : 'No logo or preview image was found on that site.';
+    }
+
+    $out['ok'] = $out['path'] !== '' || $out['title'] !== '' || $out['description'] !== '';
+    if (!$out['ok'] && $out['error'] === '') {
+        $out['error'] = 'Nothing could be read from that site.';
+    }
+    return $out;
+}
+
+/** Just the image part, for callers that only want a picture. */
+function detect_site_image(string $url, string $prefix = 'site'): array
+{
+    $r = detect_site_info($url, $prefix);
+    return [
+        'ok'     => $r['path'] !== '',
+        'path'   => $r['path'],
+        'source' => $r['source'],
+        'kind'   => $r['kind'],
+        'error'  => $r['error'],
+    ];
 }
 
 /**

@@ -65,6 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     set_setting('maintenance_mode', isset($_POST['maintenance_mode']) ? '1' : '0');
     set_setting('projects_coming_soon', isset($_POST['projects_coming_soon']) ? '1' : '0');
     set_setting('seo_noindex', isset($_POST['seo_noindex']) ? '1' : '0');
+    set_setting('sold_show_price', isset($_POST['sold_show_price']) ? '1' : '0');
     flash('Settings saved.');
     touch_content();
     header('Location: ' . url('/admin/settings.php'));
@@ -148,6 +149,11 @@ function s(string $k): string { return e(setting($k)); }
       <label class="switch"><input type="checkbox" name="projects_coming_soon" <?= setting('projects_coming_soon','1')==='1'?'checked':'' ?> /><span class="track"></span></label>
       <span class="small">Fill the last slide's empty spots with “Coming soon” cards. The number of slides grows automatically as you add projects (4 per slide).</span>
     </div>
+    <div class="field row-inline">
+      <label class="switch"><input type="checkbox" name="sold_show_price" <?= setting('sold_show_price','1')==='1'?'checked':'' ?> /><span class="track"></span></label>
+      <span class="small">Show what each sold project sold for. Turn this off to keep your prices private — the Sold section still shows, just without the figures.</span>
+    </div>
+    <div class="hint">Sold projects get their own sliding section below the main one, four to a slide, exactly like your live projects.</div>
   </div>
 
   <div class="panel">
