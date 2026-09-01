@@ -1263,8 +1263,8 @@ $e = static fn (?string $s): string => htmlspecialchars((string) $s, ENT_QUOTES,
 
                 <label class="field">
                     <span>Database name</span>
-                    <input name="db_name" value="<?= $e($post('db_name', 'techbiss')) ?>" required autocomplete="off"
-                           class="<?= isset($errors['db_name']) ? 'bad' : '' ?>">
+                    <input name="db_name" value="<?= $e($post('db_name')) ?>" required autocomplete="off"
+                           placeholder="e.g. techbiss" class="<?= isset($errors['db_name']) ? 'bad' : '' ?>">
                     <?php if (isset($errors['db_name'])): ?><em class="err"><?= $e($errors['db_name']) ?></em><?php endif; ?>
                 </label>
 
