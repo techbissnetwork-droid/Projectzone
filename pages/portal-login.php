@@ -33,7 +33,7 @@
                 </button>
             </div>
 
-            <p class="hint mt-4"><?= icon('shield') ?> Only for clients with a project already on file. Not what you need? <a href="<?= e(url('/contact')) ?>">Talk to us instead</a>.</p>
+            <p class="hint mt-4"><?= icon('shield') ?> Only for clients with a project already on file. Not what you need? <a class="link" href="<?= e(url('/contact')) ?>">Talk to us instead</a>.</p>
         </form>
     </div>
 </section>

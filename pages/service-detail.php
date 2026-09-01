@@ -159,6 +159,12 @@ $phoneLink = phone_link();
 
 <?= $view->partial('partials/cta-band', [
     'eyebrow' => 'Next step',
-    'heading' => 'Ready to talk about ' . strtolower((string) $service['name']) . '?',
+    // Lowercasing the name so it reads mid-sentence breaks an acronym like
+    // "AI" or "SEO" into "ai"/"seo" — keep any all-caps word (2+ letters) as
+    // the admin wrote it, lowercase the rest.
+    'heading' => 'Ready to talk about ' . preg_replace_callback('/\S+/', static function (array $m): string {
+        $letters = preg_replace('/[^A-Za-z]/', '', $m[0]);
+        return ($letters !== '' && $letters === strtoupper($letters) && strlen($letters) > 1) ? $m[0] : mb_strtolower($m[0]);
+    }, (string) $service['name']) . '?',
     'lead'    => 'Tell us about the business. You get a scope, a schedule and a price.',
 ]) ?>

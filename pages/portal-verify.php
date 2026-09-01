@@ -26,7 +26,7 @@
                 </button>
             </div>
 
-            <p class="hint mt-4">Code did not arrive, or it expired? <a href="<?= e(url('/portal/login')) ?>">Request a new one</a>.</p>
+            <p class="hint mt-4">Code did not arrive, or it expired? <a class="link" href="<?= e(url('/portal/login')) ?>">Request a new one</a>.</p>
         </form>
     </div>
 </section>

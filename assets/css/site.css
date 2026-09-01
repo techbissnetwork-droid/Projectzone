@@ -1057,6 +1057,13 @@ body.has-cursor-fx.cursor-hidden .cursor-ring { opacity: 0; }
 }
 .float-action:hover { transform: translateY(-3px) scale(1.04); box-shadow: var(--sh-xl); }
 .float-action .icon { width: 24px; height: 24px; }
+@media (max-width: 640px) {
+  /* Smaller footprint on narrow screens, where it sits over full-bleed
+     content far more often than it does on desktop's wider margins. Still
+     comfortably above the 44px minimum touch target. */
+  .float-action { width: 46px; height: 46px; }
+  .float-action .icon { width: 21px; height: 21px; }
+}
 
 /* ---------------------------------------------------------------------
    19. Contact page
@@ -1148,6 +1155,12 @@ body.has-cursor-fx.cursor-hidden .cursor-ring { opacity: 0; }
   .hero__meta { gap: 1rem 1.5rem; }
   .table-wrap { border-radius: var(--r-md); }
   .cta-band { border-radius: var(--r-lg); }
+  /* The three float shapes are positioned by percentage so they clear a wide
+     desktop band, but a narrow band is proportionally much shorter, so at
+     this width they end up sitting behind the stacked buttons/disclaimer
+     text instead of in clear space. Decorative only (pointer-events: none
+     already), so simplest is to not show them where there is no room. */
+  .cta-band .float-shapes { display: none; }
 }
 
 /* Touch devices: remove hover-only affordances so nothing is unreachable */

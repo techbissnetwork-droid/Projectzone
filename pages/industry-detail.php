@@ -75,7 +75,7 @@ $image      = media_url($industry['image']);
     <div class="container">
         <div class="row row--between mb-6" data-reveal>
             <h2><?= e($industry['name']) ?> work</h2>
-            <a class="link hide-sm" href="<?= e(url('/portfolio?industry=' . $industry['slug'])) ?>">All <?= e(strtolower((string) $industry['name'])) ?> projects<?= icon('arrow-right') ?></a>
+            <a class="link hide-sm" href="<?= e(url('/portfolio?industry=' . $industry['slug'])) ?>">All projects<?= icon('arrow-right') ?></a>
         </div>
         <div class="slider" data-slider>
             <div class="slider__track slider__track--work" data-reveal-stagger>
@@ -109,5 +109,10 @@ $image      = media_url($industry['image']);
 
 <?= $view->partial('partials/cta-band', [
     'eyebrow' => $industry['name'],
-    'heading' => 'Take your ' . strtolower((string) $industry['name']) . ' business digital.',
+    // The eyebrow above already names the industry, so the heading does not
+    // need to repeat it — which sidesteps having to grammatically agree with
+    // whatever an admin names a sector ("Restaurants", "Local Businesses",
+    // "Startups" all read fine here; slotted into "Take your ___ business
+    // digital." several of them did not).
+    'heading' => 'Take this business digital.',
 ]) ?>
