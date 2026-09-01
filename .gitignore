@@ -1,0 +1,17 @@
+# Runtime-generated state (written by install.php / admin panel)
+/data/*.sqlite
+/data/*.sqlite-journal
+/data/*.sqlite-wal
+/data/*.sqlite-shm
+/data/config.local.php
+/data/installed.lock
+/data/uploads/*
+!/data/uploads/.htaccess
+!/data/uploads/index.html
+!/data/uploads/web.config
+/data-path.php
+*.log
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db

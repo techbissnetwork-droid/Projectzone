@@ -1,0 +1,100 @@
+# SignalMasterAi - Apache configuration.
+#
+# Everything here is optional in the sense that the app runs without it: the
+# .php URLs keep working whether or not this file is read. That is deliberate.
+# A host with AllowOverride off, or a server that is not Apache, must not end
+# up with a site whose every link 404s.
+
+# ------------------------------------------------------------------ 404 page
+# The site has no dynamic slugs, so a 404 only ever means a stale link or a
+# typo - but it should still look like this site instead of the server's bare
+# default. error404.php renders through the normal shell (nav, tokens,
+# footer). Harmless on a host with AllowOverride off: visitors just see that
+# host's own 404 instead, same as before this line existed.
+ErrorDocument 404 /error404.php
+
+# ---------------------------------------------------------------- clean URLs
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Directory this app is installed in, so it works in a subfolder as well as
+  # at a domain root without anyone editing this file.
+  RewriteBase /
+
+  # /sitemap.xml is the name every crawler looks for, and the sitemap has to
+  # be generated - coins are added and removed, and a stale file claiming
+  # pages that now 404 is worse than no file at all. Before the general rule
+  # below, because that one only fires for paths with no matching file.
+  RewriteRule ^sitemap\.xml$ sitemap.php [L]
+
+  # /robots.txt is generated too, for one line: `Sitemap:` must be an ABSOLUTE
+  # URL or the parser skips it, and a static file cannot know the domain it was
+  # uploaded to. The static robots.txt stays on disk as the fallback for a host
+  # with no rewriting - its Disallow rules are still obeyed there, only the
+  # sitemap hint is lost, which is the same position every install was in
+  # before this rule existed.
+  RewriteRule ^robots\.txt$ robots.php [L]
+
+  # /charts -> /charts.php, and only when that file actually exists. Anything
+  # else falls through untouched, so a missing page is still an honest 404
+  # rather than a rewrite loop.
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_FILENAME}.php -f
+  RewriteRule ^(.+?)/?$ $1.php [L,QSA]
+
+  # NOTE: there is deliberately no redirect from /charts.php to /charts.
+  #
+  # A 301 would reach the endpoints too, and a payment gateway POSTing to
+  # payment_webhook.php does not survive one - most clients drop the body and
+  # turn it into a GET. Both spellings serve the same page instead, and the
+  # links the site writes are the clean ones (Settings > Site > Clean URLs),
+  # which is what decides what visitors see and share.
+
+  # ------------------------------------------------------------ www or not
+  # Both hosts work as shipped. Uncomment ONE of these to settle on a single
+  # spelling once you know which one your certificate covers - a redirect to a
+  # host with no certificate is worse than no redirect at all.
+  #
+  # Force www:
+  #   RewriteCond %{HTTP_HOST} ^(?!www\.)(.+)$ [NC]
+  #   RewriteRule ^ https://www.%1%{REQUEST_URI} [R=301,L]
+  #
+  # Force non-www:
+  #   RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+  #   RewriteRule ^ https://%1%{REQUEST_URI} [R=301,L]
+  #
+  # Force HTTPS (only once a certificate is installed and working):
+  #   RewriteCond %{HTTPS} !=on
+  #   RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+</IfModule>
+
+# ------------------------------------------------------------- what is private
+# The database and the class files are not documents. Most installs put them
+# below the web root anyway; on shared hosting that is often not an option, so
+# they are refused here as well.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^(data|src)/ - [F,L]
+</IfModule>
+<FilesMatch "\.(sqlite|sqlite3|db|lock|log|md)$">
+  Require all denied
+</FilesMatch>
+<Files "config.local.php">
+  Require all denied
+</Files>
+
+# ------------------------------------------------------------------- caching
+# Assets carry a ?v=<filemtime> query, so they can be cached hard and still
+# update the moment a file changes.
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/css "access plus 1 year"
+  ExpiresByType application/javascript "access plus 1 year"
+  ExpiresByType image/svg+xml "access plus 1 year"
+  ExpiresByType image/png "access plus 1 year"
+  ExpiresByType image/webp "access plus 1 year"
+</IfModule>
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml
+</IfModule>

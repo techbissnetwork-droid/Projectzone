@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SignalMasterAi — component gallery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Inter+Tight:wght@400;500&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  body{padding:0}
+  .gal{max-width:1080px;margin:0 auto;padding:28px 22px 60px}
+  .gal h1{font-family:var(--font-display);font-weight:400;font-size:38px;letter-spacing:-.01em;margin-bottom:4px}
+  .gal > p.lead{color:var(--muted);font-size:15px;margin-bottom:30px}
+  .grp{margin:0 0 30px}
+  .grp > h2{font-size:13px;font-weight:400;font-family:var(--font-mono);letter-spacing:.16em;
+            text-transform:uppercase;color:var(--dim);padding-bottom:8px;margin-bottom:14px;
+            border-bottom:1px solid var(--border)}
+  .strip{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .two{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+  .four{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+</style>
+</head>
+<body>
+<div class="gal">
+
+  <h1>Component gallery</h1>
+  <p class="lead">Every component below uses the class names already in the templates, drawn by <code>assets/style.css</code>. If this page looks right, the design layer is live.</p>
+
+  <div class="grp">
+    <h2>Buttons — one filled per view</h2>
+    <div class="strip">
+      <a class="btn-primary" href="#">Open live charts</a>
+      <a class="btn" href="#">See how a signal is scored</a>
+      <a class="btn" href="#">Copy plan</a>
+      <a class="btn danger" href="#">Reset learning</a>
+      <a class="btn-primary btn-big" href="#">Go premium</a>
+    </div>
+  </div>
+
+  <div class="grp">
+    <h2>Badges and grades</h2>
+    <div class="strip">
+      <span class="badge buy">Buy</span>
+      <span class="badge sell">Sell</span>
+      <span class="badge neutral">Neutral</span>
+      <span class="badge on">Enabled</span>
+      <span class="badge off">Disabled</span>
+      <span class="grade gAp">A+</span>
+      <span class="grade gA">A</span>
+      <span class="grade gB">B</span>
+      <span class="grade gC">C</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <h2>Stat blocks</h2>
+    <div class="four">
+      <div class="stat"><b>268</b><span>graded calls</span></div>
+      <div class="stat"><b class="yes">54.5%</b><span>win rate</span></div>
+      <div class="stat"><b>1.34</b><span>profit factor</span></div>
+      <div class="stat"><b>+0.31R</b><span>expectancy</span></div>
+    </div>
+  </div>
+
+  <div class="grp">
+    <h2>Panels — verdict, evidence ledger, trade plan</h2>
+    <div class="two">
+
+      <div class="panel" style="padding:0;overflow:hidden">
+        <div style="display:flex;align-items:flex-end;gap:12px;padding:16px 18px 8px">
+          <span style="font-family:var(--font-display);font-size:38px;line-height:.9;color:var(--up)">Buy</span>
+          <span class="grade gAp">A+</span>
+          <span style="margin-left:auto;text-align:right">
+            <b class="num" style="display:block;font-size:15px">0.61</b>
+            <span class="lbl">P(win)</span></span>
+        </div>
+        <div style="padding:0 18px 10px"><span class="lbl">Evidence ledger</span></div>
+
+        <div style="display:grid;grid-template-columns:84px 1fr 42px;align-items:center;gap:10px;padding:9px 18px;border-bottom:1px solid var(--border)">
+          <div style="font-size:12px">Trend<small class="gray" style="display:block;font-family:var(--font-mono);font-size:10px">7 rules</small></div>
+          <div class="evidence-track"><span class="evidence-bar pos" style="width:30%"></span><i class="evidence-cap" style="left:80%"></i></div>
+          <div class="num yes" style="text-align:right;font-size:12px">+3.0</div>
+        </div>
+        <div style="display:grid;grid-template-columns:84px 1fr 42px;align-items:center;gap:10px;padding:9px 18px;border-bottom:1px solid var(--border)">
+          <div style="font-size:12px">Momentum<small class="gray" style="display:block;font-family:var(--font-mono);font-size:10px">5 rules</small></div>
+          <div class="evidence-track"><span class="evidence-bar pos" style="width:22%"></span></div>
+          <div class="num yes" style="text-align:right;font-size:12px">+2.2</div>
+        </div>
+        <div style="display:grid;grid-template-columns:84px 1fr 42px;align-items:center;gap:10px;padding:9px 18px;border-bottom:1px solid var(--border)">
+          <div style="font-size:12px">Volatility<small class="gray" style="display:block;font-family:var(--font-mono);font-size:10px">2 rules</small></div>
+          <div class="evidence-track"><span class="evidence-bar neg" style="width:8%"></span></div>
+          <div class="num danger" style="text-align:right;font-size:12px">&minus;0.8</div>
+        </div>
+        <div style="display:flex;align-items:center;padding:12px 18px;border-top:1px solid var(--border-2);font-size:12px;color:var(--muted)">
+          Net after caps
+          <b class="num" style="margin-left:auto;font-size:16px;color:var(--up);font-weight:500">+7.6</b>
+        </div>
+        <p class="hint" style="padding:0 18px 16px;margin:0">
+          <strong style="color:var(--brass);font-weight:500">Cap applied:</strong>
+          trend scored +8.0 raw, clipped to +3.0.</p>
+      </div>
+
+      <div class="panel" style="padding:0;overflow:hidden">
+        <div style="padding:13px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center">
+          <h3 style="font-size:13px;font-weight:500">Trade plan</h3>
+          <span class="lbl" style="margin-left:auto">time stop 18 candles</span>
+        </div>
+        <div style="padding:4px 18px 12px">
+          <div class="tp-row"><span class="ticket-label">Entry</span><strong>64,180</strong></div>
+          <div class="tp-row sl"><span class="ticket-label">Stop</span><strong>62,410</strong></div>
+          <div class="tp-row tp"><span class="ticket-label">TP1 · 50%</span><strong>66,940</strong></div>
+          <div class="tp-row tp"><span class="ticket-label">TP2 · 30%</span><strong>68,720</strong></div>
+          <div class="tp-row"><span class="ticket-label">R : R</span><strong>1 : 2.4</strong></div>
+        </div>
+        <div style="padding:0 18px 16px">
+          <a class="btn-primary" href="#" style="width:100%">Add to paper portfolio</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grp">
+    <h2>Table — scanner rows</h2>
+    <div class="panel" style="overflow:hidden;padding:0">
+      <table class="grid">
+        <thead><tr><th>Symbol</th><th>TF</th><th>Verdict</th><th>Grade</th><th style="text-align:right">Score</th><th style="text-align:right">R:R</th></tr></thead>
+        <tbody>
+          <tr><td>BTC/USDT</td><td class="num gray">4H</td><td><span class="badge buy">Buy</span></td><td><span class="grade gAp">A+</span></td><td class="num yes">+7.6</td><td class="num">1 : 2.4</td></tr>
+          <tr><td>ETH/USDT</td><td class="num gray">4H</td><td><span class="badge buy">Buy</span></td><td><span class="grade gA">A</span></td><td class="num yes">+6.9</td><td class="num">1 : 2.1</td></tr>
+          <tr><td>SOL/USDT</td><td class="num gray">1H</td><td><span class="badge sell">Sell</span></td><td><span class="grade gB">B</span></td><td class="num danger">&minus;4.2</td><td class="num">1 : 1.8</td></tr>
+          <tr><td>EUR/USD</td><td class="num gray">4H</td><td><span class="badge neutral">Neutral</span></td><td><span class="grade gC">C</span></td><td class="num gray">&minus;0.4</td><td class="num gray">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="grp">
+    <h2>Forms and controls</h2>
+    <div class="two">
+      <div class="card">
+        <label class="lbl" style="display:block;margin-bottom:6px">Account size</label>
+        <input type="text" value="12,400">
+        <label class="lbl" style="display:block;margin:14px 0 6px">Risk per trade</label>
+        <select><option>1.0% — conservative</option><option>2.0%</option></select>
+        <label class="chk" style="margin-top:14px"><input type="checkbox" checked> Also email me when a watched pair flips</label>
+        <label class="chk"><input type="checkbox"> Quiet hours 23:00–07:00</label>
+        <span class="hint">Alerts obey the grade floor set in your preferences.</span>
+      </div>
+      <div class="card">
+        <span class="lbl" style="display:block;margin-bottom:10px">Timeframe</span>
+        <div class="mode-seg">
+          <button>15m</button><button>1H</button><button class="on">4H</button><button>1D</button><button>1W</button>
+        </div>
+        <div class="okmsg" style="margin-top:16px"><strong>Saved.</strong> Preferences apply from the next scan.</div>
+        <div class="error" style="margin-top:10px"><strong>Payment expired.</strong> The invoice window closed before confirmation.</div>
+        <div class="note" style="margin-top:10px"><strong>Wilson lower bound.</strong> Buckets under thirty samples stay unpublished.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grp">
+    <h2>Empty state</h2>
+    <div class="empty-state">
+      <h3>Start your watchlist</h3>
+      <p>Pick a pair and it follows you across devices, with alerts on the timeframes you choose.</p>
+      <a class="btn-primary" href="#">Browse symbols</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

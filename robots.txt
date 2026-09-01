@@ -1,0 +1,31 @@
+# SignalMasterAi
+#
+# Two rules of thumb decide everything below.
+#
+# 1. Disallow means "do not READ this", not "do not index this". A page you
+#    Disallow can still appear in results as a bare URL with no title, and -
+#    worse - a crawler forbidden from reading it can never see the noindex tag
+#    that would have removed it properly. So the member-facing pages are NOT
+#    disallowed here; they carry noindex themselves, which is the tag that
+#    actually works, and a crawler has to be allowed in to find it.
+#
+# 2. Only endpoints that are pointless to crawl are blocked: the admin panel,
+#    the data directory, the JSON API and the two things that are triggered
+#    rather than read.
+
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /data/
+Disallow: /api.php
+Disallow: /cron.php
+Disallow: /payment_webhook.php
+Disallow: /install.php
+Disallow: /logo.php
+Disallow: /pm-image.php
+
+# The map of what is worth reading. sitemap.php always resolves; /sitemap.xml
+# is the same file under the name crawlers expect, mapped in .htaccess, so
+# both are listed rather than betting on mod_rewrite being available.
+Sitemap: /sitemap.xml
+Sitemap: /sitemap.php
