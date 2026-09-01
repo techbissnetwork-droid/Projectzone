@@ -275,3 +275,13 @@ UPDATE `services` SET
   `description` = '<p>Whatever site you need — a marketing site, a booking or ordering site, a full online store — we design and build it around what your business does and what a visitor needs to decide, responsive from the first breakpoint. This is not a template with your logo dropped in.</p><p>Once it is built, we set up everything around it: your domain registered in your name, DNS pointed correctly, managed hosting with SSL installed and renewed automatically, and professional email on your own domain. If you sell products, the store — catalogue, checkout, payments — is built into the same site. One job, one team, one thing to maintain.</p>',
   `deliverables` = 'Custom-designed, responsive website — built for what your business does, not a template\nEditable CMS so you can update content yourself\nDomain registered in your name, DNS configured\nManaged hosting with SSL installed and auto-renewed\nProfessional email on your domain (SPF, DKIM, DMARC configured)\nOnline store with catalogue, checkout and payments, if you sell products\nContact and enquiry forms\nDaily backups and uptime monitoring\nAnalytics and Search Console setup'
   WHERE `slug` = 'business-website' AND `name` = 'Website Setup';
+
+-- The homepage "Services under one partner" stat was seeded from the
+-- services count at install time (see database/demo-content.sql), so a site
+-- set up before the services consolidation is still showing the old count
+-- of 10 even though the catalog itself was merged down to 6. Recomputed the
+-- same way demo-content.sql seeds it, and only touched while it still reads
+-- exactly the stale pre-consolidation figure — an admin who typed in their
+-- own number is left alone.
+UPDATE `stats` SET `value` = CAST((SELECT COUNT(*) FROM `services` WHERE `is_published` = 1) AS CHAR)
+  WHERE `label` = 'Services under one partner' AND `value` = '10';
