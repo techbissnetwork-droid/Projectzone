@@ -685,6 +685,24 @@ body.has-cursor-fx.cursor-hidden .cursor-ring { opacity: 0; }
    9. Process steps
    --------------------------------------------------------------------- */
 .process { display: grid; gap: 0; position: relative; }
+/* The line running through the step numbers: a faint permanent track, plus an
+   accent line that draws down once when the list scrolls into view. */
+.process::before,
+.process::after {
+  content: "";
+  position: absolute;
+  top: 0; bottom: 0; left: 2.7rem;
+  width: 2px; border-radius: 1px;
+}
+.process::before { background: var(--border); }
+.process::after {
+  background: linear-gradient(var(--accent), var(--cyan));
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 1.4s var(--ease-out);
+}
+.process.is-visible::after { transform: scaleY(1); }
+@media (max-width: 640px) { .process::before, .process::after { display: none; } }
 .process__step {
   display: grid;
   grid-template-columns: 5.5rem minmax(0, 1fr);
@@ -692,6 +710,7 @@ body.has-cursor-fx.cursor-hidden .cursor-ring { opacity: 0; }
   padding: clamp(1.5rem, 1rem + 1.5vw, 2.35rem) 0;
   border-top: 1px solid var(--border);
   position: relative;
+  z-index: 1;
   transition: background-color var(--t-base) var(--ease);
 }
 .process__step:last-child { border-bottom: 1px solid var(--border); }

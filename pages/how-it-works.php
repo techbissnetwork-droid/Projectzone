@@ -9,7 +9,7 @@
 <section class="section section--flush-top">
     <div class="container">
         <?php if ($steps): ?>
-        <div class="process">
+        <div class="process" data-reveal="kinetic">
             <?php foreach ($steps as $step): ?>
             <div class="process__step" data-reveal>
                 <div class="process__num"><?= e($step['step_number']) ?></div>

@@ -15,9 +15,14 @@ $hero = $sections['hero'] ?? [];
 <!-- ================= HERO ================= -->
 <section class="hero">
     <div class="hero__bg" aria-hidden="true">
-        <span class="glow glow--a"></span>
-        <span class="glow glow--b"></span>
+        <span class="glow glow--a" data-parallax="0.12"></span>
+        <span class="glow glow--b" data-parallax="0.22"></span>
         <span class="grid-pattern"></span>
+        <span class="float-shapes">
+            <span class="float-shape float-shape--1"></span>
+            <span class="float-shape float-shape--2 float-shape--round"></span>
+            <span class="float-shape float-shape--3"></span>
+        </span>
     </div>
 
     <div class="container">
@@ -31,16 +36,17 @@ $hero = $sections['hero'] ?? [];
                 </span>
                 <?php endif; ?>
 
-                <h1 class="display hero__title" data-reveal>
+                <h1 class="display hero__title" data-reveal="kinetic">
                     <?php
-                    // Emphasise the closing phrase without hard-coding the sentence.
+                    // Emphasise the closing phrase without hard-coding the sentence, and
+                    // let each word rise into place on its own rather than the whole
+                    // line fading in as one block.
                     $title = $s('hero', 'heading', 'Your Digital Business Starts Here.');
                     $words = preg_split('/\s+/', trim($title)) ?: [$title];
                     $tail  = array_splice($words, max(0, count($words) - 2));
-                    echo e(implode(' ', $words));
-                    echo $words ? ' ' : '';
-                    echo '<span class="text-gradient">' . e(implode(' ', $tail)) . '</span>';
-                    ?>
+                    foreach ($words as $i => $word):
+                    ?><span class="kinetic-word" style="--i:<?= $i ?>"><span><?= e($word) ?></span></span> <?php
+                    endforeach; ?><span class="kinetic-word" style="--i:<?= count($words) ?>"><span class="text-gradient"><?= e(implode(' ', $tail)) ?></span></span>
                 </h1>
 
                 <p class="lead hero__lead" data-reveal style="--reveal-delay:80ms">

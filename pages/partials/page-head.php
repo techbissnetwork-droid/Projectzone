@@ -11,7 +11,7 @@ $crumbs  = $seo->getBreadcrumbs();
 ?>
 <section class="page-head<?= $center ? ' page-head--center' : '' ?>">
     <div class="page-head__bg" aria-hidden="true">
-        <span class="glow"></span>
+        <span class="glow" data-parallax="0.08"></span>
         <span class="grid-pattern"></span>
     </div>
     <div class="container">

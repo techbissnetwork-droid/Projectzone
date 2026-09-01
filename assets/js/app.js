@@ -379,9 +379,58 @@
     $$('.card--spotlight').forEach(function (card) {
       on(card, 'mousemove', function (e) {
         var r = card.getBoundingClientRect();
-        card.style.setProperty('--mx', (e.clientX - r.left) + 'px');
-        card.style.setProperty('--my', (e.clientY - r.top) + 'px');
+        var mx = e.clientX - r.left, my = e.clientY - r.top;
+        card.style.setProperty('--mx', mx + 'px');
+        card.style.setProperty('--my', my + 'px');
+        // A light 3D tilt toward the cursor, on top of the existing glow —
+        // capped low (8deg) so it reads as responsive, not gimmicky.
+        var rx = (my / r.height - 0.5) * -8;
+        var ry = (mx / r.width - 0.5) * 8;
+        card.style.transform = 'perspective(900px) rotateX(' + rx.toFixed(2) + 'deg) rotateY(' + ry.toFixed(2) + 'deg) translateY(-4px)';
       });
+      on(card, 'mouseleave', function () { card.style.transform = ''; });
+    });
+  }
+
+  /* -------------------------------------------------------------------
+     Depth scroll — background layers move at their own rate as the page
+     scrolls. Desktop and touch alike; only reduced motion turns it off.
+     ------------------------------------------------------------------- */
+  function initParallax() {
+    var layers = $$('[data-parallax]');
+    if (!layers.length || reduceMotion.matches) return;
+
+    var update = throttleFrame(function () {
+      var vh = window.innerHeight;
+      layers.forEach(function (el) {
+        var rate = parseFloat(el.getAttribute('data-parallax')) || 0.15;
+        var r = el.getBoundingClientRect();
+        var center = r.top + r.height / 2;
+        var offset = (center - vh / 2) * rate;
+        el.style.transform = 'translateY(' + offset.toFixed(1) + 'px)';
+      });
+    });
+    on(window, 'scroll', update, { passive: true });
+    on(window, 'resize', update);
+    update();
+  }
+
+  /* -------------------------------------------------------------------
+     Cursor spotlight over a CTA band's grid — desktop pointers only
+     ------------------------------------------------------------------- */
+  function initSpotlightBand() {
+    if (!canHover.matches || reduceMotion.matches) return;
+
+    $$('.cta-band').forEach(function (band) {
+      var spot = band.querySelector('[data-spotlight]');
+      if (!spot) return;
+      on(band, 'mousemove', function (e) {
+        var r = band.getBoundingClientRect();
+        spot.style.setProperty('--sx', (e.clientX - r.left) + 'px');
+        spot.style.setProperty('--sy', (e.clientY - r.top) + 'px');
+        spot.classList.add('is-active');
+      });
+      on(band, 'mouseleave', function () { spot.classList.remove('is-active'); });
     });
   }
 
@@ -816,6 +865,8 @@
     initFlash();
     if (cfg.cursor !== false) initCursor();
     initMagnetic();
+    initParallax();
+    initSpotlightBand();
     initSliders();
     initAutoOpen();
   }

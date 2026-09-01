@@ -441,8 +441,57 @@ h4 { font-size: var(--fs-h4); letter-spacing: -0.012em; }
   filter: blur(70px);
   opacity: 0.5;
   will-change: transform;
+  animation: glow-drift-a 22s ease-in-out infinite;
 }
 [data-theme="light"] .glow { opacity: 0.32; filter: blur(80px); }
+.glow--b { animation-name: glow-drift-b; animation-duration: 27s; }
+
+/* Animated on `translate`/`scale` rather than `transform` — a data-parallax
+   element (see initParallax) sets `transform` on scroll on these same spans,
+   and a running CSS animation on `transform` would win that fight and make
+   the JS value invisible. translate/scale are independent properties that
+   compose with `transform` instead of overriding it. */
+@keyframes glow-drift-a {
+  0%, 100% { translate: 0 0;      scale: 1; }
+  50%      { translate: 4% 6%;    scale: 1.12; }
+}
+@keyframes glow-drift-b {
+  0%, 100% { translate: 0 0;      scale: 1; }
+  50%      { translate: -5% -4%;  scale: 1.08; }
+}
+
+/* Quiet geometric pieces drifting behind a hero or CTA band. Decorative only —
+   markup is a handful of empty spans, sized and placed per instance by the
+   caller. */
+.float-shapes { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.float-shape {
+  position: absolute;
+  border-radius: var(--r-lg);
+  background: linear-gradient(150deg, var(--surface-hover), transparent);
+  border: 1px solid var(--border-strong);
+  animation: float-a 8s ease-in-out infinite;
+}
+.float-shape--round { border-radius: 50%; }
+.float-shape:nth-child(2) { animation-name: float-b; animation-duration: 9.5s; }
+.float-shape:nth-child(3) { animation-name: float-c; animation-duration: 7s; }
+/* Percentage placement so the same three shapes work in a wide hero or a
+   narrower CTA band without page-specific overrides. */
+.float-shape--1 { width: 64px; height: 64px; top: 8%;  right: 9%; }
+.float-shape--2 { width: 40px; height: 40px; bottom: 16%; right: 22%; }
+.float-shape--3 { width: 50px; height: 50px; bottom: 10%; left: 6%; }
+@keyframes float-a { 0%, 100% { translate: 0 0;    rotate: 0deg; } 50% { translate: 0 -14px; rotate: 7deg; } }
+@keyframes float-b { 0%, 100% { translate: 0 0; } 50% { translate: 0 12px; } }
+@keyframes float-c { 0%, 100% { translate: 0 0;    rotate: 0deg; } 50% { translate: 0 -9px;  rotate: -8deg; } }
+
+/* Cursor-follow light over a grid-pattern band — JS writes --sx/--sy on
+   mousemove, CSS does the rest. Desktop pointers only (see initSpotlightBand). */
+.band-spotlight {
+  position: absolute; inset: 0;
+  opacity: 0;
+  transition: opacity var(--t-base) var(--ease);
+  background: radial-gradient(260px circle at var(--sx, 50%) var(--sy, 50%), var(--accent-tint), transparent 68%);
+}
+.band-spotlight.is-active { opacity: 1; }
 
 .hairline {
   height: 1px;
@@ -1137,10 +1186,25 @@ a.pill:hover, button.pill:hover { border-color: var(--border-strong); color: var
 [data-reveal="right"] { transform: translateX(22px); }
 [data-reveal="scale"] { transform: scale(0.965); }
 [data-reveal="fade"]  { transform: none; }
+[data-reveal="kinetic"] { opacity: 1; transform: none; }
 [data-reveal].is-visible { opacity: 1; transform: none; will-change: auto; }
 
 /* Progressive list reveal — index set inline by the template */
 [data-reveal-stagger] > * { --reveal-delay: calc(var(--i, 0) * 55ms); }
+
+/* data-reveal="kinetic": the element itself does not fade or move on reveal —
+   it's used where something inside it should react to .is-visible instead.
+   For a heading, that's each word rising out of its own overflow:hidden mask
+   in sequence (below); .process reuses the same variant to trigger the
+   step-line draw-in without also fading the whole list. */
+.kinetic-word { display: inline-block; overflow: hidden; vertical-align: top; }
+.kinetic-word > span {
+  display: inline-block;
+  transform: translateY(115%);
+  transition: transform 640ms var(--ease-out);
+  transition-delay: calc(var(--i, 0) * 70ms);
+}
+[data-reveal="kinetic"].is-visible .kinetic-word > span { transform: translateY(0); }
 
 /* ---------------------------------------------------------------------
    15. Motion and print preferences
