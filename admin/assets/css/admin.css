@@ -601,6 +601,12 @@ a.tile:hover { border-color: var(--border-strong); transform: translateY(-2px); 
 .timeline__meta { font-size: .75rem; color: var(--text-faint); margin-top: .1rem; }
 
 .perm-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1.25rem; }
+.perm-group {
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--bg-elev);
+}
 .perm-group__title { font-size: .8rem; font-weight: 650; color: var(--text); margin-bottom: .6rem; }
 
 .mono-sm { font-family: var(--font-mono); font-size: .75rem; color: var(--text-muted); }

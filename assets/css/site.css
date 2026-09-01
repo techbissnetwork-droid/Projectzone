@@ -949,23 +949,6 @@ body.has-cursor-fx.cursor-hidden .cursor-ring { opacity: 0; }
   gap: clamp(1.35rem, 1rem + 1.2vw, 1.9rem);
 }
 
-/* Pagination */
-.pagination { display: flex; align-items: center; justify-content: center; gap: 0.35rem; margin-top: clamp(2.25rem, 1.75rem + 2vw, 3.5rem); flex-wrap: wrap; }
-.pagination__link {
-  min-width: 40px; height: 40px;
-  display: grid; place-items: center;
-  padding-inline: 0.6rem;
-  border-radius: var(--r-sm);
-  border: 1px solid var(--border);
-  font-size: var(--fs-sm);
-  color: var(--text-muted);
-  font-variant-numeric: tabular-nums;
-  transition: all var(--t-fast) var(--ease);
-}
-.pagination__link:hover { border-color: var(--border-strong); color: var(--text); background: var(--surface); }
-.pagination__link[aria-current="page"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
-.pagination__gap { color: var(--text-faint); padding-inline: 0.35rem; }
-.pagination__link.is-disabled { opacity: 0.4; pointer-events: none; }
 
 /* ---------------------------------------------------------------------
    17. CTA band

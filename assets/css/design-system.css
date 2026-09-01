@@ -771,6 +771,43 @@ a.pill:hover, button.pill:hover { border-color: var(--border-strong); color: var
 .notice--success { border-color: rgba(52, 211, 153, 0.28); background: rgba(52, 211, 153, 0.07); }
 .notice--success .icon { color: var(--success); }
 
+/* Plain-text cousin of .notice, no icon slot — the installer already uses
+   this exact name for its own standalone stylesheet, so the admin app's
+   warning/error banners (a tool note, a validation stop) match it rather
+   than introducing a second name for the same idea. */
+.alert {
+  padding: 1rem 1.15rem;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-size: var(--fs-sm);
+  color: var(--text-soft);
+  line-height: 1.6;
+}
+.alert strong { color: var(--text); }
+.alert--warn { border-color: rgba(251, 191, 36, 0.28); background: rgba(251, 191, 36, 0.07); }
+.alert--bad  { border-color: rgba(248, 113, 113, 0.3); background: rgba(248, 113, 113, 0.07); }
+.alert--good { border-color: rgba(52, 211, 153, 0.28); background: rgba(52, 211, 153, 0.07); }
+
+/* Pagination — lives here rather than site.css because the admin resource
+   lists use it too, and admin's layout does not load site.css. */
+.pagination { display: flex; align-items: center; justify-content: center; gap: 0.35rem; margin-top: clamp(2.25rem, 1.75rem + 2vw, 3.5rem); flex-wrap: wrap; }
+.pagination__link {
+  min-width: 40px; height: 40px;
+  display: grid; place-items: center;
+  padding-inline: 0.6rem;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border);
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  transition: all var(--t-fast) var(--ease);
+}
+.pagination__link:hover { border-color: var(--border-strong); color: var(--text); background: var(--surface); }
+.pagination__link[aria-current="page"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
+.pagination__gap { color: var(--text-faint); padding-inline: 0.35rem; }
+.pagination__link.is-disabled { opacity: 0.4; pointer-events: none; }
+
 /* ---------------------------------------------------------------------
    9. Forms
    --------------------------------------------------------------------- */
@@ -1172,6 +1209,56 @@ a.pill:hover, button.pill:hover { border-color: var(--border-strong); color: var
 @keyframes fade-in  { from { opacity: 0; } }
 @keyframes modal-in { from { opacity: 0; transform: translateY(16px) scale(0.98); } }
 
+/* Image viewer — built by initLightbox in app.js, not present in any
+   template, so it needs its own rules rather than reusing .modal's. */
+.lightbox {
+  position: fixed; inset: 0;
+  z-index: var(--z-modal);
+  display: grid; place-items: center;
+  padding: clamp(1rem, 3vw, 3rem);
+  background: rgba(3, 4, 8, 0.9);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: fade-in 180ms var(--ease) both;
+}
+.lightbox img {
+  display: block;
+  max-width: 100%; max-height: 100%;
+  width: auto; height: auto;
+  object-fit: contain;
+  border-radius: var(--r-md);
+  animation: modal-in 260ms var(--ease-out) both;
+}
+.lightbox__close,
+.lightbox__nav {
+  position: fixed;
+  display: grid; place-items: center;
+  width: 44px; height: 44px;
+  border-radius: var(--r-full);
+  background: var(--glass);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--border);
+  color: var(--text);
+  cursor: pointer;
+  transition: background-color var(--t-base) var(--ease), border-color var(--t-base) var(--ease);
+}
+.lightbox__close:hover, .lightbox__close:focus-visible,
+.lightbox__nav:hover, .lightbox__nav:focus-visible { background: var(--surface-hover); border-color: var(--border-strong); }
+.lightbox__close { top: clamp(0.75rem, 2vw, 1.5rem); right: clamp(0.75rem, 2vw, 1.5rem); }
+.lightbox__nav--prev { left: clamp(0.75rem, 2vw, 1.5rem); top: 50%; transform: translateY(-50%); }
+.lightbox__nav--next { right: clamp(0.75rem, 2vw, 1.5rem); top: 50%; transform: translateY(-50%); }
+.lightbox__count {
+  position: fixed; bottom: clamp(0.75rem, 2vw, 1.5rem); left: 50%; transform: translateX(-50%);
+  font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--text-soft);
+  background: var(--glass); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--border); border-radius: var(--r-full);
+  padding: 0.35rem 0.85rem;
+}
+@media (max-width: 640px) {
+  .lightbox__close, .lightbox__nav { width: 38px; height: 38px; }
+}
+
 /* ---------------------------------------------------------------------
    14. Scroll reveal
    --------------------------------------------------------------------- */
@@ -1301,6 +1388,7 @@ a.pill:hover, button.pill:hover { border-color: var(--border-strong); color: var
 .mb-0 { margin-bottom: 0; }   .mb-2 { margin-bottom: var(--s-2); }
 .mb-3 { margin-bottom: var(--s-3); } .mb-4 { margin-bottom: var(--s-4); }
 .mb-5 { margin-bottom: var(--s-5); } .mb-6 { margin-bottom: var(--s-6); }
+.mb-8 { margin-bottom: var(--s-8); }
 .ml-auto { margin-left: auto; }
 .text-center { text-align: center; }
 .text-right  { text-align: right; }
