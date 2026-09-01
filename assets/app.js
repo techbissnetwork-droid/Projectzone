@@ -1416,6 +1416,7 @@
       computeDerived();
       statusEl.classList.add('hidden');
       draw();
+      canvas.classList.add('ready');   // see #chart.ready in style.css
       renderChartTable();
       tickPrice();
       // Re-price the open trades off the candles that have just arrived. Done

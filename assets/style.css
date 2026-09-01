@@ -538,7 +538,15 @@ button.primary:disabled { opacity: 0.6; cursor: wait; }
 /* The chart is the reason the page exists, so it takes the height the screen
    can spare rather than a fixed slab with dead space under it. */
 .chart-wrap { position: relative; height: clamp(320px, 58vh, 640px); }
-#chart { width: 100%; height: 100%; display: block; cursor: crosshair; }
+/* Fades in once app.js's loadChart() has real candles drawn (.ready, added
+ * right after the first draw() - see app.js), instead of the canvas simply
+ * existing with content already on it the instant the browser paints it.
+ * Every subsequent symbol/timeframe switch keeps .ready set, so this is a
+ * once-per-page-load entrance, not a flash on every switch - the shimmering
+ * #chartStatus already covers "still loading" for those. */
+#chart { width: 100%; height: 100%; display: block; cursor: crosshair; opacity: 0; transition: opacity var(--dur-slow) var(--ease-out); }
+#chart.ready { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { #chart { opacity: 1; transition: none; } }
 .chart-status {
   position: absolute;
   inset: 0;
