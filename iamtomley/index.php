@@ -316,8 +316,11 @@ function coming_soon_card(): string
               $st = project_status_key($p['status'] ?? 'live');
               $badge = project_statuses()[$st][1] ?? '';
               $img = media((string) ($p['image'] ?? ''));
+              // A card that leads somewhere is clickable across its whole face.
+              // Sold projects have nowhere to send anyone, so they stay inert.
+              $cardHref = ($st !== 'sold' && $p['url'] !== '' && $p['url'] !== '#') ? (string) $p['url'] : '';
             ?>
-            <article class="card status-<?= e($st) ?><?= $img !== '' ? ' has-shot' : '' ?>">
+            <article class="card status-<?= e($st) ?><?= $img !== '' ? ' has-shot' : '' ?>"<?= $cardHref !== '' ? ' data-href="' . e($cardHref) . '"' : '' ?>>
               <?php if ($badge !== ''): ?><span class="project-ribbon ribbon-<?= e($st) ?>"><?= e($badge) ?></span><?php endif; ?>
               <?php if ($img !== ''): ?><span class="project-shot"><img src="<?= e($img) ?>" alt="<?= e($p['title']) ?> logo" loading="lazy" decoding="async" /></span><?php endif; ?>
               <?php if ($p['tag'] !== ''): ?><span class="project-tag<?= $ts ?>"><?= e($p['tag']) ?></span><?php endif; ?>
@@ -435,13 +438,20 @@ function coming_soon_card(): string
         </div>
       </div>
 
-      <div class="games-grid" id="gamesGrid" aria-live="polite"></div>
-
-      <div class="pagination" id="pager">
-        <button class="pg-btn" id="pgPrev" type="button" aria-label="Previous page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
-        <div class="pg-info">Page <b id="pgCur">1</b> / <b id="pgTot">1</b></div>
-        <div class="pg-dots" id="pgDots"></div>
-        <button class="pg-btn" id="pgNext" type="button" aria-label="Next page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
+      <!-- The games slide exactly like the projects. The track is filled by
+           app.js, which rebuilds it whenever the filter or search changes. -->
+      <div id="gamesSlider" data-slider="manual">
+        <div class="slider-top reveal">
+          <div class="slider-counter">Slide <b class="slider-active">1</b> / <b class="slider-total">1</b></div>
+          <div class="slider-btns">
+            <button class="slider-btn slider-prev" type="button" aria-label="Previous games"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
+            <button class="slider-btn slider-next" type="button" aria-label="Next games"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
+          </div>
+        </div>
+        <div class="slider-view">
+          <div class="slider-track" id="gamesTrack" aria-live="polite"></div>
+        </div>
+        <div class="slider-progress"><div class="slider-progress-fill" style="width:100%"></div></div>
       </div>
     </section>
 

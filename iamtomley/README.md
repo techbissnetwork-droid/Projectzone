@@ -62,13 +62,29 @@ read for everything the card needs:
 - its **description** — from `og:description` or the page's meta description.
 
 Only empty boxes are filled: anything you have already typed is left exactly as
-you wrote it, and you can overwrite any of it afterwards. Leave the image blank
+you wrote it, and you can overwrite any of it afterwards.
+
+**Refresh all from the web** (the button on the Projects page) does the same for
+every project at once. Each site is read in turn and the results appear in a
+table — name, description and picture, all editable — with a tick box per
+project and tick-all / untick-all. Nothing is written until you apply, and a
+picture fetched for a row you did not keep is deleted again. Leave the image blank
 on a new project and the same lookup runs by itself when you save. You can
 always upload your own file or paste a path instead, and **Clear** removes it.
 
 Only public `http`/`https` addresses are ever opened, redirects are limited, and
 downloads are capped — the lookup cannot be pointed at your own server's private
 network. SVGs containing scripts are refused outright.
+
+### Everything slides
+
+Projects, sold projects and games each slide four (or eight) to a view, with
+buttons, swipe, and arrow keys that drive whichever slider you are looking at.
+Each slider is as tall as the slide you are on, so a last slide holding one
+card does not leave empty space below it.
+
+Clicking anywhere on a project card opens its site; the Buy and Preview buttons
+on a for-sale card keep their own behaviour.
 
 ### Sold projects
 

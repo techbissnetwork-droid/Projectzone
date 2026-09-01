@@ -238,7 +238,13 @@ $shown = $filter === 'all'
   if (!projects_has_image($pdo))  { $missing['image']  = "VARCHAR(255) NOT NULL DEFAULT ''"; }
   $hasImage = !isset($missing['image']);
 ?>
-<div class="topbar"><div><h1 class="page-title">Projects</h1><div class="page-sub">Cards in the projects slider — their picture, status and link.</div></div></div>
+<div class="topbar">
+  <div><h1 class="page-title">Projects</h1><div class="page-sub">Cards in the projects slider — their picture, status and link.</div></div>
+  <a class="btn btn-ghost" href="<?= e(url('/admin/detect-all.php')) ?>">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+    Refresh all from the web
+  </a>
+</div>
 <?php if ($missing): ?>
 <div class="panel" style="border-color:rgba(255,200,60,.3)">
   <div class="alert alert-warn" style="margin-bottom:1rem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>

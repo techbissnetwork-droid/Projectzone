@@ -66,6 +66,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     set_setting('projects_coming_soon', isset($_POST['projects_coming_soon']) ? '1' : '0');
     set_setting('seo_noindex', isset($_POST['seo_noindex']) ? '1' : '0');
     set_setting('sold_show_price', isset($_POST['sold_show_price']) ? '1' : '0');
+    $mode = (string) ($_POST['clean_urls_mode'] ?? 'auto');
+    set_setting('clean_urls_mode', in_array($mode, ['auto', 'on', 'off'], true) ? $mode : 'auto');
     flash('Settings saved.');
     touch_content();
     header('Location: ' . url('/admin/settings.php'));
@@ -192,6 +194,33 @@ function s(string $k): string { return e(setting($k)); }
       always match what is on the site — including every project image, so those get indexed too. Submit the sitemap
       address once in Google Search Console and you are done. While maintenance mode or the switch above is on, both
       tell search engines to stay away.
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Web addresses</h2>
+    <div class="grid-2">
+      <div class="field">
+        <label>Hide <code>.php</code> in the address bar</label>
+        <select name="clean_urls_mode">
+          <option value="auto" <?= setting('clean_urls_mode','auto')==='auto'?'selected':'' ?>>Automatic — work it out (recommended)</option>
+          <option value="on"   <?= setting('clean_urls_mode','auto')==='on'  ?'selected':'' ?>>Always hide it</option>
+          <option value="off"  <?= setting('clean_urls_mode','auto')==='off' ?'selected':'' ?>>Never hide it</option>
+        </select>
+        <div class="hint">Hiding <code>.php</code> needs Apache with <code>mod_rewrite</code> and the shipped
+        <code>.htaccess</code> in force. On <strong>Automatic</strong> the site proves that for itself the first
+        time a clean address reaches it, and keeps <code>.php</code> until then. Choose <strong>Always</strong>
+        only if the check below passes.</div>
+      </div>
+      <div class="field">
+        <label>Is your server doing it?</label>
+        <div class="actions" style="margin-top:.35rem">
+          <button class="btn btn-ghost btn-sm" type="button" data-cleanurl-test="#cleanUrlNote">Check my server</button>
+        </div>
+        <div class="detect-note" id="cleanUrlNote">
+          Right now the site is writing links <strong><?= clean_urls() ? 'without' : 'with' ?></strong> <code>.php</code>.
+        </div>
+      </div>
     </div>
   </div>
 

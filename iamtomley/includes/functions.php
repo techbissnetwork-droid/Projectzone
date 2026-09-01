@@ -47,6 +47,11 @@ function clean_urls(): bool
     }
     $on = false;
     try {
+        // "on" and "off" are the admin overriding the guess.
+        $mode = setting('clean_urls_mode', 'auto');
+        if ($mode === 'on')  { $on = true;  return $on; }
+        if ($mode === 'off') { $on = false; return $on; }
+
         if (setting('clean_urls', '') === '1') {
             $on = true;
             return $on;

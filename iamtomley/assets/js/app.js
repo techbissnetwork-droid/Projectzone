@@ -249,14 +249,96 @@
     });
   });
 
-  /* ── Sliders (projects, and sold projects) ─────────────────────────────── */
-  (function sliders() {
-    const roots = $$('[data-slider]');
-    if (!roots.length) return;
-    const modal = $('#gameModal');
-    const made = [];
+  /* ── A whole project card opens its site ───────────────────────────────── */
+  (function clickableCards() {
+    $$('.card[data-href]').forEach(card => {
+      card.addEventListener('click', e => {
+        // Real links and buttons inside the card keep their own behaviour,
+        // so "Buy" and "Preview" are never hijacked.
+        if (e.target.closest('a, button')) return;
+        if (window.getSelection && String(window.getSelection())) return;   // let people select text
+        window.open(card.dataset.href, '_blank', 'noopener');
+      });
+    });
+  })();
 
-    roots.forEach(root => {
+  /* ── Sliders ───────────────────────────────────────────────────────────── */
+  // Projects, sold projects and games all slide the same way. Each registers
+  // here so the arrow keys drive whichever one the reader is looking at.
+  const SLIDERS = [];
+
+  function registerSlider(root, goTo, getCur) {
+    const at = SLIDERS.findIndex(s => s.root === root);
+    const entry = { root, goTo, getCur };
+    if (at >= 0) SLIDERS[at] = entry; else SLIDERS.push(entry);
+  }
+
+  /**
+   * Keep the window over a slider as tall as the slide being shown.
+   *
+   * Slides sit side by side in a flex row, so without this the view is as tall
+   * as the tallest slide and a half-empty last slide leaves a screenful of
+   * nothing underneath. Returns a function to call whenever the slide changes.
+   */
+  function heightFitter(root, track) {
+    const view = $('.slider-view', root);
+    if (!view) return () => {};
+    let index = 0;
+
+    const fit = () => {
+      const slide = track.children[index];
+      if (!slide) return;
+      const h = slide.offsetHeight;
+      if (h > 0) view.style.height = h + 'px';
+    };
+
+    // Cards grow as their images arrive and as the window changes width.
+    if (window.ResizeObserver) {
+      const ro = new ResizeObserver(fit);
+      ro.observe(track);
+      Array.from(track.children).forEach(c => ro.observe(c));
+    }
+    window.addEventListener('resize', fit);
+    window.addEventListener('load', fit);
+    $$('img', track).forEach(img => {
+      if (!img.complete) img.addEventListener('load', fit, { once: true });
+    });
+
+    return (i) => { index = i; fit(); };
+  }
+
+  /** Move a slider on a horizontal swipe. */
+  function bindSwipe(track, move) {
+    let sx = 0;
+    track.addEventListener('touchstart', e => { sx = e.touches[0].clientX; }, { passive: true });
+    track.addEventListener('touchend', e => {
+      const d = sx - e.changedTouches[0].clientX;
+      if (Math.abs(d) > 50) move(d > 0 ? 1 : -1);
+    });
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+    const modal = $('#gameModal');
+    if (modal && modal.classList.contains('open')) return;
+    // Don't hijack the arrow keys while someone is typing in the search box.
+    const tag = (document.activeElement || {}).tagName || '';
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+
+    let best = null, bestSeen = 0;
+    SLIDERS.forEach(s => {
+      const r = s.root.getBoundingClientRect();
+      const seen = Math.max(0, Math.min(r.bottom, innerHeight) - Math.max(r.top, 0));
+      if (seen > bestSeen) { bestSeen = seen; best = s; }
+    });
+    if (best) best.goTo(best.getCur() + (e.key === 'ArrowRight' ? 1 : -1));
+  });
+
+  // Sliders whose slides are already in the HTML. The games one builds its own
+  // slides as you filter, so it opts out with data-slider="manual".
+  (function staticSliders() {
+    $$('[data-slider]').forEach(root => {
+      if (root.dataset.slider === 'manual') return;
       const track = $('.slider-track', root);
       if (!track) return;
       const total = $$('.slide', track).length;
@@ -267,54 +349,38 @@
       const totalEl  = $('.slider-total', root);
       if (totalEl) totalEl.textContent = total;
       let cur = 0;
+      const fitTo = heightFitter(root, track);
 
       function goTo(i) {
         cur = (i + total) % total;
         track.style.transform = `translateX(-${cur * 100}%)`;
         if (activeEl) activeEl.textContent = cur + 1;
         if (fill) fill.style.width = ((cur + 1) / total * 100) + '%';
+        fitTo(cur);
       }
 
       const next = $('.slider-next', root), prev = $('.slider-prev', root);
       if (next) next.addEventListener('click', () => goTo(cur + 1));
       if (prev) prev.addEventListener('click', () => goTo(cur - 1));
-
-      let sx = 0;
-      track.addEventListener('touchstart', e => { sx = e.touches[0].clientX; }, { passive: true });
-      track.addEventListener('touchend', e => {
-        const d = sx - e.changedTouches[0].clientX;
-        if (Math.abs(d) > 50) goTo(d > 0 ? cur + 1 : cur - 1);
-      });
+      bindSwipe(track, d => goTo(cur + d));
 
       goTo(0);
-      made.push({ root, goTo, get cur() { return cur; } });
-    });
-
-    // Arrow keys drive whichever slider the reader is actually looking at,
-    // so two sliders on one page never move together.
-    document.addEventListener('keydown', e => {
-      if (modal && modal.classList.contains('open')) return;
-      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
-      let best = null, bestSeen = 0;
-      made.forEach(s => {
-        const r = s.root.getBoundingClientRect();
-        const seen = Math.max(0, Math.min(r.bottom, innerHeight) - Math.max(r.top, 0));
-        if (seen > bestSeen) { bestSeen = seen; best = s; }
-      });
-      if (best) best.goTo(best.cur + (e.key === 'ArrowRight' ? 1 : -1));
+      registerSlider(root, goTo, () => cur);
     });
   })();
 
-  /* ── Games: render + filter + search + pagination ──────────────────────── */
-  const games = (function gamesModule() {
-    const grid = $('#gamesGrid');
+  /* ── Games: slides + filter + search ───────────────────────────────────── */
+  (function gamesModule() {
+    const root  = $('#gamesSlider');
+    const track = $('#gamesTrack');
     const GAMES = Array.isArray(window.GAMES) ? window.GAMES : [];
-    if (!grid || !GAMES.length) return null;
+    if (!root || !track || !GAMES.length) return;
 
-    const PER_PAGE = 8;
+    const PER_SLIDE = 8;
     const CATS = window.GAME_CATS || {};
     let filtered = [...GAMES];
-    let page = 1, catFilter = 'all', searchQ = '';
+    let cur = 0, total = 1;
+    let byKey = new Map();
 
     // Titles, categories and cover paths are admin-entered — escape before
     // they go anywhere near innerHTML.
@@ -323,25 +389,10 @@
     const catLabel = (k) => CATS[k] || k;
     const keyOf = (g) => String(g.row != null ? 'r' + g.row : 'b' + g.id);
 
-    function skeletons(n) {
-      grid.innerHTML = Array.from({ length: n }, () =>
-        `<div class="game-card skeleton" aria-hidden="true" style="border:1px solid var(--border)"></div>`).join('');
-    }
+    const chrome = () => [$('.slider-top', root), $('.slider-progress', root)];
 
-    function render() {
-      const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
-      page = Math.min(Math.max(page, 1), totalPages);
-      const pager = $('#pager');
-
-      if (!filtered.length) {
-        grid.innerHTML = '<div class="games-empty">No games found 🎮 — try another search.</div>';
-        if (pager) pager.style.display = 'none';
-        return;
-      }
-
-      const items = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
-      grid.style.opacity = '0';
-      grid.innerHTML = items.map(g => `
+    function card(g) {
+      return `
         <button class="game-card" data-key="${esc(keyOf(g))}" aria-label="Play ${esc(g.title)}">
           <span class="game-thumb${g.cover ? ' has-cover' : ''}">
             ${g.cover
@@ -353,38 +404,66 @@
             <span class="game-title">${esc(g.title)}</span>
             <span class="game-badge ${esc(g.cat)}">${esc(catLabel(g.cat))}</span>
           </span>
-        </button>`).join('');
-      requestAnimationFrame(() => { grid.style.opacity = '1'; });
+        </button>`;
+    }
 
-      const byKey = new Map(items.map(g => [keyOf(g), g]));
-      $$('.game-card', grid).forEach(card => card.addEventListener('click', () => {
-        const g = byKey.get(card.dataset.key);
+    let fitTo = () => {};
+    function goTo(i) {
+      cur = (i + total) % total;
+      track.style.transform = `translateX(-${cur * 100}%)`;
+      const activeEl = $('.slider-active', root), fill = $('.slider-progress-fill', root);
+      if (activeEl) activeEl.textContent = cur + 1;
+      if (fill) fill.style.width = ((cur + 1) / total * 100) + '%';
+      fitTo(cur);
+    }
+
+    function skeletons() {
+      total = 1;
+      track.innerHTML = `<div class="slide"><div class="games-grid">${
+        Array.from({ length: PER_SLIDE }, () =>
+          '<div class="game-card skeleton" aria-hidden="true" style="border:1px solid var(--border)"></div>').join('')
+      }</div></div>`;
+    }
+
+    function render() {
+      if (!filtered.length) {
+        track.innerHTML = '<div class="slide"><div class="games-empty">No games found 🎮 — try another search.</div></div>';
+        total = 1;
+        chrome().forEach(el => { if (el) el.style.display = 'none'; });
+        fitTo = heightFitter(root, track);
+        goTo(0);
+        return;
+      }
+
+      const slides = [];
+      for (let i = 0; i < filtered.length; i += PER_SLIDE) slides.push(filtered.slice(i, i + PER_SLIDE));
+      total = slides.length;
+
+      track.style.transition = 'none';
+      track.innerHTML = slides.map(items =>
+        `<div class="slide"><div class="games-grid">${items.map(card).join('')}</div></div>`).join('');
+      requestAnimationFrame(() => { track.style.transition = ''; });
+
+      const totalEl = $('.slider-total', root);
+      if (totalEl) totalEl.textContent = total;
+      chrome().forEach(el => { if (el) el.style.display = total <= 1 ? 'none' : ''; });
+
+      fitTo = heightFitter(root, track);
+      byKey = new Map(filtered.map(g => [keyOf(g), g]));
+      $$('.game-card', track).forEach(c => c.addEventListener('click', () => {
+        const g = byKey.get(c.dataset.key);
         if (g) openGame(g);
       }));
 
-      // pagination UI
-      if (pager) {
-        pager.style.display = totalPages <= 1 ? 'none' : 'flex';
-        $('#pgCur').textContent = page;
-        $('#pgTot').textContent = totalPages;
-        $('#pgPrev').disabled = page === 1;
-        $('#pgNext').disabled = page === totalPages;
-        const dots = $('#pgDots');
-        dots.innerHTML = Array.from({ length: totalPages }, (_, i) =>
-          `<span class="pg-dot${i + 1 === page ? ' on' : ''}" data-p="${i + 1}" role="button" tabindex="0" aria-label="Page ${i + 1}"></span>`).join('');
-        $$('.pg-dot', dots).forEach(d => {
-          const go = () => { page = +d.dataset.p; render(); };
-          d.addEventListener('click', go);
-          d.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
-        });
-      }
+      goTo(Math.min(cur, total - 1));
     }
 
+    let catFilter = 'all', searchQ = '';
     function applyFilter() {
       filtered = GAMES.filter(g =>
         (catFilter === 'all' || g.cat === catFilter) &&
         g.title.toLowerCase().includes(searchQ));
-      page = 1;
+      cur = 0;
       render();
     }
 
@@ -396,16 +475,19 @@
     }));
 
     const searchEl = $('#gameSearch');
-    if (searchEl) searchEl.addEventListener('input', e => { searchQ = e.target.value.toLowerCase().trim(); applyFilter(); });
+    if (searchEl) searchEl.addEventListener('input', e => {
+      searchQ = e.target.value.toLowerCase().trim();
+      applyFilter();
+    });
 
-    const pgPrev = $('#pgPrev'), pgNext = $('#pgNext');
-    if (pgPrev) pgPrev.addEventListener('click', () => { page--; render(); });
-    if (pgNext) pgNext.addEventListener('click', () => { page++; render(); });
+    const next = $('.slider-next', root), prev = $('.slider-prev', root);
+    if (next) next.addEventListener('click', () => goTo(cur + 1));
+    if (prev) prev.addEventListener('click', () => goTo(cur - 1));
+    bindSwipe(track, d => goTo(cur + d));
+    registerSlider(root, goTo, () => cur);
 
-    // initial skeleton → content
-    skeletons(PER_PAGE);
+    skeletons();
     setTimeout(render, prefersReduced ? 0 : 420);
-    return { render };
   })();
 
   /* ── Game modal (blob iframe, fullscreen) ──────────────────────────────── */
