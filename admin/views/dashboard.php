@@ -178,33 +178,34 @@ foreach ($series as $point) {
         <?php endif; ?>
 
         <?php if ($dueSoon): ?>
-        <!-- Work that needs a conversation before it lapses. -->
+        <!-- Domain, hosting, SSL and maintenance renewals — before they lapse. -->
         <div class="panel">
             <div class="panel__head">
                 <div>
-                    <span class="panel__title">Maintenance coming due</span>
-                    <div class="panel__sub">Client projects due in the next 45 days, or already past</div>
+                    <span class="panel__title">Renewals due soon</span>
+                    <div class="panel__sub">Domain, hosting, SSL and maintenance due in the next 30 days, or already past</div>
                 </div>
                 <a class="btn btn--quiet btn--sm" href="<?= e(url('/admin/client_projects')) ?>">All projects</a>
             </div>
             <div class="table-wrap" style="border:0;border-radius:0;background:none">
-                <table class="data-table" style="min-width:560px">
-                    <thead><tr><th>Project</th><th>Client</th><th>Due</th><th class="actions">Get in touch</th></tr></thead>
+                <table class="data-table" style="min-width:620px">
+                    <thead><tr><th>Project</th><th>Client</th><th>Renewal</th><th>Due</th><th class="actions">Get in touch</th></tr></thead>
                     <tbody>
                         <?php foreach ($dueSoon as $row):
-                            $overdue = strtotime((string) $row['maintenance_due']) < strtotime('today');
+                            $overdue = strtotime((string) $row['due_date']) < strtotime('today');
                             $phone   = preg_replace('/[^0-9]/', '', (string) ($row['customer_phone'] ?? '')); ?>
                         <tr>
                             <td><a href="<?= e(url('/admin/client_projects/' . (int) $row['id'] . '/edit')) ?>">
                                 <span class="cell-title"><?= e($row['name']) ?></span>
                                 <span class="cell-sub"><?= e(ucfirst((string) $row['status'])) ?></span></a></td>
                             <td><?= e($row['customer_name'] ?: '—') ?></td>
+                            <td><span class="badge"><?= e($row['due_type']) ?></span></td>
                             <td><span class="status-dot status-dot--<?= $overdue ? 'danger' : 'warn' ?>">
-                                <?= e(format_date($row['maintenance_due'])) ?></span></td>
+                                <?= e(format_date($row['due_date'])) ?></span></td>
                             <td class="actions">
                                 <?php if (filter_var($row['customer_email'] ?? '', FILTER_VALIDATE_EMAIL)): ?>
                                 <a class="icon-btn" title="Email <?= e($row['customer_name']) ?>" aria-label="Email <?= e($row['customer_name']) ?>"
-                                   href="mailto:<?= e($row['customer_email']) ?>?subject=<?= rawurlencode($row['name'] . ' — maintenance') ?>"><?= icon('mail') ?></a>
+                                   href="mailto:<?= e($row['customer_email']) ?>?subject=<?= rawurlencode($row['name'] . ' — ' . $row['due_type']) ?>"><?= icon('mail') ?></a>
                                 <?php endif; ?>
                                 <?php if (strlen((string) $phone) >= 8): ?>
                                 <a class="icon-btn" title="WhatsApp <?= e($row['customer_name']) ?>" aria-label="WhatsApp <?= e($row['customer_name']) ?>"

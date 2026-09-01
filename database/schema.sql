@@ -536,6 +536,8 @@ CREATE TABLE IF NOT EXISTS `client_projects` (
   `live_url`         VARCHAR(255) NOT NULL DEFAULT '',
   `hosting`          VARCHAR(190) NOT NULL DEFAULT '',
   `domain_renews_on` DATE         NULL,
+  `hosting_renews_on` DATE        NULL,
+  `ssl_expires_on`   DATE         NULL,
   `started_on`       DATE         NULL,
   `launched_on`      DATE         NULL,
   `maintenance_due`  DATE         NULL,

@@ -46,16 +46,7 @@ final class DashboardController extends BaseAdminController
         // The point of the job book: work that needs a conversation soon, with
         // the client's own contact details beside it.
         $dueSoon = \Techbiss\Core\Auth::can('customers.manage')
-            ? $db->all(
-                "SELECT p.id, p.name, p.maintenance_due, p.status, p.live_url,
-                        c.name AS customer_name, c.email AS customer_email, c.phone AS customer_phone
-                 FROM client_projects p
-                 LEFT JOIN customers c ON c.id = p.customer_id
-                 WHERE p.maintenance_due IS NOT NULL
-                   AND p.status <> 'ended'
-                   AND p.maintenance_due <= DATE_ADD(CURDATE(), INTERVAL 45 DAY)
-                 ORDER BY p.maintenance_due ASC LIMIT 6"
-            )
+            ? array_slice((new \Techbiss\Repo\ClientProjectRepo())->dueSoon(30), 0, 8)
             : [];
 
         $this->view->render('dashboard', [
