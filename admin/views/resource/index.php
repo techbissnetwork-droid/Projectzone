@@ -3,6 +3,17 @@
 $key       = $resourceKey;
 $orderable = !empty($resource['orderable']);
 $query     = array_filter(['q' => $search, 'status' => $status]);
+// Only resources with a real is_published column filter by it — showing the
+// control on one that has no such column (client_projects, for one, uses a
+// `status` enum instead) would let an admin "filter" and silently get back
+// the unfiltered list with no sign anything was ignored.
+$hasStatusFilter = false;
+foreach ($resource['columns'] as $col) {
+    if (($col['key'] ?? '') === 'is_published') {
+        $hasStatusFilter = true;
+        break;
+    }
+}
 ?>
 <div class="page-header">
     <div>
@@ -30,12 +41,14 @@ $query     = array_filter(['q' => $search, 'status' => $status]);
     </div>
     <?php endif; ?>
 
+    <?php if ($hasStatusFilter): ?>
     <label class="sr-only" for="res-status">Status</label>
     <select class="select" id="res-status" name="status" data-autosubmit style="max-width:150px">
         <option value="">All statuses</option>
         <option value="published" <?= $status === 'published' ? 'selected' : '' ?>>Published</option>
         <option value="draft" <?= $status === 'draft' ? 'selected' : '' ?>>Draft</option>
     </select>
+    <?php endif; ?>
 
     <?php if ($search !== '' || $status !== ''): ?>
     <a class="btn btn--quiet btn--sm" href="<?= e(url('/admin/' . $key)) ?>">Clear</a>
