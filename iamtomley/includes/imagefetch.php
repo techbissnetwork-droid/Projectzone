@@ -253,13 +253,16 @@ function image_candidates(string $html, string $pageUrl): array
         }
     }
 
+    // 'guess' marks the conventional /favicon.ico we try even when the page
+    // never mentioned it — so a site with no artwork at all can be told apart
+    // from one whose artwork simply would not download.
     $out = [];
-    $push = static function (?string $href, string $kind) use (&$out, $pageUrl): void {
+    $push = static function (?string $href, string $kind, bool $guess = false) use (&$out, $pageUrl): void {
         if ($href === null || $href === '') { return; }
         $abs = absolute_url($href, $pageUrl);
         if ($abs === null) { return; }
         foreach ($out as $existing) { if ($existing['url'] === $abs) { return; } }
-        $out[] = ['url' => $abs, 'kind' => $kind];
+        $out[] = ['url' => $abs, 'kind' => $kind, 'guess' => $guess];
     };
 
     // 1. Social preview images — usually the nicest, biggest artwork.
@@ -285,8 +288,9 @@ function image_candidates(string $html, string $pageUrl): array
     usort($icons, static fn($a, $b) => $b['score'] <=> $a['score']);
     foreach ($icons as $i) { $push($i['href'], $i['kind']); }
 
-    // 3. Last resort: the conventional /favicon.ico at the site root.
-    $push('/favicon.ico', 'Favicon');
+    // 3. Last resort: the conventional /favicon.ico at the site root, whether
+    //    or not the page linked to it.
+    $push('/favicon.ico', 'Favicon', true);
 
     return $out;
 }
@@ -374,11 +378,17 @@ function detect_site_image(string $url, string $prefix = 'site'): array
     } else {
         // The page itself would not load; still try the conventional favicon.
         $root = absolute_url('/favicon.ico', $url);
-        if ($root !== null) { $candidates = [['url' => $root, 'kind' => 'Favicon']]; }
+        if ($root !== null) { $candidates = [['url' => $root, 'kind' => 'Favicon', 'guess' => true]]; }
     }
 
     if (!$candidates) {
         return $fail('No logo or preview image was found on that site.');
+    }
+
+    // Did the page actually point at any artwork, or are we only guessing?
+    $named = false;
+    foreach ($candidates as $c) {
+        if (empty($c['guess'])) { $named = true; break; }
     }
 
     foreach ($candidates as $c) {
@@ -394,7 +404,9 @@ function detect_site_image(string $url, string $prefix = 'site'): array
         return ['ok' => true, 'path' => $path, 'source' => $c['url'], 'kind' => $c['kind'], 'error' => ''];
     }
 
-    return $fail('An image was listed but none of them could be downloaded.');
+    return $fail($named
+        ? 'That site lists an image, but it could not be downloaded.'
+        : 'No logo or preview image was found on that site.');
 }
 
 /**
