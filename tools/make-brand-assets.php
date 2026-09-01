@@ -109,9 +109,16 @@ function gradientAt(float $t): array
  * @param bool  $rings  draw the orbit rings (dropped below ~48px, where they
  *                      only add noise once the browser downsamples)
  * @param float $bleed  0 for a normal icon; ~0.1 for a maskable icon, which
- *                      platforms crop to a circle
+ *                      insets the glyph into the platform's circular safe zone
+ * @param bool  $fullBleedBg  fill the entire canvas with the gradient, corner to
+ *                      corner, instead of a rounded tile. Maskable icons need this:
+ *                      the OS applies its own shape mask over the full square, so
+ *                      any part of the asset that is not opaque out to the edge
+ *                      shows through as a gap once that mask is not our rounded
+ *                      rect — a circle mask in particular reaches past where our
+ *                      own corners would have been transparent.
  */
-function renderMark(int $size, bool $rings = true, float $bleed = 0.0, bool $heavyGlyph = false): \GdImage
+function renderMark(int $size, bool $rings = true, float $bleed = 0.0, bool $heavyGlyph = false, bool $fullBleedBg = false): \GdImage
 {
     $im = canvas($size, $size);
 
@@ -120,7 +127,11 @@ function renderMark(int $size, bool $rings = true, float $bleed = 0.0, bool $hea
     $tileW = $size - $inset * 2;
     $radius = $tileW * ($heavyGlyph ? 0.22 : 0.24);
 
-    $tileMask = coverageMask($size, function (\GdImage $im, int $white, float $s) use ($bleed, $radius, $size): void {
+    $tileMask = coverageMask($size, function (\GdImage $im, int $white, float $s) use ($bleed, $radius, $size, $fullBleedBg): void {
+        if ($fullBleedBg) {
+            imagefilledrectangle($im, 0, 0, (int) round($s), (int) round($s), $white);
+            return;
+        }
         $k = $s / $size;
         roundedRect($im, $bleed * $s, $bleed * $s, $s - $bleed * 2 * $s, $s - $bleed * 2 * $s, $radius * $k, $white);
     });
@@ -429,8 +440,9 @@ foreach ([16, 32, 48] as $s) {
 save(renderMark(180), 'apple-touch-icon.png');
 save(renderMark(192), 'icon-192.png');
 save(renderMark(512), 'icon-512.png');
-// Maskable icons are cropped to a circle by Android, so the mark is inset.
-save(renderMark(512, true, 0.10), 'icon-maskable-512.png');
+// Maskable icons are cropped to a circle by Android, so the glyph is inset
+// into the safe zone, but the background must stay opaque edge to edge.
+save(renderMark(512, true, 0.10, false, true), 'icon-maskable-512.png');
 writeIco([16, 32, 48], 'favicon.ico');
 
 echo "\nLogo rasters\n";

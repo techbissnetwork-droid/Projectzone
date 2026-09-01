@@ -73,6 +73,9 @@ final class SiteController
             'url'         => absolute_url('/'),
             'description' => $settings->get('seo_default_description'),
             'slogan'      => $settings->get('tagline'),
+            // Google's structured data guidelines want this on Organization for
+            // the knowledge panel — a square image, crawlable, no query string.
+            'logo'        => absolute_url('assets/images/brand/logo-mark-256.png'),
             'email'       => $settings->get('contact_email'),
             'telephone'   => $settings->get('contact_phone'),
             'sameAs'      => array_column($settings->socialLinks(), 'url'),
