@@ -104,7 +104,7 @@ View::topbar('');
   </section>
 
   <?php if ($gapRows): ?>
-  <section class="panel">
+  <section class="panel reveal">
     <h2>Data quality</h2>
     <p class="hint-p">Gaps detected in cached candle series. Missing bars are repaired automatically
       from the exchange; a series listed here was recently incomplete, which is worth knowing before

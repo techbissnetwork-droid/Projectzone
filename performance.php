@@ -517,7 +517,7 @@ CSS;
       appear automatically as signals resolve. Check back soon.</p>
   <?php else: ?>
   <?php if ($showStats): ?>
-  <div class="perf-stats">
+  <div class="perf-stats reveal">
     <?php // Three numbers by default, four with the detailed record on.
           //
           // Profit factor is expectancy expressed as a ratio, so it is not
@@ -533,7 +533,7 @@ CSS;
           // Nothing else read $maxDd, so the arithmetic went with it. ?>
     <div class="pstat"><b class="<?= ($avgR ?? 0) >= 0 ? 'r-pos' : 'r-neg' ?>"><?= $avgR !== null ? ($avgR > 0 ? '+' : '') . $avgR : '—' ?></b><span>average R per signal</span></div>
     <div class="pstat"><b><?= $winrate !== null ? $winrate . '%' : '—' ?></b><span>win rate</span></div>
-    <div class="pstat"><b><?= $total ?></b><span>verified signals</span></div>
+    <div class="pstat"><b class="cnt" data-n="<?= (int)$total ?>">0</b><span>verified signals</span></div>
     <?php if ($perfDetail): ?>
       <?php // Null when nothing has lost yet: with no gross loss the ratio is a
             // division by zero, and "infinite" is not a track record, it is a
@@ -574,7 +574,7 @@ CSS;
         // and publishing nothing are both defensible; publishing a losing
         // record dressed up as a winning one is not, so that is the one thing
         // this box will not do. ?>
-  <div class="perf-confidence <?= $proven ? ($rCi[0] > 0 ? 'ok' : 'bad') : 'unproven' ?>">
+  <div class="perf-confidence reveal <?= $proven ? ($rCi[0] > 0 ? 'ok' : 'bad') : 'unproven' ?>">
     <strong><?= $proven
       ? ($rCi[0] > 0
           ? 'Statistically significant result over ' . $total . ' verified signals'
@@ -620,6 +620,16 @@ CSS;
   <?php endif; ?>
 
   <?php if ($showBreak): ?>
+  <?php // One reveal for the whole breakdowns block, not one per table: the
+        // headings inside it (.perf-slide-h) are walked sibling-by-sibling by
+        // the carousel builder in ui.js, which groups each heading with the
+        // elements up to the next h2 - splitting this into several reveal
+        // wrappers would put each heading in its own subtree and break that
+        // walk (or silently swallow every slide but the first once the
+        // carousel reparents them). One wrapper preserves the exact sibling
+        // order the carousel depends on and still gets the section a single
+        // scroll-triggered fade-in. ?>
+  <div class="reveal">
   <?php
   $byTf = $pdo->query(
       "SELECT tf, COUNT(*) t,
@@ -950,6 +960,7 @@ CSS;
         // actually act on - open the coin, see the current chart, trade it.
         // Same data, same 'perf_coins' gate (see Gate::FEATURES), one place
         // it lives now rather than two. ?>
+  </div>
   <?php endif; ?>
 
   <?php if ($showTrades): ?>

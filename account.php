@@ -894,6 +894,7 @@ ob_start();
         $refDays = (int)sma_setting('referral_days', '7');
         $refBase = rtrim(sma_setting('site_url'), '/');
       ?>
+      <div class="reveal">
       <p class="sub" style="margin-top:20px;margin-bottom:6px"><strong style="color:var(--text)">Invite a friend</strong></p>
       <p class="sub" style="font-size:11.5px">When someone who signs up through your link makes their
         first payment, you both get <strong><?= $refDays ?> days</strong> of premium.</p>
@@ -912,11 +913,15 @@ ob_start();
           you have earned <strong><?= (int)$refStats['converted'] * $refDays ?> days</strong>.
         <?php endif; ?>
       </p>
+      </div>
       <?php endif; ?>
 
       <?php // Telegram delivery is gated like the rest - see Admin >
             // Settings > What free and premium accounts get. Shown-but-locked
             // rather than hidden, so a free member knows the channel exists. ?>
+      <?php if (\SignalMasterAi\Telegram::enabled()): ?>
+      <div class="reveal">
+      <?php endif; ?>
       <?php if (\SignalMasterAi\Telegram::enabled()
                 && !\SignalMasterAi\Gate::allows('telegram', $member['tier'])): ?>
         <p class="sub" style="margin-top:20px;margin-bottom:6px"><strong style="color:var(--text)">Telegram alerts <span class="nav-lock"></span></strong></p>
@@ -951,8 +956,12 @@ ob_start();
           <?php endif; ?>
         <?php endif; ?>
       <?php endif; ?>
+      <?php if (\SignalMasterAi\Telegram::enabled()): ?>
+      </div>
+      <?php endif; ?>
 
       <?php if ($member['tier'] === 'paid' && sma_setting('api_feed_enabled', '1') === '1'): ?>
+      <div class="reveal">
         <p class="sub" style="margin-top:20px;margin-bottom:6px"><strong style="color:var(--text)">Signals API (premium)</strong></p>
         <?php if (!empty($_SESSION['api_token_show'])): ?>
           <?php // A token plainly exists here - it's shown two lines down -
@@ -1020,6 +1029,7 @@ ob_start();
             tap <strong>Take</strong> on the message. The bot is yours, made with @BotFather in a
             minute &mdash; it is not this site's bot, which only delivers alerts.</p>
         </details>
+      </div>
       <?php endif; ?>
 
       <?php
@@ -1060,6 +1070,7 @@ ob_start();
       };
       ?>
       <?php if ($myPays): ?>
+      <div class="reveal">
       <p class="sub" style="margin-top:20px;margin-bottom:6px"><strong style="color:var(--text)">Your payments</strong></p>
       <?php foreach ($myPays as $p): ?>
         <div class="perk" style="justify-content:space-between;gap:10px;align-items:flex-start">
@@ -1081,6 +1092,7 @@ ob_start();
         <p class="sub" style="font-size:12px;margin-top:4px">
           <a href="account.php" style="color:var(--accent)">Show fewer</a></p>
       <?php endif; ?>
+      </div>
       <?php endif; ?>
       <a class="back" href="account.php?logout=1">Log out</a>
 

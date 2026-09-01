@@ -200,15 +200,16 @@ View::topbar('');
            needs to finish.</p>
       </div>
     <?php else: ?>
+      <div class="reveal">
       <div class="stat-row">
         <div class="stat"><b class="<?= ($expectancy ?? 0) >= 0 ? 'pos' : 'neg' ?>">
           <?= $expectancy !== null ? ($expectancy > 0 ? '+' : '') . $expectancy : '—' ?></b>
           <span>expectancy (R)</span></div>
         <div class="stat"><b><?= $report['winrate'] !== null ? $report['winrate'] . '%' : '—' ?></b><span>win rate</span></div>
-        <div class="stat"><b><?= (int)$report['signals'] ?></b><span>simulated signals</span></div>
-        <div class="stat"><b class="pos"><?= (int)$report['confirmed'] ?></b><span>hit target</span></div>
-        <div class="stat"><b class="neg"><?= (int)$report['invalid'] ?></b><span>stopped out</span></div>
-        <div class="stat"><b><?= (int)$report['expired'] ?></b><span>expired</span></div>
+        <div class="stat"><b class="cnt" data-n="<?= (int)$report['signals'] ?>">0</b><span>simulated signals</span></div>
+        <div class="stat"><b class="pos cnt" data-n="<?= (int)$report['confirmed'] ?>">0</b><span>hit target</span></div>
+        <div class="stat"><b class="neg cnt" data-n="<?= (int)$report['invalid'] ?>">0</b><span>stopped out</span></div>
+        <div class="stat"><b class="cnt" data-n="<?= (int)$report['expired'] ?>">0</b><span>expired</span></div>
       </div>
       <p class="stat-note">
         <?= sma_e($symbol) ?> on <?= sma_e($tf) ?>: <?= $decided ?> setups resolved either way.
@@ -218,12 +219,14 @@ View::topbar('');
           <strong>This is a small sample.</strong> Treat it as a sketch, not a measurement.
         <?php endif; ?>
       </p>
+      </div>
       <?php
       $exc = is_array($report['excursion'] ?? null) ? $report['excursion'] : [];
       $win = $exc['win'] ?? ['n' => 0];
       $loss = $exc['loss'] ?? ['n' => 0];
       ?>
       <?php if ((int)($win['n'] ?? 0) > 0 || (int)($loss['n'] ?? 0) > 0): ?>
+        <div class="reveal">
         <h2 class="sec">How the trades behaved</h2>
         <div class="stat-row">
           <div class="stat"><b class="neg"><?= $win['avg_mae'] !== null ? $win['avg_mae'] : '—' ?>R</b>
@@ -241,6 +244,7 @@ View::topbar('');
           away from being losers; winners that barely go offside mean the entries are early enough
           to matter. The same figure for losers says how often they were nearly right.
         </p>
+        </div>
       <?php endif; ?>
       <p class="hint-p">Simulated on history this server happens to hold, with chart rules only, so
         it will not match live results exactly. Past behaviour does not predict future results.</p>

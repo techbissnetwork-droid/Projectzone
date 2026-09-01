@@ -688,6 +688,7 @@ input[type=file], textarea.note { width: 100%; margin-top: 6px; padding: 10px; b
         $benefits = \SignalMasterAi\Premium::benefits();
         ?>
         <?php if ($benefits): ?>
+        <div class="reveal">
           <h2 class="sec">What Premium gives you</h2>
           <ul class="perk-list">
             <?php foreach ($benefits as $b): ?>
@@ -697,6 +698,7 @@ input[type=file], textarea.note { width: 100%; margin-top: 6px; padding: 10px; b
           </ul>
           <p class="sub">Your free account keeps everything it already has &mdash; the signals, the
             verified record and the alerts. Premium adds the list above.</p>
+        </div>
         <?php endif; ?>
 
         <?php // NOTHING TO SELL SOMEBODY WHO ALREADY OWNS IT OUTRIGHT.
@@ -715,6 +717,7 @@ input[type=file], textarea.note { width: 100%; margin-top: 6px; padding: 10px; b
             choose and nothing to pay. <a href="account.php" style="color:var(--accent)">Back to your
             account</a>.</p>
         <?php else: ?>
+        <div class="reveal">
         <h2 class="sec"><?= $benefits ? 'Choose your plan' : '1 &middot; Choose your plan' ?></h2>
         <?php if (!$plans): ?><p class="sub">No plans available - the admin has not created any yet.</p><?php endif; ?>
         <div class="plan-grid">
@@ -731,7 +734,9 @@ input[type=file], textarea.note { width: 100%; margin-top: 6px; padding: 10px; b
           </label>
           <?php endforeach; ?>
         </div>
+        </div>
 
+        <div class="reveal">
         <h2 class="sec">2 &middot; Choose payment method</h2>
         <div class="pm-list">
           <?php foreach ($autoMethods as $idx => $m): ?>
@@ -765,8 +770,10 @@ input[type=file], textarea.note { width: 100%; margin-top: 6px; padding: 10px; b
             <p class="sub">No payment methods are configured yet - contact the site operator.</p>
           <?php endif; ?>
         </div>
+        </div>
 
         <?php if ($plans && ($autoMethods || $extraGateways || $manualMethods)): ?>
+        <div class="reveal">
         <h2 class="sec">3 &middot; Coupon code (optional)</h2>
         <input type="text" name="coupon" placeholder="e.g. LAUNCH20" autocomplete="off"
                style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;box-sizing:border-box;text-transform:uppercase">
@@ -782,6 +789,7 @@ input[type=file], textarea.note { width: 100%; margin-top: 6px; padding: 10px; b
         <p class="hint" id="slowpay" style="display:none;margin-top:10px">This is taking longer than
           usual. The payment gateway may not be reachable from this server &mdash; you can wait, or
           go back and choose another payment method.</p>
+        </div>
         <?php endif; ?>
         <?php endif;   // $isLifetime - the whole purchase flow above ?>
       </form>

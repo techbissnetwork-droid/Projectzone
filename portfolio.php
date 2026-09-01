@@ -293,7 +293,7 @@ View::topbar('portfolio');
   </section>
 
   <?php if ($summary['trades'] === 0 && $summary['open'] === 0): ?>
-    <div class="panel empty-state">
+    <div class="panel empty-state reveal">
       <h2>No positions yet</h2>
       <p>Open a chart and use <strong>Paper-trade this signal</strong> on any BUY or SELL setup. You
          choose how much of your balance to commit and whether to enter at the signal's price or the
@@ -302,22 +302,22 @@ View::topbar('portfolio');
     </div>
   <?php else: ?>
 
-  <div class="stat-row">
-    <div class="stat"><b><?= (int)$summary['trades'] ?></b><span>closed trades</span></div>
+  <div class="stat-row reveal">
+    <div class="stat"><b class="cnt" data-n="<?= (int)$summary['trades'] ?>">0</b><span>closed trades</span></div>
     <div class="stat"><b><?= $summary['winrate'] !== null ? $summary['winrate'] . '%' : '—' ?></b><span>win rate</span></div>
     <div class="stat"><b class="<?= ($summary['expectancy'] ?? 0) >= 0 ? 'pos' : 'neg' ?>">
       <?= $summary['expectancy'] !== null ? ($summary['expectancy'] > 0 ? '+' : '') . $summary['expectancy'] : '—' ?></b>
       <span>expectancy (R)</span></div>
     <div class="stat"><b><?= $summary['profit_factor'] !== null ? $summary['profit_factor'] : '—' ?></b><span>profit factor</span></div>
     <div class="stat"><b class="neg">−<?= sma_e((string)$summary['max_drawdown_r']) ?></b><span>max drawdown (R)</span></div>
-    <div class="stat"><b><?= (int)$summary['open'] ?></b><span>open now</span></div>
+    <div class="stat"><b class="cnt" data-n="<?= (int)$summary['open'] ?>">0</b><span>open now</span></div>
   </div>
   <p class="stat-note">Expectancy is average R per trade — the number that decides whether a system
      makes money. A 40% win rate at 2R beats a 60% win rate at 0.5R, which is why win rate alone is
      shown here as a secondary figure.</p>
 
   <?php if (count($curve) > 1): ?>
-  <section class="panel">
+  <section class="panel reveal">
     <h2>Equity curve <span class="h2-sub">cumulative R</span></h2>
     <?php
     $vals = array_column($curve, 'equity');
@@ -347,7 +347,7 @@ View::topbar('portfolio');
   <?php endif; ?>
 
   <?php if ($open): ?>
-  <section class="panel table-panel">
+  <section class="panel table-panel reveal">
     <h2>Open positions</h2>
     <!-- One card per position instead of a nine-column table. The table only
          fitted by scrolling sideways, which hid the columns that matter, and
@@ -476,7 +476,7 @@ View::topbar('portfolio');
   <?php endif; ?>
 
   <?php if ($paperSum['trades'] > 0 && $liveSum['trades'] > 0): ?>
-  <section class="panel">
+  <section class="panel reveal">
     <h2>Followed signals vs your own trades</h2>
     <p class="hint-p">The comparison that actually matters: whether following the engine works better
       than your own judgement, measured the same way for both.</p>
@@ -502,7 +502,7 @@ View::topbar('portfolio');
   <?php endif; ?>
 
   <?php if ($closed): ?>
-  <section class="panel table-panel">
+  <section class="panel table-panel reveal">
     <h2>Closed trades</h2>
     <!-- Cards, like the open positions. An eight-column table needed sideways
          scrolling on a phone, which put the result and the P&L - the two
@@ -584,7 +584,7 @@ View::topbar('portfolio');
   <?php endif; ?>
   <?php endif; ?>
 
-  <section class="panel">
+  <section class="panel reveal">
     <h2>Log a trade</h2>
     <p class="hint-p">See how your own trades stack up — scored the same way as every signal on this
       site. Entry and stop are enough; the result settles itself as the price plays out.</p>
