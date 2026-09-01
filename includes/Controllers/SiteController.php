@@ -754,6 +754,7 @@ final class SiteController
             'related'   => $repo->related($project, 3),
             'countries' => self::countries(),
             'sent'      => $request->queryString('sent') === '1',
+            'ready'     => [],
         ]);
     }
 
@@ -903,7 +904,54 @@ final class SiteController
             (string) $v->get('email')
         );
 
+        // The enquiry is saved and the admin notified either way. When WhatsApp
+        // was the chosen channel, hand the visitor straight into the chat with
+        // the message pre-filled, the same way /request does — rather than
+        // making them wait for a reply to a form that already knows what to say.
+        if ($v->get('preferred_contact', '') === 'whatsapp') {
+            $message = self::projectOrderMessage(
+                $reference,
+                (string) $project['name'],
+                $v->get('name'),
+                $v->get('business_name', ''),
+                $v->get('domain_name', ''),
+                $v->get('requirements', '')
+            );
+            $wa = whatsapp_link($message);
+            if ($wa !== '') {
+                $this->view->render('premade-project-detail', [
+                    'project'   => $project,
+                    'related'   => $repo->related($project, 3),
+                    'countries' => self::countries(),
+                    'sent'      => false,
+                    'ready'     => ['link' => $wa, 'channel' => 'whatsapp', 'message' => $message],
+                ]);
+                return;
+            }
+        }
+
         $this->formSuccess($request, $target . '?sent=1', 'Thanks — we have your enquiry and will be in touch shortly.');
+    }
+
+    /** The WhatsApp message for a premade-project order, so the chat opens already saying what was asked for. */
+    public static function projectOrderMessage(string $reference, string $project, string $name, string $business, string $domain, string $requirements): string
+    {
+        $who = trim($name . ($business !== '' ? ' (' . $business . ')' : ''));
+
+        $lines = ['Hi ' . App::settings()->get('site_name', 'TECHBISS') . ','];
+        $lines[] = 'I would like to order "' . $project . '" (Ref: ' . $reference . ').';
+        if ($who !== '') {
+            $lines[] = 'I am ' . $who . '.';
+        }
+        if ($domain !== '') {
+            $lines[] = 'Domain: ' . $domain . '.';
+        }
+        if ($requirements !== '') {
+            $lines[] = $requirements;
+        }
+        $lines[] = 'Please confirm the price and how we get started.';
+
+        return implode("\n", $lines);
     }
 
     // =================================================================

@@ -5,7 +5,7 @@
  * Deliberately price-free. Buying is a conversation, so the page ends with the
  * channels the business actually answers on rather than a checkout.
  *
- * @var array $project @var array $related @var array $countries @var bool $sent
+ * @var array $project @var array $related @var array $countries @var bool $sent @var array $ready
  * @var \Techbiss\Repo\SettingsRepo $settings
  */
 $hero     = media_url($project['hero_image'] ?: $project['thumbnail']);
@@ -292,7 +292,19 @@ $meta = array_filter([
             <p class="lead">We reply with a price and a date. Nothing is charged here.</p>
         </div>
 
-        <?php if ($sent): ?>
+        <?php if ($ready): ?>
+        <div class="card card--pad-lg mt-6" data-reveal>
+            <p class="eyebrow mb-3">Your message is ready</p>
+            <pre class="request-preview"><?= e($ready['message']) ?></pre>
+            <div class="card__footer stack stack-2">
+                <a class="btn btn--primary btn--lg btn--block" href="<?= e($ready['link']) ?>"
+                   target="_blank" rel="noopener noreferrer" data-auto-open>
+                    <?= icon('whatsapp') ?>Open WhatsApp
+                </a>
+            </div>
+            <p class="hint mt-4">It should open by itself. If it does not, use the button — or copy the text above and send it however you like.</p>
+        </div>
+        <?php elseif ($sent): ?>
         <div class="notice mt-6" role="status">
             <?= icon('check-circle') ?>
             <span><strong style="color:var(--text)">Got it.</strong> We have your enquiry about <?= e($project['name']) ?> and will reply shortly.</span>
