@@ -264,3 +264,14 @@ UPDATE `settings` SET `label` = 'WhatsApp number or chat link',
 UPDATE `page_sections` SET `subheading` = 'Everything you need to run your business online, delivered as one setup — domain, hosting, the site, email, and the app you have in mind.'
   WHERE `page_key` = 'home' AND `section_key` = 'services'
     AND `subheading` = 'Ten services — your domain and website, custom web and mobile apps, and the work that keeps them running.';
+
+-- "Website Setup" read as configuration work on an existing site — leading
+-- with domain/hosting undersold that a custom site is designed and built
+-- here too, not just plugged together.
+UPDATE `services` SET
+  `name` = 'Website Design & Setup',
+  `tagline` = 'We build the website — any kind, from scratch — then set up everything it needs to run.',
+  `short_description` = 'A custom website, designed and built around your business, not a template. Then everything it needs to run: domain, hosting, DNS and SSL, professional email on your own domain, and an online store if you sell products. Built and launched together, not sold piece by piece.',
+  `description` = '<p>Whatever site you need — a marketing site, a booking or ordering site, a full online store — we design and build it around what your business does and what a visitor needs to decide, responsive from the first breakpoint. This is not a template with your logo dropped in.</p><p>Once it is built, we set up everything around it: your domain registered in your name, DNS pointed correctly, managed hosting with SSL installed and renewed automatically, and professional email on your own domain. If you sell products, the store — catalogue, checkout, payments — is built into the same site. One job, one team, one thing to maintain.</p>',
+  `deliverables` = 'Custom-designed, responsive website — built for what your business does, not a template\nEditable CMS so you can update content yourself\nDomain registered in your name, DNS configured\nManaged hosting with SSL installed and auto-renewed\nProfessional email on your domain (SPF, DKIM, DMARC configured)\nOnline store with catalogue, checkout and payments, if you sell products\nContact and enquiry forms\nDaily backups and uptime monitoring\nAnalytics and Search Console setup'
+  WHERE `slug` = 'business-website' AND `name` = 'Website Setup';

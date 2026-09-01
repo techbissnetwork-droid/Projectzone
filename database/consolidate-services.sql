@@ -10,11 +10,11 @@
 -- it already applied is a harmless no-op, not an error.
 
 UPDATE services SET
-  name = 'Website Setup',
-  tagline = 'Domain, hosting, the site itself and business email — set up and launched as one job.',
-  short_description = 'Everything to run your business online: domain, hosting, DNS and SSL, a custom-built website, professional email on your own domain, and an online store if you sell products. Set up and launched together, not sold piece by piece.',
-  description = '<p>Your domain is the one asset that stays with you, so we register it in your name, point DNS correctly, and provision managed hosting with SSL installed and renewed automatically. The website itself is built around what your business does and what a visitor needs to decide — responsive from the first breakpoint, with a CMS so you can edit it yourself.</p><p>Professional email on your own domain is included, configured so it actually reaches the inbox. If you sell products, we build the store into the same site — catalogue, checkout, payments and the order tooling behind them. One job, one team, one thing to maintain.</p>',
-  deliverables = 'Domain registered in your name, DNS configured\nManaged hosting with SSL installed and auto-renewed\nCustom-designed, responsive website with an editable CMS\nProfessional email on your domain (SPF, DKIM, DMARC configured)\nOnline store with catalogue, checkout and payments, if you sell products\nContact and enquiry forms\nDaily backups and uptime monitoring\nAnalytics and Search Console setup'
+  name = 'Website Design & Setup',
+  tagline = 'We build the website — any kind, from scratch — then set up everything it needs to run.',
+  short_description = 'A custom website, designed and built around your business, not a template. Then everything it needs to run: domain, hosting, DNS and SSL, professional email on your own domain, and an online store if you sell products. Built and launched together, not sold piece by piece.',
+  description = '<p>Whatever site you need — a marketing site, a booking or ordering site, a full online store — we design and build it around what your business does and what a visitor needs to decide, responsive from the first breakpoint. This is not a template with your logo dropped in.</p><p>Once it is built, we set up everything around it: your domain registered in your name, DNS pointed correctly, managed hosting with SSL installed and renewed automatically, and professional email on your own domain. If you sell products, the store — catalogue, checkout, payments — is built into the same site. One job, one team, one thing to maintain.</p>',
+  deliverables = 'Custom-designed, responsive website — built for what your business does, not a template\nEditable CMS so you can update content yourself\nDomain registered in your name, DNS configured\nManaged hosting with SSL installed and auto-renewed\nProfessional email on your domain (SPF, DKIM, DMARC configured)\nOnline store with catalogue, checkout and payments, if you sell products\nContact and enquiry forms\nDaily backups and uptime monitoring\nAnalytics and Search Console setup'
 WHERE slug = 'business-website';
 
 UPDATE services SET
