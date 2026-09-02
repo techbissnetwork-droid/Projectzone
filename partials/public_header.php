@@ -18,6 +18,9 @@ $fontB = Settings::get('font_body', 'Inter');
 $families = array_values(array_unique(array_filter([$fontD, $fontB], static fn($f) => $f !== 'system')));
 $radius = ['sharp' => ['6px','10px','14px','18px'], 'normal' => ['10px','16px','22px','30px'],
            'round' => ['14px','22px','30px','40px']][Settings::get('radius_scale', 'normal')] ?? ['10px','16px','22px','30px'];
+/* How much scrolling the two pinned sections take. */
+$pace = ['compact' => ['230vh','260vh'], 'standard' => ['300vh','340vh'],
+         'cinematic' => ['440vh','500vh']][Settings::get('scroll_pace', 'standard')] ?? ['300vh','340vh'];
 ?><!doctype html>
 <html lang="en" class="no-js">
 <head>
@@ -55,6 +58,7 @@ if ($og): ?><meta property="og:image" content="<?= e($og) ?>"><?php endif; ?>
   --tx:<?= e(Settings::get('text_primary', '#EEF1F6')) ?>;
   --tx-2:<?= e(Settings::get('text_muted', '#98A1B0')) ?>;
   --r-s:<?= e($radius[0]) ?>; --r-m:<?= e($radius[1]) ?>; --r-l:<?= e($radius[2]) ?>; --r-xl:<?= e($radius[3]) ?>;
+  --track-shift:<?= e($pace[0]) ?>; --track-proc:<?= e($pace[1]) ?>;
   --ff-d:<?= $fontD === 'system' ? 'system-ui, sans-serif' : '"' . e($fontD) . '", "Inter", system-ui, sans-serif' ?>;
   --ff-b:<?= $fontB === 'system' ? 'system-ui, sans-serif' : '"' . e($fontB) . '", system-ui, -apple-system, sans-serif' ?>;
 }

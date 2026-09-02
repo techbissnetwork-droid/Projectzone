@@ -22,11 +22,6 @@ if ($action === 'view') {
         if (!in_array($status, ['pending','paid','delivered','cancelled'], true)) {
             $status = $o['status'];
         }
-        /* Count the sale once, when it first reaches paid. */
-        $wasUnpaid = $o['status'] === 'pending' || $o['status'] === 'cancelled';
-        if ($wasUnpaid && in_array($status, ['paid','delivered'], true) && $o['product_id']) {
-            Database::run('UPDATE products SET sales_count = sales_count + 1 WHERE id = :p', ['p' => (int)$o['product_id']]);
-        }
         Database::update('orders', [
             'status'         => $status,
             'payment_method' => trim((string)($_POST['payment_method'] ?? '')) ?: null,
@@ -34,6 +29,16 @@ if ($action === 'view') {
             'notes'          => trim((string)($_POST['notes'] ?? '')) ?: null,
             'updated_at'     => now(),
         ], $id);
+        /* Derive the sale count from the orders themselves, so toggling a
+           status back and forth can never drift it. */
+        if ($o['product_id']) {
+            Database::run(
+                "UPDATE products SET sales_count =
+                   (SELECT COUNT(*) FROM orders WHERE product_id = :p AND status IN ('paid','delivered'))
+                 WHERE id = :p2",
+                ['p' => (int)$o['product_id'], 'p2' => (int)$o['product_id']]
+            );
+        }
         log_activity('order.update', 'order', $id, $o['reference'] . ' → ' . $status);
         Flash::ok('Order updated.');
         redirect('admin/orders.php?action=view&id=' . $id);

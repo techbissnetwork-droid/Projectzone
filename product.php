@@ -20,10 +20,10 @@ if (!$p) {
     exit;
 }
 
-$me     = Auth::user();
-$price  = $p['sale_price'] !== null ? (float)$p['sale_price'] : (float)$p['price'];
-$errors = [];
-$placed = null;
+$me      = Auth::user();
+$price   = $p['sale_price'] !== null ? (float)$p['sale_price'] : (float)$p['price'];
+$methods = array_values(array_filter(Payments::active(), static fn($m) => Payments::isConfigured($m)));
+$errors  = [];
 
 if (post()) {
     Csrf::check();
@@ -31,31 +31,46 @@ if (post()) {
     $email = trim(mb_strtolower((string)($_POST['buyer_email'] ?? '')));
     $phone = trim((string)($_POST['buyer_phone'] ?? ''));
     $note  = trim((string)($_POST['notes'] ?? ''));
+    $mid   = (int)($_POST['payment_method_id'] ?? 0);
 
     if ($name === '')      $errors[] = 'Enter your name.';
     if (!is_email($email)) $errors[] = 'Enter a valid email address.';
     if (mb_strlen($note) > 2000) $errors[] = 'Keep the note under 2000 characters.';
 
+    $method = null;
+    if ($methods) {
+        foreach ($methods as $cand) {
+            if ((int)$cand['id'] === $mid) { $method = $cand; break; }
+        }
+        if (!$method) {
+            $errors[] = 'Choose how you would like to pay.';
+        }
+    }
+
     if (!$errors) {
-        /* Attach the order to an existing account when the email matches one. */
         $userId = $me['id'] ?? Database::value('SELECT id FROM users WHERE email = :e', ['e' => $email]);
-        $ref = reference('ORD');
+        $ref    = reference('ORD');
+        $token  = bin2hex(random_bytes(16));
         $oid = Database::insert('orders', [
-            'reference'   => $ref,
-            'user_id'     => $userId ? (int)$userId : null,
-            'product_id'  => (int)$p['id'],
-            'buyer_name'  => $name,
-            'buyer_email' => $email,
-            'buyer_phone' => $phone ?: null,
-            'amount'      => $price,
-            'currency'    => Settings::get('currency', 'NPR'),
-            'status'      => 'pending',
-            'notes'       => $note ?: null,
-            'created_at'  => now(),
-            'updated_at'  => now(),
+            'reference'         => $ref,
+            'user_id'           => $userId ? (int)$userId : null,
+            'product_id'        => (int)$p['id'],
+            'buyer_name'        => $name,
+            'buyer_email'       => $email,
+            'buyer_phone'       => $phone ?: null,
+            'amount'            => $price,
+            'currency'          => Settings::get('currency', 'NPR'),
+            'status'            => 'pending',
+            'payment_method'    => $method['name'] ?? null,
+            'payment_method_id' => $method['id'] ?? null,
+            'access_token'      => $token,
+            'notes'             => $note ?: null,
+            'created_at'        => now(),
+            'updated_at'        => now(),
         ]);
         log_activity('order.create', 'order', $oid, $ref . ' · ' . $p['title']);
-        $placed = ['ref' => $ref, 'email' => $email, 'linked' => (bool)$userId];
+        /* Redirect after posting so a refresh can never place a second order. */
+        redirect('order.php?ref=' . urlencode($ref) . '&t=' . urlencode($token) . '&new=1');
     }
 }
 
@@ -86,16 +101,6 @@ require __DIR__ . '/partials/public_header.php';
         <?php endif; ?>
 
         <h2 class="detail__h2" id="buy">Order this project</h2>
-        <?php if ($placed): ?>
-          <div class="notice notice--ok">
-            <p><b>Order <?= e($placed['ref']) ?> received.</b></p>
-            <p style="white-space:pre-wrap"><?= e(Settings::get('payment_instructions')) ?></p>
-            <p>Quote your reference <b class="mono"><?= e($placed['ref']) ?></b> when you pay. We confirm by email at <?= e($placed['email']) ?>.</p>
-            <?php if ($placed['linked']): ?>
-              <p><a class="link" href="<?= e(url('client/orders.php')) ?>">Track it in your account <span aria-hidden="true">→</span></a></p>
-            <?php endif; ?>
-          </div>
-        <?php else: ?>
           <?php if ($errors): ?>
             <div class="notice notice--err"><?php foreach ($errors as $er): ?><p><?= e($er) ?></p><?php endforeach; ?></div>
           <?php endif; ?>
@@ -111,10 +116,32 @@ require __DIR__ . '/partials/public_header.php';
               <input name="buyer_phone" value="<?= e(old('buyer_phone', $me['phone'] ?? '')) ?>"></label>
             <label><span>Anything we should know? <small>optional</small></span>
               <textarea name="notes" rows="3" placeholder="Branding, changes you need, your timeline…"><?= e(old('notes')) ?></textarea></label>
+
+            <?php if ($methods): ?>
+              <fieldset class="paypick">
+                <legend>How would you like to pay?</legend>
+                <?php foreach ($methods as $i => $mth):
+                  $checked = (int)old('payment_method_id', (string)($methods[0]['id'] ?? 0)) === (int)$mth['id']; ?>
+                  <label class="paypick__opt">
+                    <input type="radio" name="payment_method_id" value="<?= (int)$mth['id'] ?>"<?= $checked ? ' checked' : '' ?> required>
+                    <span>
+                      <b><?= e($mth['name']) ?>
+                        <?php if (Payments::isGateway((string)$mth['provider'])): ?>
+                          <i class="paypick__tag">pay online</i>
+                        <?php else: ?>
+                          <i class="paypick__tag paypick__tag--manual">confirmed by us</i>
+                        <?php endif; ?>
+                      </b>
+                      <?php if ($mth['summary']): ?><em><?= e($mth['summary']) ?></em><?php endif; ?>
+                    </span>
+                  </label>
+                <?php endforeach; ?>
+              </fieldset>
+            <?php endif; ?>
+
             <button class="btn btn--primary btn--lg magnetic" type="submit">Place order · <?= e(money($price)) ?> <span class="btn__arrow">→</span></button>
-            <p class="wform__note">No payment is taken now. We confirm availability and send payment details, then hand over the files.</p>
+            <p class="wform__note">Nothing is charged on this page. You will see the payment details on the next screen.</p>
           </form>
-        <?php endif; ?>
       </div>
 
       <aside class="detail__meta reveal">

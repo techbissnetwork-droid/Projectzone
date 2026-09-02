@@ -68,7 +68,7 @@
       var cx = W * (small ? 0.5 : 0.54), cy = H * 0.5;
       core.bx = cx; core.by = cy; core.depth = 0.35;
 
-      var rx = Math.min(W * (small ? 0.40 : 0.35), 290);
+      var rx = Math.min(W * (small ? 0.33 : 0.35), 290);
       var ry = Math.min(H * 0.41, small ? 190 : 252);
       ring.forEach(function (n, i) {
         var a = -Math.PI / 2 + 0.30 + (i / ring.length) * TAU;
@@ -96,10 +96,20 @@
       for (var i = 0; i < all.length; i++) {
         var n = all[i];
         var float = reduce ? 0 : Math.sin(t * 0.0006 + n.ph) * (n === core ? 2.5 : 5.5);
-        n.x = n.bx + mx * 20 * n.depth;
-        n.y = n.by + my * 16 * n.depth + float;
-        n.el.style.setProperty('--x', n.x.toFixed(1) + 'px');
-        n.el.style.setProperty('--y', n.y.toFixed(1) + 'px');
+        var x = n.bx + mx * 20 * n.depth;
+        var y = n.by + my * 16 * n.depth + float;
+
+        /* Labels are editable, so their width is unknown until measured.
+           Keep every pill inside the box rather than letting a long service
+           name hang off the edge on a narrow phone. */
+        var hw = (n.el.offsetWidth || 90) / 2 + 4;
+        var hh = (n.el.offsetHeight || 34) / 2 + 4;
+        if (W > hw * 2) { x = Math.max(hw, Math.min(W - hw, x)); }
+        if (H > hh * 2) { y = Math.max(hh, Math.min(H - hh, y)); }
+
+        n.x = x; n.y = y;
+        n.el.style.setProperty('--x', x.toFixed(1) + 'px');
+        n.el.style.setProperty('--y', y.toFixed(1) + 'px');
         n.el.style.setProperty('--s', (1 + (n.depth - 0.6) * 0.055).toFixed(3));
       }
     }
@@ -217,6 +227,7 @@
       }, { passive: true });
     }
 
+    wrap.classList.add('js-anim');
     requestAnimationFrame(function () { wrap.classList.add('is-ready'); });
     if (reduce) { draw(0); } else { loop(wrap, draw); }
   })();
@@ -233,17 +244,45 @@
 
     var nodes = [].slice.call(host.children).map(function (el, i) {
       el.style.setProperty('--i', i);
-      return { el: el, key: el.getAttribute('data-arch'), layer: +el.getAttribute('data-layer'), x: 0, y: 0 };
+      return {
+        el: el,
+        key: el.getAttribute('data-arch') || ('n' + i),
+        layer: Math.max(0, Math.min(3, parseInt(el.getAttribute('data-layer'), 10) || 0)),
+        x: 0, y: 0
+      };
     });
-    var by = {};
-    nodes.forEach(function (n) { by[n.key] = n; });
+    if (!nodes.length) return;
 
-    var EDGES = [
-      ['business', 'core'],
-      ['core', 'website'], ['core', 'app'], ['core', 'payments'], ['core', 'email'],
-      ['website', 'hosting'], ['app', 'database'], ['payments', 'security'], ['email', 'cloud'],
-      ['hosting', 'database'], ['database', 'security'], ['security', 'cloud']
-    ];
+    var byLayer = [[], [], [], []];
+    nodes.forEach(function (n) { byLayer[n.layer].push(n); });
+
+    /**
+     * Edges are derived from the layers, never from hardcoded names, so the
+     * diagram keeps working whatever nodes are configured: the source feeds
+     * the core, the core fans out to the services, each service drops to the
+     * infrastructure node beneath it, and the infrastructure row is chained.
+     */
+    function buildEdges() {
+      var e = [];
+      var src = byLayer[0], core = byLayer[1], svc = byLayer[2], infra = byLayer[3];
+      var hub = core[0] || svc[0] || src[0];
+
+      src.forEach(function (s) { if (hub && s !== hub) e.push([s, hub]); });
+      if (hub) { svc.forEach(function (s) { e.push([hub, s]); }); }
+      else if (src.length) { svc.forEach(function (s) { e.push([src[0], s]); }); }
+
+      if (infra.length) {
+        svc.forEach(function (s, i) {
+          var target = infra[Math.min(i, infra.length - 1)];
+          if (target) { e.push([s, target]); }
+        });
+        for (var k = 0; k < infra.length - 1; k++) { e.push([infra[k], infra[k + 1]]); }
+        if (!svc.length && hub) { e.push([hub, infra[0]]); }
+      }
+      return e;
+    }
+    var EDGES = buildEdges();
+
     var W = 0, H = 0, ctx = null, packets = [];
 
     function layout() {
@@ -252,24 +291,38 @@
       if (W < 2 || H < 2) return;
       ctx = fitCanvas(cv, W, H);
 
-      var L2 = nodes.filter(function (n) { return n.layer === 2; });
-      var L3 = nodes.filter(function (n) { return n.layer === 3; });
       var narrow = W < 760;
       var padX = Math.max(narrow ? 14 : 24, W * (narrow ? 0.03 : 0.055));
       var span = W - padX * 2;
 
-      by.business.x = W / 2; by.business.y = H * (narrow ? 0.075 : 0.10);
-      by.core.x = W / 2;     by.core.y = H * (narrow ? 0.245 : 0.345);
+      /* Only the layers that actually have nodes take up vertical room. */
+      var used = [0, 1, 2, 3].filter(function (l) { return byLayer[l].length > 0; });
+      var rowY = {};
+      used.forEach(function (l, i) {
+        rowY[l] = H * (used.length === 1 ? 0.5 : (0.11 + (0.74 * i) / (used.length - 1)));
+      });
 
-      if (narrow) {
-        // two columns per layer — a composition made for the phone, not a squeezed desktop
-        var col = [padX + span * 0.26, padX + span * 0.74];
-        L2.forEach(function (n, i) { n.x = col[i % 2]; n.y = H * (i < 2 ? 0.455 : 0.585); });
-        L3.forEach(function (n, i) { n.x = col[i % 2]; n.y = H * (i < 2 ? 0.775 : 0.905); });
-      } else {
-        L2.forEach(function (n, i) { n.x = padX + span * ((i + 0.5) / L2.length); n.y = H * 0.635; });
-        L3.forEach(function (n, i) { n.x = padX + span * ((i + 0.5) / L3.length); n.y = H * 0.885; });
+      function place(list, y, forceRows) {
+        if (!list.length) { return; }
+        if (list.length === 1) { list[0].x = W / 2; list[0].y = y; return; }
+        if (narrow && (forceRows || list.length > 2)) {
+          /* Two columns on a phone rather than a squeezed single row. */
+          var col = [padX + span * 0.26, padX + span * 0.74];
+          var rows = Math.ceil(list.length / 2);
+          var band = H * 0.13;
+          list.forEach(function (n, i) {
+            n.x = col[i % 2];
+            n.y = y + (Math.floor(i / 2) - (rows - 1) / 2) * (band / Math.max(1, rows - 1) * (rows > 1 ? 1 : 0));
+          });
+          return;
+        }
+        list.forEach(function (n, i) { n.x = padX + span * ((i + 0.5) / list.length); n.y = y; });
       }
+
+      place(byLayer[0], rowY[0] || H * 0.10);
+      place(byLayer[1], rowY[1] || H * 0.34);
+      place(byLayer[2], rowY[2] || H * 0.63, true);
+      place(byLayer[3], rowY[3] || H * 0.88, true);
 
       nodes.forEach(function (n) {
         n.el.style.setProperty('--x', n.x.toFixed(1) + 'px');
@@ -283,7 +336,7 @@
     }
 
     var hot = null;
-    function isHot(e) { return hot && (e[0] === hot || e[1] === hot); }
+    function isHot(e) { return hot && (e[0].key === hot || e[1].key === hot); }
 
     function curve(a, b) {
       var mid = (a.y + b.y) / 2;
@@ -307,7 +360,7 @@
       ctx.clearRect(0, 0, W, H);
 
       for (var i = 0; i < EDGES.length; i++) {
-        var e = EDGES[i], a = by[e[0]], b = by[e[1]];
+        var e = EDGES[i], a = e[0], b = e[1];
         if (!a || !b) continue;
         var on = isHot(e);
         ctx.strokeStyle = on ? 'rgba(143,176,255,.55)' : 'rgba(143,176,255,.17)';
@@ -321,7 +374,7 @@
           pk.t += pk.sp;
           if (pk.t > 1) pk.t = -0.1;
           if (pk.t < 0) continue;
-          var ed = EDGES[pk.e], na = by[ed[0]], nb = by[ed[1]];
+          var ed = EDGES[pk.e], na = ed[0], nb = ed[1];
           if (!na || !nb) continue;
           var p = pointOn(na, nb, pk.t);
           var fade = Math.sin(clamp(pk.t, 0, 1) * Math.PI);
@@ -349,11 +402,21 @@
       hot = null; nodes.forEach(function (n) { n.el.classList.remove('is-hot'); });
     });
 
-    if ('IntersectionObserver' in win && section) {
-      new IntersectionObserver(function (es) {
-        if (es[0].isIntersecting) { section.classList.add('is-ready'); }
-      }, { threshold: 0.15 }).observe(section);
-    } else if (section) section.classList.add('is-ready');
+    if (section) {
+      section.classList.add('js-anim');
+      var reveal = function () { section.classList.add('is-ready'); };
+      if ('IntersectionObserver' in win) {
+        var io = new IntersectionObserver(function (es) {
+          if (es[0].isIntersecting) { reveal(); io.disconnect(); }
+        }, { threshold: 0, rootMargin: '0px 0px -5% 0px' });
+        io.observe(section);
+        /* Failsafe: a section taller than the viewport, a browser that never
+           fires, a restored scroll position — the diagram still fills in. */
+        win.setTimeout(reveal, 2500);
+      } else {
+        reveal();
+      }
+    }
 
     if (reduce) draw(0); else loop(wrap, draw);
   })();

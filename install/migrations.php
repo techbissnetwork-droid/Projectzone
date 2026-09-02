@@ -38,6 +38,11 @@ function tb_migrate(PDO $pdo, string $driver = 'mysql'): array
         'projects' => ['portfolio_id' => 'INT UNSIGNED NULL'],
         'users'    => ['company' => 'VARCHAR(160) NULL', 'must_change' => 'TINYINT(1) NOT NULL DEFAULT 0'],
         'products' => ['sales_count' => 'INT NOT NULL DEFAULT 0'],
+        'orders'   => [
+            'payment_method_id' => 'INT UNSIGNED NULL',
+            'paid_at'           => 'DATETIME NULL',
+            'access_token'      => 'VARCHAR(64) NULL',
+        ],
     ];
     foreach ($wanted as $table => $cols) {
         if (!in_array(strtolower($table), $tables, true) || !$cols) {
@@ -72,6 +77,14 @@ function tb_migrate(PDO $pdo, string $driver = 'mysql'): array
     }
     if ($added) {
         $done[] = 'Added ' . $added . ' new setting' . ($added === 1 ? '' : 's');
+    }
+
+    /* 3b · a starter payment method, so checkout is never a dead end */
+    if (in_array('payment_methods', $tables, true)
+        && (int)$pdo->query('SELECT COUNT(*) FROM payment_methods')->fetchColumn() === 0) {
+        require_once __DIR__ . '/seed.php';
+        tb_seed_payments($pdo, $ts);
+        $done[] = 'Added the default bank-transfer payment method';
     }
 
     /* 4 · seed content blocks, pages and menus only when they are empty,

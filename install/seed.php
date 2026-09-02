@@ -54,6 +54,7 @@ function install_seed(PDO $pdo, string $ts): void
     }
 
     tb_seed_content($pdo, $ts);
+    tb_seed_payments($pdo, $ts);
 }
 
 /** Editable content blocks, starter pages and menus. Split out so a
@@ -171,4 +172,19 @@ function tb_seed_content(PDO $pdo, string $ts): void
               ['Request a quote', 'contact.php']] as $i => $n) {
         $nv->execute(['footer_3', $n[0], $n[1], null, $i * 10, $ts]);
     }
+}
+
+/** A working payment method out of the box, so checkout is never a dead end. */
+function tb_seed_payments(PDO $pdo, string $ts): void
+{
+    $pdo->prepare('INSERT INTO payment_methods
+        (code,name,provider,summary,instructions,account_name,account_number,config,is_active,is_test,sort_order,created_at)
+        VALUES (?,?,?,?,?,?,?,?,1,0,?,?)')
+        ->execute([
+            'bank-transfer', 'Bank transfer', 'manual',
+            'Pay directly into our account and send the reference.',
+            "Transfer the total to the account below, then reply with the transaction reference.\n"
+          . "We confirm every transfer manually within one business day.",
+            'Your Company Pvt. Ltd.', '0000000000000000', null, 10, $ts,
+        ]);
 }

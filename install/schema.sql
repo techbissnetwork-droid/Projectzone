@@ -102,11 +102,15 @@ CREATE TABLE orders (
   currency       VARCHAR(8)   NOT NULL DEFAULT 'NPR',
   status         VARCHAR(16)  NOT NULL DEFAULT 'pending',
   payment_method VARCHAR(40)  NULL,
+  payment_method_id INT UNSIGNED NULL,
   payment_ref    VARCHAR(120) NULL,
+  paid_at        DATETIME     NULL,
+  access_token   VARCHAR(64)  NULL,
   notes          TEXT         NULL,
   created_at     DATETIME     NOT NULL,
   updated_at     DATETIME     NOT NULL,
   UNIQUE KEY uq_orders_ref (reference),
+  KEY ix_orders_token (access_token),
   KEY ix_orders_user (user_id),
   KEY ix_orders_status (status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -269,4 +273,46 @@ CREATE TABLE content_items (
   is_active  TINYINT(1)   NOT NULL DEFAULT 1,
   created_at DATETIME     NOT NULL,
   KEY ix_content_kind (kind, sort_order)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ══════════════════════════════════════════════════════════════
+-- Marketplace payments
+-- ══════════════════════════════════════════════════════════════
+
+-- How buyers can pay. "manual" methods just show instructions and are
+-- confirmed by hand; the rest hand off to a gateway and are verified.
+CREATE TABLE payment_methods (
+  id             INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  code           VARCHAR(40)  NOT NULL,
+  name           VARCHAR(120) NOT NULL,
+  provider       VARCHAR(24)  NOT NULL DEFAULT 'manual',
+  summary        VARCHAR(300) NULL,
+  instructions   TEXT         NULL,
+  account_name   VARCHAR(160) NULL,
+  account_number VARCHAR(160) NULL,
+  config         TEXT         NULL,
+  is_active      TINYINT(1)   NOT NULL DEFAULT 1,
+  is_test        TINYINT(1)   NOT NULL DEFAULT 1,
+  sort_order     INT          NOT NULL DEFAULT 0,
+  created_at     DATETIME     NOT NULL,
+  UNIQUE KEY uq_pay_code (code),
+  KEY ix_pay_active (is_active, sort_order)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- One row per attempt, so a failed or abandoned payment is never silently lost.
+CREATE TABLE payment_attempts (
+  id           INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  order_id     INT UNSIGNED NOT NULL,
+  method_id    INT UNSIGNED NULL,
+  provider     VARCHAR(24)  NOT NULL,
+  status       VARCHAR(16)  NOT NULL DEFAULT 'started',
+  amount       DECIMAL(12,2) NOT NULL DEFAULT 0,
+  currency     VARCHAR(8)   NOT NULL DEFAULT 'NPR',
+  gateway_ref  VARCHAR(190) NULL,
+  message      VARCHAR(400) NULL,
+  payload      TEXT         NULL,
+  created_at   DATETIME     NOT NULL,
+  updated_at   DATETIME     NOT NULL,
+  KEY ix_attempt_order (order_id, created_at),
+  KEY ix_attempt_ref (gateway_ref)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

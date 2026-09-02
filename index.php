@@ -2,7 +2,9 @@
 declare(strict_types=1);
 require_once __DIR__ . '/app/bootstrap.php';
 
-$services = Database::all('SELECT * FROM services WHERE is_active = 1 ORDER BY sort_order, id LIMIT 9');
+$homeCount = max(3, min(9, (int)Settings::get('home_services', '6')));
+$services  = Database::all('SELECT * FROM services WHERE is_active = 1 ORDER BY sort_order, id LIMIT ' . $homeCount);
+$serviceTotal = (int)Database::value('SELECT COUNT(*) FROM services WHERE is_active = 1', [], 0);
 $stats    = Content::items('stat');
 $featured = Settings::bool('show_portfolio', true)
     ? Database::all("SELECT * FROM portfolio WHERE visibility = 'public' ORDER BY is_featured DESC, sort_order, completed_on DESC LIMIT 4")
@@ -97,7 +99,11 @@ foreach (Content::sectionOrder() as $section):
               <p class="sec__lede reveal"><?= e(Settings::get('services_lede')) ?></p>
             </header>
             <div class="svcs__grid" id="svcGrid"><?php require __DIR__ . '/partials/service_cards.php'; ?></div>
-            <p class="svcs__foot reveal"><a class="link" href="<?= e(url('services.php')) ?>">See every service in detail <span aria-hidden="true">→</span></a></p>
+            <p class="svcs__foot reveal">
+              <?php if ($serviceTotal > count($services)): ?>
+                <span class="muted"><?= $serviceTotal - count($services) ?> more services, from domains to automation.</span>
+              <?php endif; ?>
+              <a class="link" href="<?= e(url('services.php')) ?>">See every service in detail <span aria-hidden="true">→</span></a></p>
           </div>
         </section>
         <?php break;

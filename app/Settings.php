@@ -112,6 +112,8 @@ final class Settings
             'custom_body_end'  => '',
 
             /* home page sections */
+            'scroll_pace'      => 'standard',
+            'home_services'    => '6',
             'home_sections'    => 'journey,services,arch,process,work,transform,pillars,marketplace,quote',
             'section_journey'  => '1',
             'section_services' => '1',

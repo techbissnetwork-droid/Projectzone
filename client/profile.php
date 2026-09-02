@@ -2,7 +2,7 @@
 declare(strict_types=1);
 require_once __DIR__ . '/../app/bootstrap.php';
 require_once __DIR__ . '/../app/guard.php';
-$me = require_login();
+$me = require_client();
 
 $errors = [];
 if (post()) {
@@ -26,7 +26,7 @@ if (post()) {
                 'company' => trim((string)($_POST['company'] ?? '')) ?: null,
             ], (int)$me['id']);
             Flash::ok('Profile updated.');
-            redirect(($me['role'] === 'admin' ? 'admin' : 'client') . '/profile.php');
+            redirect('client/profile.php');
         }
     }
 
@@ -44,13 +44,13 @@ if (post()) {
             ], (int)$me['id']);
             log_activity('password.change', 'user', (int)$me['id']);
             Flash::ok('Password changed.');
-            redirect(($me['role'] === 'admin' ? 'admin' : 'client') . '/profile.php');
+            redirect('client/profile.php');
         }
     }
 }
 
 $PAGE_TITLE = 'Profile';
-$AREA = $me['role'] === 'admin' ? 'admin' : 'client';
+$AREA = 'client';
 require __DIR__ . '/../partials/app_header.php';
 ?>
 <?php if ($errors): ?>
