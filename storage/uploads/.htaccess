@@ -1,0 +1,12 @@
+# Images are served from here; scripts never are.
+<IfModule mod_authz_core.c>
+  Require all granted
+</IfModule>
+<IfModule !mod_authz_core.c>
+  Order allow,deny
+  Allow from all
+</IfModule>
+php_flag engine off
+<FilesMatch "\.(php|phtml|php\d|phar|cgi|pl|py|sh)$">
+  Require all denied
+</FilesMatch>

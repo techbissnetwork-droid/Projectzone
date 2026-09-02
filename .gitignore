@@ -1,0 +1,16 @@
+# Written by the installer — never commit real credentials.
+app/config.php
+
+# The local SQLite database and anything uploaded through the admin.
+storage/*.sqlite
+storage/*.sqlite3
+storage/uploads/*
+!storage/uploads/.htaccess
+!storage/uploads/.gitkeep
+
+# Editor and OS noise
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/

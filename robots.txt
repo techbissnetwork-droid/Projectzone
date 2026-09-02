@@ -1,0 +1,7 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /client/
+Disallow: /install.php
+Allow: /
+
+Sitemap: /sitemap.xml

@@ -1,0 +1,45 @@
+/* Client portal — reuses the admin palette, arranged as a normal page. */
+body.portal{background:var(--bg)}
+.phead-bar{border-bottom:1px solid var(--line);background:var(--panel);position:sticky;top:0;z-index:10}
+.phead-bar .inner,.portal-foot .inner{width:min(1120px,92vw);margin-inline:auto;
+  display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.phead-bar .inner{padding:14px 0}
+.phead-bar .brand{display:flex;align-items:center;gap:10px;font-family:var(--disp);font-weight:800;
+  font-size:19px;letter-spacing:-.04em}
+.phead-bar .brand i{width:10px;height:10px;border-radius:50%;background:var(--acc);
+  box-shadow:0 0 14px var(--acc)}
+.tabs{display:flex;gap:4px;flex-wrap:wrap}
+.tabs a{padding:8px 15px;border-radius:999px;font-size:14px;color:var(--mute);transition:.25s}
+.tabs a:hover{color:var(--fg);background:var(--panel2)}
+.tabs a.on{background:var(--acc);color:var(--bg);font-weight:600}
+.me{margin-left:auto;display:flex;align-items:center;gap:12px;font-size:13.5px;color:var(--mute)}
+@media(max-width:760px){.me span{display:none}}
+.portal-main{width:min(1120px,92vw);margin:26px auto 70px}
+.portal-foot{border-top:1px solid var(--line);padding:26px 0 40px;font-size:13px;color:var(--dim)}
+.portal-foot .inner{justify-content:space-between}
+.portal-foot a{color:var(--mute)}
+.portal-foot a:hover{color:var(--acc)}
+
+.hero-line{margin-bottom:22px}
+.hero-line h1{font-family:var(--disp);font-size:clamp(26px,4vw,40px);text-transform:uppercase;
+  letter-spacing:-.035em;font-weight:700;line-height:1}
+.hero-line p{color:var(--mute);margin-top:8px;max-width:70ch}
+
+.renewals{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;
+  margin-bottom:20px}
+.ren{border:1px solid var(--line);border-radius:14px;padding:18px;background:var(--panel)}
+.ren h6{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--dim);font-weight:400}
+.ren b{display:block;font-family:var(--disp);font-size:22px;font-weight:700;letter-spacing:-.03em;
+  margin:8px 0 6px}
+.ren small{color:var(--mute);font-size:12.5px;display:block;margin-top:6px}
+.ren.urgent,.ren.expired{border-color:rgba(255,107,61,.5)}
+.ren.soon{border-color:rgba(255,196,87,.45)}
+
+.ticketlist{display:grid;gap:10px}
+.ticketrow{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:15px 17px;
+  border:1px solid var(--line);border-radius:12px;background:var(--panel);transition:.3s}
+.ticketrow:hover{border-color:var(--line2)}
+.ticketrow b{font-size:15px}
+.ticketrow .meta{color:var(--dim);font-family:var(--mono);font-size:11px;letter-spacing:.08em}
+.ticketrow .right{margin-left:auto;display:flex;gap:8px;align-items:center}
