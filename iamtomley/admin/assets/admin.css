@@ -141,7 +141,7 @@ svg{display:block;}
 
 @media (prefers-reduced-motion:reduce){ .notif-btn.has-notices svg{animation:none;} }
 
-.nav-scrim{position:fixed;inset:0;z-index:50;background:rgba(3,4,10,.6);
+.nav-scrim{position:fixed;inset:0;z-index:50;background:rgba(3,4,10,.45);
   opacity:0;pointer-events:none;transition:opacity .3s;}
 
 /* Content */
@@ -251,30 +251,31 @@ td .muted{color:var(--text-mute);font-size:.82rem;}
 .small{font-size:.78rem;color:var(--text-mute);}
 
 @media (max-width:820px){
-  /* The sections move into a panel that lies over the page, with a scrim to
-     dim what is behind it and somewhere to tap to close. */
-  .nav-drawer{position:fixed;top:0;right:0;z-index:60;
-    width:min(84vw,300px);height:100vh;overflow-y:auto;
-    flex-direction:column;align-items:stretch;gap:.45rem;
-    padding:calc(var(--bar-h) + .75rem) 1rem 1rem;
-    background:var(--surface-solid);border-left:1px solid var(--border);
-    transform:translateX(100%);visibility:hidden;
-    transition:transform .3s cubic-bezier(.22,1,.36,1),visibility .3s;}
-  html.nav-open .nav-drawer{transform:none;visibility:visible;}
+  /* The sections drop out of the bar as a menu that is only as tall as what
+     is in it — a full-height panel left a screenful of nothing between the
+     last section and the buttons pinned at its foot. It only scrolls if it
+     ever grows past the window. */
+  .nav-drawer{position:absolute;top:100%;left:0;right:0;z-index:60;
+    width:auto;max-height:calc(100vh - var(--bar-h));overflow-y:auto;
+    flex-direction:column;align-items:stretch;gap:.4rem;padding:.6rem .9rem 1rem;
+    background:var(--surface-solid);border-bottom:1px solid var(--border-strong);
+    box-shadow:var(--shadow);
+    opacity:0;transform:translateY(-8px);transform-origin:top;visibility:hidden;
+    transition:opacity .22s ease,transform .22s cubic-bezier(.22,1,.36,1),visibility .22s;}
+  html.nav-open .nav-drawer{opacity:1;transform:none;visibility:visible;}
   html.nav-open .nav-scrim{opacity:1;pointer-events:auto;}
-  html.nav-open, html.nav-open body{overflow:hidden;}
-  .nav-list{flex-direction:column;align-items:stretch;gap:.45rem;overflow:visible;}
+  .nav-list{flex-direction:column;align-items:stretch;gap:.4rem;overflow:visible;}
   .nav-label{display:block;font-family:var(--mono);font-size:.6rem;letter-spacing:.14em;
     text-transform:uppercase;color:var(--text-dim);padding:.35rem .7rem .45rem;}
   .nav-item{padding:.68rem .85rem;font-size:.88rem;}
   .nav-item:hover,.nav-item:active{transform:none;}
-  .sidebar-foot{margin-left:0;margin-top:auto;padding-top:1rem;
-    border-top:1px solid var(--border);flex-direction:column;align-items:stretch;gap:.45rem;}
+  .sidebar-foot{margin-left:0;margin-top:.45rem;padding-top:.45rem;
+    border-top:1px solid var(--border);flex-direction:column;align-items:stretch;gap:.4rem;}
   .sidebar-foot .nav-item{gap:.7rem;padding:.68rem .85rem;font-size:.88rem;}
 
   .nav-toggle{display:grid;place-items:center;flex:0 0 auto;
     width:42px;height:42px;border:1px solid var(--border-strong);border-radius:var(--r-sm);
-    background:var(--surface-solid);color:var(--text-soft);cursor:pointer;
+    background:var(--glass);color:var(--text-soft);cursor:pointer;
     transition:background .2s,color .2s,border-color .2s;}
   .nav-toggle:hover{background:var(--glass-2);color:var(--mint);border-color:rgba(0,255,179,.35);}
   .nav-toggle:focus-visible{outline:2px solid var(--mint);outline-offset:2px;}
