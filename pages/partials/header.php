@@ -1,18 +1,12 @@
 <?php
 /** @var array $primaryNav @var \Techbiss\Repo\SettingsRepo $settings @var string $currentPath */
 $siteName = $settings->get('site_name', 'TECHBISS');
-$logo     = media_url($settings->get('logo'));
 ?>
 <header class="site-header">
     <div class="container">
         <div class="site-header__inner">
             <a class="brand" href="<?= e(url('/')) ?>" aria-label="<?= e($siteName) ?> home">
-                <?php if ($logo !== ''): ?>
-                    <img class="brand__logo" src="<?= e($logo) ?>" alt="<?= e($siteName) ?>" width="140" height="30">
-                <?php else: ?>
-                    <svg class="brand__mark" aria-hidden="true" focusable="false"><use href="#tb-mark"/></svg>
-                    <span class="brand__text"><?= e($siteName) ?></span>
-                <?php endif; ?>
+                <span class="brand__text"><?= e($siteName) ?></span>
             </a>
 
             <nav class="nav" aria-label="Primary">
@@ -54,10 +48,6 @@ $logo     = media_url($settings->get('logo'));
             </nav>
 
             <div class="header-actions">
-                <a class="header-icon-link" href="<?= e(url('/portal')) ?>" aria-label="Client sign in" title="Client sign in">
-                    <?= icon('user') ?>
-                </a>
-
                 <?php foreach ($primaryNav as $item):
                     if ((int) $item['is_button'] !== 1) { continue; } ?>
                 <a class="btn btn--primary btn--sm btn--nav btn--arrow" href="<?= e(url($item['url'])) ?>" data-magnetic="0.22">
