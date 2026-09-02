@@ -96,14 +96,14 @@ function mail_order_receipt(array $o, ?array $product): bool
     return send_mail($o['buyer_email'], 'Your order ' . $o['reference'] . ' — TECHBISS', $body);
 }
 
-/** Send a new client their portal login. */
-function mail_client_welcome(array $user, string $tempPassword, ?array $project): bool
+/** Tell a new client their portal is ready. There is no password to send. */
+function mail_client_welcome(array $user, ?array $project): bool
 {
-    $body = "Your TECHBISS account is ready.\n\n"
-          . "Sign in here: " . url('client/login.php') . "\n"
-          . "Email:        {$user['email']}\n"
-          . "Password:     {$tempPassword}\n\n"
-          . "Please change that password the first time you sign in.\n\n";
+    $body = "Your " . setting('site.name', 'TECHBISS') . " account is ready.\n\n"
+          . "There is no password to remember. Go to the portal, type this email address,\n"
+          . "and we email you a six-digit code to sign in with.\n\n"
+          . "  Portal: " . url('client/login.php') . "\n"
+          . "  Email:  {$user['email']}\n\n";
     if ($project) {
         $body .= "Your project: {$project['name']}\n";
         if ($project['domain']) {
@@ -112,8 +112,20 @@ function mail_client_welcome(array $user, string $tempPassword, ?array $project)
         $body .= "\nInside the portal you can see your domain, hosting, SSL and email renewal\n"
                . "dates, raise a support or maintenance request, and message us directly.\n\n";
     }
-    $body .= "— TECHBISS\n";
-    return send_mail($user['email'], 'Your TECHBISS account', $body);
+    $body .= "— " . setting('site.name', 'TECHBISS') . "\n";
+    return send_mail($user['email'], 'Your ' . setting('site.name', 'TECHBISS') . ' account', $body);
+}
+
+/** The six-digit code a client signs in with. */
+function mail_login_code(array $user, string $code): bool
+{
+    $body = "Your sign-in code is:\n\n"
+          . "        " . $code . "\n\n"
+          . "It works once and expires in " . LOGIN_CODE_MINUTES . " minutes.\n\n"
+          . "If you did not ask to sign in, ignore this email. Nobody can get into your\n"
+          . "account without this code, and it will expire on its own.\n\n"
+          . "— " . setting('site.name', 'TECHBISS') . "\n";
+    return send_mail($user['email'], $code . ' is your sign-in code', $body);
 }
 
 /** Tell the other side that a ticket has a new reply. */

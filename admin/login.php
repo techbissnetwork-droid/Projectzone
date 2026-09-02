@@ -48,6 +48,7 @@ if (is_post()) {
       <button class="btn" type="submit">Sign in</button>
     </form>
     <div class="alt">
+      <a href="forgot.php">Forgotten your password?</a><br><br>
       Are you a client? <a href="../client/login.php">Use the client portal</a>.
     </div>
   </div>

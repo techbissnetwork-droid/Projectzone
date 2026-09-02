@@ -32,6 +32,23 @@ if (is_post() && post('action') === 'add') {
     }
 }
 
+if (is_post() && post('action') === 'setpass') {
+    csrf_check();
+    $target = db_one('SELECT * FROM users WHERE id = ?', [post_int('id')]);
+    $pass   = $_POST['new_password'] ?? '';
+    if (!$target || $target['role'] === ROLE_CLIENT) {
+        flash('That is not a team account.', 'bad');
+    } elseif ($p = password_problem($pass)) {
+        flash('Password: ' . esc($p), 'bad');
+    } else {
+        db_update('users', (int) $target['id'], ['password_hash' => hash_password($pass)]);
+        log_activity('Set a new password for ' . $target['email'], 'user', (int) $target['id']);
+        flash('Password changed for ' . esc($target['name'])
+            . '. Give it to them directly — it is not emailed.');
+    }
+    redirect('users.php');
+}
+
 if (is_post() && post('action') === 'delete') {
     csrf_check();
     $victim = db_one('SELECT * FROM users WHERE id = ?', [post_int('id')]);
@@ -53,7 +70,9 @@ if (is_post() && post('action') === 'delete') {
 $team = db_all("SELECT * FROM users WHERE role IN ('admin','staff') ORDER BY role, name");
 
 admin_head('Team', 'users.php');
-admin_page_head('Team', 'People who can sign in to this admin area. Clients are managed separately.');
+admin_page_head('Team',
+    'People who can sign in to this admin area with a password. Clients are separate — they sign '
+    . 'in to the portal with a code emailed to them, and have no password at all.');
 
 foreach ($errors as $e) {
     echo '<div class="flash bad">' . esc($e) . '</div>';
@@ -77,12 +96,22 @@ foreach ($errors as $e) {
 <?php if ((int) $u['id'] === (int) $me['id']): ?>
               <span class="pill">You</span>
 <?php else: ?>
-              <form method="post" data-confirm="Remove <?= esc($u['name']) ?> from the team?">
-                <?= csrf_field() ?>
-                <input type="hidden" name="action" value="delete">
-                <input type="hidden" name="id" value="<?= (int) $u['id'] ?>">
-                <button class="btn danger sm" type="submit">Remove</button>
-              </form>
+              <div class="rowacts">
+                <form method="post" data-confirm="Set a new password for <?= esc($u['name']) ?>?">
+                  <?= csrf_field() ?>
+                  <input type="hidden" name="action" value="setpass">
+                  <input type="hidden" name="id" value="<?= (int) $u['id'] ?>">
+                  <input type="password" name="new_password" placeholder="New password"
+                         style="width:170px;padding:7px 11px;font-size:13px" required>
+                  <button class="btn ghost sm" type="submit">Set</button>
+                </form>
+                <form method="post" data-confirm="Remove <?= esc($u['name']) ?> from the team?">
+                  <?= csrf_field() ?>
+                  <input type="hidden" name="action" value="delete">
+                  <input type="hidden" name="id" value="<?= (int) $u['id'] ?>">
+                  <button class="btn danger sm" type="submit">Remove</button>
+                </form>
+              </div>
 <?php endif; ?>
             </td>
           </tr>

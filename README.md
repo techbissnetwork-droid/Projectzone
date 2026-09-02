@@ -86,12 +86,21 @@ About and Contact. Every word is editable from the admin area.
 ### Client portal — `/client/`
 
 Created from a project: put the owner's email in, tick *Give the owner a login*,
-and they get an account with a temporary password emailed to them. They then see:
+and the account exists. **Clients have no password.** They go to the portal, type
+their email address, and a six-digit code is emailed to them — good once, and for
+ten minutes. A client cannot change their own email address, because it is the
+only way into the account; only you can, from Client accounts.
+
+Staff and admins are different: they sign in to `/admin/` with a password, so a
+broken mail server can never lock you out of your own site. If somebody forgets
+theirs, another admin sets a new one under Team.
+
+In the portal a client sees:
 
 - their project's domain, hosting, SSL and email renewal dates, colour-coded
 - the maintenance history — but only entries you marked client-visible
 - support, maintenance and upgrade requests, with two-way messaging
-- their own account details and password
+- their own name and contact details
 
 ---
 
@@ -120,7 +129,10 @@ Deleting is permanent and removes the cover image too.
 
 - Passwords hashed with `password_hash()`; they cannot be read back, only reset
 - CSRF token on every form; failures return 419 rather than acting
-- Sign-in throttled to 8 attempts per address per 15 minutes
+- Sign-in throttled to 8 attempts per address per 15 minutes, requests for a
+  sign-in code included
+- Sign-in codes are stored hashed, expire in ten minutes, work once, and die
+  after five wrong guesses
 - All queries use prepared statements
 - Everything printed is escaped
 - Admins and clients are separate roles that cannot reach each other's areas

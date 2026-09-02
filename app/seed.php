@@ -38,6 +38,11 @@ function setting_definitions(): array
         ['global', 'social.linkedin', 'LinkedIn URL', '#', 'text'],
         ['global', 'social.instagram', 'Instagram URL', '#', 'text'],
         ['global', 'social.whatsapp', 'WhatsApp URL', '#', 'text'],
+        ['global', 'cron.token', 'Cron token (keep this secret)', '', 'text'],
+        ['global', 'reminders.enabled', 'Send renewal reminders (1 = yes, 0 = no)', '1', 'text'],
+        ['global', 'reminders.days', 'Remind this many days before (comma separated)', '45,14,3', 'text'],
+        ['global', 'reminders.notify_client', 'Also email the client (1 = yes, 0 = no)', '0', 'text'],
+        ['global', 'reminders.last_run', 'When cron last ran', '', 'text'],
         ['global', 'marquee.words', 'Scrolling word strip (one per line)', "Websites\nApps\nDomains\nHosting\nSSL\nEmail\nSEO\nBranding\nAutomation\nSupport", 'textarea'],
 
         ['home', 'home.meta.title', 'Browser tab title', 'TECHBISS — One partner for everything your business needs online', 'text'],

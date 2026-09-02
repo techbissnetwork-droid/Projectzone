@@ -169,13 +169,6 @@ function hash_password(string $password): string
     return password_hash($password, PASSWORD_DEFAULT);
 }
 
-/** A readable temporary password for a new client account. */
-function temp_password(): string
-{
-    $words = ['harbour', 'signal', 'lantern', 'copper', 'meridian', 'anchor', 'quartz', 'beacon'];
-    return $words[random_int(0, count($words) - 1)] . '-' . random_int(1000, 9999);
-}
-
 function log_activity(string $action, string $entity = '', int $entityId = 0, ?string $actor = null): void
 {
     try {
@@ -191,4 +184,120 @@ function log_activity(string $action, string $entity = '', int $entityId = 0, ?s
     } catch (Throwable $e) {
         // Never let the audit trail break a real action.
     }
+}
+
+/* ---------------------------------------------------------------------- */
+/* one-time sign-in codes                                                 */
+/* ---------------------------------------------------------------------- */
+/*
+ * Clients do not have passwords. They type their email address, we email a
+ * six-digit code, and they type that back. Only staff sign in with a password,
+ * so a broken mail server can never lock you out of your own admin area.
+ */
+
+const LOGIN_CODE_MINUTES  = 10;   /* how long a code stays valid */
+const LOGIN_CODE_ATTEMPTS = 5;    /* wrong guesses before the code dies */
+
+/**
+ * Issue a code for a client account and return it, so the caller can email it.
+ * Returns null when there is no such client — the caller must still behave
+ * exactly the same either way, so the page never reveals who has an account.
+ */
+function login_code_request(string $email): ?string
+{
+    $email = strtolower(trim($email));
+    if (!valid_email($email)) {
+        return null;
+    }
+
+    /* Same throttle as a password login, so nobody can spam an inbox. */
+    if (login_too_many('code:' . $email)) {
+        return null;
+    }
+    login_record_failure('code:' . $email);
+
+    $user = db_one('SELECT * FROM users WHERE email = ? AND status = ?', [$email, 'active']);
+    if (!$user || $user['role'] !== ROLE_CLIENT) {
+        return null;
+    }
+
+    /* Asking for a new code cancels any earlier one. */
+    db_run('DELETE FROM login_codes WHERE user_id = ?', [$user['id']]);
+
+    $code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+    db_insert('login_codes', [
+        'user_id'    => (int) $user['id'],
+        'code_hash'  => hash('sha256', $code),
+        'expires_at' => date('Y-m-d H:i:s', time() + LOGIN_CODE_MINUTES * 60),
+        'attempts'   => 0,
+        'created_at' => now(),
+    ]);
+
+    return $code;
+}
+
+/**
+ * Check a code and sign the client in.
+ * Returns the user, or null with $error explaining what to tell them.
+ */
+function login_code_verify(string $email, string $code, ?string &$error = null): ?array
+{
+    $email = strtolower(trim($email));
+    $code  = preg_replace('/\D/', '', $code);
+
+    if ($code === '' || strlen($code) !== 6) {
+        $error = 'Enter the six-digit code from the email.';
+        return null;
+    }
+
+    $user = db_one('SELECT * FROM users WHERE email = ? AND status = ?', [$email, 'active']);
+    if (!$user || $user['role'] !== ROLE_CLIENT) {
+        $error = 'That code did not work. Ask for a new one.';
+        return null;
+    }
+
+    $row = db_one(
+        'SELECT * FROM login_codes WHERE user_id = ? AND used_at IS NULL ORDER BY id DESC',
+        [$user['id']]
+    );
+    if (!$row) {
+        $error = 'That code has already been used. Ask for a new one.';
+        return null;
+    }
+    if (strtotime((string) $row['expires_at']) < time()) {
+        db_run('DELETE FROM login_codes WHERE id = ?', [$row['id']]);
+        $error = 'That code has expired — they last ' . LOGIN_CODE_MINUTES . ' minutes. Ask for a new one.';
+        return null;
+    }
+    if ((int) $row['attempts'] >= LOGIN_CODE_ATTEMPTS) {
+        db_run('DELETE FROM login_codes WHERE id = ?', [$row['id']]);
+        $error = 'Too many wrong tries. Ask for a new code.';
+        return null;
+    }
+
+    if (!hash_equals((string) $row['code_hash'], hash('sha256', $code))) {
+        db_run('UPDATE login_codes SET attempts = attempts + 1 WHERE id = ?', [$row['id']]);
+        $left  = LOGIN_CODE_ATTEMPTS - ((int) $row['attempts'] + 1);
+        $error = $left > 0
+            ? 'That code is not right. ' . $left . ' ' . ($left === 1 ? 'try' : 'tries') . ' left.'
+            : 'Too many wrong tries. Ask for a new code.';
+        return null;
+    }
+
+    /* Correct. Burn the code and sign them in. */
+    db_run('UPDATE login_codes SET used_at = ? WHERE id = ?', [now(), $row['id']]);
+    login_clear('code:' . $email);
+    session_regenerate_id(true);
+    $_SESSION['user_id'] = (int) $user['id'];
+    db_update('users', (int) $user['id'], ['last_login_at' => now()]);
+    log_activity('Signed in with a code', 'user', (int) $user['id'], $user['name']);
+
+    return $user;
+}
+
+/** Clear out codes that are spent or long expired. */
+function login_code_prune(): void
+{
+    db_run('DELETE FROM login_codes WHERE expires_at < ? OR used_at IS NOT NULL',
+        [date('Y-m-d H:i:s', time() - 3600)]);
 }

@@ -9,37 +9,15 @@ $errors = [];
 
 if (is_post() && post('action') === 'details') {
     csrf_check();
-    $name  = post('name');
-    $email = strtolower(post('email'));
-    if ($name === '')         { $errors[] = 'Enter your name.'; }
-    if (!valid_email($email)) { $errors[] = 'Enter a valid email address.'; }
-    if (db_one('SELECT id FROM users WHERE email = ? AND id <> ?', [$email, $me['id']])) {
-        $errors[] = 'Another account already uses that email address.';
-    }
+    /* The email address is deliberately not editable here: it is the sign-in
+       identity, so only staff may change it. */
+    $name = post('name');
+    if ($name === '') { $errors[] = 'Enter your name.'; }
     if (!$errors) {
         db_update('users', (int) $me['id'], [
-            'name' => $name, 'email' => $email,
-            'phone' => post('phone'), 'company' => post('company'),
+            'name' => $name, 'phone' => post('phone'), 'company' => post('company'),
         ]);
         flash('Your details are saved.');
-        redirect('account.php');
-    }
-}
-
-if (is_post() && post('action') === 'password') {
-    csrf_check();
-    $current = $_POST['current_password'] ?? '';
-    $new     = $_POST['new_password'] ?? '';
-    if (!password_verify($current, $me['password_hash'])) {
-        $errors[] = 'Your current password is not right.';
-    }
-    if ($p = password_problem($new)) { $errors[] = 'New password: ' . $p; }
-    if (!$errors) {
-        db_update('users', (int) $me['id'], [
-            'password_hash'        => hash_password($new),
-            'must_change_password' => 0,
-        ]);
-        flash('Your password is changed.');
         redirect('account.php');
     }
 }
@@ -49,7 +27,8 @@ client_head('Account', 'account.php');
 
 <div class="hero-line">
   <h1>Your account</h1>
-  <p>Your details and your password. Changing your email address changes how you sign in.</p>
+  <p>Your name and contact details. There is no password to manage — you sign in with a code
+     we email you.</p>
 </div>
 
 <?php foreach ($errors as $e): ?>
@@ -64,9 +43,11 @@ client_head('Account', 'account.php');
       <legend>Your details</legend>
       <div class="f"><label for="name">Name</label>
         <input id="name" name="name" required value="<?= esc($me['name']) ?>"></div>
-      <div class="f"><label for="email">Email</label>
-        <input id="email" name="email" type="email" required value="<?= esc($me['email']) ?>">
-        <span class="hint">This is also your sign-in address.</span></div>
+      <div class="f"><label>Email</label>
+        <input value="<?= esc($me['email']) ?>" disabled>
+        <span class="hint">This is your sign-in address and where your codes are sent.
+          To change it, ask us &mdash; raise it under
+          <a href="support.php" style="color:var(--acc)">Support</a> and we will update it.</span></div>
       <div class="f"><label for="phone">Phone</label>
         <input id="phone" name="phone" value="<?= esc($me['phone']) ?>"></div>
       <div class="f"><label for="company">Business name</label>
@@ -75,19 +56,16 @@ client_head('Account', 'account.php');
     </fieldset>
   </form>
 
-  <form method="post" class="admin">
-    <?= csrf_field() ?>
-    <input type="hidden" name="action" value="password">
-    <fieldset>
-      <legend>Password</legend>
-      <div class="f"><label for="current_password">Current password</label>
-        <input id="current_password" name="current_password" type="password" required></div>
-      <div class="f"><label for="new_password">New password</label>
-        <input id="new_password" name="new_password" type="password" required>
-        <span class="hint">At least 10 characters, with a letter and a number.</span></div>
-      <div class="formbar"><button class="btn" type="submit">Change password</button></div>
-    </fieldset>
-  </form>
+  <div class="panel">
+    <header><h2>Signing in</h2></header>
+    <div class="pad" style="color:var(--mute);font-size:14px">
+      <p style="margin-bottom:12px">This account has no password. Each time you sign in, we email
+        a six-digit code to <strong style="color:var(--fg)"><?= esc($me['email']) ?></strong>.
+        The code works once and expires after <?= LOGIN_CODE_MINUTES ?> minutes.</p>
+      <p>That means there is nothing to forget and nothing to leak. If you lose access to that
+        inbox, contact us and we will change the address for you.</p>
+    </div>
+  </div>
 </div>
 
 <?php client_foot(); ?>

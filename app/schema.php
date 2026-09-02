@@ -11,7 +11,7 @@
  */
 
 /** Bump this whenever schema_tables() changes. Migration compares against it. */
-const SCHEMA_VERSION = 2;
+const SCHEMA_VERSION = 4;
 
 function schema_tables(): array
 {
@@ -140,6 +140,8 @@ function schema_tables(): array
             'sale_price'     => 'DECIMAL(10,2) NULL',
             'demo_url'       => "VARCHAR(255) NOT NULL DEFAULT ''",
             'cover_image'    => "VARCHAR(255) NOT NULL DEFAULT ''",
+            'file_path'      => "VARCHAR(255) NOT NULL DEFAULT ''",
+            'file_name'      => "VARCHAR(255) NOT NULL DEFAULT ''",
             'pages'          => 'INTEGER NOT NULL DEFAULT 0',
             'includes_setup' => 'INTEGER NOT NULL DEFAULT 1',
             'is_active'      => 'INTEGER NOT NULL DEFAULT 1',
@@ -164,9 +166,14 @@ function schema_tables(): array
             'notes'         => 'TEXT NULL',
             'admin_notes'   => 'TEXT NULL',
             'status'        => "VARCHAR(20) NOT NULL DEFAULT 'new'",
+            'download_token'   => "VARCHAR(64) NOT NULL DEFAULT ''",
+            'download_expires' => 'DATETIME NULL',
+            'download_count'   => 'INTEGER NOT NULL DEFAULT 0',
+            'delivered_at'     => 'DATETIME NULL',
             'created_at'    => 'DATETIME NULL',
         ], 'indexes' => [
             'idx_orders_status' => ['unique' => false, 'columns' => 'status'],
+            'idx_orders_token'  => ['unique' => false, 'columns' => 'download_token'],
         ]],
 
         'projects' => ['columns' => [
@@ -270,6 +277,33 @@ function schema_tables(): array
             'entity'     => "VARCHAR(60) NOT NULL DEFAULT ''",
             'entity_id'  => 'INTEGER NOT NULL DEFAULT 0',
             'created_at' => 'DATETIME NULL',
+        ]],
+
+        /* One-time sign-in codes emailed to clients. The code itself is never
+           stored — only a hash of it, like a password. */
+        'login_codes' => ['columns' => [
+            'id'         => '@id',
+            'user_id'    => '@fk NULL',
+            'code_hash'  => "VARCHAR(64) NOT NULL DEFAULT ''",
+            'expires_at' => 'DATETIME NULL',
+            'used_at'    => 'DATETIME NULL',
+            'attempts'   => 'INTEGER NOT NULL DEFAULT 0',
+            'created_at' => 'DATETIME NULL',
+        ], 'indexes' => [
+            'idx_codes_user' => ['unique' => false, 'columns' => 'user_id'],
+        ]],
+
+        /* One row per reminder actually sent, so none is ever sent twice. */
+        'reminders_sent' => ['columns' => [
+            'id'         => '@id',
+            'project_id' => '@fk NULL',
+            'kind'       => "VARCHAR(30) NOT NULL DEFAULT ''",
+            'due_on'     => 'DATE NULL',
+            'stage'      => 'INTEGER NOT NULL DEFAULT 0',
+            'sent_to'    => "VARCHAR(190) NOT NULL DEFAULT ''",
+            'created_at' => 'DATETIME NULL',
+        ], 'indexes' => [
+            'idx_reminders_key' => ['unique' => false, 'columns' => 'project_id'],
         ]],
 
         'login_attempts' => ['columns' => [

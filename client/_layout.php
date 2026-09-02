@@ -44,12 +44,6 @@ function client_head(string $title, string $current = ''): void
 <?php foreach (flash_take() as $f): ?>
   <div class="flash <?= esc($f['type']) ?>"><?= $f['message'] ?></div>
 <?php endforeach; ?>
-<?php if (!empty($user['must_change_password'])): ?>
-  <div class="flash warn">
-    You are still using the temporary password we sent you.
-    <a href="account.php" style="color:inherit;text-decoration:underline">Choose your own</a>.
-  </div>
-<?php endif; ?>
 <?php
 }
 

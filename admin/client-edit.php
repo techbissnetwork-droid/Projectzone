@@ -25,24 +25,6 @@ if (is_post() && post('action') === 'delete' && $client) {
     redirect('clients.php');
 }
 
-if (is_post() && post('action') === 'reset' && $client) {
-    csrf_check();
-    $temp = temp_password();
-    db_update('users', (int) $client['id'], [
-        'password_hash'        => hash_password($temp),
-        'must_change_password' => 1,
-    ]);
-    $project = db_one('SELECT * FROM projects WHERE user_id = ? ORDER BY id DESC', [$client['id']]);
-    $sent    = mail_client_welcome($client, $temp, $project);
-    log_activity('Reset password for ' . $client['email'], 'user', (int) $client['id']);
-    flash($sent
-        ? 'A new password has been emailed to ' . esc($client['email']) . '.'
-        : 'Password reset, but <strong>the email could not be sent</strong>. Give them this '
-          . 'password yourself: <code style="font-family:var(--mono)">' . esc($temp) . '</code>',
-        $sent ? 'ok' : 'warn');
-    redirect('client-edit.php?id=' . $client['id']);
-}
-
 if (is_post() && post('action') === 'save') {
     csrf_check();
     $data = [
@@ -64,19 +46,16 @@ if (is_post() && post('action') === 'save') {
             flash('Client saved.');
             redirect('client-edit.php?id=' . $client['id']);
         }
-        $temp = temp_password();
-        $data['role']                 = ROLE_CLIENT;
-        $data['password_hash']        = hash_password($temp);
-        $data['must_change_password'] = 1;
-        $data['created_at']           = now();
+        $data['role']       = ROLE_CLIENT;
+        $data['created_at'] = now();
         $newId = db_insert('users', $data);
         $user  = db_one('SELECT * FROM users WHERE id = ?', [$newId]);
-        $sent  = mail_client_welcome($user, $temp, null);
+        $sent  = mail_client_welcome($user, null);
         log_activity('Created client: ' . $data['email'], 'user', $newId);
         flash($sent
-            ? 'Client created and their password emailed.'
-            : 'Client created. <strong>The email could not be sent</strong>, so give them this '
-              . 'password: <code style="font-family:var(--mono)">' . esc($temp) . '</code>',
+            ? 'Client created and told their portal is ready.'
+            : 'Client created, but <strong>the welcome email could not be sent</strong>. They can '
+              . 'still sign in — the portal emails a code when they enter their address.',
             $sent ? 'ok' : 'warn');
         redirect('client-edit.php?id=' . $newId);
     }
@@ -114,7 +93,8 @@ foreach ($errors as $e) {
             <input id="name" name="name" required value="<?= esc($c['name']) ?>"></div>
           <div class="f"><label for="email">Email</label>
             <input id="email" name="email" type="email" required value="<?= esc($c['email']) ?>">
-            <span class="hint">This is their sign-in address.</span></div>
+            <span class="hint">Their sign-in address, and where their code is emailed.
+              Only you can change this &mdash; they cannot change it themselves.</span></div>
         </div>
         <div class="grid2">
           <div class="f"><label for="phone">Phone</label>

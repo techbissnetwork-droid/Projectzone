@@ -130,27 +130,27 @@ if (is_post() && post('action') === 'save') {
                     flash('That email belongs to a team account, so no client login was created for it.', 'warn');
                 }
             } else {
-                $temp = temp_password();
+                /* Clients have no password — they sign in with an emailed code. */
                 $userId = db_insert('users', [
-                    'name'                 => $data['owner_name'] ?: $data['name'],
-                    'email'                => $data['owner_email'],
-                    'password_hash'        => hash_password($temp),
-                    'role'                 => ROLE_CLIENT,
-                    'phone'                => $data['owner_phone'],
-                    'company'              => $data['company'],
-                    'status'               => 'active',
-                    'must_change_password' => 1,
-                    'created_at'           => now(),
+                    'name'       => $data['owner_name'] ?: $data['name'],
+                    'email'      => $data['owner_email'],
+                    'role'       => ROLE_CLIENT,
+                    'phone'      => $data['owner_phone'],
+                    'company'    => $data['company'],
+                    'status'     => 'active',
+                    'created_at' => now(),
                 ]);
                 db_run('UPDATE projects SET user_id = ? WHERE id = ?', [$userId, $projectId]);
                 $user = db_one('SELECT * FROM users WHERE id = ?', [$userId]);
-                $sent = mail_client_welcome($user, $temp, db_one('SELECT * FROM projects WHERE id = ?', [$projectId]));
+                $sent = mail_client_welcome($user, db_one('SELECT * FROM projects WHERE id = ?', [$projectId]));
                 log_activity('Created client login for ' . $data['owner_email'], 'user', $userId);
                 flash($sent
-                    ? 'Client login created and emailed to ' . esc($data['owner_email']) . '.'
-                    : 'Client login created. <strong>The email could not be sent</strong>, so give them '
-                      . 'this password yourself: <code style="font-family:var(--mono)">' . esc($temp)
-                      . '</code>', $sent ? 'ok' : 'warn');
+                    ? 'Client account created. We emailed ' . esc($data['owner_email'])
+                      . ' to say their portal is ready.'
+                    : 'Client account created, but <strong>the welcome email could not be sent</strong>. '
+                      . 'Tell them to go to the portal and sign in with '
+                      . '<code style="font-family:var(--mono)">' . esc($data['owner_email'])
+                      . '</code> — the code is emailed at that point.', $sent ? 'ok' : 'warn');
             }
         }
 
@@ -243,8 +243,9 @@ foreach ($errors as $e) {
           <label class="check">
             <input type="checkbox" name="create_login" value="1">
             <span><strong>Give the owner a login.</strong> Creates a client account for the email
-              above and emails them a temporary password. They can then see this project, its
-              renewal dates, raise support and maintenance requests, and message you.</span>
+              above. There is no password — they sign in at the portal with that address and a
+              code we email them. They can then see this project, its renewal dates, raise support
+              and maintenance requests, and message you.</span>
           </label>
         </div>
 <?php endif; ?>
