@@ -23,7 +23,7 @@ $price = $p['sale_price'] !== null ? (float)$p['sale_price'] : (float)$p['price'
       <p class="pcard__desc"><?= e(excerpt($p['summary'], 118)) ?></p>
       <div class="pcard__foot">
         <span class="pcard__price">
-          <?= e(money($price)) ?>
+          <span><?= e(money($price)) ?></span>
           <?php if ($p['sale_price'] !== null): ?><s><?= e(money($p['price'])) ?></s><?php endif; ?>
         </span>
         <span class="pcard__go" aria-hidden="true">→</span>

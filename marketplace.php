@@ -47,7 +47,9 @@ require __DIR__ . '/partials/public_header.php';
         <a class="btn btn--ghost magnetic" href="<?= e(url('contact.php')) ?>">Ask what is coming</a>
       </div>
     <?php else: ?>
-      <div class="pgrid">
+      <?php /* Up to four products get a row of their own; more fall back to three. */
+         $pcols = count($products) <= 4 ? max(2, count($products)) : 3; ?>
+      <div class="pgrid" style="--n:<?= $pcols ?>">
         <?php foreach ($products as $p): require __DIR__ . '/partials/product_card.php'; endforeach; ?>
       </div>
     <?php endif; ?>

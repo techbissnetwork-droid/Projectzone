@@ -65,7 +65,14 @@
 /* ── product cards ───────────────────────────────────────── */
 .mkt-strip{ padding:clamp(70px,9vw,130px) 0; background:
   radial-gradient(70% 40% at 50% 0%, rgba(231,187,141,.06), transparent 62%), var(--bg) }
-.pgrid{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:clamp(14px,2vw,24px) }
+/* --n is the number of products, set inline; up to four they get a row of their
+   own rather than three and a stray. The media queries below set --cols
+   directly, which an inline custom property would otherwise outrank. */
+.pgrid{
+  display:grid; gap:clamp(14px,2vw,24px);
+  --cols:var(--n,3);
+  grid-template-columns:repeat(var(--cols),minmax(0,1fr));
+}
 .pcard{ height:100% }
 .pcard__link{
   display:grid; grid-template-rows:auto 1fr; height:100%;
@@ -87,9 +94,15 @@
 .pcard__cat{ color:var(--sig); letter-spacing:.13em }
 .pcard__title{ font-size:1.2rem; letter-spacing:-.03em }
 .pcard__desc{ color:var(--tx-2); font-size:14px }
-.pcard__foot{ display:flex; align-items:baseline; gap:12px; margin-top:8px; padding-top:14px; border-top:1px solid var(--line) }
-.pcard__price{ font-family:var(--ff-d); font-size:1.15rem; font-weight:600; letter-spacing:-.03em }
-.pcard__price s{ margin-left:8px; font-size:.78em; color:var(--tx-4); font-weight:400 }
+.pcard__foot{ display:flex; align-items:baseline; gap:10px; margin-top:8px; padding-top:14px; border-top:1px solid var(--line) }
+.pcard__price{
+  font-family:var(--ff-d); font-size:1.15rem; font-weight:600; letter-spacing:-.03em;
+  /* Each figure stays whole. Without this a narrow card breaks the struck-out
+     price across lines, leaving a stray "Rs" hanging on the row above. */
+  display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 8px; min-width:0;
+}
+.pcard__price > span{ white-space:nowrap }
+.pcard__price s{ font-size:.78em; color:var(--tx-4); font-weight:400; white-space:nowrap }
 .pcard__go{ margin-left:auto; color:var(--sig); transition:transform .5s var(--e-out) }
 .pcard:hover .pcard__go{ transform:translateX(5px) }
 

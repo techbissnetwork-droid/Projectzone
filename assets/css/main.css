@@ -280,8 +280,10 @@ section{ position:relative; z-index:2; }
 }
 @media (max-width:1100px){ .svc__art{ display:none; } }
 
-/* Uniform modules: every service reads the same, none is a hero. */
-.svcs__grid{ grid-template-columns:repeat(4,minmax(0,1fr)); }
+/* Uniform modules: every service reads the same, none is a hero. Three columns,
+   because the page lists every service and nine of them make three clean rows —
+   four columns strand a single card beside three empty cells. */
+.svcs__grid{ grid-template-columns:repeat(3,minmax(0,1fr)); }
 .svcs__grid > .svc{ grid-column:auto; grid-row:auto; }
 
 .svcs__foot{ margin-top:26px; color:var(--tx-3); font-size:14px; display:flex; flex-wrap:wrap; gap:10px 18px; align-items:center; }
@@ -329,7 +331,6 @@ section{ position:relative; z-index:2; }
 /* Four modules side by side, stepping down before they get too narrow to read. */
 .carousel.svcs__carousel{ --rows:1; --cols:4; }
 @media (max-width:1200px){
-  .svcs__grid{ grid-template-columns:repeat(3,minmax(0,1fr)); }
   .carousel.svcs__carousel{ --cols:3; }
 }
 @media (max-width:880px){
