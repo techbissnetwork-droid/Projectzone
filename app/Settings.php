@@ -28,7 +28,10 @@ final class Settings
     public static function get(string $key, string $default = ''): string
     {
         self::load();
-        $v = self::$cache[$key] ?? null;
+        /* A key absent from the database has simply never been migrated, so the
+           code default stands in until the update runs. A key that is present
+           but empty was deliberately cleared, and is left empty. */
+        $v = self::$cache[$key] ?? (self::defaults()[$key] ?? null);
         return ($v === null || $v === '') ? $default : (string)$v;
     }
 
@@ -65,7 +68,8 @@ final class Settings
     /** @return array<string,string> */
     public static function defaults(): array
     {
-        return [
+        static $d = null;
+        return $d ??= [
             'site_name'        => 'TECHBISS',
             'site_tagline'     => 'Digital transformation for businesses ready to move forward.',
             'site_description' => 'TECHBISS builds the complete digital presence of your business — websites, apps, hosting, security, email, e-commerce, automation and payments.',
@@ -113,7 +117,6 @@ final class Settings
 
             /* home page sections */
             'scroll_pace'      => 'standard',
-            'home_services'    => '6',
             'home_sections'    => 'journey,services,arch,process,work,transform,pillars,marketplace,quote',
             'section_journey'  => '1',
             'section_services' => '1',
@@ -127,6 +130,8 @@ final class Settings
 
             /* section headings */
             'journey_eyebrow'  => 'The transformation',
+            'journey_title'    => "Offline to online,\nstage by stage.",
+            'journey_lede'     => 'The same business, rebuilt so it runs itself — records become data, the shopfront becomes a website, and reach stops ending at the end of the street.',
             'services_eyebrow' => 'The ecosystem',
             'services_title'   => "Everything your business\nneeds to exist online.",
             'services_lede'    => 'Commission one module, or let us run the entire stack — domain to analytics — as a single system.',
@@ -135,7 +140,8 @@ final class Settings
             'arch_lede'        => 'Brand, front-end, application, backend, database, payments, hosting, security and analytics — designed as one architecture so nothing is bolted on later.',
             'arch_flow'        => 'Brand → Website → App → Backend → Database → Payments → Hosting → Security → Analytics',
             'process_eyebrow'  => 'The experience',
-            'process_title'    => 'How we work',
+            'process_title'    => "How we work,\nfrom first call to launch.",
+            'process_lede'     => 'Five stages, each with something you can see and sign off before the next one starts.',
             'work_eyebrow'     => 'Selected builds',
             'work_title'       => "Businesses that moved\ntheir operations online.",
             'work_lede'        => 'Delivered projects, with the scope and the outcome.',

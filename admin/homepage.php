@@ -4,6 +4,38 @@ require_once __DIR__ . '/../app/bootstrap.php';
 require_once __DIR__ . '/../app/guard.php';
 require_admin();
 
+/**
+ * The heading of every home-page section, grouped as they appear on the page.
+ * Titles take a line break; the site renders it as one.
+ */
+const HEADING_FIELDS = [
+    'journey' => [
+        'journey_eyebrow' => 'Eyebrow', 'journey_title' => 'Headline', 'journey_lede' => 'Paragraph',
+    ],
+    'services' => [
+        'services_eyebrow' => 'Eyebrow', 'services_title' => 'Headline', 'services_lede' => 'Paragraph',
+    ],
+    'arch' => [
+        'arch_eyebrow' => 'Eyebrow', 'arch_title' => 'Headline', 'arch_lede' => 'Paragraph',
+        'arch_flow' => 'Data path line',
+    ],
+    'process' => [
+        'process_eyebrow' => 'Eyebrow', 'process_title' => 'Headline', 'process_lede' => 'Paragraph',
+    ],
+    'work' => [
+        'work_eyebrow' => 'Eyebrow', 'work_title' => 'Headline', 'work_lede' => 'Paragraph',
+    ],
+    'transform' => [
+        'transform_eyebrow' => 'Eyebrow', 'transform_title' => 'Headline',
+    ],
+    'pillars' => [
+        'pillars_eyebrow' => 'Eyebrow', 'pillars_title' => 'Headline', 'pillars_lede' => 'Paragraph',
+    ],
+    'marketplace' => [
+        'mkt_eyebrow' => 'Eyebrow', 'mkt_title' => 'Headline', 'mkt_lede' => 'Paragraph',
+    ],
+];
+
 if (post()) {
     Csrf::check();
     $order = [];
@@ -23,6 +55,14 @@ if (post()) {
     foreach (['hero_eyebrow','hero_title_a','hero_title_b','hero_title_c','hero_lede',
               'hero_cta_primary','hero_cta_secondary','quote'] as $k) {
         $save[$k] = trim((string)($_POST[$k] ?? ''));
+    }
+    /* Every section heading is editable from the same page. */
+    foreach (HEADING_FIELDS as $fields) {
+        foreach (array_keys($fields) as $k) {
+            if (array_key_exists($k, $_POST)) {
+                $save[$k] = trim((string)$_POST[$k]);
+            }
+        }
     }
     Settings::setMany($save);
     log_activity('homepage.update');
@@ -112,6 +152,20 @@ require __DIR__ . '/../partials/app_header.php';
         <p class="legend">Statement quote</p>
         <label class="field"><span>Quote</span><textarea name="quote" rows="3"><?= e(Settings::get('quote')) ?></textarea></label>
       </div>
+
+      <?php foreach (HEADING_FIELDS as $sec => $fields): ?>
+        <div class="fieldset" id="head-<?= e($sec) ?>">
+          <p class="legend"><?= e(Content::SECTIONS[$sec] ?? label($sec)) ?></p>
+          <?php foreach ($fields as $k => $lbl): ?>
+            <?php if ($lbl === 'Headline' || $lbl === 'Paragraph'): ?>
+              <label class="field"><span><?= e($lbl) ?><?php if ($lbl === 'Headline'): ?> <small>a line break splits the headline</small><?php endif; ?></span>
+                <textarea name="<?= e($k) ?>" rows="<?= $lbl === 'Headline' ? 2 : 3 ?>"><?= e(Settings::get($k)) ?></textarea></label>
+            <?php else: ?>
+              <label class="field"><span><?= e($lbl) ?></span><input name="<?= e($k) ?>" value="<?= e(Settings::get($k)) ?>"></label>
+            <?php endif; ?>
+          <?php endforeach; ?>
+        </div>
+      <?php endforeach; ?>
     </div>
   </div>
   <div class="formfoot"><button class="btn" type="submit">Save home page</button></div>

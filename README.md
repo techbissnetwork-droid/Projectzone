@@ -53,9 +53,10 @@ The installer checks all of this on the first step and writes nothing until you 
 `marketplace.php` · `product.php` · `contact.php` · `login.php` · `page.php` (your own pages)
 
 Every headline, colour, service, project and price comes from the database.
-The animated hero ecosystem, the offline→online scroll transformation, the
-system-architecture diagram and the process timeline are all still there — they
-are now partials in `partials/section_*.php`, shared between pages.
+The animated hero ecosystem and the system-architecture diagram are still there;
+the offline→online transformation and the process timeline are plain single rows
+of stages rather than scroll-driven set pieces. All of them are partials in
+`partials/section_*.php`, shared between pages.
 
 ### Admin panel — `/admin/`
 | Page | What it does |
@@ -70,7 +71,7 @@ are now partials in `partials/section_*.php`, shared between pages.
 | Orders | Confirm payments; a sale is counted once, when it first reaches paid |
 | Services | The modules shown on the site, reorderable and switchable |
 | Enquiries | Contact-form inbox with read / archive / delete |
-| **Home page** | Turn each section on or off and drag the order; edit the hero and the quote |
+| **Home page** | Turn each section on or off and drag the order; edit the hero, the quote and the heading of every section |
 | **Content** | Every repeatable list: hero stats, the offline→online journey, the process timeline, the trust pillars, the architecture diagram, the transformations |
 | **Pages** | Create any page — About, Privacy, Terms — with its own header style and SEO |
 | **Menus** | Build the header menu and three footer columns from built-in pages, your own pages or any URL |
@@ -131,7 +132,8 @@ panel, so you can record a delivery before the client agrees to publish it.
 
 Nothing on the public site is hardcoded any more.
 
-- **Every section of the home page** — order, visibility, headings and body copy.
+- **Every section of the home page** — order, visibility, and the eyebrow,
+  headline and paragraph of each one, all on the Home page screen.
 - **Every repeatable list** — the four journey stages, five process steps, six
   pillars, ten architecture nodes, six transformations and three hero stats are
   rows in one table you edit, reorder, hide or delete. Add a sixth process step
