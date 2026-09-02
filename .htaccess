@@ -1,0 +1,41 @@
+# TECHBISS — Apache configuration for shared / cPanel hosting.
+
+Options -Indexes
+DirectoryIndex index.php index.html
+
+# The application folder holds database credentials. Nothing in it should ever
+# be reachable over the web; every page loads it from disk instead.
+RedirectMatch 404 ^/app/
+RedirectMatch 404 ^/storage/
+
+<FilesMatch "^(config\.php|config\.sample\.php|\.gitignore|README\.md|composer\.(json|lock))$">
+  Require all denied
+</FilesMatch>
+
+ErrorDocument 404 /404.php
+
+# Drop the .php from addresses: /services instead of /services.php
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_URI} !\.[a-zA-Z0-9]{2,5}$
+  RewriteRule ^(.+)$ $1.php [L]
+</IfModule>
+
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/javascript application/javascript image/svg+xml
+</IfModule>
+
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/css "access plus 7 days"
+  ExpiresByType application/javascript "access plus 7 days"
+  ExpiresByType image/svg+xml "access plus 30 days"
+</IfModule>

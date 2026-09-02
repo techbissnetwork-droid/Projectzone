@@ -1,0 +1,10 @@
+# Real credentials, written by install.php
+app/config.php
+
+# SQLite database and anything else generated at runtime
+storage/*
+!storage/.htaccess
+!storage/.gitkeep
+
+.DS_Store
+Thumbs.db

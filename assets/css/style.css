@@ -359,6 +359,17 @@ form.enquiry{display:grid; gap:.85rem}
 .ccard p{margin:0; color:var(--muted); font-size:.84rem; line-height:1.6}
 .ccard a{color:var(--ink); text-decoration:none} .ccard a:hover{color:var(--lime)}
 
+/* form notices + honeypot */
+.notice{border:1px solid var(--hair-strong); border-radius:14px; padding:1.2rem 1.35rem; background:var(--glass); margin-bottom:1.2rem}
+.notice--ok{border-color:var(--lime); background:rgba(200,255,77,0.06)}
+.notice--err{border-color:var(--pink); background:rgba(255,93,143,0.06)}
+.notice h3{font-family:var(--font-display); font-weight:700; font-size:1.02rem; margin:0 0 .4rem}
+.notice p{margin:0; color:var(--muted); font-size:.86rem; line-height:1.6}
+.notice ul{margin:0; padding-left:1.1rem; color:var(--ink); font-size:.86rem; line-height:1.7}
+.notice a{color:var(--lime)}
+/* Honeypot: off-screen rather than display:none, which some bots skip. */
+.hp{position:absolute; left:-9999px; top:auto; width:1px; height:1px; overflow:hidden}
+
 /* ---------- team ---------- */
 .team{display:grid; grid-template-columns:repeat(4,1fr); gap:1rem}
 .member{border:1px solid var(--hair-strong); border-radius:14px; padding:1.15rem; background:var(--glass)}
