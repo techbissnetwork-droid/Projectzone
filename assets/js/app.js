@@ -529,11 +529,11 @@
 
     var dpr = Math.min(window.devicePixelRatio || 1, 2);
     var w = 0, h = 0;
-    var colors = ['#26d9c9', '#b9a8ff'];
+    var colors = ['#26d9c9', '#c8ff4d', '#ff5d8f'];
     var blobs = [
       { x: 0.22, y: 0.38, r: 0.42, dx: 0.05, dy: 0.035, freq: 0.05, phase: 0,   c: 0 },
       { x: 0.74, y: 0.26, r: 0.34, dx: 0.045, dy: 0.05,  freq: 0.045, phase: 2.1, c: 1 },
-      { x: 0.52, y: 0.72, r: 0.38, dx: 0.04, dy: 0.045,  freq: 0.038, phase: 4.2, c: 0 },
+      { x: 0.52, y: 0.72, r: 0.38, dx: 0.04, dy: 0.045,  freq: 0.038, phase: 4.2, c: 2 },
     ];
 
     function toRgba(color, alpha) {
@@ -550,11 +550,13 @@
 
     function readColors() {
       var cs = getComputedStyle(document.documentElement);
-      colors = [cs.getPropertyValue('--accent').trim() || colors[0], cs.getPropertyValue('--violet').trim() || colors[1]];
+      colors = [
+        cs.getPropertyValue('--cyan').trim() || colors[0],
+        cs.getPropertyValue('--lime').trim() || colors[1],
+        cs.getPropertyValue('--rose').trim() || colors[2],
+      ];
     }
     readColors();
-    var themeWatch = new MutationObserver(readColors);
-    themeWatch.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
     function resize() {
       var r = canvas.getBoundingClientRect();
@@ -573,18 +575,20 @@
       if (start === null) start = ts;
       var t = (ts - start) / 1000;
       ctx.clearRect(0, 0, w, h);
+      ctx.globalCompositeOperation = 'lighter';
       blobs.forEach(function (b) {
         var cx = (b.x + Math.sin(t * b.freq + b.phase) * b.dx) * w;
         var cy = (b.y + Math.cos(t * b.freq * 0.9 + b.phase) * b.dy) * h;
         var radius = b.r * Math.max(w, h);
         var g = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
-        g.addColorStop(0, toRgba(colors[b.c], 0.22));
+        g.addColorStop(0, toRgba(colors[b.c], 0.3));
         g.addColorStop(1, toRgba(colors[b.c], 0));
         ctx.fillStyle = g;
         ctx.beginPath();
         ctx.arc(cx, cy, radius, 0, Math.PI * 2);
         ctx.fill();
       });
+      ctx.globalCompositeOperation = 'source-over';
       raf = requestAnimationFrame(frame);
     }
 

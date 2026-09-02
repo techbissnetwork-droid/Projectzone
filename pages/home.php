@@ -16,14 +16,6 @@ $hero = $sections['hero'] ?? [];
 <section class="hero">
     <div class="hero__bg" aria-hidden="true">
         <canvas data-ambient aria-hidden="true"></canvas>
-        <span class="glow glow--a" data-parallax="0.12"></span>
-        <span class="glow glow--b" data-parallax="0.22"></span>
-        <span class="grid-pattern"></span>
-        <span class="float-shapes">
-            <span class="float-shape float-shape--1"></span>
-            <span class="float-shape float-shape--2 float-shape--round"></span>
-            <span class="float-shape float-shape--3"></span>
-        </span>
     </div>
 
     <div class="container">
@@ -91,8 +83,6 @@ $hero = $sections['hero'] ?? [];
                 </div>
                 <?php endif; ?>
             </div>
-
-            <?= $view->partial('partials/hero-visual') ?>
         </div>
     </div>
 
