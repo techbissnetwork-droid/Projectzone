@@ -5,6 +5,23 @@
     'lead'    => 'Domain, hosting, the website and email come as one setup — not separate purchases. Branding, SEO, apps, automation and maintenance are the work you add around it.',
 ]) ?>
 
+<?php if ($services): ?>
+<section class="section section--flush-top section--flush-bottom">
+    <div class="container">
+        <?= $view->partial('partials/hero-visual', [
+            'wrapClass' => 'services-visual',
+            'ariaLabel' => 'A diagram showing several separate tools and vendors converging into one TECHBISS setup, covering domain, hosting, website, business email, mobile, analytics, AI and SEO.',
+            'coreLabel' => 'ALL INCLUDED',
+            'coreSub'   => 'ONE SETUP',
+            'fromLabel' => 'Before',
+            'fromValue' => 'Scattered tools and vendors',
+            'toLabel'   => 'After',
+            'toValue'   => 'One partner, one bill',
+        ]) ?>
+    </div>
+</section>
+<?php endif; ?>
+
 <section class="section section--flush-top">
     <div class="container">
         <h2 class="sr-only">Services</h2>
@@ -16,7 +33,7 @@
                 <a class="btn btn--primary mt-4" href="<?= e(url('/contact')) ?>">Get in touch</a>
             </div>
         <?php else: ?>
-        <div class="section-head" data-reveal>
+        <div class="section-head" data-reveal="rise-blur">
             <p class="eyebrow">In detail</p>
             <h2 class="mt-4">What each service actually includes.</h2>
             <p class="lead">No vague deliverables. Here is what is in scope before you commit to anything.</p>

@@ -84,7 +84,7 @@ $title = rawurlencode((string) $post['title']);
         <h2 class="mb-6" style="font-size:var(--fs-h3)" data-reveal>Keep reading</h2>
         <div class="grid grid-3" data-reveal-stagger>
             <?php foreach ($related as $i => $rel): $rimg = media_url($rel['featured_image']); ?>
-            <article class="card card--interactive post-card" style="--i:<?= $i ?>" data-reveal>
+            <article class="card card--interactive card--spotlight post-card" style="--i:<?= $i ?>" data-reveal>
                 <?php if ($rimg !== ''): ?>
                 <div class="post-card__media"><img src="<?= e($rimg) ?>" alt="<?= e($rel['title']) ?>" loading="lazy" width="600" height="338"></div>
                 <?php endif; ?>

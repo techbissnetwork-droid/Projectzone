@@ -110,7 +110,8 @@ $gaId       = $settings->get('google_analytics_id');
    and never used — the forms carry it in a hidden field. */
 window.TECHBISS = {
     cursor: <?= $settings->bool('enable_cursor', true) ? 'true' : 'false' ?>,
-    transitions: <?= $settings->bool('enable_transitions', true) ? 'true' : 'false' ?>
+    transitions: <?= $settings->bool('enable_transitions', true) ? 'true' : 'false' ?>,
+    ambient: <?= $settings->bool('enable_ambient', true) ? 'true' : 'false' ?>
 };
 </script>
 <script src="<?= e(asset('assets/js/app.js')) ?>" defer></script>

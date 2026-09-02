@@ -18,6 +18,10 @@ $mail = email_link('Request from the website');
     'lead'    => 'Tick anything you need, add the rest in your own words, then send it. No forms to fill in and nothing to pay here.',
 ]) ?>
 
+<div class="container">
+    <?= $view->partial('partials/radar-visual', ['label' => 'No payment taken here — the price comes after']) ?>
+</div>
+
 <section class="section section--flush-top">
     <div class="container container--narrow">
         <?php if ($ready): ?>

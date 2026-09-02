@@ -13,6 +13,7 @@ $crumbs  = $seo->getBreadcrumbs();
     <div class="page-head__bg" aria-hidden="true">
         <span class="glow" data-parallax="0.08"></span>
         <span class="grid-pattern"></span>
+        <span class="page-head__ring"></span>
     </div>
     <div class="container">
         <?php if (count($crumbs) > 1): ?>

@@ -375,6 +375,7 @@ h4 { font-size: var(--fs-h4); letter-spacing: -0.012em; }
 .section { padding-block: var(--section-y); position: relative; }
 .section--tight { padding-block: clamp(3rem, 2rem + 4vw, 5.5rem); }
 .section--flush-top { padding-top: 0; }
+.section--flush-bottom { padding-bottom: 0; }
 
 .section-head { max-width: 62ch; margin-bottom: clamp(2.25rem, 1.5rem + 2.5vw, 3.75rem); }
 .section-head--center { margin-inline: auto; text-align: center; }
@@ -1265,7 +1266,7 @@ a.pill:hover, button.pill:hover { border-color: var(--border-strong); color: var
 [data-reveal] {
   opacity: 0;
   transform: translateY(18px);
-  transition: opacity 620ms var(--ease-out), transform 620ms var(--ease-out);
+  transition: opacity 620ms var(--ease-out), transform 620ms var(--ease-out), filter 620ms var(--ease-out);
   transition-delay: var(--reveal-delay, 0ms);
   will-change: opacity, transform;
 }
@@ -1274,7 +1275,11 @@ a.pill:hover, button.pill:hover { border-color: var(--border-strong); color: var
 [data-reveal="scale"] { transform: scale(0.965); }
 [data-reveal="fade"]  { transform: none; }
 [data-reveal="kinetic"] { opacity: 1; transform: none; }
-[data-reveal].is-visible { opacity: 1; transform: none; will-change: auto; }
+/* Same rise as the default, plus a soft-to-sharp focus pull — reserved for a
+   handful of showcase moments (set-piece visuals, section leads), not blanket
+   sitewide, since blur is a heavier paint cost than plain opacity/transform. */
+[data-reveal="rise-blur"] { filter: blur(9px); }
+[data-reveal].is-visible { opacity: 1; transform: none; filter: none; will-change: auto; }
 
 /* Progressive list reveal — index set inline by the template */
 [data-reveal-stagger] > * { --reveal-delay: calc(var(--i, 0) * 55ms); }
@@ -1294,6 +1299,56 @@ a.pill:hover, button.pill:hover { border-color: var(--border-strong); color: var
 [data-reveal="kinetic"].is-visible .kinetic-word > span { transform: translateY(0); }
 
 /* ---------------------------------------------------------------------
+   14b. Scroll scenes — continuous, scroll-linked (not one-shot) motion.
+   initScrollScene() in app.js writes --scroll-progress on [data-scene]
+   elements as the page scrolls: 0 when the element's top has just reached
+   the bottom of the viewport, 1 once it has fully scrolled past the top.
+   JS only ever writes that one number; every visual decision lives here,
+   the same split already used for --mx/--my (cursor spotlight) and
+   --sx/--sy (band spotlight). initScrollScene() does nothing at all under
+   reduced motion, so every custom property below carries a fallback that
+   resolves to the settled, final look with no JS involved.
+   --------------------------------------------------------------------- */
+[data-scene] {
+  /* Remaps the first 35% of an element's scroll journey to 0-1, so it
+     settles into place shortly after entering view rather than still be
+     animating once a visitor is already reading it. */
+  --scene-in: clamp(0, calc(var(--scroll-progress, 1) / 0.35), 1);
+}
+[data-scene="rise"] {
+  opacity: var(--scene-in);
+  transform: translateY(calc((1 - var(--scene-in)) * 34px)) scale(calc(0.96 + var(--scene-in) * 0.04));
+  will-change: transform, opacity;
+}
+[data-scene="tilt"] {
+  opacity: var(--scene-in);
+  transform: perspective(900px) rotateX(calc((1 - var(--scene-in)) * 12deg)) translateY(calc((1 - var(--scene-in)) * 26px));
+  will-change: transform, opacity;
+}
+[data-scene="drift"] {
+  /* No entrance fade — for decorative background elements that should
+     already be visible, just keep gently traveling opposite the scroll
+     for as long as they're near the viewport. Falls back to a centered
+     0.5 so an element with no JS running sits at its neutral position. */
+  transform: translateY(calc((var(--scroll-progress, 0.5) - 0.5) * -48px));
+  will-change: transform;
+}
+
+/* Ambient canvas — a soft drifting-gradient background confined to a hero
+   band, drawn by initAmbient() in app.js. Purely decorative: never the only
+   carrier of real content, always aria-hidden. */
+canvas[data-ambient] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 900ms var(--ease-out);
+}
+canvas[data-ambient].is-ready { opacity: 1; }
+
+/* ---------------------------------------------------------------------
    15. Motion and print preferences
    --------------------------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
@@ -1306,6 +1361,11 @@ a.pill:hover, button.pill:hover { border-color: var(--border-strong); color: var
   }
   [data-reveal] { opacity: 1 !important; transform: none !important; }
   .btn--primary::before { display: none; }
+  /* The ambient canvas is a requestAnimationFrame loop, not a CSS animation
+     or transition — nothing above touches it. initAmbient() in app.js checks
+     reduceMotion before ever starting that loop, which is the real fix; this
+     is a visual backstop in case that check ever races the media query. */
+  canvas[data-ambient] { display: none !important; }
 }
 
 @media print {

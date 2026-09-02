@@ -40,7 +40,7 @@ $hero = media_url($page['hero_image'] ?? '');
 <?php if (!empty($services)): ?>
 <section class="section">
     <div class="container">
-        <div class="section-head" data-reveal>
+        <div class="section-head" data-reveal="rise-blur">
             <p class="eyebrow">What we do</p>
             <h2 class="mt-4">Everything under one partner.</h2>
         </div>
@@ -56,7 +56,7 @@ $hero = media_url($page['hero_image'] ?? '');
 <?php if (!empty($steps)): ?>
 <section class="section">
     <div class="container">
-        <div class="section-head" data-reveal>
+        <div class="section-head" data-reveal="rise-blur">
             <p class="eyebrow">How we work</p>
             <h2 class="mt-4">A process you can plan around.</h2>
         </div>

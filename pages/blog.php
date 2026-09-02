@@ -49,7 +49,7 @@ $query = array_filter(['category' => $activeCat, 'tag' => $activeTag, 'q' => $se
             <div class="slider" data-slider>
                 <div class="slider__track slider__track--cards" data-reveal-stagger>
                 <?php foreach ($posts as $i => $post): $img = media_url($post['featured_image']); ?>
-                <article class="card card--interactive post-card" style="--i:<?= $i ?>" data-reveal>
+                <article class="card card--interactive card--spotlight post-card" style="--i:<?= $i ?>" data-reveal>
                     <?php if ($img !== ''): ?>
                     <div class="post-card__media">
                         <img src="<?= e($img) ?>" alt="<?= e($post['title']) ?>" loading="lazy" decoding="async" width="600" height="338">

@@ -144,7 +144,7 @@ $phoneLink = phone_link();
 <?php if ($related): ?>
 <section class="section">
     <div class="container">
-        <div class="section-head" data-reveal>
+        <div class="section-head" data-reveal="rise-blur">
             <p class="eyebrow">Works well with</p>
             <h2 class="mt-4">Services businesses usually pair with this.</h2>
         </div>

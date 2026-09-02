@@ -109,6 +109,7 @@ INSERT INTO `settings` (`group_name`, `key_name`, `value`, `type`, `label`, `hin
 ('appearance','enable_loader','1','bool','Branded loading screen','',3,NOW()),
 ('appearance','enable_cursor','1','bool','Desktop cursor enhancement','Automatically disabled on touch devices.',4,NOW()),
 ('appearance','enable_transitions','1','bool','Page transitions','',5,NOW()),
+('appearance','enable_ambient','1','bool','Ambient background motion','A soft moving gradient behind the homepage hero. Automatically off when a visitor has reduced motion turned on.',6,NOW()),
 -- Commerce
 ('commerce','public_pricing','0','bool','Show prices on the website','Off by default: work is priced in conversation. Turn on only if you want figures published.',0,NOW()),
 ('commerce','currency','USD','text','Currency code','',1,NOW()),

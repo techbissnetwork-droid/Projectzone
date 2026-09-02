@@ -23,7 +23,7 @@
                 ['Our work', '/portfolio', 'image', 'Projects and case studies.'],
                 ['Contact', '/contact', 'mail', 'Talk to a person.'],
             ] as $i => $link): ?>
-            <a class="card card--interactive" href="<?= e(url($link[1])) ?>" style="--i:<?= $i ?>" data-reveal>
+            <a class="card card--interactive card--spotlight" href="<?= e(url($link[1])) ?>" style="--i:<?= $i ?>" data-reveal>
                 <span class="icon-plate icon-plate--sm"><?= icon($link[2]) ?></span>
                 <h2 class="card__title mt-4" style="font-size:var(--fs-sm)"><?= e($link[0]) ?></h2>
                 <p class="card__text" style="font-size:var(--fs-xs)"><?= e($link[3]) ?></p>

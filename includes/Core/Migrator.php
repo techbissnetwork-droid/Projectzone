@@ -540,6 +540,8 @@ final class Migrator
         $settings = [
             ['commerce', 'public_pricing', '0', 'bool', 'Show prices on the website',
              'Off by default: packages and services are priced in conversation. Turn on only if you want figures published.', 0],
+            ['appearance', 'enable_ambient', '1', 'bool', 'Ambient background motion',
+             'A soft moving gradient behind the homepage hero. Automatically off when a visitor has reduced motion turned on.', 6],
         ];
         if (isset($existing['settings'])) {
             foreach ($settings as [$group, $key, $value, $type, $label, $hint, $order]) {

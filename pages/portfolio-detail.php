@@ -143,7 +143,7 @@ $blocks = array_filter([
 <?php if ($images): ?>
 <section class="section">
     <div class="container">
-        <div class="section-head" data-reveal>
+        <div class="section-head" data-reveal="rise-blur">
             <p class="eyebrow">Gallery</p>
             <h2 class="mt-4">A closer look</h2>
         </div>

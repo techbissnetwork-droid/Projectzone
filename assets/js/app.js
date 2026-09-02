@@ -416,6 +416,50 @@
   }
 
   /* -------------------------------------------------------------------
+     Scroll scenes — continuous scroll-linked motion, not one-shot like
+     data-reveal. Writes --scroll-progress (0 to 1, how far the element has
+     traveled through the viewport) on every [data-scene] element; CSS owns
+     what that number does to transform/opacity, same bridge pattern as the
+     cursor/band spotlight's --mx/--sx custom properties above. An
+     IntersectionObserver keeps only near-viewport elements in the per-frame
+     loop — data-parallax is a handful of hero layers and can afford to
+     touch every one of them every scroll frame, but data-scene is meant to
+     be used liberally across a whole page, so it needs the gate from the
+     start.
+     ------------------------------------------------------------------- */
+  function initScrollScene() {
+    var scenes = $$('[data-scene]');
+    if (!scenes.length || reduceMotion.matches || !('IntersectionObserver' in window)) return;
+
+    var active = [];
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        var i = active.indexOf(entry.target);
+        if (entry.isIntersecting) {
+          if (i === -1) active.push(entry.target);
+        } else if (i !== -1) {
+          active.splice(i, 1);
+        }
+      });
+    }, { rootMargin: '200px 0px 200px 0px', threshold: 0 });
+    scenes.forEach(function (el) { io.observe(el); });
+
+    var update = throttleFrame(function () {
+      var vh = window.innerHeight;
+      active.forEach(function (el) {
+        var r = el.getBoundingClientRect();
+        var total = vh + r.height;
+        var p = total > 0 ? (vh - r.top) / total : 0;
+        if (p < 0) p = 0; else if (p > 1) p = 1;
+        el.style.setProperty('--scroll-progress', p.toFixed(3));
+      });
+    });
+    on(window, 'scroll', update, { passive: true });
+    on(window, 'resize', update);
+    update();
+  }
+
+  /* -------------------------------------------------------------------
      Cursor spotlight over a CTA band's grid — desktop pointers only
      ------------------------------------------------------------------- */
   function initSpotlightBand() {
@@ -432,6 +476,110 @@
       });
       on(band, 'mouseleave', function () { spot.classList.remove('is-active'); });
     });
+  }
+
+  /* -------------------------------------------------------------------
+     Ambient background — a soft drifting-gradient canvas confined to a
+     hero band. Reserved for a couple of flagship moments (marked with
+     canvas[data-ambient] in the template), never sitewide: this is the one
+     genuinely continuous render loop in the file, so it is the most
+     strictly gated. It only ever starts if reduced motion is off, the
+     canvas is actually on/near screen, and the tab is visible — and it
+     stops the instant any of those stop being true, not just at load.
+     ------------------------------------------------------------------- */
+  function initAmbient() {
+    var canvas = $('canvas[data-ambient]');
+    if (!canvas || !canvas.getContext) return;
+
+    var ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var w = 0, h = 0;
+    var colors = ['#4f8cff', '#a78bfa'];
+    var blobs = [
+      { x: 0.22, y: 0.38, r: 0.42, dx: 0.05, dy: 0.035, freq: 0.05, phase: 0,   c: 0 },
+      { x: 0.74, y: 0.26, r: 0.34, dx: 0.045, dy: 0.05,  freq: 0.045, phase: 2.1, c: 1 },
+      { x: 0.52, y: 0.72, r: 0.38, dx: 0.04, dy: 0.045,  freq: 0.038, phase: 4.2, c: 0 },
+    ];
+
+    function toRgba(color, alpha) {
+      color = (color || '').trim();
+      if (color.charAt(0) === '#') {
+        var hex = color.slice(1);
+        if (hex.length === 3) hex = hex.replace(/./g, function (c) { return c + c; });
+        var num = parseInt(hex, 16);
+        return 'rgba(' + [(num >> 16) & 255, (num >> 8) & 255, num & 255].join(',') + ',' + alpha + ')';
+      }
+      var m = color.match(/rgba?\(([^)]+)\)/);
+      return m ? 'rgba(' + m[1].split(',').slice(0, 3).join(',') + ',' + alpha + ')' : color;
+    }
+
+    function readColors() {
+      var cs = getComputedStyle(document.documentElement);
+      colors = [cs.getPropertyValue('--accent').trim() || colors[0], cs.getPropertyValue('--violet').trim() || colors[1]];
+    }
+    readColors();
+    var themeWatch = new MutationObserver(readColors);
+    themeWatch.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+    function resize() {
+      var r = canvas.getBoundingClientRect();
+      w = Math.max(1, Math.round(r.width));
+      h = Math.max(1, Math.round(r.height));
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    resize();
+    on(window, 'resize', throttleFrame(resize));
+
+    var raf = null, start = null, running = false;
+    function frame(ts) {
+      if (!running) return;
+      if (start === null) start = ts;
+      var t = (ts - start) / 1000;
+      ctx.clearRect(0, 0, w, h);
+      blobs.forEach(function (b) {
+        var cx = (b.x + Math.sin(t * b.freq + b.phase) * b.dx) * w;
+        var cy = (b.y + Math.cos(t * b.freq * 0.9 + b.phase) * b.dy) * h;
+        var radius = b.r * Math.max(w, h);
+        var g = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
+        g.addColorStop(0, toRgba(colors[b.c], 0.22));
+        g.addColorStop(1, toRgba(colors[b.c], 0));
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      raf = requestAnimationFrame(frame);
+    }
+
+    function play() {
+      if (running) return;
+      running = true;
+      start = null;
+      raf = requestAnimationFrame(frame);
+      requestAnimationFrame(function () { canvas.classList.add('is-ready'); });
+    }
+    function pause() {
+      running = false;
+      if (raf) cancelAnimationFrame(raf);
+    }
+
+    var onScreen = false, tabVisible = !document.hidden;
+    function sync() {
+      if (onScreen && tabVisible && !reduceMotion.matches) play(); else pause();
+    }
+
+    var io = new IntersectionObserver(function (entries) {
+      onScreen = entries[0].isIntersecting;
+      sync();
+    }, { threshold: 0 });
+    io.observe(canvas);
+
+    on(document, 'visibilitychange', function () { tabVisible = !document.hidden; sync(); });
+    on(reduceMotion, 'change', sync);
   }
 
   /* -------------------------------------------------------------------
@@ -866,7 +1014,9 @@
     if (cfg.cursor !== false) initCursor();
     initMagnetic();
     initParallax();
+    initScrollScene();
     initSpotlightBand();
+    if (cfg.ambient !== false) initAmbient();
     initSliders();
     initAutoOpen();
   }

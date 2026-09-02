@@ -11,7 +11,7 @@
         <?php if ($steps): ?>
         <div class="process" data-reveal="kinetic">
             <?php foreach ($steps as $step): ?>
-            <div class="process__step" data-reveal>
+            <div class="process__step" data-scene="rise">
                 <div class="process__num"><?= e($step['step_number']) ?></div>
                 <div class="process__body">
                     <div class="row row--tight mb-3">

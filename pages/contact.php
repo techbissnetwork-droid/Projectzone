@@ -8,6 +8,10 @@ $whatsapp = whatsapp_link();
     'lead'    => 'No sales script. Tell us what you run and what is missing.',
 ]) ?>
 
+<div class="container">
+    <?= $view->partial('partials/radar-visual', ['label' => 'We reply within one business day']) ?>
+</div>
+
 <section class="section section--flush-top">
     <div class="container">
         <div class="contact-grid">

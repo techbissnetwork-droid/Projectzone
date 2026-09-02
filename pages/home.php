@@ -15,6 +15,7 @@ $hero = $sections['hero'] ?? [];
 <!-- ================= HERO ================= -->
 <section class="hero">
     <div class="hero__bg" aria-hidden="true">
+        <canvas data-ambient aria-hidden="true"></canvas>
         <span class="glow glow--a" data-parallax="0.12"></span>
         <span class="glow glow--b" data-parallax="0.22"></span>
         <span class="grid-pattern"></span>
@@ -122,7 +123,7 @@ $hero = $sections['hero'] ?? [];
 <?php if (isset($sections['problem'])): ?>
 <section class="section">
     <div class="container">
-        <div class="section-head" data-reveal>
+        <div class="section-head" data-reveal="rise-blur">
             <p class="eyebrow"><?= e($s('problem', 'eyebrow')) ?></p>
             <h2><?= e($s('problem', 'heading')) ?></h2>
             <p class="lead"><?= e($s('problem', 'subheading')) ?></p>
@@ -194,7 +195,7 @@ $hero = $sections['hero'] ?? [];
 <?php if ($industries): ?>
 <section class="section">
     <div class="container">
-        <div class="section-head" data-reveal>
+        <div class="section-head" data-reveal="rise-blur">
             <p class="eyebrow"><?= e($s('industries', 'eyebrow', 'Industries')) ?></p>
             <h2 class="mt-4"><?= e($s('industries', 'heading', 'Built around how your sector actually works.')) ?></h2>
             <p class="lead"><?= e($s('industries', 'subheading')) ?></p>
