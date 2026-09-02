@@ -86,7 +86,12 @@
 }
 @media (max-width: 560px) {
   .bento { grid-template-columns: 1fr; }
-  .bento > .card:nth-child(1) { grid-column: span 1; }
+  /* Both wide cards need resetting here, not just the featured one — a
+     lone leftover span:2 on a 1-column grid makes CSS Grid invent a
+     phantom second column, which starves every card's real column down
+     to a sliver and wraps every heading to one letter per line. */
+  .bento > .card:nth-child(1),
+  .bento > .card:nth-child(4) { grid-column: span 1; }
 }
 
 /* ---------------------------------------------------------------------
