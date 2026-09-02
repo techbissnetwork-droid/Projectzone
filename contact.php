@@ -78,7 +78,7 @@ page_head(
 <section id="form"><div class="wrap">
 <?php if ($sent): ?>
   <div class="notebox ok rv">
-    <h3>Message received.</h3>
+    <h3>Thanks, we have got it.</h3>
     <p><?= esc(setting('contact.thanks')) ?></p>
     <div class="acts" style="margin-top:20px">
       <a class="pill" href="portfolio.php">See our work</a>
@@ -110,26 +110,26 @@ page_head(
           <input id="company" name="company" value="<?= esc(post('company')) ?>"></div>
       </div>
       <div class="two">
-        <div class="field"><label for="service">What do you need</label>
+        <div class="field"><label for="service">What are you after</label>
           <select id="service" name="service">
-            <option value="">Not sure yet</option>
+            <option value="">I am not sure yet</option>
 <?php foreach ($services as $s): ?>
             <option value="<?= esc($s['title']) ?>"<?= post('service') === $s['title'] ? ' selected' : '' ?>>
               <?= esc($s['title']) ?></option>
 <?php endforeach; ?>
-            <option value="The whole stack"<?= post('service') === 'The whole stack' ? ' selected' : '' ?>>The whole stack</option>
+            <option value="Everything"<?= post('service') === 'Everything' ? ' selected' : '' ?>>Everything &mdash; I want it all handled</option>
           </select></div>
-        <div class="field"><label for="budget">Rough budget</label>
+        <div class="field"><label for="budget">Rough budget, if you have one</label>
           <select id="budget" name="budget">
 <?php foreach (['', 'Under $1,500', '$1,500 – $4,000', '$4,000 – $10,000', 'Over $10,000', 'No idea yet'] as $b): ?>
             <option value="<?= esc($b) ?>"<?= post('budget') === $b && $b !== '' ? ' selected' : '' ?>>
-              <?= $b === '' ? 'Prefer not to say' : esc($b) ?></option>
+              <?= $b === '' ? 'I would rather not say' : esc($b) ?></option>
 <?php endforeach; ?>
           </select></div>
       </div>
-      <div class="field"><label for="message">What is going on <span class="req">*</span></label>
+      <div class="field"><label for="message">Tell us a bit more <span class="req">*</span></label>
         <textarea id="message" name="message" required minlength="10"
-          placeholder="What the business does, what you have online today, and what is frustrating right now."><?= esc(post('message')) ?></textarea>
+          placeholder="What your business does, what you have online at the moment, and what is annoying you."><?= esc(post('message')) ?></textarea>
         <span class="err">A sentence or two is plenty.</span></div>
 
       <input class="hp" type="text" name="company_website" tabindex="-1" autocomplete="off" aria-hidden="true">
@@ -142,12 +142,12 @@ page_head(
       <div class="cbit">
         <h4>Email</h4>
         <a href="mailto:<?= esc(setting('site.email')) ?>"><?= esc(setting('site.email')) ?></a>
-        <p>For anything new. We answer within one business day.</p>
+        <p>For anything new. We reply within one working day.</p>
       </div>
       <div class="cbit">
         <h4>Support</h4>
         <a href="mailto:<?= esc(setting('site.support_email')) ?>"><?= esc(setting('site.support_email')) ?></a>
-        <p>Already a client? Raise it in the
+        <p>Already a customer? Raise it in the
            <a href="client/login.php" style="display:inline;font-size:inherit;font-family:inherit;font-weight:400;color:var(--acc)">client portal</a>
            so it is tracked against your project.</p>
       </div>
@@ -160,8 +160,8 @@ page_head(
 <?php endif; ?>
       <div class="cbit">
         <h4>What happens next</h4>
-        <p>You get a straight answer about what is worth doing first &mdash; and what is not.
-           No script, no deck, no pressure to buy the whole stack on day one.</p>
+        <p>You get an honest answer about what is worth doing first, and what can wait. No sales
+           script, no slideshow, and no pressure to buy everything on day one.</p>
       </div>
     </aside>
   </div>
@@ -170,5 +170,5 @@ page_head(
 
 <?php
 faq_block('services', 'While you are here.',
-    'The questions we get asked before anyone signs anything.');
+    'The things people usually want to know before they commit to anything.');
 include APP_DIR . '/partials/footer.php';

@@ -84,14 +84,14 @@ include APP_DIR . '/partials/head.php';
         </div>
       </div>
 <?php endif; ?>
-      <a class="pill lg" href="contact.php" style="width:100%">Start something like this</a>
+      <a class="pill lg" href="contact.php" style="width:100%">Ask about something like this</a>
     </aside>
   </div>
 </div></section>
 
 <?php if ($more): ?>
 <section><div class="wrap">
-  <div class="sh rv"><span class="no">More work</span><h2>Other things<br>we run.</h2></div>
+  <div class="sh rv"><span class="no">More work</span><h2>Other work<br>we have done.</h2></div>
   <div class="grid-3">
 <?php foreach (array_slice($more, 0, 3) as $p) { portfolio_card($p); } ?>
   </div>
@@ -99,7 +99,7 @@ include APP_DIR . '/partials/head.php';
 <?php endif; ?>
 
 <?php
-closing_cta('Want one of these for your business?',
-    'One conversation, no script. Describe what you run and what is missing.',
-    ['contact.php', 'Talk to us &rarr;'], ['portfolio.php', 'See all work']);
+closing_cta('Want something like this?',
+    'One chat, no sales script. Tell us what you do and what is missing.',
+    ['contact.php', 'Talk to us &rarr;'], ['portfolio.php', 'See more work']);
 include APP_DIR . '/partials/footer.php';

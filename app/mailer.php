@@ -145,3 +145,20 @@ function mail_ticket_reply(array $ticket, string $body, bool $toClient, ?array $
           . url('admin/ticket.php?id=' . $ticket['id']) . "\n";
     return send_mail(mail_to(), '[' . $ticket['reference'] . '] ' . $ticket['subject'], $text);
 }
+
+/** Send the buyer their download link. */
+function mail_order_delivery(array $order, ?array $product, int $days): bool
+{
+    $link = url('download.php?token=' . $order['download_token']);
+    $body = "Your files are ready.\n\n"
+          . "Order:   {$order['reference']}\n"
+          . "Project: " . ($product['title'] ?? '') . "\n\n"
+          . "Download them here:\n\n"
+          . $link . "\n\n"
+          . "The link works for {$days} days. If it expires before you have grabbed them,\n"
+          . "reply to this email and we will send a fresh one — your purchase stays on file.\n\n"
+          . "Unzip, upload to your hosting, open install.php and follow the three steps.\n"
+          . "Reply here if you get stuck at any point.\n\n"
+          . "— " . setting('site.name', 'TECHBISS') . "\n";
+    return send_mail($order['buyer_email'], 'Your files — ' . $order['reference'], $body);
+}

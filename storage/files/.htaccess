@@ -1,0 +1,9 @@
+# Purchased project files live here. They are only ever served through
+# download.php, which checks the buyer's token first — never directly.
+<IfModule mod_authz_core.c>
+  Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+  Order allow,deny
+  Deny from all
+</IfModule>

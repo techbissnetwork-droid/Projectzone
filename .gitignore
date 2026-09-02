@@ -8,6 +8,11 @@ storage/uploads/*
 !storage/uploads/.htaccess
 !storage/uploads/.gitkeep
 
+# Files sold through the marketplace. Never in version control.
+storage/files/*
+!storage/files/.htaccess
+!storage/files/.gitkeep
+
 # Editor and OS noise
 .DS_Store
 Thumbs.db

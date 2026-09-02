@@ -19,7 +19,7 @@ page_head(
     setting('pricing.hero.line2'),
     setting('pricing.hero.lead'),
     [['index.php', 'Home'], [null, 'Pricing']],
-    [['contact.php', 'Get an exact number &rarr;'], ['marketplace.php', 'Buy something premade']]
+    [['contact.php', 'Get a price &rarr;'], ['marketplace.php', 'Buy one ready-made']]
 );
 
 /** One row of package cards. */
@@ -43,7 +43,7 @@ function package_row(array $packages, string $sym): void
 ?>
 
 <section><div class="wrap">
-  <div class="sh rv"><span class="no">Build</span>
+  <div class="sh rv"><span class="no">Building it</span>
     <h2><?= esc(setting('pricing.build.heading')) ?></h2>
     <p><?= esc(setting('pricing.build.sub')) ?></p></div>
   <?php package_row($builds, $sym); ?>
@@ -51,7 +51,7 @@ function package_row(array $packages, string $sym): void
 
 <?php if ($care): ?>
 <section><div class="wrap">
-  <div class="sh rv"><span class="no">Care</span>
+  <div class="sh rv"><span class="no">Looking after it</span>
     <h2><?= esc(setting('pricing.care.heading')) ?></h2>
     <p><?= esc(setting('pricing.care.sub')) ?></p></div>
   <?php package_row($care, $sym); ?>
@@ -60,7 +60,7 @@ function package_row(array $packages, string $sym): void
 
 <?php if ($addons): ?>
 <section><div class="wrap">
-  <div class="sh rv"><span class="no">Add-ons</span>
+  <div class="sh rv"><span class="no">Extras</span>
     <h2><?= esc(setting('pricing.addons.heading')) ?></h2>
     <p><?= esc(setting('pricing.addons.sub')) ?></p></div>
   <div class="addons rv">
@@ -78,8 +78,8 @@ function package_row(array $packages, string $sym): void
 <?php statement(setting('pricing.statement')); ?>
 
 <section><div class="wrap">
-  <div class="sh rv"><span class="no">Side by side</span><h2>What is in<br>each package.</h2>
-    <p>So nothing is hiding in a footnote.</p></div>
+  <div class="sh rv"><span class="no">Side by side</span><h2>What you get<br>in each one.</h2>
+    <p>Side by side, so nothing is hiding in the small print.</p></div>
   <div class="tablewrap rv">
     <table>
       <caption class="sr">Comparison of the build packages</caption>
@@ -92,15 +92,15 @@ function package_row(array $packages, string $sym): void
       <tbody>
 <?php
 $compare = [
-  ['Pages included',            ['Up to 5', 'Up to 15', 'As scoped']],
-  ['Editable admin area',       ['n', 'y', 'y']],
-  ['Domain, hosting &amp; SSL set up', ['y', 'y', 'y']],
-  ['Business email configured', ['y', 'y', 'y']],
-  ['SEO groundwork',            ['n', 'y', 'y']],
-  ['Google Business listing',   ['y', 'y', 'y']],
-  ['E-commerce or booking',     ['n', 'n', 'y']],
-  ['Integrations &amp; automation',   ['n', 'n', 'y']],
-  ['Aftercare',                 ['30 days', '90 days', 'Ongoing']],
+  ['Pages included',            ['Up to 5', 'Up to 15', 'As agreed']],
+  ['You can edit it yourself',  ['n', 'y', 'y']],
+  ['Web address, hosting and security', ['y', 'y', 'y']],
+  ['Business email set up',     ['y', 'y', 'y']],
+  ['Groundwork for Google',     ['n', 'y', 'y']],
+  ['Your Google listing',       ['y', 'y', 'y']],
+  ['Online shop or booking',    ['n', 'n', 'y']],
+  ['Joining up your other tools', ['n', 'n', 'y']],
+  ['We look after it',          ['30 days', '90 days', 'Ongoing']],
 ];
 foreach ($compare as [$label, $cells]): ?>
         <tr>
@@ -115,13 +115,13 @@ foreach ($compare as [$label, $cells]): ?>
       </tbody>
     </table>
   </div>
-  <p class="formnote rv" style="margin-top:18px">Third-party costs &mdash; domain registration,
-     hosting, email licences &mdash; are billed to you at cost, in your own name. Typically
-     <?= esc($sym) ?>80 to <?= esc($sym) ?>300 a year for a small business.</p>
+  <p class="formnote rv" style="margin-top:18px">Things we buy for you &mdash; your web address,
+     hosting and email accounts &mdash; are charged at exactly what they cost, in your own name.
+     For a small business that is usually <?= esc($sym) ?>80 to <?= esc($sym) ?>300 a year.</p>
 </div></section>
 
 <?php
-faq_block('pricing', 'Pricing questions.', 'The awkward ones, answered up front.');
+faq_block('pricing', 'Questions about money.', 'Including the awkward ones.');
 closing_cta(setting('pricing.cta.heading'), setting('pricing.cta.body'),
-    ['contact.php', 'Get an exact number &rarr;'], ['services.php', 'See the services']);
+    ['contact.php', 'Get a price &rarr;'], ['services.php', 'See what we do']);
 include APP_DIR . '/partials/footer.php';

@@ -22,6 +22,7 @@ require_once APP_DIR . '/auth.php';
 require_once APP_DIR . '/content.php';
 require_once APP_DIR . '/mailer.php';
 require_once APP_DIR . '/reminders.php';
+require_once APP_DIR . '/seo.php';
 
 /**
  * Config, loaded once.

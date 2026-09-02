@@ -33,6 +33,7 @@ function admin_nav(): array
         ],
         'Website' => [
             ['content.php',                    'Page text',    null],
+            ['branding.php',                   'Branding & SEO', null],
             ['resource.php?type=services',     'Services',     null],
             ['resource.php?type=industries',   'Industries',   null],
             ['resource.php?type=packages',     'Pricing',      null],
@@ -47,6 +48,7 @@ function admin_nav(): array
         'System' => [
             ['settings.php', 'Settings', null],
             ['users.php',    'Team',     null],
+            ['backup.php',   'Backup',   null],
             ['activity.php', 'Activity', null],
         ],
     ];

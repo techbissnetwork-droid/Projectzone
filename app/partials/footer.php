@@ -3,7 +3,7 @@
 <footer class="site-foot"><div class="wrap">
   <div class="fg">
     <div>
-      <a class="logo" href="index.php"><i aria-hidden="true"></i><?= esc(setting('site.name', 'TECHBISS')) ?></a>
+      <a class="logo" href="index.php"><?php brand_mark(true); ?></a>
       <p><?= esc(setting('site.tagline')) ?></p>
     </div>
     <div><h5>Company</h5><ul>

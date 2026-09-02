@@ -47,22 +47,22 @@ include APP_DIR . '/partials/head.php';
   <div class="stack">
 <?php
 $blocks = [
-  ['Build', 'Websites and apps designed for the business you actually run — fast, indexed, and yours to edit without calling anyone.',
-   ['Websites, 5 to 50 pages, with a CMS you can use', 'Booking, ordering, portals, dashboards',
-    'E-commerce and payments', 'Content written with you, not filled with lorem'],
-   'Build / design / ship'],
-  ['Set up', 'Domain, hosting, SSL and business email, configured together as one system — under your own accounts, in your own name.',
-   ['Domain registered to you, never to us', 'Hosting provisioned, tuned, backed up nightly',
-    'Certificates issued and auto-renewed', 'SPF, DKIM and DMARC set so mail lands'],
-   'Domain / host / SSL / mail'],
-  ['Be found', 'Most businesses we meet already work. They are just invisible to anyone searching for what they sell.',
-   ['Technical SEO and a sitemap that gets read', 'Google Business and Maps, details kept accurate',
-    'Branding — logo, colour, type, assets', 'Listings tidied across the web'],
-   'SEO / maps / brand'],
-  ['Keep running', 'The part most vendors skip. Launch is the start of the job, not the end of it.',
-   ['Uptime monitoring, 60-second checks', 'Nightly backups with 30-day retention',
-    'Renewals watched so nothing lapses on a Sunday', 'One number for support — the people who built it'],
-   'Monitor / backup / support'],
+  ['We build it', 'A website made for the business you actually run — quick on a phone, easy to find, and simple enough that you can change the words yourself.',
+   ['Websites you can edit yourself, no code', 'Booking, ordering and customer logins',
+    'Online shops and card payments', 'Words written with you, not filled with waffle'],
+   'Design and build'],
+  ['We set it up', 'Your web address, hosting, the security padlock and business email — all sorted together, and all in your name rather than ours.',
+   ['Your web address bought in your name, never ours', 'Hosting set up, made quick, copied every night',
+    'The padlock in place and renewed automatically', 'Email set up so it does not land in spam'],
+   'Address, hosting, email'],
+  ['People find you', 'Most businesses we meet are doing fine. They are just invisible to anyone searching for what they sell.',
+   ['The groundwork so Google can read your site', 'Your Google and Maps listing, with the right hours',
+    'Logo, colours and fonts if you need them', 'Your details tidied up everywhere online'],
+   'Google and Maps'],
+  ['We keep it going', 'The bit most companies skip. Going live is the start of the job, not the end of it.',
+   ['Checked every minute to make sure it is up', 'A copy saved every night, kept for a month',
+    'Renewals watched, so nothing expires on a Sunday', 'One number to call — the people who built it'],
+   'Looking after it'],
 ];
 foreach ($blocks as $i => [$title, $body, $bullets, $label]): ?>
     <article class="sc"><div class="in"><div>
@@ -74,7 +74,7 @@ foreach ($blocks as $i => [$title, $body, $bullets, $label]): ?>
 <?php endforeach; ?>
   </div>
   <div class="spacer"></div>
-  <div class="rv center"><a class="pill ghost lg" href="services.php">All ten services in full &rarr;</a></div>
+  <div class="rv center"><a class="pill ghost lg" href="services.php">See everything we do &rarr;</a></div>
 </div></section>
 
 <section id="proof"><div class="wrap">
@@ -97,7 +97,7 @@ foreach ($blocks as $i => [$title, $body, $bullets, $label]): ?>
 <?php foreach ($work as $p) { portfolio_card($p); } ?>
   </div>
   <div class="spacer"></div>
-  <div class="rv center"><a class="pill ghost lg" href="portfolio.php">See all our work &rarr;</a></div>
+  <div class="rv center"><a class="pill ghost lg" href="portfolio.php">See more of our work &rarr;</a></div>
 </div></section>
 <?php endif; ?>
 
@@ -106,17 +106,18 @@ foreach ($blocks as $i => [$title, $body, $bullets, $label]): ?>
     <h2><?= esc(setting('home.process.heading')) ?></h2>
     <p><?= esc(setting('home.process.sub')) ?></p></div>
   <div class="pr">
-    <div class="ps"><h4>Conversation</h4>
-      <p>You describe what the business does and what is missing. We say what is worth doing
-         first &mdash; and what is not.</p></div>
-    <div class="ps"><h4>Written scope</h4>
-      <p>Everything listed on one page, one fixed number. Third-party costs passed through at
-         cost, in your name.</p></div>
-    <div class="ps"><h4>Build &amp; set up</h4>
-      <p>Domain, hosting, SSL, email and the site configured together, under your own accounts,
-         documented.</p></div>
-    <div class="ps"><h4>Live &amp; watched</h4>
-      <p>Monitoring, backups, renewals and support from the same people who built the thing.</p></div>
+    <div class="ps"><h4>We talk</h4>
+      <p>You tell us what your business does and what is missing. We tell you what is worth
+         doing first, and what is not worth paying for yet.</p></div>
+    <div class="ps"><h4>You get a price</h4>
+      <p>Everything you are getting, listed on one page, with one fixed price. Anything we buy
+         for you is charged at cost.</p></div>
+    <div class="ps"><h4>We build it</h4>
+      <p>Website, web address, hosting, security and email, all set up together and all in your
+         name. We write down how it works.</p></div>
+    <div class="ps"><h4>We look after it</h4>
+      <p>Checks, backups, renewals and support, from the same people who built it. Not a call
+         centre.</p></div>
   </div>
 </div></section>
 
@@ -130,7 +131,7 @@ foreach ($blocks as $i => [$title, $body, $bullets, $label]): ?>
 <?php foreach ($products as $p) { product_card($p); } ?>
   </div>
   <div class="spacer"></div>
-  <div class="rv center"><a class="pill ghost lg" href="marketplace.php">Browse the marketplace &rarr;</a></div>
+  <div class="rv center"><a class="pill ghost lg" href="marketplace.php">See the ready-made ones &rarr;</a></div>
 </div></section>
 <?php endif; ?>
 
@@ -158,7 +159,7 @@ foreach ($blocks as $i => [$title, $body, $bullets, $label]): ?>
 <?php if ($builds): ?>
 <section id="pricing"><div class="wrap">
   <div class="sh rv"><span class="no">Pricing</span>
-    <h2>Prices you can see<br>before you call.</h2>
+    <h2>Prices, before<br>you call us.</h2>
     <p><?= esc(setting('pricing.hero.lead')) ?></p></div>
   <div class="pl">
 <?php $sym = setting('site.currency', '$');
@@ -169,7 +170,7 @@ foreach ($blocks as $i => [$title, $body, $bullets, $label]): ?>
       <div class="per"><?= esc($b['period']) ?></div>
 <?php if ($b['blurb']): ?>      <p class="who"><?= esc($b['blurb']) ?></p><?php endif; ?>
       <ul><?php foreach (lines($b['features']) as $f): ?><li><?= esc($f) ?></li><?php endforeach; ?></ul>
-      <a class="pill<?= $b['is_featured'] ? '' : ' ghost' ?>" href="pricing.php">See what is included</a>
+      <a class="pill<?= $b['is_featured'] ? '' : ' ghost' ?>" href="pricing.php">What you get</a>
     </div>
 <?php endforeach; ?>
   </div>

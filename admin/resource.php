@@ -38,6 +38,9 @@ if (is_post() && post('action') === 'delete') {
         if (!empty($res['image']) && !empty($victim[$res['image']])) {
             delete_upload($victim[$res['image']]);
         }
+        if (!empty($victim['file_path'])) {
+            delete_stored_file($victim['file_path']);
+        }
         db_delete($table, (int) $victim['id']);
         log_activity('Deleted ' . strtolower($res['singular']), $type, (int) $victim['id']);
         flash(esc($res['singular']) . ' deleted.');
@@ -82,6 +85,26 @@ if (is_post() && post('action') === 'save') {
                     $errors[] = $label . ' is not a valid date.';
                 } else {
                     $data[$key] = $v;
+                }
+                break;
+
+            case 'file':
+                $err = null;
+                $new = handle_file_upload($key, $err);
+                if ($err) {
+                    $errors[] = $err;
+                } elseif ($new) {
+                    if ($row && $row[$key]) {
+                        delete_stored_file($row[$key]);
+                    }
+                    $data[$key] = $new;
+                    $data['file_name'] = (string) ($_FILES[$key]['name'] ?? '');
+                } elseif (post('remove_' . $key) === '1') {
+                    if ($row && $row[$key]) {
+                        delete_stored_file($row[$key]);
+                    }
+                    $data[$key]        = '';
+                    $data['file_name'] = '';
                 }
                 break;
 
@@ -212,6 +235,23 @@ if ($action === 'edit' || $action === 'new') {
                     <input type="checkbox" name="<?= esc($key) ?>" value="1"<?= $value ? ' checked' : '' ?>>
                     <span><?= esc($hint ?: $label) ?></span></label><?php
                 $hint = '';
+                break;
+
+            case 'file':
+                if ($value) {
+                    $full = APP_ROOT . '/' . $value;
+                    ?><p style="font-size:14px;color:var(--mute);margin-bottom:8px">
+                        Currently: <strong style="color:var(--fg)"><?=
+                          esc($row['file_name'] ?: basename((string) $value)) ?></strong>
+                        <?= is_file($full) ? '(' . number_format(filesize($full) / 1048576, 1) . ' MB)'
+                                           : '<span style="color:var(--bad)">— missing from disk</span>' ?>
+                      </p>
+                    <label class="check" style="margin-bottom:8px">
+                      <input type="checkbox" name="remove_<?= esc($key) ?>" value="1">
+                      <span>Remove this file</span></label><?php
+                }
+                ?><input id="<?= esc($key) ?>" name="<?= esc($key) ?>" type="file"
+                         accept=".zip,.gz,.tgz,.rar,.7z,.pdf"><?php
                 break;
 
             case 'image':

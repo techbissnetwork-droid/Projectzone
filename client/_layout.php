@@ -4,13 +4,20 @@
 function client_head(string $title, string $current = ''): void
 {
     $user = current_user();
-    $nav  = [
+    $nav = [
         ['index.php',       'Overview'],
         ['project.php',     'My project'],
         ['support.php',     'Support'],
         ['maintenance.php', 'Maintenance'],
-        ['account.php',     'Account'],
     ];
+    /* Only worth a tab if they have actually bought something. */
+    if ($user && db_count(
+        'SELECT COUNT(*) FROM orders WHERE user_id = ? OR LOWER(buyer_email) = ?',
+        [$user['id'], strtolower($user['email'])]
+    )) {
+        $nav[] = ['orders.php', 'Orders'];
+    }
+    $nav[] = ['account.php', 'Account'];
     ?><!DOCTYPE html>
 <html lang="en">
 <head>

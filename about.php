@@ -15,7 +15,7 @@ page_head(
     setting('about.hero.line2'),
     setting('about.hero.lead'),
     [['index.php', 'Home'], [null, 'About']],
-    [['contact.php', 'Start a conversation &rarr;'], ['portfolio.php', 'See our work']]
+    [['contact.php', 'Have a chat &rarr;'], ['portfolio.php', 'See our work']]
 );
 ?>
 
@@ -46,22 +46,22 @@ page_head(
 <section><div class="wrap">
   <div class="sh rv"><span class="no">How we work</span>
     <h2><?= esc(setting('about.rules.heading')) ?></h2>
-    <p>Five things we hold to, including the ones that cost us work.</p></div>
+    <p>Six things we stick to, including the ones that cost us money.</p></div>
   <div class="grid-auto">
 <?php
 $rules = [
-  ['Everything in your name', '◇',
-   'Domain, hosting, email and every third-party account is registered to your business, not to us. We do the admin without holding the asset. If you leave, nothing has to move.'],
-  ['Third-party costs at cost', '◈',
-   'Domain registration, hosting and email licences are billed to you at what they cost. We do not mark up a domain and call it a service.'],
+  ['Everything is in your name', '◇',
+   'Your web address, hosting and email are all bought in your business name, not ours. We do the work without owning your things. If you ever leave us, nothing has to be moved or handed back.'],
+  ['We do not add a markup', '◈',
+   'Your web address, hosting and email accounts are charged at exactly what they cost us. We do not buy a $12 web address, sell it to you for $60, and call that a service.'],
   ['We will talk you out of work', '⛨',
-   'If your site works and only needs email or search fixed, we say so and quote for the smaller job. A rebuild you did not need is a bad sale twice.'],
-  ['Launch is the start', '⟲',
-   'Monitoring, backups, renewals and updates continue after go-live. Most vendors disappear at handover; that is when most things actually break.'],
-  ['One number for support', '☎',
-   'The people who answer built the thing. No ticket queue in another timezone, no explaining your setup from scratch each time.'],
-  ['Written scope, fixed price', '▣',
-   'Everything listed on one page before work starts. If you ask for something outside it, we quote that first — never after the fact.'],
+   'If your site is fine and only your email or your Google listing needs fixing, we will say so and quote for that instead. Selling you a rebuild you did not need loses us the next job too.'],
+  ['Going live is the start', '⟲',
+   'Checks, backups, renewals and updates carry on after your site is live. Most companies disappear the day they hand over, which is exactly when things start to break.'],
+  ['One number to call', '☎',
+   'The person who answers is the person who built it. No queue in another country, and no explaining your setup from scratch every single time.'],
+  ['A written price, agreed first', '▣',
+   'Everything you are getting on one page, before any work starts. Ask for something extra and we tell you the price before we do it, never after.'],
 ];
 foreach ($rules as [$title, $icon, $body]): ?>
     <article class="card rv">
@@ -74,8 +74,8 @@ foreach ($rules as [$title, $icon, $body]): ?>
 </div></section>
 
 <section class="tight"><div class="wrap">
-  <p class="say rv">We are not short of competition. We are just the ones
-     <mark>who answer the phone in year three.</mark></p>
+  <p class="say rv">Plenty of people can build you a website. We are the ones
+     <mark>still answering the phone three years later.</mark></p>
 </div></section>
 
 <?php $work = public_portfolio(3); if ($work): ?>
@@ -89,5 +89,5 @@ foreach ($rules as [$title, $icon, $body]): ?>
 
 <?php
 closing_cta(setting('about.cta.heading'), setting('about.cta.body'),
-    ['contact.php', 'Talk to us &rarr;'], ['services.php', 'See the services']);
+    ['contact.php', 'Talk to us &rarr;'], ['services.php', 'See what we do']);
 include APP_DIR . '/partials/footer.php';

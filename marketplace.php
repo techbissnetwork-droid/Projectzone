@@ -30,7 +30,7 @@ page_head(
     setting('market.hero.line2'),
     setting('market.hero.lead'),
     [['index.php', 'Home'], [null, 'Marketplace']],
-    [['#listings', 'Browse what is ready &rarr;'], ['contact.php', 'Ask for something else']]
+    [['#listings', 'See what is ready &rarr;'], ['contact.php', 'Ask for something else']]
 );
 ?>
 
@@ -62,36 +62,35 @@ page_head(
 
 <section><div class="wrap">
   <div class="sh rv"><span class="no">How buying works</span>
-    <h2>Built already.<br>Yours this week.</h2>
-    <p>Nothing is charged online. You place the order, we confirm it and send payment details,
-       and the project is handed over &mdash; or set up for you on your own accounts.</p></div>
+    <h2>Already built.<br>Yours this week.</h2>
+    <p>Nothing is taken from your card on this website. You send the order, we confirm it and send
+       you payment details, then you get the files &mdash; or we set the whole thing up for you.</p></div>
   <div class="pr">
-    <div class="ps"><h4>Pick a project</h4>
-      <p>Every listing shows what is in it, what it is built with, and what it costs. Ask for a
-         walkthrough if you want to see it running first.</p></div>
-    <div class="ps"><h4>Place the order</h4>
-      <p>A short form. No card details, no account needed. We confirm within one business day
-         with payment details and a date.</p></div>
-    <div class="ps"><h4>Setup, if you want it</h4>
-      <p>For <?= esc($sym . setting('market.setup.price', '450')) ?> we put it on your own domain,
-         hosting, SSL and email, with your content in place.</p></div>
+    <div class="ps"><h4>Pick one</h4>
+      <p>Each one shows what is included and what it costs. Ask us for a walkthrough if you want
+         to see it working first.</p></div>
+    <div class="ps"><h4>Send the order</h4>
+      <p>A short form. No card details and no account to create. We come back within one working
+         day with how to pay and a date.</p></div>
+    <div class="ps"><h4>We can set it up</h4>
+      <p>For <?= esc($sym . setting('market.setup.price', '450')) ?> we put it on your own web
+         address, sort the hosting, security and email, and put your own words in.</p></div>
     <div class="ps"><h4>You get the keys</h4>
-      <p>Files, database, admin logins and a written record of the setup. Registered in your
-         name, not ours.</p></div>
+      <p>All the files, every login, and a note of how it is set up. In your name, not ours.</p></div>
   </div>
 </div></section>
 
 <section class="tight"><div class="wrap">
   <div class="notebox rv">
-    <h3>What the setup service covers</h3>
+    <h3>What we do if you ask us to set it up</h3>
     <p><?= esc(setting('market.setup.blurb')) ?></p>
-    <p class="formnote">Optional. Buy the project on its own and install it yourself if you would
-       rather &mdash; the files and instructions are the same either way.</p>
+    <p class="formnote">Completely optional. Buy the files on their own and install it yourself if
+       you would rather &mdash; you get the same files and instructions either way.</p>
   </div>
 </div></section>
 
 <?php
-closing_cta('Nothing here quite fits?',
-    'Tell us what you are after. If we have something close we will say so, and if we do not we will quote for building it.',
-    ['contact.php', 'Ask us &rarr;'], ['pricing.php', 'See build pricing']);
+closing_cta('Nothing here quite right?',
+    'Tell us what you are after. If we have something close we will say so, and if not we will price up building it for you.',
+    ['contact.php', 'Ask us &rarr;'], ['pricing.php', 'See our prices']);
 include APP_DIR . '/partials/footer.php';

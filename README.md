@@ -76,11 +76,13 @@ About and Contact. Every word is editable from the admin area.
 | **Client accounts** | Portal logins, password resets, suspend or delete |
 | **Maintenance log** | Everything done to every project, per project or all together |
 | **Page text** | Every heading, paragraph and button on the public site, grouped by page |
+| **Branding & SEO** | Logo, favicon, sharing image, page titles, the words Google shows, your address |
 | **Services / Industries / Pricing / Add-ons / FAQs / Testimonials** | Add, edit, reorder, delete |
 | **Portfolio** | Completed work — public on the site, or **admin only** as an internal record |
 | **Marketplace** | Premade projects for sale, with sale prices and cover images |
 | **Settings** | Company details, contact addresses, social links, currency |
-| **Team** | Admin and staff accounts |
+| **Team** | Admin and staff accounts, and setting a colleague's password |
+| **Backup** | Download the whole database as a .sql file |
 | **Activity** | Audit trail of who changed what |
 
 ### Client portal — `/client/`
@@ -125,6 +127,33 @@ Deleting is permanent and removes the cover image too.
 
 ---
 
+## Renewal reminders
+
+The dashboard shows what is falling due, but the reminders that actually reach
+your inbox come from `cron.php`. Set it up once, in cPanel → *Cron Jobs*, to run
+daily:
+
+```
+/usr/local/bin/php /home/ACCOUNT/public_html/cron.php --token=YOUR_TOKEN
+```
+
+The token is generated under **Settings**. Without it the script does nothing, so
+the URL is safe to leave public. Reminders go out 45, 14 and 3 days before a
+renewal and again once it is overdue — those numbers are configurable, and each
+one is recorded so the same reminder is never sent twice. Anything that fails to
+send is *not* recorded, so the next run tries again.
+
+Optionally the client gets a copy too, so a renewal charge never surprises them.
+
+## Selling a premade project
+
+1. Attach the files (a zip) to the listing under **Marketplace**. They are stored
+   in `storage/files`, which the web server refuses to serve.
+2. When an order is paid, open it and press **Email the download link**. The
+   buyer gets a link carrying a random token, valid for as long as you choose.
+3. If it expires before they fetch it, send a fresh one — the old link dies the
+   moment you do.
+
 ## Security
 
 - Passwords hashed with `password_hash()`; they cannot be read back, only reset
@@ -136,8 +165,12 @@ Deleting is permanent and removes the cover image too.
 - All queries use prepared statements
 - Everything printed is escaped
 - Admins and clients are separate roles that cannot reach each other's areas
-- Uploads accept images only, checked by content and not by file extension, and
-  `storage/uploads/.htaccess` stops anything there being executed
+- Uploads accept images only, checked by content and not by file extension, are
+  downscaled to 1800px (which also strips EXIF, so photos stop carrying the GPS
+  coordinates of where they were taken), and `storage/uploads/.htaccess` stops
+  anything there being executed
+- Files for sale live in `storage/files`, denied by Apache *and* by `router.php`,
+  and are only ever handed over by `download.php` after it checks the token
 - `app/` and `storage/` deny direct web access
 - `app/config.php` is gitignored — real credentials never reach the repository
 

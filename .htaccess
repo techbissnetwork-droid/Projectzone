@@ -49,3 +49,6 @@ DirectoryIndex index.php index.html
   ExpiresByType image/png "access plus 30 days"
   ExpiresByType image/webp "access plus 30 days"
 </IfModule>
+
+# Paid deliverables are only ever served by download.php, never directly.
+RedirectMatch 403 ^/storage/files/

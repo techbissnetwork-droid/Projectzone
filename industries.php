@@ -16,7 +16,7 @@ page_head(
     setting('industries.hero.line2'),
     setting('industries.hero.lead'),
     [['index.php', 'Home'], [null, 'Industries']],
-    [['contact.php', 'Talk to us &rarr;'], ['services.php', 'See the services']]
+    [['contact.php', 'Talk to us &rarr;'], ['services.php', 'See what we do']]
 );
 
 runner_strip();
@@ -43,8 +43,8 @@ runner_strip();
 
 <?php $work = public_portfolio(3); if ($work): ?>
 <section><div class="wrap">
-  <div class="sh rv"><span class="no">In practice</span><h2>The same stack,<br>a different job.</h2>
-    <p>Three of the businesses we run for, and what the site actually had to do.</p></div>
+  <div class="sh rv"><span class="no">In practice</span><h2>Same setup,<br>different job.</h2>
+    <p>Three real businesses, and what their website actually had to do each day.</p></div>
   <div class="grid-3">
 <?php foreach ($work as $p) { portfolio_card($p); } ?>
   </div>

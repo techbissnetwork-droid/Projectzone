@@ -27,6 +27,38 @@ if (is_post() && post('action') === 'update') {
     redirect('order.php?id=' . $order['id']);
 }
 
+/* Issue (or reissue) the buyer's download link and email it. */
+if (is_post() && post('action') === 'deliver') {
+    csrf_check();
+    $days = max(1, min(365, post_int('days', 30)));
+
+    if (!$product) {
+        flash('This order has no listing attached, so there is nothing to send.', 'bad');
+    } elseif (!$product['file_path'] || !is_file(APP_ROOT . '/' . $product['file_path'])) {
+        flash('No files are attached to <strong>' . esc($product['title']) . '</strong> yet. '
+            . 'Add the zip under Marketplace first, then come back here.', 'bad');
+    } else {
+        $token = bin2hex(random_bytes(24));
+        db_update('orders', (int) $order['id'], [
+            'download_token'   => $token,
+            'download_expires' => date('Y-m-d H:i:s', time() + $days * 86400),
+            'download_count'   => 0,
+            'delivered_at'     => now(),
+            'status'           => $order['status'] === 'new' ? 'delivered' : $order['status'],
+        ]);
+        $order = db_one('SELECT * FROM orders WHERE id = ?', [$order['id']]);
+        $sent  = mail_order_delivery($order, $product, $days);
+        log_activity('Sent files for order ' . $order['reference'], 'order', (int) $order['id']);
+        flash($sent
+            ? 'Download link emailed to ' . esc($order['buyer_email']) . '. It lasts ' . $days . ' days.'
+            : 'Link created but <strong>the email could not be sent</strong>. Send it to them '
+              . 'yourself: <code style="font-family:var(--mono);word-break:break-all">'
+              . esc(url('download.php?token=' . $token)) . '</code>',
+            $sent ? 'ok' : 'warn');
+    }
+    redirect('order.php?id=' . $order['id']);
+}
+
 if (is_post() && post('action') === 'delete') {
     csrf_check();
     db_delete('orders', (int) $order['id']);
@@ -95,6 +127,48 @@ admin_page_head('Order ' . $order['reference'], '', [], [['orders.php', 'Orders'
           <strong><a href="mailto:<?= esc($order['buyer_email']) ?>"><?= esc($order['buyer_email']) ?></a></strong></div>
         <div class="kv"><span>Phone</span><strong><?= esc($order['buyer_phone'] ?: '—') ?></strong></div>
         <div class="kv"><span>Company</span><strong><?= esc($order['buyer_company'] ?: '—') ?></strong></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <header><h2>Send the files</h2></header>
+      <div class="pad">
+<?php if (!$product): ?>
+        <p style="color:var(--mute);font-size:13.5px">The listing this order was for has been
+          deleted, so there is nothing to send.</p>
+<?php elseif (!$product['file_path']): ?>
+        <p style="color:var(--mute);font-size:13.5px;margin-bottom:12px">
+          No files are attached to <strong><?= esc($product['title']) ?></strong> yet.</p>
+        <a class="btn ghost sm" href="resource.php?type=products&amp;action=edit&amp;id=<?= (int) $product['id'] ?>">
+          Attach the files</a>
+<?php else: ?>
+<?php if ($order['delivered_at']): ?>
+        <div class="kv"><span>Sent</span>
+          <strong><?= esc(datetime_human($order['delivered_at'])) ?></strong></div>
+        <div class="kv"><span>Link expires</span>
+          <strong><?= esc(date_human($order['download_expires'])) ?>
+            <?php [$st, $hu] = expiry_state($order['download_expires']); ?>
+            <span class="pill <?= esc($st) ?>"><?= esc($hu) ?></span></strong></div>
+        <div class="kv"><span>Downloaded</span>
+          <strong><?= (int) $order['download_count'] ?> time<?= (int) $order['download_count'] === 1 ? '' : 's' ?></strong></div>
+<?php endif; ?>
+        <form method="post" class="admin" style="margin-top:12px">
+          <?= csrf_field() ?>
+          <input type="hidden" name="action" value="deliver">
+          <div class="f"><label for="days">Link valid for</label>
+            <select id="days" name="days">
+              <option value="7">7 days</option>
+              <option value="30" selected>30 days</option>
+              <option value="90">90 days</option>
+              <option value="365">A year</option>
+            </select></div>
+          <button class="btn" type="submit">
+            <?= $order['delivered_at'] ? 'Send a fresh link' : 'Email the download link' ?></button>
+        </form>
+        <p style="color:var(--mute);font-size:12.5px;margin-top:10px">
+          Only do this once payment has cleared. Sending again replaces the old link, which stops
+          working immediately.</p>
+<?php endif; ?>
       </div>
     </div>
 

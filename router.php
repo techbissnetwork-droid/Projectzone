@@ -9,6 +9,17 @@
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $file = __DIR__ . $path;
 
+/* The same paths .htaccess denies on Apache. Uploaded images are the one thing
+   under storage/ that is meant to be public. */
+foreach (['/app/', '/storage/files/'] as $blocked) {
+    if (str_starts_with($path, $blocked)) {
+        http_response_code(403);
+        header('Content-Type: text/plain');
+        echo "Forbidden.\n";
+        return true;
+    }
+}
+
 if ($path !== '/' && is_file($file)) {
     return false;   // let the built-in server serve the static file
 }

@@ -31,14 +31,14 @@ page_head(
     setting('portfolio.hero.line2'),
     setting('portfolio.hero.lead'),
     [['index.php', 'Home'], [null, 'Work']],
-    [['contact.php', 'Start a project &rarr;'], ['marketplace.php', 'Buy something premade']]
+    [['contact.php', 'Start a project &rarr;'], ['marketplace.php', 'Buy one ready-made']]
 );
 ?>
 
 <section><div class="wrap">
 <?php if (!$items && $filter === ''): ?>
   <div class="empty rv">
-    <h2>Case studies on the way.</h2>
+    <h2>Examples on the way.</h2>
     <p><?= esc(setting('portfolio.empty')) ?></p>
     <a class="pill" href="contact.php">Ask for examples &rarr;</a>
   </div>
@@ -61,7 +61,7 @@ page_head(
 </div></section>
 
 <?php
-closing_cta('Want one of these for your business?',
-    'Tell us what the business does and what is not working. You will get a written scope and a fixed price.',
-    ['contact.php', 'Start a project &rarr;'], ['pricing.php', 'See pricing']);
+closing_cta('Want something like this?',
+    'Tell us what your business does and what is not working. You will get a written list of what you would get, and a fixed price.',
+    ['contact.php', 'Start a project &rarr;'], ['pricing.php', 'See prices']);
 include APP_DIR . '/partials/footer.php';

@@ -16,7 +16,7 @@ page_head(
     setting('services.hero.line2'),
     setting('services.hero.lead'),
     [['index.php', 'Home'], [null, 'Services']],
-    [['contact.php', 'Get a straight answer &rarr;'], ['pricing.php', 'See pricing']]
+    [['contact.php', 'Ask us a question &rarr;'], ['pricing.php', 'See prices']]
 );
 
 runner_strip();
@@ -46,8 +46,8 @@ runner_strip();
 
 <?php
 statement(setting('services.statement'));
-faq_block('services', 'Asked first, every time.',
-    'If yours is not here, ask it directly — we answer within one business day.');
+faq_block('services', 'The questions we get asked most.',
+    'If yours is not here, just ask — we reply within one working day.');
 closing_cta(setting('services.cta.heading'), setting('services.cta.body'),
-    ['contact.php', 'Get a straight answer &rarr;'], ['industries.php', 'See your industry']);
+    ['contact.php', 'Ask us &rarr;'], ['industries.php', 'Find your type of business']);
 include APP_DIR . '/partials/footer.php';

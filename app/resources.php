@@ -183,6 +183,9 @@ function resources(): array
                 ['sale_price', 'Sale price',   'money',  'half', 'Leave blank if it is not on sale.'],
                 ['demo_url',   'Demo address', 'text',   'half', 'https://…  Leave blank if there is no demo.'],
                 ['cover_image','Cover image',  'image',  'full', ''],
+                ['file_path',  'The files a buyer gets', 'file', 'full',
+                    'A zip of the project. Stored outside the public folder and only ever handed '
+                    . 'over through an expiring link after you mark an order delivered.'],
                 ['is_active',  'List on the marketplace', 'check', 'half', ''],
                 ['is_featured','Feature this one', 'check', 'half', ''],
                 ['sort',       'Order',        'number', 'half', ''],
