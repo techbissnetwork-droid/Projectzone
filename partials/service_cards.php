@@ -24,21 +24,19 @@ foreach ($services as $i => $s):
     $tech = csv_list($s['tech']);
 ?>
   <article class="svc<?= $cls ?> tilt" data-svc="<?= e($s['slug']) ?>" id="<?= e($s['slug']) ?>">
-    <button class="svc__btn" type="button" aria-expanded="false">
+    <div class="svc__head">
       <span class="svc__index"><?= sprintf('%02d', $i + 1) ?></span>
       <span class="svc__glyph"><svg viewBox="0 0 40 32" fill="none" aria-hidden="true"><?= $glyph ?></svg></span>
-      <span class="svc__name"><?= e($s['title']) ?></span>
-      <span class="svc__desc"><?= e($s['summary']) ?></span>
-      <span class="svc__more" aria-hidden="true"><i></i><i></i></span>
-    </button>
-    <div class="svc__detail"><div class="svc__detailIn">
-      <?php if ($s['body']): ?><p><?= e($s['body']) ?></p><?php endif; ?>
+      <h3 class="svc__name"><?= e($s['title']) ?></h3>
+      <p class="svc__desc"><?= e($s['summary']) ?></p>
+    </div>
+    <div class="svc__detail">
       <?php if ($features): ?>
-        <ul class="ticks"><?php foreach (array_slice($features, 0, 5) as $f): ?><li><?= e($f) ?></li><?php endforeach; ?></ul>
+        <ul class="ticks"><?php foreach (array_slice($features, 0, 4) as $f): ?><li><?= e($f) ?></li><?php endforeach; ?></ul>
       <?php endif; ?>
       <?php if ($tech): ?>
-        <div class="tags"><?php foreach ($tech as $t): ?><span><?= e($t) ?></span><?php endforeach; ?></div>
+        <div class="tags"><?php foreach (array_slice($tech, 0, 4) as $t): ?><span><?= e($t) ?></span><?php endforeach; ?></div>
       <?php endif; ?>
-    </div></div>
+    </div>
   </article>
 <?php endforeach; ?>

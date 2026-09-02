@@ -98,7 +98,18 @@ foreach (Content::sectionOrder() as $section):
               <h2 class="sec__title reveal"><?= nl2br(e(Settings::get('services_title')), false) ?></h2>
               <p class="sec__lede reveal"><?= e(Settings::get('services_lede')) ?></p>
             </header>
-            <div class="svcs__grid" id="svcGrid"><?php require __DIR__ . '/partials/service_cards.php'; ?></div>
+            <div class="svcs__carousel reveal" id="svcCarousel">
+              <div class="svcs__rail" id="svcRail"><?php require __DIR__ . '/partials/service_cards.php'; ?></div>
+              <div class="svcs__nav">
+                <div class="svcs__dots" id="svcDots"></div>
+                <button class="svcs__arrow" type="button" data-svc-prev aria-label="Previous services">
+                  <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M10 2 4 8l6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+                <button class="svcs__arrow" type="button" data-svc-next aria-label="More services">
+                  <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m6 2 6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+              </div>
+            </div>
             <p class="svcs__foot reveal">
               <?php if ($serviceTotal > count($services)): ?>
                 <span class="muted"><?= $serviceTotal - count($services) ?> more services, from domains to automation.</span>

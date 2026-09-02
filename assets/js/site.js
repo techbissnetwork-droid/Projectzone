@@ -201,32 +201,89 @@
     });
   })();
 
-  /* ── 03 services: expanding modules ─────────────────────── */
+  /* ── 03 services: a slider, three modules to a slide ────── */
   (function () {
-    var grid = doc.getElementById('svcGrid');
-    if (!grid) return;
-    var cards = [].slice.call(grid.querySelectorAll('.svc'));
+    var rail = doc.getElementById('svcRail');
+    var wrap = doc.getElementById('svcCarousel');
+    var dots = doc.getElementById('svcDots');
+    if (!rail || !wrap) return;
 
-    function setOpen(card, on) {
-      card.classList.toggle('is-open', on);
-      var btn = card.querySelector('.svc__btn');
-      if (btn) btn.setAttribute('aria-expanded', on ? 'true' : 'false');
+    var cards = [].slice.call(rail.querySelectorAll('.svc'));
+    if (!cards.length) return;
+    var prev = wrap.querySelector('[data-svc-prev]');
+    var next = wrap.querySelector('[data-svc-next]');
+    var pages = 1, page = 0;
+
+    /* How many fit is decided by CSS, so read it back from a card rather than
+       duplicating the breakpoints here. */
+    function perView() {
+      var w = cards[0].getBoundingClientRect().width;
+      if (w < 1) return 1;
+      return Math.max(1, Math.round(rail.clientWidth / w));
     }
-    cards.forEach(function (card) {
-      var btn = card.querySelector('.svc__btn');
-      card.addEventListener('click', function (e) {
-        if (e.target.closest && e.target.closest('a')) return;
-        var willOpen = !card.classList.contains('is-pinned');
-        cards.forEach(function (c) { c.classList.remove('is-pinned'); setOpen(c, false); });
-        if (willOpen) { card.classList.add('is-pinned'); setOpen(card, true); }
-      });
-      if (fine) {
-        card.addEventListener('mouseenter', function () { setOpen(card, true); });
-        card.addEventListener('mouseleave', function () { if (!card.classList.contains('is-pinned')) setOpen(card, false); });
-        btn.addEventListener('focus', function () { setOpen(card, true); });
-        btn.addEventListener('blur', function () { if (!card.classList.contains('is-pinned')) setOpen(card, false); });
+    function step() {
+      if (cards.length < 2) return rail.clientWidth;
+      return cards[1].offsetLeft - cards[0].offsetLeft;
+    }
+
+    function measure() {
+      var per = perView();
+      pages = Math.max(1, Math.ceil(cards.length / per));
+      wrap.classList.toggle('is-static', pages < 2);
+
+      if (dots) {
+        dots.innerHTML = '';
+        if (pages > 1) {
+          for (var i = 0; i < pages; i++) {
+            var b = doc.createElement('button');
+            b.type = 'button';
+            b.setAttribute('aria-label', 'Services ' + (i + 1) + ' of ' + pages);
+            b.addEventListener('click', go.bind(null, i));
+            dots.appendChild(b);
+          }
+        }
       }
+      sync();
+    }
+
+    function go(i) {
+      page = Math.max(0, Math.min(pages - 1, i));
+      rail.scrollTo({ left: page * perView() * step(), behavior: reduce ? 'auto' : 'smooth' });
+    }
+
+    function sync() {
+      var per = perView(), sp = step();
+      page = sp > 0 ? Math.round(rail.scrollLeft / (per * sp)) : 0;
+      page = Math.max(0, Math.min(pages - 1, page));
+      if (dots) {
+        [].forEach.call(dots.children, function (d, i) {
+          d.classList.toggle('is-on', i === page);
+          d.setAttribute('aria-current', i === page ? 'true' : 'false');
+        });
+      }
+      /* Driven by the page, not by raw pixels: the rail carries a little padding
+         so the card glow is not clipped, and scrollLeft never rests at zero. */
+      if (prev) prev.disabled = page === 0;
+      if (next) next.disabled = page >= pages - 1;
+    }
+
+    if (prev) prev.addEventListener('click', function () { go(page - 1); });
+    if (next) next.addEventListener('click', function () { go(page + 1); });
+
+    var idle = 0;
+    rail.addEventListener('scroll', function () {
+      win.clearTimeout(idle);
+      idle = win.setTimeout(sync, 90);
+    }, { passive: true });
+
+    rail.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowRight') { e.preventDefault(); go(page + 1); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); go(page - 1); }
     });
+
+    measure();
+    if ('ResizeObserver' in win) new ResizeObserver(measure).observe(rail);
+    else win.addEventListener('resize', measure, { passive: true });
   })();
 
   /* ── 02 offline → online : scroll-driven ────────────────── */
