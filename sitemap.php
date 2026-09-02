@@ -57,6 +57,13 @@ if (Master::master('signals')) {
 if (Database::setting('performance_page_enabled', '1') === '1') {
     $urls[] = ['performance' . $ext, 'daily', '0.8'];
 }
+// The site's only commercial landing page - deliberately indexable (see the
+// comment in upgrade.php: a stranger gets to see the price before signing
+// up) and reachable no other way a crawler can discover on its own, since
+// every link to it sits behind a signed-in member's own nav. Unconditional:
+// unlike the coin pages, showing the plans and prices to a guest is not
+// behind any feature switch.
+$urls[] = ['upgrade' . $ext, 'weekly', '0.7'];
 $urls[] = ['status' . $ext, 'daily', '0.3'];
 // The legal pages are NOT listed.
 //

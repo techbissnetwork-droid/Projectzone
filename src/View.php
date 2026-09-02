@@ -202,8 +202,30 @@ class View
         }
     }
 
+    /**
+     * A search snippet cuts off around 155-160 characters - past that, a raw
+     * substr() lands mid-word ("...records f", "...faster ") which reads as
+     * broken rather than trimmed. This lands on the last whole word instead
+     * and marks the cut with an ellipsis, so every caller's fallback text
+     * gets a safe snippet even when it never thought about the limit.
+     */
+    private static function trimDescription(string $text, int $max = 155): string
+    {
+        $text = trim(preg_replace('/\s+/', ' ', $text) ?? $text);
+        if (mb_strlen($text) <= $max) {
+            return $text;
+        }
+        $cut = mb_substr($text, 0, $max);
+        $lastSpace = mb_strrpos($cut, ' ');
+        if ($lastSpace !== false && $lastSpace >= (int)($max * 0.6)) {
+            $cut = mb_substr($cut, 0, $lastSpace);
+        }
+        return rtrim($cut, " .,;:-—") . '…';
+    }
+
     public static function head(string $title, string $description = '', array $opts = []): void
     {
+        $description = self::trimDescription($description);
         $siteName = Database::setting('site_name', 'SignalMasterAi');
         $hex = static function (string $k, string $d): string {
             $v = Database::setting($k, $d);

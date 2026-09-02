@@ -56,7 +56,9 @@ $pageCss = <<<'CSS'
 CSS;
 \SignalMasterAi\View::head(
     $title,
-    mb_substr(trim(preg_replace('/\s+/', ' ', $content)), 0, 155),
+    // head() trims this to a search-snippet length on its own, at a whole
+    // word rather than mid-sentence - no need to pre-cut it here.
+    trim(preg_replace('/\s+/', ' ', $content)),
     // Which page this is lives in the query string, so the canonical has to
     // carry it - without this all three legal pages claim the same address.
     ['noindex' => true, 'style' => $pageCss, 'query' => ['p' => $p]]

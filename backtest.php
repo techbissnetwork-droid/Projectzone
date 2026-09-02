@@ -105,7 +105,7 @@ if ($symbol !== '' && $allowed) {
     }
 }
 
-View::head('Backtest', 'Replay the signal engine over stored history for any coin and timeframe.',
+View::head('Backtest', 'Replay the signal engine over stored price history for any coin and timeframe, and see exactly which rules would have fired and how each trade would have settled.',
     // A member's own replay of their own choices. Nothing here is the same
     // twice for two people, so there is nothing for a search engine to index -
     // but the links out of it are worth following, hence noindex and not

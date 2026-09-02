@@ -57,7 +57,7 @@ if ($isPost) {
     exit;
 }
 
-View::head('Email alerts', 'Manage the alert emails from this site.',
+View::head('Email alerts', 'Turn off alert emails from this site with one click - your watchlist stays intact, only the emails stop.',
     // Reached from a one-time link in an email. Indexing it would put a
     // personal unsubscribe URL in a search result.
     ['noindex' => true]);

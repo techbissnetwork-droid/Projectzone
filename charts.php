@@ -149,21 +149,41 @@ $groupTitles = ['public' => 'Free for everyone', 'free' => 'Members (free accoun
 // is not set - this page opts into raw_title (below) precisely so it can put
 // the coin/timeframe first, but the separator it chose should still read as
 // the same site.
-$seoTitle = sma_setting('seo_title') !== '' ? sma_setting('seo_title') : $siteName . ' — AI chart analysis & signals';
-// A DESCRIPTION LONG ENOUGH TO BE ONE.
 //
-// The fallback was the site tagline with a full stop - forty-three characters,
-// where a search result gives you about a hundred and sixty. Google fills the
-// rest in from whatever it finds on the page, and what it finds on this page
-// is toolbar labels. Worse, every coin got the SAME sentence, so a search
-// engine looking at forty chart pages saw forty identical descriptions.
+// A DESCRIPTION - AND A TITLE - LONG ENOUGH TO BE ONE, AND ONE EACH PAGE OWNS.
 //
-// Each coin and timeframe is already its own canonical page, so the
-// description says which one it is. Still overridden by the operator's own
-// meta_description when they have set one.
-$seoDesc = sma_setting('meta_description');
-if ($seoDesc === '') {
-    $seoDesc = $tagline . '. '
+// The fallback used to be the site tagline with a full stop - forty-three
+// characters, where a search result gives you about a hundred and sixty -
+// and it never referenced the coin or timeframe at all, so every coin got
+// the identical title AND description. A search engine looking at forty
+// chart pages saw forty duplicates of one page, which is the opposite of
+// what "each coin is its own canonical page" is supposed to mean.
+//
+// $defaultSymbol is which coin the page actually renders, by this point in
+// the file - the requested one when it is real and allowed, otherwise the
+// site's own default - and that is true on the bare /charts landing page
+// too, which shows that same default coin's chart. Its canonical already
+// collapses ?symbol=<the default> onto the bare URL below because they are
+// one page; the title and description now agree that they are one page
+// too, instead of one naming a coin and the other staying generic.
+// A genuinely unmatched ?symbol= (badSymbol, below) still falls through to
+// this same branch and names whatever coin the page fell back to showing -
+// accurate to what renders, and moot for indexing since that page is
+// noindex regardless.
+// Still overridden by the operator's own seo_title/meta_description when
+// they have set one - that override was already global across every coin,
+// and stays that way; an operator who wants one fixed title gets it.
+if ($defaultSymbol !== '') {
+    $seoTitle = sma_setting('seo_title') !== '' ? sma_setting('seo_title')
+        : $defaultSymbol . ' ' . $defaultInterval . ' chart & signals — ' . $siteName;
+    $seoDesc = sma_setting('meta_description') !== '' ? sma_setting('meta_description')
+        : $defaultSymbol . ' ' . $defaultInterval . ': AI-generated BUY/SELL signal with entry, '
+        . 'stop loss and take-profit targets, multi-timeframe confluence and a verified '
+        . 'win/loss track record.';
+} else {
+    $seoTitle = sma_setting('seo_title') !== '' ? sma_setting('seo_title') : $siteName . ' — AI chart analysis & signals';
+    $seoDesc = sma_setting('meta_description') !== '' ? sma_setting('meta_description')
+        : $tagline . '. '
         . 'Live BUY / SELL signals with entry, stop loss and take-profit targets, '
         . 'multi-timeframe confluence and a verified track record of wins and losses.';
 }
@@ -183,7 +203,14 @@ $base = \SignalMasterAi\View::baseUrl();
 // counts. The bare URL is the honest canonical for the bare URL, and a deep
 // link keeps naming what it actually shows.
 $canonQ = [];
-if ($canonSym !== '') { $canonQ['symbol'] = $canonSym; }
+// The site default coin is dropped the same way the default timeframe is
+// below, so ?symbol=<the default> and the bare URL collapse onto one
+// canonical instead of disagreeing about which of the two is it. $defaultSymbol
+// is no longer that value by this point - the block above overwrote it with
+// whichever coin the visitor actually ended up on - so the site's own default
+// is re-read here, exactly as $siteTf is re-read a few lines down.
+$siteSym = (string)sma_setting('default_symbol', $config['market']['default_symbol']);
+if ($canonSym !== '' && strcasecmp($canonSym, $siteSym) !== 0) { $canonQ['symbol'] = $canonSym; }
 // The site default frame is dropped, so ?symbol=X and ?symbol=X&tf=<default>
 // are one URL rather than two pages of identical content competing with each
 // other. Any other frame is genuinely different content and keeps its own.
