@@ -144,7 +144,12 @@ if (!in_array($defaultInterval, $symTfs, true)) {
 $groupTitles = ['public' => 'Free for everyone', 'free' => 'Members (free account)', 'paid' => 'Premium members'];
 ?>
 <?php
-$seoTitle = sma_setting('seo_title') !== '' ? sma_setting('seo_title') : $siteName . ' - AI chart analysis & signals';
+// Em dash, matching index.php's own fallback ($siteName . ' — ' . $tagline)
+// and every other "Title — SiteName" pair View::head() builds when raw_title
+// is not set - this page opts into raw_title (below) precisely so it can put
+// the coin/timeframe first, but the separator it chose should still read as
+// the same site.
+$seoTitle = sma_setting('seo_title') !== '' ? sma_setting('seo_title') : $siteName . ' — AI chart analysis & signals';
 // A DESCRIPTION LONG ENOUGH TO BE ONE.
 //
 // The fallback was the site tagline with a full stop - forty-three characters,
