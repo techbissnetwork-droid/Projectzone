@@ -1345,6 +1345,11 @@ canvas[data-ambient].is-ready { opacity: 1; }
    --------------------------------------------------------------------- */
 .brand { display: inline-flex; align-items: center; gap: 0.65rem; flex: none; }
 .brand__logo { height: 30px; width: auto; }
+/* Minimal wordmark-only header, matching the Flow reference — the mark
+   stays in the DOM (admin sidebar and other contexts still use it) but
+   is hidden here rather than deleted, so it's a one-line change to
+   bring back once the mark itself is revisited. */
+.site-header .brand__mark { display: none; }
 .brand__text {
   font-family: var(--font-display);
   font-size: 1.02rem;
@@ -1382,8 +1387,12 @@ canvas[data-ambient].is-ready { opacity: 1; }
 [data-theme="light"] .theme-toggle .icon--moon { display: block; }
 
 .header-icon-link {
+  /* Hidden, not removed, to match the Flow reference's minimal nav — the
+     client-portal link still shows in the mobile drawer, and /portal is
+     still reachable directly. */
+  display: none;
   width: 40px; height: 40px;
-  display: grid; place-items: center;
+  place-items: center;
   border-radius: 50%;
   border: 1px solid var(--border);
   background: transparent;
