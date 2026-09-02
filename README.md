@@ -49,13 +49,30 @@ The installer checks all of this on the first step and writes nothing until you 
 ## What is in it
 
 ### Public site
-`index.php` · `services.php` · `portfolio.php` · `portfolio-item.php` ·
-`marketplace.php` · `product.php` · `contact.php` · `login.php` · `page.php` (your own pages)
+
+| Page | Holds |
+|---|---|
+| `index.php` | The hero, then a short summary of each area with a link to its page |
+| `transformation.php` | The full offline→online journey and every business type |
+| `technology.php` | The full architecture diagram and the technology pillars |
+| `process.php` | The full five-stage timeline, plus every stage listed at once |
+| `services.php` | Every service module in detail |
+| `portfolio.php`, `portfolio-item.php` | Selected work |
+| `marketplace.php`, `product.php`, `order.php` | Premade projects and checkout |
+| `contact.php`, `login.php`, `staff-login.php` | Getting in touch and signing in |
+| `page.php` | Any page you create yourself |
+
+**The landing page is a summary, not the whole site.** The five heavy sections —
+the offline→online journey, the architecture diagram, the process timeline, the
+business transformations and the technology pillars — show a compact block with a
+link, and the full version lives on its own page. That keeps the home page around
+nine screens instead of twenty.
+
+Each of those five can be switched back to **Full section** on the home page in
+Admin → Home page, per section. Nothing is lost either way: both forms read the
+same content blocks.
 
 Every headline, colour, service, project and price comes from the database.
-The animated hero ecosystem, the offline→online scroll transformation, the
-system-architecture diagram and the process timeline are all still there — they
-are now partials in `partials/section_*.php`, shared between pages.
 
 ### Admin panel — `/admin/`
 | Page | What it does |
@@ -131,7 +148,8 @@ panel, so you can record a delivery before the client agrees to publish it.
 
 Nothing on the public site is hardcoded any more.
 
-- **Every section of the home page** — order, visibility, headings and body copy.
+- **Every section of the home page** — order, visibility, headings, body copy,
+  and whether a heavy section appears in full or as a summary linking to its page.
 - **Every repeatable list** — the four journey stages, five process steps, six
   pillars, ten architecture nodes, six transformations and three hero stats are
   rows in one table you edit, reorder, hide or delete. Add a sixth process step

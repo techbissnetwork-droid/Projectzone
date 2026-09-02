@@ -19,6 +19,9 @@ if (post()) {
     foreach (array_keys(Content::SECTIONS) as $k) {
         $save['section_' . $k] = !empty($_POST['on'][$k]) ? '1' : '0';
     }
+    foreach (array_keys(Content::DUAL) as $k) {
+        $save['mode_' . $k] = ($_POST['mode'][$k] ?? 'compact') === 'full' ? 'full' : 'compact';
+    }
     /* Hero fields live here too — this is the page people reach for. */
     foreach (['hero_eyebrow','hero_title_a','hero_title_b','hero_title_c','hero_lede',
               'hero_cta_primary','hero_cta_secondary','quote'] as $k) {
@@ -72,14 +75,26 @@ require __DIR__ . '/../partials/app_header.php';
     <section class="card">
       <div class="card__head"><h2>Sections</h2>
         <span class="badge muted">Set the number to reorder</span></div>
+      <div class="card__body" style="padding-bottom:0">
+        <p class="hint">Heavy sections show a <b>summary with a link</b> by default, so the home page stays
+          short and the detail lives on its own page. Switch one to <b>Full section</b> to put the whole
+          thing back on the home page.</p>
+      </div>
       <div class="tablewrap"><table class="data">
-        <thead><tr><th style="width:76px">Order</th><th>Section</th><th>Content</th><th>Shown</th></tr></thead>
+        <thead><tr><th style="width:76px">Order</th><th>Section</th><th>On the home page</th><th>Content</th><th>Shown</th></tr></thead>
         <tbody>
         <?php foreach ($pos as $k => $n): [$href, $countKey] = $LINKS[$k]; ?>
           <tr>
             <td><input type="number" name="pos[<?= e($k) ?>]" value="<?= (int)$n ?>" min="1"
                        style="width:66px;padding:6px 8px;border-radius:6px;border:1px solid var(--line-2);background:rgba(255,255,255,.03);color:var(--tx)"></td>
             <td><span class="t-main"><?= e(Content::SECTIONS[$k]) ?></span></td>
+            <td><?php if (isset(Content::DUAL[$k])): ?>
+                  <select name="mode[<?= e($k) ?>]" style="padding:6px 10px;border-radius:6px;border:1px solid var(--line-2);background:rgba(255,255,255,.03);color:var(--tx);font-size:12.5px">
+                    <option value="compact"<?= Content::mode($k) === 'compact' ? ' selected' : '' ?>>Summary + link</option>
+                    <option value="full"<?= Content::mode($k) === 'full' ? ' selected' : '' ?>>Full section</option>
+                  </select>
+                  <span class="t-sub">full version at <?= e(Content::DUAL[$k]) ?></span>
+                <?php else: ?><span class="muted">—</span><?php endif; ?></td>
             <td><?php if ($countKey !== null): ?>
                   <a class="linkish" href="<?= e($href) ?>"><?= (int)$counts[$countKey] ?> items — edit</a>
                 <?php elseif ($href !== '#quote'): ?>

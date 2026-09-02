@@ -113,6 +113,13 @@ final class Settings
 
             /* home page sections */
             'scroll_pace'      => 'standard',
+            /* Heavy sections default to a summary on the home page; the full
+               version lives on its own page. Switch any of these to 'full'. */
+            'mode_journey'     => 'compact',
+            'mode_arch'        => 'compact',
+            'mode_process'     => 'compact',
+            'mode_transform'   => 'compact',
+            'mode_pillars'     => 'compact',
             'home_services'    => '6',
             'home_sections'    => 'journey,services,arch,process,work,transform,pillars,marketplace,quote',
             'section_journey'  => '1',

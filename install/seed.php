@@ -160,13 +160,17 @@ function tb_seed_content(PDO $pdo, string $ts): void
               ['Marketplace', 'marketplace.php'], ['About', null], ['Contact', 'contact.php']] as $i => $n) {
         $nv->execute(['header', $n[0], $n[1], $n[1] === null ? 1 : null, $i * 10, $ts]);
     }
-    foreach ([['Services', 'services.php'], ['Selected work', 'portfolio.php'],
-              ['Marketplace', 'marketplace.php']] as $i => $n) {
+    foreach ([['Services', 'services.php'], ['From offline to online', 'transformation.php'],
+              ['Selected work', 'portfolio.php'], ['Marketplace', 'marketplace.php']] as $i => $n) {
         $nv->execute(['footer_1', $n[0], $n[1], null, $i * 10, $ts]);
     }
-    foreach ([['About us', null], ['Contact', 'contact.php'],
-              ['Privacy policy', null], ['Terms of service', null]] as $i => $n) {
-        $nv->execute(['footer_2', $n[0], $n[1], $n[1] === null ? ($i === 0 ? 1 : ($i === 2 ? 2 : 3)) : null, $i * 10, $ts]);
+    foreach ([['About us', null], ['How we work', 'process.php'], ['Technology', 'technology.php'],
+              ['Contact', 'contact.php'], ['Privacy policy', null], ['Terms of service', null]] as $i => $n) {
+        $pageId = null;
+        if ($n[0] === 'About us')          { $pageId = 1; }
+        if ($n[0] === 'Privacy policy')    { $pageId = 2; }
+        if ($n[0] === 'Terms of service')  { $pageId = 3; }
+        $nv->execute(['footer_2', $n[0], $n[1], $pageId, $i * 10, $ts]);
     }
     foreach ([['Client portal', 'login.php'], ['Support & maintenance', 'login.php'],
               ['Request a quote', 'contact.php']] as $i => $n) {
