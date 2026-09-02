@@ -403,7 +403,8 @@ body.has-cursor-fx.cursor-hidden .cursor-ring { opacity: 0; }
 .slider__btn:hover:not(:disabled) { border-color: var(--accent); background: var(--surface-hover); }
 .slider__btn:disabled { opacity: 0.35; cursor: default; }
 
-.slider__dots { display: flex; gap: 0; }
+.slider__dots { display: flex; gap: 0; overflow-x: auto; scrollbar-width: none; min-width: 0; }
+.slider__dots::-webkit-scrollbar { display: none; }
 /* The visible dot is 7px, which is far too small to hit. The button carries a
    24px target and a pseudo-element draws the dot inside it. */
 .slider__dot {
@@ -456,8 +457,13 @@ body.has-cursor-fx.cursor-hidden .cursor-ring { opacity: 0; }
    viewport and makes the whole page scroll sideways. */
 @media (max-width: 640px) {
   .slider { --slider-edge: var(--gutter); }
-  /* Keeps the arrows and dots clear of the fixed WhatsApp puck. */
-  .slider__controls { justify-content: flex-start; }
+  /* Keeps the arrows and dots clear of the fixed WhatsApp puck. Left-aligning
+     isn't enough on its own — a page with many dots (e.g. 15 industries)
+     still pushed the whole row wide enough for the last arrow to land right
+     under the puck. The dots scroll internally now (min-width:0 above lets
+     that flex child actually shrink), and this reserves the puck's corner
+     as dead space so the row's own box never reaches it either. */
+  .slider__controls { justify-content: flex-start; padding-right: 64px; }
 }
 
 /* Reading progress bar on article pages */
@@ -548,6 +554,10 @@ body.has-cursor-fx.cursor-hidden .cursor-ring { opacity: 0; }
 /* Same diagram, reused smaller as a standalone section rather than beside
    hero copy — services.php today, potentially other interior pages later. */
 .services-visual .transform-viz { max-width: 300px; }
+@media (max-width: 640px) {
+  .services-visual .transform-viz { max-width: 230px; }
+  .services-visual .transform-viz__endpoint-value { max-width: 90px; }
+}
 .transform-viz__ring {
   position: absolute;
   border: 1px solid var(--border-faint);
@@ -928,6 +938,13 @@ body.has-cursor-fx.cursor-hidden .cursor-ring { opacity: 0; }
   animation: viz-spin 85s linear infinite;
 }
 .page-head--center .page-head__ring { right: 50%; margin-right: -230px; opacity: 0.35; }
+@media (max-width: 640px) {
+  /* 460px reads as near-free background texture on a wide desktop hero;
+     on a 390px phone the same ring covers most of the screen and reads as
+     the page just being oversized. Same quiet motion, much smaller stage. */
+  .page-head__ring { width: 220px; height: 220px; margin-top: -110px; right: -70px; opacity: 0.4; }
+  .page-head--center .page-head__ring { margin-right: -110px; }
+}
 .page-head h1 { margin-block: 1rem 1.15rem; }
 .page-head .lead { max-width: 58ch; }
 .page-head--center { text-align: center; }
