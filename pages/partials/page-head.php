@@ -33,7 +33,10 @@ $crumbs  = $seo->getBreadcrumbs();
         <p class="eyebrow mt-5"><?= e($eyebrow) ?></p>
         <?php endif; ?>
 
-        <h1><?= e($heading) ?></h1>
+        <h1 data-reveal="kinetic">
+            <?php $words = preg_split('/\s+/', trim($heading)) ?: [$heading]; ?>
+            <?php foreach ($words as $i => $word): ?><span class="kinetic-word" style="--i:<?= $i ?>"><span><?= e($word) ?></span></span> <?php endforeach; ?>
+        </h1>
 
         <?php if ($lead !== ''): ?>
         <p class="lead"><?= e($lead) ?></p>

@@ -198,9 +198,10 @@ table { border-collapse: collapse; width: 100%; }
    3. Typography
    --------------------------------------------------------------------- */
 h1, h2, h3, h4, h5, h6 {
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-weight: 700;
   line-height: var(--lh-snug);
-  letter-spacing: -0.021em;
+  letter-spacing: -0.01em;
   color: var(--text);
   text-wrap: balance;
 }
@@ -212,9 +213,9 @@ h4 { font-size: var(--fs-h4); letter-spacing: -0.012em; }
 
 .display {
   font-size: var(--fs-hero);
-  font-weight: 600;
+  font-weight: 800;
   line-height: var(--lh-tight);
-  letter-spacing: -0.038em;
+  letter-spacing: -0.015em;
   text-wrap: balance;
 }
 
@@ -1340,9 +1341,10 @@ canvas[data-ambient].is-ready { opacity: 1; }
 .brand { display: inline-flex; align-items: center; gap: 0.65rem; flex: none; }
 .brand__logo { height: 30px; width: auto; }
 .brand__text {
-  font-size: 1.06rem;
-  font-weight: 650;
-  letter-spacing: 0.14em;
+  font-family: var(--font-display);
+  font-size: 1.02rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
   color: var(--text);
 }
 /* The mark itself carries its own gradient, so it needs no theme handling —
