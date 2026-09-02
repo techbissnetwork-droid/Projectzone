@@ -878,17 +878,15 @@ if ($coinRow):
         <button class="btn small gray" type="submit">
           <?= (int)$coinRow['priority'] === 1 ? 'Drop from priority' : 'Scan every run' ?></button>
       </form>
-      <form method="post" action="symbols.php" class="inline-form">
-        <input type="hidden" name="csrf" value="<?= $csrf ?>">
-        <input type="hidden" name="act" value="set_tier">
-        <input type="hidden" name="id" value="<?= (int)$coinRow['id'] ?>">
-        <select name="tier" style="max-width:150px">
-          <?php foreach (['public' => 'Everyone', 'free' => 'Signed-in members', 'paid' => 'Premium only'] as $tk => $tl): ?>
-            <option value="<?= $tk ?>" <?= (string)$coinRow['tier'] === $tk ? 'selected' : '' ?>><?= $tl ?></option>
-          <?php endforeach; ?>
-        </select>
-        <button class="btn small gray" type="submit">Set access</button>
-      </form>
+      <?php // Who can see this coin has one live control - the row's own
+            // "Tier" select in the table below, which applies the instant it
+            // changes. A second copy lived here too, needing its own "Set
+            // access" click, with option labels ("Everyone"/"Signed-in
+            // members"/"Premium only") that did not even match the row's
+            // ("Public"/"Free members"/"Paid members") - two settings by
+            // appearance, one setting underneath. The summary line above
+            // already names the current tier; that plus the row's select is
+            // the whole control now. ?>
     </div>
   </details>
 
@@ -985,9 +983,12 @@ if ($coinRow):
       Override trade-plan levels for this coin</label>
     <label class="chk" style="margin-left:22px"><input type="checkbox" name="levels_enabled"
       <?= (string)($ov['levels_enabled'] ?? '1') === '1' ? 'checked' : '' ?>> Publish entry/stop/targets</label>
+    <?php // No second "Close" here - it read as leaving just this group, but
+          // it is the same href as the panel's own Close at the top (line
+          // 847) and leaves the whole panel either way. Neither sibling
+          // group ("Where it appears", "Timeframes") has one. ?>
     <p style="margin-top:14px">
       <button class="btn" type="submit">Save overrides</button>
-      <a class="btn gray" href="symbols.php">Close</a>
     </p>
     <p class="hint">Submitting with every field blank clears this coin's overrides.</p>
   </form>
@@ -1144,12 +1145,12 @@ if ($coinRow):
     </td>
     <td>
       <a class="btn small gray" href="symbols.php?coin=<?= (int)$s['id'] ?>#coin">Settings</a>
-      <form class="inline-form" method="post" action="symbols.php">
-        <input type="hidden" name="csrf" value="<?= $csrf ?>">
-        <input type="hidden" name="act" value="toggle">
-        <input type="hidden" name="id" value="<?= (int)$s['id'] ?>">
-        <button class="btn small gray" type="submit"><?= $s['enabled'] ? 'Disable' : 'Enable' ?></button>
-      </form>
+      <?php // The master on/off switch lives on the coin's own hub panel now
+            // ("Turn off everywhere"/"Turn on" under Availability), reached
+            // by the Settings link right above - not as a second button here
+            // posting the identical act=toggle. The Status column's badge
+            // already shows ENABLED/DISABLED at a glance; this row does not
+            // also need a live control for it. ?>
       <?php // Two questions, not one. Removing the coin from the site is
             // reversible - add it back and it rescans. Deleting its settled
             // signals rewrites the published track record and cannot be

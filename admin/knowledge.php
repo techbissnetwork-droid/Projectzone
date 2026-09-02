@@ -231,16 +231,16 @@ show_flash();
     <input type="hidden" name="id" value="<?= (int)$r['id'] ?>">
     <label>Description (the "why" shown to visitors when this rule fires)</label>
     <textarea aria-label="Description (the &quot;why&quot; shown to visitors when this rule fires)" name="description"><?= sma_e($r['description']) ?></textarea>
-    <div class="row2">
-      <div>
-        <label>Weight (0 - 5)</label>
-        <input aria-label="Weight (0 - 5)" type="number" name="weight" step="0.1" min="0" max="5" value="<?= sma_e((string)$r['weight']) ?>">
-      </div>
-      <div>
-        <label>Enabled</label>
-        <input aria-label="Enabled" type="checkbox" name="enabled" <?= $r['enabled'] ? 'checked' : '' ?> style="width:auto">
-      </div>
-    </div>
+    <?php // Weight and Enabled already have a live control each in "The rule
+          // set" table below - the row this Edit link came from. A second
+          // Weight input and a second Enabled checkbox here, editing the
+          // same two columns, meant two forms could each save a different
+          // value for the same rule depending on which one was submitted
+          // last. This form now only carries them through unchanged, so the
+          // one field it uniquely offers - the description - can be edited
+          // without a round trip through the table's own inputs. ?>
+    <input type="hidden" name="weight" value="<?= sma_e((string)$r['weight']) ?>">
+    <?php if ($r['enabled']): ?><input type="hidden" name="enabled" value="1"><?php endif; ?>
     <p style="margin-top:14px">
       <button class="btn" type="submit">Save rule</button>
       <a class="btn gray" href="knowledge.php">Cancel</a>

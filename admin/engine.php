@@ -561,7 +561,12 @@ show_flash();
 
   <?php
   $job = LongJob::state();
-  $jobRunning = LongJob::pending();
+  // Scoped to this card's own job kind, matching #levels2 below - unscoped,
+  // this card rendered its progress bar, "Run a step now" and Cancel for
+  // WHICHEVER job was pending, including a level_search started from the
+  // other card, with counts and a confirm() dialog that both named the
+  // wrong job.
+  $jobRunning = LongJob::pending() && (($job['kind'] ?? '') === 'preset_accuracy');
   $res = ($job && ($job['kind'] ?? '') === 'preset_accuracy') ? ($job['results'] ?? null) : null;
   ?>
 
@@ -583,7 +588,7 @@ show_flash();
       <input type="hidden" name="act" value="job_cancel">
       <button class="btn gray" type="submit">Cancel</button>
     </form>
-  <?php else: ?>
+  <?php elseif (!LongJob::pending()): ?>
     <form method="post" action="engine.php">
       <input type="hidden" name="csrf" value="<?= $csrf ?>">
       <input type="hidden" name="act" value="preset_test">
@@ -598,6 +603,9 @@ show_flash();
         four seconds per replay, which is what it measured at here.</p>
       <p><button class="btn" type="submit"><?= $res ? 'Run it again' : 'Start the test' ?></button></p>
     </form>
+  <?php else: ?>
+    <p class="hint">Another measurement is running &mdash; the stop/target search below. One at a
+      time; wait for it to finish or cancel it there.</p>
   <?php endif; ?>
 
   <?php if ($res && !empty($res['cells'])): ?>
