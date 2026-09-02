@@ -1,6 +1,6 @@
 <?php /** @var array $service @var int $i */ ?>
 <article class="card card--interactive card--spotlight service-card" data-accent="<?= e($service['accent'] ?: 'cyan') ?>"
-         data-reveal style="--i:<?= (int) ($i ?? 0) ?>">
+         data-reveal data-tilt style="--i:<?= (int) ($i ?? 0) ?>">
     <span class="icon-plate"><?= icon((string) ($service['icon'] ?: 'spark')) ?></span>
     <h3 class="service-card__name">
         <a href="<?= e(url('/services/' . $service['slug'])) ?>" style="position:static">

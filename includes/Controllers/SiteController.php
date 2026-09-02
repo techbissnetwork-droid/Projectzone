@@ -98,6 +98,7 @@ final class SiteController
             'industries'   => (new IndustryRepo())->featured(8),
             'testimonials' => (new TestimonialRepo())->publishedWithProject(3),
             'stats'        => (new StatRepo())->published(4),
+            'steps'        => (new ProcessRepo())->published(4),
             'bodyClass'    => 'page-home',
         ]);
     }

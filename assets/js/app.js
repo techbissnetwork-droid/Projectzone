@@ -1053,6 +1053,87 @@
     if (cfg.ambient !== false) initAmbient();
     initSliders();
     initAutoOpen();
+    initTilt();
+    initRail();
+    initSkew();
+  }
+
+  /* -------------------------------------------------------------------
+     Bento card tilt — a real perspective rotate on pointer move, plus a
+     cursor-tracked glow position (written as --gx/--gy, same JS-writes-
+     a-number / CSS-does-the-rest split as every other spotlight effect
+     here). No-ops without a fine pointer, under reduced motion, or when
+     no [data-tilt] element exists on the page.
+     ------------------------------------------------------------------- */
+  function initTilt() {
+    if (reduceMotion.matches || !canHover.matches) return;
+    var cards = $$('[data-tilt]');
+    if (!cards.length) return;
+    cards.forEach(function (card) {
+      on(card, 'mousemove', function (e) {
+        var r = card.getBoundingClientRect();
+        var px = (e.clientX - r.left) / r.width, py = (e.clientY - r.top) / r.height;
+        var rx = (py - 0.5) * -8, ry = (px - 0.5) * 10;
+        card.style.transform = 'perspective(700px) rotateX(' + rx + 'deg) rotateY(' + ry + 'deg) translateZ(0)';
+        card.style.setProperty('--gx', (px * 100) + '%');
+        card.style.setProperty('--gy', (py * 100) + '%');
+      });
+      on(card, 'mouseleave', function () {
+        card.style.transition = 'transform 420ms ' + getComputedStyle(document.documentElement).getPropertyValue('--ease-out');
+        card.style.transform = 'none';
+        window.setTimeout(function () { card.style.transition = ''; }, 420);
+      });
+    });
+  }
+
+  /* -------------------------------------------------------------------
+     Process rail — fills a vertical line as the visitor scrolls through
+     the steps beside it, and marks whichever step is currently in the
+     read band as active. Pure scroll-position read, no state kept
+     beyond what's visible on screen right now.
+     ------------------------------------------------------------------- */
+  function initRail() {
+    var line = $('.process-rail__line');
+    var fill = line ? $('i', line) : null;
+    var steps = $$('.rail-step');
+    if (!line || !fill || !steps.length) return;
+    var update = throttleFrame(function () {
+      var r = line.getBoundingClientRect();
+      var vh = window.innerHeight;
+      var start = vh * 0.75, end = vh * 0.3;
+      var covered = start - r.top;
+      var frac = Math.max(0, Math.min(1, covered / (r.height + (start - end))));
+      fill.style.height = (frac * 100) + '%';
+      steps.forEach(function (step) {
+        var sr = step.getBoundingClientRect();
+        step.classList.toggle('is-active', sr.top < vh * 0.65 && sr.bottom > vh * 0.2);
+      });
+    });
+    on(window, 'scroll', update, { passive: true });
+    on(window, 'resize', update);
+    update();
+  }
+
+  /* -------------------------------------------------------------------
+     Statement skew — a single line that leans with scroll velocity and
+     settles back upright. Decorative only; the text itself never moves
+     out of reading position enough to affect legibility.
+     ------------------------------------------------------------------- */
+  function initSkew() {
+    if (reduceMotion.matches) return;
+    var el = $('[data-skew]');
+    if (!el) return;
+    var lastY = window.scrollY, vel = 0;
+    on(window, 'scroll', function () {
+      var y = window.scrollY;
+      vel = y - lastY; lastY = y;
+    }, { passive: true });
+    (function frame() {
+      var target = Math.max(-6, Math.min(6, vel * 0.6));
+      vel *= 0.85;
+      el.style.transform = 'skewY(' + target.toFixed(2) + 'deg)';
+      requestAnimationFrame(frame);
+    })();
   }
 
   /* ---------------------------------------------------------------------

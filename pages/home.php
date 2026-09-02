@@ -95,6 +95,12 @@ $hero = $sections['hero'] ?? [];
             <?= $view->partial('partials/hero-visual') ?>
         </div>
     </div>
+
+    <div class="hero-chips" aria-hidden="true">
+        <span class="hero-chip"><b></b>Website — kept online</span>
+        <span class="hero-chip"><b></b>Backups — done nightly</span>
+        <span class="hero-chip"><b></b>Checked — every day</span>
+    </div>
 </section>
 
 <!-- ================= CAPABILITY MARQUEE ================= -->
@@ -166,6 +172,34 @@ $hero = $sections['hero'] ?? [];
 </section>
 <?php endif; ?>
 
+<!-- ================= HOW A PROJECT GOES LIVE ================= -->
+<?php if ($steps): ?>
+<section class="process-rail-sec">
+    <div class="container">
+        <div class="section-head" data-reveal="rise-blur">
+            <p class="eyebrow">How it works</p>
+            <h2 class="mt-4">How a project goes live.</h2>
+            <p class="lead">The same order every time — nothing skipped to hit a date.</p>
+        </div>
+        <div class="process-rail">
+            <div class="process-rail__line"><i></i></div>
+            <div class="rail-steps">
+                <?php foreach ($steps as $step): ?>
+                <div class="rail-step">
+                    <span class="rail-step__dot"></span>
+                    <span class="rail-step__no"><?= e($step['step_number'] ?: '01') ?></span>
+                    <div class="rail-step__body">
+                        <h3><?= e($step['title']) ?></h3>
+                        <p><?= e($step['description']) ?></p>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </div>
+</section>
+<?php endif; ?>
+
 <!-- ================= WORK ================= -->
 <?php if ($projects): ?>
 <section class="section">
@@ -201,23 +235,16 @@ $hero = $sections['hero'] ?? [];
             <p class="lead"><?= e($s('industries', 'subheading')) ?></p>
         </div>
 
-        <div class="slider" data-slider>
-            <div class="slider__track slider__track--wide" data-reveal-stagger>
+        <div class="industry-strip" data-reveal-stagger>
             <?php foreach ($industries as $i => $industry): ?>
-            <div class="industry-card" style="--i:<?= $i ?>" data-reveal>
-                <span class="icon-plate icon-plate--sm"><?= icon((string) ($industry['icon'] ?: 'building')) ?></span>
-                <div>
-                    <div class="industry-card__name">
-                        <a href="<?= e(url('/industries/' . $industry['slug'])) ?>"><?= e($industry['name']) ?></a>
-                    </div>
-                    <?php if (!empty($industry['tagline'])): ?>
-                    <div class="industry-card__text"><?= e(str_limit($industry['tagline'], 52)) ?></div>
-                    <?php endif; ?>
-                </div>
-                <span class="industry-card__arrow"><?= icon('arrow-right') ?></span>
-            </div>
+            <a class="istrip-card" style="--i:<?= $i ?>" data-reveal href="<?= e(url('/industries/' . $industry['slug'])) ?>">
+                <span class="istrip-card__no"><?= str_pad((string) ($i + 1), 2, '0', STR_PAD_LEFT) ?></span>
+                <h3 class="istrip-card__name"><?= e($industry['name']) ?></h3>
+                <?php if (!empty($industry['tagline'])): ?>
+                <p class="istrip-card__text"><?= e(str_limit($industry['tagline'], 52)) ?></p>
+                <?php endif; ?>
+            </a>
             <?php endforeach; ?>
-        </div>
         </div>
 
         <div class="row row--center mt-6" data-reveal>
@@ -272,6 +299,13 @@ $hero = $sections['hero'] ?? [];
     </div>
 </section>
 <?php endif; ?>
+
+<!-- ================= STATEMENT ================= -->
+<section class="statement-sec">
+    <div class="container">
+        <p data-skew>No sales script. <span class="accent">Tell us what you run</span> and what's missing — we'll show you the real setup, not a mockup.</p>
+    </div>
+</section>
 
 <!-- ================= CTA ================= -->
 <?= $view->partial('partials/cta-band', ['section' => $sections['cta'] ?? null]) ?>
