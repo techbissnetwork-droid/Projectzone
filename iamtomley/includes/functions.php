@@ -64,25 +64,38 @@ function url_style(): string
     if ($style !== null) {
         return $style;
     }
-    $style = 'folder';
+
+    $mode   = 'auto';
+    $proven = false;
     try {
-        $mode = setting('clean_urls_mode', 'auto');
-        if ($mode === 'off') { $style = 'php';  return $style; }
-        if ($mode === 'on')  { $style = 'bare'; return $style; }
+        $mode   = setting('clean_urls_mode', 'auto');
+        $proven = setting('clean_urls', '') === '1';
 
-        if (setting('clean_urls', '') === '1') { $style = 'bare'; return $style; }
-
-        $uri    = (string) parse_url((string) ($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_PATH);
-        $script = basename((string) ($_SERVER['SCRIPT_NAME'] ?? ''));
-        $asked  = basename($uri);
-        if ($script !== '' && str_ends_with($script, '.php')
-            && $asked !== '' && $asked . '.php' === $script) {
-            set_setting('clean_urls', '1');
-            $style = 'bare';
+        if (!$proven) {
+            // Proof: this request's address has no .php while the script does,
+            // which only happens when the server rewrote it for us.
+            $uri    = (string) parse_url((string) ($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_PATH);
+            $script = basename((string) ($_SERVER['SCRIPT_NAME'] ?? ''));
+            $asked  = basename($uri);
+            if ($script !== '' && str_ends_with($script, '.php')
+                && $asked !== '' && $asked . '.php' === $script) {
+                set_setting('clean_urls', '1');
+                $proven = true;
+            }
         }
     } catch (Throwable $e) {
-        // No database yet — the folder form still works, so use it.
+        // No database yet; the folder form needs none, so carry on.
     }
+
+    if ($mode === 'off') {
+        $style = 'php';
+        return $style;
+    }
+
+    // "Always" is a preference, not a promise. The short form is only ever
+    // written once the server has actually shown it rewrites — otherwise every
+    // link on the site would 404 and there would be no way back in.
+    $style = $proven ? 'bare' : 'folder';
     return $style;
 }
 
@@ -119,14 +132,21 @@ function pretty_path(string $path): string
         return $path . $tail;
     }
 
-    // Folder form: only for pages that actually have a folder to serve them.
+    // Folder form: only for pages that have a folder, and only when that
+    // folder is actually present — an upload that skipped the new folders
+    // falls back to .php instead of 404-ing the whole site.
     if (!in_array($path, folder_pages(), true)) {
         return $path . $tail;
     }
-    $path = str_ends_with($path, '/index.php')
+    $folded = str_ends_with($path, '/index.php')
         ? substr($path, 0, -strlen('index.php'))
         : substr($path, 0, -4) . '/';
-    return $path . $tail;
+
+    static $exists = [];
+    if (!isset($exists[$folded])) {
+        $exists[$folded] = is_file(APP_ROOT . $folded . 'index.php');
+    }
+    return ($exists[$folded] ? $folded : $path) . $tail;
 }
 
 /** Scheme + host of the current request (auto-detected, proxy-aware). */

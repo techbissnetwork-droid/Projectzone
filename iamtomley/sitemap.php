@@ -16,6 +16,10 @@ require_once __DIR__ . '/includes/functions.php';
 header('Content-Type: application/xml; charset=UTF-8');
 header('X-Robots-Tag: noindex');
 
+// Reaching this file without the .php in the address proves the server rewrites;
+// url_style() notices and remembers, which is what the check in Site Settings
+// relies on.
+
 /** Nothing to index yet — reply with a valid but empty sitemap. */
 function empty_sitemap(): void
 {
@@ -33,6 +37,7 @@ if (setting('maintenance_mode', '0') === '1' || setting('seo_noindex', '0') === 
     empty_sitemap();
 }
 
+clean_urls();          // records the proof if this address was rewritten
 $home = canonical_url();
 $when = content_updated_at();
 

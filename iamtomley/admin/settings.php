@@ -218,14 +218,15 @@ function s(string $k): string { return e(setting($k)); }
         <label>Hide <code>.php</code> in the address bar</label>
         <select name="clean_urls_mode">
           <option value="auto" <?= setting('clean_urls_mode','auto')==='auto'?'selected':'' ?>>Automatic — work it out (recommended)</option>
-          <option value="on"   <?= setting('clean_urls_mode','auto')==='on'  ?'selected':'' ?>>Always hide it</option>
+          <option value="on"   <?= setting('clean_urls_mode','auto')==='on'  ?'selected':'' ?>>Prefer the shortest form</option>
           <option value="off"  <?= setting('clean_urls_mode','auto')==='off' ?'selected':'' ?>>Never hide it</option>
         </select>
         <div class="hint">On <strong>Automatic</strong> your addresses never show <code>.php</code>, whatever your
         host supports. Where the server rewrites, you get the shortest form — <code>/admin/login</code>. Where it
         does not, the site uses the folder form — <code>/admin/login/</code> — which works on every server without
-        any configuration. <strong>Always</strong> forces the short form (only if the check says your server
-        rewrites); <strong>Never</strong> goes back to plain <code>.php</code>.</div>
+        any configuration. <strong>Prefer the shortest form</strong> uses <code>/admin/login</code> as soon as your server proves it
+        rewrites — it will never switch to a shape your server cannot serve, so it cannot break your links.
+        <strong>Never</strong> goes back to plain <code>.php</code>.</div>
       </div>
       <div class="field">
         <label>Is your server doing it?</label>

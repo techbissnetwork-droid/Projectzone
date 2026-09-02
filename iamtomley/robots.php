@@ -16,6 +16,10 @@ require_once __DIR__ . '/includes/functions.php';
 header('Content-Type: text/plain; charset=UTF-8');
 header('X-Robots-Tag: noindex');
 
+// Reaching this file without the .php in the address proves the server rewrites;
+// url_style() notices and remembers, which is what the check in Site Settings
+// relies on.
+
 $closed = true;
 if (is_installed()) {
     $closed = setting('maintenance_mode', '0') === '1' || setting('seo_noindex', '0') === '1';
@@ -27,6 +31,7 @@ if ($closed) {
     exit;
 }
 
+clean_urls();          // records the proof if this address was rewritten
 $base = BASE_URL;
 
 echo "User-agent: *\n";
