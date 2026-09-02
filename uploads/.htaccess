@@ -1,8 +1,36 @@
 # Uploaded files are data, never code.
-php_flag engine off
+#
+# php_flag is a mod_php directive. Most hosts now run PHP through FPM, CGI or
+# LiteSpeed, where mod_php is absent and an unguarded php_flag makes Apache
+# return 500 for every file in this folder — every image on the site. Guarded,
+# it turns the engine off where it can, and the rules below do the real work
+# everywhere else.
+<IfModule mod_php.c>
+  php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+  php_flag engine off
+</IfModule>
+<IfModule mod_php8.c>
+  php_flag engine off
+</IfModule>
+
 <IfModule mod_headers.c>
   Header always set X-Content-Type-Options "nosniff"
 </IfModule>
+
 <FilesMatch "\.(php|phtml|php[0-9]|phar|cgi|pl|py|sh|htaccess)$">
-  Require all denied
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
 </FilesMatch>
+
+# Belt and braces where mod_rewrite is available but mod_php is not.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule \.(php|phtml|php[0-9]|phar)$ - [F,L,NC]
+</IfModule>

@@ -303,18 +303,28 @@ final class Payments
 
     private static function khaltiVerify(array $order, array $method, array $request): array
     {
-        $cfg  = self::config($method);
-        $pidx = (string)($request['pidx'] ?? '');
-        if ($pidx === '') {
-            $pidx = (string)Database::value(
-                "SELECT gateway_ref FROM payment_attempts
-                 WHERE order_id = :o AND provider = 'khalti' AND gateway_ref IS NOT NULL
-                 ORDER BY id DESC LIMIT 1",
-                ['o' => (int)$order['id']], ''
-            );
-        }
+        $cfg = self::config($method);
+
+        /* The reference is taken from what we recorded when this order started
+           its payment, never from the return URL. A pidx in the query string is
+           accepted only when it is one of this order's own, so a completed
+           payment cannot be replayed against a second order of the same price —
+           which the amount check alone would not catch. */
+        $mine = array_column(Database::all(
+            "SELECT gateway_ref FROM payment_attempts
+             WHERE order_id = :o AND provider = 'khalti' AND gateway_ref IS NOT NULL
+             ORDER BY id DESC",
+            ['o' => (int)$order['id']]
+        ), 'gateway_ref');
+        $asked = (string)($request['pidx'] ?? '');
+        $pidx  = ($asked !== '' && in_array($asked, $mine, true)) ? $asked : (string)($mine[0] ?? '');
+
         if ($pidx === '') {
             return ['ok' => false, 'error' => 'This payment has no Khalti reference to check.'];
+        }
+        if ($asked !== '' && $asked !== $pidx) {
+            self::logAttempt($order, $method, 'failed', $asked, 'Returned pidx does not belong to this order');
+            return ['ok' => false, 'error' => 'That payment reference does not belong to this order.'];
         }
         [$body, $err] = self::http(
             'POST',

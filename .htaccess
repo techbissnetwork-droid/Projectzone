@@ -13,7 +13,10 @@ Options -Indexes
 # are not in play.
 RedirectMatch 404 (^|/)(config|app|partials)/
 RedirectMatch 404 \.(sql|md|log)$
-RedirectMatch 404 /\.
+# Dotfiles stay hidden, but not /.well-known/: blocking it stops Let's Encrypt
+# and AutoSSL from answering the challenge, so certificates cannot be issued or
+# renewed — on a site whose whole business is running other people's SSL.
+RedirectMatch 404 /\.(?!well-known/)
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
