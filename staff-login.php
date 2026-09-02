@@ -58,13 +58,23 @@ $heading = $stage === 'code' ? 'Check your email' : 'Staff sign in';
 $lede    = $stage === 'code'
     ? 'Enter the code we just sent. It expires in ' . LoginCode::TTL_MINUTES . ' minutes.'
     : 'Manage projects, clients, support and the site.';
+$hideCodeForm = !LoginCode::available();
 $altLink = url('login.php');
 $altText = 'Client sign in';
 
-/* The password fallback, folded away unless it is needed. */
+/* Normally folded away. When sign-in codes cannot work — because the database
+   is behind the code — it is the only way in, so open it and say why. */
+$codesDown = !LoginCode::available();
 ob_start(); ?>
-<details class="auth__fallback">
-  <summary>Email not arriving? Use a password instead</summary>
+<?php if ($codesDown): ?>
+  <div class="notice notice--err">
+    <p><b>Sign-in codes are unavailable.</b> This site's database has not been updated for the
+      current version yet.</p>
+    <p>Sign in with your password below, then open <b>System → Run database update</b>.</p>
+  </div>
+<?php endif; ?>
+<details class="auth__fallback"<?= $codesDown ? ' open' : '' ?>>
+  <summary><?= $codesDown ? 'Sign in with a password' : 'Email not arriving? Use a password instead' ?></summary>
   <form method="post" class="wform">
     <?= Csrf::field() ?>
     <input type="hidden" name="step" value="password">

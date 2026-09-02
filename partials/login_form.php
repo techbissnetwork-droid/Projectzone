@@ -16,7 +16,9 @@ if (!class_exists('Settings')) { http_response_code(404); exit('Not found.'); }
     <?php if (!empty($notice)): ?><div class="notice notice--ok"><p><?= e($notice) ?></p></div><?php endif; ?>
     <?php if (!empty($error)): ?><div class="notice notice--err"><p><?= e($error) ?></p></div><?php endif; ?>
 
-    <?php if ($stage === 'code'): ?>
+    <?php if (!empty($hideCodeForm)): ?>
+      <?php /* codes unavailable — the fallback below is the way in */ ?>
+    <?php elseif ($stage === 'code'): ?>
       <form method="post" class="wform">
         <?= Csrf::field() ?>
         <input type="hidden" name="step" value="verify">

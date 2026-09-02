@@ -12,8 +12,107 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
 
-/* Locked: the only way past is an administrator signing in and unlocking
-   from the admin panel. The installer itself never accepts a password. */
+/* Credentials of an install that already exists, so an update never depends on
+   re-typing them or on the session surviving between steps. */
+$configDb = null;
+if (is_file($configFile)) {
+    $existingCfg = @include $configFile;
+    if (is_array($existingCfg) && !empty($existingCfg['db']['database'])) {
+        $configDb = $existingCfg['db'];
+    }
+}
+
+/**
+ * Locked. Reinstalling still needs an administrator to unlock from the panel,
+ * but an update must never be locked out: the lock file survives a code upload,
+ * and if the database is behind the new code the panel may be unreachable too.
+ * So when — and only when — there is genuine schema work pending, the update is
+ * offered here. It is additive and idempotent; it drops nothing.
+ */
+$pendingUpdate = [];
+if ($installed && $configDb !== null) {
+    try {
+        $pdo = new PDO(Database::dsn($configDb), $configDb['username'] ?? null, $configDb['password'] ?? null,
+            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+        require_once __DIR__ . '/migrations.php';
+        $have = tb_tables($pdo, $configDb['driver'] ?? 'mysql');
+        $sqlText = (string)@file_get_contents(__DIR__ . '/schema.sql');
+        preg_match_all('/CREATE TABLE\s+(\w+)/i', $sqlText, $mm);
+        foreach ($mm[1] as $t) {
+            if (!in_array(strtolower($t), $have, true)) {
+                $pendingUpdate[] = 'Missing table: ' . $t;
+            }
+        }
+        $keys = array_flip($pdo->query('SELECT skey FROM settings')->fetchAll(PDO::FETCH_COLUMN));
+        $miss = 0;
+        foreach (array_keys(Settings::defaults()) as $k) {
+            if (!isset($keys[$k])) { $miss++; }
+        }
+        if ($miss) {
+            $pendingUpdate[] = $miss . ' setting' . ($miss === 1 ? '' : 's') . ' not yet stored';
+        }
+    } catch (Throwable) {
+        $pendingUpdate = [];
+    }
+}
+
+if ($installed && $pendingUpdate && empty($_SESSION['install_done'])) {
+    $ranLog = null;
+    $ranErr = null;
+    if (post() && ($_POST['do'] ?? '') === 'update') {
+        try {
+            $pdo = new PDO(Database::dsn($configDb), $configDb['username'] ?? null, $configDb['password'] ?? null,
+                [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+            $pdo->exec('SET NAMES utf8mb4');
+            require_once __DIR__ . '/migrations.php';
+            $ranLog = tb_migrate($pdo, $configDb['driver'] ?? 'mysql');
+        } catch (Throwable $ex) {
+            $ranErr = $ex->getMessage();
+        }
+    }
+    ?><!doctype html><html lang="en"><head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex"><title>Database update</title>
+    <link rel="stylesheet" href="../assets/css/install.css"></head><body>
+    <div class="wrap">
+      <header class="head">
+        <span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2 21.5 7v10L12 22 2.5 17V7z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M12 22V12l9.5-5M12 12 2.5 7" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round" opacity=".55"/></svg></span>
+        <div><h1>Database update</h1><p>This site is installed, but its database is older than the code.</p></div>
+      </header>
+      <main class="card">
+        <?php if ($ranErr !== null): ?>
+          <div class="alert err"><p><b>The update failed.</b></p><p><?= e($ranErr) ?></p></div>
+        <?php elseif ($ranLog !== null): ?>
+          <h2>Done</h2>
+          <ul class="loglist"><?php foreach ($ranLog as $line): ?><li><?= e($line) ?></li><?php endforeach; ?></ul>
+          <div class="actions">
+            <a class="btn" href="../admin/">Open the admin panel <span>→</span></a>
+            <a class="btn ghost" href="../">View the site</a>
+          </div>
+          <p class="hint" style="margin-top:18px">Now delete the <code>install/</code> folder from your server.</p>
+        <?php else: ?>
+          <h2>An update is waiting</h2>
+          <p class="hint">The code expects things this database does not have yet:</p>
+          <ul class="loglist" style="margin-top:14px">
+            <?php foreach ($pendingUpdate as $p): ?><li><?= e($p) ?></li><?php endforeach; ?>
+          </ul>
+          <div class="alert warn">
+            <p><b>This only adds what is missing.</b> No table is dropped and no record is changed.
+               Take a database backup first if you can.</p>
+          </div>
+          <form method="post">
+            <input type="hidden" name="do" value="update">
+            <button class="btn" type="submit">Run the database update <span>→</span></button>
+          </form>
+          <p class="hint" style="margin-top:18px">Reinstalling from scratch is a different matter and still
+            requires signing in as an administrator and unlocking this folder from <b>System</b>.</p>
+        <?php endif; ?>
+      </main>
+      <p class="foot">TECHBISS platform installer</p>
+    </div></body></html><?php
+    exit;
+}
+
 if ($installed && empty($_SESSION['install_done'])) {
     http_response_code(403);
     ?><!doctype html><html lang="en"><head><meta charset="utf-8">
@@ -49,6 +148,48 @@ if ($installed && empty($_SESSION['install_done'])) {
 $step   = max(1, min(5, (int)($_GET['step'] ?? 1)));
 $errors = [];
 $data   = $_SESSION['install'] ?? [];
+
+/**
+ * An upgrade usually runs over an install that already has config/config.php.
+ * Read the credentials from there when the session does not carry them, so a
+ * host that cannot keep sessions can still update its database.
+ */
+if (empty($data['db']) && $configDb !== null) {
+    $data['db'] = $configDb;
+    $data['from_config'] = true;
+}
+
+/** Does this connection already hold TECHBISS tables? */
+function tb_has_tables(array $db): bool
+{
+    try {
+        $pdo = new PDO(Database::dsn($db), $db['username'] ?? null, $db['password'] ?? null,
+            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+        return (bool)$pdo->query("SHOW TABLES LIKE 'users'")->fetchColumn();
+    } catch (Throwable) {
+        return false;
+    }
+}
+
+/** Send the installer back to the database step with an explanation. */
+function tb_restart(string $why): never
+{
+    $_SESSION['install_note'] = $why;
+    header('Location: ?step=2');
+    exit;
+}
+
+/* Sessions are how the wizard remembers step 2. Prove they work before relying
+   on them, and say so plainly rather than looping the user back forever. */
+$sessionWorks = true;
+if ($step > 1) {
+    if (!isset($_SESSION['probe'])) {
+        $sessionWorks = false;
+    }
+}
+$_SESSION['probe'] = 1;
+$note = $_SESSION['install_note'] ?? '';
+unset($_SESSION['install_note']);
 
 /* ── detected defaults ──────────────────────────────────── */
 function detect_url(): string
@@ -89,6 +230,11 @@ if ($step === 2 && post()) {
         'password' => (string)($_POST['password'] ?? ''),
         'charset'  => 'utf8mb4',
     ];
+    if ($db['password'] === '' && $configDb !== null
+        && ($configDb['database'] ?? '') === $db['database']
+        && ($configDb['username'] ?? '') === $db['username']) {
+        $db['password'] = (string)($configDb['password'] ?? '');
+    }
     if ($db['database'] === '') $errors[] = 'Enter the database name.';
     if ($db['username'] === '') $errors[] = 'Enter the database username.';
 
@@ -109,6 +255,9 @@ if ($step === 2 && post()) {
 
 /* ── step 3 · choose fresh or migrate (existing database only) ── */
 if ($step === 3 && post()) {
+    if (empty($data['db'])) {
+        tb_restart('The installer lost the database details. Enter them once more — this happens when the browser or the server drops the session between steps.');
+    }
     $mode = (string)($_POST['mode'] ?? '');
     if (!in_array($mode, ['migrate', 'fresh'], true)) {
         $errors[] = 'Choose what to do with the existing database.';
@@ -193,7 +342,13 @@ if ($step === 4 && post()) {
 }
 
 /* ── step 5 · run the migration, or show the finish screen ─ */
-if ($step === 5 && ($data['mode'] ?? '') === 'migrate' && empty($_SESSION['install_done'])) {
+$migrateReady = ($data['mode'] ?? '') === 'migrate'
+    || (!empty($data['from_config']) && $step === 5 && empty($_SESSION['install_done']));
+
+if ($step === 5 && $migrateReady && empty($_SESSION['install_done'])) {
+    if (empty($data['db'])) {
+        tb_restart('The installer lost the database details. Enter them once more, then choose “Update”.');
+    }
     if (post()) {
         $tz     = (string)($_POST['timezone'] ?? $detectedTz);
         $appUrl = rtrim(trim((string)($_POST['app_url'] ?? '')), '/');
@@ -261,6 +416,18 @@ if (!empty($data['db']) && empty($data['existing']) && $step >= 3) {
     <?php endforeach; ?>
   </ol>
 
+  <?php if (!$sessionWorks): ?>
+    <div class="alert err">
+      <p><b>This server is not keeping the installer's session.</b> Each step forgets the one before it,
+        so the wizard cannot finish.</p>
+      <p>Ask your host to make PHP's <code>session.save_path</code> writable. If you are only updating an
+        existing install, sign in and use <b>System → Run database update</b> instead — that does not
+        need a session.</p>
+    </div>
+  <?php endif; ?>
+  <?php if ($note !== ''): ?>
+    <div class="alert warn"><p><?= e($note) ?></p></div>
+  <?php endif; ?>
   <?php if ($errors): ?>
     <div class="alert err"><?php foreach ($errors as $er): ?><p><?= e($er) ?></p><?php endforeach; ?></div>
   <?php endif; ?>
@@ -279,16 +446,23 @@ if (!empty($data['db']) && empty($data['existing']) && $step >= 3) {
 
   <?php elseif ($step === 2): ?>
     <h2>Database connection</h2>
+    <?php if ($configDb !== null): ?>
+      <div class="alert warn">
+        <p><b>An existing installation was found.</b> Its database details are filled in below —
+          the password is not shown, so leave it blank to reuse the saved one.</p>
+      </div>
+    <?php endif; ?>
     <p class="hint">Enter the details of your MySQL database. We detect whether it is empty and offer the right options next.</p>
     <form method="post" class="form">
       <div class="row two">
-        <label>Host<input name="host" value="<?= e($_POST['host'] ?? $data['db']['host'] ?? 'localhost') ?>" required></label>
-        <label>Port<input name="port" type="number" value="<?= e((string)($_POST['port'] ?? $data['db']['port'] ?? 3306)) ?>" required></label>
+        <label>Host<input name="host" value="<?= e($_POST['host'] ?? $data['db']['host'] ?? $configDb['host'] ?? 'localhost') ?>" required></label>
+        <label>Port<input name="port" type="number" value="<?= e((string)($_POST['port'] ?? $data['db']['port'] ?? $configDb['port'] ?? 3306)) ?>" required></label>
       </div>
-      <label>Database name<input name="database" value="<?= e($_POST['database'] ?? $data['db']['database'] ?? '') ?>" required></label>
+      <label>Database name<input name="database" value="<?= e($_POST['database'] ?? $data['db']['database'] ?? $configDb['database'] ?? '') ?>" required></label>
       <div class="row two">
-        <label>Username<input name="username" value="<?= e($_POST['username'] ?? $data['db']['username'] ?? '') ?>" required></label>
-        <label>Password<input name="password" type="password" value=""></label>
+        <label>Username<input name="username" value="<?= e($_POST['username'] ?? $data['db']['username'] ?? $configDb['username'] ?? '') ?>" required></label>
+        <label>Password <?php if ($configDb !== null): ?><small>blank keeps the saved one</small><?php endif; ?>
+          <input name="password" type="password" value=""></label>
       </div>
       <button class="btn" type="submit">Test connection <span>→</span></button>
     </form>

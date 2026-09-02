@@ -20,8 +20,26 @@ final class LoginCode
      * address has an account.
      * @return array{0:bool,1:string} [accepted, message]
      */
+    /** The codes table is newer than the first release; it may not exist yet. */
+    public static function available(): bool
+    {
+        static $ok = null;
+        if ($ok !== null) {
+            return $ok;
+        }
+        try {
+            Database::value('SELECT COUNT(*) FROM login_codes WHERE 1 = 0', [], 0);
+            return $ok = true;
+        } catch (PDOException) {
+            return $ok = false;
+        }
+    }
+
     public static function request(string $email, string $audience): array
     {
+        if (!self::available()) {
+            return [false, 'Sign-in codes are not available until the database update has been run.'];
+        }
         $email = trim(mb_strtolower($email));
         if (!is_email($email)) {
             return [false, 'Enter a valid email address.'];
@@ -90,6 +108,9 @@ final class LoginCode
      */
     public static function verify(string $email, string $code, string $audience): array
     {
+        if (!self::available()) {
+            return [false, 'Sign-in codes are not available until the database update has been run.'];
+        }
         $email = trim(mb_strtolower($email));
         $code  = preg_replace('/\D+/', '', $code) ?? '';
         if ($email === '' || $code === '') {
