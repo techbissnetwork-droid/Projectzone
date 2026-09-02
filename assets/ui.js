@@ -595,5 +595,40 @@
     window.addEventListener('resize', function () {
       requestAnimationFrame(syncHeight);
     }, { passive: true });
+
+    // SELF-HEALING, FOR WHEN THE TAB AND THE TABLE UNDER IT DISAGREE.
+    //
+    // Tapping a tab only asks the browser to scrollIntoView; the observer
+    // above is the only thing that ever marks a tab "on". CSS scroll-snap
+    // is entitled to override an in-flight smooth scroll and settle the
+    // track on a different slide than the one that scroll was headed for -
+    // documented iOS Safari behaviour, not a bug in either piece alone - and
+    // if the observer had already reacted to the interrupted scroll's brief
+    // crossing of the 0.6 threshold before snap pulled the track back, the
+    // highlighted tab and the slide actually on screen are left disagreeing
+    // until the next full swipe fixes it by accident.
+    //
+    // Reconciled here from the track's own settled position, which cannot
+    // be wrong about what is actually in view: on ANY scroll, once it stops
+    // moving for 120ms, find whichever slide's centre is nearest the middle
+    // of the visible strip and make that tab the one lit up - regardless of
+    // whether it agrees with what the observer last decided.
+    var settleTimer = null;
+    function syncFromSettledScroll() {
+      var mid = track.scrollLeft + track.clientWidth / 2;
+      var best = 0;
+      var bestDist = Infinity;
+      Array.prototype.forEach.call(track.children, function (s, i) {
+        var dist = Math.abs((s.offsetLeft + s.offsetWidth / 2) - mid);
+        if (dist < bestDist) { bestDist = dist; best = i; }
+      });
+      Array.prototype.forEach.call(tabEls, function (t, i) {
+        t.classList.toggle('on', i === best);
+      });
+    }
+    track.addEventListener('scroll', function () {
+      clearTimeout(settleTimer);
+      settleTimer = setTimeout(syncFromSettledScroll, 120);
+    }, { passive: true });
   }
 })();
