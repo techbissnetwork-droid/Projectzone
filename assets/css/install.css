@@ -57,3 +57,18 @@ hr{ border:0; border-top:1px solid var(--line); margin:4px 0 }
 .hint{ color:var(--tx-3); font-size:13px; margin-bottom:14px }
 .foot{ text-align:center; margin-top:26px; font-size:12px; color:var(--tx-4) }
 @media (max-width:560px){ .row.two{ grid-template-columns:1fr } .wrap{ padding-top:32px } }
+
+/* mode picker + migration log */
+.pick{ display:grid; grid-template-columns:auto 1fr; gap:12px; align-items:start;
+  padding:16px 18px; border:1px solid var(--line-2); border-radius:12px; cursor:pointer;
+  background:rgba(255,255,255,.02); transition:border-color .25s, background-color .25s }
+.pick:hover{ border-color:var(--sig) }
+.pick:has(input:checked){ border-color:var(--sig); background:rgba(143,176,255,.08) }
+.pick input{ width:auto; margin-top:3px }
+.pick span{ display:grid; gap:5px; font-size:13.5px; color:var(--tx-3) }
+.pick b{ color:var(--tx); font-size:15px; font-weight:600 }
+.pick--danger:has(input:checked){ border-color:var(--danger); background:rgba(240,138,138,.08) }
+.loglist{ display:grid; gap:8px; margin:0 0 18px; padding:16px 18px; list-style:none;
+  border:1px solid var(--line); border-radius:12px; background:rgba(255,255,255,.02) }
+.loglist li{ font-size:13.5px; color:var(--tx-2); padding-left:18px; position:relative }
+.loglist li::before{ content:"✓"; position:absolute; left:0; color:var(--ok) }

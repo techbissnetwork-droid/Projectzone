@@ -52,4 +52,123 @@ function install_seed(PDO $pdo, string $ts): void
     foreach ($products as $i => $p) {
         $st->execute([$p[0], $p[1], $p[2], $p[3], $p[4], $p[5], $p[6], $p[7], $p[8], $i === 0 ? 1 : 0, $i * 10, $ts]);
     }
+
+    tb_seed_content($pdo, $ts);
+}
+
+/** Editable content blocks, starter pages and menus. Split out so a
+ *  migration can add them to an existing install without touching
+ *  services or products. */
+function tb_seed_content(PDO $pdo, string $ts): void
+{
+    /* ── repeatable content blocks ───────────────────────── */
+    $ci = $pdo->prepare('INSERT INTO content_items (kind,label,title,body,extra,meta1,meta2,icon,sort_order,is_active,created_at)
+                         VALUES (?,?,?,?,?,?,?,?,?,1,?)');
+    $blocks = [];
+
+    foreach ([
+        ['Services under one roof', '12'],
+        ['Delivery model', 'End-to-end'],
+        ['Infrastructure uptime', '99.98%'],
+    ] as $i => $r) { $blocks[] = ['stat', $r[0], $r[1], null, null, null, null, null, $i * 10]; }
+
+    foreach ([
+        ['OFFLINE', 'A business that only exists in one place',
+         'Paper records, phone orders, manual follow-ups and a customer base limited by walking distance. Every process depends on someone remembering it.', 'Offline'],
+        ['DIGITAL', 'Every process gets a digital counterpart',
+         'We map how your business actually runs, then rebuild each step as a system: the order book becomes an API, the ledger becomes payments, the notebook becomes a database.', 'Digital'],
+        ['ONLINE', 'Your business, open every hour of the day',
+         'A website, an app, business email on your own domain, secure payments and cloud infrastructure — running together, monitored, and no longer dependent on anyone being at the counter.', 'Online'],
+        ['GROWING', 'Reach that keeps compounding',
+         'With everything measured, the improvements never stop: more orders per shift, customers far beyond your street, and zero hours lost to manual admin.', 'Growing'],
+    ] as $i => $r) { $blocks[] = ['journey', $r[0], $r[1], $r[2], null, $r[3], null, null, $i * 10]; }
+
+    foreach ([
+        ['Discover', 'week 1', 'We understand your business, your customers and your goals — how orders actually arrive, where time is lost, what growth is blocked on.',
+         "Business & operations audit\nCustomer journey mapping\nTechnical requirements\nScope, budget and timeline", 'mapping business logic'],
+        ['Design', 'week 2–3', 'We create the digital experience and the architecture behind it — interface, brand system and the data model they sit on.',
+         "Design system & UI\nInteractive prototype\nSystem architecture\nContent & copy structure", 'composing the system'],
+        ['Build', 'week 3–8', 'We develop the website, the application and the infrastructure together, shipping to a staging environment you can watch grow.',
+         "Front-end & backend build\nIntegrations & automation\nQA across real devices\nWeekly staging reviews", 'building & testing'],
+        ['Launch', 'launch week', 'We configure domain, hosting, SSL, email and deployment — then move you across without downtime and hand over the keys.',
+         "DNS, SSL & mail records\nZero-downtime cutover\nAnalytics & monitoring\nTeam training & handover", 'cutting over'],
+        ['Grow', 'ongoing', 'We maintain, optimise and keep improving the digital side of your business — because launch day is the beginning of the work, not the end.',
+         "Maintenance & support\nPerformance & SEO tuning\nConversion improvements\nNew features each quarter", 'compounding results'],
+    ] as $i => $r) { $blocks[] = ['process', $r[0], $r[1], $r[2], $r[3], $r[4], null, null, $i * 10]; }
+
+    foreach ([
+        ['Secure', 'certificate valid · auto-renew', 'TLS 1.3, firewalled, hardened and access-audited by default.', 'meter'],
+        ['Scalable', 'auto-scaling · 3 regions', 'Capacity that follows demand instead of the other way round.', 'bars'],
+        ['Fast', 'lighthouse target', 'Edge-cached, image-optimised, measured against Core Web Vitals.', 'gauge'],
+        ['Reliable', '99.98% · 30-day window', 'Monitored around the clock, with restore-tested backups.', 'ticks'],
+        ['Cloud-ready', 'containerised · reproducible', 'Containerised and portable — you are never locked to one vendor.', 'orbits'],
+        ['Mobile-ready', 'responsive · touch-first', 'Designed for the device most of your customers actually use.', 'devices'],
+    ] as $i => $r) { $blocks[] = ['pillar', $r[0], $r[1], $r[2], null, null, null, $r[3], $i * 10]; }
+
+    foreach ([
+        ['BUSINESS', 'Your goals, customers, operations', '0'],
+        ['TECHBISS CORE', 'Architecture · design system · API contracts', '1'],
+        ['WEBSITE', 'Marketing & conversion', '2'],
+        ['APP', 'iOS · Android · internal', '2'],
+        ['PAYMENTS', 'Checkout & settlement', '2'],
+        ['EMAIL', 'Domain communication', '2'],
+        ['HOSTING', 'Edge + origin', '3'],
+        ['DATABASE', 'Single source of truth', '3'],
+        ['SECURITY', 'TLS · WAF · access', '3'],
+        ['CLOUD', 'Scale & backups', '3'],
+    ] as $i => $r) { $blocks[] = ['arch', $r[0], $r[1], null, null, $r[2], null, null, $i * 10]; }
+
+    foreach ([
+        ['Restaurant', 'Online ordering system', 'Digital menu, delivery and pickup ordering, table reservations, kitchen display and payments — one flow from customer to counter.',
+         "Menu & ordering\nReservations\nKitchen tickets\nDigital payments\nLoyalty"],
+        ['Retail store', 'E-commerce platform', 'Your shelves online with live stock, courier integration, invoices and a storefront that sells outside opening hours.',
+         "Catalogue\nInventory sync\nCheckout\nDelivery\nAnalytics"],
+        ['School', 'Education portal', 'Admissions, attendance, results, fee collection and parent communication behind one secure login per role.',
+         "Admissions\nAttendance\nResults\nFee payments\nParent portal"],
+        ['Hospital', 'Booking & management system', 'Patient appointments, doctor schedules, records and billing on infrastructure built for privacy and uptime.',
+         "Appointments\nSchedules\nRecords\nBilling\nEncrypted backups"],
+        ['Service company', 'Online booking platform', 'Availability, quotes, bookings, job dispatch and automatic follow-up — so enquiries stop dying in a chat thread.',
+         "Availability\nQuotes\nDispatch\nInvoices\nCRM"],
+        ['Startup', 'Complete digital product', 'Brand, marketing site, product, API and infrastructure — built to ship early and scale when the numbers say so.',
+         "Brand\nProduct\nAPI\nCloud\nAnalytics"],
+    ] as $i => $r) { $blocks[] = ['transform', $r[0], $r[1], $r[2], $r[3], null, null, null, $i * 10]; }
+
+    foreach ($blocks as $b) {
+        $ci->execute([$b[0], $b[1], $b[2], $b[3], $b[4], $b[5], $b[6], $b[7], $b[8], $ts]);
+    }
+
+    /* ── starter pages ───────────────────────────────────── */
+    $pg = $pdo->prepare('INSERT INTO pages (slug,title,subtitle,eyebrow,body,status,show_cta,sort_order,created_at,updated_at)
+                         VALUES (?,?,?,?,?,?,?,?,?,?)');
+    $pg->execute(['about', 'About us', 'A team that builds the whole digital side of a business, not just the front page.', 'Who we are',
+        "We started because too many good businesses were being handed a website and left to work out hosting, email, security and payments on their own.\n\n"
+      . "Today we take responsibility for the whole stack. One team designs the interface, writes the code, configures the server, sets up the mail records and picks up the phone when something breaks.\n\n"
+      . "Edit this page from the admin panel: Pages → About us.",
+        'published', 1, 10, $ts, $ts]);
+    $pg->execute(['privacy', 'Privacy policy', 'How we handle the information you give us.', 'Legal',
+        "Replace this text with your own privacy policy.\n\nCover at least: what you collect, why you collect it, how long you keep it, who you share it with, and how someone asks for their data to be removed.",
+        'published', 0, 20, $ts, $ts]);
+    $pg->execute(['terms', 'Terms of service', 'The terms that apply when you work with us.', 'Legal',
+        "Replace this text with your own terms.\n\nCover at least: scope of work, payment terms, revisions, ownership of the finished work, hosting and maintenance obligations, and how either side ends the engagement.",
+        'published', 0, 30, $ts, $ts]);
+
+    /* ── menus ───────────────────────────────────────────── */
+    $nv = $pdo->prepare('INSERT INTO nav_items (location,label,url,page_id,new_tab,sort_order,is_active,created_at)
+                         VALUES (?,?,?,?,0,?,1,?)');
+    foreach ([['Services', 'services.php'], ['Work', 'portfolio.php'],
+              ['Marketplace', 'marketplace.php'], ['About', null], ['Contact', 'contact.php']] as $i => $n) {
+        $nv->execute(['header', $n[0], $n[1], $n[1] === null ? 1 : null, $i * 10, $ts]);
+    }
+    foreach ([['Services', 'services.php'], ['Selected work', 'portfolio.php'],
+              ['Marketplace', 'marketplace.php']] as $i => $n) {
+        $nv->execute(['footer_1', $n[0], $n[1], null, $i * 10, $ts]);
+    }
+    foreach ([['About us', null], ['Contact', 'contact.php'],
+              ['Privacy policy', null], ['Terms of service', null]] as $i => $n) {
+        $nv->execute(['footer_2', $n[0], $n[1], $n[1] === null ? ($i === 0 ? 1 : ($i === 2 ? 2 : 3)) : null, $i * 10, $ts]);
+    }
+    foreach ([['Client portal', 'login.php'], ['Support & maintenance', 'login.php'],
+              ['Request a quote', 'contact.php']] as $i => $n) {
+        $nv->execute(['footer_3', $n[0], $n[1], null, $i * 10, $ts]);
+    }
 }

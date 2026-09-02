@@ -6,8 +6,8 @@
     <div class="foot__top">
       <div class="foot__brand">
         <a class="brand brand--lg" href="<?= e(url()) ?>">
-          <span class="brand__mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2 21.5 7v10L12 22 2.5 17V7z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M12 22V12l9.5-5M12 12 2.5 7" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round" opacity=".55"/></svg></span>
-          <span class="brand__word"><?= e(Settings::get('site_name', 'TECHBISS')) ?></span>
+          <?= Content::logo() ?>
+          <?php if (Settings::get('logo_image', '') === ''): ?><span class="brand__word"><?= e(Settings::get('site_name', 'TECHBISS')) ?></span><?php endif; ?>
         </a>
         <p class="foot__statement"><?= e(Settings::get('footer_note', Settings::get('site_tagline'))) ?></p>
         <p class="foot__mail"><a class="link" href="mailto:<?= e(Settings::get('contact_email')) ?>"><?= e(Settings::get('contact_email')) ?></a></p>
@@ -17,31 +17,24 @@
       </div>
 
       <nav class="foot__cols" aria-label="Footer">
-        <div class="foot__col">
-          <h4>Services</h4>
-          <ul>
-            <?php foreach (Database::all('SELECT slug, title FROM services WHERE is_active = 1 ORDER BY sort_order LIMIT 8') as $s): ?>
-              <li><a href="<?= e(url('services.php#' . $s['slug'])) ?>"><?= e($s['title']) ?></a></li>
-            <?php endforeach; ?>
-          </ul>
-        </div>
-        <div class="foot__col">
-          <h4>Company</h4>
-          <ul>
-            <li><a href="<?= e(url('services.php')) ?>">What we build</a></li>
-            <?php if (Settings::bool('show_portfolio', true)): ?><li><a href="<?= e(url('portfolio.php')) ?>">Selected work</a></li><?php endif; ?>
-            <?php if (Settings::bool('show_marketplace', true)): ?><li><a href="<?= e(url('marketplace.php')) ?>">Marketplace</a></li><?php endif; ?>
-            <li><a href="<?= e(url('contact.php')) ?>">Contact</a></li>
-          </ul>
-        </div>
-        <div class="foot__col">
-          <h4>Clients</h4>
-          <ul>
-            <li><a href="<?= e(url('login.php')) ?>">Client portal</a></li>
-            <li><a href="<?= e(url('login.php')) ?>">Support &amp; maintenance</a></li>
-            <li><a href="<?= e(url('contact.php')) ?>">Request a quote</a></li>
-          </ul>
-        </div>
+        <?php
+        $footCols = [
+            'footer_1' => Settings::get('foot_col1', 'Services'),
+            'footer_2' => Settings::get('foot_col2', 'Company'),
+            'footer_3' => Settings::get('foot_col3', 'Clients'),
+        ];
+        foreach ($footCols as $locKey => $heading):
+            $links = Content::nav($locKey);
+            if (!$links) { continue; } ?>
+          <div class="foot__col">
+            <h4><?= e($heading) ?></h4>
+            <ul>
+              <?php foreach ($links as $ln): ?>
+                <li><a href="<?= e($ln['href']) ?>"<?= $ln['new_tab'] ? ' target="_blank" rel="noopener"' : '' ?>><?= e($ln['label']) ?></a></li>
+              <?php endforeach; ?>
+            </ul>
+          </div>
+        <?php endforeach; ?>
         <div class="foot__col">
           <h4>Contact</h4>
           <ul>
@@ -86,5 +79,6 @@
 </footer>
 <script src="<?= e(asset('assets/js/site.js')) ?>" defer></script>
 <?php if (!empty($WITH_VIZ)): ?><script src="<?= e(asset('assets/js/viz.js')) ?>" defer></script><?php endif; ?>
+<?= Settings::get('custom_body_end') ?>
 </body>
 </html>

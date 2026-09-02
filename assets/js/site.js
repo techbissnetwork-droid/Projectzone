@@ -242,20 +242,16 @@
     var title = doc.getElementById('shiftTitle'), text = doc.getElementById('shiftText');
     var stageLabel = doc.getElementById('shiftStageLabel');
 
-    var COPY = [
-      ['A business that only exists in one place',
-       'Paper records, phone orders, manual follow-ups and a customer base limited by walking distance. Every process depends on someone remembering it.',
-       'Stage 01 — Offline'],
-      ['Every process gets a digital counterpart',
-       'We map how your business actually runs, then rebuild each step as a system: the order book becomes an API, the ledger becomes payments, the notebook becomes a database.',
-       'Stage 02 — Digital'],
-      ['Your business, open every hour of the day',
-       'A website, an app, business email on your own domain, secure payments and cloud infrastructure — running together, monitored, and no longer dependent on anyone being at the counter.',
-       'Stage 03 — Online'],
-      ['Reach that keeps compounding',
-       'With everything measured, the improvements never stop: more orders per shift, customers far beyond your street, and zero hours lost to manual admin.',
-       'Stage 04 — Growing']
-    ];
+    /* Stage copy is rendered by PHP from the editable content blocks. */
+    var COPY = [];
+    var dataEl = doc.getElementById('journeyData');
+    if (dataEl) {
+      try {
+        COPY = JSON.parse(dataEl.textContent || '[]').map(function (s) {
+          return [s.title || '', s.text || '', 'Stage ' + '', s.rail || ''];
+        });
+      } catch (err) { COPY = []; }
+    }
 
     var offsets = [];
     function measure() {
@@ -272,25 +268,28 @@
       var r = track.getBoundingClientRect();
       var total = track.offsetHeight - vh;
       var p = clamp((-r.top) / (total || 1), 0, 1);
-      var f = p * 3;                       // 0 → 3 across four stages
-      var idx = clamp(Math.round(f), 0, 3);
+      var last = Math.max(0, (words.length || 1) - 1);
+      var f = p * last;
+      var idx = clamp(Math.round(f), 0, last);
 
       if (bar) bar.style.setProperty('--p', (p * 100).toFixed(2) + '%');
 
       if (offsets.length) {
-        var a = Math.floor(f), b = Math.min(a + 1, 3), t = f - a;
+        var a = Math.floor(f), b = Math.min(a + 1, last), t = f - a;
         wordsTrack.style.setProperty('--wx', lerp(offsets[a], offsets[b], t).toFixed(1));
       }
 
       if (idx === current) return;
       current = idx;
-      stage.setAttribute('data-active', idx);
+      stage.setAttribute('data-active', Math.min(idx, 3));
       panels.forEach(function (pn, i) { pn.classList.toggle('is-active', i === idx); });
       rail.forEach(function (li, i) { li.classList.toggle('is-on', i === idx); });
       words.forEach(function (s, i) { s.classList.toggle('is-on', i === idx); });
-      if (title) title.textContent = COPY[idx][0];
-      if (text) text.textContent = COPY[idx][1];
-      if (stageLabel) stageLabel.textContent = COPY[idx][2];
+      var copy = COPY[idx];
+      if (!copy) return;
+      if (title) title.textContent = copy[0];
+      if (text) text.textContent = copy[1];
+      if (stageLabel) stageLabel.textContent = 'Stage ' + ('0' + (idx + 1)).slice(-2) + ' — ' + copy[3];
     });
   })();
 
@@ -312,7 +311,7 @@
       if (bar) bar.style.setProperty('--p', (p * 100).toFixed(2) + '%');
       if (idx === current) return;
       current = idx;
-      stage.setAttribute('data-active', idx);
+      stage.setAttribute('data-active', Math.min(idx, 3));
       steps.forEach(function (s, i) { s.classList.toggle('is-active', i === idx); });
       pvs.forEach(function (v, i) { v.classList.toggle('is-on', i === idx); });
       if (now) now.textContent = '0' + (idx + 1);

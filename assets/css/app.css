@@ -247,3 +247,9 @@ table.data .t-sub{ display:block; font-size:12px; color:var(--tx-3); margin-top:
   .searchbar{ width:100%; margin-left:0 }
 }
 @media (prefers-reduced-motion:reduce){ *{ transition-duration:.01ms !important; animation-duration:.01ms !important } }
+
+/* grouped sidebar */
+.side__group{ padding:14px 12px 5px; font-family:var(--ff-m); font-size:9px; letter-spacing:.18em;
+  text-transform:uppercase; color:var(--tx-4) }
+.side__group:first-child{ padding-top:4px }
+.field textarea.mono{ font-family:var(--ff-m); font-size:12.5px; line-height:1.6 }

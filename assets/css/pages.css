@@ -208,3 +208,20 @@ body.authpage .foot__wordmark{ display:none }
   .wform__row{ grid-template-columns:minmax(0,1fr) }
   .pagehead__title{ max-width:none }
 }
+
+/* ── custom pages ────────────────────────────────────────── */
+.pagehead--lg{ padding-block:clamp(180px,26vh,300px) clamp(64px,9vh,110px) }
+.pagehead--lg .pagehead__title{ font-size:clamp(2.8rem,8vw,7rem) }
+.prose{ padding:clamp(52px,8vw,104px) 0 }
+.prose__inner{ display:grid; gap:22px; max-width:min(78ch, var(--shell)) }
+.prose p{ color:var(--tx-2); font-size:clamp(1rem,1.15vw,1.14rem); line-height:1.75 }
+.prose__h1{ font-size:clamp(2.2rem,5vw,3.6rem); letter-spacing:-.042em; margin-bottom:4px }
+.prose__h2{ font-family:var(--ff-d); font-size:clamp(1.3rem,2.2vw,1.8rem); letter-spacing:-.035em;
+  color:var(--tx); margin-top:22px }
+.prose__lede{ color:var(--tx-2); font-size:clamp(1.05rem,1.4vw,1.25rem) }
+.prose__list{ display:grid; gap:11px }
+.prose__list li{ position:relative; padding-left:24px; color:var(--tx-2); font-size:1rem }
+.prose__list li::before{ content:""; position:absolute; left:2px; top:.62em; width:11px; height:6px;
+  border-left:1.5px solid var(--sig); border-bottom:1.5px solid var(--sig); transform:rotate(-45deg) }
+.brand__mark--img{ width:auto; height:28px; display:block }
+.brand__mark--img img{ height:100%; width:auto; object-fit:contain }

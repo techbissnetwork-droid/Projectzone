@@ -213,3 +213,60 @@ CREATE TABLE activity_log (
   created_at DATETIME     NOT NULL,
   KEY ix_activity_created (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ══════════════════════════════════════════════════════════════
+-- Customisation: pages, menus and repeatable content blocks
+-- ══════════════════════════════════════════════════════════════
+
+-- Arbitrary pages the admin creates (About, Privacy, Terms, anything).
+CREATE TABLE pages (
+  id           INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  slug         VARCHAR(180) NOT NULL,
+  title        VARCHAR(200) NOT NULL,
+  subtitle     VARCHAR(400) NULL,
+  eyebrow      VARCHAR(120) NULL,
+  body         MEDIUMTEXT   NULL,
+  meta_title   VARCHAR(200) NULL,
+  meta_desc    VARCHAR(400) NULL,
+  hero_style   VARCHAR(20)  NOT NULL DEFAULT 'standard',
+  status       VARCHAR(16)  NOT NULL DEFAULT 'draft',
+  show_cta     TINYINT(1)   NOT NULL DEFAULT 1,
+  sort_order   INT          NOT NULL DEFAULT 0,
+  created_at   DATETIME     NOT NULL,
+  updated_at   DATETIME     NOT NULL,
+  UNIQUE KEY uq_pages_slug (slug),
+  KEY ix_pages_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Header and footer menus, built by the admin.
+CREATE TABLE nav_items (
+  id         INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  location   VARCHAR(24)  NOT NULL DEFAULT 'header',
+  label      VARCHAR(120) NOT NULL,
+  url        VARCHAR(255) NULL,
+  page_id    INT UNSIGNED NULL,
+  new_tab    TINYINT(1)   NOT NULL DEFAULT 0,
+  sort_order INT          NOT NULL DEFAULT 0,
+  is_active  TINYINT(1)   NOT NULL DEFAULT 1,
+  created_at DATETIME     NOT NULL,
+  KEY ix_nav_loc (location, sort_order)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Every repeatable list on the site: hero stats, the offline-to-online
+-- journey, the process timeline, trust pillars, the architecture diagram
+-- and the business-transformation examples.
+CREATE TABLE content_items (
+  id         INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  kind       VARCHAR(24)  NOT NULL,
+  label      VARCHAR(200) NULL,
+  title      VARCHAR(250) NULL,
+  body       TEXT         NULL,
+  extra      TEXT         NULL,
+  meta1      VARCHAR(200) NULL,
+  meta2      VARCHAR(200) NULL,
+  icon       VARCHAR(40)  NULL,
+  sort_order INT          NOT NULL DEFAULT 0,
+  is_active  TINYINT(1)   NOT NULL DEFAULT 1,
+  created_at DATETIME     NOT NULL,
+  KEY ix_content_kind (kind, sort_order)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

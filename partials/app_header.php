@@ -12,15 +12,25 @@ $here       = basename((string)($_SERVER['SCRIPT_NAME'] ?? ''));
 
 $NAV = $AREA === 'admin' ? [
     ['index.php',     'Dashboard',   'grid'],
+    ['@Clients'],
     ['projects.php',  'Projects',    'layers'],
     ['clients.php',   'Clients',     'users'],
     ['tickets.php',   'Support',     'chat'],
-    ['portfolio.php', 'Portfolio',   'star'],
+    ['enquiries.php', 'Enquiries',   'inbox'],
+    ['@Selling'],
     ['products.php',  'Marketplace', 'cart'],
     ['orders.php',    'Orders',      'receipt'],
+    ['portfolio.php', 'Portfolio',   'star'],
+    ['@Website'],
+    ['homepage.php',  'Home page',   'home'],
+    ['content.php',   'Content',     'blocks'],
+    ['pages.php',     'Pages',       'doc'],
+    ['navigation.php','Menus',       'menu'],
     ['services.php',  'Services',    'stack'],
-    ['enquiries.php', 'Enquiries',   'inbox'],
+    ['appearance.php','Appearance',  'brush'],
+    ['@System'],
     ['settings.php',  'Settings',    'sliders'],
+    ['system.php',    'System',      'shield'],
 ] : [
     ['index.php',    'Dashboard', 'grid'],
     ['projects.php', 'My sites',  'layers'],
@@ -43,6 +53,12 @@ function nav_icon(string $k): string
         'inbox'   => '<path d="M3 13h5l1.5 3h5L16 13h5"/><path d="M4.5 5h15l1.5 8v6H3v-6z"/>',
         'sliders' => '<path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="2.2"/><circle cx="16" cy="17" r="2.2"/>',
         'user'    => '<circle cx="12" cy="8" r="3.4"/><path d="M5 20a7 7 0 0 1 14 0"/>',
+        'home'    => '<path d="M4 10.5 12 4l8 6.5V20H4z"/><path d="M9.5 20v-5.5h5V20"/>',
+        'blocks'  => '<rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/>',
+        'doc'     => '<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/>',
+        'menu'    => '<path d="M4 7h16M4 12h10M4 17h13"/>',
+        'brush'   => '<path d="M4 20c3 0 4-1.6 4-4a2.6 2.6 0 1 0-4 0z"/><path d="M8.5 15 19 4.5a1.8 1.8 0 0 1 2.6 2.6L11 17.6"/>',
+        'shield'  => '<path d="M12 3.2 19 6v6c0 4.6-3 7.8-7 9-4-1.2-7-4.4-7-9V6z"/><path d="M9.5 12.2l1.9 1.9 3.4-3.6"/>',
     ];
     return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
         . ($p[$k] ?? $p['grid']) . '</svg>';
@@ -72,11 +88,15 @@ function nav_icon(string $k): string
   </a>
   <p class="side__area"><?= $AREA === 'admin' ? 'Admin panel' : 'Client portal' ?></p>
   <nav class="side__nav" aria-label="<?= $AREA === 'admin' ? 'Admin' : 'Portal' ?>">
-    <?php foreach ($NAV as [$file, $text, $icon]): ?>
-      <a href="<?= e($file) ?>"<?= $here === $file ? ' class="on" aria-current="page"' : '' ?>>
-        <?= nav_icon($icon) ?><span><?= e($text) ?></span>
-      </a>
-    <?php endforeach; ?>
+    <?php foreach ($NAV as $row):
+      if (str_starts_with($row[0], '@')): ?>
+        <p class="side__group"><?= e(substr($row[0], 1)) ?></p>
+      <?php else: [$file, $text, $icon] = $row; ?>
+        <a href="<?= e($file) ?>"<?= $here === $file ? ' class="on" aria-current="page"' : '' ?>>
+          <?= nav_icon($icon) ?><span><?= e($text) ?></span>
+        </a>
+      <?php endif;
+    endforeach; ?>
   </nav>
   <div class="side__foot">
     <?php if ($AREA === 'admin'): ?><a href="<?= e(url()) ?>" target="_blank" rel="noopener">View site ↗</a><?php endif; ?>
@@ -96,6 +116,12 @@ function nav_icon(string $k): string
   </header>
 
   <main class="content" id="content">
+    <?php if ($AREA === 'admin' && Content::schemaBehind()): ?>
+      <div class="alert warn" role="alert">
+        <p><b>The database is behind the code.</b> Parts of the site are switched off until it is updated.</p>
+        <p><a class="linkish" href="<?= e(url('admin/system.php')) ?>">Open System and run the database update →</a></p>
+      </div>
+    <?php endif; ?>
     <?php foreach (Flash::take() as $f): ?>
       <div class="alert <?= $f['type'] === 'ok' ? 'ok' : 'err' ?>" role="status"><?= e($f['message']) ?></div>
     <?php endforeach; ?>

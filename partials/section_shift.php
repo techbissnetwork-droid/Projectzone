@@ -1,5 +1,13 @@
-<?php if (!class_exists('Settings')) { http_response_code(404); exit('Not found.'); }
+<?php
+if (!class_exists('Settings')) { http_response_code(404); exit('Not found.'); }
+/** Offline → online. Stages come from content_items (kind = journey). */
+$journey = Content::items('journey');
+if (!$journey) { return; }
+$secNum = $secNum ?? 2;
 ?>
+<script type="application/json" id="journeyData"><?= json_encode(array_map(
+    static fn($j) => ['title' => (string)$j['title'], 'text' => (string)$j['body'], 'rail' => (string)$j['meta1']],
+    $journey), JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) ?></script>
 <!-- ══════════════ 02 · OFFLINE → ONLINE ══════════════ -->
 <section class="shift" id="shift" data-theme="deep">
   <div class="shift__track" id="shiftTrack">
@@ -7,20 +15,20 @@
       <div class="shift__aura" aria-hidden="true"></div>
 
       <div class="shell shift__head">
-        <p class="eyebrow"><span class="num">02</span> The transformation</p>
+        <p class="eyebrow"><span class="num"><?= sprintf('%02d', $secNum) ?></span> <?= e(Settings::get('journey_eyebrow', 'The transformation')) ?></p>
         <div class="shift__words" aria-hidden="true">
           <div class="shift__wordsTrack" id="shiftWords">
-            <span>OFFLINE</span><span>DIGITAL</span><span>ONLINE</span><span>GROWING</span>
+            <?php foreach ($journey as $j): ?><span><?= e($j['label']) ?></span><?php endforeach; ?>
           </div>
         </div>
       </div>
 
       <div class="shift__body shell">
         <div class="shift__copy">
-          <h2 class="shift__title" id="shiftTitle">A business that only exists in one place</h2>
-          <p class="shift__text" id="shiftText">Paper records, phone orders, manual follow-ups and a customer base limited by walking distance. Every process depends on someone remembering it.</p>
+          <h2 class="shift__title" id="shiftTitle"><?= e($journey[0]['title'] ?? '') ?></h2>
+          <p class="shift__text" id="shiftText"><?= e($journey[0]['body'] ?? '') ?></p>
           <div class="shift__meta">
-            <span class="chip chip--ghost" id="shiftStageLabel">Stage 01 — Offline</span>
+            <span class="chip chip--ghost" id="shiftStageLabel">Stage 01 — <?= e($journey[0]['meta1'] ?? '') ?></span>
           </div>
         </div>
 
@@ -93,10 +101,9 @@
 
       <div class="shell shift__rail">
         <ol class="rail" id="shiftRail">
-          <li data-step="0"><b>01</b> Offline</li>
-          <li data-step="1"><b>02</b> Digital</li>
-          <li data-step="2"><b>03</b> Online</li>
-          <li data-step="3"><b>04</b> Growing</li>
+          <?php foreach ($journey as $ji => $j): ?>
+            <li data-step="<?= $ji ?>"><b><?= sprintf('%02d', $ji + 1) ?></b> <?= e($j['meta1'] ?: $j['label']) ?></li>
+          <?php endforeach; ?>
         </ol>
         <div class="rail__bar" aria-hidden="true"><i id="shiftBar"></i></div>
       </div>
