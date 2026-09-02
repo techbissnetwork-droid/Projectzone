@@ -233,18 +233,12 @@ h4 { font-size: var(--fs-h4); letter-spacing: -0.012em; }
   align-items: center;
   gap: 0.5rem;
   font-size: var(--fs-label);
-  font-weight: 600;
-  letter-spacing: 0.11em;
+  font-weight: 500;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--accent);
 }
-.eyebrow::before {
-  content: "";
-  width: 1.5rem;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--accent));
-}
-.eyebrow--plain::before { display: none; }
+.eyebrow::before { display: none; }
 
 .text-muted  { color: var(--text-muted); }
 .text-soft   { color: var(--text-soft); }

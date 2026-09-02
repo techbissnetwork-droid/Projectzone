@@ -828,7 +828,10 @@ body.has-cursor-fx.cursor-hidden .cursor-ring { opacity: 0; }
   padding-bottom: clamp(2rem, 1.5rem + 2.5vw, 3.5rem);
   overflow: hidden;
   isolation: isolate;
+  text-align: center;
 }
+.page-head .lead { max-width: 40ch; margin-inline: auto; }
+.page-head .breadcrumbs { justify-content: center; }
 .page-head__bg { position: absolute; inset: 0; z-index: -1; }
 .page-head__bg .glow {
   width: 560px; height: 400px;
@@ -843,12 +846,13 @@ body.has-cursor-fx.cursor-hidden .cursor-ring { opacity: 0; }
    the homepage's transform-viz rings, just slower and far less busy. */
 .page-head__ring {
   position: absolute;
-  top: 50%; right: -120px;
+  top: 50%; right: 50%;
   width: 460px; height: 460px;
   margin-top: -230px;
+  margin-right: -230px;
   border: 1px solid var(--border-faint);
   border-radius: 50%;
-  opacity: 0.5;
+  opacity: 0.35;
 }
 .page-head__ring::before {
   content: "";
@@ -859,19 +863,13 @@ body.has-cursor-fx.cursor-hidden .cursor-ring { opacity: 0; }
   border-top-color: var(--accent-glow);
   animation: viz-spin 85s linear infinite;
 }
-.page-head--center .page-head__ring { right: 50%; margin-right: -230px; opacity: 0.35; }
 @media (max-width: 640px) {
   /* 460px reads as near-free background texture on a wide desktop hero;
      on a 390px phone the same ring covers most of the screen and reads as
      the page just being oversized. Same quiet motion, much smaller stage. */
-  .page-head__ring { width: 220px; height: 220px; margin-top: -110px; right: -70px; opacity: 0.4; }
-  .page-head--center .page-head__ring { margin-right: -110px; }
+  .page-head__ring { width: 220px; height: 220px; margin-top: -110px; margin-right: -110px; }
 }
 .page-head h1 { margin-block: 1rem 1.15rem; }
-.page-head .lead { max-width: 58ch; }
-.page-head--center { text-align: center; }
-.page-head--center .lead { margin-inline: auto; }
-.page-head--center .eyebrow::before { display: none; }
 
 .breadcrumbs { display: flex; align-items: center; gap: 0.4rem; font-size: var(--fs-xs); color: var(--text-faint); flex-wrap: wrap; }
 .breadcrumbs a { color: var(--text-muted); transition: color var(--t-fast) var(--ease); display: inline-flex; align-items: center; min-height: 28px; }
@@ -1000,9 +998,12 @@ body.has-cursor-fx.cursor-hidden .cursor-ring { opacity: 0; }
 }
 .cta-band__bg { position: absolute; inset: 0; z-index: -1; }
 .cta-band__bg .glow {
-  width: 620px; height: 400px;
-  bottom: -220px; left: 50%; margin-left: -310px;
-  background: radial-gradient(ellipse, var(--accent-glow), transparent 65%);
+  width: 400px; height: 400px;
+  top: -160px; right: -100px; left: auto; margin: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--lime-glow), transparent 70%);
+  opacity: 0.9;
+  filter: blur(4px);
 }
 .cta-band h2 { margin-bottom: 1rem; }
 .cta-band .lead { max-width: 52ch; margin-inline: auto; }
@@ -1045,7 +1046,7 @@ body.has-cursor-fx.cursor-hidden .cursor-ring { opacity: 0; }
   padding-block: 0.3rem;
   min-height: 32px;
 }
-.footer-col a:hover { color: var(--text); }
+.footer-col a:hover { color: var(--accent); }
 .footer-col .icon { width: 15px; height: 15px; opacity: 0.7; flex: none; }
 
 .newsletter { margin-top: 1.75rem; max-width: 24rem; }

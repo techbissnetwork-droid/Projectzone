@@ -1,15 +1,15 @@
 <?php
 /**
- * Interior page header with breadcrumbs.
+ * Interior page header with breadcrumbs. Always centered, matching the
+ * homepage hero's badge/eyebrow/kinetic-heading treatment.
  * @var string $eyebrow @var string $heading @var string $lead
- * @var bool $center @var \Techbiss\Core\Seo $seo
+ * @var \Techbiss\Core\Seo $seo
  */
 $eyebrow = $eyebrow ?? '';
 $lead    = $lead ?? '';
-$center  = $center ?? false;
 $crumbs  = $seo->getBreadcrumbs();
 ?>
-<section class="page-head<?= $center ? ' page-head--center' : '' ?>">
+<section class="page-head">
     <div class="page-head__bg" aria-hidden="true">
         <span class="glow" data-parallax="0.08"></span>
         <span class="grid-pattern"></span>
@@ -17,7 +17,7 @@ $crumbs  = $seo->getBreadcrumbs();
     </div>
     <div class="container">
         <?php if (count($crumbs) > 1): ?>
-        <nav class="breadcrumbs<?= $center ? ' row--center' : '' ?>" aria-label="Breadcrumb">
+        <nav class="breadcrumbs" aria-label="Breadcrumb">
             <?php foreach ($crumbs as $i => $crumb): ?>
                 <?php if ($i > 0): ?><?= icon('chevron-right') ?><?php endif; ?>
                 <?php if ($i === count($crumbs) - 1): ?>
@@ -43,7 +43,7 @@ $crumbs  = $seo->getBreadcrumbs();
         <?php endif; ?>
 
         <?php if (!empty($actions)): ?>
-        <div class="row mt-6<?= $center ? ' row--center' : '' ?>"><?= $actions ?></div>
+        <div class="row row--center mt-6"><?= $actions ?></div>
         <?php endif; ?>
     </div>
 </section>
