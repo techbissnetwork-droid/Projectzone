@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <div class="brand"><span class="dot"></span><?= e(setting('brand_name', 'iamtomley')) ?></div>
       <div class="sub">Admin panel — sign in to manage your site</div>
       <?php if ($error): ?>
-        <div class="alert alert-error"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><?= e($error) ?></div>
+        <div class="alert alert-error"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span class="alert-msg"><?= e($error) ?></span></div>
       <?php endif; ?>
       <?= csrf_field() ?>
       <div class="field">

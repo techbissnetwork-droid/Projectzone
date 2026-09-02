@@ -335,4 +335,78 @@
     sel.addEventListener('change', sync);
     sync();
   });
+  /* ── The nav panel ───────────────────────────────────────────────────────
+     One button opens and closes it. Which state you left it in is remembered,
+     so it does not fight you on every page load. On a narrow screen it lies
+     over the page, so it also closes on the scrim, on Escape, and once you
+     have picked where you are going. */
+  (function () {
+    var root   = document.documentElement;
+    var btn    = document.getElementById('navToggle');
+    var panel  = document.getElementById('adminNav');
+    var scrim  = document.getElementById('navScrim');
+    if (!btn || !panel) { return; }
+
+    var overlay = function () { return window.matchMedia('(max-width: 820px)').matches; };
+    var open    = function () { return root.classList.contains('nav-open'); };
+
+    var sync = function () { btn.setAttribute('aria-expanded', open() ? 'true' : 'false'); };
+
+    var set = function (on, remember) {
+      root.classList.toggle('nav-open', on);
+      if (remember !== false) {
+        try { localStorage.setItem('adminNav', on ? 'open' : 'shut'); } catch (e) {}
+      }
+      sync();
+    };
+
+    sync();
+    btn.addEventListener('click', function () {
+      set(!open());
+      if (open() && overlay()) {
+        var first = panel.querySelector('.nav-item');
+        if (first) { first.focus(); }
+      }
+    });
+
+    if (scrim) { scrim.addEventListener('click', function () { if (overlay()) { set(false); } }); }
+
+    document.addEventListener('keydown', function (ev) {
+      if (ev.key === 'Escape' && open() && overlay()) { set(false); btn.focus(); }
+    });
+
+    /* Following a link on a phone should not leave the panel covering the page
+       it just opened; remembered state stays whatever you chose with the button. */
+    panel.addEventListener('click', function (ev) {
+      var a = ev.target.closest('a[href]');
+      if (a && overlay() && a.target !== '_blank') { set(false, false); }
+    });
+  })();
+  /* ── The notification bell ───────────────────────────────────────────────
+     Opens the list of things that still want attention. Nothing here marks
+     anything as read: each item is a live condition, so it leaves the list
+     when the condition is actually gone. */
+  (function () {
+    var btn   = document.getElementById('notifBtn');
+    var panel = document.getElementById('notifPanel');
+    if (!btn || !panel) { return; }
+
+    var show = function (on) {
+      panel.hidden = !on;
+      btn.setAttribute('aria-expanded', on ? 'true' : 'false');
+    };
+
+    btn.addEventListener('click', function (ev) {
+      ev.stopPropagation();
+      show(panel.hidden);
+    });
+
+    document.addEventListener('click', function (ev) {
+      if (!panel.hidden && !panel.contains(ev.target) && ev.target !== btn) { show(false); }
+    });
+
+    document.addEventListener('keydown', function (ev) {
+      if (ev.key === 'Escape' && !panel.hidden) { show(false); btn.focus(); }
+    });
+  })();
 })();

@@ -247,7 +247,7 @@ $shown = $filter === 'all'
 </div>
 <?php if ($missing): ?>
 <div class="panel" style="border-color:rgba(255,200,60,.3)">
-  <div class="alert alert-warn" style="margin-bottom:1rem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+  <div class="alert alert-warn" style="margin-bottom:1rem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span class="alert-msg">
     Your database is missing the
     <?php $n = count($missing); $i = 0; foreach (array_keys($missing) as $col): $i++; ?>
       <span class="pill"><?= e($col) ?></span><?= $i < $n - 1 ? ', ' : ($i === $n - 1 ? ' and ' : '') ?>
@@ -256,7 +256,7 @@ $shown = $filter === 'all'
     <?= isset($missing['status']) || isset($missing['price']) ? '<strong>Sold / For&nbsp;Sale / Coming&nbsp;Soon</strong> and prices' : '' ?>
     <?= count($missing) > 1 && isset($missing['image']) && (isset($missing['status']) || isset($missing['price'])) ? ' and ' : '' ?>
     <?= isset($missing['image']) ? '<strong>card images</strong>' : '' ?>
-    won't persist yet. Click the button to add <?= $n > 1 ? 'them' : 'it' ?> automatically:</div>
+    won't persist yet. Click the button to add <?= $n > 1 ? 'them' : 'it' ?> automatically:</span></div>
   <form method="post" action="<?= e(url('/admin/projects.php')) ?>" style="margin-bottom:1rem"><?= csrf_field() ?><input type="hidden" name="action" value="repair"><button class="btn btn-primary" type="submit">Upgrade the projects table now</button></form>
   <div class="small">If that fails (some hosts block <code>ALTER</code>), run <?= $n > 1 ? 'these' : 'this' ?> once in <strong>phpMyAdmin → your database → SQL</strong>:<br>
   <?php foreach ($missing as $col => $definition): ?>

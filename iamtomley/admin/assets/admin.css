@@ -10,12 +10,13 @@
   --border:rgba(255,255,255,.08); --border-strong:rgba(255,255,255,.14);
   --text:#eef0f8; --text-soft:#c3c6d6; --text-mute:#868aa3; --text-dim:#565a76;
   --danger:#ff4d6d; --success:#2ee6a6; --warning:#ffc83c;
+  /* .55rem padding above and below a 42px control, plus the bottom border. */
+  --bar-h:61px;
   --r-sm:10px; --r-md:14px; --r-lg:18px;
   --shadow:0 20px 50px rgba(3,4,10,.5);
   --font:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
   --mono:'JetBrains Mono',ui-monospace,'SF Mono',monospace;
   --display:'Space Grotesk',var(--font);
-  --sidebar-w:250px;
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:var(--font);background:var(--bg-0);color:var(--text);min-height:100vh;
@@ -31,21 +32,122 @@ svg{display:block;}
 ::selection{background:rgba(0,255,179,.25);}
 
 /* Layout */
-.layout{display:grid;grid-template-columns:var(--sidebar-w) 1fr;min-height:100vh;}
-.sidebar{position:sticky;top:0;height:100vh;padding:1.5rem 1rem;display:flex;flex-direction:column;gap:.35rem;
-  background:var(--surface);backdrop-filter:blur(18px);border-right:1px solid var(--border);}
-.brand{display:flex;align-items:center;gap:.6rem;font-family:var(--display);font-weight:700;font-size:1.2rem;padding:.4rem .6rem 1.2rem;}
-.brand .dot{width:10px;height:10px;border-radius:50%;background:var(--grad);box-shadow:0 0 12px rgba(0,255,179,.7);}
-.nav-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);padding:.9rem .7rem .3rem;}
-.nav-item{display:flex;align-items:center;gap:.7rem;padding:.65rem .75rem;border-radius:var(--r-sm);color:var(--text-mute);
-  font-size:.9rem;font-weight:500;transition:all .2s;}
-.nav-item svg{width:18px;height:18px;flex-shrink:0;}
-.nav-item:hover{background:var(--glass);color:var(--text);}
-.nav-item.active{background:rgba(0,255,179,.1);color:var(--mint);border:1px solid rgba(0,255,179,.2);}
-.sidebar-foot{margin-top:auto;padding-top:1rem;border-top:1px solid var(--border);}
+/* One bar across the top on a PC: brand, then the sections as buttons, then
+   the bell. On a phone the same buttons become a panel that slides in from
+   the right behind the menu button, because a row of nine will not fit. */
+.layout{min-height:100vh;}
+.admin-bar{position:sticky;top:0;z-index:70;display:flex;align-items:center;gap:1rem;
+  padding:.55rem clamp(.9rem,2vw,1.4rem);
+  background:var(--surface-solid);border-bottom:1px solid var(--border);}
+.bar-brand{position:relative;z-index:80;display:flex;align-items:center;gap:.55rem;flex:0 0 auto;
+  font-family:var(--display);font-weight:700;font-size:1.05rem;color:var(--text);min-width:0;}
+.bar-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+/* The site's own icon, rather than a coloured dot standing in for it. */
+.bar-logo{width:26px;height:26px;flex:0 0 auto;border-radius:7px;object-fit:cover;
+  box-shadow:0 0 0 1px var(--border);}
+
+.nav-drawer{display:flex;align-items:center;gap:.5rem;flex:1 1 auto;min-width:0;}
+.nav-list{display:flex;align-items:center;gap:.35rem;min-width:0;
+  overflow-x:auto;scrollbar-width:none;}
+.nav-list::-webkit-scrollbar{display:none;}
+.nav-label{display:none;}
+.sidebar-foot{display:flex;align-items:center;gap:.35rem;flex:0 0 auto;margin-left:auto;}
+
+.bar-tools{position:relative;z-index:80;display:flex;align-items:center;gap:.5rem;flex:0 0 auto;}
+.nav-toggle{display:none;}
+
+/* Where the full row stops fitting, View site and Log out keep their icons
+   and drop their labels before any section does. */
+@media (max-width:1180px){
+  .sidebar-foot .nav-item{gap:0;padding:.5rem .55rem;font-size:0;}
+  .sidebar-foot .nav-item svg{opacity:.85;}
+}
+
+/* Each destination is a button: its own edge and ground, so it reads as
+   something to press rather than a line of text that happens to be a link. */
+.nav-item{flex:0 0 auto;display:flex;align-items:center;gap:.5rem;
+  padding:.5rem .7rem;border-radius:var(--r-sm);white-space:nowrap;
+  border:1px solid var(--border);background:var(--glass);
+  color:var(--text-soft);font-size:.82rem;font-weight:600;
+  transition:background .2s,border-color .2s,color .2s,transform .2s,box-shadow .2s;}
+.nav-item svg{width:17px;height:17px;flex-shrink:0;opacity:.7;transition:opacity .2s;}
+.nav-item:hover{background:var(--glass-2);border-color:var(--border-strong);
+  color:var(--text);transform:translateY(-1px);}
+.nav-item:hover svg{opacity:1;}
+.nav-item:focus-visible{outline:2px solid var(--mint);outline-offset:2px;}
+.nav-item:active{transform:translateY(0) scale(.985);}
+.nav-item.active{background:rgba(0,255,179,.12);border-color:rgba(0,255,179,.35);color:var(--mint);
+  box-shadow:0 6px 18px rgba(0,255,179,.12);}
+.nav-item.active svg{opacity:1;}
+.nav-danger:hover{background:rgba(255,77,109,.12);border-color:rgba(255,77,109,.35);color:var(--danger);}
+
+/* Where the full row stops fitting, View site and Log out keep their icons
+   and drop their labels before any section does. */
+@media (max-width:1180px){
+}
+
+/* ── Notifications ────────────────────────────────────────────────────────
+   Standing problems with the site live behind the bell instead of taking a
+   banner at the top of every page. The count is worked out fresh each load,
+   so it falls as things are actually fixed; there is nothing to dismiss. */
+.notif{position:relative;flex:0 0 auto;}
+.notif-btn{position:relative;flex:0 0 auto;width:42px;height:42px;display:grid;place-items:center;
+  border:1px solid var(--border-strong);border-radius:var(--r-sm);
+  background:var(--glass);color:var(--text-soft);cursor:pointer;
+  transition:background .2s,color .2s,border-color .2s;}
+.notif-btn:hover{background:var(--glass-2);color:var(--text);}
+.notif-btn:focus-visible{outline:2px solid var(--mint);outline-offset:2px;}
+.notif-btn svg{width:19px;height:19px;}
+.notif-btn.has-notices{color:var(--warning);border-color:rgba(255,200,60,.35);}
+/* Only the bell swings, and only while there is something to say. */
+.notif-btn.has-notices svg{transform-origin:50% 4px;animation:ring 5s ease-in-out infinite;}
+@keyframes ring{
+  0%,88%,100%{transform:rotate(0);}
+  90%{transform:rotate(11deg);} 93%{transform:rotate(-9deg);}
+  96%{transform:rotate(5deg);} 98%{transform:rotate(-3deg);}
+}
+.notif-count{position:absolute;top:-6px;right:-6px;min-width:19px;height:19px;padding:0 5px;
+  display:grid;place-items:center;border-radius:999px;
+  background:var(--danger);color:#fff;font-size:.66rem;font-weight:700;line-height:1;
+  font-family:var(--mono);box-shadow:0 0 0 2px var(--surface-solid);}
+
+.notif-panel{position:absolute;top:calc(100% + .55rem);right:0;z-index:80;
+  width:min(92vw,340px);max-height:min(70vh,460px);overflow-y:auto;
+  background:var(--surface-solid);border:1px solid var(--border-strong);
+  border-radius:var(--r-md);box-shadow:var(--shadow);padding:.45rem;}
+.notif-panel[hidden]{display:none;}
+.notif-head{display:flex;align-items:center;justify-content:space-between;gap:.75rem;
+  padding:.5rem .6rem .6rem;font-size:.9rem;}
+.notif-n{font-family:var(--mono);font-size:.68rem;color:var(--text-dim);
+  text-transform:uppercase;letter-spacing:.1em;}
+.notif-empty{display:flex;align-items:center;gap:.6rem;padding:.85rem .6rem 1rem;
+  font-size:.82rem;color:var(--text-mute);}
+.notif-empty svg{width:18px;height:18px;flex:0 0 auto;color:var(--success);}
+
+.notif-item{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:start;
+  gap:.6rem;padding:.7rem .6rem;border-radius:var(--r-sm);transition:background .2s;}
+.notif-item + .notif-item{margin-top:.15rem;}
+.notif-item:hover{background:var(--glass-2);}
+.notif-item:focus-visible{outline:2px solid var(--mint);outline-offset:-2px;}
+.notif-dot{width:8px;height:8px;margin-top:.36rem;border-radius:50%;background:var(--warning);}
+.notif-item.lvl-danger .notif-dot{background:var(--danger);}
+.notif-body{display:flex;flex-direction:column;gap:.15rem;min-width:0;}
+.notif-body strong{font-size:.84rem;font-weight:600;color:var(--text);}
+.notif-body span{font-size:.76rem;color:var(--text-mute);line-height:1.45;}
+.notif-cta{align-self:start;margin-top:.05rem;flex:0 0 auto;font-size:.7rem;font-weight:700;
+  font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;
+  color:var(--mint);padding:.25rem .5rem;border-radius:6px;
+  border:1px solid rgba(0,255,179,.25);background:rgba(0,255,179,.08);}
+
+@media (prefers-reduced-motion:reduce){ .notif-btn.has-notices svg{animation:none;} }
+
+.nav-scrim{position:fixed;inset:0;z-index:50;background:rgba(3,4,10,.6);
+  opacity:0;pointer-events:none;transition:opacity .3s;}
 
 /* Content */
-.content{padding:2rem clamp(1rem,3vw,2.5rem);max-width:1100px;width:100%;}
+/* min-width:0 so a wide table scrolls in its own box rather than stretching
+   the page. */
+.content{min-width:0;padding:2rem clamp(1rem,3vw,2.5rem);width:100%;}
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1.75rem;flex-wrap:wrap;}
 .page-title{font-size:1.65rem;}
 .page-sub{color:var(--text-mute);font-size:.9rem;margin-top:.15rem;}
@@ -114,8 +216,16 @@ td .muted{color:var(--text-mute);font-size:.82rem;}
 .pill.casual{color:var(--amber);border-color:rgba(255,200,60,.25);}
 
 /* Flash / alerts */
-.alert{padding:.85rem 1.1rem;border-radius:var(--r-sm);margin-bottom:1.25rem;font-size:.88rem;display:flex;align-items:center;gap:.6rem;}
-.alert svg{width:18px;height:18px;flex-shrink:0;}
+/* Icon in one column, the whole message in the other. The message has to be
+   wrapped in .alert-msg: without it every <strong> and <a> inside became a
+   box of its own and the sentence broke into columns on a narrow screen. */
+.alert{padding:.85rem 1.1rem;border-radius:var(--r-sm);margin-bottom:1.25rem;font-size:.88rem;
+  display:grid;grid-template-columns:auto minmax(0,1fr);align-items:start;gap:.65rem;line-height:1.55;}
+.alert svg{width:18px;height:18px;margin-top:.18rem;}
+.alert-msg{min-width:0;}
+/* A pair of credentials is one thing to read; letting it break across lines
+   turns "admin / admin" into two half-sentences. */
+.alert strong{white-space:nowrap;}
 .alert-success{background:rgba(46,230,166,.1);border:1px solid rgba(46,230,166,.3);color:var(--success);}
 .alert-error{background:rgba(255,77,109,.1);border:1px solid rgba(255,77,109,.3);color:var(--danger);}
 .alert-warn{background:rgba(255,200,60,.1);border:1px solid rgba(255,200,60,.3);color:var(--warning);}
@@ -141,11 +251,52 @@ td .muted{color:var(--text-mute);font-size:.82rem;}
 .small{font-size:.78rem;color:var(--text-mute);}
 
 @media (max-width:820px){
-  .layout{grid-template-columns:1fr;}
-  .sidebar{position:static;height:auto;flex-direction:row;flex-wrap:wrap;align-items:center;}
-  .sidebar .nav-label,.sidebar-foot{display:none;}
-  .brand{padding:.4rem .6rem;width:100%;}
+  /* The sections move into a panel that lies over the page, with a scrim to
+     dim what is behind it and somewhere to tap to close. */
+  .nav-drawer{position:fixed;top:0;right:0;z-index:60;
+    width:min(84vw,300px);height:100vh;overflow-y:auto;
+    flex-direction:column;align-items:stretch;gap:.45rem;
+    padding:calc(var(--bar-h) + .75rem) 1rem 1rem;
+    background:var(--surface-solid);border-left:1px solid var(--border);
+    transform:translateX(100%);visibility:hidden;
+    transition:transform .3s cubic-bezier(.22,1,.36,1),visibility .3s;}
+  html.nav-open .nav-drawer{transform:none;visibility:visible;}
+  html.nav-open .nav-scrim{opacity:1;pointer-events:auto;}
+  html.nav-open, html.nav-open body{overflow:hidden;}
+  .nav-list{flex-direction:column;align-items:stretch;gap:.45rem;overflow:visible;}
+  .nav-label{display:block;font-family:var(--mono);font-size:.6rem;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--text-dim);padding:.35rem .7rem .45rem;}
+  .nav-item{padding:.68rem .85rem;font-size:.88rem;}
+  .nav-item:hover,.nav-item:active{transform:none;}
+  .sidebar-foot{margin-left:0;margin-top:auto;padding-top:1rem;
+    border-top:1px solid var(--border);flex-direction:column;align-items:stretch;gap:.45rem;}
+  .sidebar-foot .nav-item{gap:.7rem;padding:.68rem .85rem;font-size:.88rem;}
+
+  .nav-toggle{display:grid;place-items:center;flex:0 0 auto;
+    width:42px;height:42px;border:1px solid var(--border-strong);border-radius:var(--r-sm);
+    background:var(--surface-solid);color:var(--text-soft);cursor:pointer;
+    transition:background .2s,color .2s,border-color .2s;}
+  .nav-toggle:hover{background:var(--glass-2);color:var(--mint);border-color:rgba(0,255,179,.35);}
+  .nav-toggle:focus-visible{outline:2px solid var(--mint);outline-offset:2px;}
+  .nav-toggle svg{width:20px;height:20px;}
+  .nav-toggle .ico-close{display:none;}
+  html.nav-open .nav-toggle .ico-close{display:block;}
+  html.nav-open .nav-toggle .ico-open{display:none;}
+
+  .content{padding:1.25rem 1rem 2.5rem;}
+  .topbar{gap:.75rem;margin-bottom:1.25rem;}
+  .page-title{font-size:1.4rem;}
+  .panel{padding:1.1rem;border-radius:var(--r-md);}
+  .tiles{grid-template-columns:1fr 1fr;gap:.7rem;}
+  .tile{padding:1rem;}
+  .tile .n{font-size:1.6rem;}
   .grid-2,.grid-3{grid-template-columns:1fr;}
+}
+@media (prefers-reduced-motion:reduce){ .nav-drawer,.nav-scrim{transition:none;} }
+
+/* Only where two side by side would be too cramped to read. */
+@media (max-width:380px){
+  .tiles{grid-template-columns:1fr;}
 }
 
 /* ============================================================================
