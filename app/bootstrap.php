@@ -2,6 +2,16 @@
 declare(strict_types=1);
 
 /**
+ * Never the entry point. The web server should not serve this folder at all,
+ * but a server without .htaccess support (nginx) would otherwise run this file
+ * directly if someone asked for it by name.
+ */
+if (realpath(__FILE__) === realpath((string)($_SERVER['SCRIPT_FILENAME'] ?? ''))) {
+    http_response_code(404);
+    exit;
+}
+
+/**
  * Boots the application: config, database, session, settings.
  * Every entry point includes this file first.
  */

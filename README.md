@@ -197,10 +197,17 @@ API but has not been run against a live merchant account.
   `uploads/.htaccess` turns the PHP engine off in that folder.
 - Role checks on every admin and portal page; clients can only reach their own
   records (`require_owner`).
-- `config/`, `app/` and `partials/` are blocked in `.htaccess`, and each partial
-  also refuses to run when loaded directly.
+- `config/`, `app/` and `partials/` each carry their own `.htaccess` denying
+  everything, as well as being blocked from the main one. Per-directory rules
+  matter: the main file's pattern is matched at any depth, but a directory rule
+  holds even where that file is not consulted.
+- Defence in depth behind that: every partial refuses to run when loaded
+  directly, `app/bootstrap.php` refuses to be the entry point, and the rest of
+  `app/` is class definitions that emit nothing if they are ever executed.
 
-**On nginx** there is no `.htaccess`, so add this to your server block:
+**On nginx none of the `.htaccess` files are read at all**, so these rules are
+not optional — without them `install/schema.sql` and `README.md` are served as
+plain text. Add to your server block:
 
 ```nginx
 location ~ ^/(config|app|partials)/ { deny all; }
@@ -208,6 +215,9 @@ location ~ \.(sql|md|log)$          { deny all; }
 location ^~ /uploads/ { location ~ \.php$ { deny all; } }
 location /install/ { allow 203.0.113.4; deny all; }   # your IP, then delete the folder
 ```
+
+Deleting `install/` after setup removes the schema file along with it, which is
+the simplest way to close that one on any server.
 
 ---
 

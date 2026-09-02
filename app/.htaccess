@@ -1,0 +1,10 @@
+# Nothing in this folder is ever fetched over HTTP. A per-directory rule works
+# at any depth, including a subdirectory install where a root-anchored rule in
+# the main .htaccess would not match.
+<IfModule mod_authz_core.c>
+  Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+  Order allow,deny
+  Deny from all
+</IfModule>

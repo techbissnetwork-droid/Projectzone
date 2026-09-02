@@ -7,8 +7,11 @@ Options -Indexes
   Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
 </IfModule>
 
-# Never serve config, app internals or the schema over HTTP
-RedirectMatch 404 ^/(config|app|partials)/
+# Never serve config, app internals or the schema over HTTP. Matched at any
+# depth so a subdirectory install is covered too; each of those folders also
+# carries its own .htaccess, which is what protects them when this file's rules
+# are not in play.
+RedirectMatch 404 (^|/)(config|app|partials)/
 RedirectMatch 404 \.(sql|md|log)$
 RedirectMatch 404 /\.
 
