@@ -17,9 +17,14 @@ function seed_all(): void
     seed_products();
 }
 
-function seed_settings(): void
+/**
+ * Every setting the site expects, as [group, key, label, value, type].
+ * seed_settings() writes them all on a fresh install; seed_missing_settings()
+ * adds only the ones a later version introduced, leaving edits alone.
+ */
+function setting_definitions(): array
 {
-    $rows = [
+    return [
         // group, key, label, value, type
         ['global', 'site.name', 'Company name', 'TECHBISS', 'text'],
         ['global', 'site.tagline', 'Footer description', 'One partner for everything a business needs online — domain, hosting, SSL, website, apps, email, branding, SEO and support.', 'textarea'],
@@ -144,9 +149,12 @@ function seed_settings(): void
         ['contact', 'contact.form.note', 'Small print under the form', 'We reply within one business day. Your details are used to answer you and nothing else.', 'textarea'],
         ['contact', 'contact.thanks', 'Message shown after sending', 'Thanks — that reached us. We answer within one business day.', 'textarea'],
     ];
+}
 
+function seed_settings(): void
+{
     $sort = 0;
-    foreach ($rows as [$group, $key, $label, $value, $type]) {
+    foreach (setting_definitions() as [$group, $key, $label, $value, $type]) {
         db_insert('settings', [
             'group_name'  => $group,
             'setting_key' => $key,
@@ -156,6 +164,36 @@ function seed_settings(): void
             'sort'        => $sort++,
         ]);
     }
+}
+
+/**
+ * Add settings introduced since this site was installed. Existing rows are
+ * left exactly as they are — a migration never overwrites edited copy.
+ * Returns the keys it added.
+ */
+function seed_missing_settings(): array
+{
+    $have = [];
+    foreach (db_all('SELECT setting_key FROM settings') as $row) {
+        $have[$row['setting_key']] = true;
+    }
+    $added = [];
+    $sort  = (int) db_value('SELECT COALESCE(MAX(sort), 0) FROM settings');
+    foreach (setting_definitions() as [$group, $key, $label, $value, $type]) {
+        if (isset($have[$key])) {
+            continue;
+        }
+        db_insert('settings', [
+            'group_name'  => $group,
+            'setting_key' => $key,
+            'label'       => $label,
+            'value'       => $value,
+            'field_type'  => $type,
+            'sort'        => ++$sort,
+        ]);
+        $added[] = $key;
+    }
+    return $added;
 }
 
 function seed_services(): void

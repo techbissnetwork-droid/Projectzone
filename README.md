@@ -16,12 +16,28 @@ to ordinary cPanel hosting by FTP and runs.
 2. **Create the mailbox** you want mail sent from, in cPanel → *Email Accounts*.
    It must be on your own domain (`website@yourdomain.com`), not Gmail or Yahoo.
 3. **Upload the files** to `public_html`.
-4. **Open `https://yourdomain.com/install.php`** and fill in the form.
-5. **Delete `install.php` from the server.** It refuses to run twice, but it has
-   no business being there afterwards.
+4. **Open `https://yourdomain.com/install.php`** and fill in the form. The site
+   address is detected for you.
+5. **The installer deletes itself.** If it cannot — the web server has no
+   permission — it says so and you remove it by hand.
 6. Sign in at `https://yourdomain.com/admin/`.
 
 Make sure `app/` and `storage/` are writable (755) before step 4.
+
+### Updating later
+
+Upload the newer files over the old ones, then **Settings → Database → Run the
+update** in the admin area. It adds any new tables, columns and settings the new
+version expects. It never deletes anything and never overwrites text you have
+edited.
+
+### If you keep install.php
+
+Once a site is installed the installer writes `app/install.lock`, and from then
+on it will not do anything without an administrator password — even if it is
+re-uploaded later. Signed in, it offers three things: run the database update,
+delete itself, or erase everything and start again (that one needs you to type
+`ERASE` and set up a new administrator).
 
 ### If mail fails
 

@@ -210,18 +210,47 @@ function reference(string $prefix = 'TB'): string
     return $prefix . '-' . strtoupper(substr(bin2hex(random_bytes(4)), 0, 6));
 }
 
+/**
+ * Work out the site address from the request itself.
+ *
+ * Handles https behind a proxy or load balancer, a non-standard port, and the
+ * site living in a subfolder. /admin and /client are stripped so the result is
+ * always the site root, whichever page asked.
+ */
+function detect_base_url(): string
+{
+    $https = (!empty($_SERVER['HTTPS']) && strtolower((string) $_SERVER['HTTPS']) !== 'off')
+        || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https')
+        || (($_SERVER['HTTP_X_FORWARDED_SSL'] ?? '') === 'on')
+        || ((int) ($_SERVER['SERVER_PORT'] ?? 0) === 443);
+
+    $host = $_SERVER['HTTP_X_FORWARDED_HOST'] ?? $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? 'localhost';
+    $host = trim(explode(',', $host)[0]);          /* a proxy may send a list */
+    $host = preg_replace('/[^A-Za-z0-9\.\-:\[\]]/', '', $host) ?: 'localhost';
+
+    /* HTTP_HOST already carries the port when it is not the default. */
+    if (!str_contains($host, ':')) {
+        $port = (int) ($_SERVER['SERVER_PORT'] ?? 0);
+        if ($port && $port !== 80 && $port !== 443) {
+            $host .= ':' . $port;
+        }
+    }
+
+    $script = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '/'));
+    $script = preg_replace('#/(admin|client)$#', '', $script);
+    $script = rtrim($script === '/' ? '' : $script, '/');
+
+    return ($https ? 'https://' : 'http://') . $host . $script;
+}
+
+/** The configured site address, or the detected one when it is left blank. */
 function base_url(): string
 {
     $cfg = config();
     if (!empty($cfg['base_url'])) {
         return rtrim($cfg['base_url'], '/');
     }
-    $https  = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-        || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
-    $host   = $_SERVER['HTTP_HOST'] ?? 'localhost';
-    $script = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? ''));
-    $script = rtrim(preg_replace('#/(admin|client)$#', '', $script), '/');
-    return ($https ? 'https://' : 'http://') . $host . $script;
+    return detect_base_url();
 }
 
 /** Handle one uploaded image. Returns a web path, or null. */
