@@ -378,7 +378,7 @@ footer .ic-svg { width: 12px; height: 12px; vertical-align: -1px; margin-right: 
   <h2>How it works</h2>
   <div class="steps">
     <div class="step"><h3>Open a chart</h3><p>Pick any of <?= number_format($stats['coins']) ?> coins and a timeframe from 15 minutes to 1 week. The analysis runs instantly and refreshes itself live.</p></div>
-    <div class="step"><h3>Read the signal</h3><p>See the verdict, its grade, the exact rules that fired, key levels and the full trade plan — nothing is a black box.</p></div>
+    <div class="step"><h3>Read the signal</h3><p>Every candle and indicator already read for you — see the verdict, its grade and the trade plan built alongside it, so you confirm and execute in seconds. Nothing is a black box.</p></div>
     <div class="step"><h3>Get alerted</h3><p>Watch your coins and let push or email alerts find you when a signal flips. Premium unlocks every coin.</p></div>
   </div>
 </section>
