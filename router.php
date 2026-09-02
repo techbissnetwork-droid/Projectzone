@@ -12,6 +12,10 @@ $file = __DIR__ . $path;
 if ($path !== '/' && is_file($file)) {
     return false;   // let the built-in server serve the static file
 }
+if ($path === '/sitemap.xml') {
+    require __DIR__ . '/sitemap.php';
+    return true;
+}
 if ($path === '/' || $path === '') {
     require __DIR__ . '/index.php';
     return true;

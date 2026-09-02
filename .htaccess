@@ -6,6 +6,9 @@ DirectoryIndex index.php index.html
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
+  # robots.txt advertises /sitemap.xml; the generator is sitemap.php.
+  RewriteRule ^sitemap\.xml$ sitemap.php [L]
+
   # Send /services to services.php, and so on.
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
