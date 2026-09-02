@@ -1692,10 +1692,11 @@ $smaShow = static function (string $s): string {
       </div>
       <div><label>Market context panel</label>
         <select name="context_panel_enabled">
-          <option value="1" <?= Database::setting('context_panel_enabled', '1') === '1' ? 'selected' : '' ?>>Shown — Fear &amp; Greed gauge, funding, long/short, open interest, taker flow, breadth</option>
+          <option value="1" <?= Database::setting('context_panel_enabled', '1') === '1' ? 'selected' : '' ?>>Shown — market context below the chart</option>
           <option value="0" <?= Database::setting('context_panel_enabled', '1') === '0' ? 'selected' : '' ?>>Hidden</option>
         </select>
-        <p class="hint">These are the same figures the engine already scores. Showing them is what
+        <p class="hint">Fear &amp; Greed gauge, funding, long/short, open interest, taker flow,
+          breadth &mdash; these are the same figures the engine already scores. Showing them is what
           turns a verdict into something a reader can check rather than a number they have to take
           on trust. Every cell fills on its own, so a feed that returns nothing leaves a dash. Which
           feeds are collected at all is under <strong>Signals &rsaquo; Signal engine thresholds
@@ -2257,6 +2258,7 @@ $smaShow = static function (string $s): string {
           coin that reliably moves the other way. Correlation is measured on returns, not prices, so
           two things that merely drift upward together are not mistaken for one following the other.</p>
       </div>
+      </div>
       <?php // THREE FEED SWITCHES THAT HAD NO CONTROL.
             //
             // Taker flow, breadth, funding, Fear & Greed and BTC correlation
@@ -2291,7 +2293,6 @@ $smaShow = static function (string $s): string {
             default because it needs a real history before an hour's record means anything &mdash;
             on a young site it is fitting noise.</span></div>
         <div></div>
-      </div>
       </div>
       </div>
     </details>
@@ -3323,17 +3324,6 @@ $smaShow = static function (string $s): string {
           <option value="1" <?= Database::setting('paper_enabled', '1') === '1' ? 'selected' : '' ?>>On — members can follow calls on paper</option>
           <option value="0" <?= Database::setting('paper_enabled', '1') === '0' ? 'selected' : '' ?>>Off — hidden from the menu and the API</option>
         </select></div>
-      <div data-dep="paper_enabled" data-dep-value="1"
-           data-dep-note="The paper portfolio is off, so no trades are being opened and nothing is being emailed about them."><label>Trade receipts by email</label>
-        <select name="trade_email_enabled" aria-label="Trade receipts by email">
-          <option value="1" <?= Database::setting('trade_email_enabled', '1') === '1' ? 'selected' : '' ?>>On &mdash; tell a member when their trade opens and closes</option>
-          <option value="0" <?= Database::setting('trade_email_enabled', '1') === '0' ? 'selected' : '' ?>>Off &mdash; no email either way</option>
-        </select>
-        <p class="hint">Two messages per trade at most, sent by the background worker rather than
-          from the button, so opening a position never waits on your mail server. The close carries
-          the exit price, how it ended, the money, the R, how long it was held and the wallet
-          afterwards. Each member can turn their own off on their account page; this switch turns
-          it off for everybody.</p></div>
       <div><label>Highest leverage a member may take</label>
         <input type="number" min="1" max="<?= (int)\SignalMasterAi\Paper::MAX_LEVERAGE_CEILING ?>"
                step="1" name="paper_max_leverage"
@@ -3354,6 +3344,22 @@ $smaShow = static function (string $s): string {
           <code><?= sma_e(implode(', ', array_map(
               static fn($n) => rtrim(rtrim(number_format($n, 2, '.', ''), '0'), '.') . 'x',
               \SignalMasterAi\Paper::leverageLadder()))) ?></code>.</p></div>
+    </div>
+    <?php // Its own row, not a third column squeezed beside Paper portfolio
+          // and Highest leverage - this field's hint runs four sentences and
+          // was landing in a column barely wide enough for its own label. ?>
+    <div class="row2">
+      <div data-dep="paper_enabled" data-dep-value="1"
+           data-dep-note="The paper portfolio is off, so no trades are being opened and nothing is being emailed about them."><label>Trade receipts by email</label>
+        <select name="trade_email_enabled" aria-label="Trade receipts by email">
+          <option value="1" <?= Database::setting('trade_email_enabled', '1') === '1' ? 'selected' : '' ?>>On &mdash; tell a member when their trade opens and closes</option>
+          <option value="0" <?= Database::setting('trade_email_enabled', '1') === '0' ? 'selected' : '' ?>>Off &mdash; no email either way</option>
+        </select>
+        <p class="hint">Two messages per trade at most, sent by the background worker rather than
+          from the button, so opening a position never waits on your mail server. The close carries
+          the exit price, how it ended, the money, the R, how long it was held and the wallet
+          afterwards. Each member can turn their own off on their account page; this switch turns
+          it off for everybody.</p></div>
     </div>
     <div class="row2">
       <div><label>Member backtesting</label>
@@ -3409,7 +3415,12 @@ $smaShow = static function (string $s): string {
         <?php endforeach; ?>
       </tr>
       <?php foreach (\SignalMasterAi\Limits::LIMITS as $lk => $l): ?>
-        <?php $lLive = \SignalMasterAi\Limits::live($lk); ?>
+        <?php // Not Limits::live(): that also checks a tier gate against
+              // whoever is viewing THIS page (the admin's own account), and
+              // this row lists every tier's number at once - there is no
+              // one viewer to gate-check here, only "is it switched on for
+              // anybody at all." ?>
+        <?php $lLive = \SignalMasterAi\Limits::featureOn($lk); ?>
         <tr>
           <td><strong><?= sma_e((string)$l['label']) ?></strong>
             <?php if (!$lLive): ?>
@@ -3584,14 +3595,18 @@ $smaShow = static function (string $s): string {
             <option value="<?= $k ?>" <?= Database::setting('promo_audience', 'free') === $k ? 'selected' : '' ?>><?= $lbl ?></option>
           <?php endforeach; ?>
         </select>
-        <p class="hint">"New" counts as the first
-          <input type="number" name="promo_new_days" min="1" max="365" style="width:70px;display:inline-block"
-                 value="<?= $s('promo_new_days', '7') ?>"> days after sign-up.</p></div>
+      </div>
       <div><label>Show it to only this share of them</label>
         <input type="number" name="promo_random_pct" min="0" max="100" value="<?= $s('promo_random_pct', '100') ?>">
         <p class="hint">100 = everyone in that audience. Lower it to test an offer on a slice first.
           The choice is fixed per person for the whole campaign, so nobody sees the banner appear and
           disappear as they browse &mdash; that reads as a broken site and makes the offer look fake.</p></div>
+    </div>
+    <div class="row2">
+      <div><label>"New" member window (days)</label>
+        <input type="number" name="promo_new_days" min="1" max="365" value="<?= $s('promo_new_days', '7') ?>">
+        <p class="hint">Counts as the first N days after sign-up &mdash; only matters when
+          <strong>Who sees it</strong> above is set to "New free members only".</p></div>
     </div>
     <div class="row2">
       <div><label>Or send it to specific people only</label>

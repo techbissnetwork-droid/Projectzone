@@ -341,7 +341,12 @@ button { min-height: 24px; }
    is visible the moment two of them sit next to each other. */
 .form-card > h2:first-child { margin-top: 0; }
 .inline-form { display: inline; }
-.row2 { display: flex; gap: 16px; flex-wrap: wrap; }
+/* align-items: flex-start - default stretch makes both columns match the
+   taller sibling's height, which left a dead gap under any field that has
+   no hint paragraph next to one that does (e.g. Settings > Site > Chart
+   page: "Candles per chart" next to a field with a two-line hint). Columns
+   now size to their own content. */
+.row2 { display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start; }
 .row2 > div { flex: 1; min-width: 220px; }
 .row3 { display: flex; gap: 16px; flex-wrap: wrap; }
 .row3 > div { flex: 1; min-width: 190px; }
@@ -481,7 +486,14 @@ details.acc > .acc-body > .hint { margin-top: 8px; }
  * put the card's summary there too. scroll-margin-top is what tells the
  * browser where the top actually is. */
 .settings-tabs { scroll-margin-top: var(--adm-head, 0px); }
-.form-card { scroll-margin-top: calc(var(--adm-head, 0px) + 62px); }
+/* scroll-margin-bottom: the account dock (fixed, 56px) and this page's own
+   sticky save-bar (measured ~91px on a wrapping mobile layout) stack at the
+   bottom of the viewport too - a card whose bottom lands in that band on
+   open (a deep link, or the browser's own toggle-into-view) settled
+   partly underneath both. Margin only changes where a scroll STOPS; it adds
+   no visible space during ordinary scrolling. */
+.form-card { scroll-margin-top: calc(var(--adm-head, 0px) + 62px);
+  scroll-margin-bottom: calc(56px + 96px + env(safe-area-inset-bottom, 0px)); }
 
 /* One line about the section you are in, where the seven tile descriptions
    used to argue with each other above it. */

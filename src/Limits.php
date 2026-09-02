@@ -184,11 +184,30 @@ class Limits
     }
 
     /**
-     * Is the thing this limit bounds switched on at all?
+     * Is the thing this limit bounds switched on at all, for any viewer?
      *
      * Selling "30 backtests a day" while the backtester is off is the same
      * false claim as selling a feature nobody has - see Premium::featureLive(),
      * which this defers to wherever a limit belongs to a gated feature.
+     *
+     * Deliberately not viewer-scoped: the admin overview table lists every
+     * tier's number on one row, so there is no single viewer to check a tier
+     * gate against - it needs only "would this ever apply to anybody,"
+     * which live() below builds on for the narrower one-viewer question.
+     */
+    public static function featureOn(string $key): bool
+    {
+        return match ($key) {
+            'backtests'    => Premium::featureLive('backtest'),
+            'ai_asks'      => Premium::featureLive('ai_ask'),
+            'positions'    => Premium::featureLive('portfolio'),
+            'scanner_rows' => Premium::featureLive('scanner'),
+            default        => true,
+        };
+    }
+
+    /**
+     * Is the thing this limit bounds reachable by ONE particular viewer?
      *
      * Off entirely is not the only way a limit is unreachable: backtest.php
      * also walls the whole feature off by TIER (member_backtest_tier), a
@@ -200,13 +219,6 @@ class Limits
      */
     public static function live(string $key, ?string $tier = null): bool
     {
-        $on = match ($key) {
-            'backtests'    => Premium::featureLive('backtest'),
-            'ai_asks'      => Premium::featureLive('ai_ask'),
-            'positions'    => Premium::featureLive('portfolio'),
-            'scanner_rows' => Premium::featureLive('scanner'),
-            default        => true,
-        };
-        return $on && ($key !== 'backtests' || Gate::allows('backtest', $tier));
+        return self::featureOn($key) && ($key !== 'backtests' || Gate::allows('backtest', $tier));
     }
 }
