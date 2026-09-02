@@ -9,9 +9,6 @@ require_admin();
  * Titles take a line break; the site renders it as one.
  */
 const HEADING_FIELDS = [
-    'journey' => [
-        'journey_eyebrow' => 'Eyebrow', 'journey_title' => 'Headline', 'journey_lede' => 'Paragraph',
-    ],
     'services' => [
         'services_eyebrow' => 'Eyebrow', 'services_title' => 'Headline', 'services_lede' => 'Paragraph',
     ],
@@ -86,11 +83,10 @@ foreach (array_keys(Content::SECTIONS) as $k) {
 asort($pos);
 
 $counts = [];
-foreach (['journey','process','pillar','arch','transform','stat'] as $k) {
+foreach (['process','pillar','arch','transform','stat'] as $k) {
     $counts[$k] = count(Content::items($k));
 }
 $LINKS = [
-    'journey'   => ['content.php?kind=journey', 'journey'],
     'services'  => ['services.php', null],
     'arch'      => ['content.php?kind=arch', 'arch'],
     'process'   => ['content.php?kind=process', 'process'],

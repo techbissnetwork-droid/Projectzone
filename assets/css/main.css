@@ -145,8 +145,6 @@ section{ position:relative; z-index:2; }
 /* One component for both: a single row of stages, read at a glance. Neither
    section pins the page or drives itself off the scroll position any more. */
 .flowsec{ padding:var(--sec-y) 0; }
-.flowsec[data-theme="deep"]{ background:
-  radial-gradient(70% 45% at 50% 0%, rgba(78,118,232,.09), transparent 62%), var(--bg-2); }
 
 .flow{
   /* --n is set inline from the number of stages; the media queries below set
@@ -316,17 +314,14 @@ section{ position:relative; z-index:2; }
 .svcs__arrow:disabled{ opacity:.3; cursor:default; }
 .svcs__arrow svg{ width:15px; height:15px; }
 
-@media (max-width:1240px){
-  .svcs__grid{ grid-template-columns:repeat(3,minmax(0,1fr)); }
-  .svcs__carousel{ --per:3; }
-}
-@media (max-width:940px){
+/* Four to a slide for as long as they stay readable, then two. Never one. */
+@media (max-width:700px){
   .svcs__grid{ grid-template-columns:repeat(2,minmax(0,1fr)); }
   .svcs__carousel{ --per:2; }
 }
 @media (max-width:720px){
-  .svcs__grid{ grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
-  .svcs__carousel{ --per:2; --sgap:8px; }
+  .svcs__grid{ gap:8px; }
+  .svcs__carousel{ --sgap:8px; }
   .svc__head{ padding:13px; }
   .svc__index{ font-size:9px; }
   .svc__glyph{ width:24px; height:20px; margin:9px 0 8px; }
@@ -338,10 +333,7 @@ section{ position:relative; z-index:2; }
   .svc__detail .tags span{ font-size:9px; padding:3px 7px; }
   .svcs__arrow{ width:34px; height:34px; }
 }
-@media (max-width:620px){
-  .svcs__grid{ grid-template-columns:minmax(0,1fr); }
-  .svcs__carousel{ --per:1; }
-}
+
 
 
 /* ══════════════ 04 · ARCHITECTURE ══════════════ */

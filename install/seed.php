@@ -74,17 +74,6 @@ function tb_seed_content(PDO $pdo, string $ts): void
     ] as $i => $r) { $blocks[] = ['stat', $r[0], $r[1], null, null, null, null, null, $i * 10]; }
 
     foreach ([
-        ['OFFLINE', 'A business that only exists in one place',
-         'Paper records, phone orders, manual follow-ups and a customer base limited by walking distance. Every process depends on someone remembering it.', 'Offline'],
-        ['DIGITAL', 'Every process gets a digital counterpart',
-         'We map how your business actually runs, then rebuild each step as a system: the order book becomes an API, the ledger becomes payments, the notebook becomes a database.', 'Digital'],
-        ['ONLINE', 'Your business, open every hour of the day',
-         'A website, an app, business email on your own domain, secure payments and cloud infrastructure — running together, monitored, and no longer dependent on anyone being at the counter.', 'Online'],
-        ['GROWING', 'Reach that keeps compounding',
-         'With everything measured, the improvements never stop: more orders per shift, customers far beyond your street, and zero hours lost to manual admin.', 'Growing'],
-    ] as $i => $r) { $blocks[] = ['journey', $r[0], $r[1], $r[2], null, $r[3], null, null, $i * 10]; }
-
-    foreach ([
         ['Discover', 'week 1', 'We understand your business, your customers and your goals — how orders actually arrive, where time is lost, what growth is blocked on.',
          "Business & operations audit\nCustomer journey mapping\nTechnical requirements\nScope, budget and timeline", 'mapping business logic'],
         ['Design', 'week 2–3', 'We create the digital experience and the architecture behind it — interface, brand system and the data model they sit on.',

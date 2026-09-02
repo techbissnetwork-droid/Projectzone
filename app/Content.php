@@ -17,17 +17,9 @@ final class Content
             'body'  => [null, null],
             'meta1' => [null, null],
         ],
-        'journey' => [
-            'name'  => 'Offline → online journey',
-            'hint'  => 'The scroll-driven transformation. One row per stage, in order.',
-            'label' => ['Stage word', 'OFFLINE'],
-            'title' => ['Headline', 'A business that only exists in one place'],
-            'body'  => ['Paragraph', 'Paper records, phone orders, manual follow-ups…'],
-            'meta1' => ['Rail caption', 'Offline'],
-        ],
         'process' => [
             'name'  => 'How we work',
-            'hint'  => 'The scroll-reactive timeline. One row per stage.',
+            'hint'  => 'The stages of a project. One row per stage, in order.',
             'label' => ['Stage name', 'Discover'],
             'title' => ['Timing label', 'week 1'],
             'body'  => ['Paragraph', 'We understand your business, customers and goals.'],
@@ -63,7 +55,6 @@ final class Content
 
     /** Sections of the home page, in the order the admin can rearrange. */
     public const SECTIONS = [
-        'journey'     => 'Offline → online transformation',
         'services'    => 'Service modules',
         'arch'        => 'System architecture',
         'process'     => 'How we work',

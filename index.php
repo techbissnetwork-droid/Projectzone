@@ -84,10 +84,6 @@ foreach (Content::sectionOrder() as $section):
     $secNum++;
     switch ($section):
 
-    case 'journey':
-        require __DIR__ . '/partials/section_shift.php';
-        break;
-
     case 'services':
         if (!$services) { break; } ?>
         <section class="svcs" id="services">

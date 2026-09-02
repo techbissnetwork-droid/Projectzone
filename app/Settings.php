@@ -117,8 +117,7 @@ final class Settings
 
             /* home page sections */
             'scroll_pace'      => 'standard',
-            'home_sections'    => 'journey,services,arch,process,work,transform,pillars,marketplace,quote',
-            'section_journey'  => '1',
+            'home_sections'    => 'services,arch,process,work,transform,pillars,marketplace,quote',
             'section_services' => '1',
             'section_arch'     => '1',
             'section_process'  => '1',
@@ -129,9 +128,6 @@ final class Settings
             'section_quote'    => '1',
 
             /* section headings */
-            'journey_eyebrow'  => 'The transformation',
-            'journey_title'    => "Offline to online,\nstage by stage.",
-            'journey_lede'     => 'The same business, rebuilt so it runs itself — records become data, the shopfront becomes a website, and reach stops ending at the end of the street.',
             'services_eyebrow' => 'The ecosystem',
             'services_title'   => "Everything your business\nneeds to exist online.",
             'services_lede'    => 'Commission one module, or let us run the entire stack — domain to analytics — as a single system.',
