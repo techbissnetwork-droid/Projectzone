@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TECHBISS — Five design directions, 2026</title>
+<meta name="description" content="Five premium animated homepage directions for TECHBISS. Pick one to develop into the full site.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#08080b; --panel:#0e0e13; --fg:#f2f3f7; --mute:rgba(242,243,247,.56);
+  --dim:rgba(242,243,247,.3); --line:rgba(255,255,255,.1); --line2:rgba(255,255,255,.22);
+  --acc:#2dd4bf; --acc2:#8b5cf6;
+  --sans:'Inter Tight',system-ui,sans-serif; --serif:'Instrument Serif',Georgia,serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--fg);font-family:var(--sans);line-height:1.6;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--acc2);color:#fff}
+.wrap{width:min(1320px,92vw);margin-inline:auto}
+.bgfx{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(60% 50% at 20% 0%,rgba(45,212,191,.13),transparent 60%),
+             radial-gradient(50% 45% at 85% 12%,rgba(139,92,246,.14),transparent 62%)}
+.grid{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.4;
+  background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);
+  background-size:70px 70px;
+  mask-image:radial-gradient(100% 70% at 50% 0%,#000,transparent 75%);
+  -webkit-mask-image:radial-gradient(100% 70% at 50% 0%,#000,transparent 75%)}
+main,header{position:relative;z-index:2}
+
+header{padding:26px 0;position:sticky;top:0;z-index:50;backdrop-filter:blur(16px);
+  background:rgba(8,8,11,.7);border-bottom:1px solid var(--line)}
+.hb{display:flex;align-items:center;gap:18px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:600;letter-spacing:.12em;font-size:13px}
+.logo b{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-family:var(--serif);
+  font-size:17px;background:linear-gradient(140deg,var(--acc),var(--acc2));color:#08080b}
+.hb .tag{margin-left:auto;font-family:var(--mono);font-size:11px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--dim)}
+
+.intro{padding:clamp(60px,9vw,120px) 0 clamp(40px,6vw,70px)}
+.kick{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--acc);margin-bottom:18px}
+h1{font-size:clamp(38px,7vw,88px);line-height:.98;letter-spacing:-.04em;font-weight:600;max-width:16ch}
+h1 em{font-family:var(--serif);font-style:italic;font-weight:400;
+  background:linear-gradient(100deg,var(--acc),var(--acc2));-webkit-background-clip:text;
+  background-clip:text;color:transparent}
+.intro p{color:var(--mute);max-width:62ch;margin-top:24px;font-size:17px}
+.note{margin-top:30px;display:flex;flex-wrap:wrap;gap:10px}
+.note span{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
+  padding:7px 13px;border:1px solid var(--line);border-radius:999px;color:var(--mute)}
+
+.list{padding-bottom:clamp(70px,10vw,140px);display:grid;gap:22px}
+.item{border:1px solid var(--line);border-radius:22px;overflow:hidden;background:var(--panel);
+  display:grid;grid-template-columns:.85fr 1.15fr;transition:.55s var(--ease)}
+.item:hover{border-color:var(--line2);transform:translateY(-5px)}
+@media(max-width:960px){.item{grid-template-columns:1fr}}
+.item .txt{padding:clamp(26px,3.4vw,44px);display:flex;flex-direction:column}
+.item .no{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--acc)}
+.item h2{font-size:clamp(26px,3.4vw,42px);line-height:1.02;letter-spacing:-.03em;font-weight:600;
+  margin:14px 0 14px}
+.item h2 em{font-family:var(--serif);font-style:italic;font-weight:400;color:var(--mute)}
+.item p{color:var(--mute);font-size:15px;max-width:44ch}
+.item .best{margin-top:20px;font-size:14px;color:var(--fg);padding:14px 16px;border-radius:12px;
+  border:1px solid var(--line);background:rgba(255,255,255,.03)}
+.item .best b{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--acc);display:block;margin-bottom:6px;font-weight:400}
+.item ul{list-style:none;display:flex;flex-wrap:wrap;gap:7px;margin:20px 0 0}
+.item li{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  padding:6px 11px;border:1px solid var(--line);border-radius:999px;color:var(--mute)}
+.item .go{margin-top:auto;padding-top:26px;display:flex;gap:10px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:9px;padding:13px 22px;border-radius:999px;
+  font-size:14px;font-weight:500;border:1px solid var(--line2);transition:.4s var(--ease)}
+.btn:hover{background:var(--fg);color:#08080b;border-color:transparent}
+.btn.pri{background:linear-gradient(100deg,var(--acc),var(--acc2));color:#08080b;font-weight:600;
+  border-color:transparent}
+.btn.pri:hover{filter:brightness(1.12);background:linear-gradient(100deg,var(--acc),var(--acc2));color:#08080b}
+
+.frame{position:relative;border-left:1px solid var(--line);min-height:420px;background:#000;
+  overflow:hidden}
+@media(max-width:960px){.frame{border-left:0;border-top:1px solid var(--line);min-height:330px}}
+.frame iframe{position:absolute;top:0;left:0;width:1440px;height:1100px;border:0;
+  transform-origin:0 0;pointer-events:none}
+.frame .veil{position:absolute;inset:0;background:linear-gradient(180deg,transparent 60%,rgba(8,8,11,.85));
+  pointer-events:none}
+.frame .ph{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--mono);
+  font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);
+  background:var(--panel);transition:opacity .6s;z-index:2}
+.frame.loaded .ph{opacity:0;pointer-events:none}
+.frame .open{position:absolute;right:16px;bottom:16px;z-index:3;padding:11px 18px;border-radius:999px;
+  background:rgba(8,8,11,.82);backdrop-filter:blur(12px);border:1px solid var(--line2);font-size:13px;
+  transition:.4s var(--ease)}
+.frame .open:hover{background:var(--fg);color:#08080b}
+
+.foot{border-top:1px solid var(--line);padding:40px 0 60px;font-family:var(--mono);font-size:11px;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--dim);display:flex;
+  justify-content:space-between;flex-wrap:wrap;gap:14px}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important;animation:none!important}
+  html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div class="bgfx"></div><div class="grid"></div>
+
+<header><div class="wrap hb">
+  <span class="logo"><b>T</b>TECHBISS</span>
+  <span class="tag">Design directions · 2026</span>
+</div></header>
+
+<main>
+<section class="intro"><div class="wrap">
+  <p class="kick">Round one — five directions</p>
+  <h1>Five ways TECHBISS could look <em>in 2026.</em></h1>
+  <p>Each one is a complete, working homepage — not a picture of a homepage. Real motion, real interaction, real copy from the business: one partner for domain, hosting, SSL, website, apps, email, SEO and support. Open them, scroll them, hover things. Then pick the one that feels like the company, and that becomes the full site.</p>
+  <div class="note">
+    <span>Plain HTML · CSS · JS</span><span>No build step</span><span>Uploads to cPanel as-is</span>
+    <span>Responsive</span><span>Respects reduced-motion</span>
+  </div>
+</div></section>
+
+<section class="list"><div class="wrap" style="display:grid;gap:22px">
+
+  <article class="item">
+    <div class="txt">
+      <span class="no">01</span>
+      <h2>Aurora Glass <em>— quiet luxury</em></h2>
+      <p>Near-black canvas with a live aurora field drifting behind frosted glass panels. A custom cursor that swells over anything clickable, buttons that lean toward the pointer, and a bento grid whose cards tilt in 3D and light up under a spotlight.</p>
+      <div class="best"><b>Choose this if</b>You want TECHBISS to read as expensive and calm — the agency other agencies hire. Ages well; nothing here is a trend.</div>
+      <ul><li>Aurora canvas</li><li>Magnetic cursor</li><li>3D tilt bento</li><li>Scroll-linked process</li><li>Price toggle</li></ul>
+      <div class="go">
+        <a class="btn pri" href="designs/01-aurora-glass/index.html">Open full page →</a>
+        <a class="btn" href="designs/01-aurora-glass/index.html" target="_blank" rel="noopener">New tab</a>
+      </div>
+    </div>
+    <div class="frame"><span class="ph">Loading preview…</span>
+      <iframe data-src="designs/01-aurora-glass/index.html" title="Aurora Glass preview" loading="lazy" scrolling="no" tabindex="-1"></iframe>
+      <div class="veil"></div>
+      <a class="open" href="designs/01-aurora-glass/index.html">Open ↗</a></div>
+  </article>
+
+  <article class="item">
+    <div class="txt">
+      <span class="no">02</span>
+      <h2>Kinetic Editorial <em>— confident, light</em></h2>
+      <p>Warm paper stock, enormous type set the way a magazine sets it, and a services rail you drag sideways. Text scrambles into place as it enters view, a labelled cursor tells you what a link does, and the whole page reads like a printed annual report that happens to move.</p>
+      <div class="best"><b>Choose this if</b>Your clients are business owners, not developers. Light backgrounds convert better with non-technical buyers and print beautifully in a proposal.</div>
+      <ul><li>Drag rail</li><li>Text scramble</li><li>Labelled cursor</li><li>Accordion process</li><li>Reading progress</li></ul>
+      <div class="go">
+        <a class="btn pri" href="designs/02-kinetic-editorial/index.html">Open full page →</a>
+        <a class="btn" href="designs/02-kinetic-editorial/index.html" target="_blank" rel="noopener">New tab</a>
+      </div>
+    </div>
+    <div class="frame"><span class="ph">Loading preview…</span>
+      <iframe data-src="designs/02-kinetic-editorial/index.html" title="Kinetic Editorial preview" loading="lazy" scrolling="no" tabindex="-1"></iframe>
+      <div class="veil"></div>
+      <a class="open" href="designs/02-kinetic-editorial/index.html">Open ↗</a></div>
+  </article>
+
+  <article class="item">
+    <div class="txt">
+      <span class="no">03</span>
+      <h2>Signal Terminal <em>— proof, not promises</em></h2>
+      <p>A control room. A console streams live operations lines as you read, sparklines redraw themselves, a wireframe globe turns with client locations pulsing on it, and every service sits in a status table marked LIVE / VALID / DELIVERING.</p>
+      <div class="best"><b>Choose this if</b>Your strongest sales argument is that you keep things running after launch. This design argues it visually before anyone reads a word.</div>
+      <ul><li>Live console</li><li>Canvas globe</li><li>Sparklines</li><li>Status matrix</li><li>Typewriter hero</li></ul>
+      <div class="go">
+        <a class="btn pri" href="designs/03-signal-terminal/index.html">Open full page →</a>
+        <a class="btn" href="designs/03-signal-terminal/index.html" target="_blank" rel="noopener">New tab</a>
+      </div>
+    </div>
+    <div class="frame"><span class="ph">Loading preview…</span>
+      <iframe data-src="designs/03-signal-terminal/index.html" title="Signal Terminal preview" loading="lazy" scrolling="no" tabindex="-1"></iframe>
+      <div class="veil"></div>
+      <a class="open" href="designs/03-signal-terminal/index.html">Open ↗</a></div>
+  </article>
+
+  <article class="item">
+    <div class="txt">
+      <span class="no">04</span>
+      <h2>Liquid Chrome <em>— loud and modern</em></h2>
+      <p>Metallic display type whose shimmer tracks your scroll, coloured light pooling behind the page, and four service blocks that stack on top of one another as you move — each one dimming and shrinking as the next slides over it.</p>
+      <div class="best"><b>Choose this if</b>You want to look like the newest studio in the market. Highest visual impact of the five, and the most memorable on a phone.</div>
+      <ul><li>Chrome shimmer</li><li>Stacking cards</li><li>Metaball light</li><li>Orbit diagram</li><li>Swipe quotes</li></ul>
+      <div class="go">
+        <a class="btn pri" href="designs/04-liquid-chrome/index.html">Open full page →</a>
+        <a class="btn" href="designs/04-liquid-chrome/index.html" target="_blank" rel="noopener">New tab</a>
+      </div>
+    </div>
+    <div class="frame"><span class="ph">Loading preview…</span>
+      <iframe data-src="designs/04-liquid-chrome/index.html" title="Liquid Chrome preview" loading="lazy" scrolling="no" tabindex="-1"></iframe>
+      <div class="veil"></div>
+      <a class="open" href="designs/04-liquid-chrome/index.html">Open ↗</a></div>
+  </article>
+
+  <article class="item">
+    <div class="txt">
+      <span class="no">05</span>
+      <h2>Blueprint Stack <em>— explain the offer</em></h2>
+      <p>Deep navy drafting paper. The hero holds an isometric diagram that draws itself layer by layer — domain, hosting, SSL, email, website — with packets travelling up the spine, and the process section builds a glowing timeline as you scroll past it.</p>
+      <div class="best"><b>Choose this if</b>The hardest part of your sale is explaining what "full web setup" actually includes. This design makes the stack visible in one glance.</div>
+      <ul><li>Self-drawing SVG</li><li>Interactive layers</li><li>Scroll timeline</li><li>Starfield</li><li>Spotlight cards</li></ul>
+      <div class="go">
+        <a class="btn pri" href="designs/05-blueprint-stack/index.html">Open full page →</a>
+        <a class="btn" href="designs/05-blueprint-stack/index.html" target="_blank" rel="noopener">New tab</a>
+      </div>
+    </div>
+    <div class="frame"><span class="ph">Loading preview…</span>
+      <iframe data-src="designs/05-blueprint-stack/index.html" title="Blueprint Stack preview" loading="lazy" scrolling="no" tabindex="-1"></iframe>
+      <div class="veil"></div>
+      <a class="open" href="designs/05-blueprint-stack/index.html">Open ↗</a></div>
+  </article>
+
+</div></section>
+
+<div class="wrap"><div class="foot">
+  <span>© 2026 TECHBISS — design round one</span>
+  <span>Pick one, and it becomes the site</span>
+</div></div>
+</main>
+
+<script>
+(function(){
+"use strict";
+/* scale each preview iframe to fit its frame, and load it only when near view */
+var frames=[].slice.call(document.querySelectorAll('.frame'));
+function fit(f){
+  var ifr=f.querySelector('iframe');
+  var s=f.clientWidth/1440;
+  ifr.style.transform='scale('+s+')';
+  ifr.style.height=Math.max(f.clientHeight/s,900)+'px';
+}
+var io=new IntersectionObserver(function(es){
+  es.forEach(function(e){
+    if(!e.isIntersecting)return;
+    var f=e.target,ifr=f.querySelector('iframe');
+    io.unobserve(f);
+    fit(f);
+    ifr.addEventListener('load',function(){f.classList.add('loaded')});
+    /* webfonts or a slow asset can delay the load event; reveal anyway */
+    setTimeout(function(){f.classList.add('loaded')},2500);
+    ifr.src=ifr.dataset.src;
+  });
+},{rootMargin:'300px'});
+frames.forEach(function(f){io.observe(f)});
+addEventListener('resize',function(){frames.forEach(fit)});
+})();
+</script>
+</body>
+</html>
