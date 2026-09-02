@@ -33,7 +33,6 @@ $secNum = $secNum ?? 4;
             </div>
           <?php endforeach; ?>
         </div>
-        </div>
       </div>
 
       <aside class="arch__panel">

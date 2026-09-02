@@ -33,12 +33,22 @@
     return { start: start, stop: stop };
   }
 
+  /**
+   * Each visualisation runs inside its own guard. They share one file, so
+   * without this an error in the hero would abort the script before the
+   * architecture diagram or the CTA field ever ran, leaving them blank.
+   */
+  function block(name, fn) {
+    try { fn(); }
+    catch (err) { if (win.console) { win.console.error('[techbiss] ' + name + ' visualisation failed', err); } }
+  }
+
   /* ══════════════════════════════════════════════════════════
      01 · HERO ECOSYSTEM
      Business → Domain → Website → App → Hosting → Email →
      Security → Payments → Growth, orbiting the TECHBISS core.
      ══════════════════════════════════════════════════════════ */
-  (function () {
+  block('hero ecosystem', function () {
     var wrap = doc.getElementById('viz');
     var cv = doc.getElementById('vizCanvas');
     var host = doc.getElementById('vizNodes');
@@ -230,12 +240,12 @@
     wrap.classList.add('js-anim');
     requestAnimationFrame(function () { wrap.classList.add('is-ready'); });
     if (reduce) { draw(0); } else { loop(wrap, draw); }
-  })();
+  });
 
   /* ══════════════════════════════════════════════════════════
      04 · SYSTEM ARCHITECTURE
      ══════════════════════════════════════════════════════════ */
-  (function () {
+  block('architecture', function () {
     var wrap = doc.getElementById('archDiagram');
     var cv = doc.getElementById('archCanvas');
     var host = doc.getElementById('archNodes');
@@ -283,7 +293,7 @@
     }
     var EDGES = buildEdges();
 
-    var W = 0, H = 0, ctx = null, packets = [];
+    var W = 0, H = 0, ctx = null, packets = [], placed = false;
 
     function layout() {
       var r = wrap.getBoundingClientRect();
@@ -328,6 +338,10 @@
         n.el.style.setProperty('--x', n.x.toFixed(1) + 'px');
         n.el.style.setProperty('--y', n.y.toFixed(1) + 'px');
       });
+      /* Every node now has a coordinate, so it is safe to switch the container
+         out of its flowed fallback and into the positioned diagram. */
+      host.classList.add('is-placed');
+      placed = true;
 
       if (packets.length !== EDGES.length) {
         packets = EDGES.map(function (e, i) { return { e: i, t: -(i * 0.13) % 1, sp: 0.0035 + (i % 3) * 0.0007 }; });
@@ -402,7 +416,10 @@
       hot = null; nodes.forEach(function (n) { n.el.classList.remove('is-hot'); });
     });
 
-    if (section) {
+    /* The fade-in is only armed once the nodes are positioned. If layout never
+       ran, the nodes stay visible in their fallback stack instead of being
+       hidden by an animation that will never play. */
+    if (section && placed) {
       section.classList.add('js-anim');
       var reveal = function () { section.classList.add('is-ready'); };
       if ('IntersectionObserver' in win) {
@@ -419,12 +436,12 @@
     }
 
     if (reduce) draw(0); else loop(wrap, draw);
-  })();
+  });
 
   /* ══════════════════════════════════════════════════════════
      09 · CTA FIELD — slow drifting light
      ══════════════════════════════════════════════════════════ */
-  (function () {
+  block('CTA field', function () {
     var cv = doc.getElementById('ctaCanvas');
     if (!cv || reduce) return;
     var wrap = cv.parentNode, W = 0, H = 0, ctx = null, pts = [];
@@ -462,5 +479,5 @@
     if ('ResizeObserver' in win) new ResizeObserver(layout).observe(wrap);
     else win.addEventListener('resize', layout, { passive: true });
     loop(wrap, draw);
-  })();
+  });
 })();

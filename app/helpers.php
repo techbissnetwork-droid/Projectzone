@@ -30,9 +30,57 @@ function url(string $path = ''): string
     return $base . ($path === '' ? '/' : '/' . ltrim($path, '/'));
 }
 
+/**
+ * A versioned URL for a local asset. The file's modification time rides along
+ * as a query string, so a browser or CDN holding yesterday's CSS or JS fetches
+ * the new one the moment the file changes rather than keeping the old copy.
+ */
 function asset(string $path): string
 {
-    return url($path);
+    $u = url($path);
+    $file = dirname(__DIR__) . '/' . ltrim($path, '/');
+    $mtime = @filemtime($file);
+    if ($mtime) {
+        $u .= (str_contains($u, '?') ? '&' : '?') . 'v=' . $mtime;
+    }
+    return $u;
+}
+
+/**
+ * A compact label for the hero's orbiting ecosystem. The orbit is drawn from
+ * your service names, and a full name like "Hosting & VPS" or "SSL & Security"
+ * makes a pill wide enough to collide with its neighbours on a phone.
+ *
+ * Anything after a separator is dropped. A name that is still too wide is cut
+ * to the one word that identifies it: the first, unless the first is a generic
+ * qualifier, so "Domain Registration" orbits as "Domain" but "Business Email"
+ * orbits as "Email".
+ */
+function orbit_label(string $title): string
+{
+    static $qualifiers = [
+        'business', 'digital', 'online', 'professional', 'custom', 'managed',
+        'mobile', 'complete', 'full', 'enterprise', 'smart', 'modern',
+        'premium', 'advanced', 'corporate', 'creative',
+    ];
+
+    $t = trim(preg_split('/\s*(?:&|\+|\/|,|\band\b)\s*/i', trim($title))[0] ?? '');
+    if ($t === '') {
+        $t = trim($title);
+    }
+    if (mb_strlen($t) <= 11) {
+        return $t;
+    }
+
+    $words = preg_split('/\s+/', $t) ?: [$t];
+    $pick  = $words[0];
+    foreach ($words as $w) {
+        if (!in_array(mb_strtolower(trim($w, '.-')), $qualifiers, true)) {
+            $pick = $w;
+            break;
+        }
+    }
+    return mb_strlen($pick) > 14 ? mb_substr($pick, 0, 13) . '…' : $pick;
 }
 
 function e(?string $v): string

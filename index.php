@@ -32,7 +32,7 @@ require __DIR__ . '/partials/public_header.php';
       $orbit = array_slice(array_map(static fn($s) => $s['title'], $services), 0, 9);
       if (count($orbit) < 4) { $orbit = ['Business','Domain','Website','App','Hosting','Email','Security','Payments','Growth']; }
       foreach ($orbit as $n): ?>
-        <div class="vnode" data-node="<?= e(slugify($n)) ?>" data-ring="1"><span class="vnode__label"><?= e($n) ?></span></div>
+        <div class="vnode" data-node="<?= e(slugify($n)) ?>" data-ring="1" title="<?= e($n) ?>"><span class="vnode__label"><?= e(orbit_label($n)) ?></span></div>
       <?php endforeach; ?>
     </div>
     <div class="viz__hud">

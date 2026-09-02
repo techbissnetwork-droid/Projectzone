@@ -494,16 +494,26 @@ section{ position:relative; z-index:2; }
   box-shadow:inset 0 1px 0 rgba(255,255,255,.04), var(--sh-3);
 }
 #archCanvas{ position:absolute; inset:0; width:100%; height:100%; }
-.arch__nodes{ position:absolute; inset:0; }
+/* Until the script has measured the box and placed every node, the nodes flow
+   as a plain centred stack. Without this the diagram is an empty grid whenever
+   the script is stale, blocked or slow. */
+.arch__nodes{
+  position:absolute; inset:0; display:flex; flex-wrap:wrap; gap:10px;
+  align-content:center; justify-content:center; padding:20px; overflow:auto;
+}
+.arch__nodes.is-placed{ display:block; padding:0; overflow:visible; }
 .anode{
-  position:absolute; top:0; left:0;
-  transform:translate3d(calc(var(--x,0px) - 50%), calc(var(--y,0px) - 50%), 0);
+  position:relative;
   display:grid; gap:3px; padding:12px 16px; border-radius:12px; min-width:118px;
   border:1px solid var(--line-2); background:linear-gradient(180deg, rgba(19,23,32,.95), rgba(9,11,16,.95));
   -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); box-shadow:var(--sh-2);
   text-align:center; justify-items:center; white-space:nowrap;
   opacity:1; transition:opacity .8s var(--e-out), border-color .45s, box-shadow .45s, transform .45s var(--e-out);
   will-change:transform;
+}
+.arch__nodes.is-placed .anode{
+  position:absolute; top:0; left:0;
+  transform:translate3d(calc(var(--x,0px) - 50%), calc(var(--y,0px) - 50%), 0);
 }
 .arch.js-anim .anode{ opacity:0; }
 .arch.js-anim.is-ready .anode{ opacity:1; transition-delay:calc(var(--i,0)*60ms); }
@@ -934,6 +944,12 @@ section{ position:relative; z-index:2; }
 }
 @media (max-width:760px){
   :root{ --sec-y:clamp(58px,8vh,86px); --r-xl:22px; --r-l:18px; }
+  /* The orbit has far less room on a phone, so the pills tighten up rather
+     than growing into each other. */
+  .vnode{ padding:7px 12px; max-width:38vw; }
+  .vnode__label{ font-size:11.5px; overflow:hidden; text-overflow:ellipsis; }
+  .vnode--core{ padding:12px 20px; max-width:none; }
+  .vnode--core .vnode__label{ font-size:13.5px; }
   .sec__head--split{ grid-template-columns:1fr; align-items:start; gap:20px; }
   .sec__lede{ font-size:.98rem; }
   .hero__stats{ display:grid; grid-template-columns:1fr 1fr; gap:18px 20px; }
