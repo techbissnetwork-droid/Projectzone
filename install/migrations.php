@@ -44,6 +44,33 @@ function tb_migrate(PDO $pdo, string $driver = 'mysql'): array
             'access_token'      => 'VARCHAR(64) NULL',
         ],
     ];
+    /* 2b · columns that exist but are too narrow for what the code now writes.
+             orders.payment_method holds a copy of payment_methods.name, which is
+             VARCHAR(120); at VARCHAR(40) a longer method name made every
+             checkout throw and lose the sale. ADD COLUMN above never revisits a
+             column that already exists, so widening needs its own step. */
+    $widen = [
+        'orders' => ['payment_method' => ['VARCHAR(120) NULL', 120]],
+    ];
+    if ($driver !== 'sqlite') {
+        foreach ($widen as $table => $cols) {
+            if (!in_array(strtolower($table), $tables, true)) {
+                continue;
+            }
+            foreach ($cols as $col => [$ddl, $want]) {
+                $len = $pdo->query(
+                    'SELECT CHARACTER_MAXIMUM_LENGTH FROM information_schema.COLUMNS'
+                    . " WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '" . $table . "'"
+                    . " AND COLUMN_NAME = '" . $col . "'"
+                )->fetchColumn();
+                if ($len !== false && $len !== null && (int)$len < $want) {
+                    $pdo->exec('ALTER TABLE ' . $table . ' MODIFY ' . $col . ' ' . $ddl);
+                    $done[] = 'Widened ' . $table . '.' . $col . ' to ' . $want;
+                }
+            }
+        }
+    }
+
     foreach ($wanted as $table => $cols) {
         if (!in_array(strtolower($table), $tables, true) || !$cols) {
             continue;

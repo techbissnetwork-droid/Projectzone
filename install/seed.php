@@ -163,17 +163,21 @@ function tb_seed_content(PDO $pdo, string $ts): void
     }
 }
 
-/** A working payment method out of the box, so checkout is never a dead end. */
+/**
+ * A bank-transfer method ready to fill in — switched OFF, and with the account
+ * fields empty rather than a placeholder number. An active method carrying
+ * 0000000000000000 would have real buyers transfer real money into nothing.
+ */
 function tb_seed_payments(PDO $pdo, string $ts): void
 {
     $pdo->prepare('INSERT INTO payment_methods
         (code,name,provider,summary,instructions,account_name,account_number,config,is_active,is_test,sort_order,created_at)
-        VALUES (?,?,?,?,?,?,?,?,1,0,?,?)')
+        VALUES (?,?,?,?,?,?,?,?,0,0,?,?)')
         ->execute([
             'bank-transfer', 'Bank transfer', 'manual',
             'Pay directly into our account and send the reference.',
             "Transfer the total to the account below, then reply with the transaction reference.\n"
           . "We confirm every transfer manually within one business day.",
-            'Your Company Pvt. Ltd.', '0000000000000000', null, 10, $ts,
+            '', '', null, 10, $ts,
         ]);
 }

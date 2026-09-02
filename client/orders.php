@@ -41,6 +41,11 @@ require __DIR__ . '/../partials/app_header.php';
               <p><b>Waiting for payment confirmation.</b></p>
               <p style="white-space:pre-wrap"><?= e(Settings::get('payment_instructions')) ?></p>
               <p>Quote your reference <b class="mono"><?= e($o['reference']) ?></b> when you pay.</p>
+              <?php /* Without this the payment page is unreachable once the tab
+                       that opened it is closed, and the order is stranded. */ ?>
+              <p style="margin-top:12px">
+                <a class="btn sm" href="<?= e(Payments::orderUrl($o)) ?>">Complete payment <span aria-hidden="true">&rarr;</span></a>
+              </p>
             </div>
           <?php elseif ($o['status'] === 'delivered'): ?>
             <div class="alert ok" style="margin-top:14px"><p>Delivered. Raise a support request if you need the files again or want help installing.</p></div>

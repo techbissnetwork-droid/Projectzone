@@ -101,7 +101,7 @@ CREATE TABLE orders (
   amount         DECIMAL(12,2) NOT NULL DEFAULT 0,
   currency       VARCHAR(8)   NOT NULL DEFAULT 'NPR',
   status         VARCHAR(16)  NOT NULL DEFAULT 'pending',
-  payment_method VARCHAR(40)  NULL,
+  payment_method VARCHAR(120) NULL,
   payment_method_id INT UNSIGNED NULL,
   payment_ref    VARCHAR(120) NULL,
   paid_at        DATETIME     NULL,

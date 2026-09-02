@@ -73,7 +73,15 @@ final class Payments
     {
         $provider = (string)$method['provider'];
         if (!self::isGateway($provider)) {
-            return true;
+            /* A manual method is somewhere to send money. Offering one whose
+               account details are still the placeholder would have buyers pay
+               into an account that does not exist. */
+            $name   = trim((string)($method['account_name'] ?? ''));
+            $number = trim((string)($method['account_number'] ?? ''));
+            if ($name === '' || $number === '') {
+                return false;
+            }
+            return (bool)preg_match('/[1-9]/', $number);
         }
         $cfg = self::config($method);
         foreach (array_keys(self::PROVIDERS[$provider]['fields'] ?? []) as $key) {

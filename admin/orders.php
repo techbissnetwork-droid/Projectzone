@@ -81,6 +81,14 @@ if ($action === 'view') {
         <div class="card__body">
           <table class="data" style="margin:-8px 0"><tbody>
             <tr><th>Reference</th><td class="right mono"><?= e($o['reference']) ?></td></tr>
+            <?php /* The buyer's own payment link. It is the only way back into a
+                     pending order, so staff need it here to send it on. */ ?>
+            <?php if (!empty($o['access_token'])): ?>
+              <tr><th>Payment link</th><td class="right">
+                <a class="linkish mono" style="word-break:break-all" href="<?= e(Payments::orderUrl($o)) ?>"
+                   target="_blank" rel="noopener"><?= e(Payments::orderUrl($o)) ?></a>
+              </td></tr>
+            <?php endif; ?>
             <tr><th>Product</th><td class="right"><?= $o['product_id']
               ? '<a class="linkish" href="products.php?action=edit&id=' . (int)$o['product_id'] . '">' . e((string)$o['product_title']) . '</a>'
               : '<span class="muted">Removed</span>' ?></td></tr>
