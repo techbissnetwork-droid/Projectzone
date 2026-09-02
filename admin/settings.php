@@ -30,6 +30,9 @@ $FIELDS = [
     'social_x'         => ['contact', 'X URL', 'text', ''],
     'social_github'    => ['contact', 'GitHub URL', 'text', ''],
 
+    'mail_from_name'   => ['contact', 'Email sender name', 'text', 'Shown as the sender on sign-in codes and notifications.'],
+    'mail_from_email'  => ['contact', 'Email sender address', 'text', 'Must be an address your server is allowed to send from, or mail lands in spam.'],
+
     'currency'         => ['commerce', 'Currency code', 'text', 'For example NPR or USD.'],
     'currency_symbol'  => ['commerce', 'Currency symbol', 'text', 'For example Rs or $.'],
     'payment_instructions' => ['commerce', 'Payment instructions', 'textarea', 'Shown to a buyer after they place an order.'],

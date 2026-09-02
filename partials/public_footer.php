@@ -73,7 +73,11 @@
 
     <div class="foot__bottom">
       <p>© <?= date('Y') ?> <?= e(Settings::get('site_name', 'TECHBISS')) ?>. All rights reserved.</p>
-      <p class="muted"><a class="link" href="<?= e(url('login.php')) ?>">Client sign in</a></p>
+      <p class="muted">
+        <a class="link" href="<?= e(url('login.php')) ?>">Client sign in</a>
+        <span aria-hidden="true"> · </span>
+        <a class="link" href="<?= e(url('staff-login.php')) ?>">Staff</a>
+      </p>
     </div>
   </div>
 </footer>

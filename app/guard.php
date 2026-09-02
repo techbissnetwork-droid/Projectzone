@@ -16,7 +16,12 @@ function require_login(): array
 
 function require_admin(): array
 {
-    $u = require_login();
+    $u = Auth::user();
+    if (!$u) {
+        $_SESSION['after_login'] = $_SERVER['REQUEST_URI'] ?? null;
+        Flash::err('Please sign in to continue.');
+        redirect('staff-login.php');
+    }
     if ($u['role'] !== 'admin') {
         http_response_code(403);
         exit('You do not have access to this area.');

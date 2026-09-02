@@ -155,6 +155,8 @@ final class Settings
             'cta_secondary'    => 'Talk to us',
 
             /* SEO & analytics */
+            'mail_from_name'   => '',
+            'mail_from_email'  => '',
             'meta_suffix'      => '',
             'og_image'         => '',
             'analytics_id'     => '',

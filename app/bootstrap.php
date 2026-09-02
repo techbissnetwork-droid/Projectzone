@@ -19,6 +19,8 @@ require_once __DIR__ . '/Flash.php';
 require_once __DIR__ . '/Upload.php';
 require_once __DIR__ . '/Content.php';
 require_once __DIR__ . '/Payments.php';
+require_once __DIR__ . '/Mail.php';
+require_once __DIR__ . '/LoginCode.php';
 
 $configFile = base_path('config/config.php');
 if (!is_file($configFile)) {

@@ -316,3 +316,18 @@ CREATE TABLE payment_attempts (
   KEY ix_attempt_order (order_id, created_at),
   KEY ix_attempt_ref (gateway_ref)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Single-use sign-in codes emailed to the account holder.
+CREATE TABLE login_codes (
+  id         INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  email      VARCHAR(190) NOT NULL,
+  code_hash  VARCHAR(255) NOT NULL,
+  audience   VARCHAR(16)  NOT NULL DEFAULT 'client',
+  expires_at DATETIME     NOT NULL,
+  attempts   INT          NOT NULL DEFAULT 0,
+  used_at    DATETIME     NULL,
+  ip         VARCHAR(45)  NULL,
+  created_at DATETIME     NOT NULL,
+  KEY ix_code_email (email, created_at),
+  KEY ix_code_expiry (expires_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

@@ -279,3 +279,26 @@ body.authpage .foot__wordmark{ display:none }
 .payblock div{ display:flex; justify-content:space-between; gap:16px; align-items:baseline; flex-wrap:wrap }
 .payblock span{ font-family:var(--ff-m); font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--tx-4) }
 .payblock b{ font-size:15px; font-weight:500; overflow-wrap:anywhere; text-align:right }
+
+/* ── sign in ─────────────────────────────────────────────── */
+.otp{
+  font-family:var(--ff-m); font-size:1.7rem !important; letter-spacing:.32em;
+  text-align:center; padding:16px 12px !important;
+}
+.otp::placeholder{ letter-spacing:.32em; color:var(--tx-4) }
+.auth__resend{ display:flex; gap:16px; justify-content:space-between; flex-wrap:wrap; margin-top:-4px }
+.auth__resend button{ background:none; border:0; padding:0; cursor:pointer; font:inherit; font-size:13px }
+.auth__resend .linkish{ font-size:13px }
+.auth__fallback{ border-top:1px solid var(--line); padding-top:14px; margin-top:2px }
+.auth__fallback summary{
+  cursor:pointer; font-size:13px; color:var(--tx-3); list-style:none;
+  display:flex; align-items:center; gap:8px;
+}
+.auth__fallback summary::-webkit-details-marker{ display:none }
+.auth__fallback summary::before{
+  content:""; width:6px; height:6px; border-right:1.5px solid currentColor;
+  border-bottom:1.5px solid currentColor; transform:rotate(-45deg); transition:transform .3s var(--e-out);
+}
+.auth__fallback[open] summary::before{ transform:rotate(45deg) }
+.auth__fallback summary:hover{ color:var(--tx-2) }
+.auth__fallback .wform{ margin-top:16px }

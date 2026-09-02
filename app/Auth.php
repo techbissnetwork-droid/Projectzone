@@ -6,24 +6,32 @@ final class Auth
     private const MAX_ATTEMPTS = 6;
     private const WINDOW_MIN   = 15;
 
+    private static bool $resolved = false;
+    private static ?array $current = null;
+
     public static function user(): ?array
     {
-        static $cached = false;
-        static $user = null;
-        if ($cached) {
-            return $user;
+        if (self::$resolved) {
+            return self::$current;
         }
-        $cached = true;
+        self::$resolved = true;
         $id = (int)($_SESSION['uid'] ?? 0);
         if ($id <= 0) {
-            return $user = null;
+            return self::$current = null;
         }
         $row = Database::one('SELECT * FROM users WHERE id = :id', ['id' => $id]);
         if (!$row || $row['status'] !== 'active') {
             self::logout();
-            return $user = null;
+            return self::$current = null;
         }
-        return $user = $row;
+        return self::$current = $row;
+    }
+
+    /** Drop the cached identity so the next read reflects a sign-in or sign-out. */
+    public static function forget(): void
+    {
+        self::$resolved = false;
+        self::$current = null;
     }
 
     public static function id(): int
@@ -98,12 +106,14 @@ final class Auth
     {
         session_regenerate_id(true);
         $_SESSION['uid'] = (int)$user['id'];
+        self::forget();
         Database::update('users', ['last_login_at' => now()], (int)$user['id']);
         log_activity('login', 'user', (int)$user['id']);
     }
 
     public static function logout(): void
     {
+        self::forget();
         $_SESSION = [];
         if (ini_get('session.use_cookies')) {
             $p = session_get_cookie_params();

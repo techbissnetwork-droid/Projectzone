@@ -78,14 +78,33 @@ are now partials in `partials/section_*.php`, shared between pages.
 | Settings | Brand, contact details, social links, currency, feature switches, SEO |
 | **System** | Run the database update, lock or unlock the installer, see the environment |
 
+### Signing in
+
+Two separate doors, both passwordless:
+
+| Who | Where | How |
+|---|---|---|
+| Clients | `/login.php` | Enter your email, get a six-digit code, enter it |
+| Staff | `/staff-login.php` | Same, plus a password fallback |
+
+Codes are stored hashed, work once, expire in ten minutes, die after five wrong
+attempts, and are limited to five per address per hour. Requesting one never
+reveals whether an account exists. A client code cannot open the staff door and
+an administrator cannot sign in on the client page.
+
+The staff page keeps a password fallback on purpose: if your server cannot send
+mail, that is the difference between a bad afternoon and being locked out of your
+own site. Set **Email sender address** in Settings to an address your host is
+allowed to send from, or the codes will land in spam.
+
 ### Client portal — `/client/`
 Created automatically: ticking **"Create a portal login from the owner email"**
-on a project generates the account and shows the password once.
+on a project generates the account.
 
-The client signs in with that email and gets their sites, colour-coded renewal
-meters, the maintenance history of what you actually did and when, one-click
-maintenance / upgrade / problem requests, a threaded conversation with you, and
-their marketplace purchases.
+The client signs in with that email — a code is emailed, no password — and gets
+their sites, colour-coded renewal meters, the maintenance history of what you
+actually did and when, one-click maintenance / upgrade / problem requests, a
+threaded conversation with you, and their marketplace purchases.
 
 ---
 
@@ -130,12 +149,27 @@ matches what you actually sell.
 
 ## Payments
 
-Marketplace orders are recorded and confirmed **manually**: the buyer places an
-order, sees your payment instructions (editable in Settings) and a reference, and
-you mark it paid once the money lands. Nothing is charged automatically.
+Set up methods under **Payments**. Two kinds:
 
-Adding a gateway means one new file that flips an order to `paid` on a verified
-callback — the order table already carries `payment_method` and `payment_ref`.
+**Manual** — bank transfer, a wallet QR, cash. The buyer sees your instructions,
+account details and a reference; you mark the order paid in Orders once the money
+lands. Works with no configuration beyond typing your account number.
+
+**Gateways** — eSewa, Khalti and Stripe. The buyer is redirected, pays, and comes
+back. Each needs its own keys, entered under Payments and stored in the database.
+
+No order is ever marked paid because a browser came back with a success URL. On
+return the result is re-checked against the provider's own API, and the amount
+and order reference on their record must match ours before anything changes.
+Every attempt is logged, so a failed or abandoned payment stays visible.
+
+Buyers land on `order.php`, reachable by a per-order token, which shows the
+payment steps and stays current — safe to bookmark or email.
+
+**Before taking real money:** run one full transaction in the gateway's sandbox
+(the "Sandbox / test mode" switch on the method), confirm the order flips to
+paid, then switch it off. The gateway code is written to each provider's current
+API but has not been run against a live merchant account.
 
 ---
 
@@ -144,7 +178,9 @@ callback — the order table already carries `payment_method` and `payment_ref`.
 - Every query is a prepared statement; every output goes through `e()`.
 - CSRF token on every POST, verified in one place (`Csrf::check()`).
 - Session ID regenerated on login; `httponly`, `samesite=Lax`, `secure` over HTTPS.
-- Login throttled to 6 failures per email per 15 minutes.
+- Sign-in is by emailed one-time code; codes are hashed, single-use, expire in
+  ten minutes and are rate limited per address. Password attempts (the staff
+  fallback) are throttled to 6 failures per email per 15 minutes.
 - Uploads: MIME whitelist, SVG scanned for script, random filenames, and
   `uploads/.htaccess` turns the PHP engine off in that folder.
 - Role checks on every admin and portal page; clients can only reach their own

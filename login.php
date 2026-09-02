@@ -3,53 +3,55 @@ declare(strict_types=1);
 require_once __DIR__ . '/app/bootstrap.php';
 require_once __DIR__ . '/app/guard.php';
 
+/** Client portal sign-in. Administrators use staff-login.php. */
 if (Auth::check()) {
     redirect(Auth::isAdmin() ? 'admin/' : 'client/');
 }
+LoginCode::prune();
 
-$error = '';
+$audience = 'client';
+$stage    = 'email';
+$email    = '';
+$error    = '';
+$notice   = '';
+
 if (post()) {
     Csrf::check();
-    [$ok, $msg] = Auth::attempt((string)($_POST['email'] ?? ''), (string)($_POST['password'] ?? ''));
-    if ($ok) {
-        $next = $_SESSION['after_login'] ?? null;
-        unset($_SESSION['after_login']);
-        if ($next && str_starts_with((string)$next, '/') && !str_starts_with((string)$next, '//')) {
-            header('Location: ' . $next);
-            exit;
+    $step  = (string)($_POST['step'] ?? 'request');
+    $email = trim(mb_strtolower((string)($_POST['email'] ?? '')));
+
+    if ($step === 'request') {
+        [$ok, $msg] = LoginCode::request($email, $audience);
+        if ($ok) { $stage = 'code'; $notice = $msg; } else { $error = $msg; }
+    } else {
+        [$ok, $msg] = LoginCode::verify($email, (string)($_POST['code'] ?? ''), $audience);
+        if ($ok) {
+            $next = $_SESSION['after_login'] ?? null;
+            unset($_SESSION['after_login']);
+            if ($next && str_starts_with((string)$next, '/') && !str_starts_with((string)$next, '//')) {
+                header('Location: ' . $next);
+                exit;
+            }
+            redirect('client/');
         }
-        redirect(Auth::isAdmin() ? 'admin/' : 'client/');
+        $stage = 'code';
+        $error = $msg;
     }
-    $error = $msg;
 }
 
-$PAGE_TITLE = 'Sign in';
-$META_DESC  = 'Client portal sign in.';
+$PAGE_TITLE = 'Client sign in';
+$META_DESC  = 'Sign in to track your sites, renewals and support requests.';
 $BODY_CLASS = 'authpage';
+$eyebrow = 'Client portal';
+$heading = $stage === 'code' ? 'Check your email' : 'Sign in';
+$lede    = $stage === 'code'
+    ? 'Enter the code we just sent. It expires in ' . LoginCode::TTL_MINUTES . ' minutes.'
+    : 'Track your sites, renewals and support requests.';
+$altLink = url('staff-login.php');
+$altText = 'Staff sign in';
+$extra   = '<p class="auth__foot muted">No account yet? One is created when we start a project for you. '
+         . '<a class="link" href="' . e(url('contact.php')) . '">Talk to us</a></p>';
+
 require __DIR__ . '/partials/public_header.php';
-?>
-<section class="auth" data-theme="deep">
-  <div class="auth__field" aria-hidden="true"><span class="auth__halo"></span></div>
-  <div class="auth__box">
-    <p class="eyebrow"><i class="dot dot--live"></i> Client portal</p>
-    <h1 class="auth__title">Sign in</h1>
-    <p class="auth__lede">Track your sites, renewals and support requests.</p>
-
-    <?php if ($error): ?><div class="notice notice--err"><p><?= e($error) ?></p></div><?php endif; ?>
-
-    <form method="post" class="wform">
-      <?= Csrf::field() ?>
-      <label><span>Email</span>
-        <input name="email" type="email" required autocomplete="username" autofocus value="<?= e(old('email')) ?>"></label>
-      <label><span>Password</span>
-        <input name="password" type="password" required autocomplete="current-password"></label>
-      <button class="btn btn--primary btn--lg btn--block magnetic" type="submit">Sign in <span class="btn__arrow">→</span></button>
-    </form>
-
-    <p class="auth__foot">No account yet? Accounts are created when we start a project for you.
-      <a class="link" href="<?= e(url('contact.php')) ?>">Talk to us <span aria-hidden="true">→</span></a></p>
-    <p class="auth__foot muted">Forgot your password? Email
-      <a class="link" href="mailto:<?= e(Settings::get('contact_email')) ?>"><?= e(Settings::get('contact_email')) ?></a> and we will reset it.</p>
-  </div>
-</section>
-<?php require __DIR__ . '/partials/public_footer.php'; ?>
+require __DIR__ . '/partials/login_form.php';
+require __DIR__ . '/partials/public_footer.php';
