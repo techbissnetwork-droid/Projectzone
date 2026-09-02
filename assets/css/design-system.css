@@ -656,6 +656,11 @@ h4 { font-size: var(--fs-h4); letter-spacing: -0.012em; }
 .icon-plate--sm .icon { width: 18px; height: 18px; }
 .icon-plate--lg { width: 58px; height: 58px; border-radius: 16px; }
 .icon-plate--lg .icon { width: 27px; height: 27px; }
+.icon-plate--number {
+  width: 42px; height: 42px; border-radius: 12px;
+  background: var(--surface); border-color: var(--border-strong);
+  font-family: var(--font-display); font-weight: 700; font-size: 0.9rem; color: var(--accent);
+}
 .card--interactive:hover .icon-plate { transform: scale(1.06) rotate(-2deg); }
 
 /* Accent variants tint the plate only — the card itself stays neutral */

@@ -108,7 +108,7 @@ $hero = $sections['hero'] ?? [];
 
         <div class="bento" data-reveal-stagger>
             <?php foreach ($services as $i => $service): ?>
-                <?= $view->partial('partials/service-card', ['service' => $service, 'i' => $i]) ?>
+                <?= $view->partial('partials/service-card', ['service' => $service, 'i' => $i, 'numbered' => true]) ?>
             <?php endforeach; ?>
         </div>
     </div>
@@ -123,12 +123,14 @@ $hero = $sections['hero'] ?? [];
             <p class="eyebrow">How it works</p>
             <h2 class="mt-4">Four steps, same order every time.</h2>
         </div>
-        <div class="process-row" data-reveal-stagger>
+        <div class="rail" style="max-width:760px;margin-inline:auto">
             <?php foreach (array_slice($steps, 0, 4) as $step): ?>
-            <div class="process-row__step">
-                <span class="process-row__no"><?= e($step['step_number'] ?: '01') ?></span>
-                <h3><?= e($step['title']) ?></h3>
-                <p><?= e($step['description']) ?></p>
+            <div class="rstep">
+                <span class="rstep__no"><?= e($step['step_number'] ?: '01') ?></span>
+                <div>
+                    <h3><?= e($step['title']) ?></h3>
+                    <p><?= e($step['description']) ?></p>
+                </div>
             </div>
             <?php endforeach; ?>
         </div>

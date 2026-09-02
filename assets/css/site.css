@@ -126,16 +126,16 @@
 .rail-step.is-active .rail-step__dot { border-color: var(--lime); background: var(--lime); }
 
 /* ---------------------------------------------------------------------
-   1f-2. Process row — a compact horizontal variant of the same four
-   steps, for the homepage flagship section where a full-height vertical
-   timeline runs long. Same content, read left to right instead.
+   1f-2. Rail — the homepage flagship's process list: a plain vertical
+   stack, each step full-width with a top hairline, matching the Current
+   reference exactly (as opposed to process-rail's vertical line + dot).
    --------------------------------------------------------------------- */
-.process-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2rem; }
-.process-row__step { padding-top: 1.1rem; border-top: 1px solid var(--border); }
-.process-row__no { font-family: var(--font-display); font-weight: 700; font-size: 1.35rem; color: var(--text-faint); display: block; margin-bottom: 0.9rem; }
-.process-row__step h3 { font-size: 1rem; margin: 0 0 0.4rem; }
-.process-row__step p { margin: 0; color: var(--text-muted); font-size: 0.85rem; line-height: 1.6; }
-@media (max-width: 680px) { .process-row { grid-template-columns: 1fr 1fr; } }
+.rail { display: flex; flex-direction: column; }
+.rstep { display: grid; grid-template-columns: 3.5rem 1fr; gap: 1.5rem; padding: 1.7rem 0; border-top: 1px solid var(--border); }
+.rstep:first-child { border-top: none; }
+.rstep__no { font-family: var(--font-display); font-weight: 700; font-size: 1.3rem; color: var(--text-faint); }
+.rstep h3 { font-size: 1.05rem; margin: 0 0 0.4rem; }
+.rstep p { margin: 0; color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; }
 
 /* ---------------------------------------------------------------------
    1g. Industries strip — a horizontally-scrolling row of colour-blocked
