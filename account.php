@@ -14,6 +14,7 @@ $siteName = sma_setting('site_name', $config['app_name']);
 $regEnabled = sma_setting('registration_enabled', '1') === '1';
 $error = null;
 $notice = null;
+$deleteError = null;
 
 // Where to send a signed-out visitor once they are in - e.g. portfolio.php
 // sends them here with ?next=portfolio.php rather than to their dashboard.
@@ -295,6 +296,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header('Location: account.php');
             exit;
         }
+    } elseif (($_POST['act'] ?? '') === 'delete_account') {
+        // Self-service erase. The admin side of this (admin/members.php,
+        // act=delete) already exists and already does the whole job -
+        // Membership::erase() removes the row plus every one of the ten
+        // tables a member owns, keeping payments for the books - it was
+        // simply never reachable except by an operator deleting someone on a
+        // member's behalf. This is the same call, same defaults, with the
+        // one extra step an operator's own login already stood in for: the
+        // password re-entered here, not just the session cookie, is what
+        // says the person asking is the account's owner and not a CSRF token
+        // that slipped through, or a moment's misclick on a page with
+        // nothing else this destructive on it.
+        $cm = MemberAuth::current();
+        if ($cm) {
+            // Its own variable, not $error: this action is only ever taken
+            // from the logged-in dashboard, which (unlike the logged-out
+            // login/register view further down) has nowhere that renders
+            // $error at all - so a rejection here is shown right at the
+            // Danger zone form instead.
+            if (!password_verify((string)($_POST['password'] ?? ''), (string)($cm['password_hash'] ?? ''))) {
+                $deleteError = 'That password is not right - your account has not been touched.';
+            } else {
+                $counts = \SignalMasterAi\Membership::erase((int)$cm['id'], true);
+                // Explicit actor: Audit::log()'s own default falls back to
+                // ACTOR_ENGINE with nobody logged into /admin on this
+                // request, which would make a member's own action look like
+                // the background engine did it.
+                \SignalMasterAi\Audit::log('member.self_delete', 'member #' . $cm['id'], 'existed',
+                    'self-deleted with ' . \SignalMasterAi\Membership::describeErase($counts),
+                    'member:' . $cm['email']);
+                MemberAuth::logout();
+                $_SESSION['account_deleted'] = 1;
+                header('Location: account.php');
+                exit;
+            }
+        }
     } elseif (($_POST['act'] ?? '') === 'login') {
         // Brute-force damping, same policy as the admin login - and counted
         // server-side for the same reason: a failure count kept in $_SESSION
@@ -333,6 +370,16 @@ if (($_SESSION['webhook_error'] ?? '') !== '') {
     $webhookBadValue = (string)($_SESSION['webhook_bad_value'] ?? '');
     unset($_SESSION['webhook_error'], $_SESSION['webhook_bad_value']);
 }
+
+// Delete-account redirects here already logged out, so $member is null and
+// this always lands on the login/register view below - the one place left
+// to say the account is actually gone. Guarded on $notice === null like the
+// verify_notice check further down: this request could already have set one
+// (e.g. resend_otp's "code sent" message) and must not overwrite it.
+if (($_SESSION['account_deleted'] ?? 0) === 1 && $notice === null) {
+    $notice = 'Your account has been deleted.';
+}
+unset($_SESSION['account_deleted']);
 
 // A logged-in member who still owes a code sees the code form, not their
 // account. The gate in MemberAuth::start() sends them here from everywhere
@@ -1134,6 +1181,23 @@ ob_start();
       <?php endif; ?>
       </div>
       <?php endif; ?>
+
+      <details style="margin-top:20px">
+        <summary style="color:var(--down)"><strong>Delete account</strong></summary>
+        <p class="sub" style="font-size:11.5px;margin-top:6px">Removes your account, watchlists, alert
+          preferences, paper trades and API access immediately. Payment records are kept for accounting,
+          the same as when an operator removes an account. <strong>This cannot be undone.</strong></p>
+        <?php if ($deleteError): ?><div class="err"><?= sma_e($deleteError) ?></div><?php endif; ?>
+        <form method="post" action="account.php" id="deleteAccountForm" style="margin-top:8px">
+          <input type="hidden" name="csrf" value="<?= $csrf ?>">
+          <input type="hidden" name="act" value="delete_account">
+          <label>Confirm your password
+            <input type="password" name="password" autocomplete="current-password" required>
+          </label>
+          <button class="btn danger" type="submit" style="margin-top:10px">Delete my account</button>
+        </form>
+      </details>
+
       <a class="back" href="account.php?logout=1">Log out</a>
 
     <?php else: ?>
@@ -1229,6 +1293,21 @@ ob_start();
     <?php endif; ?>
   </div>
 </div>
+<?php // Zeroes the account outright with no undo, same as portfolio.php's
+      // reset_wallet guard - a confirm() dialog, wired through
+      // addEventListener rather than an onclick attribute since the public
+      // CSP has no 'unsafe-inline' for script. ?>
+<script<?= sma_nonce() ?>>
+(function () {
+  var form = document.getElementById('deleteAccountForm');
+  if (!form) { return; }
+  form.addEventListener('submit', function (e) {
+    if (!confirm('Delete your account? Everything is removed immediately and this cannot be undone.')) {
+      e.preventDefault();
+    }
+  });
+})();
+</script>
 <script src="assets/ui.js?v=<?= @filemtime(__DIR__ . '/assets/ui.js') ?: 1 ?>" defer></script>
 </body>
 </html>
