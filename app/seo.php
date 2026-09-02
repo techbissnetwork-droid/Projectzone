@@ -25,6 +25,9 @@ function seo_description(string $description): string
 function seo_social_image(): string
 {
     $img = setting('brand.social_image', '');
+    if ($img === '' && is_file(APP_ROOT . '/assets/brand/social.png')) {
+        $img = 'assets/brand/social.png';      /* the one that ships with the site */
+    }
     return $img !== '' ? url($img) : '';
 }
 
@@ -80,7 +83,13 @@ function seo_tags(string $title, string $description): void
 <meta name="google-site-verification" content="<?= esc($code) ?>">
 <?php endif; ?>
 <link rel="icon" href="<?= esc($icon) ?>" type="<?= esc($iconType) ?>">
+<?php if (setting('brand.favicon', '') === ''): ?>
+<link rel="icon" href="<?= esc(url('assets/brand/icon-32.png')) ?>" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="<?= esc(url('assets/brand/icon-180.png')) ?>">
+<?php else: ?>
 <link rel="apple-touch-icon" href="<?= esc($icon) ?>">
+<?php endif; ?>
+<link rel="manifest" href="<?= esc(url('manifest.php')) ?>">
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="<?= esc($name) ?>">
@@ -161,6 +170,15 @@ function brand_mark(bool $inFooter = false): void
 {
     $logo = setting('brand.logo', '');
     $name = setting('site.name', 'TECHBISS');
+
+    /* Nothing uploaded and the company still called TECHBISS? Use the logo that
+       ships with the site. Rename the company and it drops back to text, which
+       is what you want — our logo should not sit above somebody else's name. */
+    if ($logo === '' && strcasecmp(trim($name), 'TECHBISS') === 0
+        && is_file(APP_ROOT . '/assets/brand/logo.svg')) {
+        $logo = 'assets/brand/logo.svg';
+    }
+
     if ($logo !== '') {
         $h = max(16, min(80, (int) setting('brand.logo_height', '30')));
         ?><img src="<?= esc(url($logo)) ?>" alt="<?= esc($name) ?>"

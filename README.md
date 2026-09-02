@@ -154,6 +154,19 @@ Optionally the client gets a copy too, so a renewal charge never surprises them.
 3. If it expires before they fetch it, send a fresh one — the old link dies the
    moment you do.
 
+## Brand files
+
+`assets/brand/` holds the logo, the mark, the sharing image and the app icons.
+The wordmark is Syne ExtraBold converted to outlines, so the SVGs render the
+same everywhere without the font. There is a `README.txt` in there listing the
+colours and how to use them.
+
+The site uses these out of the box: the favicon, the header and footer logo, and
+the image shown when your link is shared. Upload your own under **Branding &
+SEO** and yours replaces them. The bundled logo is used only while the company
+is still called TECHBISS — rename it and the header falls back to plain text,
+so our logo never sits above somebody else's name.
+
 ## Security
 
 - Passwords hashed with `password_hash()`; they cannot be read back, only reset

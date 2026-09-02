@@ -27,6 +27,10 @@ if ($path === '/sitemap.xml') {
     require __DIR__ . '/sitemap.php';
     return true;
 }
+if ($path === '/site.webmanifest') {
+    require __DIR__ . '/manifest.php';
+    return true;
+}
 if ($path === '/' || $path === '') {
     require __DIR__ . '/index.php';
     return true;

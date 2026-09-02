@@ -8,6 +8,7 @@ DirectoryIndex index.php index.html
 
   # robots.txt advertises /sitemap.xml; the generator is sitemap.php.
   RewriteRule ^sitemap\.xml$ sitemap.php [L]
+  RewriteRule ^site\.webmanifest$ manifest.php [L]
 
   # Send /services to services.php, and so on.
   RewriteCond %{REQUEST_FILENAME} !-f
