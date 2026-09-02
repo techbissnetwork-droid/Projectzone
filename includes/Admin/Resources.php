@@ -185,7 +185,7 @@ final class Resources
                 ],
                 'fields' => [
                     ['key' => 'name', 'label' => 'Project name', 'type' => 'text', 'required' => true, 'max' => 190],
-                    ['key' => 'customer_id', 'label' => 'Client', 'type' => 'lookup', 'lookup' => ['table' => 'customers', 'label' => 'name'], 'hint' => 'Add the client under Customers first, so their email and phone are on file.'],
+                    ['key' => 'customer_id', 'label' => 'Client', 'type' => 'customer_picker', 'lookup' => ['table' => 'customers', 'label' => 'name'], 'hint' => 'Pick an existing client, or leave this as "New client" and fill in their details below — their portal account is created automatically when you save.'],
                     ['key' => 'summary', 'label' => 'What you built', 'type' => 'textarea', 'max' => 2000],
                     ['key' => 'live_url', 'label' => 'Live address', 'type' => 'text', 'max' => 255],
                     ['key' => 'hosting', 'label' => 'Hosting and domain', 'type' => 'text', 'max' => 190, 'hint' => 'Where it runs and with which registrar, so you are not hunting for it in a year.'],

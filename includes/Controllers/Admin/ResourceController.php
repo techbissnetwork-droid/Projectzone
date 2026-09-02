@@ -11,6 +11,7 @@ use Techbiss\Core\Paginator;
 use Techbiss\Core\Request;
 use Techbiss\Core\Str;
 use Techbiss\Core\Validator;
+use Techbiss\Repo\CustomerRepo;
 use Techbiss\Repo\IndustryRepo;
 use Techbiss\Repo\ServiceRepo;
 
@@ -362,6 +363,31 @@ final class ResourceController extends BaseAdminController
                     $data[$key] = $lookupId > 0 ? $lookupId : null;
                     break;
 
+                case 'customer_picker':
+                    $customerId = $request->int($key);
+                    if ($customerId <= 0) {
+                        $newName  = trim($request->str('client_name'));
+                        $newEmail = trim($request->str('client_email'));
+                        $newPhone = trim($request->str('client_phone'));
+                        if ($newName !== '' || $newEmail !== '') {
+                            if ($newName === '') {
+                                $v->addError('client_name', 'Client name is required to create a new client.');
+                            } elseif ($newEmail === '' || !filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
+                                $v->addError('client_email', 'Enter a valid email address to create the client.');
+                            } elseif (mb_strlen($newName) > 190 || mb_strlen($newEmail) > 190) {
+                                $v->addError('client_name', 'Client name or email is too long.');
+                            } else {
+                                $customerId = (new CustomerRepo())->upsert([
+                                    'name'  => $newName,
+                                    'email' => mb_strtolower($newEmail),
+                                    'phone' => mb_substr($newPhone, 0, 40),
+                                ]);
+                            }
+                        }
+                    }
+                    $data[$key] = $customerId > 0 ? $customerId : null;
+                    break;
+
                 case 'services':
                     $side['services'] = array_map('intval', $request->arr($key));
                     break;
@@ -410,7 +436,7 @@ final class ResourceController extends BaseAdminController
     {
         $extras = [];
         foreach ($this->resource['fields'] as $field) {
-            if ($field['type'] === 'lookup') {
+            if ($field['type'] === 'lookup' || $field['type'] === 'customer_picker') {
                 $lookup = $field['lookup'];
                 $t = preg_match('/^[a-z_]+$/', $lookup['table']) ? $lookup['table'] : '';
                 $l = preg_match('/^[a-z_]+$/', $lookup['label']) ? $lookup['label'] : '';

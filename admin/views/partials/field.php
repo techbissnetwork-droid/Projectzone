@@ -131,6 +131,39 @@ $accents = ['cyan' => '#34d3e0', 'violet' => '#a78bfa', 'emerald' => '#34d399', 
             </select>
         <?php break;
 
+        case 'customer_picker':
+            $custOptions = $extras['lookup_' . $key] ?? [];
+            $cNameErr    = error_for('client_name');
+            $cEmailErr   = error_for('client_email'); ?>
+            <select class="select" id="<?= e($id) ?>" name="<?= e($key) ?>"<?= $aria ?>>
+                <option value="">— New client —</option>
+                <?php foreach ($custOptions as $opt): ?>
+                <option value="<?= (int) $opt['id'] ?>" <?= (int) $value === (int) $opt['id'] ? 'selected' : '' ?>>
+                    <?= e($opt['label']) ?>
+                </option>
+                <?php endforeach; ?>
+            </select>
+            <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.6rem;margin-top:.6rem">
+                <div class="field">
+                    <label class="label" for="f-client_name">New client name</label>
+                    <input class="input<?= $cNameErr ? ' is-invalid' : '' ?>" id="f-client_name" type="text"
+                           name="client_name" value="<?= e(old('client_name')) ?>" maxlength="190">
+                    <?php if ($cNameErr): ?><span class="field-error" role="alert"><?= icon('alert') ?><?= e($cNameErr) ?></span><?php endif; ?>
+                </div>
+                <div class="field">
+                    <label class="label" for="f-client_email">New client email</label>
+                    <input class="input<?= $cEmailErr ? ' is-invalid' : '' ?>" id="f-client_email" type="email"
+                           name="client_email" value="<?= e(old('client_email')) ?>" maxlength="190">
+                    <?php if ($cEmailErr): ?><span class="field-error" role="alert"><?= icon('alert') ?><?= e($cEmailErr) ?></span><?php endif; ?>
+                </div>
+                <div class="field">
+                    <label class="label" for="f-client_phone">New client phone</label>
+                    <input class="input" id="f-client_phone" type="text" name="client_phone"
+                           value="<?= e(old('client_phone')) ?>" maxlength="40">
+                </div>
+            </div>
+        <?php break;
+
         case 'media': ?>
             <div class="media-field" data-media-field<?= $ariaReq ?><?= $aria ?>>
                 <div class="media-field__preview">
