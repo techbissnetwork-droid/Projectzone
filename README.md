@@ -34,10 +34,20 @@ new sections switch off, and the admin panel shows a banner pointing at System.
 
 ### The installer lock
 
-Installing writes `install/.installed`, and the installer then refuses to run —
-it has no password prompt of its own. To reinstall from scratch you must sign in
-as an administrator and unlock it from **System**, confirming with your own
-password. You can re-lock it there too. Deleting the folder is still the safest end state.
+Whether a site is installed is decided by the database, not by a marker file:
+if `config/config.php` points at a database that already has your tables, the
+installer will not run again. Installing also writes `install/.installed`, but
+that file is a convenience — on a host where `install/` is not writable it
+cannot be created, and the installer says so rather than silently starting over.
+
+The installer has no password prompt of its own. To reinstall from scratch you
+must sign in as an administrator and unlock it from **System**, confirming with
+your own password. You can re-lock it there too. Deleting the folder is still
+the safest end state.
+
+If you open `install/` on a site whose database is behind the code, it offers
+the update directly — missing tables, missing columns and missing settings are
+all detected — so a code upload is never a dead end.
 
 Requirements: PHP 8.1+ with `pdo_mysql`, `mbstring`, `fileinfo` and `openssl`;
 MySQL 5.7+ or MariaDB 10.3+; `config/` and `uploads/` writable.

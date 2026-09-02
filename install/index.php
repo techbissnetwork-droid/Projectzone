@@ -1,16 +1,32 @@
 <?php
 declare(strict_types=1);
 define('TB_INSTALLING', true);
+
+/**
+ * The installer keeps its own session, started before the application boots.
+ * Without config.php the bootstrap returns early and never starts one; the
+ * moment an install writes that file the bootstrap starts a differently named
+ * session instead, and the wizard would lose its own state at the last step.
+ * Starting first means the bootstrap finds a session already active and leaves
+ * it alone.
+ */
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_set_cookie_params([
+        'lifetime' => 0,
+        'path'     => '/',
+        'secure'   => (($_SERVER['HTTPS'] ?? '') !== '' && $_SERVER['HTTPS'] !== 'off')
+                    || ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https',
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
+    session_name('techbiss_install');
+    session_start();
+}
+
 require_once __DIR__ . '/../app/bootstrap.php';
 
 $configFile = base_path('config/config.php');
 $lockFile   = __DIR__ . '/.installed';
-$installed  = is_file($lockFile) && is_file($configFile);
-
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    session_name('techbiss_install');
-    session_start();
-}
 
 /* Credentials of an install that already exists, so an update never depends on
    re-typing them or on the session surviving between steps. */
@@ -22,6 +38,45 @@ if (is_file($configFile)) {
     }
 }
 
+/** Open the database named in an existing config.php. */
+function tb_open(?array $db): ?PDO
+{
+    if (!$db) {
+        return null;
+    }
+    try {
+        $pdo = new PDO(Database::dsn($db), $db['username'] ?? null, $db['password'] ?? null,
+            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+        $pdo->exec('SET NAMES utf8mb4');
+        return $pdo;
+    } catch (Throwable) {
+        return null;
+    }
+}
+
+/**
+ * Whether this site is installed is decided by the database, not by a marker
+ * file. install/ is often not writable on shared hosting, and a lock file that
+ * could not be written used to send the installer back to step one on every
+ * visit — for ever, and with the update screen unreachable behind it.
+ */
+$installedPdo = tb_open($configDb);
+$dbInstalled  = false;
+if ($installedPdo) {
+    try {
+        $dbInstalled = (bool)$installedPdo->query("SHOW TABLES LIKE 'users'")->fetchColumn();
+    } catch (Throwable) {
+        $dbInstalled = false;
+    }
+}
+$installed = $dbInstalled || (is_file($lockFile) && is_file($configFile));
+
+/** Write the lock, reporting failure instead of hiding it. */
+function tb_lock(string $lockFile): bool
+{
+    return @file_put_contents($lockFile, date('Y-m-d H:i:s')) !== false;
+}
+
 /**
  * Locked. Reinstalling still needs an administrator to unlock from the panel,
  * but an update must never be locked out: the lock file survives a code upload,
@@ -30,20 +85,38 @@ if (is_file($configFile)) {
  * offered here. It is additive and idempotent; it drops nothing.
  */
 $pendingUpdate = [];
-if ($installed && $configDb !== null) {
+if ($installed && $installedPdo) {
     try {
-        $pdo = new PDO(Database::dsn($configDb), $configDb['username'] ?? null, $configDb['password'] ?? null,
-            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
         require_once __DIR__ . '/migrations.php';
-        $have = tb_tables($pdo, $configDb['driver'] ?? 'mysql');
+        $driver  = $configDb['driver'] ?? 'mysql';
+        $have    = tb_tables($installedPdo, $driver);
         $sqlText = (string)@file_get_contents(__DIR__ . '/schema.sql');
-        preg_match_all('/CREATE TABLE\s+(\w+)/i', $sqlText, $mm);
-        foreach ($mm[1] as $t) {
-            if (!in_array(strtolower($t), $have, true)) {
-                $pendingUpdate[] = 'Missing table: ' . $t;
+
+        /* Every table the schema declares, and the columns inside it. A release
+           that only adds a column used to look like nothing was pending. */
+        preg_match_all('/CREATE TABLE\s+(\w+)\s*\((.*?)\n\)/is', $sqlText, $mm, PREG_SET_ORDER);
+        $missingCols = 0;
+        foreach ($mm as $t) {
+            $table = strtolower($t[1]);
+            if (!in_array($table, $have, true)) {
+                $pendingUpdate[] = 'Missing table: ' . $t[1];
+                continue;
+            }
+            $existing = array_map('strtolower', tb_columns($installedPdo, $t[1], $driver));
+            foreach (explode("\n", $t[2]) as $line) {
+                if (!preg_match('/^\s*`?([a-z_][a-z0-9_]*)`?\s+(?:tinyint|smallint|mediumint|bigint|int|decimal|float|double|varchar|char|text|mediumtext|longtext|date|datetime|timestamp|time|enum|json|blob)/i', $line, $c)) {
+                    continue;
+                }
+                if (!in_array(strtolower($c[1]), $existing, true)) {
+                    $missingCols++;
+                }
             }
         }
-        $keys = array_flip($pdo->query('SELECT skey FROM settings')->fetchAll(PDO::FETCH_COLUMN));
+        if ($missingCols) {
+            $pendingUpdate[] = $missingCols . ' column' . ($missingCols === 1 ? '' : 's') . ' not yet added';
+        }
+
+        $keys = array_flip($installedPdo->query('SELECT skey FROM settings')->fetchAll(PDO::FETCH_COLUMN));
         $miss = 0;
         foreach (array_keys(Settings::defaults()) as $k) {
             if (!isset($keys[$k])) { $miss++; }
@@ -59,13 +132,12 @@ if ($installed && $configDb !== null) {
 if ($installed && $pendingUpdate && empty($_SESSION['install_done'])) {
     $ranLog = null;
     $ranErr = null;
+    $lockWarn = false;
     if (post() && ($_POST['do'] ?? '') === 'update') {
         try {
-            $pdo = new PDO(Database::dsn($configDb), $configDb['username'] ?? null, $configDb['password'] ?? null,
-                [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
-            $pdo->exec('SET NAMES utf8mb4');
             require_once __DIR__ . '/migrations.php';
-            $ranLog = tb_migrate($pdo, $configDb['driver'] ?? 'mysql');
+            $ranLog = tb_migrate($installedPdo, $configDb['driver'] ?? 'mysql');
+            $lockWarn = !tb_lock($lockFile);
         } catch (Throwable $ex) {
             $ranErr = $ex->getMessage();
         }
@@ -85,6 +157,11 @@ if ($installed && $pendingUpdate && empty($_SESSION['install_done'])) {
         <?php elseif ($ranLog !== null): ?>
           <h2>Done</h2>
           <ul class="loglist"><?php foreach ($ranLog as $line): ?><li><?= e($line) ?></li><?php endforeach; ?></ul>
+          <?php if ($lockWarn): ?>
+            <div class="alert warn"><p><b>The database is updated, but <code>install/.installed</code> could not be
+              written</b> — the folder is not writable. Nothing is broken; the safe fix is to delete the
+              <code>install/</code> folder now that the update has run.</p></div>
+          <?php endif; ?>
           <div class="actions">
             <a class="btn" href="../admin/">Open the admin panel <span>→</span></a>
             <a class="btn ghost" href="../">View the site</a>
@@ -329,10 +406,11 @@ if ($step === 4 && post()) {
             install_seed($pdo, $ts);
 
             tb_write_config($configFile, $data['db'], $appUrl ?: $detectedUrl, $tz, $site, $email);
-            @file_put_contents($lockFile, $ts);
+            $lockedOk = tb_lock($lockFile);
 
             unset($_SESSION['install']);
-            $_SESSION['install_done'] = ['email' => $email, 'site' => $site, 'mode' => 'fresh', 'log' => []];
+            $_SESSION['install_done'] = ['email' => $email, 'site' => $site, 'mode' => 'fresh',
+                                         'log' => [], 'lock' => $lockedOk];
             header('Location: ?step=5');
             exit;
         } catch (Throwable $ex) {
@@ -362,10 +440,11 @@ if ($step === 5 && $migrateReady && empty($_SESSION['install_done'])) {
             $siteName  = (string)($pdo->query("SELECT svalue FROM settings WHERE skey='site_name'")->fetchColumn() ?: 'TECHBISS');
             $adminMail = (string)($pdo->query("SELECT email FROM users WHERE role='admin' ORDER BY id LIMIT 1")->fetchColumn() ?: '');
             tb_write_config($configFile, $data['db'], $appUrl ?: $detectedUrl, $tz, $siteName, $adminMail);
-            @file_put_contents($lockFile, date('Y-m-d H:i:s'));
+            $lockedOk = tb_lock($lockFile);
 
             unset($_SESSION['install']);
-            $_SESSION['install_done'] = ['email' => $adminMail, 'site' => $siteName, 'mode' => 'migrate', 'log' => $log];
+            $_SESSION['install_done'] = ['email' => $adminMail, 'site' => $siteName, 'mode' => 'migrate',
+                                         'log' => $log, 'lock' => $lockedOk];
             header('Location: ?step=5');
             exit;
         } catch (Throwable $ex) {
@@ -533,9 +612,15 @@ if (!empty($data['db']) && empty($data['existing']) && $step >= 3) {
       <ul class="loglist"><?php foreach ($done['log'] as $line): ?><li><?= e($line) ?></li><?php endforeach; ?></ul>
     <?php endif; ?>
     <div class="alert warn">
-      <p><b>Now lock this down.</b> Delete the <code>install/</code> folder from your server.
-         Until you do, it is protected by a lock file — reopening the installer requires signing in
-         as an administrator and unlocking it from <b>System</b>.</p>
+      <p><b>Now lock this down.</b> Delete the <code>install/</code> folder from your server.</p>
+      <?php if (($done['lock'] ?? true) === false): ?>
+        <p><code>install/.installed</code> could not be written, because the folder is not writable.
+           The site is installed and works; the installer will not run again either way, because it
+           checks the database. Deleting the folder is now the important step.</p>
+      <?php else: ?>
+        <p>Until you do, it is protected by a lock file — reopening the installer requires signing in
+           as an administrator and unlocking it from <b>System</b>.</p>
+      <?php endif; ?>
     </div>
     <div class="actions">
       <a class="btn" href="../admin/">Open the admin panel <span>→</span></a>

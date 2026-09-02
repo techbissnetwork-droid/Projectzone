@@ -147,7 +147,16 @@ section{ position:relative; z-index:2; }
 .flowsec{ padding:var(--sec-y) 0; }
 
 /* Two stages to a slide, each a card the eye can finish. */
-.carousel.proc__carousel{ --per:2; --sgap:14px; margin-top:clamp(26px,3vw,40px); }
+.carousel.proc__carousel{ --rows:4; --cols:1; --rgap:12px; margin-top:clamp(26px,3vw,40px); }
+.proc__carousel .flow__step{
+  grid-template-columns:auto minmax(0,1fr) 260px;
+  column-gap:clamp(18px,2.4vw,34px); align-items:start;
+}
+.proc__carousel .flow__mark{ grid-row:1 / span 3; }
+.proc__carousel .flow__tag{ grid-column:2; margin-top:0; }
+.proc__carousel .flow__name{ grid-column:2; }
+.proc__carousel .flow__text{ grid-column:2; }
+.proc__carousel .flow__ticks{ grid-column:3; grid-row:1 / span 3; align-self:center; }
 .proc__carousel .flow__step{
   position:relative; display:grid; align-content:start; gap:7px;
   padding:clamp(18px,1.6vw,24px); border-radius:var(--r-l);
@@ -171,7 +180,10 @@ section{ position:relative; z-index:2; }
 .flow__ticks li{ font-size:11.5px; line-height:1.5; }
 
 @media (max-width:640px){
-  .proc__carousel{ --sgap:10px; }
+  .proc__carousel .flow__step{ grid-template-columns:minmax(0,1fr); }
+  .proc__carousel .flow__mark{ grid-row:auto; }
+  .proc__carousel .flow__tag,.proc__carousel .flow__name,
+  .proc__carousel .flow__text,.proc__carousel .flow__ticks{ grid-column:auto; grid-row:auto; }
   .proc__carousel .flow__step{ padding:15px; }
   .flow__mark{ width:32px; height:32px; }
   .flow__text{ font-size:12.5px; }
@@ -275,18 +287,22 @@ section{ position:relative; z-index:2; }
 .svcs__foot{ margin-top:26px; color:var(--tx-3); font-size:14px; display:flex; flex-wrap:wrap; gap:10px 18px; align-items:center; }
 
 /* ── slider, shared by the services and the process stages ── */
-.carousel{ position:relative; --per:4; --sgap:12px; }
+/* A slide is a grid column. --rows items stack down it, --cols columns fit
+   across the rail, so "four to a slide, one under the other" is rows:4 cols:1
+   and "three side by side" is rows:1 cols:3. */
+.carousel{ position:relative; --rows:1; --cols:4; --sgap:12px; --rgap:12px; }
 .carousel__rail{
-  display:flex; gap:var(--sgap); align-items:stretch; list-style:none;
+  display:grid; list-style:none;
+  grid-auto-flow:column;
+  grid-auto-columns:calc((100% - (var(--cols) - 1) * var(--sgap)) / var(--cols));
+  grid-template-rows:repeat(var(--rows), auto);
+  gap:var(--rgap) var(--sgap);
   overflow-x:auto; overscroll-behavior-x:contain; scroll-snap-type:x mandatory;
   scrollbar-width:none; -ms-overflow-style:none;
   padding:2px; margin:-2px;
 }
 .carousel__rail::-webkit-scrollbar{ display:none; }
-.carousel__rail > *{
-  flex:0 0 calc((100% - (var(--per) - 1) * var(--sgap)) / var(--per));
-  min-width:0; scroll-snap-align:start;
-}
+.carousel__rail > *{ min-width:0; scroll-snap-align:start; }
 .carousel__nav{ display:flex; align-items:center; gap:10px; margin-top:18px; }
 .carousel.is-static .carousel__nav{ display:none; }
 .carousel__dots{ display:flex; align-items:center; gap:7px; margin-right:auto; }
@@ -306,18 +322,23 @@ section{ position:relative; z-index:2; }
 
 /* The marketplace strip: one row that pages, rather than a grid that grows a
    second row with an empty cell beside the last product. */
-.carousel.mkt__carousel{ --per:3; --sgap:clamp(14px,2vw,24px); }
+.carousel.mkt__carousel{ --rows:1; --cols:3; --sgap:clamp(14px,2vw,24px); }
 .mkt__carousel .pcard{ height:auto; }
-@media (max-width:900px){ .carousel.mkt__carousel{ --per:2; } }
+@media (max-width:900px){ .carousel.mkt__carousel{ --cols:2; } }
 
-/* Four to a slide for as long as they stay readable, then two. Never one. */
-@media (max-width:700px){
+/* Four modules side by side, stepping down before they get too narrow to read. */
+.carousel.svcs__carousel{ --rows:1; --cols:4; }
+@media (max-width:1200px){
+  .svcs__grid{ grid-template-columns:repeat(3,minmax(0,1fr)); }
+  .carousel.svcs__carousel{ --cols:3; }
+}
+@media (max-width:880px){
   .svcs__grid{ grid-template-columns:repeat(2,minmax(0,1fr)); }
-  .carousel{ --per:2; }
+  .carousel.svcs__carousel{ --cols:2; }
 }
 @media (max-width:720px){
   .svcs__grid{ gap:8px; }
-  .carousel{ --sgap:8px; }
+  .carousel{ --sgap:8px; --rgap:8px; }
   .svc__head{ padding:13px; }
   .svc__index{ font-size:9px; }
   .svc__glyph{ width:24px; height:20px; margin:9px 0 8px; }

@@ -217,17 +217,23 @@
     var noun = wrap.getAttribute('data-carousel') || 'Slide';
     var pages = 1, page = 0;
 
-    function perView() {
-      var w = items[0].getBoundingClientRect().width;
-      if (w < 1) return 1;
-      return Math.max(1, Math.round(rail.clientWidth / w));
-    }
-    function step() {
-      return items.length < 2 ? rail.clientWidth : items[1].offsetLeft - items[0].offsetLeft;
+    /* A slide is a grid column. Read the shape back from the laid-out items so
+       the same code serves "four stacked" and "three side by side": the items
+       sharing the first item's x are one column, and the next distinct x is a
+       column away. */
+    function shape() {
+      var x0 = items[0].offsetLeft, rows = 0;
+      for (var i = 0; i < items.length; i++) {
+        if (Math.abs(items[i].offsetLeft - x0) < 2) { rows++; } else { break; }
+      }
+      rows = Math.max(1, rows);
+      var span = items.length > rows ? items[rows].offsetLeft - x0 : rail.clientWidth;
+      var cols = span > 0 ? Math.max(1, Math.round(rail.clientWidth / span)) : 1;
+      return { per: rows * cols, step: span * cols };
     }
 
     function measure() {
-      pages = Math.max(1, Math.ceil(items.length / perView()));
+      pages = Math.max(1, Math.ceil(items.length / shape().per));
       wrap.classList.toggle('is-static', pages < 2);
       if (dots) {
         dots.innerHTML = '';
@@ -248,13 +254,13 @@
       page = Math.max(0, Math.min(pages - 1, i));
       var max = rail.scrollWidth - rail.clientWidth;
       rail.scrollTo({
-        left: Math.min(page * perView() * step(), max),
+        left: Math.min(page * shape().step, max),
         behavior: reduce ? 'auto' : 'smooth'
       });
     }
 
     function sync() {
-      var span = perView() * step();
+      var span = shape().step;
       var max  = rail.scrollWidth - rail.clientWidth;
       page = span > 0 ? Math.round(rail.scrollLeft / span) : 0;
       /* The last page is a partial one whenever the items do not divide evenly,
