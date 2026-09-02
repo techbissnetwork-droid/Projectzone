@@ -273,6 +273,9 @@ td .muted{color:var(--text-mute);font-size:.82rem;}
     border-top:1px solid var(--border);flex-direction:column;align-items:stretch;gap:.4rem;}
   .sidebar-foot .nav-item{gap:.7rem;padding:.68rem .85rem;font-size:.88rem;}
 
+  /* The menu is taken out of the flow here, so nothing is left between the
+     brand and these two to push them across. */
+  .bar-tools{margin-left:auto;}
   .nav-toggle{display:grid;place-items:center;flex:0 0 auto;
     width:42px;height:42px;border:1px solid var(--border-strong);border-radius:var(--r-sm);
     background:var(--glass);color:var(--text-soft);cursor:pointer;
