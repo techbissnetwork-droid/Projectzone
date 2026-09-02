@@ -93,17 +93,9 @@ foreach (Content::sectionOrder() as $section):
               <h2 class="sec__title reveal"><?= nl2br(e(Settings::get('services_title')), false) ?></h2>
               <p class="sec__lede reveal"><?= e(Settings::get('services_lede')) ?></p>
             </header>
-            <div class="svcs__carousel reveal" id="svcCarousel">
-              <div class="svcs__rail" id="svcRail"><?php require __DIR__ . '/partials/service_cards.php'; ?></div>
-              <div class="svcs__nav">
-                <div class="svcs__dots" id="svcDots"></div>
-                <button class="svcs__arrow" type="button" data-svc-prev aria-label="Previous services">
-                  <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M10 2 4 8l6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                </button>
-                <button class="svcs__arrow" type="button" data-svc-next aria-label="More services">
-                  <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m6 2 6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                </button>
-              </div>
+            <div class="carousel svcs__carousel reveal" data-carousel="Services">
+              <div class="carousel__rail" data-rail><?php require __DIR__ . '/partials/service_cards.php'; ?></div>
+              <?php require __DIR__ . '/partials/carousel_nav.php'; ?>
             </div>
           </div>
         </section>
@@ -177,8 +169,11 @@ foreach (Content::sectionOrder() as $section):
               <p class="sec__lede reveal"><?= e(Settings::get('mkt_lede')) ?>
                 <a class="link" href="<?= e(url('marketplace.php')) ?>">Browse the marketplace <span aria-hidden="true">→</span></a></p>
             </header>
-            <div class="pgrid">
-              <?php foreach ($products as $p): require __DIR__ . '/partials/product_card.php'; endforeach; ?>
+            <div class="carousel mkt__carousel reveal" data-carousel="Product">
+              <div class="carousel__rail" data-rail>
+                <?php foreach ($products as $p): require __DIR__ . '/partials/product_card.php'; endforeach; ?>
+              </div>
+              <?php require __DIR__ . '/partials/carousel_nav.php'; ?>
             </div>
           </div>
         </section>
@@ -186,7 +181,7 @@ foreach (Content::sectionOrder() as $section):
 
     case 'quote':
         if (Settings::get('quote') === '') { break; } ?>
-        <section class="trust" data-theme="deep">
+        <section class="quotesec" data-theme="deep">
           <div class="shell"><p class="trust__quote reveal">“<?= e(Settings::get('quote')) ?>”</p></div>
         </section>
         <?php break;

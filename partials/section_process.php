@@ -16,10 +16,10 @@ $secNum = $secNum ?? 5;
       <p class="sec__lede reveal"><?= e(Settings::get('process_lede')) ?></p>
     </header>
 
-    <?php $cols = max(2, min(6, count($steps))); /* One row, however many stages there are. */ ?>
-    <ol class="flow" style="--n:<?= $cols ?>">
+    <div class="carousel proc__carousel reveal" data-carousel="Stage">
+      <ol class="carousel__rail" data-rail>
       <?php foreach ($steps as $si => $st): ?>
-        <li class="flow__step reveal">
+        <li class="flow__step">
           <div class="flow__mark" aria-hidden="true"><span class="flow__num mono"><?= sprintf('%02d', $si + 1) ?></span></div>
           <?php if ($st['title']): ?><span class="flow__tag mono"><?= e($st['title']) ?></span><?php endif; ?>
           <h3 class="flow__name"><?= e($st['label']) ?></h3>
@@ -29,6 +29,8 @@ $secNum = $secNum ?? 5;
           <?php endif; ?>
         </li>
       <?php endforeach; ?>
-    </ol>
+      </ol>
+      <?php require __DIR__ . '/carousel_nav.php'; ?>
+    </div>
   </div>
 </section>

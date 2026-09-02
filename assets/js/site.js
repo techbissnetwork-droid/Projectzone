@@ -201,43 +201,41 @@
     });
   })();
 
-  /* ── 03 services: a slider, three modules to a slide ────── */
-  (function () {
-    var rail = doc.getElementById('svcRail');
-    var wrap = doc.getElementById('svcCarousel');
-    var dots = doc.getElementById('svcDots');
-    if (!rail || !wrap) return;
+  /* ── sliders: services, and the process stages ──────────── */
+  /* One implementation, driven by markup. A [data-carousel] element holds a
+     [data-rail] of items; how many fit on a slide is decided by CSS and read
+     back from an item, so the breakpoints live in one place. */
+  [].forEach.call(doc.querySelectorAll('[data-carousel]'), function (wrap) {
+    var rail = wrap.querySelector('[data-rail]');
+    if (!rail) return;
+    var items = [].slice.call(rail.children);
+    if (!items.length) return;
 
-    var cards = [].slice.call(rail.querySelectorAll('.svc'));
-    if (!cards.length) return;
-    var prev = wrap.querySelector('[data-svc-prev]');
-    var next = wrap.querySelector('[data-svc-next]');
+    var dots = wrap.querySelector('[data-dots]');
+    var prev = wrap.querySelector('[data-prev]');
+    var next = wrap.querySelector('[data-next]');
+    var noun = wrap.getAttribute('data-carousel') || 'Slide';
     var pages = 1, page = 0;
 
-    /* How many fit is decided by CSS, so read it back from a card rather than
-       duplicating the breakpoints here. */
     function perView() {
-      var w = cards[0].getBoundingClientRect().width;
+      var w = items[0].getBoundingClientRect().width;
       if (w < 1) return 1;
       return Math.max(1, Math.round(rail.clientWidth / w));
     }
     function step() {
-      if (cards.length < 2) return rail.clientWidth;
-      return cards[1].offsetLeft - cards[0].offsetLeft;
+      return items.length < 2 ? rail.clientWidth : items[1].offsetLeft - items[0].offsetLeft;
     }
 
     function measure() {
-      var per = perView();
-      pages = Math.max(1, Math.ceil(cards.length / per));
+      pages = Math.max(1, Math.ceil(items.length / perView()));
       wrap.classList.toggle('is-static', pages < 2);
-
       if (dots) {
         dots.innerHTML = '';
         if (pages > 1) {
           for (var i = 0; i < pages; i++) {
             var b = doc.createElement('button');
             b.type = 'button';
-            b.setAttribute('aria-label', 'Services ' + (i + 1) + ' of ' + pages);
+            b.setAttribute('aria-label', noun + ' ' + (i + 1) + ' of ' + pages);
             b.addEventListener('click', go.bind(null, i));
             dots.appendChild(b);
           }
@@ -248,12 +246,21 @@
 
     function go(i) {
       page = Math.max(0, Math.min(pages - 1, i));
-      rail.scrollTo({ left: page * perView() * step(), behavior: reduce ? 'auto' : 'smooth' });
+      var max = rail.scrollWidth - rail.clientWidth;
+      rail.scrollTo({
+        left: Math.min(page * perView() * step(), max),
+        behavior: reduce ? 'auto' : 'smooth'
+      });
     }
 
     function sync() {
-      var per = perView(), sp = step();
-      page = sp > 0 ? Math.round(rail.scrollLeft / (per * sp)) : 0;
+      var span = perView() * step();
+      var max  = rail.scrollWidth - rail.clientWidth;
+      page = span > 0 ? Math.round(rail.scrollLeft / span) : 0;
+      /* The last page is a partial one whenever the items do not divide evenly,
+         so it stops short of its own offset. Being at the end of the rail is
+         what identifies it, not the distance travelled. */
+      if (max > 2 && rail.scrollLeft >= max - 2) { page = pages - 1; }
       page = Math.max(0, Math.min(pages - 1, page));
       if (dots) {
         [].forEach.call(dots.children, function (d, i) {
@@ -262,7 +269,7 @@
         });
       }
       /* Driven by the page, not by raw pixels: the rail carries a little padding
-         so the card glow is not clipped, and scrollLeft never rests at zero. */
+         so a card's glow is not clipped, and scrollLeft never rests at zero. */
       if (prev) prev.disabled = page === 0;
       if (next) next.disabled = page >= pages - 1;
     }
@@ -284,7 +291,7 @@
     measure();
     if ('ResizeObserver' in win) new ResizeObserver(measure).observe(rail);
     else win.addEventListener('resize', measure, { passive: true });
-  })();
+  });
 
   /* ── 07 business transformation ─────────────────────────── */
   (function () {

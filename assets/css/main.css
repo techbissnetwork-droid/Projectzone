@@ -146,22 +146,15 @@ section{ position:relative; z-index:2; }
    section pins the page or drives itself off the scroll position any more. */
 .flowsec{ padding:var(--sec-y) 0; }
 
-.flow{
-  /* --n is set inline from the number of stages; the media queries below set
-     --cols directly, which an inline custom property would otherwise outrank. */
-  --cols:var(--n,4);
-  position:relative; display:grid; grid-template-columns:repeat(var(--cols),minmax(0,1fr));
-  gap:12px; margin-top:clamp(26px,3vw,40px); list-style:none;
-}
-/* the thread the stages sit on */
-.flow::before{
-  content:""; position:absolute; left:0; right:0; top:19px; height:1px;
-  background:linear-gradient(90deg, transparent, var(--line-2) 12%, var(--line-2) 88%, transparent);
-}
-.flow__step{
+/* Two stages to a slide, each a card the eye can finish. */
+.carousel.proc__carousel{ --per:2; --sgap:14px; margin-top:clamp(26px,3vw,40px); }
+.proc__carousel .flow__step{
   position:relative; display:grid; align-content:start; gap:7px;
-  padding:0 clamp(10px,1vw,14px) 0 0;
+  padding:clamp(18px,1.6vw,24px); border-radius:var(--r-l);
+  border:1px solid var(--line); background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.006));
+  transition:border-color .45s var(--e-out), transform .5s var(--e-out), box-shadow .5s var(--e-out);
 }
+.proc__carousel .flow__step:hover{ border-color:var(--line-2); transform:translateY(-3px); box-shadow:var(--sh-2); }
 .flow__mark{
   position:relative; z-index:2; width:38px; height:38px; display:grid; place-items:center;
   border-radius:50%; border:1px solid var(--line-2); background:var(--bg);
@@ -177,15 +170,12 @@ section{ position:relative; z-index:2; }
 .flow__ticks{ margin-top:3px; gap:5px; }
 .flow__ticks li{ font-size:11.5px; line-height:1.5; }
 
-@media (max-width:1000px){
-  .flow{ --cols:2; gap:22px 14px; }
-  .flow::before{ display:none; }
-}
-@media (max-width:520px){
-  .flow{ --cols:1; gap:18px; }
-  .flow__step{ padding-right:0; }
+@media (max-width:640px){
+  .proc__carousel{ --sgap:10px; }
+  .proc__carousel .flow__step{ padding:15px; }
   .flow__mark{ width:32px; height:32px; }
   .flow__text{ font-size:12.5px; }
+  .flow__name{ font-size:1rem; }
 }
 
 /* ══════════════ 03 · SERVICES ══════════════ */
@@ -284,44 +274,50 @@ section{ position:relative; z-index:2; }
 
 .svcs__foot{ margin-top:26px; color:var(--tx-3); font-size:14px; display:flex; flex-wrap:wrap; gap:10px 18px; align-items:center; }
 
-/* ── the slider: three modules to a slide ────────────────── */
-.svcs__carousel{ position:relative; --per:4; --sgap:12px; }
-.svcs__rail{
-  display:flex; gap:var(--sgap); align-items:stretch;
+/* ── slider, shared by the services and the process stages ── */
+.carousel{ position:relative; --per:4; --sgap:12px; }
+.carousel__rail{
+  display:flex; gap:var(--sgap); align-items:stretch; list-style:none;
   overflow-x:auto; overscroll-behavior-x:contain; scroll-snap-type:x mandatory;
   scrollbar-width:none; -ms-overflow-style:none;
   padding:2px; margin:-2px;
 }
-.svcs__rail::-webkit-scrollbar{ display:none; }
-.svcs__rail > .svc{
+.carousel__rail::-webkit-scrollbar{ display:none; }
+.carousel__rail > *{
   flex:0 0 calc((100% - (var(--per) - 1) * var(--sgap)) / var(--per));
   min-width:0; scroll-snap-align:start;
 }
-.svcs__nav{ display:flex; align-items:center; gap:10px; margin-top:18px; }
-.svcs__carousel.is-static .svcs__nav{ display:none; }
-.svcs__dots{ display:flex; align-items:center; gap:7px; margin-right:auto; }
-.svcs__dots button{
+.carousel__nav{ display:flex; align-items:center; gap:10px; margin-top:18px; }
+.carousel.is-static .carousel__nav{ display:none; }
+.carousel__dots{ display:flex; align-items:center; gap:7px; margin-right:auto; }
+.carousel__dots button{
   width:7px; height:7px; padding:0; border:0; border-radius:50%; cursor:pointer;
   background:var(--line-2); transition:background-color .35s, width .4s var(--e-out);
 }
-.svcs__dots button.is-on{ width:22px; border-radius:4px; background:var(--sig); }
-.svcs__arrow{
+.carousel__dots button.is-on{ width:22px; border-radius:4px; background:var(--sig); }
+.carousel__arrow{
   width:38px; height:38px; display:grid; place-items:center; padding:0; cursor:pointer;
   border-radius:50%; border:1px solid var(--line-2); background:rgba(255,255,255,.02);
   color:var(--tx-2); transition:border-color .35s, color .35s, background-color .35s, opacity .35s;
 }
-.svcs__arrow:hover:not(:disabled){ border-color:rgba(143,176,255,.5); color:var(--tx); background:rgba(143,176,255,.08); }
-.svcs__arrow:disabled{ opacity:.3; cursor:default; }
-.svcs__arrow svg{ width:15px; height:15px; }
+.carousel__arrow:hover:not(:disabled){ border-color:rgba(143,176,255,.5); color:var(--tx); background:rgba(143,176,255,.08); }
+.carousel__arrow:disabled{ opacity:.3; cursor:default; }
+.carousel__arrow svg{ width:15px; height:15px; }
+
+/* The marketplace strip: one row that pages, rather than a grid that grows a
+   second row with an empty cell beside the last product. */
+.carousel.mkt__carousel{ --per:3; --sgap:clamp(14px,2vw,24px); }
+.mkt__carousel .pcard{ height:auto; }
+@media (max-width:900px){ .carousel.mkt__carousel{ --per:2; } }
 
 /* Four to a slide for as long as they stay readable, then two. Never one. */
 @media (max-width:700px){
   .svcs__grid{ grid-template-columns:repeat(2,minmax(0,1fr)); }
-  .svcs__carousel{ --per:2; }
+  .carousel{ --per:2; }
 }
 @media (max-width:720px){
   .svcs__grid{ gap:8px; }
-  .svcs__carousel{ --sgap:8px; }
+  .carousel{ --sgap:8px; }
   .svc__head{ padding:13px; }
   .svc__index{ font-size:9px; }
   .svc__glyph{ width:24px; height:20px; margin:9px 0 8px; }
@@ -331,7 +327,7 @@ section{ position:relative; z-index:2; }
   .svc__detail{ margin:0 13px; padding:10px 0 13px; gap:9px; }
   .svc__detail .ticks li{ font-size:11px; padding-left:16px; }
   .svc__detail .tags span{ font-size:9px; padding:3px 7px; }
-  .svcs__arrow{ width:34px; height:34px; }
+  .carousel__arrow{ width:34px; height:34px; }
 }
 
 
@@ -619,8 +615,11 @@ section{ position:relative; z-index:2; }
 .devices .d1{ width:22px; height:36px; border-radius:5px }
 .devices .d2{ width:38px; height:28px }
 .devices .d3{ width:58px; height:38px }
+/* A standalone statement section: it needs breathing room, not the full
+   section rhythm above and below one line of text. */
+.quotesec{ padding:clamp(54px,7vh,84px) 0; }
 .trust__quote{
-  margin-top:clamp(48px,7vw,90px); text-align:center;
+  text-align:center;
   font-family:var(--ff-d); font-size:clamp(1.15rem, 0.7rem + 2.4vw, 2.7rem); font-weight:500;
   letter-spacing:-.038em; line-height:1.2; color:var(--tx-2); max-width:22ch; margin-inline:auto;
 }
