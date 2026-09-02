@@ -1,0 +1,20 @@
+Options -Indexes
+
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+</IfModule>
+
+# Never serve config, app internals or the schema over HTTP
+RedirectMatch 404 ^/(config|app|partials)/
+RedirectMatch 404 \.(sql|md|log)$
+RedirectMatch 404 /\.
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  # Pretty URLs: /portfolio/my-slug -> portfolio-item.php?slug=my-slug
+  RewriteRule ^portfolio/([A-Za-z0-9\-]+)/?$ portfolio-item.php?slug=$1 [L,QSA]
+  RewriteRule ^marketplace/([A-Za-z0-9\-]+)/?$ product.php?slug=$1 [L,QSA]
+</IfModule>

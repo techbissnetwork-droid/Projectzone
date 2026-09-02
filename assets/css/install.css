@@ -1,0 +1,59 @@
+/* TECHBISS installer */
+:root{
+  --bg:#06070A; --bg-2:#0E1117; --line:rgba(255,255,255,.08); --line-2:rgba(255,255,255,.15);
+  --tx:#EEF1F6; --tx-2:#98A1B0; --tx-3:#626B7A; --tx-4:#3E4552;
+  --sig:#8FB0FF; --ok:#7FD6B4; --danger:#F08A8A; --warn:#E7BB8D;
+  color-scheme:dark;
+}
+*,*::before,*::after{ box-sizing:border-box }
+body{ margin:0; background:var(--bg); color:var(--tx); line-height:1.6;
+  font:15px/1.6 "Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  background-image:radial-gradient(60% 40% at 50% -5%, rgba(78,118,232,.16), transparent 65%);
+  -webkit-font-smoothing:antialiased }
+.wrap{ max-width:660px; margin:0 auto; padding:56px 20px 64px }
+h1,h2{ margin:0; font-weight:600; letter-spacing:-.03em; line-height:1.15 }
+h1{ font-size:1.5rem } h2{ font-size:1.15rem; margin-bottom:16px }
+p{ margin:0 }
+.head{ display:flex; gap:14px; align-items:center; margin-bottom:28px }
+.head p{ color:var(--tx-3); font-size:14px; margin-top:2px }
+.mark{ width:34px; height:34px; color:var(--sig); flex:none }
+.steps{ display:flex; gap:6px; list-style:none; padding:0; margin:0 0 20px; flex-wrap:wrap }
+.steps li{ display:flex; align-items:center; gap:8px; padding:8px 14px; border-radius:100px;
+  border:1px solid var(--line); font-size:12.5px; color:var(--tx-4) }
+.steps b{ font-family:ui-monospace,Menlo,monospace; font-size:11px }
+.steps .on{ border-color:rgba(143,176,255,.45); background:rgba(143,176,255,.1); color:var(--tx) }
+.steps .done{ color:var(--ok); border-color:rgba(127,214,180,.35) }
+.card{ padding:26px; border:1px solid var(--line); border-radius:18px;
+  background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.006)) }
+.alert{ padding:13px 16px; border-radius:12px; border:1px solid var(--line-2); font-size:14px; margin-bottom:18px }
+.alert.err{ border-color:rgba(240,138,138,.45); background:rgba(240,138,138,.08); color:#FBD9D9 }
+.alert.warn{ border-color:rgba(231,187,141,.45); background:rgba(231,187,141,.08); color:#F5E2CD }
+.alert p+p{ margin-top:5px }
+.alert code{ font-family:ui-monospace,Menlo,monospace; font-size:.9em; background:rgba(0,0,0,.3); padding:1px 5px; border-radius:4px }
+.checks{ width:100%; border-collapse:collapse; margin-bottom:22px }
+.checks tr{ border-bottom:1px solid var(--line) }
+.checks tr:last-child{ border-bottom:0 }
+.checks td,.checks th{ padding:11px 6px; text-align:left; font-weight:400 }
+.checks td:first-child{ width:24px; font-size:15px }
+.checks .pass td:first-child{ color:var(--ok) }
+.checks .fail td:first-child{ color:var(--danger) }
+.checks .note{ text-align:right; font-family:ui-monospace,Menlo,monospace; font-size:12px; color:var(--tx-3) }
+.form{ display:grid; gap:16px }
+.form label{ display:grid; gap:7px; font-size:12.5px; color:var(--tx-2); min-width:0 }
+.form label small{ color:var(--tx-4) }
+.form input, .form select{ width:100%; padding:11px 13px; border-radius:8px; border:1px solid var(--line-2);
+  background:rgba(255,255,255,.03); color:var(--tx); font:inherit }
+.form input:focus, .form select:focus{ border-color:var(--sig); background:rgba(143,176,255,.06); outline:none }
+.row.two{ display:grid; grid-template-columns:1fr 1fr; gap:16px }
+.check{ grid-auto-flow:column; justify-content:start; align-items:center; gap:9px; font-size:13px }
+.check input{ width:auto }
+hr{ border:0; border-top:1px solid var(--line); margin:4px 0 }
+.btn{ display:inline-flex; align-items:center; gap:8px; justify-content:center;
+  padding:12px 22px; border-radius:100px; border:1px solid transparent; cursor:pointer;
+  background:#F2F5FA; color:#060810; font:500 14px/1 inherit; font-family:inherit }
+.btn.ghost{ background:transparent; border-color:var(--line-2); color:var(--tx) }
+.actions{ display:flex; gap:10px; flex-wrap:wrap }
+.lede{ color:var(--tx-2); margin-bottom:16px }
+.hint{ color:var(--tx-3); font-size:13px; margin-bottom:14px }
+.foot{ text-align:center; margin-top:26px; font-size:12px; color:var(--tx-4) }
+@media (max-width:560px){ .row.two{ grid-template-columns:1fr } .wrap{ padding-top:32px } }

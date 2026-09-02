@@ -1,0 +1,8 @@
+# Uploaded files are data, never code.
+php_flag engine off
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+</IfModule>
+<FilesMatch "\.(php|phtml|php[0-9]|phar|cgi|pl|py|sh|htaccess)$">
+  Require all denied
+</FilesMatch>

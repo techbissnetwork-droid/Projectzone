@@ -1,80 +1,140 @@
-# TECHBISS — website
+# TECHBISS platform
 
-Marketing site for TECHBISS, a digital transformation company that moves businesses
-from offline operations to a complete online ecosystem.
+A PHP + MySQL application for a digital agency: a customisable public website, an
+admin panel, a marketplace for premade projects, and a client portal where the
+businesses you build for can track their sites, renewals and support requests.
 
-**No build step. No framework. No dependencies.** Open `index.html`, or serve the
-folder statically — that is the whole deployment story.
+No Composer, no build step, no framework — upload the folder and run the installer.
 
-```bash
-python3 -m http.server 8000     # then open http://localhost:8000
+---
+
+## Install
+
+1. Upload everything to your web root.
+2. Create an empty MySQL database.
+3. Open `https://yourdomain.com/install/` and follow the four steps.
+4. **Delete the `install/` folder** when it finishes.
+
+Requirements: PHP 8.1+ with `pdo_mysql`, `mbstring`, `fileinfo` and `openssl`;
+MySQL 5.7+ or MariaDB 10.3+; `config/` and `uploads/` writable.
+
+The installer checks all of this on step 1 and writes nothing until step 3.
+
+---
+
+## What is in it
+
+### Public site
+`index.php` · `services.php` · `portfolio.php` · `portfolio-item.php` ·
+`marketplace.php` · `product.php` · `contact.php` · `login.php`
+
+Every headline, colour, service, project and price comes from the database.
+The animated hero ecosystem, the offline→online scroll transformation, the
+system-architecture diagram and the process timeline are all still there — they
+are now partials in `partials/section_*.php`, shared between pages.
+
+### Admin panel — `/admin/`
+| Page | What it does |
+|---|---|
+| Dashboard | Live counts, and every domain / hosting / SSL renewal due inside the warning window |
+| Projects | Create a delivered site with owner details, domain, hosting, SSL, email and fees |
+| Project detail | Renewal meters, maintenance & upgrade history, linked tickets, owner record |
+| Clients | Accounts, roles, suspension, password reset. Cannot delete the last admin |
+| Support | Ticket queue sorted by priority, threaded replies, status and priority control |
+| Portfolio | Add completed projects; **delete** them; flip each between public and admin-only |
+| Marketplace | List premade projects with price, sale price, includes, demo link and cover |
+| Orders | Confirm payments; a sale is counted once, when it first reaches paid |
+| Services | The nine modules shown on the site, reorderable and switchable |
+| Enquiries | Contact-form inbox with read / archive / delete |
+| Settings | Brand, colours, hero copy, contact details, social links, currency, feature switches |
+
+### Client portal — `/client/`
+Created automatically: ticking **"Create a portal login from the owner email"**
+on a project generates the account and shows the password once.
+
+The client signs in with that email and gets their sites, colour-coded renewal
+meters, the maintenance history of what you actually did and when, one-click
+maintenance / upgrade / problem requests, a threaded conversation with you, and
+their marketplace purchases.
+
+---
+
+## How the pieces connect
+
+```
+Project ──┬── owner name / email / phone
+          ├── domain     + registrar + expiry ──┐
+          ├── hosting    + plan      + expiry ──┼─→ renewal meters (admin + client)
+          ├── SSL        + issuer    + expiry ──┘
+          ├── business email + mailbox count
+          ├── maintenance_logs ─────────────────→ "what we have done" in the portal
+          ├── tickets ──────────────────────────→ support / maintenance / upgrade thread
+          ├── user account ─────────────────────→ the client's login
+          └── portfolio entry ──────────────────→ public case study, or admin-only
 ```
 
-## Structure
+A portfolio entry is `public` or `private`. Private entries never leave the admin
+panel, so you can record a delivery before the client agrees to publish it.
+
+---
+
+## Payments
+
+Marketplace orders are recorded and confirmed **manually**: the buyer places an
+order, sees your payment instructions (editable in Settings) and a reference, and
+you mark it paid once the money lands. Nothing is charged automatically.
+
+Adding a gateway means one new file that flips an order to `paid` on a verified
+callback — the order table already carries `payment_method` and `payment_ref`.
+
+---
+
+## Security
+
+- Every query is a prepared statement; every output goes through `e()`.
+- CSRF token on every POST, verified in one place (`Csrf::check()`).
+- Session ID regenerated on login; `httponly`, `samesite=Lax`, `secure` over HTTPS.
+- Login throttled to 6 failures per email per 15 minutes.
+- Uploads: MIME whitelist, SVG scanned for script, random filenames, and
+  `uploads/.htaccess` turns the PHP engine off in that folder.
+- Role checks on every admin and portal page; clients can only reach their own
+  records (`require_owner`).
+- `config/`, `app/` and `partials/` are blocked in `.htaccess`, and each partial
+  also refuses to run when loaded directly.
+
+**On nginx** there is no `.htaccess`, so add this to your server block:
+
+```nginx
+location ~ ^/(config|app|partials)/ { deny all; }
+location ~ \.(sql|md|log)$          { deny all; }
+location ^~ /uploads/ { location ~ \.php$ { deny all; } }
+location /install/ { allow 203.0.113.4; deny all; }   # your IP, then delete the folder
+```
+
+---
+
+## Layout
 
 ```
-index.html            single page, semantic sections, JSON-LD, OG/Twitter metadata
-assets/css/base.css   design tokens, reset, typography, buttons, nav, cursor
-assets/css/main.css   the nine sections + footer, and their responsive rules
-assets/js/site.js     nav, menu, cursor, reveals, magnetics, tilt, scroll-driven sections
-assets/js/viz.js      three canvas visualisations (hero ecosystem, architecture, CTA field)
-assets/img/           favicon
-robots.txt, sitemap.xml
+app/          bootstrap, Database, Auth, Settings, Csrf, Flash, Upload, helpers, guards
+config/       config.sample.php — the installer writes config.php next to it
+install/      the four-step wizard, schema.sql and the starter content
+partials/     public + app shells, the designed home-page sections, shared cards
+admin/        11 admin pages
+client/       6 portal pages
+assets/       base.css, main.css, pages.css, app.css, install.css, site.js, viz.js, app.js
+uploads/      portfolio/, products/, site/ — written by the admin panel
 ```
 
-## The narrative
+`assets/css/base.css` holds the design tokens. Change them there, or change the two
+accent colours in **Settings**, and the whole site follows.
 
-The page is one argument, in order: **business → transformation → technology → build →
-launch → grow.**
+---
 
-| # | Section | What carries it |
-|---|---------|-----------------|
-| 01 | Hero | Interactive ecosystem: a TECHBISS core with nine orbiting nodes (Business → Domain → Website → App → Hosting → Email → Security → Payments → Growth), DOM labels over a canvas of edges, travelling pulses and cursor-reactive parallax |
-| 02 | Offline → Online | Pinned, scroll-driven: OFFLINE → DIGITAL → ONLINE → GROWING, each stage a different composition (paper records → a conversion ledger → a live storefront → compounding metrics) |
-| 03 | Services | Nine modules in a deliberately uneven bento; hover or click expands one in place |
-| 04 | Architecture | Canvas system diagram, four layers, animated data packets, live-looking status panel |
-| 05 | Process | Pinned five-stage timeline: the active step becomes dominant, the rest collapse to a line |
-| 06 | Work | Four case studies, four different compositions, each with a CSS/SVG animated preview |
-| 07 | Transformation | Six business types, each morphing into its digital counterpart |
-| 08 | Trust | Six infrastructure pillars with animated technical indicators |
-| 09 | CTA + footer | Full-bleed closing statement over a drifting particle field |
+## After installing
 
-## Design system
-
-Deep near-black foundation (`#06070A`), one restrained signal blue (`#8FB0FF`) with a warm
-counterpoint (`#E7BB8D`), hairline borders, controlled glow. No neon, no rainbow gradients.
-Display type is Inter Tight with tight negative tracking; body is Inter; small technical
-labels use the system monospace stack. All tokens live at the top of `base.css` — change
-them there and the whole site follows.
-
-## Animation
-
-One `requestAnimationFrame` scroll bus drives every scroll-reactive section; canvases run
-their own loops, gated by `IntersectionObserver` and `visibilitychange` so nothing animates
-off-screen or in a background tab. Only `transform` and `opacity` are animated.
-
-`prefers-reduced-motion: reduce` is fully honoured — reveals resolve immediately, loops are
-replaced with a single static frame, and the custom cursor is disabled.
-
-## Responsive
-
-Desktop, laptop, tablet and mobile each get their own composition, not a scaled-down one.
-The architecture diagram re-lays out into two columns on phones; the transformation list
-becomes a snap carousel; the service grid recomposes at 1100px and again at 720px; the hero
-moves the ecosystem below the headline. Verified at 390 / 768 / 1024 / 1512 px with zero
-horizontal overflow.
-
-## Performance
-
-~40 KB gzipped total for HTML + CSS + JS. No images, no icon font, no runtime dependency —
-every graphic is inline SVG, CSS, or canvas. Fonts load non-render-blocking from Google
-Fonts with a full system fallback stack; self-host `assets/fonts/` if you would rather not
-depend on a third party.
-
-## Before going live
-
-- Replace `https://techbiss.com/` in the canonical URL, JSON-LD, OG tags and `sitemap.xml`.
-- Add `assets/img/og.png` (1200×630) — the OG tags already point at it.
-- Point the footer social links at the real profiles.
-- **The four case studies in section 06 are illustrative**, labelled as such on the page.
-  Swap in real projects and real numbers before publishing, or keep the disclaimer.
+- Delete `install/`.
+- Set your real contact details, social links and currency in **Settings**.
+- Replace the four seeded marketplace products with your own.
+- Add your delivered projects under **Projects**, and publish the ones you want
+  on the public portfolio.
