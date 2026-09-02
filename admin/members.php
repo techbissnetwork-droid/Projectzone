@@ -125,7 +125,10 @@ $members = $q->fetchAll();
 // without a second COUNT over a filtered set.
 $mMore = count($members) > $mLimit;
 if ($mMore) { array_pop($members); }
-$paidCount = count(array_filter($members, fn($m) => $m['tier'] === 'paid'));
+// Stat cards describe the whole install, not the current search - a
+// zero-match query must not make the site look like it has no members.
+$paidCount = (int)$pdo->query("SELECT COUNT(*) FROM members WHERE tier = 'paid'")->fetchColumn();
+$unverifiedCount = (int)$pdo->query('SELECT COUNT(*) FROM members WHERE verified = 0')->fetchColumn();
 $csrf = Auth::csrfToken();
 
 admin_header('Members', 'members',
@@ -135,12 +138,11 @@ admin_header('Members', 'members',
 show_flash();
 ?>
 <div class="cards">
-  <div class="card"><div class="num"><?= count($members) ?></div><div class="lbl">Registered members</div></div>
-  <div class="card"><div class="num"><?= $paidCount ?></div><div class="lbl">Paid members</div></div>
-  <?php $unverified = count(array_filter($members, fn($m) => (int)($m['verified'] ?? 1) === 0)); ?>
-  <div class="card"><div class="num"><?= $unverified ?></div><div class="lbl">Waiting on an email code</div></div>
+  <div class="card"><div class="num"><?= number_format($mTotal) ?></div><div class="lbl">Registered members</div></div>
+  <div class="card"><div class="num"><?= number_format($paidCount) ?></div><div class="lbl">Paid members</div></div>
+  <div class="card"><div class="num"><?= number_format($unverifiedCount) ?></div><div class="lbl">Waiting on an email code</div></div>
 </div>
-<?php if ($unverified > 0): ?>
+<?php if ($unverifiedCount > 0): ?>
   <p class="hint" style="margin-bottom:16px">A row marked <strong>UNVERIFIED</strong> registered but
     never typed the code, so it cannot log in. Usually that is a mistyped address or a code sitting in
     a spam folder &mdash; check the <a href="emails.php" style="color:var(--accent)">Email log</a> to
@@ -148,7 +150,7 @@ show_flash();
     <a href="settings.php#members" style="color:var(--accent)">Settings &rsaquo; Members</a>.</p>
 <?php endif; ?>
 
-<?php if (!$members): ?>
+<?php if (!$members && $mSearch === ''): ?>
   <p class="hint">No members yet - visitors can register from the site header.</p>
 <?php else: ?>
 <?php

@@ -150,6 +150,12 @@ function admin_header(string $title, string $active, string $lede = ''): void
       // charts.php having done exactly that before it, which is how you end up
       // with three. Deferred so it never blocks the panel rendering. ?>
 <script src="../assets/ui.js?v=<?= @filemtime(__DIR__ . '/../assets/ui.js') ?: 1 ?>" defer></script>
+<?php // Closes the subject-row .cat-drop dropdowns on an outside click, on
+      // Escape, and closes any other one when a new one opens - the same
+      // outside-click pattern #acctChip below already has, extended to
+      // several elements that also need to close each other. Shared here so
+      // every admin page gets it, not just the one it was first built on. ?>
+<script src="admin.js?v=<?= @filemtime(__DIR__ . '/admin.js') ?: 1 ?>" defer></script>
 </head>
 <body>
 <div class="admin-shell">

@@ -110,9 +110,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'site_notice'      => fn($v) => trim($v) !== '' ? trim($v) : 'Not financial advice.',
             'seo_title'        => fn($v) => mb_substr(trim($v), 0, 120),
             'performance_page_enabled' => fn($v) => $v === '1' ? '1' : '0',
-            'terms_content'    => fn($v) => mb_substr(trim($v), 0, 20000),
-            'privacy_content'  => fn($v) => mb_substr(trim($v), 0, 20000),
-            'risk_content'     => fn($v) => mb_substr(trim($v), 0, 20000),
+            // Every <textarea> submit normalises \n to \r\n per the HTML spec,
+            // so a save that never touches these fields still rewrites their
+            // LF line breaks to CRLF - which never matches the LF-only
+            // defaults above again, and "Changed from default" says so
+            // forever. Folded back to \n before it's stored, not just before
+            // it's compared, so the value itself stays clean too.
+            'terms_content'    => fn($v) => mb_substr(trim(str_replace("\r\n", "\n", $v)), 0, 20000),
+            'privacy_content'  => fn($v) => mb_substr(trim(str_replace("\r\n", "\n", $v)), 0, 20000),
+            'risk_content'     => fn($v) => mb_substr(trim(str_replace("\r\n", "\n", $v)), 0, 20000),
             'meta_description' => fn($v) => mb_substr(trim($v), 0, 300),
             'meta_keywords'    => fn($v) => mb_substr(trim($v), 0, 300),
             'api_mode'         => fn($v) => in_array($v, ['auto', 'single'], true) ? $v : 'auto',
@@ -559,7 +565,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               . 'with http:// or https:// and contain no spaces.'
             : 'Settings saved.',
             ($epBad ?? 0) > 0 ? 'warn' : 'ok');
-        header('Location: settings.php');
+        // The tab the form was submitted from, same as the #market rejection
+        // above sends back to Market - a save that lands back on Overview no
+        // matter which of the seven tabs it was made from is a save that
+        // loses your place. Whitelisted rather than echoed straight back:
+        // this becomes part of a URL, and $_POST['tab'] is client-supplied.
+        $saveTab = in_array($_POST['tab'] ?? '',
+            ['overview', 'site', 'signals', 'market', 'alerts', 'members', 'security'], true)
+            ? '#' . $_POST['tab'] : '';
+        header('Location: settings.php' . $saveTab);
         exit;
     }
 
@@ -595,7 +609,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             \SignalMasterAi\DataGuard::clearFirstLogin();
             Database::setSetting('admin_first_login', '0');
             flash('Password changed.');
-            header('Location: settings.php');
+            // This form only ever lives on Security - hardcoded like the
+            // #market rejection below, not a tab the admin could be on
+            // elsewhere.
+            header('Location: settings.php#security');
             exit;
         }
     }
@@ -884,9 +901,16 @@ foreach ($smaDefaults as $k => $v) {
     // Numbers compared as numbers. "2.0" and "2" are the same threshold, and
     // a list that calls them a change is a list nobody will trust twice - the
     // whole value of this panel is that it is short and every line is real.
+    // Hex colors compared case-insensitively for the same reason: the form's
+    // <input type=color> always posts lowercase, so an untouched color saved
+    // through the big form drifts from the uppercase shipped default and
+    // reads as "changed" forever after - same fix View::head() already uses
+    // for this exact comparison, when deciding whether to emit an override.
     $same = is_numeric($cur) && is_numeric($v)
         ? abs((float)$cur - (float)$v) < 1e-9
-        : (string)$cur === (string)$v;
+        : (in_array($k, ['accent_color', 'up_color', 'down_color'], true)
+            ? strcasecmp((string)$cur, (string)$v) === 0
+            : (string)$cur === (string)$v);
     if (!$same) {
         // ONE definition of "this is a credential", shared with the audit log
         // and the storage layer. The regular expression that used to live here
@@ -1051,6 +1075,11 @@ $smaShow = static function (string $s): string {
 <form method="post" action="settings.php" id="allSettings">
   <input type="hidden" name="csrf" value="<?= $csrf ?>">
   <input type="hidden" name="act" value="settings">
+  <?php // Which tab the save should return to. The script below fills this in
+        // from the same hash the tab strip itself reads on submit - left
+        // empty, a save lands back on Overview no matter which tab it was
+        // made from. ?>
+  <input type="hidden" name="tab" id="allSettingsTab" value="">
 
   <details class="form-card" data-tab="site" open>
     <summary>Site</summary>
@@ -2847,7 +2876,8 @@ $smaShow = static function (string $s): string {
       watching every one on every timeframe would be
       <strong><?= $wlCoins * $wlTfs ?></strong> pairs.</p>
     <p class="hint">Currently
-      <?php foreach (\SignalMasterAi\Limits::TIERS as $tk => $tl): ?><strong><?= sma_e($tl) ?></strong>
+      <?php $wlTierFirst = array_key_first(\SignalMasterAi\Limits::TIERS);
+      foreach (\SignalMasterAi\Limits::TIERS as $tk => $tl): ?><?= $tk === $wlTierFirst ? '' : ', ' ?><strong><?= sma_e($tl) ?></strong>
         <?= sma_e(\SignalMasterAi\Limits::label(\SignalMasterAi\Limits::forTier('watch', $tk))) ?><?php
         endforeach; ?>. Set them under
       <a href="#limits"><strong>How much each tier gets</strong></a>, on the Members tab.</p>
@@ -3013,7 +3043,7 @@ $smaShow = static function (string $s): string {
           <option value="0" <?= Database::setting('liq_clusters_enabled', '1') === '0' ? 'selected' : '' ?>>Disabled</option>
         </select></div>
       <div><label>Leverage tiers to project</label>
-        <input name="liq_leverages" value="<?= $s('liq_leverages', '10,25,50,100') ?>"></div>
+        <input type="text" name="liq_leverages" value="<?= $s('liq_leverages', '10,25,50,100') ?>"></div>
     </div>
     <div class="row2">
       <div><label>Cluster lookback (bars, 60 - 1000)</label>
@@ -3252,6 +3282,16 @@ $smaShow = static function (string $s): string {
           <code>ab@gmail.com</code> count as the one mailbox they actually are.</p>
       </div>
     </div>
+    <?php // table.grid.stack's mobile card layout inherits overflow-wrap:anywhere
+          // from its td onto this ::before label - meant for an unbreakable value
+          // like a wallet address, but on a plain word like "STARTED" or "RUNNING"
+          // it breaks the word itself rather than wrapping at the space the two-word
+          // labels already have room to use. Scoped to this card only. ?>
+    <style>
+      @media (max-width: 860px) {
+        #trial table.grid.stack td::before { overflow-wrap: normal; word-break: normal; }
+      }
+    </style>
     <div class="tbl-scroll" style="margin-top:12px">
     <table class="grid stack">
       <tr class="head"><th>Trials started</th><th>Still running</th><th>Last 7 days</th>
@@ -3305,7 +3345,7 @@ $smaShow = static function (string $s): string {
           &mdash; so the rest of the balance is never at risk, but the wallet still goes to
           nothing that much faster. Lower it if the portfolio is meant to teach patience.</p>
         <label style="margin-top:10px">Leverage rungs on the order ticket</label>
-        <input name="paper_leverages" style="font-family:var(--font-mono)"
+        <input type="text" name="paper_leverages" style="font-family:var(--font-mono)"
                value="<?= sma_e(Database::setting('paper_leverages',
                    \SignalMasterAi\Paper::LEVERAGE_LADDER_DEFAULT)) ?>">
         <p class="hint">Comma separated. Anything above the cap above is dropped from the list
@@ -4331,6 +4371,14 @@ $secStat = \SignalMasterAi\Secrets::status();
     show(currentTab());
     revealHashCard();
   });
+  // Which tab a save lands back on. Read at submit time, not baked in on
+  // load, because the operator may have switched tabs since the page opened.
+  if (mainForm) {
+    mainForm.addEventListener('submit', function () {
+      var tabField = document.getElementById('allSettingsTab');
+      if (tabField) { tabField.value = currentTab(); }
+    });
+  }
   show(currentTab());
   revealHashCard();
 })();

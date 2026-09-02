@@ -93,7 +93,15 @@ class Premium
         // Walked, not written, for the same reason as everything above it: an
         // operator who raises the free allowance must not leave a paragraph
         // behind claiming premium is bigger.
+        //
+        // 'watch' is skipped here: it is the same Limits::of('watch', ...)
+        // setting as the dedicated, better-worded entry above, and printing
+        // both told the reader the same fact twice under two different
+        // titles.
         foreach (Limits::benefits() as $lb) {
+            if ($lb['title'] === Limits::LIMITS['watch']['label']) {
+                continue;
+            }
             $out[] = $lb;
         }
 

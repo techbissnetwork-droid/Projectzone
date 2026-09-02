@@ -287,6 +287,15 @@ View::topbar('portfolio');
             to open trades.</p>
         </div>
       </form>
+      <?php // Its own form rather than a third option in the deposit/withdraw
+            // radio group above: that group's whole "act" comes from which
+            // radio is checked, and a same-named submit button here would
+            // fight it over which value actually gets posted. ?>
+      <form method="post" action="portfolio.php" id="walletResetForm" style="margin-top:12px">
+        <input type="hidden" name="csrf" value="<?= sma_e($csrf) ?>">
+        <input type="hidden" name="act" value="reset_wallet">
+        <button class="btn danger" type="submit">Reset wallet</button>
+      </form>
       <p class="tp-note">Simulated funds for tracking your own results — no real money moves and
         nothing is deposited anywhere. Trades can only be opened from what is available.</p>
     </div>
@@ -637,6 +646,19 @@ View::topbar('portfolio');
     Array.prototype.forEach.call(presets.children, function (c) {
       c.classList.toggle('on', parseFloat(c.dataset.amt) === v);
     });
+  });
+})();
+
+// Reset zeroes the simulated balance outright with no undo, same as closing
+// a trade elsewhere on the site - so it gets the same confirm() guard. CSP on
+// this page has no 'unsafe-inline', which rules out an onclick attribute here.
+(function () {
+  var form = document.getElementById('walletResetForm');
+  if (!form) return;
+  form.addEventListener('submit', function (e) {
+    if (!confirm('Reset your wallet to $0? This cannot be undone.')) {
+      e.preventDefault();
+    }
   });
 })();
 

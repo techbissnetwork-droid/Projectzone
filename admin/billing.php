@@ -674,6 +674,9 @@ if ($error) {
           ? '<span class="badge on">LIVE AT CHECKOUT</span>'
           : '<span class="badge off">NOT LIVE</span> <span class="hint why">' . sma_e($why) . '</span>';
   };
+  // Needed by the Cryptomus card below as well as the other four, so it is
+  // defined here rather than down beside CoinGate where only those four used it.
+  $siteUrl = Database::setting('site_url', 'https://your-site');
   ?>
   <form method="post" action="billing.php">
     <input type="hidden" name="csrf" value="<?= $csrf ?>">
@@ -779,6 +782,8 @@ if ($error) {
         </details>
         <?php endif; ?>
 
+        <div class="hook"><b>Webhook URL</b> Set this in your Cryptomus payment settings:
+          <code><?= sma_e($siteUrl) ?>/payment_webhook.php?gw=cryptomus</code></div>
         <?php // Clearing is separate from unticking on purpose: one stops
               // offering it, the other forgets the account. An operator who
               // pasted the wrong merchant's credentials needs the second. ?>
@@ -792,7 +797,6 @@ if ($error) {
     </details>
 
     <?php
-    $siteUrl = Database::setting('site_url', 'https://your-site');
     $kept = fn(string $k) => Database::setting($k) !== '' ? '(saved - leave blank to keep)' : '';
     $gwOpen = fn(string $gw) => \SignalMasterAi\Gateways::configured($gw) ? 'open' : '';
     ?>

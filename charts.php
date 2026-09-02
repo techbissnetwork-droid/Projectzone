@@ -478,7 +478,7 @@ $badSymbol = $wantSym !== '' && $canonSym === '';
                   // printed as two numbers beside the chart. This draws them
                   // ON it, which is the only place they mean anything. ?>
             <button type="button" class="ct-tile" data-ov="sr"><b>S/R</b><small>support &amp; resistance</small></button>
-            <button type="button" class="ct-tile" data-ov="markers"><b></b><small>past signals</small></button>
+            <button type="button" class="ct-tile" data-ov="markers"><b>SIG</b><small>past signals</small></button>
           </div>
           <p class="ct-menu-head">Panels &amp; scale</p>
           <div class="ct-grid">

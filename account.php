@@ -15,6 +15,17 @@ $regEnabled = sma_setting('registration_enabled', '1') === '1';
 $error = null;
 $notice = null;
 
+// Where to send a signed-out visitor once they are in - e.g. portfolio.php
+// sends them here with ?next=portfolio.php rather than to their dashboard.
+// An allowlist of exact filenames, never a raw pass-through: this value ends
+// up in a Location header, and honouring an arbitrary "next" is an open
+// redirect. Read once, up front, so every success path below can use it;
+// $_POST wins over $_GET so a hidden field carries it across the login form's
+// own submit, which PHP does not do on its own.
+$nextAllowed = ['charts.php', 'portfolio.php', 'account.php', 'backtest.php', 'performance.php', 'upgrade.php'];
+$next = (string)($_POST['next'] ?? $_GET['next'] ?? '');
+$next = in_array($next, $nextAllowed, true) ? $next : '';
+
 if (isset($_GET['logout'])) {
     MemberAuth::logout();
     header('Location: account.php');
@@ -62,13 +73,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // A send that failed must not be reported in the green box -
                 // "on its way" and "could not be sent" are not the same news.
                 $_SESSION[$sent ? 'verify_notice' : 'verify_error'] = $sendMsg;
-                header('Location: account.php?tab=verify');
+                // The trip to the verify tab is not the login itself, so next
+                // has to ride the query string here or it is gone by the time
+                // the code is actually entered.
+                header('Location: account.php?tab=verify' . ($next !== '' ? '&next=' . rawurlencode($next) : ''));
                 exit;
             }
             if ($ok) {
                 // Credit the referrer who sent this visitor, if any.
                 \SignalMasterAi\Referrals::attach(MemberAuth::currentId());
-                header('Location: charts.php');
+                header('Location: ' . ($next !== '' ? $next : 'charts.php'));
                 exit;
             }
             $error = $msg;
@@ -100,7 +114,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     // Referral credit waits for verification, so a code nobody
                     // types never pays anyone for the introduction.
                     \SignalMasterAi\Referrals::attach($pendingId);
-                    header('Location: charts.php');
+                    header('Location: ' . ($next !== '' ? $next : 'charts.php'));
                     exit;
                 }
                 $error = $vMsg;
@@ -207,6 +221,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // and alert volume, so nothing here is trusted as submitted.
         $cm = MemberAuth::current();
         if ($cm) {
+            // sanitiseWebhook() silently returns '' for anything it rejects
+            // (http://, a private-range host, ...) - save() would then store
+            // that blank indistinguishably from "left empty". Checked here,
+            // before save(), so a rejection can say so instead of reporting
+            // the same "Settings saved" as everything else on this form.
+            $webhookRaw = trim((string)($_POST['webhook_url'] ?? ''));
+            $webhookRejected = $webhookRaw !== ''
+                && \SignalMasterAi\MemberPrefs::sanitiseWebhook($webhookRaw) === '';
             \SignalMasterAi\MemberPrefs::save((int)$cm['id'], [
                 'profile'        => (string)($_POST['profile'] ?? 'balanced'),
                 'timezone'       => (string)($_POST['timezone'] ?? ''),
@@ -239,6 +261,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ),
                 'disabled_categories' => (array)($_POST['disabled_categories'] ?? []),
             ]);
+            if ($webhookRejected) {
+                // Carried across the redirect the same way verify_error/
+                // verify_notice already are, so the risk section can say what
+                // was typed and why it did not save.
+                $_SESSION['webhook_error'] = 'That webhook URL was not saved - it must be an https:// '
+                    . 'address, not a private or local one.';
+                $_SESSION['webhook_bad_value'] = $webhookRaw;
+                header('Location: account.php#risk');
+                exit;
+            }
             header('Location: account.php?saved=1#risk');
             exit;
         }
@@ -273,7 +305,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $error = 'Too many failed attempts. Try again in ' . (int)ceil($retry / 60) . ' minutes.';
         } elseif (MemberAuth::login($em, (string)($_POST['password'] ?? ''))) {
             \SignalMasterAi\RateLimit::loginPassed('mem', $em);
-            header('Location: charts.php');
+            header('Location: ' . ($next !== '' ? $next : 'charts.php'));
             exit;
         } elseif (($pendId = MemberAuth::pendingVerifyId()) > 0) {
             // Right password, unverified address. The credentials were good,
@@ -283,7 +315,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             [$sent, $sendMsg] = \SignalMasterAi\MemberVerify::issue($pendId);
             $_SESSION[$sent ? 'verify_notice' : 'verify_error'] =
                 'This address still needs verifying. ' . $sendMsg;
-            header('Location: account.php?tab=verify');
+            header('Location: account.php?tab=verify' . ($next !== '' ? '&next=' . rawurlencode($next) : ''));
             exit;
         } else {
             \SignalMasterAi\RateLimit::loginFailed('mem', $em);
@@ -293,6 +325,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $member = MemberAuth::current();
+
+// A rejected webhook URL, handed across the redirect above.
+$webhookBadValue = null;
+if (($_SESSION['webhook_error'] ?? '') !== '') {
+    $error = (string)$_SESSION['webhook_error'];
+    $webhookBadValue = (string)($_SESSION['webhook_bad_value'] ?? '');
+    unset($_SESSION['webhook_error'], $_SESSION['webhook_bad_value']);
+}
 
 // A logged-in member who still owes a code sees the code form, not their
 // account. The gate in MemberAuth::start() sends them here from everywhere
@@ -872,7 +912,7 @@ ob_start();
         <p class="prefs-hint">Every flip on your watched pairs is POSTed here as signed JSON — connect a
           bot, n8n, Zapier or your own service. HTTPS public endpoints only.</p>
         <label class="wh-label">Endpoint URL
-          <input type="url" name="webhook_url" value="<?= sma_e($prefs['webhook_url']) ?>" placeholder="https://example.com/hooks/signals">
+          <input type="url" name="webhook_url" value="<?= sma_e($webhookBadValue ?? $prefs['webhook_url']) ?>" placeholder="https://example.com/hooks/signals">
         </label>
         <?php if ($prefs['webhook_url'] !== ''): ?>
           <p class="prefs-hint">Verify requests with the <code>X-SMA-Signature</code> header (HMAC-SHA256).
@@ -1124,6 +1164,7 @@ ob_start();
         <form method="post" action="account.php?tab=verify">
           <input type="hidden" name="csrf" value="<?= $csrf ?>">
           <input type="hidden" name="act" value="verify_otp">
+          <?php if ($next !== ''): ?><input type="hidden" name="next" value="<?= sma_e($next) ?>"><?php endif; ?>
           <label>Verification code</label>
           <?php /* inputmode + one-time-code give a phone the numeric pad and the
                    autofill suggestion straight from the notification. */ ?>
@@ -1136,6 +1177,7 @@ ob_start();
         <form method="post" action="account.php?tab=verify" style="margin-top:10px">
           <input type="hidden" name="csrf" value="<?= $csrf ?>">
           <input type="hidden" name="act" value="resend_otp">
+          <?php if ($next !== ''): ?><input type="hidden" name="next" value="<?= sma_e($next) ?>"><?php endif; ?>
           <button type="submit" class="back"
                   style="background:none;border:0;padding:0;cursor:pointer;font:inherit">
             Didn't get it? Send another code</button>
@@ -1172,6 +1214,7 @@ ob_start();
       <form method="post" action="account.php?tab=<?= $tab ?>">
         <input type="hidden" name="csrf" value="<?= $csrf ?>">
         <input type="hidden" name="act" value="<?= $tab ?>">
+        <?php if ($next !== ''): ?><input type="hidden" name="next" value="<?= sma_e($next) ?>"><?php endif; ?>
         <label>Email</label>
         <input type="email" name="email" autocomplete="email" required>
         <label>Password<?= $tab === 'register' ? ' (min 8 characters)' : '' ?></label>

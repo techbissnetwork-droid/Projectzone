@@ -1212,7 +1212,7 @@ label:has(> input[type="checkbox"]), label:has(> input[type="radio"]) {
   font-weight: 500;
   letter-spacing: 0.09em;
   background: #1b2430;
-  color: var(--bg-accent);
+  color: var(--accent);
   border: 1px solid #33455c;
   border-radius: 6px;
   padding: 2px 7px;

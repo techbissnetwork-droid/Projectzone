@@ -519,6 +519,19 @@ input[type=file], textarea.note { width: 100%; margin-top: 6px; padding: 10px; b
     <?php if ($isLifetime): ?>
       <div class="okmsg">You already have <strong>lifetime premium</strong> on this account &mdash;
         there is nothing here you need to buy.</div>
+    <?php elseif ($member['tier'] === 'paid'): ?>
+      <?php // A TIME-LIMITED PLAN IS NOT A STRANGER'S FIRST VISIT.
+            //
+            // Unlike the lifetime notice above, this does not stand in place
+            // of the pitch below - a month or a year runs out, so buying more
+            // is a real purchase and the plan list stays exactly as it was.
+            // It just says what today's purchase would be extending, which
+            // the page below never mentioned. current() already downgrades an
+            // expired paid_until to 'free' before this runs, so this date is
+            // always still ahead. ?>
+      <div class="okmsg">You are on the <strong>Premium</strong> plan until
+        <strong><?= sma_e(gmdate('M j, Y', (int)$member['paid_until'])) ?></strong> UTC.
+        Purchasing below extends your current plan.</div>
     <?php endif; ?>
 
     <?php if ($payView): ?>

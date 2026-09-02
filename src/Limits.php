@@ -189,15 +189,24 @@ class Limits
      * Selling "30 backtests a day" while the backtester is off is the same
      * false claim as selling a feature nobody has - see Premium::featureLive(),
      * which this defers to wherever a limit belongs to a gated feature.
+     *
+     * Off entirely is not the only way a limit is unreachable: backtest.php
+     * also walls the whole feature off by TIER (member_backtest_tier), a
+     * separate gate from member_backtest_enabled. A free viewer that gate
+     * excludes can no more reach "3 backtests a day" than one where the
+     * feature is switched off, so the tier this is being asked for - the
+     * caller's viewer, defaulting to whoever is looking - has to clear that
+     * gate too.
      */
-    public static function live(string $key): bool
+    public static function live(string $key, ?string $tier = null): bool
     {
-        return match ($key) {
+        $on = match ($key) {
             'backtests'    => Premium::featureLive('backtest'),
             'ai_asks'      => Premium::featureLive('ai_ask'),
             'positions'    => Premium::featureLive('portfolio'),
             'scanner_rows' => Premium::featureLive('scanner'),
             default        => true,
         };
+        return $on && ($key !== 'backtests' || Gate::allows('backtest', $tier));
     }
 }

@@ -1056,7 +1056,7 @@ $siteTfsNow = \SignalMasterAi\Visibility::siteTfs($config['market']['intervals']
     <td><span class="badge <?= strtolower($s['signal']) ?>"><?= sma_e($s['signal']) ?></span></td>
     <td><?= $s['score'] > 0 ? '+' : '' ?><?= sma_e((string)$s['score']) ?></td>
     <td><?= sma_e((string)$s['confidence']) ?>%</td>
-    <td><?= sma_e((string)$s['price']) ?></td>
+    <td><?= sma_e(\SignalMasterAi\View::price($s['price'])) ?></td>
     <td><?php if (!$why): ?><span style="color:var(--up)">yes</span><?php else: ?>
       <span style="color:var(--warn)" title="<?= sma_e(implode('; ', $why)) ?>">no &mdash;
         <?= sma_e($why[0]) ?></span><?php endif; ?></td>

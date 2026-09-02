@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ]);
         flash($r['ok']
             ? 'Accuracy test queued: ' . (int)$r['total'] . ' replays. It advances on every cron '
-              . 'run, or press "Run a step" to push it along now.'
+              . 'run, or press "Run a step now" to push it along.'
             : $r['error'], $r['ok'] ? 'ok' : 'warn');
         header('Location: engine.php#presets');
         exit;
@@ -624,7 +624,7 @@ show_flash();
           <td><?= sma_e((string)$d['win_rate']) ?>%</td>
           <td><?= $d['wilson'] !== null ? sma_e((string)$d['wilson']) . '%' : '&mdash;' ?></td>
           <td style="font-weight:500"><?= ($d['expectancy'] >= 0 ? '+' : '') . sma_e((string)$d['expectancy']) ?>R</td>
-          <td>+<?= sma_e((string)$d['avg_win']) ?>R</td>
+          <td><?= $d['avg_win'] === null ? '&mdash;' : '+' . sma_e((string)$d['avg_win']) . 'R' ?></td>
           <td><?= sma_e((string)$d['avg_loss']) ?>R</td>
           <td style="font-weight:500"><?= $d['payoff'] !== null ? sma_e((string)$d['payoff']) : '&mdash;' ?></td>
           <td><?= $d['need_payoff'] !== null ? sma_e((string)$d['need_payoff']) : '&mdash;' ?></td>
@@ -1871,4 +1871,31 @@ foreach (Database::pdo()->query(
     <?php endif; ?>
   <?php endif; ?>
 </div>
+<?php // Every POST handler on this page redirects to engine.php#anchor so the
+      // admin lands back on the card they used, but html's global smooth
+      // scroll-behavior (admin.css) loses its race against the .form-card
+      // entrance animation on the very first paint - a known Chromium quirk
+      // where the browser's automatic fragment-scroll silently does nothing.
+      // It works fine for a same-page anchor click after load, so redo the
+      // jump ourselves once that animation has had time to finish, instead of
+      // touching the shared CSS/JS that everything else relies on. Forcing
+      // scroll-behavior to auto for this one jump is what actually gets it
+      // there - asking a *smooth* scroll to redo the same jump hits the same
+      // quirk it's working around, so it never moves either. ?>
+<script<?= sma_nonce() ?>>
+(function () {
+  var id = (location.hash || '').slice(1);
+  if (!id) { return; }
+  window.addEventListener('load', function () {
+    var el = document.getElementById(id);
+    if (!el) { return; }
+    setTimeout(function () {
+      var prev = document.documentElement.style.scrollBehavior;
+      document.documentElement.style.scrollBehavior = 'auto';
+      el.scrollIntoView({ block: 'start' });
+      document.documentElement.style.scrollBehavior = prev;
+    }, 450);
+  });
+}());
+</script>
 <?php admin_footer(); ?>

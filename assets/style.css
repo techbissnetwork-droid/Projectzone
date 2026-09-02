@@ -1065,7 +1065,11 @@ button.primary:disabled { opacity: 0.6; cursor: wait; }
   font-weight: 500;
   letter-spacing: 0.09em;
   background: #1b2430;
-  color: var(--bg-accent);
+  /* Was --bg-accent, a background-tint token, used as the foreground color -
+     against this chip's own dark background that landed text and background
+     within a hair of each other. --accent is the paired full-strength
+     foreground token, same as every other --bg-X/X pairing in this file. */
+  color: var(--accent);
   border: 1px solid #33455c;
   border-radius: 8px;
   padding: 3px 8px;

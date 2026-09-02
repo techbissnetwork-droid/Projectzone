@@ -252,7 +252,11 @@ ob_start(); ?>
   background: var(--accent); color: #fff; font-weight: 500; font-size: 14px; margin-bottom: 12px; }
 .step h3 { font-size: 15px; margin-bottom: 6px; }
 .step p { color: var(--muted); font-size: 13px; line-height: 1.65; }
-.price-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; max-width: 900px; margin: 0 auto; }
+/* 900px only fits 3 of the 220px-min cards, so the free tier plus 3 paid
+   plans (the common case) stranded the 4th alone on row two with a big
+   empty gap beside it. 1040px fits all 4 across at once (4*220 + 3*14 =
+   922) while staying inside .sec's own 1100px cap. */
+.price-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; max-width: 1040px; margin: 0 auto; }
 .price { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; text-align: center; }
 /* Brass is earned status, and the premium tier is exactly that. A glow was
    doing the job a border should do, and it was the accent colour rather

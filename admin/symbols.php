@@ -977,8 +977,8 @@ if ($coinRow):
         <p class="hint">Sets this coin's whole ladder - targets always publish at exactly 1&times;,
           2&times; and 3&times; this distance.</p></div>
       <div><label>Chase-guard distance (ATR multiple)</label>
-        <input type="number" step="0.1" name="tp1_atr_mult" value="<?= $val('tp1_atr_mult') ?>"
-               placeholder="<?= $def('tp1_atr_mult', '1.0') ?>">
+        <input aria-label="Chase-guard distance (ATR multiple)" type="number" step="0.1" name="tp1_atr_mult" value="<?= $val('tp1_atr_mult') ?>"
+               placeholder="site default: <?= $def('tp1_atr_mult', '1.0') ?>">
         <p class="hint">Not a price target - only when this coin's "entry is stale" warning kicks in.</p></div>
     </div>
     <label class="chk"><input type="checkbox" name="levels_enabled_set" <?= isset($ov['levels_enabled']) ? 'checked' : '' ?>>

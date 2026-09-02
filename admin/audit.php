@@ -75,18 +75,18 @@ show_flash();
         'Changes appear here from the moment they are made - this page cannot show what happened before it existed.'); ?>
   <?php else: ?>
   <div class="tbl-scroll">
-  <table class="grid">
+  <table class="grid stack">
     <tr class="head"><th>When</th><th>Who</th><th>Change</th><th>What</th><th>From</th><th>To</th></tr>
     <?php foreach ($rows as $r): ?>
     <tr>
-      <td class="muted" style="white-space:nowrap"><?= sma_e(gmdate('M j, H:i', (int)$r['at'])) ?></td>
-      <td><?php if ($r['actor'] === Audit::ACTOR_ENGINE): ?>
+      <td class="muted" style="white-space:nowrap" data-label="When"><?= sma_e(gmdate('M j, H:i', (int)$r['at'])) ?></td>
+      <td data-label="Who"><?php if ($r['actor'] === Audit::ACTOR_ENGINE): ?>
             <span class="badge" style="background:var(--warn-bg);color:var(--warn)">ENGINE</span>
           <?php else: ?><strong><?= sma_e($r['actor']) ?></strong><?php endif; ?></td>
-      <td><code><?= sma_e($r['action']) ?></code></td>
-      <td><?= sma_e($r['target']) ?></td>
-      <td class="muted"><?= $r['before_val'] === '' ? '&mdash;' : sma_e($r['before_val']) ?></td>
-      <td><strong><?= $r['after_val'] === '' ? '&mdash;' : sma_e($r['after_val']) ?></strong></td>
+      <td data-label="Change"><code><?= sma_e($r['action']) ?></code></td>
+      <td data-label="What"><?= sma_e($r['target']) ?></td>
+      <td class="muted" data-label="From"><?= $r['before_val'] === '' ? '&mdash;' : sma_e($r['before_val']) ?></td>
+      <td data-label="To"><strong><?= $r['after_val'] === '' ? '&mdash;' : sma_e($r['after_val']) ?></strong></td>
     </tr>
     <?php endforeach; ?>
   </table>
