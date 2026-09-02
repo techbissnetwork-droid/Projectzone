@@ -63,9 +63,11 @@
 .bento {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  grid-auto-rows: minmax(240px, auto);
-  gap: 1rem;
+  grid-auto-rows: minmax(200px, auto);
+  align-items: start;
+  gap: 0.85rem;
 }
+.bento > .service-card { min-height: 0; }
 .bento > .card:nth-child(1) {
   grid-column: span 2;
   overflow: hidden; position: relative;
@@ -93,44 +95,6 @@
   .bento > .card:nth-child(1),
   .bento > .card:nth-child(4) { grid-column: span 1; }
 }
-
-/* ---------------------------------------------------------------------
-   1c-2. Colour-blocked bento cards — the same solid-gradient treatment
-   as the industries strip, cycling per card. Bright backgrounds need
-   dark text/icon/ghost-numeral throughout, the cursor spotlight glow
-   turned off (it's tinted for a dark card and would muddy a bright
-   one), and the hover state kept from reverting to the dark surface
-   color the plain card style hovers to.
-   --------------------------------------------------------------------- */
-.bento > .service-card {
-  border-color: rgba(0, 0, 0, 0.1);
-  transition: transform var(--t-base) var(--ease-out), box-shadow var(--t-base) var(--ease);
-}
-.bento > .service-card:nth-child(6n+1) { background: linear-gradient(155deg, var(--lime), #7FD957); }
-.bento > .service-card:nth-child(6n+2) { background: linear-gradient(155deg, var(--cyan), #2497E0); }
-.bento > .service-card:nth-child(6n+3) { background: linear-gradient(155deg, var(--rose), #FF9A5D); }
-.bento > .service-card:nth-child(6n+4) { background: linear-gradient(155deg, var(--violet), #7FA1FF); }
-.bento > .service-card:nth-child(6n+5) { background: linear-gradient(155deg, var(--amber), #FF9A5D); }
-.bento > .service-card:nth-child(6n+0) { background: linear-gradient(155deg, #7FE9D0, #4DC8FF); }
-.bento > .service-card.card--interactive:hover,
-.bento > .service-card.card--interactive:focus-within {
-  border-color: rgba(0, 0, 0, 0.16);
-  box-shadow: var(--sh-lg);
-}
-.bento > .service-card::before { display: none; }
-.bento > .service-card.card--spotlight::after { display: none; }
-.bento > .service-card .service-card__name,
-.bento > .service-card .service-card__name a { color: #0A0C0D; }
-.bento > .service-card .service-card__tagline { color: rgba(10, 12, 13, 0.72); }
-.bento > .service-card .service-card__text { color: rgba(10, 12, 13, 0.62); }
-.bento > .service-card .link { color: #0A0C0D; }
-.bento > .service-card .icon-plate {
-  background: rgba(10, 12, 13, 0.14);
-  border-color: rgba(10, 12, 13, 0.18);
-  color: #0A0C0D;
-}
-.bento > .card:nth-child(1)::before,
-.bento > .card:nth-child(4)::before { -webkit-text-stroke-color: rgba(10, 12, 13, 0.22); }
 
 /* ---------------------------------------------------------------------
    1d. Hero status chips — small trust signals floating beside the hero.
@@ -648,7 +612,7 @@ body.has-cursor-fx.cursor-hidden .cursor-ring { opacity: 0; }
    --------------------------------------------------------------------- */
 .hero {
   position: relative;
-  min-height: 88vh;
+  min-height: 74vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -798,7 +762,11 @@ body.has-cursor-fx.cursor-hidden .cursor-ring { opacity: 0; }
 /* ---------------------------------------------------------------------
    8. Service / feature cards
    --------------------------------------------------------------------- */
-.service-card { min-height: 100%; }
+/* Sizes to its own content everywhere it's used (bento, grid-3 related-
+   services, popular-services) rather than stretching to match a taller
+   sibling in the same row — stretching pins the "Explore" link to the
+   bottom of a card with room to spare, leaving a dead gap above it. */
+.service-card { min-height: 0; align-self: start; }
 .service-card .icon-plate { margin-bottom: 1.15rem; }
 .service-card__name { font-size: var(--fs-h4); font-weight: 600; margin-bottom: 0.4rem; }
 /* The title was a 20px-tall target on a card the size of a hand. Stretching it
