@@ -328,11 +328,11 @@ INSERT INTO `pages` (`slug`,`title`,`eyebrow`,`subtitle`,`content`,`template`,`s
 -- Homepage sections
 -- ---------------------------------------------------------------------
 INSERT INTO `page_sections` (`page_key`,`section_key`,`eyebrow`,`heading`,`subheading`,`body`,`cta_label`,`cta_url`,`is_published`,`sort_order`,`created_at`,`updated_at`) VALUES
-('home','hero','One partner. Websites and apps.','Your Digital Business Starts Here.','We take offline businesses online — domain, website, email, branding, SEO — and build the custom app you have in mind.','','Tell Us What You Need','/request',1,1,NOW(),NOW()),
+('home','hero','One partner, everything digital','Everything your business needs — live.','Domain, hosting, the site, email, and the app you have in mind — designed, built, and kept running by one team.','','Tell us what you need','/request',1,1,NOW(),NOW()),
 ('home','problem','The starting point','Still running your business mostly offline?','You have the customers and the reputation. What is missing is the part that makes you easy to find and easy to buy from.','','See how it works','/how-it-works',1,2,NOW(),NOW()),
-('home','services','What we do','Everything your business needs to operate online.','Everything you need to run your business online, delivered as one setup — domain, hosting, the site, email, and the app you have in mind.','','View all services','/services',1,4,NOW(),NOW()),
+('home','services','What we build','Six disciplines, run as one shop.','','','View all services','/services',1,4,NOW(),NOW()),
 ('home','work','Selected work','Built the same way yours will be.','Case studies covering websites, applications, commerce and brand systems.','','View all work','/portfolio',1,8,NOW(),NOW()),
 ('home','industries','Industries','Built around your sector.','A restaurant and a law firm need different things. We start from your sector, not a template.','','All industries','/industries',1,9,NOW(),NOW()),
-('home','cta','Ready when you are','Let''s build your digital business.','Tell us about the business. You get a scope, a schedule and a price. No obligation.','','Tell Us What You Need','/request',1,10,NOW(),NOW());
+('home','cta','Ready when you are','No sales script. Tell us what you run.','We will come back with a clear scope, a schedule and a price — no obligation.','','Tell us what you need','/request',1,10,NOW(),NOW());
 
 

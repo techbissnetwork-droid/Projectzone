@@ -54,46 +54,22 @@
 }
 
 /* ---------------------------------------------------------------------
-   1c. Bento grid — an asymmetric card grid for a flagship feature list.
-   First item runs large (2x2), a middle item runs wide (2x1), the rest
-   fill in at 1x1 — CSS grid auto-flow handles any item count gracefully.
-   A large ghost numeral sits behind each card's content, clipped to its
-   rounded corners; --i (already output by service-card.php) drives it.
+   1c. Bento grid — a plain equal-column card grid for a flagship feature
+   list. Every card is the same size; hierarchy comes from the small
+   numbered icon plate on each card, not from a bigger or wider one.
    --------------------------------------------------------------------- */
 .bento {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-auto-rows: minmax(200px, auto);
+  grid-template-columns: repeat(3, 1fr);
   align-items: start;
   gap: 0.85rem;
 }
 .bento > .service-card { min-height: 0; }
-.bento > .card:nth-child(1) {
-  grid-column: span 2;
-  overflow: hidden; position: relative;
-}
-.bento > .card:nth-child(1)::before {
-  content: "01";
-  position: absolute;
-  top: -0.1em; right: 1.3rem; left: auto;
-  font-family: var(--font-display); font-weight: 800; font-size: 6.5rem; line-height: 1;
-  color: transparent; -webkit-text-stroke: 1px var(--border-strong);
-  pointer-events: none; z-index: 0;
-}
-.bento > .card:nth-child(1) > * { position: relative; z-index: 1; }
-.bento > .card:nth-child(4) { grid-column: span 2; }
 @media (max-width: 900px) {
   .bento { grid-template-columns: repeat(2, 1fr); }
-  .bento > .card:nth-child(1) { grid-column: span 2; }
 }
 @media (max-width: 560px) {
   .bento { grid-template-columns: 1fr; }
-  /* Both wide cards need resetting here, not just the featured one — a
-     lone leftover span:2 on a 1-column grid makes CSS Grid invent a
-     phantom second column, which starves every card's real column down
-     to a sliver and wraps every heading to one letter per line. */
-  .bento > .card:nth-child(1),
-  .bento > .card:nth-child(4) { grid-column: span 1; }
 }
 
 /* ---------------------------------------------------------------------
@@ -148,6 +124,18 @@
   border: 2px solid var(--border-strong); transition: border-color 320ms ease, background 320ms ease;
 }
 .rail-step.is-active .rail-step__dot { border-color: var(--lime); background: var(--lime); }
+
+/* ---------------------------------------------------------------------
+   1f-2. Process row — a compact horizontal variant of the same four
+   steps, for the homepage flagship section where a full-height vertical
+   timeline runs long. Same content, read left to right instead.
+   --------------------------------------------------------------------- */
+.process-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2rem; }
+.process-row__step { padding-top: 1.1rem; border-top: 1px solid var(--border); }
+.process-row__no { font-family: var(--font-display); font-weight: 700; font-size: 1.35rem; color: var(--text-faint); display: block; margin-bottom: 0.9rem; }
+.process-row__step h3 { font-size: 1rem; margin: 0 0 0.4rem; }
+.process-row__step p { margin: 0; color: var(--text-muted); font-size: 0.85rem; line-height: 1.6; }
+@media (max-width: 680px) { .process-row { grid-template-columns: 1fr 1fr; } }
 
 /* ---------------------------------------------------------------------
    1g. Industries strip — a horizontally-scrolling row of colour-blocked
@@ -612,11 +600,13 @@ body.has-cursor-fx.cursor-hidden .cursor-ring { opacity: 0; }
    --------------------------------------------------------------------- */
 .hero {
   position: relative;
-  min-height: 74vh;
+  min-height: 62vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 6vh 0 4vh;
+  align-items: center;
+  text-align: center;
+  padding: 7vh 0 5vh;
   overflow: hidden;
   isolation: isolate;
 }
@@ -626,20 +616,25 @@ body.has-cursor-fx.cursor-hidden .cursor-ring { opacity: 0; }
   content: ""; position: absolute; inset: 0;
   background: linear-gradient(180deg, transparent 40%, var(--bg) 96%);
 }
-.hero__inner { display: block; }
-.hero__copy { max-width: 42rem; }
+.hero__inner { display: flex; flex-direction: column; align-items: center; }
+.hero__copy { max-width: 42rem; margin-inline: auto; }
 .hero__title { margin: 1.15rem 0 1.35rem; }
-.hero__lead { max-width: 42rem; }
-.hero__actions { margin-top: 2.15rem; display: flex; gap: 0.75rem; flex-wrap: wrap; }
+.hero__lead { max-width: 36rem; margin-inline: auto; }
+.hero__actions { margin-top: 1.9rem; display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: center; }
 .hero__meta {
-  margin-top: 2.5rem;
-  padding-top: 1.75rem;
+  margin-top: 2.75rem;
+  padding-top: 1.6rem;
   border-top: 1px solid var(--border-faint);
-  display: flex; flex-wrap: wrap; gap: 1.35rem 2.25rem;
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 0 0;
 }
-.hero__meta-item { display: flex; flex-direction: column; gap: 0.15rem; }
-.hero__meta-value { font-size: 1.4rem; font-weight: 600; letter-spacing: -0.02em; color: var(--text); font-variant-numeric: tabular-nums; }
-.hero__meta-label { font-size: var(--fs-xs); color: var(--text-muted); }
+.hero__meta-item { display: flex; flex-direction: column; gap: 0.15rem; padding: 0 clamp(1.25rem, 3.5vw, 2.25rem); border-left: 1px solid var(--border-faint); }
+.hero__meta-item:first-child { border-left: none; }
+.hero__meta-value { font-family: var(--font-display); font-size: 1.7rem; font-weight: 700; letter-spacing: -0.02em; color: var(--text); font-variant-numeric: tabular-nums; }
+.hero__meta-label { font-size: var(--fs-xs); color: var(--text-muted); margin-top: 0.2rem; }
+@media (max-width: 480px) {
+  .hero__meta { flex-direction: column; gap: 1.25rem; }
+  .hero__meta-item { border-left: none; padding: 0; }
+}
 
 /* Announcement pill above the headline */
 .hero__flag {
@@ -653,6 +648,13 @@ body.has-cursor-fx.cursor-hidden .cursor-ring { opacity: 0; }
 }
 .hero__flag .badge { padding: 0.2rem 0.5rem; }
 .hero__flag .icon { width: 14px; height: 14px; color: var(--text-faint); }
+.hero__flag-dot {
+  width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); flex: none;
+  box-shadow: 0 0 10px var(--accent-glow);
+  animation: flagblink 2.2s ease-in-out infinite;
+}
+@keyframes flagblink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+@media (prefers-reduced-motion: reduce) { .hero__flag-dot { animation: none; } }
 
 /* ---------------------------------------------------------------------
    5b. Radar visual — a small pulsing signal motif for pages that want a
@@ -715,7 +717,8 @@ body.has-cursor-fx.cursor-hidden .cursor-ring { opacity: 0; }
   overflow: hidden;
   mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
-  padding-block: 0.5rem;
+  padding-block: 0.9rem;
+  border-block: 1px solid var(--border);
 }
 .marquee__track {
   display: flex;
@@ -775,7 +778,7 @@ body.has-cursor-fx.cursor-hidden .cursor-ring { opacity: 0; }
 .service-card__name a::after,
 .card--interactive > .card__title > a::after { content: ""; position: absolute; inset: 0; }
 .card--interactive > .card__footer { position: relative; z-index: 1; }
-.service-card__tagline { font-size: var(--fs-sm); color: var(--accent); margin-bottom: 0.6rem; font-weight: 500; }
+.service-card__tagline { font-size: var(--fs-sm); color: var(--text-soft); margin-bottom: 0.6rem; font-weight: 500; }
 .service-card__text { font-size: var(--fs-sm); color: var(--text-muted); line-height: 1.62; }
 .service-card__link { margin-top: 1.35rem; position: relative; z-index: 1; }
 

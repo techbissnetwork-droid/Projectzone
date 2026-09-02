@@ -33,7 +33,7 @@ $gaId       = $settings->get('google_analytics_id');
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <?php $fontHref = 'https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800;900&family=Manrope:wght@400;500;600;700&family=Azeret+Mono:wght@400;500&display=swap'; ?>
+    <?php $fontHref = 'https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Inter:wght@400;500;600;700&family=Azeret+Mono:wght@400;500&display=swap'; ?>
     <link rel="stylesheet" href="<?= e($fontHref) ?>" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="<?= e($fontHref) ?>"></noscript>
 
