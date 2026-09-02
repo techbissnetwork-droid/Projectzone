@@ -1,7 +1,6 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__ . '/app/bootstrap.php';
-require_once __DIR__ . '/partials/compact.php';
 
 $homeCount = max(3, min(9, (int)Settings::get('home_services', '6')));
 $services  = Database::all('SELECT * FROM services WHERE is_active = 1 ORDER BY sort_order, id LIMIT ' . $homeCount);
@@ -87,11 +86,7 @@ foreach (Content::sectionOrder() as $section):
     switch ($section):
 
     case 'journey':
-        if (Content::mode('journey') === 'full') {
-            require __DIR__ . '/partials/section_shift.php';
-        } else {
-            compact_block('journey', $secNum);
-        }
+        require __DIR__ . '/partials/section_shift.php';
         break;
 
     case 'services':
@@ -114,19 +109,11 @@ foreach (Content::sectionOrder() as $section):
         <?php break;
 
     case 'arch':
-        if (Content::mode('arch') === 'full') {
-            require __DIR__ . '/partials/section_arch.php';
-        } else {
-            compact_block('arch', $secNum);
-        }
+        require __DIR__ . '/partials/section_arch.php';
         break;
 
     case 'process':
-        if (Content::mode('process') === 'full') {
-            require __DIR__ . '/partials/section_process.php';
-        } else {
-            compact_block('process', $secNum);
-        }
+        require __DIR__ . '/partials/section_process.php';
         break;
 
     case 'work':
@@ -170,19 +157,11 @@ foreach (Content::sectionOrder() as $section):
         <?php break;
 
     case 'transform':
-        if (Content::mode('transform') === 'full') {
-            require __DIR__ . '/partials/section_transform.php';
-        } else {
-            compact_block('transform', $secNum);
-        }
+        require __DIR__ . '/partials/section_transform.php';
         break;
 
     case 'pillars':
-        if (Content::mode('pillars') === 'full') {
-            require __DIR__ . '/partials/section_pillars.php';
-        } else {
-            compact_block('pillars', $secNum);
-        }
+        require __DIR__ . '/partials/section_pillars.php';
         break;
 
     case 'marketplace':

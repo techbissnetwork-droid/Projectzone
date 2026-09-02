@@ -61,24 +61,6 @@ final class Content
         ],
     ];
 
-    /** Sections that have both a summary and a full version, and where the
-     *  full one lives when the home page shows only the summary. */
-    public const DUAL = [
-        'journey'   => 'transformation.php',
-        'arch'      => 'technology.php',
-        'process'   => 'process.php',
-        'transform' => 'transformation.php#types',
-        'pillars'   => 'technology.php#pillars',
-    ];
-
-    public static function mode(string $section): string
-    {
-        if (!isset(self::DUAL[$section])) {
-            return 'full';
-        }
-        return Settings::get('mode_' . $section, 'compact') === 'full' ? 'full' : 'compact';
-    }
-
     /** Sections of the home page, in the order the admin can rearrange. */
     public const SECTIONS = [
         'journey'     => 'Offline → online transformation',
