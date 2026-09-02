@@ -10,7 +10,13 @@ require_once __DIR__ . '/includes/auth.php';   // pulls functions.php + session 
 // Not set up yet → show a "down / under construction" page (503).
 // (down_page() sends the security headers itself before it prints anything.)
 if (!is_installed()) {
-    down_page('We\'re getting things ready', 'This site is being set up and will be live soon. Please check back shortly.');
+    down_page(
+        'We\'re getting things ready',
+        'This site is being set up and will be live soon. Please check back shortly.',
+        503,
+        'Set up this site',
+        url('/install/')
+    );
 }
 
 $S = settings();

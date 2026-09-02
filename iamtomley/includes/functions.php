@@ -256,7 +256,7 @@ function url_origin(string $url): string
  * Render a self-contained "site is down / under construction" page and exit.
  * Inline CSS so it works even before installation (no DB / assets needed).
  */
-function down_page(string $heading, string $sub, int $code = 503): void
+function down_page(string $heading, string $sub, int $code = 503, string $cta = '', string $ctaHref = ''): void
 {
     if (!headers_sent()) {
         http_response_code($code);
@@ -264,6 +264,11 @@ function down_page(string $heading, string $sub, int $code = 503): void
         security_headers();
     }
     $h = e($heading); $s = e($sub);
+    // Only the not-yet-installed page passes one of these. A maintenance page
+    // must not offer a visitor a way in.
+    $action = ($cta !== '' && $ctaHref !== '')
+        ? '<a class="cta" href="' . e($ctaHref) . '">' . e($cta) . '</a>'
+        : '';
     echo <<<HTML
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow">
@@ -286,10 +291,13 @@ background:linear-gradient(135deg,#00ffb3,#00d4ff);box-shadow:0 0 16px rgba(0,25
 @keyframes p{0%,100%{opacity:1}50%{opacity:.3}}
 h1{font-size:clamp(1.6rem,5vw,2.4rem);font-weight:800;letter-spacing:-.02em;margin-bottom:.75rem;line-height:1.1}
 p{color:#868aa3;font-size:1.02rem;line-height:1.7}
+.cta{display:inline-block;margin-top:1.6rem;padding:.8rem 1.4rem;border-radius:12px;
+font-weight:700;font-size:.95rem;text-decoration:none;color:#04120c;
+background:linear-gradient(135deg,#00ffb3,#00d4ff);box-shadow:0 14px 40px rgba(0,200,150,.3)}
 @media(prefers-reduced-motion:reduce){.b{animation:none}.dot{animation:none}}
 </style></head><body>
 <div class="bg"><span class="b b1"></span><span class="b b2"></span><span class="b b3"></span></div>
-<div class="card"><span class="dot"></span><h1>{$h}</h1><p>{$s}</p></div>
+<div class="card"><span class="dot"></span><h1>{$h}</h1><p>{$s}</p>{$action}</div>
 </body></html>
 HTML;
     exit;
