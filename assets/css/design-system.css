@@ -44,8 +44,10 @@
      on the page, so it gets its own value rather than reusing --accent. */
   --accent-on-tint: var(--accent);
 
-  --lime:    #c8ff4d;
-  --lime-ink: #1a2404;
+  --lime:      #c8ff4d;
+  --lime-soft: #d9ff81;
+  --lime-ink:  #1a2404;
+  --lime-glow: rgba(200, 255, 77, 0.32);
   --cyan:    #26d9c9;
   --violet:  #b9a8ff;
   --emerald: #34d399;
@@ -254,9 +256,10 @@ h4 { font-size: var(--fs-h4); letter-spacing: -0.012em; }
   font-variant-ligatures: none;
 }
 
-/* A restrained gradient on a few key words only */
+/* A restrained gradient on a few key words only — Pulse's own lime-to-cyan
+   signature, the same pairing the logo mark and CTAs use. */
 .text-gradient {
-  background: linear-gradient(104deg, var(--text) 12%, var(--accent-soft) 58%, var(--cyan) 96%);
+  background: linear-gradient(90deg, var(--lime), var(--cyan));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -493,14 +496,16 @@ h4 { font-size: var(--fs-h4); letter-spacing: -0.012em; }
 .btn:disabled, .btn[aria-disabled="true"] { opacity: 0.5; pointer-events: none; }
 .btn .icon { width: 1.05em; height: 1.05em; flex: none; }
 
-/* Primary: solid accent with a soft directional sheen on hover */
+/* Primary: solid lime with a soft directional sheen on hover — the one
+   accent Pulse reserves for CTAs/emphasis, kept off everyday UI (that's
+   cyan/--accent) so it stays a real signal when it shows up. */
 .btn--primary {
-  --btn-bg: var(--accent);
-  --btn-fg: var(--accent-ink);
+  --btn-bg: var(--lime);
+  --btn-fg: var(--lime-ink);
   --btn-bd: transparent;
   font-weight: 600;
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.16) inset,
-              0 10px 26px -12px var(--accent-glow);
+              0 10px 26px -12px var(--lime-glow);
 }
 .btn--primary::before {
   content: "";
@@ -511,9 +516,9 @@ h4 { font-size: var(--fs-h4); letter-spacing: -0.012em; }
   transition: transform 620ms var(--ease-out);
 }
 .btn--primary:hover {
-  background: var(--accent-soft);
+  background: var(--lime-soft);
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset,
-              0 16px 38px -14px var(--accent-glow);
+              0 16px 38px -14px var(--lime-glow);
 }
 .btn--primary:hover::before { transform: translateX(110%); }
 
