@@ -56,6 +56,12 @@
 
   /* Signature gradients */
   --grad-primary: linear-gradient(135deg, var(--mint) 0%, var(--cyan) 55%, var(--blue) 100%);
+  /* Same shape, but for hairlines and dots — a 3px bar has no room to carry
+     a colour that only reads at button size. Light theme redefines it. */
+  --grad-ink:     var(--grad-primary);
+  --track:        rgba(255, 255, 255, 0.16);
+  --stroke:       rgba(255, 255, 255, 0.22);
+  --glow-ink:     0 0 12px rgba(0, 255, 179, 0.6);
   --grad-accent:  linear-gradient(120deg, var(--mint) 0%, var(--cyan) 40%, var(--pink) 100%);
   --grad-text:    linear-gradient(90deg, var(--mint) 0%, var(--cyan) 45%, var(--pink) 100%);
   --grad-violet:  linear-gradient(135deg, var(--violet), var(--pink));
@@ -155,6 +161,10 @@
   --amber-ink:   #916800;
   --primary-ink: var(--mint-ink);
   --grad-text: linear-gradient(90deg, #00805a 0%, #007991 45%, #d00077 100%);
+  --grad-ink:  linear-gradient(135deg, #00805a 0%, #007991 55%, #0072ba 100%);
+  --track:     rgba(10, 15, 40, 0.28);
+  --stroke:    rgba(10, 15, 40, 0.3);
+  --glow-ink:  0 0 6px rgba(0, 105, 90, 0.35);
   --shadow-md: 0 12px 32px rgba(30, 40, 90, 0.12);
   --shadow-lg: 0 28px 64px rgba(30, 40, 90, 0.16);
   --shadow-xl: 0 40px 100px rgba(30, 40, 90, 0.2);
@@ -402,8 +412,8 @@ body.cursor-on .card, body.cursor-on .game-card { cursor: none; }
 /* ── 06 · Scroll progress + utilities ────────────────────────────────────── */
 .scroll-progress {
   position: fixed; top: 0; left: 0; height: 3px; width: 0;
-  z-index: 300; background: var(--grad-primary);
-  box-shadow: 0 0 12px rgba(0, 255, 179, 0.6);
+  z-index: 300; background: var(--grad-ink);
+  box-shadow: var(--glow-ink);
   will-change: width;
 }
 .wrap { width: 100%; max-width: var(--maxw); margin-inline: auto; padding-inline: var(--gutter); }
@@ -440,8 +450,8 @@ body.cursor-on .card, body.cursor-on .game-card { cursor: none; }
   display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
 .logo { display: inline-flex; align-items: center; gap: 0.6rem; font-family: var(--font-display);
   font-weight: 700; font-size: 1.15rem; letter-spacing: -0.02em; }
-.logo-mark { width: 10px; height: 10px; border-radius: 50%; background: var(--grad-primary);
-  box-shadow: 0 0 14px rgba(0, 255, 179, 0.7); animation: pulse-dot 2.4s ease-in-out infinite; }
+.logo-mark { width: 10px; height: 10px; border-radius: 50%; background: var(--grad-ink);
+  box-shadow: var(--glow-ink); animation: pulse-dot 2.4s ease-in-out infinite; }
 .nav-links { display: flex; align-items: center; gap: 0.15rem; }
 .nav-links a {
   position: relative; font-size: var(--fs-sm); font-weight: 500; color: var(--text-mute);
@@ -449,7 +459,7 @@ body.cursor-on .card, body.cursor-on .game-card { cursor: none; }
 }
 .nav-links a::after {
   content: ""; position: absolute; left: 0.9rem; right: 0.9rem; bottom: 0.35rem; height: 2px;
-  background: var(--grad-primary); border-radius: 2px; transform: scaleX(0); transform-origin: left;
+  background: var(--grad-ink); border-radius: 2px; transform: scaleX(0); transform-origin: left;
   transition: transform var(--dur-2) var(--ease);
 }
 .nav-links a:hover, .nav-links a:focus-visible { color: var(--text); }
@@ -659,9 +669,9 @@ body.cursor-on .card, body.cursor-on .game-card { cursor: none; }
 .project-link.ghost:hover { color: var(--text); border-color: var(--primary-ink);
   background: var(--glass-2); transform: translateY(-1px); box-shadow: none; }
 .sold-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(clamp(240px, 30%, 320px), 1fr)); gap: clamp(0.85rem, 1.6vw, 1.15rem); }
-.slider-progress { height: 3px; border-radius: 3px; background: var(--border); margin-top: 1.5rem; overflow: hidden; }
-.slider-progress-fill { height: 100%; border-radius: 3px; background: var(--grad-primary);
-  box-shadow: 0 0 10px rgba(0,255,179,0.5); transition: width var(--dur-3) var(--ease); }
+.slider-progress { height: 4px; border-radius: 4px; background: var(--track); margin-top: 1.5rem; overflow: hidden; }
+.slider-progress-fill { height: 100%; border-radius: 4px; background: var(--grad-ink);
+  box-shadow: var(--glow-ink); transition: width var(--dur-3) var(--ease); }
 
 /* ── 13 · Games ──────────────────────────────────────────────────────────── */
 .games-meta { display: flex; align-items: center; gap: 0.7rem; flex-wrap: wrap; margin-bottom: 1.5rem;
@@ -724,7 +734,7 @@ body.cursor-on .card, body.cursor-on .game-card { cursor: none; }
 .pg-info b { color: var(--primary-ink); }
 .pg-dots { display: flex; gap: 0.4rem; }
 .pg-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--border-strong); cursor: pointer; transition: all var(--dur-2) var(--ease); }
-.pg-dot.on { background: var(--primary); box-shadow: 0 0 8px rgba(0,255,179,0.6); transform: scale(1.2); }
+.pg-dot.on { background: var(--grad-ink); box-shadow: var(--glow-ink); transform: scale(1.2); }
 
 /* ── 14 · Game modal ─────────────────────────────────────────────────────── */
 .modal { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; padding: clamp(0.5rem, 2vw, 1.5rem);
@@ -1040,7 +1050,7 @@ html[data-motion="cinematic"] .hero-title.in .line-in { transform: none; }
 .marquee-item {
   font-family: var(--font-display); font-weight: 700; white-space: nowrap;
   font-size: clamp(1.1rem, 3.4vw, 1.9rem); letter-spacing: -0.01em;
-  color: transparent; -webkit-text-stroke: 1px var(--border-strong);
+  color: transparent; -webkit-text-stroke: 1px var(--stroke);
   transition: color var(--dur-2) var(--ease);
 }
 .marquee:hover .marquee-item { color: var(--text-mute); }
@@ -1060,3 +1070,16 @@ html[data-motion="off"] .marquee-track, html[data-motion="subtle"] .marquee-trac
   border-color: transparent; mix-blend-mode: normal;
 }
 .cursor-ring.labelled .cursor-label { opacity: 1; }
+
+/* On a very tall, narrow window — a phone, or a phone asking for the desktop
+   site — stretching the hero to the whole screen strands the content in the
+   middle with a band of nothing above and below it. Past this shape, let the
+   hero be as tall as what is in it. */
+@media (max-aspect-ratio: 3 / 4) {
+  .hero {
+    min-height: auto;
+    padding-top: calc(var(--header-h) + 7vh);
+    padding-bottom: 9vh;
+  }
+  .hero .scroll-hint { position: static; margin-top: 2.5rem; }
+}

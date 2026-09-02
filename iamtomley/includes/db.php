@@ -23,6 +23,9 @@ function db(): PDO
     if (DB_DRIVER === 'mysql') {
         $dsn = 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=' . DB_CHARSET;
         $pdo = new PDO($dsn, DB_USER, DB_PASS, $opts);
+        // Belt and braces: some MySQL builds ignore the DSN charset, and when
+        // they do, an emoji typed in the admin comes back as "?".
+        try { $pdo->exec("SET NAMES " . DB_CHARSET); } catch (Throwable $e) {}
     } else {
         if (!is_dir(DATA_DIR)) {
             @mkdir(DATA_DIR, 0775, true);
@@ -162,7 +165,40 @@ function migrate(PDO $pdo): void
     ensure_column($pdo, 'games', 'html_code', "TEXT");
     ensure_column($pdo, 'games', 'cover',     "VARCHAR(255) NOT NULL DEFAULT ''");
 
+    ensure_utf8mb4($pdo);
     seed($pdo);
+}
+
+/**
+ * Make sure the MySQL tables really are utf8mb4.
+ *
+ * A database created as latin1 — which plenty of hosting panels still do by
+ * default — silently turns an emoji into "?" on the way in. The tables are
+ * converted once and the fact recorded, so this costs nothing afterwards.
+ *
+ * Text that was already flattened to "?" cannot be recovered by this; those
+ * fields have to be typed again. From then on they stay as typed.
+ */
+function ensure_utf8mb4(PDO $pdo): void
+{
+    if (DB_DRIVER !== 'mysql') {
+        return;   // SQLite is UTF-8 throughout; nothing to do.
+    }
+    try {
+        $done = $pdo->query("SELECT svalue FROM settings WHERE skey = 'charset_fixed'")->fetchColumn();
+        if ($done === '1') {
+            return;
+        }
+        foreach (['settings', 'users', 'login_attempts', 'stats', 'projects', 'games'] as $t) {
+            try {
+                $pdo->exec("ALTER TABLE `$t` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+            } catch (Throwable $e) { /* one table failing must not stop the rest */ }
+        }
+        $pdo->prepare("INSERT INTO settings (skey, svalue) VALUES ('charset_fixed', '1')
+                       ON DUPLICATE KEY UPDATE svalue = '1'")->execute();
+    } catch (Throwable $e) {
+        // Older install without a settings table yet, or no ALTER rights.
+    }
 }
 
 /**
