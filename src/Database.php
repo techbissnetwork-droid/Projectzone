@@ -1818,7 +1818,13 @@ class Database
             'level_opt_report' => '',
             'ab_report' => '',
             'auto_backtest_enabled' => '1',
-            'auto_backtest_tfs' => '1h,4h,1d',
+            // Vestigial: nothing reads this any more (see admin/settings.php's
+            // own comment where it is kept in step with enabled_intervals on
+            // every save) - cron asks Visibility::siteTfs() directly. Kept
+            // matching enabled_intervals's default below so a fresh install's
+            // settings table doesn't show a fossil from before the two were
+            // unified into one list.
+            'auto_backtest_tfs' => '15m,1h,4h,1d,1w',
             'auto_backtest_last' => '0',
             // Telegram alerts: admin pastes a @BotFather token; members link
             // their chat with one tap. Uses the same watched pairs as email.
@@ -1840,7 +1846,10 @@ class Database
             // Batched, so the cost per cron run stays bounded whatever the
             // watchlist size.
             'fullscan_enabled' => '1',
-            'fullscan_tfs' => '15m,1h,4h',
+            // Vestigial, same as auto_backtest_tfs above: kept matching
+            // enabled_intervals's default so it isn't a fossil on a fresh
+            // install.
+            'fullscan_tfs' => '15m,1h,4h,1d,1w',
             'fullscan_batch' => '10',
             'fullscan_pos' => '0',
             // How often the host actually runs cron.php, for turning "10 coins
