@@ -14,7 +14,7 @@ process rail.
 | --- | --- |
 | `index.html` | Home — hero, 10-service bento grid, offline→online story, process rail, industries, stats, testimonials |
 | `services.html` | All ten services in detail, plus FAQ |
-| `industries.html` | Eight sectors and what the setup looks like in each |
+| `industries.html` | Eight sectors as a compact two-column grid, each with what its setup needs |
 | `pricing.html` | Build packages, care plans, full comparison table, add-ons, pricing FAQ |
 | `about.html` | Why the company exists, how it works, team, tech stack |
 | `contact.html` | Enquiry form, contact routes, pre-contact FAQ |
@@ -31,6 +31,12 @@ assets/
 
 No build step and no dependencies. Fonts come from Google Fonts; everything else
 is local.
+
+Scroll reveals are gated behind a `.js` class that an inline `<head>` script sets,
+so if JavaScript fails or is disabled the page renders fully visible rather than
+blank. The reveal observer is backed by a scroll sweep, because a fast scroll can
+otherwise move an element in and out between observer callbacks and leave it
+hidden for good.
 
 ## Running locally
 

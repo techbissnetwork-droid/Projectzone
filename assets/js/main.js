@@ -230,8 +230,28 @@
         entries.forEach(function(e){
           if(e.isIntersecting){ e.target.classList.add('is-in'); io.unobserve(e.target); }
         });
-      }, {rootMargin:'0px 0px -12% 0px', threshold:0.08});
+      }, {rootMargin:'0px 0px -60px 0px', threshold:0});
       revealEls.forEach(function(el){ io.observe(el); });
+      /* Safety net. The observer can miss an element when a fast scroll moves it
+         in and out between callback batches, which would leave it invisible for
+         good. Sweep anything already inside the viewport on scroll and once
+         after load, so nothing can stay hidden. */
+      var sweeping = false;
+      function sweep(){
+        sweeping = false;
+        var vh = window.innerHeight;
+        revealEls.forEach(function(el){
+          if(el.classList.contains('is-in')) return;
+          var r = el.getBoundingClientRect();
+          if(r.top < vh && r.bottom > 0){ el.classList.add('is-in'); io.unobserve(el); }
+        });
+      }
+      window.addEventListener('scroll', function(){
+        if(sweeping) return;
+        sweeping = true;
+        requestAnimationFrame(sweep);
+      }, {passive:true});
+      setTimeout(sweep, 2000);
     }
   }
 
