@@ -196,9 +196,10 @@ function coming_soon_card(): string
        entirely afterwards so it can never sit over the page. -->
   <div class="intro" id="intro" aria-hidden="true">
     <span class="intro-inner">
-      <span class="intro-mark"></span>
+      <img class="intro-logo" src="<?= e(url('/favicon/favicon.svg')) ?>" alt="" width="52" height="52" />
       <span class="intro-name"><?= e(setting('brand_name', 'iamtomley')) ?></span>
     </span>
+    <span class="intro-bar"><i class="intro-fill" id="introFill"></i></span>
   </div>
 
   <div class="bg" aria-hidden="true" style="--backdrop-image:url('<?= e($backdropImg) ?>')">

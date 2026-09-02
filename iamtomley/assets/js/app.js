@@ -38,11 +38,40 @@
     if (!CINEMATIC || seen) { el.remove(); return; }
     try { sessionStorage.setItem('introSeen', '1'); } catch (e) { /* private mode */ }
     document.body.style.overflow = 'hidden';
-    setTimeout(() => {
-      el.classList.add('lift');
-      document.body.style.overflow = '';
-      setTimeout(() => el.remove(), 900);
-    }, 850);
+    document.documentElement.classList.add('intro-up');
+
+    // The line tracks how far the page has actually got rather than running a
+    // fixed clock: it creeps while things are still arriving, then completes
+    // when they have. On a fast connection that makes the whole thing short.
+    const fill = $('#introFill');
+    if (fill) { requestAnimationFrame(() => { fill.style.width = '68%'; }); }
+
+    let closing = false;
+    const close = () => {
+      if (closing) return;
+      closing = true;
+      el.classList.add('ready');
+      if (fill) { fill.style.width = '100%'; }
+      // Let the line land, settle the mark out, then move the curtain.
+      setTimeout(() => {
+        el.classList.add('done');
+        setTimeout(() => {
+          el.classList.add('lift');
+          document.body.style.overflow = '';
+          document.documentElement.classList.remove('intro-up');
+          setTimeout(() => el.remove(), 820);
+        }, 200);
+      }, 300);
+    };
+
+    if (document.readyState === 'complete') {
+      setTimeout(close, 480);
+    } else {
+      window.addEventListener('load', () => setTimeout(close, 200), { once: true });
+    }
+    // Nothing on the page is worth being held behind a curtain for, so this
+    // gives up on its own if an image or a font never arrives.
+    setTimeout(close, 2600);
   })();
 
   /* ── Theme toggle ──────────────────────────────────────────────────────── */
