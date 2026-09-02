@@ -27,19 +27,28 @@ runner_strip();
     <h2><?= esc(setting('services.list.heading')) ?></h2>
     <p><?= esc(setting('services.list.sub')) ?></p>
   </div>
-  <div class="rows">
-<?php foreach ($services as $i => $s): ?>
-    <article class="row rv" id="<?= esc($s['slug']) ?>">
-      <span class="n"><?= sprintf('%02d', $i + 1) ?></span>
-      <div>
-        <h3><?= esc($s['title']) ?></h3>
-        <div class="sub"><?= esc($s['subtitle']) ?></div>
-      </div>
-      <div>
-        <p><?= esc($s['body']) ?></p>
-        <ul><?php foreach (lines($s['bullets']) as $b): ?><li><?= esc($b) ?></li><?php endforeach; ?></ul>
-      </div>
-    </article>
+  <div class="acc rv" id="servicelist">
+<?php foreach ($services as $i => $sv): ?>
+    <div class="item" id="<?= esc($sv['slug']) ?>">
+      <button class="q" type="button" aria-expanded="<?= $i === 0 ? 'true' : 'false' ?>">
+        <span class="qhead">
+          <span class="ico" aria-hidden="true"><?= esc($sv['icon']) ?></span>
+          <span>
+            <span class="t"><?= esc($sv['title']) ?></span>
+            <span class="s"><?= esc($sv['subtitle']) ?></span>
+          </span>
+        </span>
+        <span class="pm" aria-hidden="true">+</span>
+      </button>
+      <div class="a"><div class="acols">
+        <p><?= esc($sv['body']) ?></p>
+        <ul class="ticks">
+<?php foreach (lines($sv['bullets']) as $b): ?>
+          <li><?= esc($b) ?></li>
+<?php endforeach; ?>
+        </ul>
+      </div></div>
+    </div>
 <?php endforeach; ?>
   </div>
 </div></section>

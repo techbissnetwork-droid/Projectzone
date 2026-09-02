@@ -73,19 +73,29 @@ foreach ($rules as [$title, $icon, $body]): ?>
   </div>
 </div></section>
 
+<section><div class="wrap">
+  <div class="sh rv"><span class="no">How it works</span><h2>Four steps,<br>every time.</h2>
+    <p>We do them in the same order for everyone, and we do not skip one to hit a date.</p></div>
+  <div class="pr">
+    <div class="ps"><h4>We talk</h4>
+      <p>You tell us what your business does and what is missing. We tell you what is worth
+         doing first, and what is not worth paying for yet.</p></div>
+    <div class="ps"><h4>You get a price</h4>
+      <p>Everything you are getting, listed on one page, with one fixed price. Anything we buy
+         for you is charged at cost.</p></div>
+    <div class="ps"><h4>We build it</h4>
+      <p>Website, web address, hosting, security and email, all set up together and all in your
+         name. We write down how it works.</p></div>
+    <div class="ps"><h4>We look after it</h4>
+      <p>Checks, backups, renewals and support, from the same people who built it. Not a call
+         centre.</p></div>
+  </div>
+</div></section>
+
 <section class="tight"><div class="wrap">
   <p class="say rv">Plenty of people can build you a website. We are the ones
      <mark>still answering the phone three years later.</mark></p>
 </div></section>
-
-<?php $work = public_portfolio(3); if ($work): ?>
-<section><div class="wrap">
-  <div class="sh rv"><span class="no">Work</span><h2>What that<br>looks like.</h2></div>
-  <div class="grid-3">
-<?php foreach ($work as $p) { portfolio_card($p); } ?>
-  </div>
-</div></section>
-<?php endif; ?>
 
 <?php
 closing_cta(setting('about.cta.heading'), setting('about.cta.body'),

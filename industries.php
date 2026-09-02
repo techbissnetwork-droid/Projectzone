@@ -41,16 +41,6 @@ runner_strip();
 
 <?php statement(setting('industries.statement')); ?>
 
-<?php $work = public_portfolio(3); if ($work): ?>
-<section><div class="wrap">
-  <div class="sh rv"><span class="no">In practice</span><h2>Same setup,<br>different job.</h2>
-    <p>Three real businesses, and what their website actually had to do each day.</p></div>
-  <div class="grid-3">
-<?php foreach ($work as $p) { portfolio_card($p); } ?>
-  </div>
-</div></section>
-<?php endif; ?>
-
 <?php
 closing_cta(setting('industries.cta.heading'), setting('industries.cta.body'),
     ['contact.php', 'Talk to us &rarr;'], ['pricing.php', 'See pricing']);

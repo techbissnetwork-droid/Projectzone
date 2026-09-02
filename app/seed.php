@@ -218,43 +218,43 @@ function seed_missing_settings(): array
 function seed_services(): void
 {
     $rows = [
-        ['Websites', 'Designed and built for you', '\u{25c8}',
+        ['Websites', 'Designed and built for you', '◈',
          'A website built for the business you actually run, not picked off a shelf. Quick to load on a phone, easy for Google to read, and simple enough that you can change the words yourself afterwards.',
          "Five to fifty pages, laid out around what your customers look for\nYou can edit the words, prices and pictures yourself — no code\nWritten with you, so it says what you actually do\nChecked on real phones, not just a big screen"],
 
-        ['Web and mobile apps', 'When a website is not enough', '\u{25d0}',
+        ['Web and mobile apps', 'When a website is not enough', '◐',
          'Booking systems, online ordering, customer logins, staff dashboards. The sort of thing you need once a spreadsheet and a phone are not coping any more.',
          "Booking and appointments, with reminders that actually go out\nCustomer logins — their orders, their documents, their history\nDashboards for whoever runs the place\nBuilt on your own hosting, so you are never locked in"],
 
-        ['Web addresses', 'Yours, in your name', '\u{25c7}',
+        ['Web addresses', 'Yours, in your name', '◇',
          'Your web address — the yourbusiness.com part. The most common mess we clean up is finding it registered to an old designer who has vanished. Yours goes in your name, on your account, with you as the owner.',
          "Buying it, moving it, and renewing it — always in your name\nSet up and written down, so anyone could take it over\nLocked so it cannot be moved without you\nWe do the work without owning the thing"],
 
-        ['Hosting', 'Where your site lives', '\u{25a3}',
+        ['Hosting', 'Where your site lives', '▣',
          'Hosting is the space your website sits in. We set it up, make it quick, and keep an eye on it. Copies of everything are taken every night whether anyone remembers or not.',
          "Set up, moved over, and tuned for your site\nA fresh copy saved every night, kept for a month\nChecked every minute to make sure it is still up\nA private copy to try changes on before they go live"],
 
-        ['Security and the padlock', 'So nothing quietly breaks', '\u{26e8}',
+        ['Security and the padlock', 'So nothing quietly breaks', '⛨',
          'The padlock in the address bar means your site is secure — and browsers now warn people away from sites without one. We put it in place, renew it automatically, and watch it, because an expired one takes a business offline on a Sunday afternoon.',
          "The padlock set up and renewed before it ever runs out\nWatched, so we hear about a problem before you do\nSoftware kept up to date and logins locked down\nIf something nasty ever gets in, we clean it up"],
 
-        ['Business email', 'Mail that arrives', '\u{2709}',
+        ['Business email', 'Mail that arrives', '✉',
          'you@yourbusiness.com instead of a Gmail address. Just as important, we set it up properly behind the scenes so your quotes and invoices land in the inbox rather than the spam folder.',
          "Email addresses on your own name\nSet up so it does not get treated as spam\nMoved across from Gmail or an old provider, losing nothing\nShared inboxes like info@ for the whole team"],
 
-        ['Getting found on Google', 'And on Maps', '\u{25ce}',
+        ['Getting found on Google', 'And on Maps', '◎',
          'Two jobs. Making the site something Google can read properly, and making sure your business shows up on Maps with the right opening hours and phone number.',
          "The technical groundwork so Google can read every page\nYour Google listing set up and verified\nHours, address and phone kept right everywhere they appear\nA short monthly update in plain English, not a 40-page report"],
 
-        ['Logo and branding', 'The look, everywhere', '\u{2726}',
+        ['Logo and branding', 'The look, everywhere', '✦',
          'Your logo, colours and typefaces, plus the files you need for everything else — signs, social media, invoices, the van.',
          "A logo in every format you will ever be asked for\nColours and type written down, so everything matches\nReady-made templates for social media and print\nA one-page guide, so other suppliers stay on brand"],
 
-        ['Automating the boring bits', 'Fewer things done by hand', '\u{27f2}',
+        ['Automating the boring bits', 'Fewer things done by hand', '⟲',
          'The jobs you repeat every week — chasing enquiries, sending invoices, reminding people about appointments — handed to software so nobody is doing them at 9pm.',
          "Enquiries going straight to the right inbox or phone\nInvoices and receipts created for you\nReminders for appointments and payments\nJoining up the tools you already pay for"],
 
-        ['Support', 'One number, same people', '\u{260e}',
+        ['Support', 'One number, same people', '☎',
          'When you call, you get the people who built it. No ticket queue in another country, and no explaining your setup from scratch every time.',
          "First reply within four working hours\nAnything that takes your site down is fixed the same day\nSmall changes done for you if you are on a care plan\nYour setup written down, so it is not stuck in one head"],
     ];
@@ -276,21 +276,21 @@ function seed_services(): void
 function seed_industries(): void
 {
     $rows = [
-        ['Shops and retail', '\u{25ec}', 'Stock that changes, opening hours that matter, and customers checking their phone while standing outside your door.',
+        ['Shops and retail', '◬', 'Stock that changes, opening hours that matter, and customers checking their phone while standing outside your door.',
          "Opening hours on Google that are always right\nProduct or menu pages you can update in a minute\nClick and collect, or a full online shop\nReviews pointed somewhere useful"],
-        ['Schools and training', '\u{25eb}', 'Parents, students and staff all want different things from the same website, usually on the same evening.',
+        ['Schools and training', '◫', 'Parents, students and staff all want different things from the same website, usually on the same evening.',
          "Term dates, newsletters and closures\nApplication and enquiry forms\nA staff area for notices and documents\nEmail on the school name, not personal accounts"],
-        ['Restaurants and hotels', '\u{25c9}', 'Bookings, menus and good photographs. If the phone rings less after launch, that was the point.',
+        ['Restaurants and hotels', '◉', 'Bookings, menus and good photographs. If the phone rings less after launch, that was the point.',
          "Table or room booking that keeps itself in step\nMenus you can change in two minutes\nPhoto galleries that do not slow the site down\nThe same details everywhere people look you up"],
-        ['Solicitors and accountants', '\u{25c6}', 'Trust comes first. The website has to look like a firm that charges what you charge.',
+        ['Solicitors and accountants', '◆', 'Trust comes first. The website has to look like a firm that charges what you charge.',
          "Clear pages for each thing you do, and for each person\nEnquiry forms that handle sensitive details properly\nA private area for client documents\nEmail set up so client mail never lands in spam"],
-        ['Clinics and healthcare', '\u{271a}', 'Appointments, the people who work there, and clear information for someone who is worried.',
+        ['Clinics and healthcare', '✚', 'Appointments, the people who work there, and clear information for someone who is worried.',
          "Appointment requests, with reminders sent out\nProfiles and hours for each practitioner\nEnquiries handled carefully and kept private\nSeveral locations kept in step with each other"],
-        ['Estate agents', '\u{25a2}', 'Listings that change every week, and buyers who leave the moment a page is slow.',
+        ['Estate agents', '▢', 'Listings that change every week, and buyers who leave the moment a page is slow.',
          "Property listings with photos and filters\nEnquiries sent straight to the right agent\nFeeds to the portals you already use\nArea pages that show up in local searches"],
-        ['Builders and tradespeople', '\u{2699}', 'You are on a roof, not at a desk. The website has to sell while you work.',
+        ['Builders and tradespeople', '⚙', 'You are on a roof, not at a desk. The website has to sell while you work.',
          "A short quote form that lands on your phone\nPages for each area you cover, so locals find you\nBefore and after photos of real jobs\nReviews and trade memberships up front"],
-        ['Charities and local groups', '\u{2661}', 'Small budgets, lots of volunteers, and a real need for things not to break when the person who set them up moves on.',
+        ['Charities and local groups', '♡', 'Small budgets, lots of volunteers, and a real need for things not to break when the person who set them up moves on.',
          "Events, notices and newsletters\nDonations or membership sign-ups\nShared inboxes, so handover is easy\nEverything written down, not stuck in one head"],
     ];
     $i = 0;

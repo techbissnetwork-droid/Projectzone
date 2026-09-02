@@ -9,6 +9,7 @@ $activeNav = 'pricing';
 $sym       = setting('site.currency', '$');
 $builds    = active_packages('build');
 $care      = active_packages('care');
+$careBlurb = setting('pricing.care.sub');
 $addons    = active_addons();
 
 include APP_DIR . '/partials/head.php';
@@ -43,20 +44,23 @@ function package_row(array $packages, string $sym): void
 ?>
 
 <section><div class="wrap">
-  <div class="sh rv"><span class="no">Building it</span>
-    <h2><?= esc(setting('pricing.build.heading')) ?></h2>
-    <p><?= esc(setting('pricing.build.sub')) ?></p></div>
-  <?php package_row($builds, $sym); ?>
-</div></section>
+  <div class="sh rv"><span class="no">Prices</span>
+    <h2 id="planheading"><?= esc(setting('pricing.build.heading')) ?></h2>
+    <p id="planblurb"><?= esc(setting('pricing.build.sub')) ?></p>
+  </div>
 
 <?php if ($care): ?>
-<section><div class="wrap">
-  <div class="sh rv"><span class="no">Looking after it</span>
-    <h2><?= esc(setting('pricing.care.heading')) ?></h2>
-    <p><?= esc(setting('pricing.care.sub')) ?></p></div>
-  <?php package_row($care, $sym); ?>
-</div></section>
+  <div class="switch rv" id="planswitch" role="tablist">
+    <button role="tab" aria-selected="true" data-pane="build">Building your site</button>
+    <button role="tab" aria-selected="false" data-pane="care">Looking after it</button>
+  </div>
 <?php endif; ?>
+
+  <div class="pane" data-pane="build"><?php package_row($builds, $sym); ?></div>
+<?php if ($care): ?>
+  <div class="pane" data-pane="care" hidden><?php package_row($care, $sym); ?></div>
+<?php endif; ?>
+</div></section>
 
 <?php if ($addons): ?>
 <section><div class="wrap">
@@ -74,8 +78,6 @@ function package_row(array $packages, string $sym): void
   </div>
 </div></section>
 <?php endif; ?>
-
-<?php statement(setting('pricing.statement')); ?>
 
 <section><div class="wrap">
   <div class="sh rv"><span class="no">Side by side</span><h2>What you get<br>in each one.</h2>
@@ -115,6 +117,7 @@ foreach ($compare as [$label, $cells]): ?>
       </tbody>
     </table>
   </div>
+  <p class="say small rv" style="margin-top:34px"><?= highlighted(setting('pricing.statement')) ?></p>
   <p class="formnote rv" style="margin-top:18px">Things we buy for you &mdash; your web address,
      hosting and email accounts &mdash; are charged at exactly what they cost, in your own name.
      For a small business that is usually <?= esc($sym) ?>80 to <?= esc($sym) ?>300 a year.</p>
@@ -124,4 +127,36 @@ foreach ($compare as [$label, $cells]): ?>
 faq_block('pricing', 'Questions about money.', 'Including the awkward ones.');
 closing_cta(setting('pricing.cta.heading'), setting('pricing.cta.body'),
     ['contact.php', 'Get a price &rarr;'], ['services.php', 'See what we do']);
+?>
+<script>
+/* One section, two sets of prices. */
+(function () {
+  var sw = document.getElementById('planswitch');
+  if (!sw) return;
+  var blurb   = document.getElementById('planblurb');
+  var heading = document.getElementById('planheading');
+  var titles  = {
+    build: <?= json_encode(setting('pricing.build.heading')) ?>,
+    care:  <?= json_encode(setting('pricing.care.heading')) ?>
+  };
+  var subs = {
+    build: <?= json_encode(setting('pricing.build.sub')) ?>,
+    care:  <?= json_encode($careBlurb) ?>
+  };
+  sw.addEventListener('click', function (e) {
+    var btn = e.target.closest('button[data-pane]');
+    if (!btn) return;
+    var want = btn.dataset.pane;
+    sw.querySelectorAll('button').forEach(function (b) {
+      b.setAttribute('aria-selected', String(b === btn));
+    });
+    document.querySelectorAll('.pane[data-pane]').forEach(function (pane) {
+      pane.hidden = pane.dataset.pane !== want;
+    });
+    if (heading) heading.textContent = titles[want];
+    if (blurb)   blurb.textContent   = subs[want];
+  });
+})();
+</script>
+<?php
 include APP_DIR . '/partials/footer.php';

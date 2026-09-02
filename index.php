@@ -7,10 +7,8 @@ $pageTitle = setting('home.meta.title');
 $pageDesc  = setting('home.meta.desc');
 $activeNav = 'home';
 
-$work     = public_portfolio(3);
-$products = active_products(3);
-$quotes   = active_testimonials();
-$builds   = active_packages('build');
+$work   = public_portfolio(3);
+$quotes = active_testimonials();
 
 include APP_DIR . '/partials/head.php';
 ?>
@@ -78,12 +76,30 @@ foreach ($blocks as $i => [$title, $body, $bullets, $label]): ?>
 </div></section>
 
 <section id="proof"><div class="wrap">
-  <div class="sh rv"><span class="no">Proof</span><h2><?= esc(setting('home.proof.heading')) ?></h2></div>
-  <div class="nums">
+  <div class="proofrow">
+    <div>
+      <div class="sh rv" style="margin-bottom:26px">
+        <span class="no">Proof</span>
+        <h2><?= esc(setting('home.proof.heading')) ?></h2>
+      </div>
+      <div class="nums two-up">
 <?php for ($i = 1; $i <= 4; $i++): ?>
-    <div class="nm rv"><b><?= esc(setting("home.stat{$i}.value")) ?></b>
-      <span><?= esc(setting("home.stat{$i}.label")) ?></span></div>
+        <div class="nm rv"><b><?= esc(setting("home.stat{$i}.value")) ?></b>
+          <span><?= esc(setting("home.stat{$i}.label")) ?></span></div>
 <?php endfor; ?>
+      </div>
+    </div>
+<?php if ($quotes): ?>
+    <div class="qbox rv" id="qbox">
+<?php foreach ($quotes as $i => $q): ?>
+      <div class="qs<?= $i === 0 ? ' on' : '' ?>">
+        <blockquote><?= esc($q['quote']) ?></blockquote>
+        <div class="m"><span><?= esc($q['author']) ?><?= $q['role'] ? ' &middot; ' . esc($q['role']) : '' ?></span>
+          <span><?= sprintf('%02d / %02d', $i + 1, count($quotes)) ?></span></div>
+      </div>
+<?php endforeach; ?>
+    </div>
+<?php endif; ?>
   </div>
 </div></section>
 
@@ -101,81 +117,22 @@ foreach ($blocks as $i => [$title, $body, $bullets, $label]): ?>
 </div></section>
 <?php endif; ?>
 
-<section id="process"><div class="wrap">
-  <div class="sh rv"><span class="no">Process</span>
-    <h2><?= esc(setting('home.process.heading')) ?></h2>
-    <p><?= esc(setting('home.process.sub')) ?></p></div>
-  <div class="pr">
-    <div class="ps"><h4>We talk</h4>
-      <p>You tell us what your business does and what is missing. We tell you what is worth
-         doing first, and what is not worth paying for yet.</p></div>
-    <div class="ps"><h4>You get a price</h4>
-      <p>Everything you are getting, listed on one page, with one fixed price. Anything we buy
-         for you is charged at cost.</p></div>
-    <div class="ps"><h4>We build it</h4>
-      <p>Website, web address, hosting, security and email, all set up together and all in your
-         name. We write down how it works.</p></div>
-    <div class="ps"><h4>We look after it</h4>
-      <p>Checks, backups, renewals and support, from the same people who built it. Not a call
-         centre.</p></div>
+<section class="tight"><div class="wrap">
+  <div class="nextup rv">
+    <a href="pricing.php">
+      <span class="no">Prices</span>
+      <strong>See what it costs</strong>
+      <span>Fixed prices, listed before you call us.</span></a>
+    <a href="marketplace.php">
+      <span class="no">Ready-made</span>
+      <strong>Buy one already built</strong>
+      <span>Live on your own web address within a week.</span></a>
+    <a href="about.php">
+      <span class="no">About us</span>
+      <strong>How we work</strong>
+      <span>Six things we stick to, including the awkward ones.</span></a>
   </div>
 </div></section>
-
-<?php if ($products): ?>
-<section id="market"><div class="wrap">
-  <div class="sh rv"><span class="no">Marketplace</span>
-    <h2><?= esc(setting('home.market.heading')) ?></h2>
-    <p><?= esc(setting('home.market.sub')) ?></p>
-  </div>
-  <div class="grid-3">
-<?php foreach ($products as $p) { product_card($p); } ?>
-  </div>
-  <div class="spacer"></div>
-  <div class="rv center"><a class="pill ghost lg" href="marketplace.php">See the ready-made ones &rarr;</a></div>
-</div></section>
-<?php endif; ?>
-
-<?php if ($quotes): ?>
-<section id="voices"><div class="wrap">
-  <div class="sh rv"><span class="no">Voices</span><h2><?= esc(setting('home.quotes.heading')) ?></h2></div>
-  <div class="qbox rv" id="qbox">
-<?php foreach ($quotes as $i => $q): ?>
-    <div class="qs<?= $i === 0 ? ' on' : '' ?>">
-      <blockquote><?= esc($q['quote']) ?></blockquote>
-      <div class="m"><span><?= esc($q['author']) ?><?= $q['role'] ? ' &middot; ' . esc($q['role']) : '' ?></span>
-        <span><?= sprintf('%02d / %02d', $i + 1, count($quotes)) ?></span></div>
-    </div>
-<?php endforeach; ?>
-  </div>
-<?php if (count($quotes) > 1): ?>
-  <div class="qctl">
-    <button id="qprev" type="button" aria-label="Previous quote">&larr;</button>
-    <button id="qnext" type="button" aria-label="Next quote">&rarr;</button>
-  </div>
-<?php endif; ?>
-</div></section>
-<?php endif; ?>
-
-<?php if ($builds): ?>
-<section id="pricing"><div class="wrap">
-  <div class="sh rv"><span class="no">Pricing</span>
-    <h2>Prices, before<br>you call us.</h2>
-    <p><?= esc(setting('pricing.hero.lead')) ?></p></div>
-  <div class="pl">
-<?php $sym = setting('site.currency', '$');
-      foreach ($builds as $b): ?>
-    <div class="pcard rv<?= $b['is_featured'] ? ' best' : '' ?>">
-      <span class="k"><?= esc($b['name']) ?><?= $b['is_featured'] ? ' &mdash; most chosen' : '' ?></span>
-      <div class="amt"><?= esc($b['price'] !== '' ? $sym . $b['price'] : 'Quoted') ?></div>
-      <div class="per"><?= esc($b['period']) ?></div>
-<?php if ($b['blurb']): ?>      <p class="who"><?= esc($b['blurb']) ?></p><?php endif; ?>
-      <ul><?php foreach (lines($b['features']) as $f): ?><li><?= esc($f) ?></li><?php endforeach; ?></ul>
-      <a class="pill<?= $b['is_featured'] ? '' : ' ghost' ?>" href="pricing.php">What you get</a>
-    </div>
-<?php endforeach; ?>
-  </div>
-</div></section>
-<?php endif; ?>
 
 <?php
 closing_cta(setting('home.cta.heading'), setting('home.cta.body'),
