@@ -31,50 +31,76 @@ function url(string $path = ''): string
 }
 
 /**
- * Does this host serve /admin/login as well as /admin/login.php?
- *
- * It is proved rather than assumed: the .htaccess redirects a .php address to
- * its clean form, and when that redirected request arrives its address has no
- * .php while the running script does. The first time that happens the answer is
- * remembered. Until then — and forever on a host without mod_rewrite — links
- * keep their .php and everything works exactly as before.
+ * Pages that also exist as a folder with an index.php inside, so they can be
+ * reached without .php on ANY server — no mod_rewrite, no .htaccess needed.
+ * Only these are ever folded; anything else keeps its extension.
  */
-function clean_urls(): bool
+function folder_pages(): array
 {
-    static $on = null;
-    if ($on !== null) {
-        return $on;
-    }
-    $on = false;
-    try {
-        // "on" and "off" are the admin overriding the guess.
-        $mode = setting('clean_urls_mode', 'auto');
-        if ($mode === 'on')  { $on = true;  return $on; }
-        if ($mode === 'off') { $on = false; return $on; }
+    return [
+        '/index.php', '/game.php', '/sitemap.php', '/robots.php',
+        '/admin/index.php', '/admin/login.php', '/admin/logout.php',
+        '/admin/settings.php', '/admin/projects.php', '/admin/stats.php',
+        '/admin/games.php', '/admin/account.php',
+        '/admin/detect-all.php', '/admin/detect-image.php',
+    ];
+}
 
-        if (setting('clean_urls', '') === '1') {
-            $on = true;
-            return $on;
-        }
+/**
+ * Which shape of address to write.
+ *
+ *   bare   — /admin/login      needs the server to rewrite; prettiest
+ *   folder — /admin/login/     works everywhere, via the index.php folders
+ *   php    — /admin/login.php  the admin has asked for it plainly
+ *
+ * On "auto" the bare form is used once the server has proved it rewrites (a
+ * request arrives with no .php in the address while the running script has
+ * one), and the folder form until then — so the address bar is clean either
+ * way, on any host.
+ */
+function url_style(): string
+{
+    static $style = null;
+    if ($style !== null) {
+        return $style;
+    }
+    $style = 'folder';
+    try {
+        $mode = setting('clean_urls_mode', 'auto');
+        if ($mode === 'off') { $style = 'php';  return $style; }
+        if ($mode === 'on')  { $style = 'bare'; return $style; }
+
+        if (setting('clean_urls', '') === '1') { $style = 'bare'; return $style; }
+
         $uri    = (string) parse_url((string) ($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_PATH);
         $script = basename((string) ($_SERVER['SCRIPT_NAME'] ?? ''));
         $asked  = basename($uri);
-        if ($script !== '' && str_ends_with($script, '.php') && $asked !== '' && $asked . '.php' === $script) {
+        if ($script !== '' && str_ends_with($script, '.php')
+            && $asked !== '' && $asked . '.php' === $script) {
             set_setting('clean_urls', '1');
-            $on = true;
+            $style = 'bare';
         }
     } catch (Throwable $e) {
-        // No database yet (or it is unreachable) — .php links are the safe answer.
+        // No database yet — the folder form still works, so use it.
     }
-    return $on;
+    return $style;
 }
 
-/** "/admin/login.php" → "/admin/login", "/admin/index.php" → "/admin/". */
+/** True when addresses are written without .php (either clean shape). */
+function clean_urls(): bool
+{
+    return url_style() !== 'php';
+}
+
+/** "/admin/login.php" → "/admin/login" or "/admin/login/", per url_style(). */
 function pretty_path(string $path): string
 {
-    if (!clean_urls()) {
+    $style = url_style();
+    if ($style === 'php') {
         return $path;
     }
+
+    // Split the query/fragment off so only the path itself is rewritten.
     $tail = '';
     foreach (['#', '?'] as $mark) {
         $at = strpos($path, $mark);
@@ -83,11 +109,23 @@ function pretty_path(string $path): string
             $path = substr($path, 0, $at);
         }
     }
-    if (str_ends_with($path, '/index.php')) {
-        $path = substr($path, 0, -strlen('index.php'));   // keep the trailing slash
-    } elseif (str_ends_with($path, '.php')) {
-        $path = substr($path, 0, -4);
+
+    if ($style === 'bare') {
+        if (str_ends_with($path, '/index.php')) {
+            $path = substr($path, 0, -strlen('index.php'));   // keep the slash
+        } elseif (str_ends_with($path, '.php')) {
+            $path = substr($path, 0, -4);
+        }
+        return $path . $tail;
     }
+
+    // Folder form: only for pages that actually have a folder to serve them.
+    if (!in_array($path, folder_pages(), true)) {
+        return $path . $tail;
+    }
+    $path = str_ends_with($path, '/index.php')
+        ? substr($path, 0, -strlen('index.php'))
+        : substr($path, 0, -4) . '/';
     return $path . $tail;
 }
 

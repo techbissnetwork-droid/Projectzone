@@ -221,10 +221,11 @@ function s(string $k): string { return e(setting($k)); }
           <option value="on"   <?= setting('clean_urls_mode','auto')==='on'  ?'selected':'' ?>>Always hide it</option>
           <option value="off"  <?= setting('clean_urls_mode','auto')==='off' ?'selected':'' ?>>Never hide it</option>
         </select>
-        <div class="hint">Hiding <code>.php</code> needs Apache with <code>mod_rewrite</code> and the shipped
-        <code>.htaccess</code> in force. On <strong>Automatic</strong> the site proves that for itself the first
-        time a clean address reaches it, and keeps <code>.php</code> until then. Choose <strong>Always</strong>
-        only if the check below passes.</div>
+        <div class="hint">On <strong>Automatic</strong> your addresses never show <code>.php</code>, whatever your
+        host supports. Where the server rewrites, you get the shortest form — <code>/admin/login</code>. Where it
+        does not, the site uses the folder form — <code>/admin/login/</code> — which works on every server without
+        any configuration. <strong>Always</strong> forces the short form (only if the check says your server
+        rewrites); <strong>Never</strong> goes back to plain <code>.php</code>.</div>
       </div>
       <div class="field">
         <label>Is your server doing it?</label>
@@ -232,7 +233,8 @@ function s(string $k): string { return e(setting($k)); }
           <button class="btn btn-ghost btn-sm" type="button" data-cleanurl-test="#cleanUrlNote">Check my server</button>
         </div>
         <div class="detect-note" id="cleanUrlNote">
-          Right now the site is writing links <strong><?= clean_urls() ? 'without' : 'with' ?></strong> <code>.php</code>.
+          <?php $shape = ['bare' => '/admin/login', 'folder' => '/admin/login/', 'php' => '/admin/login.php']; ?>
+          Right now your addresses look like <code><?= e($shape[url_style()] ?? '') ?></code>.
         </div>
       </div>
     </div>

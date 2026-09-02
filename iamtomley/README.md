@@ -182,14 +182,21 @@ they are still reachable at `/sitemap.php` and `/robots.php` — on Nginx, map
 
 ## Clean URLs
 
-With Apache + mod_rewrite, `.php` never appears: the site writes its own links
-without it, so there is no redirect hop and nothing shows in the address bar.
+`.php` never appears in the address bar — on any host, with no configuration.
 
-It works this out rather than assuming it. The `.htaccess` redirects a `.php`
-address to its clean form; when that redirected request arrives, the app can see
-its address has no `.php` while the running script does, and remembers the
-answer. On a host without `mod_rewrite` nothing is ever proved, links keep their
-`.php`, and the site works exactly as before.
+Two shapes do it, and the site picks whichever your server supports:
+
+| Shape | Example | Needs |
+|---|---|---|
+| **Bare** | `/admin/login` | Apache with `mod_rewrite` and the shipped `.htaccess` in force |
+| **Folder** | `/admin/login/` | nothing at all — each page also exists as a folder holding an `index.php` |
+
+On **Automatic** (the default) the site starts on the folder form, which always
+works, and moves to the bare form the moment your server proves it rewrites: the
+`.htaccess` redirects a `.php` address to its clean form, and when that
+redirected request arrives the app sees its address has no `.php` while the
+running script does. **Site Settings** has a check that tells you which of the
+two you are on.
 
 ## Deployment notes
 

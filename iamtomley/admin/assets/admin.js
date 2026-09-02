@@ -239,9 +239,11 @@
         })
         .then(function (r) {
           if (r.works) {
-            say(out, 'Your server rewrites clean addresses — .php can be hidden. Set the box on the left to Always if it is not already off.', 'ok');
+            say(out, 'Your server rewrites addresses, so the site uses the shortest form: /admin/login', 'ok');
           } else {
-            say(out, 'Your server did not serve /sitemap without the .php, so links keep it. Ask your host to switch on mod_rewrite and AllowOverride All for this folder.', 'warn');
+            say(out, 'Your server does not rewrite addresses — so the site uses the folder form instead: /admin/login/ '
+                   + 'That needs nothing from your host and shows no .php either. Only switch this to Always if your '
+                   + 'host later turns on mod_rewrite.', 'ok');
           }
         })
         .catch(function () { say(out, 'The check could not run — try reloading the page.', 'warn'); });
