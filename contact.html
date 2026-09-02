@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Contact — TECHBISS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Tell us what your business runs on today and what's missing. Written scope and a fixed price, answered within one business day.">
+<meta name="theme-color" content="#07080A">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<meta property="og:title" content="Contact — TECHBISS">
+<meta property="og:description" content="Tell us what your business runs on today and what's missing. Written scope and a fixed price, answered within one business day.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800;900&family=Manrope:wght@400;500;600;700&family=Azeret+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <filter id="grainFilter"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch"/></filter>
+</svg>
+<div class="grain" aria-hidden="true" style="filter:url(#grainFilter)"></div>
+<div class="cursor" id="cursor" aria-hidden="true"></div>
+<div class="progress" aria-hidden="true"><i id="progressFill"></i></div>
+
+<header class="mast">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="brand__mark">T</span>TECHBISS</a>
+    <nav class="mast-nav" id="mastNav">
+      <a href="index.html">Home</a>
+      <a href="services.html">Services</a>
+      <a href="industries.html">Industries</a>
+      <a href="pricing.html">Pricing</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+      <a class="nav-cta" href="contact.html">Talk to us →</a>
+    </nav>
+    <a class="mast-cta magnetic" href="contact.html">Talk to us</a>
+    <button class="burger" id="burger" aria-label="Menu" aria-controls="mastNav" aria-expanded="false"><span></span></button>
+  </div>
+</header>
+
+<main id="main">
+
+<section class="page-hero">
+  <div class="wrap">
+    <p class="crumbs"><a href="index.html">Home</a> / Contact</p>
+    <p class="eyebrow"><span class="live"></span> One business day · always a human</p>
+    <h1>Tell us what you run, and what's missing.</h1>
+    <p class="lead">No sales script and no discovery-call ritual. Describe the business in a few lines — you'll get a straight answer about what's worth doing, and a fixed price if you want one.</p>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="wrap">
+    <div class="contact-grid">
+
+      <div class="reveal">
+        <form class="enquiry" id="enquiryForm" novalidate>
+          <div class="field-row">
+            <div class="field">
+              <label for="name">Your name *</label>
+              <input type="text" id="name" name="name" autocomplete="name" required>
+            </div>
+            <div class="field">
+              <label for="email">Email *</label>
+              <input type="email" id="email" name="email" autocomplete="email" required>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="company">Business name</label>
+              <input type="text" id="company" name="company" autocomplete="organization">
+            </div>
+            <div class="field">
+              <label for="phone">Phone / WhatsApp</label>
+              <input type="tel" id="phone" name="phone" autocomplete="tel">
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="service">What do you need?</label>
+              <select id="service" name="service">
+                <option>Not sure yet — advise me</option>
+                <option>A website, from scratch</option>
+                <option>Take my offline business online</option>
+                <option>Domain, hosting, SSL &amp; email setup</option>
+                <option>A web or mobile app</option>
+                <option>An online store</option>
+                <option>SEO &amp; Google Business Profile</option>
+                <option>Branding &amp; logo</option>
+                <option>Automation &amp; AI</option>
+                <option>Rescue an existing site / domain</option>
+                <option>Maintenance &amp; support only</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="budget">Rough budget</label>
+              <select id="budget" name="budget">
+                <option>Not decided</option>
+                <option>Under $700</option>
+                <option>$700 – $2,000</option>
+                <option>$2,000 – $5,000</option>
+                <option>$5,000 – $15,000</option>
+                <option>Over $15,000</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="message">What does the business do, and what's missing? *</label>
+            <textarea id="message" name="message" required placeholder="e.g. We run a two-branch pharmacy. We have a Facebook page and nothing else. People call to ask if we have stock and what time we close."></textarea>
+          </div>
+          <p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
+          <button class="btn btn--primary magnetic" type="submit">Send enquiry →</button>
+          <p class="form-note">This static site has no server, so sending opens your email app with the details filled in. Prefer to write it yourself? Email <a href="mailto:hello@techbiss.com">hello@techbiss.com</a> directly.</p>
+        </form>
+      </div>
+
+      <aside class="contact-side reveal">
+        <div class="ccard">
+          <h4>Email</h4>
+          <p><a href="mailto:hello@techbiss.com">hello@techbiss.com</a><br>Answered within one business day.</p>
+        </div>
+        <div class="ccard">
+          <h4>Phone &amp; WhatsApp</h4>
+          <p><a href="tel:+10000000000">+1 000 000 0000</a><br>Mon–Fri, 9:00–18:00.</p>
+        </div>
+        <div class="ccard">
+          <h4>Support (existing clients)</h4>
+          <p><a href="mailto:support@techbiss.com">support@techbiss.com</a><br>Something down or expiring? Put URGENT in the subject.</p>
+        </div>
+        <div class="ccard">
+          <h4>What happens next</h4>
+          <p>1 — We read it and reply with questions or an answer.<br>
+             2 — If it's a fit, you get a written scope and fixed price.<br>
+             3 — You approve it before anyone starts building.</p>
+        </div>
+        <div class="ccard">
+          <h4>Bring these if you have them</h4>
+          <p>Existing domain name, old hosting logins, current website address, logo files, and the email address your domain renewal notices go to.</p>
+        </div>
+      </aside>
+
+    </div>
+  </div>
+</section>
+
+<section class="statement">
+  <div class="wrap">
+    <p id="statementText">You don't need to know what you need. <span class="accent">Describe a normal working day</span> — we'll work out the rest.</p>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <h2>Before you write.</h2>
+      <p>The five things people ask in the first email.</p>
+    </div>
+    <div class="faq reveal">
+      <details><summary>I don't have a domain, a website or anything. Where do I even start?</summary><p>Right here. Send the enquiry with just your business name and what you do. We'll check what domain names are available, tell you what a full setup would cost, and walk you through it in plain language. Most of our clients start with nothing.</p></details>
+      <details><summary>My old developer has disappeared and I can't get into anything.</summary><p>More common than you'd think, and usually recoverable. Send whatever you have — the website address, any old invoices, the email address that receives renewal notices — and we'll work out who holds what. Domain recovery is often possible even years later.</p></details>
+      <details><summary>How quickly can you start?</summary><p>Scoping starts the day you reply to our questions. Build slots are usually 1–2 weeks out. If something is genuinely urgent — an expired certificate, a hacked site, a domain about to lapse — say so in the subject line and we'll deal with it the same day.</p></details>
+      <details><summary>Do you work with clients in other countries?</summary><p>Yes. Everything we do is remote, and time zones have never been the hard part. We handle local domain extensions, local payment gateways and local search listings wherever you are.</p></details>
+      <details><summary>Will you sign an NDA?</summary><p>Happily, before you share anything sensitive. Send yours or ask for ours.</p></details>
+    </div>
+  </div>
+</section>
+
+<section class="ctaband">
+  <div class="wrap">
+    <div class="ctabox reveal">
+      <div>
+        <h3>Still reading instead of writing?</h3>
+        <p>Three lines is enough to start. What the business does, and what's frustrating right now.</p>
+      </div>
+      <a class="btn btn--primary magnetic" href="mailto:hello@techbiss.com">Email us directly →</a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-brand"><span class="brand__mark">T</span>TECHBISS</div>
+        <p class="foot-desc">One partner for everything a business needs online — domain, hosting, SSL, website, apps, email, branding, SEO and support.</p>
+        <div class="social">
+          <a href="#" aria-label="TECHBISS on X">X</a>
+          <a href="#" aria-label="TECHBISS on LinkedIn">in</a>
+          <a href="#" aria-label="TECHBISS on Instagram">ig</a>
+          <a href="#" aria-label="TECHBISS on WhatsApp">wa</a>
+        </div>
+      </div>
+      <div class="foot-col">
+        <h4>Services</h4>
+        <a href="services.html#websites">Website Design</a>
+        <a href="services.html#apps">Web &amp; Mobile Apps</a>
+        <a href="services.html#offline">Offline → Online</a>
+        <a href="services.html#infrastructure">Domain, Hosting &amp; SSL</a>
+        <a href="services.html#email">Business Email</a>
+        <a href="services.html#seo">SEO</a>
+      </div>
+      <div class="foot-col">
+        <h4>Company</h4>
+        <a href="about.html">About</a>
+        <a href="industries.html">Industries</a>
+        <a href="pricing.html">Pricing</a>
+        <a href="contact.html">Contact</a>
+      </div>
+      <div class="foot-col">
+        <h4>Get in touch</h4>
+        <a href="mailto:hello@techbiss.com">hello@techbiss.com</a>
+        <a href="tel:+10000000000">+1 000 000 0000</a>
+        <a href="contact.html">Talk to us →</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© <span data-year>2026</span> TECHBISS — ALL RIGHTS RESERVED</span>
+      <span>ALWAYS ON</span>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/main.js"></script>
+</body>
+</html>
