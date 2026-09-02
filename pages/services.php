@@ -5,23 +5,6 @@
     'lead'    => 'Domain, hosting, the website and email come as one setup — not separate purchases. Branding, SEO, apps, automation and maintenance are the work you add around it.',
 ]) ?>
 
-<?php if ($services): ?>
-<section class="section section--flush-top section--flush-bottom">
-    <div class="container">
-        <?= $view->partial('partials/hero-visual', [
-            'wrapClass' => 'services-visual',
-            'ariaLabel' => 'A diagram showing several separate tools and vendors converging into one TECHBISS setup, covering domain, hosting, website, business email, mobile, analytics, AI and SEO.',
-            'coreLabel' => 'ALL INCLUDED',
-            'coreSub'   => 'ONE SETUP',
-            'fromLabel' => 'Before',
-            'fromValue' => 'Scattered tools and vendors',
-            'toLabel'   => 'After',
-            'toValue'   => 'One partner, one bill',
-        ]) ?>
-    </div>
-</section>
-<?php endif; ?>
-
 <section class="section section--flush-top">
     <div class="container">
         <h2 class="sr-only">Services</h2>

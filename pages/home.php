@@ -115,24 +115,6 @@ $hero = $sections['hero'] ?? [];
 </div>
 <?php endif; ?>
 
-<!-- ================= THE OFFLINE PROBLEM ================= -->
-<?php if (isset($sections['problem'])): ?>
-<section class="section">
-    <div class="container">
-        <div class="section-head" data-reveal="rise-blur">
-            <p class="eyebrow"><?= e($s('problem', 'eyebrow')) ?></p>
-            <h2><?= e($s('problem', 'heading')) ?></h2>
-            <p class="lead"><?= e($s('problem', 'subheading')) ?></p>
-        </div>
-        <div class="row" data-reveal>
-            <a class="btn btn--primary btn--lg btn--arrow" href="<?= e(url($s('problem', 'cta_url', '/how-it-works'))) ?>">
-                <?= e($s('problem', 'cta_label', 'See how it works')) ?><?= icon('arrow-right') ?>
-            </a>
-        </div>
-    </div>
-</section>
-<?php endif; ?>
-
 <!-- ================= SERVICES ================= -->
 <?php if ($services): ?>
 <section class="section" id="services">
@@ -190,31 +172,6 @@ $hero = $sections['hero'] ?? [];
 </section>
 <?php endif; ?>
 
-<!-- ================= WORK ================= -->
-<?php if ($projects): ?>
-<section class="section">
-    <div class="container">
-        <div class="row row--between mb-6" data-reveal>
-            <div>
-                <p class="eyebrow"><?= e($s('work', 'eyebrow', 'Selected work')) ?></p>
-                <h2 class="mt-4"><?= e($s('work', 'heading', 'Projects built the same way yours will be.')) ?></h2>
-            </div>
-            <a class="link hide-sm" href="<?= e(url('/portfolio')) ?>">
-                <?= e($s('work', 'cta_label', 'View all work')) ?><?= icon('arrow-right') ?>
-            </a>
-        </div>
-
-        <div class="slider" data-slider>
-            <div class="slider__track slider__track--work" data-reveal-stagger>
-            <?php foreach ($projects as $i => $project): ?>
-                <?= $view->partial('partials/work-card', ['project' => $project, 'i' => $i]) ?>
-            <?php endforeach; ?>
-        </div>
-    </div>
-    </div>
-</section>
-<?php endif; ?>
-
 <!-- ================= INDUSTRIES ================= -->
 <?php if ($industries): ?>
 <section class="section">
@@ -241,50 +198,6 @@ $hero = $sections['hero'] ?? [];
             <a class="btn btn--ghost btn--arrow" href="<?= e(url('/industries')) ?>">
                 <?= e($s('industries', 'cta_label', 'All industries')) ?><?= icon('arrow-right') ?>
             </a>
-        </div>
-    </div>
-</section>
-<?php endif; ?>
-
-<!-- ================= TESTIMONIALS ================= -->
-<?php if ($testimonials): ?>
-<section class="section">
-    <div class="container">
-        <div class="section-head section-head--center" data-reveal>
-            <p class="eyebrow eyebrow--plain">In their words</p>
-            <h2 class="mt-4">What clients say about working with us.</h2>
-        </div>
-
-        <div class="slider" data-slider>
-            <div class="slider__track slider__track--cards" data-reveal-stagger>
-            <?php foreach ($testimonials as $i => $t): ?>
-            <article class="card quote-card" style="--i:<?= $i ?>" data-reveal>
-                <span class="quote-card__mark"><?= icon('quote') ?></span>
-                <?php if ((int) $t['rating'] > 0): ?>
-                <div class="rating" aria-label="<?= (int) $t['rating'] ?> out of 5">
-                    <?php for ($star = 1; $star <= 5; $star++): ?>
-                        <?= icon('star', 'icon' . ($star <= (int) $t['rating'] ? '' : ' icon--off')) ?>
-                    <?php endfor; ?>
-                </div>
-                <?php endif; ?>
-                <p class="quote-card__text">“<?= e($t['quote']) ?>”</p>
-                <div class="quote-card__author">
-                    <?php $img = media_url($t['image']); ?>
-                    <?php if ($img !== ''): ?>
-                    <img class="avatar" src="<?= e($img) ?>" alt="<?= e($t['client_name']) ?>" loading="lazy" width="42" height="42">
-                    <?php else: ?>
-                    <span class="avatar" aria-hidden="true"><?= e(initials((string) $t['client_name'])) ?></span>
-                    <?php endif; ?>
-                    <div>
-                        <div class="quote-card__name"><?= e($t['client_name']) ?></div>
-                        <div class="quote-card__role">
-                            <?= e(trim(($t['position'] ?? '') . (($t['position'] ?? '') && ($t['company'] ?? '') ? ', ' : '') . ($t['company'] ?? ''), ', ')) ?>
-                        </div>
-                    </div>
-                </div>
-            </article>
-            <?php endforeach; ?>
-        </div>
         </div>
     </div>
 </section>
