@@ -546,7 +546,8 @@ body.has-cursor-fx.cursor-hidden .cursor-ring { opacity: 0; }
    --------------------------------------------------------------------- */
 .hero {
   position: relative;
-  min-height: 62vh;
+  min-height: 100vh;
+  min-height: 100svh;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -557,6 +558,12 @@ body.has-cursor-fx.cursor-hidden .cursor-ring { opacity: 0; }
   isolation: isolate;
 }
 .hero__bg { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+/* The homepage's own minimal nav (brand + one pill) sits inside the hero so
+   the ambient gradient runs behind it too, matching the reference exactly.
+   Absolutely positioned so it doesn't participate in the hero's own
+   vertical-centering flex layout. */
+.home-nav { position: absolute; top: 0; left: 0; right: 0; z-index: 2; padding-block: clamp(1.1rem, 0.9rem + 0.8vw, 1.6rem); }
+.home-nav__row { display: flex; justify-content: space-between; align-items: center; }
 .hero__bg canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
 .hero__bg::after {
   content: ""; position: absolute; inset: 0;
@@ -1191,12 +1198,6 @@ body.has-cursor-fx.cursor-hidden .cursor-ring { opacity: 0; }
   .hero__meta { gap: 1rem 1.5rem; }
   .table-wrap { border-radius: var(--r-md); }
   .cta-band { border-radius: var(--r-lg); }
-  /* The three float shapes are positioned by percentage so they clear a wide
-     desktop band, but a narrow band is proportionally much shorter, so at
-     this width they end up sitting behind the stacked buttons/disclaimer
-     text instead of in clear space. Decorative only (pointer-events: none
-     already), so simplest is to not show them where there is no room. */
-  .cta-band .float-shapes { display: none; }
 }
 
 /* Touch devices: remove hover-only affordances so nothing is unreachable */

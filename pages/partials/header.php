@@ -50,8 +50,8 @@ $siteName = $settings->get('site_name', 'TECHBISS');
             <div class="header-actions">
                 <?php foreach ($primaryNav as $item):
                     if ((int) $item['is_button'] !== 1) { continue; } ?>
-                <a class="btn btn--primary btn--sm btn--nav btn--arrow" href="<?= e(url($item['url'])) ?>" data-magnetic="0.22">
-                    <?= e($item['label']) ?><?= icon('arrow-right') ?>
+                <a class="btn btn--ghost btn--sm btn--nav" href="<?= e(url($item['url'])) ?>" data-magnetic="0.22">
+                    <?= e($item['label']) ?>
                 </a>
                 <?php endforeach; ?>
 

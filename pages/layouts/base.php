@@ -72,13 +72,18 @@ $gaId       = $settings->get('google_analytics_id');
 
 <a class="skip-link" href="#main">Skip to main content</a>
 
+<?php $minimalChrome = $bodyClass === 'page-home'; ?>
+<?php if (!$minimalChrome): ?>
 <?= $view->partial('partials/header') ?>
+<?php endif; ?>
 
 <main id="main" class="site-main" tabindex="-1">
     <?= $content ?>
 </main>
 
+<?php if (!$minimalChrome): ?>
 <?= $view->partial('partials/footer') ?>
+<?php endif; ?>
 
 <?php /* Live region for toasts. Present from first paint, because a region
    created and filled in the same tick is routinely missed by screen readers. */ ?>
@@ -88,7 +93,7 @@ $gaId       = $settings->get('google_analytics_id');
 <div data-flash="<?= e($item['type']) ?>" data-flash-message="<?= e($item['message']) ?>" hidden></div>
 <?php endforeach; ?>
 
-<?php $waFloat = whatsapp_link(); if ($waFloat !== ''): ?>
+<?php $waFloat = $minimalChrome ? '' : whatsapp_link(); if ($waFloat !== ''): ?>
 <a class="float-action" href="<?= e($waFloat) ?>" target="_blank" rel="noopener noreferrer"
    aria-label="Message us on WhatsApp" data-no-transition>
     <?= icon('whatsapp') ?>

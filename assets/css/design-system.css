@@ -414,29 +414,6 @@ h4 { font-size: var(--fs-h4); letter-spacing: -0.012em; }
   50%      { translate: -5% -4%;  scale: 1.08; }
 }
 
-/* Quiet geometric pieces drifting behind a hero or CTA band. Decorative only —
-   markup is a handful of empty spans, sized and placed per instance by the
-   caller. */
-.float-shapes { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
-.float-shape {
-  position: absolute;
-  border-radius: var(--r-lg);
-  background: linear-gradient(150deg, var(--surface-hover), transparent);
-  border: 1px solid var(--border-strong);
-  animation: float-a 8s ease-in-out infinite;
-}
-.float-shape--round { border-radius: 50%; }
-.float-shape:nth-child(2) { animation-name: float-b; animation-duration: 9.5s; }
-.float-shape:nth-child(3) { animation-name: float-c; animation-duration: 7s; }
-/* Percentage placement so the same three shapes work in a wide hero or a
-   narrower CTA band without page-specific overrides. */
-.float-shape--1 { width: 64px; height: 64px; top: 8%;  right: 9%; }
-.float-shape--2 { width: 40px; height: 40px; bottom: 16%; right: 22%; }
-.float-shape--3 { width: 50px; height: 50px; bottom: 10%; left: 6%; }
-@keyframes float-a { 0%, 100% { translate: 0 0;    rotate: 0deg; } 50% { translate: 0 -14px; rotate: 7deg; } }
-@keyframes float-b { 0%, 100% { translate: 0 0; } 50% { translate: 0 12px; } }
-@keyframes float-c { 0%, 100% { translate: 0 0;    rotate: 0deg; } 50% { translate: 0 -9px;  rotate: -8deg; } }
-
 /* Cursor-follow light over a grid-pattern band — JS writes --sx/--sy on
    mousemove, CSS does the rest. Desktop pointers only (see initSpotlightBand). */
 .band-spotlight {
@@ -490,34 +467,28 @@ h4 { font-size: var(--fs-h4); letter-spacing: -0.012em; }
 .btn:disabled, .btn[aria-disabled="true"] { opacity: 0.5; pointer-events: none; }
 .btn .icon { width: 1.05em; height: 1.05em; flex: none; }
 
-/* Primary: solid lime with a soft directional sheen on hover — the one
-   accent Pulse reserves for CTAs/emphasis, kept off everyday UI (that's
-   cyan/--accent) so it stays a real signal when it shows up. */
+/* Primary: solid near-white fill with a soft directional sheen on hover —
+   matches the reference design's monochrome CTA exactly. Color (teal/violet)
+   stays reserved for accents, glows and gradients, never a solid button. */
 .btn--primary {
-  --btn-bg: var(--lime);
-  --btn-fg: var(--lime-ink);
+  --btn-bg: var(--text);
+  --btn-fg: var(--bg);
   --btn-bd: transparent;
   font-weight: 600;
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.16) inset,
-              0 10px 26px -12px var(--lime-glow);
 }
 .btn--primary::before {
   content: "";
   position: absolute; inset: 0;
   z-index: -1;
-  background: linear-gradient(100deg, transparent 20%, rgba(255, 255, 255, 0.22) 50%, transparent 80%);
+  background: linear-gradient(100deg, transparent 20%, rgba(0, 0, 0, 0.1) 50%, transparent 80%);
   transform: translateX(-110%);
   transition: transform 620ms var(--ease-out);
 }
-.btn--primary:hover {
-  background: var(--lime-soft);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset,
-              0 16px 38px -14px var(--lime-glow);
-}
+.btn--primary:hover { background: var(--text-soft); }
 .btn--primary:hover::before { transform: translateX(110%); }
 
-.btn--ghost { --btn-bg: transparent; --btn-bd: var(--border); }
-.btn--ghost:hover { --btn-bd: var(--border-strong); background: var(--surface); }
+.btn--ghost { --btn-bg: var(--surface); --btn-bd: var(--border-strong); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+.btn--ghost:hover { --btn-bd: var(--border-strong); background: var(--surface-hover); }
 
 .btn--outline { --btn-bg: transparent; --btn-bd: var(--accent); --btn-fg: var(--accent); }
 .btn--outline:hover { background: var(--accent-tint); }

@@ -19,13 +19,7 @@ $chat     = $waHref !== '' || $mailHref !== '';
         <div class="cta-band" data-reveal>
             <div class="cta-band__bg" aria-hidden="true">
                 <span class="glow" data-parallax="0.1"></span>
-                <span class="grid-pattern grid-pattern--center"></span>
                 <span class="band-spotlight" data-spotlight></span>
-                <span class="float-shapes">
-                    <span class="float-shape float-shape--1"></span>
-                    <span class="float-shape float-shape--2 float-shape--round"></span>
-                    <span class="float-shape float-shape--3"></span>
-                </span>
             </div>
             <?php if ($eyebrow !== ''): ?>
             <p class="eyebrow eyebrow--plain" style="justify-content:center"><?= e($eyebrow) ?></p>
