@@ -61,14 +61,30 @@
   function initLoader() {
     var loader = $('.loader');
     if (!loader) return;
+    var pctEl  = $('.loader__pct', loader);
+    var barEl  = $('.loader__line span', loader);
     var done = false;
     var finish = function () {
       if (done) return;
       done = true;
+      if (pctEl) pctEl.textContent = '100%';
+      if (barEl) barEl.style.width = '100%';
       loader.classList.add('is-done');
       document.body.classList.remove('is-loading');
-      window.setTimeout(function () { if (loader.parentNode) loader.parentNode.removeChild(loader); }, 450);
+      window.setTimeout(function () { if (loader.parentNode) loader.parentNode.removeChild(loader); }, 750);
     };
+    // A steadily-climbing percentage, not a real progress measurement — the
+    // page has no long asset fetch to report on, so this exists purely to
+    // make the brief wait read as "counting up" rather than "stuck".
+    if (pctEl && !reduceMotion.matches) {
+      var p = 0;
+      var tick = window.setInterval(function () {
+        p = Math.min(100, p + Math.random() * 18 + 6);
+        pctEl.textContent = Math.floor(p) + '%';
+        if (barEl) barEl.style.width = p + '%';
+        if (p >= 100) window.clearInterval(tick);
+      }, 110);
+    }
     if (document.readyState === 'complete') {
       window.setTimeout(finish, 120);
     } else {
@@ -76,6 +92,23 @@
     }
     // Never block for longer than this, whatever else is happening.
     window.setTimeout(finish, 2200);
+  }
+
+  /* -------------------------------------------------------------------
+     Scroll progress — a thin fixed bar tracking how far down the page the
+     visitor has read. Pure read of scroll position, no state of its own.
+     ------------------------------------------------------------------- */
+  function initScrollProgress() {
+    var bar = $('.scroll-progress > span');
+    if (!bar) return;
+    var update = throttleFrame(function () {
+      var doc = document.documentElement;
+      var max = doc.scrollHeight - doc.clientHeight;
+      bar.style.width = (max > 0 ? (window.scrollY / max) * 100 : 0) + '%';
+    });
+    on(window, 'scroll', update, { passive: true });
+    on(window, 'resize', update);
+    update();
   }
 
   /* -------------------------------------------------------------------
@@ -496,7 +529,7 @@
 
     var dpr = Math.min(window.devicePixelRatio || 1, 2);
     var w = 0, h = 0;
-    var colors = ['#4f8cff', '#a78bfa'];
+    var colors = ['#26d9c9', '#b9a8ff'];
     var blobs = [
       { x: 0.22, y: 0.38, r: 0.42, dx: 0.05, dy: 0.035, freq: 0.05, phase: 0,   c: 0 },
       { x: 0.74, y: 0.26, r: 0.34, dx: 0.045, dy: 0.05,  freq: 0.045, phase: 2.1, c: 1 },
@@ -999,6 +1032,7 @@
      ------------------------------------------------------------------- */
   function boot() {
     initLoader();
+    initScrollProgress();
     initTheme();
     initHeader();
     initNav();

@@ -9,18 +9,18 @@
 ?>
 <style>
 :root {
-  --bg: #06070c; --card: #0c0e17; --elev: #11141f;
-  --line: rgba(255,255,255,.08); --line-strong: rgba(255,255,255,.14);
-  --text: #e9ecf6; --soft: #b4bccd; --muted: #838da3; --faint: #5d667b;
-  --accent: #4f8cff; --accent-soft: #7aabff; --tint: rgba(79,140,255,.12);
-  --ok: #34d399; --warn: #fbbf24; --bad: #f87171;
+  --bg: #07080a; --card: #0f1215; --elev: #161a1e;
+  --line: rgba(255,255,255,.10); --line-strong: rgba(255,255,255,.16);
+  --text: #f4f6f5; --soft: #c7ccd1; --muted: #9ba3ac; --faint: #5c636b;
+  --accent: #26d9c9; --accent-soft: #5ce6d9; --tint: rgba(38,217,201,.12);
+  --ok: #34d399; --warn: #ffd966; --bad: #f87171;
   --r: 14px;
 }
 * { box-sizing: border-box; }
 body {
   margin: 0; min-height: 100vh; padding: clamp(1rem, 4vw, 3rem) 1rem;
   background: var(--bg); color: var(--text);
-  font: 16px/1.65 "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  font: 16px/1.65 "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   background-image:
     radial-gradient(ellipse 70% 40% at 50% -8%, rgba(79,140,255,.16), transparent 70%),

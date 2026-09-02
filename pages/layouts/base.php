@@ -9,16 +9,14 @@
  * @var array $flash
  */
 $siteName   = $settings->get('site_name', 'TECHBISS');
-$themeMode  = $settings->get('theme_mode', 'dark') === 'light' ? 'light' : 'dark';
-$allowTheme = $settings->bool('allow_theme_toggle', true);
 $bodyClass  = $bodyClass ?? '';
 $gaId       = $settings->get('google_analytics_id');
 ?><!doctype html>
-<html lang="<?= e($settings->get('locale', 'en')) ?>" data-theme="<?= e($themeMode) ?>">
+<html lang="<?= e($settings->get('locale', 'en')) ?>">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="theme-color" content="<?= $themeMode === 'light' ? '#f7f8fb' : '#06070c' ?>">
+    <meta name="theme-color" content="#07080a">
     <?= $seo->render(
         $siteName . ' — ' . $settings->get('tagline', 'Your Digital Business Starts Here.'),
         $settings->get('seo_default_description'),
@@ -35,8 +33,9 @@ $gaId       = $settings->get('google_analytics_id');
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"></noscript>
+    <?php $fontHref = 'https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800;900&family=Manrope:wght@400;500;600;700&family=Azeret+Mono:wght@400;500&display=swap'; ?>
+    <link rel="stylesheet" href="<?= e($fontHref) ?>" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="<?= e($fontHref) ?>"></noscript>
 
     <?php /* Everything below is undone by JavaScript: the loader is removed and
              the reveal animations fade content in. Without JavaScript the
@@ -49,18 +48,6 @@ $gaId       = $settings->get('google_analytics_id');
 
     <link rel="stylesheet" href="<?= e(asset('assets/css/design-system.css')) ?>">
     <link rel="stylesheet" href="<?= e(asset('assets/css/site.css')) ?>">
-
-    <script nonce="<?= e(\Techbiss\Core\App::nonce()) ?>">
-    // Applied before first paint so a stored theme preference never flashes.
-    (function () {
-        try {
-            var stored = localStorage.getItem('techbiss-theme');
-            if (stored === 'light' || stored === 'dark') {
-                document.documentElement.setAttribute('data-theme', stored);
-            }
-        } catch (e) {}
-    })();
-    </script>
 </head>
 <body class="<?= e($bodyClass) ?><?= $settings->bool('enable_loader', true) ? ' is-loading' : '' ?>">
 
@@ -68,13 +55,16 @@ $gaId       = $settings->get('google_analytics_id');
 
 <?php if ($settings->bool('enable_loader', true)): ?>
 <div class="loader" role="status" aria-live="polite">
-    <div class="loader__inner">
-        <div class="loader__mark"><?= e($siteName) ?></div>
-        <div class="loader__line" aria-hidden="true"></div>
-        <div class="loader__caption">Preparing your experience</div>
+    <div class="loader__row">
+        <span class="loader__mark"><?= e($siteName) ?></span>
+        <span class="loader__caption">Loading</span>
     </div>
+    <div class="loader__pct" aria-hidden="true">0%</div>
+    <div class="loader__line" aria-hidden="true"><span></span></div>
 </div>
 <?php endif; ?>
+
+<div class="scroll-progress" aria-hidden="true"><span></span></div>
 
 <?php if ($settings->bool('enable_transitions', true)): ?>
 <div class="page-veil" aria-hidden="true"></div>
@@ -82,7 +72,7 @@ $gaId       = $settings->get('google_analytics_id');
 
 <a class="skip-link" href="#main">Skip to main content</a>
 
-<?= $view->partial('partials/header', ['allowTheme' => $allowTheme]) ?>
+<?= $view->partial('partials/header') ?>
 
 <main id="main" class="site-main" tabindex="-1">
     <?= $content ?>

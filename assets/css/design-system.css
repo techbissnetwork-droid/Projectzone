@@ -10,55 +10,60 @@
 :root {
   color-scheme: dark;
 
-  /* Surfaces — a near-black with a cool cast, layered rather than flat */
-  --bg:            #06070c;
-  --bg-soft:       #080a11;
-  --bg-elev:       #0c0e17;
-  --bg-elev-2:     #11141f;
-  --surface:       rgba(255, 255, 255, 0.026);
-  --surface-hover: rgba(255, 255, 255, 0.045);
-  --surface-solid: #0e111a;
-  --glass:         rgba(10, 12, 20, 0.72);
+  /* Surfaces — near-black, the one and only theme now (see brand note below) */
+  --bg:            #07080a;
+  --bg-soft:       #0b0d10;
+  --bg-elev:       #0f1215;
+  --bg-elev-2:     #161a1e;
+  --surface:       rgba(255, 255, 255, 0.045);
+  --surface-hover: rgba(255, 255, 255, 0.07);
+  --surface-solid: #0f1215;
+  --glass:         rgba(10, 12, 14, 0.72);
 
   /* Hairlines */
-  --border:        rgba(255, 255, 255, 0.075);
-  --border-strong: rgba(255, 255, 255, 0.13);
-  --border-faint:  rgba(255, 255, 255, 0.045);
+  --border:        rgba(255, 255, 255, 0.10);
+  --border-strong: rgba(255, 255, 255, 0.16);
+  --border-faint:  rgba(255, 255, 255, 0.06);
 
   /* Text */
-  --text:          #e9ecf6;
-  --text-soft:     #b4bccd;
-  --text-muted:    #838da3;
-  --text-faint:    #7b8499;
-  --text-invert:   #06070c;
+  --text:          #f4f6f5;
+  --text-soft:     #c7ccd1;
+  --text-muted:    #9ba3ac;
+  --text-faint:    #5c636b;
+  --text-invert:   #07080a;
 
-  /* Accents — used with restraint */
-  --accent:        #4f8cff;
-  --accent-soft:   #7aabff;
-  --accent-deep:   #2f6ae0;
-  --accent-ink:    #06070c;
-  --accent-tint:   rgba(79, 140, 255, 0.12);
-  --accent-glow:   rgba(79, 140, 255, 0.28);
+  /* Accents — cyan carries everyday UI (links, focus, small controls); lime is
+     reserved for hero/CTA emphasis, same two-tier split the brand itself uses. */
+  --accent:        #26d9c9;
+  --accent-soft:   #5ce6d9;
+  --accent-deep:   #1aa89c;
+  --accent-ink:    #062e28;
+  --accent-tint:   rgba(38, 217, 201, 0.12);
+  --accent-glow:   rgba(38, 217, 201, 0.28);
   /* Accent text sitting on its own tint has less to work with than accent text
      on the page, so it gets its own value rather than reusing --accent. */
   --accent-on-tint: var(--accent);
 
-  --cyan:    #34d3e0;
-  --violet:  #a78bfa;
+  --lime:    #c8ff4d;
+  --lime-ink: #1a2404;
+  --cyan:    #26d9c9;
+  --violet:  #b9a8ff;
   --emerald: #34d399;
-  --amber:   #fbbf24;
-  --rose:    #fb7185;
+  --amber:   #ffd966;
+  --rose:    #ff5d8f;
   --blue:    #4f8cff;
 
   --success: #34d399;
-  --warning: #fbbf24;
+  --warning: #ffd966;
   --danger:  #f87171;
-  --info:    #38bdf8;
+  --info:    #26d9c9;
 
   /* Typography */
-  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+  --font-display: "Unbounded", "Manrope", -apple-system, BlinkMacSystemFont,
+               "Segoe UI", Roboto, sans-serif;
+  --font-sans: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
                "Helvetica Neue", Arial, "Noto Sans", sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo,
+  --font-mono: "Azeret Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo,
                Consolas, "Liberation Mono", monospace;
 
   --fs-hero:   clamp(2.6rem, 1.35rem + 4.2vw, 5.05rem);
@@ -109,58 +114,8 @@
   --z-modal: 100; --z-toast: 110; --z-loader: 120;
 }
 
-/* Light theme — designed, not inverted: warm paper ground, ink text,
-   the same accent re-weighted so it still reads as the brand. */
-[data-theme="light"] {
-  color-scheme: light;
-  --bg:            #f7f8fb;
-  --bg-soft:       #fbfbfd;
-  --bg-elev:       #ffffff;
-  --bg-elev-2:     #ffffff;
-  --surface:       rgba(9, 13, 26, 0.022);
-  --surface-hover: rgba(9, 13, 26, 0.045);
-  --surface-solid: #ffffff;
-  --glass:         rgba(255, 255, 255, 0.82);
-
-  --border:        rgba(11, 16, 32, 0.1);
-  --border-strong: rgba(11, 16, 32, 0.18);
-  --border-faint:  rgba(11, 16, 32, 0.06);
-
-  --text:          #0d1220;
-  --text-soft:     #38415a;
-  --text-muted:    #5c6580;
-  --text-faint:    #666e82;
-  --text-invert:   #ffffff;
-
-  --accent:        #2563eb;
-  --accent-soft:   #3b7dff;
-  --accent-deep:   #1d4ed8;
-  /* The light accents are dark enough to carry white text, so the ink flips
-     back to white here — on the dark theme's bright accents it must not. */
-  --accent-ink:    #ffffff;
-  --accent-tint:   rgba(37, 99, 235, 0.09);
-  --accent-glow:   rgba(37, 99, 235, 0.2);
-  --accent-on-tint: #1d4ed8;
-
-  /* Each of these is used both as body text on a pale surface and as a filled
-     button behind white text, so every one clears 4.5:1 in both directions. */
-  --cyan:    #0e7490;
-  --violet:  #7c3aed;
-  --emerald: #047857;
-  --amber:   #b45309;
-  --rose:    #be123c;
-  --blue:    #2563eb;
-
-  --success: #047857;
-  --warning: #b45309;
-  --danger:  #be123c;
-  --info:    #0e7490;
-
-  --sh-sm: 0 1px 2px rgba(11, 16, 32, 0.06);
-  --sh-md: 0 4px 14px -4px rgba(11, 16, 32, 0.1), 0 1px 3px rgba(11, 16, 32, 0.05);
-  --sh-lg: 0 18px 44px -20px rgba(11, 16, 32, 0.18), 0 4px 12px -6px rgba(11, 16, 32, 0.08);
-  --sh-xl: 0 32px 80px -28px rgba(11, 16, 32, 0.22), 0 8px 24px -12px rgba(11, 16, 32, 0.1);
-}
+/* The site now commits to a single dark identity — no [data-theme="light"]
+   override. Admin keeps its own toggle (admin/views/layout.php), untouched. */
 
 /* ---------------------------------------------------------------------
    2. Reset
@@ -698,12 +653,13 @@ h4 { font-size: var(--fs-h4); letter-spacing: -0.012em; }
 .card--interactive:hover .icon-plate { transform: scale(1.06) rotate(-2deg); }
 
 /* Accent variants tint the plate only — the card itself stays neutral */
-[data-accent="cyan"]    { --accent: var(--cyan);    --accent-tint: rgba(52, 211, 224, 0.12); --accent-glow: rgba(52, 211, 224, 0.26); }
-[data-accent="violet"]  { --accent: var(--violet);  --accent-tint: rgba(167, 139, 250, 0.13); --accent-glow: rgba(167, 139, 250, 0.28); }
-[data-accent="emerald"] { --accent: var(--emerald); --accent-tint: rgba(52, 211, 153, 0.12); --accent-glow: rgba(52, 211, 153, 0.26); }
-[data-accent="amber"]   { --accent: var(--amber);   --accent-tint: rgba(251, 191, 36, 0.13); --accent-glow: rgba(251, 191, 36, 0.26); }
-[data-accent="rose"]    { --accent: var(--rose);    --accent-tint: rgba(251, 113, 133, 0.13); --accent-glow: rgba(251, 113, 133, 0.26); }
+[data-accent="cyan"]    { --accent: var(--cyan);    --accent-tint: rgba(38, 217, 201, 0.12);  --accent-glow: rgba(38, 217, 201, 0.26); }
+[data-accent="violet"]  { --accent: var(--violet);  --accent-tint: rgba(185, 168, 255, 0.13); --accent-glow: rgba(185, 168, 255, 0.28); }
+[data-accent="emerald"] { --accent: var(--emerald); --accent-tint: rgba(52, 211, 153, 0.12);  --accent-glow: rgba(52, 211, 153, 0.26); }
+[data-accent="amber"]   { --accent: var(--amber);   --accent-tint: rgba(255, 217, 102, 0.13); --accent-glow: rgba(255, 217, 102, 0.26); }
+[data-accent="rose"]    { --accent: var(--rose);    --accent-tint: rgba(255, 93, 143, 0.13);  --accent-glow: rgba(255, 93, 143, 0.26); }
 [data-accent="blue"]    { --accent: var(--blue);    --accent-tint: rgba(79, 140, 255, 0.13);  --accent-glow: rgba(79, 140, 255, 0.28); }
+[data-accent="lime"]    { --accent: var(--lime);    --accent-tint: rgba(200, 255, 77, 0.14);  --accent-glow: rgba(200, 255, 77, 0.28); }
 
 /* ---------------------------------------------------------------------
    8. Badges, pills, chips
@@ -723,7 +679,7 @@ h4 { font-size: var(--fs-h4); letter-spacing: -0.012em; }
 }
 .badge--accent  { background: var(--accent-tint); border-color: transparent; color: var(--accent-on-tint); }
 .badge--success { background: rgba(52, 211, 153, 0.12); color: var(--success); border-color: transparent; }
-.badge--warning { background: rgba(251, 191, 36, 0.13); color: var(--warning); border-color: transparent; }
+.badge--warning { background: rgba(255, 217, 102, 0.13); color: var(--warning); border-color: transparent; }
 .badge--danger  { background: rgba(248, 113, 113, 0.12); color: var(--danger); border-color: transparent; }
 .badge--info    { background: rgba(56, 189, 248, 0.12); color: var(--info); border-color: transparent; }
 .badge--solid   { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
@@ -765,7 +721,7 @@ a.pill:hover, button.pill:hover { border-color: var(--border-strong); color: var
 .notice .icon { width: 1.15rem; height: 1.15rem; flex: none; margin-top: 0.15rem; color: var(--text-muted); }
 .notice--accent  { border-color: var(--accent-tint); background: var(--accent-tint); }
 .notice--accent .icon { color: var(--accent); }
-.notice--warning { border-color: rgba(251, 191, 36, 0.28); background: rgba(251, 191, 36, 0.07); }
+.notice--warning { border-color: rgba(255, 217, 102, 0.28); background: rgba(255, 217, 102, 0.07); }
 .notice--warning .icon { color: var(--warning); }
 .notice--danger  { border-color: rgba(248, 113, 113, 0.3); background: rgba(248, 113, 113, 0.07); }
 .notice--danger .icon { color: var(--danger); }
@@ -786,7 +742,7 @@ a.pill:hover, button.pill:hover { border-color: var(--border-strong); color: var
   line-height: 1.6;
 }
 .alert strong { color: var(--text); }
-.alert--warn { border-color: rgba(251, 191, 36, 0.28); background: rgba(251, 191, 36, 0.07); }
+.alert--warn { border-color: rgba(255, 217, 102, 0.28); background: rgba(255, 217, 102, 0.07); }
 .alert--bad  { border-color: rgba(248, 113, 113, 0.3); background: rgba(248, 113, 113, 0.07); }
 .alert--good { border-color: rgba(52, 211, 153, 0.28); background: rgba(52, 211, 153, 0.07); }
 

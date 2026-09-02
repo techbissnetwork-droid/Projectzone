@@ -23,10 +23,10 @@ const SS  = 4;
 const FONT_BOLD    = '/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf';
 const FONT_REGULAR = '/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf';
 
-const ACCENT = [0x4F, 0x8C, 0xFF];
-const MID    = [0x3F, 0x82, 0xF2];
-const CYAN   = [0x34, 0xD3, 0xE0];
-const INK    = [0x06, 0x07, 0x0C];
+const ACCENT = [0xC8, 0xFF, 0x4D];
+const MID    = [0x77, 0xEC, 0x8B];
+const CYAN   = [0x26, 0xD9, 0xC9];
+const INK    = [0x07, 0x08, 0x0A];
 
 // ---------------------------------------------------------------------
 // Drawing primitives — identical to tools/make-brand-assets.php
@@ -234,9 +234,9 @@ function paintBackground(\GdImage $im, int $W, int $H): void
                 continue;
             }
             $c = imagecolorat($im, $x, $y);
-            $r = (int) min(255, (($c >> 16) & 0xFF) + (0x4F - 0x06) * $a);
-            $g = (int) min(255, (($c >> 8) & 0xFF) + (0x8C - 0x07) * $a * 0.9);
-            $b = (int) min(255, ($c & 0xFF) + (0xFF - 0x0C) * $a);
+            $r = (int) min(255, (($c >> 16) & 0xFF) + (0xC8 - 0x07) * $a);
+            $g = (int) min(255, (($c >> 8) & 0xFF) + (0xFF - 0x08) * $a * 0.9);
+            $b = (int) min(255, ($c & 0xFF) + (0x4D - 0x0A) * $a);
             $col = imagecolorallocate($im, $r, $g, $b);
             imagesetpixel($im, $x, $y, $col);
             imagesetpixel($im, $x + 1, $y, $col);
@@ -297,9 +297,9 @@ function makeWideCover(string $name, int $W, int $H, int $safeW, int $safeH, str
     paintBackground($im, $W, $H);
 
     $white  = imagecolorallocate($im, 255, 255, 255);
-    $soft   = imagecolorallocate($im, 0xB4, 0xBC, 0xCD);
-    $muted  = imagecolorallocate($im, 0x83, 0x8D, 0xA3);
-    $accent = imagecolorallocate($im, 0x7A, 0xAB, 0xFF);
+    $soft   = imagecolorallocate($im, 0xC7, 0xCC, 0xD1);
+    $muted  = imagecolorallocate($im, 0x9B, 0xA3, 0xAC);
+    $accent = imagecolorallocate($im, 0xC8, 0xFF, 0x4D);
 
     $safeX = (int) round(($W - $safeW) / 2);
     $safeY = (int) round(($H - $safeH) / 2);
@@ -372,7 +372,7 @@ function makeSlimCover(string $name, int $W, int $H): void
     $im = canvas($W, $H);
     paintBackground($im, $W, $H);
     $white  = imagecolorallocate($im, 255, 255, 255);
-    $soft   = imagecolorallocate($im, 0xB4, 0xBC, 0xCD);
+    $soft   = imagecolorallocate($im, 0xC7, 0xCC, 0xD1);
 
     $mark = (int) round($H * 0.52);
     $y = (int) round(($H - $mark) / 2);

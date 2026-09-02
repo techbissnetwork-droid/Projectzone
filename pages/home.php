@@ -149,7 +149,7 @@ $hero = $sections['hero'] ?? [];
             </div>
         </div>
 
-        <div class="grid grid-3" data-reveal-stagger>
+        <div class="bento" data-reveal-stagger>
             <?php foreach ($services as $i => $service): ?>
                 <?= $view->partial('partials/service-card', ['service' => $service, 'i' => $i]) ?>
             <?php endforeach; ?>

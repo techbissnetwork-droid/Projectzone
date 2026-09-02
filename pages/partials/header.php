@@ -2,7 +2,6 @@
 /** @var array $primaryNav @var \Techbiss\Repo\SettingsRepo $settings @var string $currentPath */
 $siteName = $settings->get('site_name', 'TECHBISS');
 $logo     = media_url($settings->get('logo'));
-$allowTheme = $allowTheme ?? true;
 ?>
 <header class="site-header">
     <div class="container">
@@ -58,13 +57,6 @@ $allowTheme = $allowTheme ?? true;
                 <a class="header-icon-link" href="<?= e(url('/portal')) ?>" aria-label="Client sign in" title="Client sign in">
                     <?= icon('user') ?>
                 </a>
-
-                <?php if ($allowTheme): ?>
-                <button type="button" class="theme-toggle" data-theme-toggle aria-label="Switch theme">
-                    <?= icon('sun', 'icon icon--sun') ?>
-                    <?= icon('moon', 'icon icon--moon') ?>
-                </button>
-                <?php endif; ?>
 
                 <?php foreach ($primaryNav as $item):
                     if ((int) $item['is_button'] !== 1) { continue; } ?>

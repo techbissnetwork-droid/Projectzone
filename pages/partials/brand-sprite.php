@@ -14,9 +14,9 @@
      style="position:absolute;width:0;height:0;overflow:hidden" data-brand-sprite>
     <defs>
         <linearGradient id="tb-mark-gradient" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stop-color="#4F8CFF"/>
-            <stop offset="0.55" stop-color="#3F82F2"/>
-            <stop offset="1" stop-color="#34D3E0"/>
+            <stop offset="0" stop-color="#C8FF4D"/>
+            <stop offset="0.55" stop-color="#77EC8B"/>
+            <stop offset="1" stop-color="#26D9C9"/>
         </linearGradient>
         <clipPath id="tb-mark-clip"><rect width="100" height="100" rx="24" ry="24"/></clipPath>
     </defs>

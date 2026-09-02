@@ -21,7 +21,7 @@ $custom = media_url($settings->get('favicon'));
     <link rel="apple-touch-icon" sizes="180x180" href="<?= e(asset('assets/images/brand/apple-touch-icon.png')) ?>">
     <link rel="manifest" href="<?= e(url('/site.webmanifest')) ?>">
 <?php endif; ?>
-<link rel="mask-icon" href="<?= e(asset('assets/images/brand/favicon.svg')) ?>" color="#4F8CFF">
+<link rel="mask-icon" href="<?= e(asset('assets/images/brand/favicon.svg')) ?>" color="#C8FF4D">
 <?php /* Saved to a home screen: an app-like title and chrome instead of the browser's own. */ ?>
 <meta name="apple-mobile-web-app-title" content="<?= e($settings->get('site_name', 'TECHBISS')) ?>">
 <meta name="apple-mobile-web-app-capable" content="yes">

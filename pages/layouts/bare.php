@@ -2,7 +2,7 @@
 /** Minimal layout for maintenance and standalone screens. */
 $siteName = $settings->get('site_name', 'TECHBISS');
 ?><!doctype html>
-<html lang="en" data-theme="<?= e($settings->get('theme_mode', 'dark') === 'light' ? 'light' : 'dark') ?>">
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">

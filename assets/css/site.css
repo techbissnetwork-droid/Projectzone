@@ -12,50 +12,81 @@
   position: fixed;
   inset: 0;
   z-index: var(--z-loader);
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
   background: var(--bg);
-  transition: opacity 380ms var(--ease), visibility 380ms var(--ease);
+  padding: clamp(1.25rem, 4vw, 3rem);
+  transition: transform 700ms cubic-bezier(0.65, 0, 0.15, 1), opacity 500ms var(--ease) 200ms;
 }
-.loader.is-done { opacity: 0; visibility: hidden; pointer-events: none; }
-.loader__inner { display: flex; flex-direction: column; align-items: center; gap: 1.35rem; }
-.loader__mark {
-  font-size: clamp(1.35rem, 1rem + 1.6vw, 1.9rem);
-  font-weight: 600;
-  letter-spacing: 0.3em;
-  text-indent: 0.3em;
-  color: var(--text);
-  opacity: 0;
-  animation: loader-mark 620ms var(--ease-out) 60ms forwards;
+.loader.is-done { transform: translateY(-100%); opacity: 0; pointer-events: none; }
+.loader__row {
+  display: flex; align-items: baseline; justify-content: space-between; width: 100%;
+  font-family: var(--font-mono); font-size: var(--fs-label); color: var(--text-faint); letter-spacing: 0.08em;
+}
+.loader__mark { text-transform: uppercase; }
+.loader__pct {
+  font-family: var(--font-display); font-weight: 800; font-size: clamp(3rem, 1.4rem + 8vw, 6rem);
+  color: var(--text); line-height: 1; margin-top: 0.5rem; font-variant-numeric: tabular-nums;
 }
 .loader__line {
-  position: relative;
-  width: min(220px, 46vw);
-  height: 1px;
-  background: var(--border);
-  overflow: hidden;
-  border-radius: 1px;
+  height: 2px; background: var(--border); width: 100%; margin-top: 1rem; overflow: hidden; border-radius: 1px;
 }
-.loader__line::after {
-  content: "";
-  position: absolute; inset: 0;
-  background: linear-gradient(90deg, transparent, var(--accent), var(--cyan), transparent);
-  transform: translateX(-100%);
-  animation: loader-sweep 1.15s var(--ease) infinite;
+.loader__line span {
+  display: block; height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--cyan), var(--lime));
+  transition: width 120ms var(--ease-out);
 }
-.loader__caption {
-  font-size: var(--fs-label);
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--text-faint);
-  opacity: 0;
-  animation: loader-mark 500ms var(--ease-out) 220ms forwards;
-}
-@keyframes loader-mark  { to { opacity: 1; } }
-@keyframes loader-sweep { to { transform: translateX(100%); } }
 
 @media (prefers-reduced-motion: reduce) {
   .loader { display: none; }
+}
+
+/* ---------------------------------------------------------------------
+   1b. Scroll progress — thin fixed bar tracking how far down the page.
+   --------------------------------------------------------------------- */
+.scroll-progress { position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: var(--z-header); pointer-events: none; }
+.scroll-progress span {
+  display: block; height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--cyan), var(--lime));
+  transform-origin: left;
+}
+
+/* ---------------------------------------------------------------------
+   1c. Bento grid — an asymmetric card grid for a flagship feature list.
+   First item runs large (2x2), a middle item runs wide (2x1), the rest
+   fill in at 1x1 — CSS grid auto-flow handles any item count gracefully.
+   A large ghost numeral sits behind each card's content, clipped to its
+   rounded corners; --i (already output by service-card.php) drives it.
+   --------------------------------------------------------------------- */
+.bento {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: minmax(240px, auto);
+  gap: 1rem;
+}
+.bento > .card:nth-child(1) {
+  grid-column: span 2;
+  overflow: hidden; position: relative;
+}
+.bento > .card:nth-child(1)::before {
+  content: "01";
+  position: absolute;
+  top: -0.1em; right: 1.3rem; left: auto;
+  font-family: var(--font-display); font-weight: 800; font-size: 6.5rem; line-height: 1;
+  color: transparent; -webkit-text-stroke: 1px var(--border-strong);
+  pointer-events: none; z-index: 0;
+}
+.bento > .card:nth-child(1) > * { position: relative; z-index: 1; }
+.bento > .card:nth-child(4) { grid-column: span 2; }
+@media (max-width: 900px) {
+  .bento { grid-template-columns: repeat(2, 1fr); }
+  .bento > .card:nth-child(1) { grid-column: span 2; }
+}
+@media (max-width: 560px) {
+  .bento { grid-template-columns: 1fr; }
+  .bento > .card:nth-child(1) { grid-column: span 1; }
 }
 
 /* Page transition veil — a short cross-fade, never a waiting animation */
@@ -87,20 +118,21 @@ body.has-cursor-fx .cursor-ring {
 }
 body.has-cursor-fx .cursor-dot {
   width: 5px; height: 5px;
-  background: var(--accent);
+  background: var(--lime);
   transform: translate(-50%, -50%);
 }
 body.has-cursor-fx .cursor-ring {
-  width: 30px; height: 30px;
-  border: 1px solid var(--border-strong);
+  width: 26px; height: 26px;
+  border: 1px solid var(--accent);
+  mix-blend-mode: difference;
   transform: translate(-50%, -50%);
   transition: width 220ms var(--ease-out), height 220ms var(--ease-out),
               border-color 220ms var(--ease), background-color 220ms var(--ease);
 }
 body.has-cursor-fx.cursor-hot .cursor-ring {
-  width: 46px; height: 46px;
-  border-color: var(--accent);
-  background: var(--accent-tint);
+  width: 52px; height: 52px;
+  border-color: var(--lime);
+  background: rgba(200, 255, 77, 0.15);
 }
 body.has-cursor-fx.cursor-hidden .cursor-dot,
 body.has-cursor-fx.cursor-hidden .cursor-ring { opacity: 0; }
@@ -498,7 +530,7 @@ body.has-cursor-fx.cursor-hidden .cursor-ring { opacity: 0; }
 .hero__bg .glow--b {
   width: 520px; height: 520px;
   top: -60px; right: -140px;
-  background: radial-gradient(circle, rgba(52, 211, 224, 0.2), transparent 68%);
+  background: radial-gradient(circle, rgba(38, 217, 201, 0.2), transparent 68%);
 }
 .hero__inner {
   display: grid;
@@ -567,7 +599,7 @@ body.has-cursor-fx.cursor-hidden .cursor-ring { opacity: 0; }
 .transform-viz__ring--spin {
   border-color: transparent;
   border-top-color: var(--accent-glow);
-  border-right-color: rgba(52, 211, 224, 0.18);
+  border-right-color: rgba(38, 217, 201, 0.18);
   animation: viz-spin 26s linear infinite;
 }
 .transform-viz__ring--spin-rev { animation: viz-spin 34s linear infinite reverse; }

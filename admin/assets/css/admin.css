@@ -9,6 +9,57 @@
   --topbar-h: 62px;
 }
 
+/* The public site now commits to one dark identity and dropped its light
+   theme (assets/css/design-system.css). Admin keeps its own toggle for staff
+   who prefer a light workspace, so its light palette now lives here instead —
+   same values the shared file used to carry, just relocated. */
+[data-theme="light"] {
+  color-scheme: light;
+  --bg:            #f7f8fb;
+  --bg-soft:       #fbfbfd;
+  --bg-elev:       #ffffff;
+  --bg-elev-2:     #ffffff;
+  --surface:       rgba(9, 13, 26, 0.022);
+  --surface-hover: rgba(9, 13, 26, 0.045);
+  --surface-solid: #ffffff;
+  --glass:         rgba(255, 255, 255, 0.82);
+
+  --border:        rgba(11, 16, 32, 0.1);
+  --border-strong: rgba(11, 16, 32, 0.18);
+  --border-faint:  rgba(11, 16, 32, 0.06);
+
+  --text:          #0d1220;
+  --text-soft:     #38415a;
+  --text-muted:    #5c6580;
+  --text-faint:    #666e82;
+  --text-invert:   #ffffff;
+
+  --accent:        #2563eb;
+  --accent-soft:   #3b7dff;
+  --accent-deep:   #1d4ed8;
+  --accent-ink:    #ffffff;
+  --accent-tint:   rgba(37, 99, 235, 0.09);
+  --accent-glow:   rgba(37, 99, 235, 0.2);
+  --accent-on-tint: #1d4ed8;
+
+  --cyan:    #0e7490;
+  --violet:  #7c3aed;
+  --emerald: #047857;
+  --amber:   #b45309;
+  --rose:    #be123c;
+  --blue:    #2563eb;
+
+  --success: #047857;
+  --warning: #b45309;
+  --danger:  #be123c;
+  --info:    #0e7490;
+
+  --sh-sm: 0 1px 2px rgba(11, 16, 32, 0.06);
+  --sh-md: 0 4px 14px -4px rgba(11, 16, 32, 0.1), 0 1px 3px rgba(11, 16, 32, 0.05);
+  --sh-lg: 0 18px 44px -20px rgba(11, 16, 32, 0.18), 0 4px 12px -6px rgba(11, 16, 32, 0.08);
+  --sh-xl: 0 32px 80px -28px rgba(11, 16, 32, 0.22), 0 8px 24px -12px rgba(11, 16, 32, 0.1);
+}
+
 body.admin {
   background: var(--bg);
   overflow-x: hidden;
