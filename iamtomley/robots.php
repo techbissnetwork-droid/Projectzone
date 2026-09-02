@@ -37,8 +37,12 @@ $base = BASE_URL;
 echo "User-agent: *\n";
 echo "Allow: {$base}/\n";
 // The admin panel, the installer and the app's internals are never content.
-foreach (['/admin/', '/install/', '/includes/', '/data/', '/config.php', '/game.php'] as $path) {
+// Both URL shapes are listed, since which one is in use depends on the host.
+foreach (['/admin/', '/install/', '/includes/', '/data/', '/config.php',
+          '/game.php', '/game/'] as $path) {
     echo "Disallow: {$base}{$path}\n";
 }
 echo "\n";
-echo "Sitemap: " . site_url('/sitemap.xml') . "\n";
+// Point at the sitemap address this server can actually serve: /sitemap.xml
+// needs the rewrite, /sitemap/ works anywhere.
+echo "Sitemap: " . sitemap_url() . "\n";

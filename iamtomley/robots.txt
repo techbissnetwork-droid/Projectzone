@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin/
+Disallow: /install/
+Disallow: /includes/
+Disallow: /data/
+Disallow: /config.php
+Disallow: /game.php
+Disallow: /game/
+
+# This plain file is the fallback. Where the shipped .htaccess is in force,
+# /robots.txt is served by robots.php instead and this file is never read —
+# that version also closes the site off during maintenance and while
+# "discourage search engines" is on. Admin → Search engines can rewrite this
+# file with your own address and a Sitemap line.

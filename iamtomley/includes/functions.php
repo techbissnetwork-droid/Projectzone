@@ -42,7 +42,7 @@ function folder_pages(): array
         '/admin/index.php', '/admin/login.php', '/admin/logout.php',
         '/admin/settings.php', '/admin/projects.php', '/admin/stats.php',
         '/admin/games.php', '/admin/account.php',
-        '/admin/detect-all.php', '/admin/detect-image.php',
+        '/admin/detect-all.php', '/admin/detect-image.php', '/admin/seo.php',
     ];
 }
 
@@ -97,6 +97,20 @@ function url_style(): string
     // link on the site would 404 and there would be no way back in.
     $style = $proven ? 'bare' : 'folder';
     return $style;
+}
+
+/**
+ * The sitemap address this server can actually serve.
+ *
+ * /sitemap.xml is the conventional one but it needs the rewrite; /sitemap/ is
+ * the folder that works anywhere. Submitting an address that 404s is how a
+ * sitemap ends up reported as unreadable.
+ */
+function sitemap_url(): string
+{
+    return url_style() === 'bare' || !is_file(APP_ROOT . '/sitemap/index.php')
+        ? site_url('/sitemap.xml')
+        : site_url('/sitemap/');
 }
 
 /** True when addresses are written without .php (either clean shape). */

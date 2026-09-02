@@ -203,10 +203,10 @@ function s(string $k): string { return e(setting($k)); }
       <span class="small">Discourage search engines — keeps the site out of Google while you are still working on it.</span>
     </div>
     <div class="hint" style="margin-top:.85rem">
-      Your <a href="<?= e(site_url('/sitemap.xml')) ?>" target="_blank" rel="noopener">sitemap.xml</a> and
+      Your <a href="<?= e(sitemap_url()) ?>" target="_blank" rel="noopener">sitemap</a> and
       <a href="<?= e(site_url('/robots.txt')) ?>" target="_blank" rel="noopener">robots.txt</a> are generated for you and
-      always match what is on the site — including every project image, so those get indexed too. Submit the sitemap
-      address once in Google Search Console and you are done. While maintenance mode or the switch above is on, both
+      always match what is on the site — including every project image, so those get indexed too. <strong><a href="<?= e(url('/admin/seo.php')) ?>">Search engines</a></strong> checks all of this
+      against your live site and tells you the exact address to submit to Google. While maintenance mode or the switch above is on, both
       tell search engines to stay away.
     </div>
   </div>

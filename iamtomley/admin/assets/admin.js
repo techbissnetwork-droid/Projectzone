@@ -225,6 +225,80 @@
     if (none) none.addEventListener('click', function () { tick(false); });
   })();
 
+  /* ── Ask this site what a crawler would get ─────────────────────────────── */
+  (function seoCheck() {
+    var run = document.getElementById('seoRun');
+    var table = document.getElementById('seoTable');
+    if (!run || !table) return;
+    var progress = document.getElementById('seoProgress');
+    var rows = [].slice.call(table.querySelectorAll('tr[data-seo]'));
+
+    function verdict(key, r, body) {
+      // r is null when the request could not be made at all.
+      if (!r) return ['warn', 'No answer at all — the address could not be reached.'];
+      var code = r.status, type = (r.headers.get('content-type') || '').toLowerCase();
+      var moved = r.redirected ? (' (redirected to ' + r.url + ')') : '';
+
+      if (key === 'home') {
+        return code < 400
+          ? ['ok', 'Reachable.' + moved]
+          : ['warn', 'Your home page answered ' + code + '. Nothing else matters until that is fixed.'];
+      }
+      if (key === 'robots') {
+        if (code >= 400) return ['warn', 'Missing (' + code + '). Crawlers treat an unreadable robots.txt as a reason to slow down. Use “Write robots.txt” below.'];
+        if (body.toLowerCase().indexOf('user-agent') === -1) return ['warn', 'Answers, but not with a robots.txt — it looks like a page. Use “Write robots.txt” below.'];
+        return ['ok', 'Readable, and it is a real robots.txt.' + moved];
+      }
+      if (key === 'sitemap') {
+        if (code >= 400) return ['warn', 'This is the address to give Search Console, and it answers ' + code + '.'];
+        if (type.indexOf('xml') === -1) return ['warn', 'Answers, but not as XML — Search Console will refuse it.'];
+        return ['ok', 'Submit exactly this address in Search Console.' + moved];
+      }
+      if (key === 'sitemapx') {
+        return code >= 400
+          ? ['', 'Not served here — it needs mod_rewrite. Harmless: submit the address above instead.']
+          : ['ok', 'Also works, so either address can be submitted.'];
+      }
+      if (key === 'indexphp') {
+        if (r.redirected) return ['ok', 'Redirects to your home page — one page, one address, which is what you want.'];
+        if (code < 400) return ['', 'Answers directly rather than redirecting, so the home page has two addresses. The canonical tag tells Google which one counts, so this is untidy rather than harmful.'];
+        return ['ok', 'Not served, which is fine.'];
+      }
+      return ['', ''];
+    }
+
+    run.addEventListener('click', function () {
+      run.disabled = true;
+      var i = 0;
+      (function step() {
+        if (i >= rows.length) {
+          run.disabled = false;
+          run.textContent = 'Check again';
+          say(progress, 'Done.', 'ok');
+          return;
+        }
+        var row = rows[i];
+        i += 1;
+        say(progress, 'Asking for ' + row.dataset.url + ' …', '');
+        row.querySelector('.seo-say').textContent = 'checking…';
+
+        fetch(row.dataset.url, { credentials: 'omit', cache: 'no-store' })
+          .then(function (r) { return r.text().then(function (t) { return [r, t.slice(0, 4000)]; }); })
+          .catch(function () { return [null, '']; })
+          .then(function (pair) {
+            var r = pair[0], body = pair[1];
+            var out = verdict(row.dataset.seo, r, body);
+            row.querySelector('.seo-code').textContent = r ? r.status : 'failed';
+            row.querySelector('.seo-code').className = 'seo-code' + (r && r.status < 400 ? '' : ' muted');
+            var cell = row.querySelector('.seo-say');
+            cell.textContent = out[1];
+            cell.className = 'seo-say detect-note ' + out[0];
+          })
+          .then(step);
+      })();
+    });
+  })();
+
   /* ── Does this server actually rewrite clean URLs? ──────────────────────── */
   // Ask it for /sitemap (no .php). If the rewrite is in force the server hands
   // back the sitemap; if it is not, that address simply does not exist.
