@@ -321,6 +321,7 @@ show_flash();
       <div><label class="chk"><input type="checkbox" name="chop_gate_enabled"
              <?= Database::setting('chop_gate_enabled', '1') === '1' ? 'checked' : '' ?>>
              Stand down in chop</label>
+        <label>Choppiness index limit</label>
         <input type="number" step="0.1" name="chop_limit" aria-label="Choppiness index limit" value="<?= sma_e(Database::setting('chop_limit', '61.8')) ?>">
         <p class="hint">Choppiness index above this suppresses directional signals. The ADX filter only
           dampens weights, so a consolidating market could still produce a confident breakout call.</p>
@@ -375,6 +376,7 @@ show_flash();
       <div><label class="chk"><input type="checkbox" name="extension_gate_enabled"
              <?= Database::setting('extension_gate_enabled', '1') === '1' ? 'checked' : '' ?>>
              Do not start a trade into extension</label>
+        <label>Maximum extension from the 20-EMA (ATR)</label>
         <input type="number" step="0.25" min="0.5" max="10" name="extension_max_atr"
                aria-label="Maximum extension from the 20-EMA, in ATR"
                value="<?= sma_e(Database::setting('extension_max_atr', '2.5')) ?>">
@@ -390,6 +392,15 @@ show_flash();
           signal bar closes.</p>
       </div>
     </div>
+    <?php // Moved from "Market structure", which it has nothing to do with -
+          // this is execution/cost data, the same subject as round-trip cost
+          // and the fee ceiling above. ?>
+    <label class="chk"><input type="checkbox" name="record_spread"
+      <?= Database::setting('record_spread', '1') === '1' ? 'checked' : '' ?>>
+      Record the bid/ask spread with every BUY and SELL signal</label>
+    <p class="hint">One cached request per symbol, so it costs a little time on each new signal. It
+      is what lets the engine find out later whether wide-spread setups are worth taking; switching
+      it off leaves the field empty rather than recording a misleading zero.</p>
       </div>
     </details>
     <details class="acc">
@@ -498,15 +509,13 @@ show_flash();
           being at it. An unvisited block is scenery.</p>
       </div>
     </div>
-    <label class="chk"><input type="checkbox" name="record_spread"
-      <?= Database::setting('record_spread', '1') === '1' ? 'checked' : '' ?>>
-      Record the bid/ask spread with every BUY and SELL signal</label>
-    <p class="hint">One cached request per symbol, so it costs a little time on each new signal. It
-      is what lets the engine find out later whether wide-spread setups are worth taking; switching
-      it off leaves the field empty rather than recording a misleading zero.</p>
-    <p style="margin-top:14px"><button class="btn" type="submit">Save scoring settings</button></p>
       </div>
     </details>
+    <?php // Visible regardless of which accordion is open above - it used to
+          // sit inside "Market structure" specifically, which tied saving
+          // every field on this card to opening one arbitrary, unrelated
+          // section. ?>
+    <p style="margin-top:14px"><button class="btn" type="submit">Save scoring settings</button></p>
   </form>
 </div>
 
