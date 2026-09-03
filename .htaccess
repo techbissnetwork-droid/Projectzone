@@ -1,0 +1,8 @@
+# The document root must be public/. If it is not, this stops the application
+# source, storage and configuration from being served directly.
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Deny from all
+</IfModule>

@@ -51,7 +51,9 @@ final class Seo
     public function description(?string $description = null): string
     {
         if ($description !== null) {
-            $this->description = self::clamp($description, 168);
+            // 158 characters keeps the description inside what search
+            // engines actually render, across both desktop and mobile.
+            $this->description = self::clamp($description, 158);
         }
         return $this->description;
     }

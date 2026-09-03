@@ -46,7 +46,7 @@ $pages = [
 // Extra pages are appended only when their route exists, so this script keeps
 // working while the platform is still being built out.
 $optional = [
-    ['/install', 'Installer — Requirements', 'Installer'],
+    ['/install/step/requirements', 'Installer — Requirements', 'Installer'],
     ['/install/step/environment', 'Installer — Environment', 'Installer'],
     ['/install/step/database', 'Installer — Database', 'Installer'],
     ['/install/step/detection', 'Installer — Existing site', 'Installer'],
@@ -68,6 +68,41 @@ $optional = [
 
 $app = new Application($root);
 require $root . '/app/routes.php';
+
+/**
+ * Sign in so the authenticated portals render with real data. The export runs
+ * locally against the development installation; nothing leaves this machine.
+ */
+function signInAs(Application $app, string $portal, string $email, string $password): bool
+{
+    $_SERVER = [
+        'REQUEST_METHOD' => 'POST', 'REQUEST_URI' => "/{$portal}/login",
+        'SCRIPT_NAME' => '/index.php', 'HTTP_HOST' => 'preview.techbiss.local',
+        'SERVER_PORT' => '443', 'HTTPS' => 'on', 'REMOTE_ADDR' => '127.0.0.1',
+    ];
+    $_GET = [];
+    $_POST = ['email' => $email, 'password' => $password, '_token' => $app->make('csrf')->token()];
+    $response = $app->handle(Request::capture());
+
+    foreach ($response->headers() as [$name, $value]) {
+        if (strtolower($name) === 'location' && !str_contains((string) $value, '/login')) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function signOutOf(Application $app, string $portal): void
+{
+    $_SERVER = [
+        'REQUEST_METHOD' => 'POST', 'REQUEST_URI' => "/{$portal}/logout",
+        'SCRIPT_NAME' => '/index.php', 'HTTP_HOST' => 'preview.techbiss.local',
+        'SERVER_PORT' => '443', 'HTTPS' => 'on', 'REMOTE_ADDR' => '127.0.0.1',
+    ];
+    $_GET = [];
+    $_POST = ['_token' => $app->make('csrf')->token()];
+    $app->handle(Request::capture());
+}
 
 /** Render one path through the real request pipeline. */
 function render(Application $app, string $path, ?int &$status = null): string
@@ -169,16 +204,69 @@ if ($drawerStart !== false) {
     }
 }
 
+$portalCredentials = [
+    'admin' => ['admin@techbiss.com', getenv('TECHBISS_ADMIN_PASSWORD') ?: 'TechbissDemo!2026'],
+    'staff' => ['engineer@techbiss.com', 'StaffDemo!2026'],
+    'client' => ['client@northwind.example', 'ClientDemo!2026'],
+];
+
 $all = $pages;
 foreach ($optional as $candidate) {
-    [$status] = [null];
-    $html = render($app, $candidate[0], $status);
+    $path = $candidate[0];
+
+    // Sign into the portal a page belongs to before probing it.
+    foreach ($portalCredentials as $portal => [$email, $password]) {
+        if (str_starts_with($path, '/' . $portal)) {
+            signInAs($app, $portal, $email, $password);
+            break;
+        }
+    }
+
+    $status = null;
+    render($app, $path, $status);
     if ($status === 200) {
         $all[] = $candidate;
     }
 }
 
+// Probing left a portal session open; the capture loop below assumes it starts
+// signed out so the login pages render as a visitor sees them.
+foreach (array_keys($portalCredentials) as $portal) {
+    signOutOf($app, $portal);
+}
+
+/** Which portal must be signed in for this path, if any. */
+function portalFor(string $path, array $credentials): ?string
+{
+    if (str_contains($path, '/login') || str_contains($path, '/forgot-password')) {
+        return null;
+    }
+    foreach (array_keys($credentials) as $portal) {
+        if (str_starts_with($path, '/' . $portal)) {
+            return $portal;
+        }
+    }
+    return null;
+}
+
+$activePortal = null;
 foreach ($all as [$path, $label, $group]) {
+    // Reconcile the session with what this page needs: a login page must be
+    // captured signed out, a dashboard signed into its own portal.
+    $needed = portalFor($path, $portalCredentials);
+    if ($needed !== $activePortal) {
+        if ($activePortal !== null) {
+            signOutOf($app, $activePortal);
+            $activePortal = null;
+        }
+        if ($needed !== null) {
+            [$email, $password] = $portalCredentials[$needed];
+            if (signInAs($app, $needed, $email, $password)) {
+                $activePortal = $needed;
+            }
+        }
+    }
+
     $status = null;
     $html = render($app, $path, $status);
     if ($status !== 200) {

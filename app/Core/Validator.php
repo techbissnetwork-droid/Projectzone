@@ -29,9 +29,15 @@ final class Validator
         $raw = $this->data[$field] ?? null;
         $value = is_string($raw) ? trim($raw) : $raw;
         $rules = array_filter(explode('|', $ruleset));
-        $isRequired = in_array('required', $rules, true);
 
-        if (($value === null || $value === '' || $value === []) && !$isRequired) {
+        // "accepted" and "confirmed" are assertions about absence as much as
+        // about value — an unticked checkbox arrives as no key at all, so they
+        // must still run on an empty value or they silently pass.
+        $mustRun = in_array('required', $rules, true)
+            || in_array('accepted', $rules, true)
+            || in_array('confirmed', $rules, true);
+
+        if (($value === null || $value === '' || $value === []) && !$mustRun) {
             $this->valid[$field] = $value;
             return;
         }
