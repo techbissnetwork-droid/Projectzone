@@ -262,9 +262,12 @@ section{ position:relative; z-index:2; }
 .svc:hover::before,.svc:hover::after{ opacity:1; }
 
 /* Everything a module offers is on the face of the card — nothing to open. */
+/* The head is its own height, not a flexible filler. When it stretched to fill
+   the card, a longer summary pushed the rule under it down, so the dividers sat
+   at four different heights across a row of cards. */
 .svc__head{
-  position:relative; z-index:2; flex:1 1 auto; display:grid; width:100%;
-  padding:clamp(15px,1.4vw,19px); grid-template-rows:auto auto auto 1fr;
+  position:relative; z-index:2; flex:none; display:grid; width:100%;
+  padding:clamp(15px,1.4vw,19px); grid-template-rows:auto auto auto auto;
 }
 .svc__index{ grid-row:1; }
 .svc__glyph{ grid-row:2; }
@@ -288,7 +291,11 @@ section{ position:relative; z-index:2; }
 .svc:hover .svc__glyph .blink.b2{ animation-delay:.55s; }
 @keyframes blink{ 0%,60%{opacity:1} 61%,100%{opacity:.2} }
 .svc__name{ font-family:var(--ff-d); font-size:clamp(1.02rem,1.1vw,1.16rem); font-weight:600; letter-spacing:-.028em; }
-.svc__desc{ margin-top:6px; color:var(--tx-2); font-size:12px; line-height:1.62; }
+/* Three lines' worth whatever the summary runs to, so every rule lines up. */
+.svc__desc{
+  margin-top:6px; color:var(--tx-2); font-size:12px; line-height:1.62;
+  min-height:calc(3 * 1.62em);
+}
 
 .svc__detail{
   position:relative; z-index:2; flex:none; display:grid; gap:11px; align-content:start;
