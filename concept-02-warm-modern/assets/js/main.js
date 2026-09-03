@@ -1,33 +1,32 @@
 /* ==========================================================================
-   TECHBISS — Concept 02: Minimal Executive — motion system
-   Restrained on purpose: quiet fades, no cursor follower, no magnetic
-   buttons. Defensive against missing CDN libs / reduced motion.
+   TECHBISS — Concept B: Warm Modern — motion system
+   Gentle, refined, human. No cursor follower — the warmth comes from soft
+   easing and diffused shadows, not gimmicks. Defensive against missing CDN
+   libs / reduced motion.
    ========================================================================== */
 (function(){
   "use strict";
   var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var isCoarse = window.matchMedia && window.matchMedia('(hover: none), (pointer: coarse)').matches;
   var hasGSAP = typeof window.gsap !== 'undefined';
   var hasLenis = typeof window.Lenis !== 'undefined';
 
   if (hasGSAP && window.ScrollTrigger) gsap.registerPlugin(ScrollTrigger);
 
-  /* ---------------- Smooth scroll (Lenis) ---------------- */
   var lenis = null;
   if (hasLenis && !reduced) {
-    lenis = new Lenis({ duration: 0.9, smoothWheel: true, wheelMultiplier: 1 });
+    lenis = new Lenis({ duration: 1.0, smoothWheel: true, wheelMultiplier: 1 });
     document.documentElement.classList.add('has-lenis');
     function raf(time){ lenis.raf(time); requestAnimationFrame(raf); }
     requestAnimationFrame(raf);
     if (hasGSAP) lenis.on('scroll', ScrollTrigger.update);
   }
 
-  /* ---------------- Header scroll state ---------------- */
   var header = document.querySelector('[data-header]');
   function onScroll(){ if (header) header.classList.toggle('is-scrolled', window.scrollY > 24); }
   onScroll();
   window.addEventListener('scroll', onScroll, { passive: true });
 
-  /* ---------------- Desktop mega menu ---------------- */
   document.querySelectorAll('.has-menu').forEach(function(item){
     var trigger = item.querySelector('.nav-link');
     if (!trigger) return;
@@ -42,7 +41,6 @@
     if (e.key === 'Escape') document.querySelectorAll('.has-menu.is-open').forEach(function(i){ i.classList.remove('is-open'); });
   });
 
-  /* ---------------- Mobile nav ---------------- */
   var navToggle = document.querySelector('[data-nav-toggle]');
   var mobileNav = document.querySelector('[data-mobile-nav]');
   if (navToggle && mobileNav) {
@@ -67,7 +65,18 @@
     });
   }
 
-  /* ---------------- Scroll reveals ---------------- */
+  if (!isCoarse && !reduced) {
+    document.querySelectorAll('.magnetic').forEach(function(el){
+      el.addEventListener('mousemove', function(e){
+        var r = el.getBoundingClientRect();
+        var x = (e.clientX - r.left - r.width/2) * 0.28;
+        var y = (e.clientY - r.top - r.height/2) * 0.28;
+        el.style.transform = 'translate('+x+'px,'+y+'px)';
+      });
+      el.addEventListener('mouseleave', function(){ el.style.transform = ''; });
+    });
+  }
+
   var revealEls = document.querySelectorAll('[data-reveal]');
   if (reduced || !('IntersectionObserver' in window)) {
     revealEls.forEach(function(el){ el.classList.add('reveal-in'); });
@@ -87,11 +96,10 @@
   }
   document.querySelectorAll('[data-stagger]').forEach(function(group){
     Array.prototype.forEach.call(group.children, function(child, i){
-      if (child.hasAttribute('data-reveal')) child.setAttribute('data-reveal-delay', i * 80);
+      if (child.hasAttribute('data-reveal')) child.setAttribute('data-reveal-delay', i * 90);
     });
   });
 
-  /* ---------------- Animated stat counters ---------------- */
   var counters = document.querySelectorAll('[data-count]');
   if (counters.length) {
     var counterIO = new IntersectionObserver(function(entries){
@@ -118,7 +126,6 @@
     counters.forEach(function(el){ counterIO.observe(el); });
   }
 
-  /* ---------------- Accordion ---------------- */
   document.querySelectorAll('.accordion-item').forEach(function(item){
     var trigger = item.querySelector('.accordion-trigger');
     var panel = item.querySelector('.accordion-panel');
@@ -134,7 +141,6 @@
     });
   });
 
-  /* ---------------- Filmstrip drag-to-scroll ---------------- */
   document.querySelectorAll('.filmstrip').forEach(function(strip){
     var isDown = false, startX, scrollLeft;
     strip.addEventListener('pointerdown', function(e){
@@ -148,19 +154,17 @@
     if (wrap) {
       var prev = wrap.querySelector('[data-scroll-prev]');
       var next = wrap.querySelector('[data-scroll-next]');
-      var step = function(){ return (strip.querySelector('.work-card') && strip.querySelector('.work-card').offsetWidth + 1) || 320; };
+      var step = function(){ return (strip.querySelector('.work-card') && strip.querySelector('.work-card').offsetWidth + 22) || 320; };
       if (next) next.addEventListener('click', function(){ strip.scrollBy({ left: step(), behavior: 'smooth' }); });
       if (prev) prev.addEventListener('click', function(){ strip.scrollBy({ left: -step(), behavior: 'smooth' }); });
     }
   });
 
-  /* ---------------- GSAP entrance polish for hero ---------------- */
   if (hasGSAP && !reduced) {
     var heroTitle = document.querySelector('[data-hero-title]');
-    if (heroTitle) gsap.fromTo(heroTitle, { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: 1, ease: 'power2.out', delay: .1 });
+    if (heroTitle) gsap.fromTo(heroTitle, { y: 26, opacity: 0 }, { y: 0, opacity: 1, duration: 1, ease: 'power2.out', delay: .1 });
   }
 
-  /* ---------------- Current nav link highlight ---------------- */
   var path = location.pathname.split('/').pop() || 'index.html';
   document.querySelectorAll('a[href]').forEach(function(a){
     if (a.getAttribute('href') === path) a.setAttribute('aria-current','page');
