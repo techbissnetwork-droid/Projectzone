@@ -1,23 +1,25 @@
-import { Section } from "@/components/ui/Section";
-import { Container } from "@/components/ui/Container";
-import { SectionHeading } from "@/components/ui/SectionHeading";
-import { Button } from "@/components/ui/Button";
+import { Hero } from "@/components/home/Hero";
+import { LogoCloud } from "@/components/home/LogoCloud";
+import { ServicesGrid } from "@/components/home/ServicesGrid";
+import { MarketplaceTeaser } from "@/components/home/MarketplaceTeaser";
+import { ProcessTeaser } from "@/components/home/ProcessTeaser";
+import { Stats } from "@/components/home/Stats";
+import { Testimonials } from "@/components/home/Testimonials";
+import { CaseStudyHighlight } from "@/components/home/CaseStudyHighlight";
+import { CtaBanner } from "@/components/home/CtaBanner";
 
 export default function Home() {
   return (
-    <Section size="loose">
-      <Container>
-        <SectionHeading
-          eyebrow="TECHBISS"
-          title="Digital transformation, engineered."
-          description="Placeholder home page — full build in progress."
-        />
-        <div className="mt-8 flex justify-center">
-          <Button href="/contact" variant="secondary">
-            Get Started
-          </Button>
-        </div>
-      </Container>
-    </Section>
+    <>
+      <Hero />
+      <LogoCloud />
+      <ServicesGrid />
+      <MarketplaceTeaser />
+      <Stats />
+      <ProcessTeaser />
+      <CaseStudyHighlight />
+      <Testimonials />
+      <CtaBanner />
+    </>
   );
 }
