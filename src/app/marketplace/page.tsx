@@ -62,7 +62,7 @@ export default async function MarketplacePage({
             <Reveal>
               <Eyebrow>Spotlight</Eyebrow>
               <h2 className="mt-6 max-w-[560px] text-balance text-[28px] font-medium leading-[1.1] tracking-[-0.02em] sm:text-[36px]">
-                A closer look at what's launching best.
+                A closer look at what&rsquo;s launching best.
               </h2>
             </Reveal>
 

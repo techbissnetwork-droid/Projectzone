@@ -41,7 +41,7 @@ export default async function CheckoutPage({
         <Reveal className="mx-auto max-w-[560px] text-center">
           <Eyebrow className="justify-center">Checkout</Eyebrow>
           <h1 className="mt-6 text-balance text-[32px] font-medium leading-[1.1] tracking-[-0.02em] sm:text-[42px]">
-            You're one step from launching.
+            You&rsquo;re one step from launching.
           </h1>
         </Reveal>
 

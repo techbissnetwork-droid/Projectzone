@@ -152,7 +152,7 @@ export default async function ThemeDetailPage({
               </Reveal>
 
               <Reveal>
-                <Eyebrow>What's Included</Eyebrow>
+                <Eyebrow>What&rsquo;s Included</Eyebrow>
                 <RevealGroup className="mt-6 grid gap-3 sm:grid-cols-2">
                   {product.features.map((feature) => (
                     <RevealItem key={feature}>

@@ -15,10 +15,7 @@ function formatDate(d: string) {
 }
 
 export default function BillingPage() {
-  const monthlyTotal = mySites.length * 89 > 0 ? invoices
-    .filter((i) => i.status === "paid")
-    .slice(0, 1)
-    .reduce((sum) => sum + 89, 0) : 0;
+  const dueInvoice = invoices.find((i) => i.status === "due");
 
   return (
     <div className="flex flex-col gap-8">
@@ -36,7 +33,7 @@ export default function BillingPage() {
           </div>
           <p className="text-[20px] font-medium text-[var(--color-ink)]">Business Hosting</p>
           <p className="text-[13px] text-[var(--color-ink-muted)]">
-            {mySites.length} websites · ${monthlyTotal || 89}/mo · renews monthly
+            {mySites.length} websites · $89/mo · renews {dueInvoice ? formatDate(dueInvoice.date) : "monthly"}
           </p>
         </Card>
         <PaymentMethodCard />
