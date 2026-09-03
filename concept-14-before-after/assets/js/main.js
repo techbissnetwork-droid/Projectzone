@@ -192,6 +192,22 @@
     apply(current);
   });
 
+  /* ---------------- Accordion (FAQ etc.) ---------------- */
+  document.querySelectorAll('.accordion-item').forEach(function(item){
+    var trigger = item.querySelector('.accordion-trigger');
+    var panel = item.querySelector('.accordion-panel');
+    if (!trigger || !panel) return;
+    trigger.addEventListener('click', function(){
+      var isOpen = item.classList.contains('is-open');
+      var group = item.closest('.accordion');
+      if (group) group.querySelectorAll('.accordion-item.is-open').forEach(function(other){
+        if (other !== item) { other.classList.remove('is-open'); other.querySelector('.accordion-panel').style.maxHeight = ''; }
+      });
+      if (isOpen) { item.classList.remove('is-open'); panel.style.maxHeight = ''; }
+      else { item.classList.add('is-open'); panel.style.maxHeight = panel.scrollHeight + 'px'; }
+    });
+  });
+
   document.querySelectorAll('.filmstrip').forEach(function(strip){
     var isDown = false, startX, scrollLeft;
     strip.addEventListener('pointerdown', function(e){
