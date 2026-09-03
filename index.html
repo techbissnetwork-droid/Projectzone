@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TECHBISS — Website Concepts</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b0d12;
+    --panel:#12151d;
+    --panel-2:#171b26;
+    --line:rgba(255,255,255,.09);
+    --ink:#f3f4f7;
+    --ink-dim:#9199ab;
+    --ink-faint:#5c6478;
+    --accent:#5b6bff;
+    --accent-bright:#8b96ff;
+    --gold:#e8b64a;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1100px 520px at 12% -8%, rgba(91,107,255,.16), transparent 60%),
+      radial-gradient(900px 480px at 100% 0%, rgba(232,182,74,.08), transparent 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.5;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px;}
+  a{color:inherit;}
+
+  header.top{padding:48px 0 32px;border-bottom:1px solid var(--line);}
+  .brand{display:flex;align-items:center;gap:10px;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:19px;letter-spacing:-.01em;}
+  .brand .dot{width:9px;height:9px;border-radius:50%;background:linear-gradient(135deg,var(--accent-bright),var(--gold));}
+  .eyebrow{margin-top:18px;font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);font-weight:600;}
+  h1{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:clamp(28px,4vw,40px);letter-spacing:-.02em;margin:10px 0 0;max-width:16ch;}
+  .lede{color:var(--ink-dim);font-size:15.5px;max-width:56ch;margin:14px 0 0;}
+
+  section{padding:44px 0;}
+  section + section{border-top:1px solid var(--line);}
+  .section-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:22px;flex-wrap:wrap;}
+  .section-head h2{font-family:'Bricolage Grotesque',sans-serif;font-size:15px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--ink);margin:0;}
+  .section-head p{margin:0;color:var(--ink-faint);font-size:13.5px;}
+
+  .primary-card{
+    display:grid;grid-template-columns:1fr auto;gap:24px;align-items:center;
+    background:linear-gradient(155deg,var(--panel-2),var(--panel));
+    border:1px solid rgba(91,107,255,.35);
+    border-radius:18px;padding:30px 32px;
+    box-shadow:0 30px 60px -30px rgba(91,107,255,.35);
+  }
+  .primary-card .tag{display:inline-flex;align-items:center;gap:7px;font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
+  .primary-card .tag::before{content:'★';font-size:11px;}
+  .primary-card h3{font-family:'Bricolage Grotesque',sans-serif;font-size:24px;font-weight:700;margin:0 0 8px;letter-spacing:-.01em;}
+  .primary-card p{margin:0;color:var(--ink-dim);font-size:14.5px;max-width:56ch;}
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;white-space:nowrap;
+    background:linear-gradient(135deg,var(--accent-bright),var(--accent));
+    color:#fff;text-decoration:none;font-weight:600;font-size:14.5px;
+    padding:13px 22px;border-radius:999px;
+    box-shadow:0 12px 24px -10px rgba(91,107,255,.55);
+    transition:transform .18s ease, box-shadow .18s ease;
+  }
+  .btn:hover{transform:translateY(-2px);box-shadow:0 16px 30px -10px rgba(91,107,255,.7);}
+  .btn svg{width:15px;height:15px;}
+
+  .family{margin-bottom:30px;}
+  .family:last-child{margin-bottom:0;}
+  .family-label{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint);margin:0 0 12px;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(228px,1fr));gap:12px;}
+  .card{
+    display:block;text-decoration:none;
+    background:var(--panel);border:1px solid var(--line);border-radius:13px;
+    padding:16px 17px;transition:border-color .16s ease, transform .16s ease, background .16s ease;
+  }
+  .card:hover{border-color:rgba(255,255,255,.22);transform:translateY(-2px);background:var(--panel-2);}
+  .card .num{font-size:11px;color:var(--ink-faint);font-weight:600;letter-spacing:.05em;}
+  .card .name{display:block;font-weight:600;font-size:15px;margin:5px 0 4px;letter-spacing:-.01em;}
+  .card .desc{display:block;font-size:12.5px;color:var(--ink-faint);line-height:1.45;}
+
+  footer{padding:32px 0 60px;color:var(--ink-faint);font-size:12.5px;}
+
+  @media (max-width:640px){
+    .primary-card{grid-template-columns:1fr;text-align:left;}
+    .btn{width:100%;justify-content:center;}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="top">
+    <div class="brand"><span class="dot"></span>TECHBISS</div>
+    <p class="eyebrow">Website design workspace</p>
+    <h1>14 design directions. One in active build.</h1>
+    <p class="lede">This repo holds every concept explored for the TECHBISS marketing site — each a real, running static build, not a mockup. Below: the direction currently being built out into the full site, and the full archive of what came before it.</p>
+  </header>
+
+  <section>
+    <div class="section-head">
+      <h2>Current build</h2>
+      <p>Full 16-page site in progress</p>
+    </div>
+    <a class="primary-card" href="concept-14-before-after/index.html">
+      <div>
+        <span class="tag">Selected direction</span>
+        <h3>Before / After Story</h3>
+        <p>A draggable before/after slider makes "we turn businesses into digital businesses" literal in the hero, not just a tagline — the only concept of the 14 that visualizes the transformation directly. Being built out to all 16 pages.</p>
+      </div>
+      <span class="btn">Open the site
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </span>
+    </a>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2>Concept archive</h2>
+      <p>14 home pages, grouped by exploration round</p>
+    </div>
+
+    <div class="family">
+      <p class="family-label">Round 1 — App Motion family (reference-validated: dark gradients, pill UI, animated app mockups)</p>
+      <div class="grid">
+        <a class="card" href="concept-01-app-motion/index.html"><span class="num">01</span><span class="name">App Motion</span><span class="desc">The validated base template — glow pills, animated dashboard mockup.</span></a>
+        <a class="card" href="concept-02-fintech-signal/index.html"><span class="num">02</span><span class="name">Fintech Signal</span><span class="desc">SignalMasterAi-inspired — data-signal visual language.</span></a>
+        <a class="card" href="concept-03-storefront-gradient/index.html"><span class="num">03</span><span class="name">Storefront Gradient</span><span class="desc">Code2Door-inspired — commerce-forward gradient hero.</span></a>
+        <a class="card" href="concept-04-portfolio-pulse/index.html"><span class="num">04</span><span class="name">Portfolio Pulse</span><span class="desc">iamtomley-inspired — portfolio-style pulse motion.</span></a>
+      </div>
+    </div>
+
+    <div class="family">
+      <p class="family-label">Round 2 — Structural variety (different layouts, not just recolors)</p>
+      <div class="grid">
+        <a class="card" href="concept-05-app-shell/index.html"><span class="num">05</span><span class="name">App Shell</span><span class="desc">Bento grid + tab navigation, structurally distinct.</span></a>
+        <a class="card" href="concept-06-split-scroll/index.html"><span class="num">06</span><span class="name">Split Scroll</span><span class="desc">Sticky visual synced to a scrolling narrative column.</span></a>
+        <a class="card" href="concept-07-command-palette/index.html"><span class="num">07</span><span class="name">Command Palette</span><span class="desc">Search-bar-led hero, developer-tool aesthetic.</span></a>
+        <a class="card" href="concept-08-journey-timeline/index.html"><span class="num">08</span><span class="name">Journey Timeline</span><span class="desc">Horizontal snap-scroll process spine.</span></a>
+      </div>
+    </div>
+
+    <div class="family">
+      <p class="family-label">Round 3 — Fresh aesthetic (away from dark navy)</p>
+      <div class="grid">
+        <a class="card" href="concept-09-light-premium/index.html"><span class="num">09</span><span class="name">Light Premium</span><span class="desc">Crisp white SaaS aesthetic, warm-white canvas.</span></a>
+        <a class="card" href="concept-10-monochrome-bold/index.html"><span class="num">10</span><span class="name">Monochrome Bold</span><span class="desc">Grayscale with one disciplined acid-lime accent.</span></a>
+        <a class="card" href="concept-11-warm-editorial/index.html"><span class="num">11</span><span class="name">Warm Editorial</span><span class="desc">Sunset gradient warmth, serif display type.</span></a>
+      </div>
+    </div>
+
+    <div class="family">
+      <p class="family-label">Round 4 — Original copy + new hero mechanics (no repeated dashboard-mockup formula)</p>
+      <div class="grid">
+        <a class="card" href="concept-12-big-type/index.html"><span class="num">12</span><span class="name">Big Type</span><span class="desc">Kinetic typography hero, no dashboard mockup.</span></a>
+        <a class="card" href="concept-13-numbers-first/index.html"><span class="num">13</span><span class="name">Numbers First</span><span class="desc">Results-led hero, metrics as the visual.</span></a>
+        <a class="card" href="concept-14-before-after/index.html"><span class="num">14</span><span class="name">Before / After Story ★</span><span class="desc">Draggable transformation slider — the selected direction.</span></a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="wrap" style="padding-left:0;padding-right:0;">
+    Static HTML/CSS/JS, no build step. Every concept is self-contained under its own <code>concept-*/</code> directory.
+  </footer>
+
+</div>
+
+</body>
+</html>
