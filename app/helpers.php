@@ -83,6 +83,34 @@ function orbit_label(string $title): string
     return mb_strlen($pick) > 14 ? mb_substr($pick, 0, 13) . '…' : $pick;
 }
 
+/**
+ * How many columns to lay $count cards out in, so the last row is as full as
+ * possible. Four products want four columns, eight want four again (two full
+ * rows), nine want three. Ties prefer the wider grid, and it never drops below
+ * $min to chase a full row — ten products in two columns would be tidy and far
+ * too wide.
+ */
+function grid_cols(int $count, int $max = 4, int $min = 3): int
+{
+    if ($count <= 1) {
+        return 1;
+    }
+    if ($count < $min) {
+        return $count;
+    }
+    $best = $min;
+    $bestGap = PHP_INT_MAX;
+    for ($cols = $max; $cols >= $min; $cols--) {
+        $rem = $count % $cols;
+        $gap = $rem === 0 ? 0 : $cols - $rem;
+        if ($gap < $bestGap) {
+            $bestGap = $gap;
+            $best = $cols;
+        }
+    }
+    return $best;
+}
+
 function e(?string $v): string
 {
     return htmlspecialchars((string)$v, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');

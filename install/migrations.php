@@ -106,6 +106,19 @@ function tb_migrate(PDO $pdo, string $driver = 'mysql'): array
         $done[] = 'Added ' . $added . ' new setting' . ($added === 1 ? '' : 's');
     }
 
+    /* 3a · the home page order was rearranged so that what we sell, who we
+            build it for and the proof come before the technical depth. Only
+            applied to a site still on the original order — an administrator who
+            has dragged the sections into their own arrangement keeps it. */
+    $wasOrder = 'services,arch,process,work,transform,pillars,marketplace,quote';
+    $nowOrder = 'services,transform,work,marketplace,process,arch,pillars,quote';
+    $curOrder = (string)($pdo->query("SELECT svalue FROM settings WHERE skey='home_sections'")->fetchColumn() ?: '');
+    if ($curOrder === $wasOrder) {
+        $pdo->prepare('UPDATE settings SET svalue = ?, updated_at = ? WHERE skey = ?')
+            ->execute([$nowOrder, $ts, 'home_sections']);
+        $done[] = 'Reordered the home page sections';
+    }
+
     /* 3b · a starter payment method, so checkout is never a dead end */
     if (in_array('payment_methods', $tables, true)
         && (int)$pdo->query('SELECT COUNT(*) FROM payment_methods')->fetchColumn() === 0) {

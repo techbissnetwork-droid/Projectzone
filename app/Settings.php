@@ -117,7 +117,7 @@ final class Settings
 
             /* home page sections */
             'scroll_pace'      => 'standard',
-            'home_sections'    => 'services,arch,process,work,transform,pillars,marketplace,quote',
+            'home_sections'    => 'services,transform,work,marketplace,process,arch,pillars,quote',
             'section_services' => '1',
             'section_arch'     => '1',
             'section_process'  => '1',
