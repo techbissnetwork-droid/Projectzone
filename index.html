@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TECHBISS — Premium Design Concepts</title>
+<meta name="description" content="Three premium website design concepts for TECHBISS, a complete digital-transformation partner." />
+<style>
+  :root{
+    color-scheme: dark;
+    --bg:#08090d;
+    --surface:#111219;
+    --border:rgba(255,255,255,0.08);
+    --text:#f2f3f7;
+    --muted:#9aa0ae;
+    --accent:#7c5cff;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:6vw 6vw 4vw;
+  }
+  header{ text-align:center; max-width:760px; margin-bottom:56px; }
+  .eyebrow{
+    font-size:12px; letter-spacing:0.2em; text-transform:uppercase;
+    color:var(--accent); font-weight:600; margin-bottom:16px;
+  }
+  h1{ font-size:clamp(2rem,5vw,3.25rem); line-height:1.1; margin:0 0 20px; letter-spacing:-0.02em; }
+  p.lead{ color:var(--muted); font-size:1.05rem; line-height:1.6; margin:0; }
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:24px;
+    width:100%;
+    max-width:1200px;
+  }
+  .card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:32px;
+    text-decoration:none;
+    color:var(--text);
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    transition:transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+  }
+  .card:hover{
+    transform:translateY(-4px);
+    border-color:rgba(124,92,255,0.5);
+    box-shadow:0 20px 60px -20px rgba(124,92,255,0.35);
+  }
+  .card .num{ font-size:12px; letter-spacing:.15em; color:var(--muted); font-weight:600; }
+  .card h2{ font-size:1.3rem; margin:0; letter-spacing:-0.01em; }
+  .card p{ margin:0; color:var(--muted); font-size:0.95rem; line-height:1.55; }
+  .card .cta{ margin-top:auto; font-size:.9rem; font-weight:600; color:var(--accent); }
+  footer{ margin-top:64px; color:var(--muted); font-size:.85rem; text-align:center; }
+</style>
+</head>
+<body>
+  <header>
+    <div class="eyebrow">TECHBISS — Design Exploration</div>
+    <h1>Three premium concepts.<br/>One digital-transformation partner.</h1>
+    <p class="lead">Each concept below is a fully separate, complete 15-page website with its own visual identity, typography, motion system and layout — built to explore how TECHBISS can present itself as a $100M-level technology company.</p>
+  </header>
+
+  <div class="grid">
+    <a class="card" href="concept-1-futuristic-luxury/index.html">
+      <span class="num">CONCEPT 01</span>
+      <h2>Futuristic Luxury</h2>
+      <p>Dark, cinematic, Apple/Tesla-level confidence. Glowing gradients, glassmorphism, subtle depth and restrained motion.</p>
+      <span class="cta">Enter concept →</span>
+    </a>
+    <a class="card" href="concept-2-executive-digital-empire/index.html">
+      <span class="num">CONCEPT 02</span>
+      <h2>Executive Digital Empire</h2>
+      <p>Light, editorial, enterprise-grade. Strong typography, black/white/neutral palette, powerful but minimal animation.</p>
+      <span class="cta">Enter concept →</span>
+    </a>
+    <a class="card" href="concept-3-next-gen-digital-world/index.html">
+      <span class="num">CONCEPT 03</span>
+      <h2>Next-Generation Digital World</h2>
+      <p>Bold 2026 gradients, bento grids, glass panels and intelligent motion — a startup + enterprise hybrid.</p>
+      <span class="cta">Enter concept →</span>
+    </a>
+  </div>
+
+  <footer>Each concept is self-contained — no build step required, open any <code>index.html</code> directly or serve the folder statically.</footer>
+</body>
+</html>
