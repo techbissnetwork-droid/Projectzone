@@ -60,7 +60,7 @@ section{ position:relative; z-index:2; }
   gap:10px; margin-top:clamp(26px,4vh,44px);
 }
 .hero__stats div{
-  display:grid; gap:5px; justify-items:center; text-align:center;
+  display:grid; grid-template-rows:1fr auto; gap:5px; justify-items:center; text-align:center;
   padding:clamp(14px,1.6vw,20px) clamp(10px,1.4vw,16px);
   border:1px solid var(--line); border-radius:var(--r-l);
   background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.006));
@@ -133,7 +133,11 @@ section{ position:relative; z-index:2; }
 .hud__row b{ margin-left:auto; color:var(--tx); font-weight:500; }
 
 @media (min-width:1101px){
-  .hero__viz{ position:absolute; inset:5% 1.5% 5% 46%; }
+  /* Stops above the figures rather than running the full height of the hero.
+     The readout used to sit on top of the stat cards, and the orbit's radius is
+     capped anyway, so the ecosystem is no smaller for it. */
+  .hero__viz{ position:absolute; inset:4% 1.5% 27% 46%; }
+  .viz__hud{ bottom:2%; }
 }
 @media (max-width:1100px){
   /* Sized by its content. Forcing a full viewport height left a large dead gap
@@ -160,6 +164,13 @@ section{ position:relative; z-index:2; }
   .viz__hud{ right:auto; left:50%; transform:translateX(-50%); bottom:0; }
   .hero__viz.js-anim .viz__hud{ transform:translateX(-50%) translateY(14px); }
   .hero__viz.js-anim.is-ready .viz__hud{ transform:translateX(-50%); }
+  /* A phone has room for the ecosystem or the readout, not both: at this width
+     the orbit is a few hundred pixels tall and the readout landed on top of the
+     pills. The figures directly above it already carry the same numbers. */
+  @media (max-width:760px){
+    .viz__hud{ display:none; }
+    .hero__viz{ height:min(72vw,380px); }
+  }
   .hero__stats{ margin-top:36px; }
   .hero__scroll{ display:none; }
 }
@@ -616,9 +627,15 @@ section{ position:relative; z-index:2; }
 .trans__list button.is-active{ color:var(--tx); background:rgba(143,176,255,.07); }
 .trans__list button.is-active .mono{ color:var(--sig); }
 .trans__list button.is-active i{ opacity:1; transform:none; }
-.trans__stage{ position:relative; padding:clamp(28px,3.6vw,54px); min-height:clamp(300px,38vh,380px); overflow:hidden; }
+/* Every panel shares one grid cell, so the stage is as tall as the longest of
+   them and stays that height as you move between tabs. Positioning them
+   absolutely inside a fixed height clipped the last chip off the tallest one. */
+.trans__stage{
+  position:relative; padding:clamp(28px,3.6vw,54px); overflow:hidden;
+  display:grid; min-height:clamp(280px,34vh,360px);
+}
 .tpanel{
-  position:absolute; inset:clamp(28px,3.6vw,54px); display:grid; align-content:center; gap:14px;
+  grid-area:1/1; display:grid; align-content:center; gap:14px;
   opacity:0; transform:translateY(22px) scale(.98); filter:blur(6px);
   visibility:hidden; pointer-events:none;
   transition:opacity .6s var(--e-out), transform .8s var(--e-out), filter .6s, visibility 0s linear .6s;
@@ -648,7 +665,7 @@ section{ position:relative; z-index:2; }
   .trans__list li{ scroll-snap-align:start; }
   .trans__list button{ white-space:nowrap; font-size:1rem; padding:11px 15px; }
   .trans__list button i{ display:none; }
-  .trans__stage{ min-height:270px; }
+  .trans__stage{ min-height:0; }
   .trans__beam{ inset:0 0 auto; width:auto; height:1px; background:linear-gradient(90deg,transparent,var(--sig),transparent); }
 }
 
@@ -734,7 +751,10 @@ section{ position:relative; z-index:2; }
   gap:10px; margin-top:clamp(34px,5vh,60px); width:min(860px,100%); list-style:none;
 }
 .cta__facts li{
-  display:grid; gap:5px; justify-items:center; text-align:center;
+  /* The value takes the slack, so the labels below it share one baseline even
+     when one value wraps to a second line and its neighbours do not. */
+  display:grid; grid-template-rows:1fr auto; gap:5px; justify-items:center; text-align:center;
+  align-content:stretch;
   padding:clamp(14px,1.6vw,20px) clamp(10px,1.4vw,16px);
   border:1px solid var(--line); border-radius:var(--r-l);
   background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.006));

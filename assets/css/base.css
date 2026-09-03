@@ -137,16 +137,19 @@ button{ font:inherit; color:inherit; background:none; border:0; padding:0; curso
 .sec__head--split,
 .sec__head--center{
   display:grid; justify-items:center; text-align:center;
-  max-width:min(820px, 100%); margin-inline:auto;
-  margin-bottom:clamp(44px,5.5vw,78px);
+  max-width:min(960px, 100%); margin-inline:auto;
+  margin-bottom:clamp(40px,4.6vw,64px);
   gap:0;
 }
 /* The split variant wraps its eyebrow and headline in a div to make the first
    column. Dissolving just that div lifts them onto the header's own grid;
    applying it to every child would take the lede's box away with them. */
 .sec__head--split > div{ display:contents; }
-.sec__title{ font-size:clamp(1.6rem, 0.92rem + 3.6vw, 4.2rem); margin-top:20px; }
-.sec__title--xl{ font-size:clamp(1.75rem, 0.92rem + 4.26vw, 4.75rem); margin-top:20px; letter-spacing:-.042em; }
+/* Sized so the headings the site ships with land on the lines they were
+   written for. At the old maximum a two-line headline took three, and the
+   longest took four, which read as four unrelated fragments. */
+.sec__title{ font-size:clamp(1.6rem, 1rem + 2.7vw, 3.4rem); margin-top:18px; }
+.sec__title--xl{ font-size:clamp(1.7rem, 1.05rem + 3vw, 3.75rem); margin-top:18px; letter-spacing:-.042em; }
 .sec__lede{
   color:var(--tx-2); font-size:clamp(1rem,1.15vw,1.18rem);
   max-width:58ch; margin-top:24px; margin-inline:auto;

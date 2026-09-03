@@ -79,10 +79,24 @@ require __DIR__ . '/partials/public_header.php';
 
 <span id="next"></span>
 <?php
-/* Sections render in the order set in Admin → Home page. */
+/* Sections render in the order set in Admin → Home page. A section with
+   nothing to show is dropped before the numbering starts, so the eyebrows
+   still read 02, 03, 04 … however many are switched off or left empty. */
+$hasContent = static fn(string $s): bool => match ($s) {
+    'services'    => (bool)$services,
+    'work'        => (bool)$featured,
+    'marketplace' => (bool)$products,
+    'quote'       => Settings::get('quote') !== '',
+    'arch'        => (bool)Content::items('arch'),
+    'process'     => (bool)Content::items('process'),
+    'transform'   => (bool)Content::items('transform'),
+    'pillars'     => (bool)Content::items('pillar'),
+    default       => true,
+};
 $secNum = 1;
-foreach (Content::sectionOrder() as $section):
-    $secNum++;
+foreach (array_filter(Content::sectionOrder(), $hasContent) as $section):
+    /* The statement quote carries no eyebrow, so it takes no number either. */
+    if ($section !== 'quote') { $secNum++; }
     switch ($section):
 
     case 'services':

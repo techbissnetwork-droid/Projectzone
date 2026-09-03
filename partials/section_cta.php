@@ -15,8 +15,8 @@
       <a class="btn btn--ghost btn--lg magnetic" href="mailto:<?= e(Settings::get('contact_email')) ?>"><?= e(Settings::get('cta_secondary')) ?></a>
     </div>
     <ul class="cta__facts">
-      <li><span class="mono">reply time</span><b>Within one business day</b></li>
-      <li><span class="mono">first call</span><b>Free, no obligation</b></li>
+      <li><span class="mono">reply time</span><b>1 business day</b></li>
+      <li><span class="mono">first call</span><b>Free</b></li>
       <li><span class="mono">engagement</span><b>Project or retainer</b></li>
     </ul>
   </div>

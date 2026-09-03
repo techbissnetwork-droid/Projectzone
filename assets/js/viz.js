@@ -68,10 +68,28 @@
     var mx = 0, my = 0, tmx = 0, tmy = 0;      // -1 → 1
     var pulses = [], dust = [];
 
+    /* Boxes the pills must not cover: the readout that sits over the orbit, and
+       the figures below it. Both are laid out by CSS, at sizes that change with
+       the viewport and with whatever the admin has typed, so they are measured
+       rather than assumed. */
+    var keepOut = [];
+    function readKeepOut(r) {
+      keepOut = [];
+      ['.viz__hud', '.hero__stats'].forEach(function (sel) {
+        var el = doc.querySelector(sel);
+        if (!el || !el.offsetParent) return;
+        var b = el.getBoundingClientRect();
+        if (b.width < 2 || b.height < 2) return;
+        keepOut.push({ l: b.left - r.left - 10, t: b.top - r.top - 10,
+                       r: b.right - r.left + 10, b: b.bottom - r.top + 10 });
+      });
+    }
+
     function layout() {
       var r = wrap.getBoundingClientRect();
       W = r.width; H = r.height;
       if (W < 2 || H < 2) return;
+      readKeepOut(r);
       ctx = fitCanvas(cv, W, H);
 
       var small = W < 620;
@@ -116,6 +134,30 @@
         var hh = (n.el.offsetHeight || 34) / 2 + 4;
         if (W > hw * 2) { x = Math.max(hw, Math.min(W - hw, x)); }
         if (H > hh * 2) { y = Math.max(hh, Math.min(H - hh, y)); }
+
+        /* Slide a pill off anything it would cover, taking the shortest way out
+           that still leaves it inside the box. The core keeps its place: it is
+           the anchor every edge is drawn to. */
+        if (n !== core) {
+          /* The core is placed first, so its box is known and the ring can be
+             pushed clear of it. On a narrow phone the ellipse is only a little
+             wider than the pills themselves. */
+          var cw = (core.el.offsetWidth || 130) / 2 + 6, ch = (core.el.offsetHeight || 50) / 2 + 6;
+          var zones = keepOut.concat([{ l: core.x - cw, t: core.y - ch, r: core.x + cw, b: core.y + ch }]);
+          for (var k = 0; k < zones.length; k++) {
+            var z = zones[k];
+            if (x + hw <= z.l || x - hw >= z.r || y + hh <= z.t || y - hh >= z.b) { continue; }
+            var moves = [
+              { x: z.l - hw, y: y, d: (x - (z.l - hw)) },
+              { x: z.r + hw, y: y, d: ((z.r + hw) - x) },
+              { x: x, y: z.t - hh, d: (y - (z.t - hh)) },
+              { x: x, y: z.b + hh, d: ((z.b + hh) - y) }
+            ].filter(function (m) {
+              return m.x >= hw && m.x <= W - hw && m.y >= hh && m.y <= H - hh;
+            }).sort(function (a, c) { return a.d - c.d; });
+            if (moves.length) { x = moves[0].x; y = moves[0].y; }
+          }
+        }
 
         n.x = x; n.y = y;
         n.el.style.setProperty('--x', x.toFixed(1) + 'px');
@@ -295,10 +337,28 @@
 
     var W = 0, H = 0, ctx = null, packets = [], placed = false;
 
+    /* Boxes the pills must not cover: the readout that sits over the orbit, and
+       the figures below it. Both are laid out by CSS, at sizes that change with
+       the viewport and with whatever the admin has typed, so they are measured
+       rather than assumed. */
+    var keepOut = [];
+    function readKeepOut(r) {
+      keepOut = [];
+      ['.viz__hud', '.hero__stats'].forEach(function (sel) {
+        var el = doc.querySelector(sel);
+        if (!el || !el.offsetParent) return;
+        var b = el.getBoundingClientRect();
+        if (b.width < 2 || b.height < 2) return;
+        keepOut.push({ l: b.left - r.left - 10, t: b.top - r.top - 10,
+                       r: b.right - r.left + 10, b: b.bottom - r.top + 10 });
+      });
+    }
+
     function layout() {
       var r = wrap.getBoundingClientRect();
       W = r.width; H = r.height;
       if (W < 2 || H < 2) return;
+      readKeepOut(r);
       ctx = fitCanvas(cv, W, H);
 
       var narrow = W < 760;
@@ -446,10 +506,28 @@
     if (!cv || reduce) return;
     var wrap = cv.parentNode, W = 0, H = 0, ctx = null, pts = [];
 
+    /* Boxes the pills must not cover: the readout that sits over the orbit, and
+       the figures below it. Both are laid out by CSS, at sizes that change with
+       the viewport and with whatever the admin has typed, so they are measured
+       rather than assumed. */
+    var keepOut = [];
+    function readKeepOut(r) {
+      keepOut = [];
+      ['.viz__hud', '.hero__stats'].forEach(function (sel) {
+        var el = doc.querySelector(sel);
+        if (!el || !el.offsetParent) return;
+        var b = el.getBoundingClientRect();
+        if (b.width < 2 || b.height < 2) return;
+        keepOut.push({ l: b.left - r.left - 10, t: b.top - r.top - 10,
+                       r: b.right - r.left + 10, b: b.bottom - r.top + 10 });
+      });
+    }
+
     function layout() {
       var r = wrap.getBoundingClientRect();
       W = r.width; H = r.height;
       if (W < 2 || H < 2) return;
+      readKeepOut(r);
       ctx = fitCanvas(cv, W, H);
       var n = W < 700 ? 30 : 64;
       pts = [];

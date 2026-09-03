@@ -24,7 +24,9 @@ $price = $p['sale_price'] !== null ? (float)$p['sale_price'] : (float)$p['price'
       <div class="pcard__foot">
         <span class="pcard__price">
           <span><?= e(money($price)) ?></span>
-          <?php if ($p['sale_price'] !== null): ?><s><?= e(money($p['price'])) ?></s><?php endif; ?>
+          <?php /* Always rendered, empty when nothing is discounted, so a card on
+                    sale is exactly as tall as one that is not. */ ?>
+          <s><?= $p['sale_price'] !== null ? e(money($p['price'])) : '' ?></s>
         </span>
         <span class="pcard__go" aria-hidden="true">→</span>
       </div>
