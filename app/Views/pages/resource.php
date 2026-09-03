@@ -10,13 +10,13 @@ $view->start('content');
       <div class="hero__inner">
         <?php $view->partial('partials.crumbs', ['crumbs' => ['Home' => '/', 'Resources' => '/resources', $item['topic'] => '/resources?topic=' . rawurlencode((string) $item['topic'])]]); ?>
         <div style="max-width:62ch">
-          <div class="cluster" data-reveal>
+          <div class="cluster" data-seq style="--seq:0">
             <span class="badge"><?= e($item['type']) ?></span>
             <span class="badge badge--neutral"><?= e($item['topic']) ?></span>
           </div>
-          <h1 class="h1 hero__title" data-reveal="60"><?= e($item['title']) ?></h1>
-          <p class="lede hero__lede" data-reveal="120"><?= e($item['excerpt']) ?></p>
-          <div class="cluster mt-6" data-reveal="160">
+          <h1 class="h1 hero__title" data-seq style="--seq:1"><?= e($item['title']) ?></h1>
+          <p class="lede hero__lede" data-seq style="--seq:2"><?= e($item['excerpt']) ?></p>
+          <div class="cluster mt-6" data-seq style="--seq:3">
             <span class="avatar"><?= e(initials((string) $item['author'])) ?></span>
             <div>
               <strong class="small"><?= e($item['author']) ?></strong>

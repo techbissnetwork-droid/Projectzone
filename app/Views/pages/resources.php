@@ -16,23 +16,23 @@ $query = static function (array $overrides) use ($filters): string {
       <?php $view->partial('partials.crumbs', ['crumbs' => ['Home' => '/', 'Resources' => '/resources']]); ?>
       <div class="split split--wide-left" style="align-items:end">
         <div>
-          <span class="eyebrow" data-reveal>Insights</span>
-          <h1 class="h1 hero__title" data-reveal="60">Field notes from people who are still doing the work.</h1>
+          <span class="eyebrow" data-seq style="--seq:0">Insights</span>
+          <h1 class="h1 hero__title" data-seq style="--seq:1"><span data-lines>Field notes from people who are still doing the work.</span></h1>
         </div>
-        <p class="lede" data-reveal="120">
+        <p class="lede" data-seq style="--seq:2">
           Playbooks, essays and post-mortems on architecture, performance,
           delivery and design. No gated PDFs.
         </p>
       </div>
 
-      <div class="cluster mt-7" data-reveal="160" role="group" aria-label="Filter articles">
+      <div class="cluster mt-7" data-seq style="--seq:3" role="group" aria-label="Filter articles">
         <a class="btn btn--sm <?= empty($filters['topic']) ? 'btn--solid' : 'btn--ghost' ?>" href="<?= e(url($query(['topic' => null]))) ?>">All topics</a>
         <?php foreach ($topics as $topic): ?>
           <a class="btn btn--sm <?= (($filters['topic'] ?? '') === $topic) ? 'btn--solid' : 'btn--ghost' ?>"
              href="<?= e(url($query(['topic' => $topic]))) ?>"><?= e($topic) ?></a>
         <?php endforeach; ?>
       </div>
-      <div class="cluster mt-3" data-reveal="180" role="group" aria-label="Filter by format">
+      <div class="cluster mt-3" data-seq style="--seq:3" role="group" aria-label="Filter by format">
         <span class="tiny dim" style="margin-right:.25rem">Format</span>
         <a class="btn btn--sm <?= empty($filters['type']) ? 'btn--solid' : 'btn--ghost' ?>" href="<?= e(url($query(['type' => null]))) ?>">Any</a>
         <?php foreach ($types as $type): ?>
@@ -56,7 +56,7 @@ $query = static function (array $overrides) use ($filters): string {
         <a class="btn btn--ghost" href="<?= e(url('/resources')) ?>">Clear filters</a>
       </div>
     <?php else: ?>
-      <article class="card card--flush spotlight a-<?= e($feature['accent']) ?>" data-reveal>
+      <article class="card card--flush spotlight edge-light a-<?= e($feature['accent']) ?>" data-reveal>
         <div class="split split--wide-right" style="gap:0">
           <div style="padding:clamp(1.5rem,1rem + 2vw,2.75rem);display:flex;flex-direction:column;justify-content:center">
             <div class="cluster" style="gap:.4rem">
@@ -90,7 +90,7 @@ $query = static function (array $overrides) use ($filters): string {
 
       <div class="cols-3 mt-5">
         <?php foreach ($rest as $i => $item): ?>
-          <article class="card card--lift spotlight a-<?= e($item['accent']) ?>" data-reveal="<?= $i * 50 ?>">
+          <article class="card card--lift spotlight edge-light a-<?= e($item['accent']) ?>" data-reveal="<?= $i * 50 ?>">
             <div class="cluster" style="gap:.4rem">
               <span class="badge badge--neutral"><?= e($item['type']) ?></span>
               <span class="badge badge--neutral"><?= e($item['topic']) ?></span>

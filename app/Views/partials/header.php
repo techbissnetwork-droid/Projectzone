@@ -39,7 +39,7 @@ $portalHome = $auth->check() ? (App\Core\Auth::PORTALS[$auth->portal()]['home'] 
         <a class="btn btn--sm btn--quiet u-only@lg" href="<?= e(url('/client/login')) ?>">Sign in</a>
       <?php endif; ?>
 
-      <a class="btn btn--sm btn--primary u-only@md" href="<?= e(url('/contact')) ?>">
+      <a class="btn btn--sm btn--primary magnetic u-only@md" href="<?= e(url('/contact')) ?>">
         Start a project
       </a>
 

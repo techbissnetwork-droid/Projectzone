@@ -9,9 +9,9 @@ $view->start('content');
     <div class="hero__inner">
       <?php $view->partial('partials.crumbs', ['crumbs' => ['Home' => '/', 'Pricing' => '/pricing']]); ?>
       <div style="max-width:56ch">
-        <span class="eyebrow" data-reveal>Engagement models</span>
-        <h1 class="h1 hero__title" data-reveal="60">Three ways to work with us. All of them priced up front.</h1>
-        <p class="lede hero__lede" data-reveal="120">
+        <span class="eyebrow" data-seq style="--seq:0">Engagement models</span>
+        <h1 class="h1 hero__title" data-seq style="--seq:1"><span data-lines>Three ways to work with us. All of them priced up front.</span></h1>
+        <p class="lede hero__lede" data-seq style="--seq:2">
           We do not quote day rates against an open-ended scope. Discovery is
           always fixed. Delivery is fixed per increment once architecture settles.
         </p>
@@ -51,7 +51,7 @@ $view->start('content');
           'Published reliability numbers, good months and bad',
         ], ['label' => 'Discuss operations', 'path' => '/contact?topic=support']],
       ] as $i => $plan): ?>
-        <article class="card card--lift spotlight" data-reveal="<?= $i * 60 ?>"
+        <article class="card card--lift spotlight edge-light" data-reveal="<?= $i * 60 ?>"
                  style="<?= $plan[3] ? 'border-color:var(--accent-line);box-shadow:var(--sh-glow)' : '' ?>">
           <div class="between">
             <h2 class="h4"><?= e($plan[0]) ?></h2>

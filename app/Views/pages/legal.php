@@ -8,9 +8,9 @@ $view->start('content');
   <div class="container container--wide">
     <div class="hero__inner">
       <?php $view->partial('partials.crumbs', ['crumbs' => ['Home' => '/', 'Legal' => '/legal/privacy', $document['title'] => '/legal/' . $slug]]); ?>
-      <span class="eyebrow" data-reveal>Legal</span>
-      <h1 class="h1 hero__title" data-reveal="60"><?= e($document['title']) ?></h1>
-      <p class="lede hero__lede" data-reveal="120"><?= e($document['summary']) ?></p>
+      <span class="eyebrow" data-seq style="--seq:0">Legal</span>
+      <h1 class="h1 hero__title" data-seq style="--seq:1"><?= e($document['title']) ?></h1>
+      <p class="lede hero__lede" data-seq style="--seq:2"><?= e($document['summary']) ?></p>
       <p class="small dim mt-5">Last updated <?= e(human_date($document['updated'], 'j F Y')) ?></p>
     </div>
   </div>

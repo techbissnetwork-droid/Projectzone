@@ -41,7 +41,7 @@ $view->start('content');
               </div>
               <div class="meter-row mt-4">
                 <div class="meter-row__top"><span class="tiny dim">Progress</span><b class="tiny"><?= (int) $project['progress'] ?>%</b></div>
-                <div class="progress"><i style="width:<?= (int) $project['progress'] ?>%"></i></div>
+                <div class="progress"><i style="--fill:calc(<?= (int) $project['progress'] ?> / 100)"></i></div>
               </div>
               <div class="tiny dim mt-3">Due <?= e(human_date($project['due_at'])) ?></div>
             </a>
@@ -104,7 +104,7 @@ $view->start('content');
                 <strong class="small"><?= e($d['site_name']) ?></strong>
                 <?php $view->partial('partials.status-pill', ['value' => (string) $d['status']]); ?>
               </div>
-              <div class="progress mt-3"><i style="width:<?= (int) $d['progress'] ?>%"></i></div>
+              <div class="progress mt-3"><i style="--fill:calc(<?= (int) $d['progress'] ?> / 100)"></i></div>
             </div>
           <?php endforeach; ?>
           <?php if ($deployments === []): ?><p class="small dim">No deployments yet.</p><?php endif; ?>

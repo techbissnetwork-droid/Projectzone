@@ -111,7 +111,7 @@ $view->start('content');
             <td data-label="Client"><?= e($project['company'] ?: $project['client_name']) ?></td>
             <td data-label="Phase"><span class="badge badge--neutral"><?= e(ucfirst((string) $project['phase'])) ?></span></td>
             <td data-label="Progress" style="min-width:120px">
-              <div class="progress"><i style="width:<?= (int) $project['progress'] ?>%"></i></div>
+              <div class="progress"><i style="--fill:calc(<?= (int) $project['progress'] ?> / 100)"></i></div>
               <span class="tiny dim"><?= (int) $project['progress'] ?>%</span>
             </td>
             <td data-label="Health"><?php $view->partial('partials.status-pill', ['value' => (string) $project['health']]); ?></td>

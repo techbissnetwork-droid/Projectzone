@@ -482,7 +482,11 @@ body:has(.actionbar) .footer{padding-bottom:5.5rem}
 }
 
 .progress{height:6px;border-radius:var(--r-full);background:var(--surface-3);overflow:hidden}
-.progress i{display:block;height:100%;border-radius:inherit;background:var(--accent-grad);transition:width var(--d-3) var(--ease)}
+.progress i{
+  display:block;height:100%;width:100%;border-radius:inherit;background:var(--accent-grad);
+  transform-origin:0 50%;transform:scaleX(var(--fill,0));
+  transition:transform var(--d-4) var(--ease-expo);
+}
 .meter-row{display:grid;gap:.4rem}
 .meter-row__top{display:flex;justify-content:space-between;gap:1rem;font-size:var(--t--1)}
 .meter-row__top b{font-variant-numeric:tabular-nums;color:var(--ink)}
@@ -631,3 +635,182 @@ body:has(.actionbar) .footer{padding-bottom:5.5rem}
 .mt-6{margin-top:var(--s-6)}.mt-7{margin-top:var(--s-7)}
 .gap-3{gap:var(--s-3)}.gap-4{gap:var(--s-4)}.gap-5{gap:var(--s-5)}
 .full{width:100%}
+
+/* ==========================================================================
+   10. Premium finish — hero composition and surface depth
+   ========================================================================== */
+
+/* Live badge above the headline: the one figure that establishes scale. */
+.hero__badge{
+  display:inline-flex;align-items:center;gap:.6rem;
+  padding:.4rem .85rem .4rem .7rem;border-radius:var(--r-full);
+  background:color-mix(in srgb,var(--surface) 70%,transparent);
+  border:1px solid var(--line-2);backdrop-filter:blur(12px);
+  font-size:var(--t--2);font-weight:560;color:var(--ink-2);
+  box-shadow:var(--sh-1),var(--hairline);
+}
+
+/* Browser chrome around the hero art — it reads as a product, not a graphic. */
+.hero__frame{
+  position:relative;border-radius:var(--r-xl);overflow:hidden;
+  background:var(--surface);border:1px solid var(--line-2);
+  box-shadow:var(--sh-4),var(--hairline);
+}
+.hero__frame-bar{
+  display:flex;align-items:center;gap:.4rem;
+  padding:.65rem .9rem;border-bottom:1px solid var(--line);
+  background:linear-gradient(180deg,var(--surface-2),var(--surface));
+}
+.hero__frame-bar span{width:8px;height:8px;border-radius:50%;background:var(--line-3);flex:none}
+.hero__frame-bar span:first-child{background:rgba(var(--accent-rgb),.8)}
+.hero__frame-bar em{
+  margin-left:auto;font-style:normal;font-family:var(--mono);
+  font-size:.6875rem;color:var(--ink-3);letter-spacing:.02em;
+}
+.hero__art{position:relative}
+
+/* Figures lifted clear of the frame. Hidden below 640px, where they would
+   crowd the artwork rather than support it. */
+.hero__chip{
+  display:none;position:absolute;z-index:3;align-items:center;gap:.55rem;
+  padding:.6rem .85rem;border-radius:var(--r);
+  background:color-mix(in srgb,var(--bg-elev) 88%,transparent);
+  border:1px solid var(--line-2);backdrop-filter:blur(14px) saturate(1.3);
+  box-shadow:var(--sh-3),var(--hairline);
+  animation:chip-float 6s var(--ease) infinite alternate;
+}
+.hero__chip svg{color:var(--amber)}
+.hero__chip strong{display:block;font-family:var(--font-display);font-size:var(--t-1);font-weight:660;letter-spacing:-.02em;line-height:1.1}
+.hero__chip em{display:block;font-style:normal;font-size:var(--t--2);color:var(--ink-3);margin-top:1px}
+.hero__chip--uptime{bottom:14%;left:-1.25rem}
+.hero__chip--speed{top:16%;right:-1.25rem;animation-delay:-3s}
+@keyframes chip-float{from{transform:translate3d(0,0,0)}to{transform:translate3d(0,-9px,0)}}
+@media (min-width:640px){.hero__chip{display:flex}}
+@media (prefers-reduced-motion:reduce){.hero__chip{animation:none}}
+
+/* Section rhythm: a hairline that fades in from the centre separates bands
+   without the heaviness of a full border. */
+.section + .section::before{
+  content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:min(100%,var(--container-wide));height:1px;
+  background:linear-gradient(90deg,transparent,var(--line),transparent);
+}
+
+/* Cards carry a lit top edge, which is what separates an expensive surface
+   from a flat rectangle with a border. */
+.card::before,.product::before,.panel::before{
+  content:"";position:absolute;top:0;left:12%;right:12%;height:1px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.14),transparent);
+}
+:root[data-theme="light"] .card::before,
+:root[data-theme="light"] .product::before,
+:root[data-theme="light"] .panel::before{background:linear-gradient(90deg,transparent,rgba(255,255,255,.9),transparent)}
+.card--flush::before,.panel::before{left:0;right:0}
+.panel{position:relative}
+
+/* Feature icons sit in a gradient-lined well rather than a flat tint. */
+.feature__icon{
+  position:relative;
+  background:linear-gradient(150deg,var(--accent-soft),transparent 75%),var(--surface-2);
+  box-shadow:var(--hairline);
+}
+.feature__icon::after{
+  content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;
+  background:linear-gradient(150deg,var(--accent-line),transparent 60%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  mask-composite:exclude;
+}
+
+/* Stats read as one instrument panel. */
+.stats{box-shadow:var(--sh-2),var(--hairline)}
+.stat{position:relative;transition:background var(--d-2) var(--ease)}
+.stat__value{font-family:var(--font-display)}
+@media (hover:hover){.stat:hover{background:var(--surface-2)}}
+
+/* The CTA band gets a slow conic sweep behind the glass. */
+.cta-band{box-shadow:var(--sh-3),var(--hairline)}
+.cta-band::before{
+  content:"";position:absolute;inset:-60%;pointer-events:none;opacity:.28;
+  background:conic-gradient(from 0deg,transparent,rgba(var(--accent-rgb),.5),transparent 38%);
+  animation:sweep 18s linear infinite;
+}
+@keyframes sweep{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.cta-band::before{animation:none;opacity:.16}}
+
+/* Quotes get a display-face setting and a lit rule. */
+.quote{box-shadow:var(--sh-2),var(--hairline)}
+.quote blockquote{font-family:var(--font-display);font-weight:500;letter-spacing:-.018em}
+
+/* Mega menu and drawer pick up the same depth as cards. */
+.mega__panel{box-shadow:var(--sh-4),var(--hairline)}
+.drawer__panel{box-shadow:-24px 0 60px -20px rgba(2,5,12,.7)}
+
+/* Marketplace product media zooms very slightly under the cursor. */
+.product__thumb svg,.product__thumb img{transition:transform var(--d-4) var(--ease-expo)}
+@media (hover:hover){.product:hover .product__thumb svg,.product:hover .product__thumb img{transform:scale(1.045)}}
+.product{box-shadow:var(--hairline)}
+
+/* Portal surfaces: KPI tiles lift their accent on hover. */
+.kpi{position:relative;overflow:hidden;box-shadow:var(--hairline);transition:border-color var(--d-2) var(--ease),transform var(--d-3) var(--ease-expo)}
+.kpi::after{
+  content:"";position:absolute;left:0;right:0;bottom:0;height:2px;
+  background:var(--accent-grad);transform:scaleX(0);transform-origin:left;
+  transition:transform var(--d-3) var(--ease-expo);
+}
+@media (hover:hover){
+  .kpi:hover{border-color:var(--line-2);transform:translateY(-2px)}
+  .kpi:hover::after{transform:scaleX(1)}
+}
+.kpi__value{font-family:var(--font-display)}
+
+/* Auth panels sit on the same lit glass as the rest of the platform. */
+.auth__card{position:relative}
+.auth__badge{box-shadow:var(--hairline)}
+
+/* Installer cards match the marketing surfaces. */
+.install-card{box-shadow:var(--sh-4),var(--hairline)}
+.wstep.is-current{box-shadow:var(--hairline)}
+
+/* Footer gains a top light so the page ends deliberately. */
+.footer{position:relative}
+.footer::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--accent-line),transparent);
+}
+
+/* Display face on the numbers and headings that carry weight. */
+.h1,.h2,.h3,.h4,.h5,.display,.shell__title,.product__title,.pd-buy__price b{font-family:var(--font-display)}
+.product__price,.summary__row b,.table .num{font-variant-numeric:tabular-nums}
+
+
+/* ==========================================================================
+   11. Composition corrections
+   ========================================================================== */
+
+/* A stats strip must fill the columns it declares. The hero carries two
+   figures, so it gets its own two-column track rather than sitting in the
+   four-column band with two empty cells. */
+.stats--pair{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+
+/* Hero actions: side by side once there is room, equal full-width blocks
+   below that, so the pair reads as one control group rather than two
+   differently sized buttons. */
+@media (max-width:539px){
+  .hero__actions{display:grid;grid-template-columns:1fr;gap:.6rem}
+  .hero__actions .btn{width:100%}
+}
+@media (min-width:540px){
+  .hero__actions .btn{flex:0 1 auto}
+}
+
+/* The portal sidebar scrolls; give the sign-out control room to clear the
+   bottom edge on short viewports. */
+.shell__side{padding-bottom:var(--s-6)}
+
+/* Section-head split: the supporting paragraph reads better left-aligned on
+   the wide breakpoint than ragged-left against the right edge. */
+@media (min-width:900px){
+  .section-head--split>:last-child{text-align:left}
+  .section-head--split>:last-child:has(.btn){text-align:right}
+}

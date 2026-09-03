@@ -56,9 +56,14 @@ $bodyClass = $bodyClass ?? '';
 <link rel="manifest" href="<?= e(url('/manifest.webmanifest')) ?>">
 <link rel="alternate" type="application/rss+xml" title="TECHBISS Insights" href="<?= e(url('/feed.xml')) ?>">
 
-<style><?= inline_file('assets/css/critical.css') ?></style>
+<?= font_preloads() ?>
+<style><?= inline_css('assets/css/critical.css') ?></style>
 <link rel="preload" as="style" href="<?= e(asset('assets/css/main.css')) ?>" onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link rel="stylesheet" href="<?= e(asset('assets/css/main.css')) ?>"></noscript>
+<link rel="preload" as="style" href="<?= e(asset('assets/css/motion.css')) ?>" onload="this.onload=null;this.rel='stylesheet'">
+<noscript>
+<link rel="stylesheet" href="<?= e(asset('assets/css/main.css')) ?>">
+<link rel="stylesheet" href="<?= e(asset('assets/css/motion.css')) ?>">
+</noscript>
 
 <script>
 /* Theme + JS-capability flags, set before first paint to avoid any flash. */
@@ -73,6 +78,8 @@ if(t==='light'||t==='dark'){d.setAttribute('data-theme',t)}else if(matchMedia('(
 </head>
 <body class="<?= e($bodyClass) ?>">
 <a class="skip-link" href="#main">Skip to content</a>
+<div class="scroll-rail" data-scroll-rail aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
 
 <?php $view->partial('partials.header'); ?>
 

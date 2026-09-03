@@ -21,19 +21,56 @@ The measured result, enforced by `tests/performance.php`:
 
 | Metric | Budget | Actual |
 | --- | --- | --- |
-| Heaviest page, gzipped HTML | 40 KB | **20.2 KB** |
-| Critical CSS, inlined and gzipped | 9 KB | **4.4 KB** |
-| Deferred stylesheet, gzipped | 16 KB | **9.5 KB** |
-| JavaScript, deferred and gzipped | 8 KB | **3.7 KB** |
+| Heaviest page, gzipped HTML | 40 KB | **21.7 KB** |
+| Critical CSS, inlined and gzipped | 8 KB | **5.8 KB** |
+| Deferred stylesheet, gzipped | 14 KB | **11.6 KB** |
+| Motion layer, gzipped | 4 KB | **2.8 KB** |
+| JavaScript, deferred and gzipped | 8 KB | **5.5 KB** |
+| Self-hosted fonts, both faces | 60 KB | **48.9 KB** |
 | Render-blocking stylesheets | 0 | **0** |
 | Render-blocking scripts | 0 | **0** |
 | Third-party resource origins | 0 | **0** |
-| Web font requests | 0 | **0** |
 
 Marketplace thumbnails and case-study artwork are generated as deterministic
 inline SVG seeded from each record's slug. That removes the largest image
 payload a catalogue normally carries, stays sharp at any density, and adapts to
 the active theme.
+
+## Typography
+
+Two self-hosted variable faces, latin subset, served from this origin so there
+is no third-party font request and no external connection on the critical path:
+
+- **Sora** — display and headings. Geometric and slightly technical, which is
+  the register the positioning asks for.
+- **Manrope** — body, UI and controls. Clean and warm at small sizes, where
+  most of the platform actually lives.
+
+Both are preloaded and set with `font-display: swap`, so text paints
+immediately in the fallback stack and re-renders once the face lands. Neither
+ever leaves text invisible.
+
+## Motion
+
+Motion is a layer, not a dependency. `public/assets/css/motion.css` is 2.8 KB
+gzipped and every animation runs on `transform`, `opacity` or `filter` only —
+asserted by the performance suite, which parses both stylesheets and fails the
+build on anything that would force layout or paint.
+
+- **Page load is choreographed**, not scattered: the header settles, the
+  headline wipes up line by line, then the supporting art and rail arrive.
+- **Scroll-driven effects use native scroll timelines** (`animation-timeline:
+  view()`), which run off the main thread entirely. Browsers without them fall
+  back to an IntersectionObserver class.
+- **Cross-document view transitions** turn navigation into a crossfade where
+  supported, with the header and logo persisting across the change.
+- **Pointer effects** — cursor-lit card edges, 3D tilt, magnetic buttons — are
+  gated behind `(hover: hover) and (pointer: fine)` and share a single
+  requestAnimationFrame loop rather than one per element.
+- **Touch gets its own treatment**, not a disabled one: the same emphasis
+  arrives on press.
+- **`prefers-reduced-motion` stands the whole layer down**, including the
+  scroll rail and view transitions.
 
 ---
 
@@ -171,7 +208,7 @@ app/
 config/          app, database, session, cache, mail, navigation, site,
                  solutions, legal
 database/        schema.php, seeds/
-public/          index.php, .htaccess, assets/
+public/          index.php, .htaccess, assets/{css,js,fonts,img}
 deploy/          nginx.conf, Dockerfile, docker-compose.yml, supervisord.conf
 tests/           run.sh, smoke.php, flows.php, performance.php
 build/           export-preview.php
@@ -204,6 +241,10 @@ php tests/performance.php   # byte budgets, critical path, SEO, AMP validity
 `tests/flows.php` drives real POST requests: it runs the installer end to end
 against a sandbox database — including a content import that must rewrite
 absolute URLs — then restores the development installation.
+
+`tests/performance.php` also audits the motion layer: it extracts every
+`@keyframes` body and `transition` declaration across all three stylesheets and
+fails if anything animates a property that forces layout or paint.
 
 ---
 

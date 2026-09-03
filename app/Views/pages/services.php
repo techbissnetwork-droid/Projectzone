@@ -11,10 +11,10 @@ $services = $site['services'];
       <?php $view->partial('partials.crumbs', ['crumbs' => ['Home' => '/', 'Services' => '/services']]); ?>
       <div class="split split--wide-left" style="align-items:end">
         <div>
-          <span class="eyebrow" data-reveal>Services</span>
-          <h1 class="h1 hero__title" data-reveal="60">Six practices, staffed by the people who scoped the work.</h1>
+          <span class="eyebrow" data-seq style="--seq:0">Services</span>
+          <h1 class="h1 hero__title" data-seq style="--seq:1"><span data-lines>Six practices, staffed by the people who scoped the work.</span></h1>
         </div>
-        <p class="lede" data-reveal="120">
+        <p class="lede" data-seq style="--seq:2">
           Every practice can run standalone, and most engagements combine two or
           three. Pricing below is indicative — a two-week discovery converts it
           into a fixed price.
@@ -30,7 +30,7 @@ $services = $site['services'];
   <div class="container container--wide">
     <div class="stack" style="--flow:var(--s-4)">
       <?php foreach ($services as $i => $service): ?>
-        <article class="card spotlight a-<?= e($service['accent']) ?>" id="<?= e($service['slug']) ?>"
+        <article class="card spotlight edge-light a-<?= e($service['accent']) ?>" id="<?= e($service['slug']) ?>"
                  style="scroll-margin-top:calc(var(--header-h) + 2rem)" data-reveal>
           <div class="split split--wide-left" style="gap:var(--s-6);align-items:start">
             <div>
@@ -101,7 +101,7 @@ $services = $site['services'];
         ['layers', 'Delivery pod', '8–24 weeks · per increment', 'Four to eight engineers, a designer and a delivery lead. Fortnightly production increments against published quality gates.'],
         ['gauge', 'Operate pod', 'Ongoing · monthly', 'Reliability, cost governance and roadmap. SLOs reported monthly, including the months we miss them.'],
       ] as $i => $pod): ?>
-        <article class="card card--lift feature spotlight" data-reveal="<?= $i * 60 ?>">
+        <article class="card card--lift feature spotlight edge-light" data-reveal="<?= $i * 60 ?>">
           <span class="feature__icon"><?= icon($pod[0]) ?></span>
           <h3><?= e($pod[1]) ?></h3>
           <span class="badge badge--neutral mt-3"><?= e($pod[2]) ?></span>

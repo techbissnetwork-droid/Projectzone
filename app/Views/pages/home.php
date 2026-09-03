@@ -5,40 +5,68 @@ $view->start('content');
 $services = $site['services'];
 ?>
 
-<section class="hero">
+<section class="hero hero--home">
   <div class="aura"></div>
   <div class="grid-lines"></div>
   <div class="container container--wide">
     <div class="hero__inner">
       <div class="split split--wide-left" style="align-items:center">
         <div>
-          <span class="eyebrow" data-reveal>Digital transformation, engineered</span>
-          <h1 class="display hero__title" data-reveal="60">
-            We build the platforms<br>your business <span class="gradient-text">runs on</span>.
+          <span class="hero__badge" data-seq style="--seq:0">
+            <span class="pulse-dot"></span>
+            <span>412 platforms live across 31 countries</span>
+          </span>
+
+          <h1 class="display hero__title" data-seq style="--seq:1">
+            <span data-lines>We build the platforms your business runs on.</span>
           </h1>
-          <p class="lede hero__lede" data-reveal="120">
+
+          <p class="lede hero__lede" data-seq style="--seq:3">
             TECHBISS designs, builds and operates digital platforms for regulated
             enterprises — then hands your team the keys, the runbooks and the
             reliability numbers to keep them running.
           </p>
-          <div class="hero__actions" data-reveal="180">
-            <a class="btn btn--primary btn--lg" href="<?= e(url('/contact')) ?>">Start a project<?= icon('arrow-right') ?></a>
-            <a class="btn btn--ghost btn--lg" href="<?= e(url('/marketplace')) ?>">Browse the Marketplace</a>
+
+          <div class="hero__actions" data-seq style="--seq:4">
+            <a class="btn btn--primary btn--lg magnetic icon-shift" href="<?= e(url('/contact')) ?>">
+              Start a project<?= icon('arrow-right') ?>
+            </a>
+            <a class="btn btn--ghost btn--lg magnetic" href="<?= e(url('/marketplace')) ?>">
+              <?= icon('grid') ?>Browse the Marketplace
+            </a>
           </div>
-          <ul class="hero__meta" data-reveal="240">
+
+          <ul class="hero__meta" data-seq style="--seq:5">
             <li><?= icon('check-circle') ?>Fixed-price two-week discovery</li>
             <li><?= icon('check-circle') ?>Senior engineers, no bait-and-switch</li>
             <li><?= icon('check-circle') ?>SOC 2 Type II &amp; ISO 27001</li>
           </ul>
         </div>
 
-        <div data-reveal="140">
-          <div class="card card--flush tilt" data-tilt="5" style="box-shadow:var(--sh-4)">
-            <div class="tilt__layer">
-              <?= art_mockup('techbiss-hero-platform', 'dashboard', ['label' => 'TECHBISS platform overview']) ?>
+        <div class="hero__art" data-seq style="--seq:2">
+          <div data-parallax="22">
+            <div class="hero__frame tilt edge-light" data-tilt="6">
+              <div class="hero__frame-bar" aria-hidden="true">
+                <span></span><span></span><span></span>
+                <em>fleet.techbiss.com</em>
+              </div>
+              <div class="tilt__layer">
+                <?= art_mockup('techbiss-hero-platform', 'dashboard', ['label' => 'TECHBISS platform overview']) ?>
+              </div>
+            </div>
+
+            <!-- Two figures lifted out of the frame: the numbers a buyer checks first. -->
+            <div class="hero__chip hero__chip--uptime">
+              <span class="pulse-dot"></span>
+              <span><strong>99.98%</strong><em>fleet uptime</em></span>
+            </div>
+            <div class="hero__chip hero__chip--speed">
+              <?= icon('zap', ['size' => 15]) ?>
+              <span><strong>0.9s</strong><em>LCP on 4G</em></span>
             </div>
           </div>
-          <div class="stats mt-4">
+
+          <div class="stats stats--pair mt-5">
             <?php foreach (array_slice($site['stats'], 0, 2) as $stat): ?>
               <div class="stat">
                 <span class="stat__value"><span data-count="<?= e($stat['value']) ?>"><?= e($stat['value']) ?></span><em><?= e($stat['suffix']) ?></em></span>
@@ -78,7 +106,7 @@ $services = $site['services'];
 
     <div class="rail rail--3">
       <?php foreach ($services as $i => $service): ?>
-        <article class="card card--lift feature spotlight a-<?= e($service['accent']) ?>" data-reveal="<?= $i * 60 ?>">
+        <article class="card card--lift feature spotlight edge-light edge-light a-<?= e($service['accent']) ?>" data-reveal="<?= $i * 60 ?>">
           <span class="feature__icon"><?= icon($service['icon']) ?></span>
           <h3><?= e($service['name']) ?></h3>
           <p><?= e($service['lede']) ?></p>
@@ -151,7 +179,7 @@ $services = $site['services'];
 
     <div class="rail rail--3">
       <?php foreach ($cases as $i => $case): ?>
-        <article class="card card--flush card--lift spotlight a-<?= e($case['accent']) ?>" data-reveal="<?= $i * 60 ?>">
+        <article class="card card--flush card--lift spotlight edge-light edge-light a-<?= e($case['accent']) ?>" data-reveal="<?= $i * 60 ?>">
           <a href="<?= e(url('/work/' . $case['slug'])) ?>" class="ratio-16-10" style="display:block;overflow:hidden;border-bottom:1px solid var(--line)">
             <?= art_mockup($case['slug'], (string) $case['layout'], ['label' => $case['client'] . ' case study']) ?>
           </a>
@@ -189,7 +217,7 @@ $services = $site['services'];
 
     <div class="steps steps--3">
       <?php foreach (array_slice($site['process'], 0, 6) as $i => $step): ?>
-        <article class="step spotlight" data-reveal="<?= $i * 50 ?>">
+        <article class="step spotlight edge-light" data-reveal="<?= $i * 50 ?>">
           <span class="step__meta"><?= e($step['duration']) ?></span>
           <span class="step__num"><?= e($step['phase']) ?></span>
           <h3><?= e($step['name']) ?></h3>

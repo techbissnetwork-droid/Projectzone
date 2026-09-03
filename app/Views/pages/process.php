@@ -10,16 +10,16 @@ $view->start('content');
     <div class="hero__inner">
       <?php $view->partial('partials.crumbs', ['crumbs' => ['Home' => '/', 'Process' => '/process']]); ?>
       <div style="max-width:58ch">
-        <span class="eyebrow" data-reveal>How we work</span>
-        <h1 class="h1 hero__title" data-reveal="60">Six phases, published deliverables, no surprises.</h1>
-        <p class="lede hero__lede" data-reveal="120">
+        <span class="eyebrow" data-seq style="--seq:0">How we work</span>
+        <h1 class="h1 hero__title" data-seq style="--seq:1"><span data-lines>Six phases, published deliverables, no surprises.</span></h1>
+        <p class="lede hero__lede" data-seq style="--seq:2">
           The same process runs on every engagement, whether it is an eight-week
           storefront or a two-year core replacement. What changes is the depth,
           not the shape.
         </p>
       </div>
 
-      <div class="stats mt-7" data-reveal="160">
+      <div class="stats mt-7" data-seq style="--seq:3">
         <?php foreach ([
           ['2', 'wks', 'Discovery', 'Fixed price, fixed scope'],
           ['2', 'wks', 'Increment cadence', 'Every one deployable'],
@@ -43,7 +43,7 @@ $view->start('content');
   <div class="container container--wide">
     <div class="stack" style="--flow:var(--s-4)">
       <?php foreach ($steps as $i => $step): ?>
-        <article class="card spotlight" data-reveal>
+        <article class="card spotlight edge-light" data-reveal>
           <div class="split split--wide-left" style="gap:var(--s-6);align-items:start">
             <div>
               <div class="between">

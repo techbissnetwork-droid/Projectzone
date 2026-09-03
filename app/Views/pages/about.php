@@ -10,17 +10,15 @@ $view->start('content');
       <?php $view->partial('partials.crumbs', ['crumbs' => ['Home' => '/', 'Company' => '/about']]); ?>
       <div class="split split--wide-left" style="align-items:center">
         <div>
-          <span class="eyebrow" data-reveal>About TECHBISS</span>
-          <h1 class="h1 hero__title" data-reveal="60">
-            Founded on one conviction: transformation fails when nobody owns the outcome.
-          </h1>
-          <p class="lede hero__lede" data-reveal="120">
+          <span class="eyebrow" data-seq style="--seq:0">About TECHBISS</span>
+          <h1 class="h1 hero__title" data-seq style="--seq:1"><span data-lines>Founded on one conviction: transformation fails when nobody owns the outcome.</span></h1>
+          <p class="lede hero__lede" data-seq style="--seq:2">
             Three engineers started TECHBISS in <?= e((string) $site['brand']['founded']) ?> after watching
             well-funded programmes fail for organisational reasons rather than technical
             ones. Thirteen years later we run four regions on one delivery standard.
           </p>
         </div>
-        <div data-reveal="140">
+        <div data-seq style="--seq:2">
           <div class="stats" style="grid-template-columns:repeat(2,minmax(0,1fr))">
             <?php foreach ($site['stats'] as $stat): ?>
               <div class="stat">
@@ -47,7 +45,7 @@ $view->start('content');
     ]); ?>
     <div class="cols-3">
       <?php foreach ($site['principles'] as $i => $principle): ?>
-        <article class="card card--lift spotlight" data-reveal="<?= $i * 50 ?>">
+        <article class="card card--lift spotlight edge-light" data-reveal="<?= $i * 50 ?>">
           <span class="mono dim">0<?= $i + 1 ?></span>
           <h3 class="h4 mt-3"><?= e($principle['title']) ?></h3>
           <p class="small muted mt-3"><?= e($principle['body']) ?></p>

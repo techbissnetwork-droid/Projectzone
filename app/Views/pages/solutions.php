@@ -12,9 +12,9 @@ foreach ($solutions as $solution) { $groups[$solution['category']][] = $solution
     <div class="hero__inner">
       <?php $view->partial('partials.crumbs', ['crumbs' => ['Home' => '/', 'Solutions' => '/solutions']]); ?>
       <div style="max-width:56ch">
-        <span class="eyebrow" data-reveal>Solutions by industry</span>
-        <h1 class="h1 hero__title" data-reveal="60">Reference architectures that start you at week six.</h1>
-        <p class="lede hero__lede" data-reveal="120">
+        <span class="eyebrow" data-seq style="--seq:0">Solutions by industry</span>
+        <h1 class="h1 hero__title" data-seq style="--seq:1"><span data-lines>Reference architectures that start you at week six.</span></h1>
+        <p class="lede hero__lede" data-seq style="--seq:2">
           Each solution carries pre-hardened infrastructure, a design system and a
           CI/CD pipeline tuned to that sector’s regulation and scale — so discovery
           ends with running software rather than a slide deck.
@@ -37,7 +37,7 @@ foreach ($solutions as $solution) { $groups[$solution['category']][] = $solution
         <hr class="divider mt-4">
         <div class="cols-3 mt-5">
           <?php foreach ($items as $i => $solution): ?>
-            <article class="card card--lift spotlight a-<?= e($solution['accent']) ?>" data-reveal="<?= $i * 60 ?>">
+            <article class="card card--lift spotlight edge-light a-<?= e($solution['accent']) ?>" data-reveal="<?= $i * 60 ?>">
               <span class="feature__icon"><?= icon($solution['icon']) ?></span>
               <h3 class="h4"><a href="<?= e(url('/solutions/' . $solution['slug'])) ?>"><?= e($solution['name']) ?></a></h3>
               <p class="muted small mt-3"><?= e($solution['lede']) ?></p>

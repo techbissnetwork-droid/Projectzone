@@ -2,7 +2,7 @@
 /** @var array $item */
 $tags = json_decode((string) ($item['tags'] ?? '[]'), true) ?: [];
 ?>
-<article class="product spotlight">
+<article class="product spotlight edge-light">
   <a class="product__thumb" href="<?= e(url('/marketplace/' . $item['slug'])) ?>" aria-label="<?= e($item['name']) ?>">
     <?php if (!empty($item['featured'])): ?>
       <span class="product__tags"><span class="badge">Featured</span></span>

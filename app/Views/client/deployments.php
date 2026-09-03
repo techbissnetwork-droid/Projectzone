@@ -25,7 +25,7 @@ $view->start('content');
         <div class="panel__body">
           <div class="meter-row">
             <div class="meter-row__top"><span>Installation progress</span><b><?= (int) $d['progress'] ?>%</b></div>
-            <div class="progress"><i style="width:<?= (int) $d['progress'] ?>%"></i></div>
+            <div class="progress"><i style="--fill:calc(<?= (int) $d['progress'] ?> / 100)"></i></div>
           </div>
 
           <div class="cluster mt-4" style="gap:var(--s-5)">

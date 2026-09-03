@@ -41,7 +41,7 @@ $view->start('content');
               <?php if ($d['source_platform']): ?><br><span class="tiny dim">from <?= e($d['source_platform']) ?></span><?php endif; ?>
             </td>
             <td data-label="Progress" style="min-width:120px">
-              <div class="progress"><i style="width:<?= (int) $d['progress'] ?>%"></i></div>
+              <div class="progress"><i style="--fill:calc(<?= (int) $d['progress'] ?> / 100)"></i></div>
               <span class="tiny dim"><?= (int) $d['progress'] ?>%</span>
             </td>
             <td data-label="Status"><?php $view->partial('partials.status-pill', ['value' => (string) $d['status']]); ?></td>

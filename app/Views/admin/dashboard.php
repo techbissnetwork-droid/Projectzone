@@ -38,7 +38,7 @@ $view->start('content');
                 <span><?= e($product['name']) ?></span>
                 <b><?= e(money((float) $product['revenue'])) ?></b>
               </div>
-              <div class="progress"><i style="width:<?= round((float) $product['revenue'] / $max * 100) ?>%"></i></div>
+              <div class="progress"><i style="--fill:calc(<?= round((float) $product['revenue'] / $max * 100) ?> / 100)"></i></div>
               <div class="tiny dim"><?= number_format((int) $product['sales_count']) ?> total deployments · <?= number_format((float) $product['rating'], 1) ?> rating</div>
             </div>
           <?php endforeach; ?>

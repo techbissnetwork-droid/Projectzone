@@ -29,7 +29,7 @@ $view->start('content');
         <p class="small muted"><?= e($project['summary'] ?: '') ?></p>
         <div class="meter-row mt-4">
           <div class="meter-row__top"><span>Delivery progress</span><b><?= (int) $project['progress'] ?>%</b></div>
-          <div class="progress"><i style="width:<?= (int) $project['progress'] ?>%"></i></div>
+          <div class="progress"><i style="--fill:calc(<?= (int) $project['progress'] ?> / 100)"></i></div>
         </div>
         <div class="cluster mt-4" style="gap:var(--s-5)">
           <div><span class="tiny dim">Started</span><br><strong class="small"><?= e(human_date($project['started_at'])) ?></strong></div>

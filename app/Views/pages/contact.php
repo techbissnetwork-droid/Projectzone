@@ -16,9 +16,9 @@ elseif ($prefill['product'] !== '') { $prefillMessage = 'I have a question about
     <div class="hero__inner">
       <?php $view->partial('partials.crumbs', ['crumbs' => ['Home' => '/', 'Contact' => '/contact']]); ?>
       <div style="max-width:52ch">
-        <span class="eyebrow" data-reveal>Contact</span>
-        <h1 class="h1 hero__title" data-reveal="60">Tell us what needs to change.</h1>
-        <p class="lede hero__lede" data-reveal="120">
+        <span class="eyebrow" data-seq style="--seq:0">Contact</span>
+        <h1 class="h1 hero__title" data-seq style="--seq:1"><span data-lines>Tell us what needs to change.</span></h1>
+        <p class="lede hero__lede" data-seq style="--seq:2">
           Every qualified enquiry gets a reply from an architect within one
           business day — not a sequence from a marketing platform.
         </p>

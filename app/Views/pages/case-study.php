@@ -10,21 +10,21 @@ $view->start('content');
       <div class="hero__inner">
         <?php $view->partial('partials.crumbs', ['crumbs' => ['Home' => '/', 'Work' => '/work', $case['client'] => '/work/' . $case['slug']]]); ?>
         <div style="max-width:62ch">
-          <div class="cluster" data-reveal>
+          <div class="cluster" data-seq style="--seq:0">
             <span class="badge"><?= e($case['client']) ?></span>
             <span class="badge badge--neutral"><?= e($case['industry']) ?></span>
             <span class="badge badge--neutral"><?= e($case['service']) ?></span>
           </div>
-          <h1 class="h1 hero__title" data-reveal="60"><?= e($case['title']) ?></h1>
-          <p class="lede hero__lede" data-reveal="120"><?= e($case['summary']) ?></p>
-          <ul class="hero__meta" data-reveal="160">
+          <h1 class="h1 hero__title" data-seq style="--seq:1"><?= e($case['title']) ?></h1>
+          <p class="lede hero__lede" data-seq style="--seq:2"><?= e($case['summary']) ?></p>
+          <ul class="hero__meta" data-seq style="--seq:3">
             <li><?= icon('clock') ?><?= e($case['duration']) ?></li>
             <li><?= icon('globe') ?><?= e($case['region']) ?></li>
             <li><?= icon('calendar') ?><?= e($case['year']) ?></li>
           </ul>
         </div>
 
-        <div class="card card--flush mt-7 tilt" data-tilt="4" data-reveal="200" style="box-shadow:var(--sh-4)">
+        <div class="card card--flush mt-7 tilt" data-tilt="4" data-seq style="--seq:4" style="box-shadow:var(--sh-4)">
           <?= art_mockup($case['slug'], (string) $case['layout'], ['label' => $case['client'] . ' platform']) ?>
         </div>
       </div>

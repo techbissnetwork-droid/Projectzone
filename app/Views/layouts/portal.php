@@ -19,9 +19,14 @@ $current = $request->path;
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#06080d">
 <link rel="icon" href="<?= e(asset('favicon.svg')) ?>" type="image/svg+xml">
-<style><?= inline_file('assets/css/critical.css') ?></style>
+<?= font_preloads() ?>
+<style><?= inline_css('assets/css/critical.css') ?></style>
 <link rel="preload" as="style" href="<?= e(asset('assets/css/main.css')) ?>" onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link rel="stylesheet" href="<?= e(asset('assets/css/main.css')) ?>"></noscript>
+<link rel="preload" as="style" href="<?= e(asset('assets/css/motion.css')) ?>" onload="this.onload=null;this.rel='stylesheet'">
+<noscript>
+<link rel="stylesheet" href="<?= e(asset('assets/css/main.css')) ?>">
+<link rel="stylesheet" href="<?= e(asset('assets/css/motion.css')) ?>">
+</noscript>
 <script>(function(){var d=document.documentElement;d.classList.add('js');try{var t=localStorage.getItem('tb-theme');if(t==='light'||t==='dark'){d.setAttribute('data-theme',t)}}catch(e){}})();</script>
 </head>
 <body class="a-<?= e($accent) ?>">

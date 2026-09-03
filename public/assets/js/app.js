@@ -192,33 +192,212 @@
     }, { rootMargin: '0px' }).observe(anchor);
   }
 
-  /* ---- pointer sheen + tilt (desktop pointer only) ---------------------- */
+  /* ---- pointer interactions (fine pointers, desktop only) --------------- */
+  /* One shared rAF loop drives every pointer effect on the page. Per-element
+     listeners writing styles directly would each schedule their own frame. */
+  var pointerTargets = [];
+  var pointerFrame = null;
+
+  function schedulePointerFrame() {
+    if (pointerFrame) return;
+    pointerFrame = requestAnimationFrame(function () {
+      pointerFrame = null;
+      for (var i = 0; i < pointerTargets.length; i++) pointerTargets[i]();
+    });
+  }
+
   function initPointer() {
     if (!mqFine.matches || !mqDesktop.matches || reduced.matches) return;
 
-    $$('.spotlight').forEach(function (el) {
+    // Cursor-tracked sheen and edge light: write two custom properties, let
+    // CSS do the painting.
+    $$('.spotlight, .edge-light').forEach(function (el) {
+      if (el.dataset.pointerBound) return;
+      el.dataset.pointerBound = '1';
+      var pending = null;
+      var apply = function () {
+        if (!pending) return;
+        el.style.setProperty('--mx', pending.x + '%');
+        el.style.setProperty('--my', pending.y + '%');
+        pending = null;
+      };
+      pointerTargets.push(apply);
       on(el, 'pointermove', function (e) {
         var r = el.getBoundingClientRect();
-        el.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100) + '%');
-        el.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100) + '%');
+        pending = {
+          x: (((e.clientX - r.left) / r.width) * 100).toFixed(1),
+          y: (((e.clientY - r.top) / r.height) * 100).toFixed(1)
+        };
+        schedulePointerFrame();
       });
     });
 
+    // 3D tilt toward the cursor.
     $$('.tilt').forEach(function (el) {
-      var raf = null;
+      if (el.dataset.tiltBound) return;
+      el.dataset.tiltBound = '1';
+      var pending = null;
+      var max = parseFloat(el.getAttribute('data-tilt') || '6');
+      var apply = function () {
+        if (!pending) return;
+        el.style.transform = 'perspective(1000px) rotateX(' + pending.rx + 'deg) rotateY(' + pending.ry + 'deg)';
+        pending = null;
+      };
+      pointerTargets.push(apply);
       on(el, 'pointermove', function (e) {
-        if (raf) return;
-        raf = requestAnimationFrame(function () {
-          raf = null;
-          var r = el.getBoundingClientRect();
-          var x = (e.clientX - r.left) / r.width - 0.5;
-          var y = (e.clientY - r.top) / r.height - 0.5;
-          var max = parseFloat(el.getAttribute('data-tilt') || '6');
-          el.style.transform = 'perspective(900px) rotateX(' + (-y * max).toFixed(2) + 'deg) rotateY(' + (x * max).toFixed(2) + 'deg)';
-        });
+        var r = el.getBoundingClientRect();
+        pending = {
+          rx: (-((e.clientY - r.top) / r.height - 0.5) * max).toFixed(2),
+          ry: (((e.clientX - r.left) / r.width - 0.5) * max).toFixed(2)
+        };
+        schedulePointerFrame();
       });
-      on(el, 'pointerleave', function () { el.style.transform = ''; });
+      on(el, 'pointerleave', function () { pending = null; el.style.transform = ''; });
     });
+
+    // Magnetic controls: the element drifts a few pixels toward the cursor
+    // while it is nearby, which makes a target feel like it wants to be hit.
+    $$('.magnetic').forEach(function (el) {
+      if (el.dataset.magneticBound) return;
+      el.dataset.magneticBound = '1';
+      var strength = parseFloat(el.getAttribute('data-magnetic') || '0.28');
+      var radius = 90;
+      var pending = null;
+      var apply = function () {
+        if (!pending) return;
+        el.style.transform = pending.reset ? '' : 'translate3d(' + pending.x + 'px,' + pending.y + 'px,0)';
+        pending = null;
+      };
+      pointerTargets.push(apply);
+      on(el, 'pointermove', function (e) {
+        var r = el.getBoundingClientRect();
+        var dx = e.clientX - (r.left + r.width / 2);
+        var dy = e.clientY - (r.top + r.height / 2);
+        if (Math.abs(dx) > r.width / 2 + radius || Math.abs(dy) > r.height / 2 + radius) return;
+        pending = { x: (dx * strength).toFixed(1), y: (dy * strength).toFixed(1) };
+        schedulePointerFrame();
+      });
+      on(el, 'pointerleave', function () { pending = { reset: true }; schedulePointerFrame(); });
+    });
+  }
+
+  /* ---- headline line reveal --------------------------------------------- */
+  /* Wraps each visual line of a heading in its own overflow-hidden mask so the
+     lines wipe up in sequence. Runs off the real laid-out line boxes, so it
+     stays correct at every breakpoint. Skipped entirely for reduced motion. */
+  function initLineReveal() {
+    if (reduced.matches) return;
+
+    $$('[data-lines]').forEach(function (el) {
+      if (el.dataset.linesDone) return;
+
+      var text = el.textContent.replace(/\s+/g, ' ').trim();
+      if (!text || text.length > 220) return;
+
+      // Measure where the browser actually breaks the text.
+      var words = text.split(' ');
+      var probe = document.createElement('span');
+      probe.style.cssText = 'position:absolute;visibility:hidden;pointer-events:none';
+      el.textContent = '';
+      el.appendChild(probe);
+
+      var lines = [];
+      var current = [];
+      var lastTop = null;
+      for (var i = 0; i < words.length; i++) {
+        probe.textContent = words.slice(0, i + 1).join(' ');
+        var range = document.createRange();
+        range.selectNodeContents(probe);
+        var rects = range.getClientRects();
+        var top = rects.length ? Math.round(rects[rects.length - 1].top) : 0;
+        if (lastTop !== null && top !== lastTop && current.length) {
+          lines.push(current.join(' '));
+          current = [];
+        }
+        current.push(words[i]);
+        lastTop = top;
+      }
+      if (current.length) lines.push(current.join(' '));
+      probe.remove();
+
+      if (lines.length > 6) { el.textContent = text; return; }
+
+      lines.forEach(function (line, index) {
+        var mask = document.createElement('span');
+        mask.className = 'line-mask';
+        var inner = document.createElement('span');
+        inner.textContent = line;
+        inner.style.setProperty('--line', String(index));
+        mask.appendChild(inner);
+        el.appendChild(mask);
+      });
+
+      el.dataset.linesDone = '1';
+    });
+  }
+
+  /* ---- scroll progress rail --------------------------------------------- */
+  /* Native scroll timelines handle this in CSS. This fallback only runs where
+     they are unavailable, and reads scroll position inside a rAF. */
+  function initScrollRail() {
+    var rail = $('[data-scroll-rail]');
+    if (!rail || reduced.matches) return;
+    if (CSS.supports && CSS.supports('animation-timeline: scroll()')) return;
+
+    var ticking = false;
+    function update() {
+      ticking = false;
+      var doc = doc_.documentElement;
+      var max = doc.scrollHeight - doc.clientHeight;
+      rail.style.transform = 'scaleX(' + (max > 0 ? doc.scrollTop / max : 0) + ')';
+    }
+    var doc_ = doc;
+    on(window, 'scroll', function () {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(update);
+    }, { passive: true });
+    update();
+  }
+
+  /* ---- parallax ---------------------------------------------------------- */
+  /* Depth on hero art. One observer keeps the loop idle whenever the element
+     is off screen, so scrolling the rest of the page costs nothing. */
+  function initParallax() {
+    var items = $$('[data-parallax]');
+    if (!items.length || reduced.matches || !mqDesktop.matches || !('IntersectionObserver' in window)) return;
+
+    var active = [];
+    var ticking = false;
+
+    function update() {
+      ticking = false;
+      var viewport = window.innerHeight;
+      for (var i = 0; i < active.length; i++) {
+        var el = active[i];
+        var rect = el.getBoundingClientRect();
+        var progress = (rect.top + rect.height / 2 - viewport / 2) / viewport;
+        var depth = parseFloat(el.getAttribute('data-parallax') || '18');
+        el.style.transform = 'translate3d(0,' + (-progress * depth).toFixed(1) + 'px,0)';
+      }
+    }
+
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        var index = active.indexOf(entry.target);
+        if (entry.isIntersecting && index === -1) active.push(entry.target);
+        if (!entry.isIntersecting && index > -1) active.splice(index, 1);
+      });
+      if (active.length) update();
+    }, { rootMargin: '20% 0px' });
+
+    items.forEach(function (el) { io.observe(el); });
+
+    on(window, 'scroll', function () {
+      if (ticking || !active.length) return;
+      ticking = true;
+      requestAnimationFrame(update);
+    }, { passive: true });
   }
 
   /* ---- marketplace ------------------------------------------------------ */
@@ -326,6 +505,9 @@
     initCounters();
     initActionBar();
     initPointer();
+    initLineReveal();
+    initScrollRail();
+    initParallax();
     initMarketplace();
     initCopy();
     initInstaller();

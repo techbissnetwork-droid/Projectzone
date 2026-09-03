@@ -50,7 +50,7 @@ $view->start('content');
         <div class="panel__body">
           <div class="meter-row">
             <div class="meter-row__top"><span>Budget consumed</span><b><?= $burn ?>%</b></div>
-            <div class="progress"><i style="width:<?= $burn ?>%"></i></div>
+            <div class="progress"><i style="--fill:calc(<?= $burn ?> / 100)"></i></div>
           </div>
           <table class="spec-table mt-4">
             <tbody>

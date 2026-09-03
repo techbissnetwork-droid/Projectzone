@@ -167,6 +167,7 @@ function bodyContent(string $html): string
 function rewrite(string $html): string
 {
     $html = preg_replace('#<script[^>]*src="[^"]*app\.js[^"]*"[^>]*></script>#', '', $html) ?? $html;
+    $html = preg_replace('#<link[^>]+rel="preload"[^>]*>#', '', $html) ?? $html;
     $html = preg_replace('#<a class="skip-link"[^>]*>.*?</a>#s', '', $html) ?? $html;
 
     // href="https://preview.techbiss.local/services" -> href="#/services"
@@ -298,7 +299,24 @@ foreach ($all as [$path, $label, $group]) {
 
 $criticalCss = (string) file_get_contents($root . '/public/assets/css/critical.css');
 $mainCss = (string) file_get_contents($root . '/public/assets/css/main.css');
+$motionCss = (string) file_get_contents($root . '/public/assets/css/motion.css');
 $appJs = (string) file_get_contents($root . '/public/assets/js/app.js');
+
+/**
+ * Inline the self-hosted faces as data URIs.
+ *
+ * The export is a single file served from an origin that has no /assets path,
+ * so a relative font reference would silently fall back to a system stack and
+ * lose the platform's typographic identity.
+ */
+foreach (['sora-var-latin', 'manrope-var-latin'] as $face) {
+    $file = $root . '/public/assets/fonts/' . $face . '.woff2';
+    if (!is_file($file)) {
+        continue;
+    }
+    $dataUri = 'data:font/woff2;base64,' . base64_encode((string) file_get_contents($file));
+    $criticalCss = str_replace('/assets/fonts/' . $face . '.woff2', $dataUri, $criticalCss);
+}
 
 $navHtml = '';
 foreach ($groups as $group => $items) {
@@ -330,6 +348,7 @@ $document = <<<HTML
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>{$criticalCss}</style>
 <style>{$mainCss}</style>
+<style>{$motionCss}</style>
 <style>
 /* Preview chrome — the switcher that stands in for real server routing. */
 .pv-bar{position:sticky;top:0;z-index:200;display:flex;align-items:center;gap:.75rem;

@@ -69,6 +69,38 @@ if (!function_exists('inline_file')) {
     }
 }
 
+if (!function_exists('inline_css')) {
+    /**
+     * Inline a stylesheet, rewriting its root-relative asset URLs.
+     *
+     * Inlined CSS resolves relative URLs against the *page* URL rather than a
+     * stylesheet URL, so `/assets/fonts/x.woff2` would break on a sub-directory
+     * install and on any nested route. Rewriting to the absolute base URL keeps
+     * font and image references correct everywhere.
+     */
+    function inline_css(string $path): string
+    {
+        $css = inline_file($path);
+        if ($css === '') {
+            return '';
+        }
+        return str_replace('url("/assets/', 'url("' . base_url() . '/assets/', $css);
+    }
+}
+
+if (!function_exists('font_preloads')) {
+    /** <link rel=preload> tags for the self-hosted faces used above the fold. */
+    function font_preloads(): string
+    {
+        $tags = '';
+        foreach (['assets/fonts/manrope-var-latin.woff2', 'assets/fonts/sora-var-latin.woff2'] as $font) {
+            $tags .= '<link rel="preload" as="font" type="font/woff2" crossorigin href="'
+                . e(base_url() . '/' . $font) . '">' . "\n";
+        }
+        return $tags;
+    }
+}
+
 if (!function_exists('e')) {
     function e(mixed $value): string
     {

@@ -22,8 +22,8 @@ $icons = ['requirements' => 'gauge', 'environment' => 'globe', 'database' => 'da
             live, and migrates your content with the URLs rewritten.
           </p>
           <div class="hero__actions" data-reveal="180">
-            <a class="btn btn--primary btn--lg" href="<?= e(url('/install')) ?>">Open the installer<?= icon('arrow-right') ?></a>
-            <a class="btn btn--ghost btn--lg" href="<?= e(url('/resources/deployment-playbook')) ?>">Deployment playbook</a>
+            <a class="btn btn--primary btn--lg magnetic icon-shift" href="<?= e(url('/install')) ?>">Open the installer<?= icon('arrow-right') ?></a>
+            <a class="btn btn--ghost btn--lg magnetic" href="<?= e(url('/resources/deployment-playbook')) ?>">Deployment playbook</a>
           </div>
           <ul class="hero__meta" data-reveal="220">
             <li><?= icon('check-circle') ?>Typically under 8 minutes</li>
@@ -76,7 +76,7 @@ $icons = ['requirements' => 'gauge', 'environment' => 'globe', 'database' => 'da
     ]); ?>
     <div class="steps steps--2">
       <?php $n = 1; foreach ($steps as $key => $step): ?>
-        <article class="step spotlight" data-reveal="<?= ($n - 1) * 40 ?>">
+        <article class="step spotlight edge-light" data-reveal="<?= ($n - 1) * 40 ?>">
           <span class="step__meta"><?= icon($icons[$key] ?? 'check') ?></span>
           <span class="step__num"><?= str_pad((string) $n, 2, '0', STR_PAD_LEFT) ?></span>
           <h3 class="h4"><?= e($step['label']) ?></h3>

@@ -21,17 +21,22 @@ $jsonLd = $seo->jsonLd();
 <meta name="description" content="<?= e($seo->description()) ?>">
 <meta name="robots" content="<?= e($seo->robots()) ?>">
 <meta name="theme-color" content="#06080d">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="<?= e(base_url()) ?>/assets/fonts/manrope-var-latin.woff2">
 <link rel="icon" href="<?= e(asset('favicon.svg')) ?>" type="image/svg+xml">
 <?php if ($jsonLd !== ''): ?>
 <script type="application/ld+json"><?= $jsonLd ?></script>
 <?php endif; ?>
 <style amp-boilerplate>body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
 <style amp-custom>
+/* Same self-hosted faces as the canonical pages. AMP forbids external
+   stylesheets but permits @font-face with a same-origin source. */
+@font-face{font-family:"Sora";font-style:normal;font-weight:400 700;font-display:swap;src:url("<?= e(base_url()) ?>/assets/fonts/sora-var-latin.woff2") format("woff2")}
+@font-face{font-family:"Manrope";font-style:normal;font-weight:400 700;font-display:swap;src:url("<?= e(base_url()) ?>/assets/fonts/manrope-var-latin.woff2") format("woff2")}
 :root{--bg:#06080d;--surface:#10151f;--surface2:#161d29;--line:rgba(255,255,255,.09);--ink:#f1f4fa;--ink2:#a6b0c2;--ink3:#6e7889;--accent:#3d7bff;--accent2:#22d3ee}
 *,*::before,*::after{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.62;-webkit-font-smoothing:antialiased}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Manrope",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.62;-webkit-font-smoothing:antialiased}
 a{color:inherit;text-decoration:none}
-h1,h2,h3{margin:0;font-weight:640;line-height:1.2;letter-spacing:-.02em}
+h1,h2,h3{margin:0;font-family:"Sora",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-weight:600;line-height:1.18;letter-spacing:-.024em}
 p{margin:0}
 ul{margin:0;padding:0;list-style:none}
 .wrap{width:100%;max-width:760px;margin-inline:auto;padding-inline:20px}

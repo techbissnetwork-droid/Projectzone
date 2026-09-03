@@ -10,20 +10,20 @@ $view->start('content');
       <?php $view->partial('partials.crumbs', ['crumbs' => ['Home' => '/', 'Solutions' => '/solutions', $solution['name'] => '/solutions/' . $solution['slug']]]); ?>
       <div class="split split--wide-left" style="align-items:center">
         <div>
-          <div class="cluster" data-reveal>
+          <div class="cluster" data-seq style="--seq:0">
             <span class="feature__icon" style="margin-bottom:0"><?= icon($solution['icon']) ?></span>
             <span class="badge"><?= e($solution['category']) ?></span>
           </div>
-          <h1 class="h1 hero__title" data-reveal="60"><?= e($solution['lede']) ?></h1>
-          <p class="lede hero__lede" data-reveal="120"><?= e($solution['summary']) ?></p>
-          <div class="hero__actions" data-reveal="180">
-            <a class="btn btn--primary btn--lg" href="<?= e(url('/contact?topic=new-project&industry=' . $solution['slug'])) ?>">Talk to a specialist<?= icon('arrow-right') ?></a>
+          <h1 class="h1 hero__title" data-seq style="--seq:1"><?= e($solution['lede']) ?></h1>
+          <p class="lede hero__lede" data-seq style="--seq:2"><?= e($solution['summary']) ?></p>
+          <div class="hero__actions" data-seq style="--seq:3">
+            <a class="btn btn--primary btn--lg magnetic icon-shift" href="<?= e(url('/contact?topic=new-project&industry=' . $solution['slug'])) ?>">Talk to a specialist<?= icon('arrow-right') ?></a>
             <?php if ($proof): ?>
-              <a class="btn btn--ghost btn--lg" href="<?= e(url('/work/' . $proof['slug'])) ?>">Read the case study</a>
+              <a class="btn btn--ghost btn--lg magnetic" href="<?= e(url('/work/' . $proof['slug'])) ?>">Read the case study</a>
             <?php endif; ?>
           </div>
         </div>
-        <div data-reveal="140">
+        <div data-seq style="--seq:2">
           <div class="stats" style="grid-template-columns:repeat(1,minmax(0,1fr))">
             <?php foreach ($solution['metrics'] as $metric): ?>
               <div class="stat">
@@ -105,7 +105,7 @@ $view->start('content');
       'title' => 'We have done this before.',
       'action' => ['label' => 'All case studies', 'path' => '/work'],
     ]); ?>
-    <article class="card card--flush spotlight a-<?= e($proof['accent']) ?>" data-reveal>
+    <article class="card card--flush spotlight edge-light a-<?= e($proof['accent']) ?>" data-reveal>
       <div class="split" style="gap:0">
         <a href="<?= e(url('/work/' . $proof['slug'])) ?>" style="display:block">
           <?= art_mockup($proof['slug'], (string) $proof['layout'], ['label' => $proof['client'] . ' case study']) ?>

@@ -24,7 +24,7 @@ $view->start('content');
           <div>
             <div class="meter-row">
               <div class="meter-row__top"><span>Delivery progress</span><b><?= (int) $project['progress'] ?>%</b></div>
-              <div class="progress"><i style="width:<?= (int) $project['progress'] ?>%"></i></div>
+              <div class="progress"><i style="--fill:calc(<?= (int) $project['progress'] ?> / 100)"></i></div>
             </div>
 
             <?php if ($project['budget']): ?>
@@ -34,7 +34,7 @@ $view->start('content');
                   <span>Budget consumed</span>
                   <b><?= e(money((float) $project['spent'])) ?> / <?= e(money((float) $project['budget'])) ?></b>
                 </div>
-                <div class="progress"><i style="width:<?= $burn ?>%"></i></div>
+                <div class="progress"><i style="--fill:calc(<?= $burn ?> / 100)"></i></div>
                 <div class="tiny dim"><?= $burn ?>% of budget against <?= (int) $project['progress'] ?>% of scope</div>
               </div>
             <?php endif; ?>
