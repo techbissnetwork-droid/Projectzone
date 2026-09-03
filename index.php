@@ -94,7 +94,7 @@ foreach (Content::sectionOrder() as $section):
               <h2 class="sec__title reveal"><?= nl2br(e(Settings::get('services_title')), false) ?></h2>
               <p class="sec__lede reveal"><?= e(Settings::get('services_lede')) ?></p>
             </header>
-            <div class="carousel svcs__carousel reveal" data-carousel="Services"
+            <div class="carousel svcs__carousel reveal" data-carousel="Services" data-autoplay="<?= (int)Settings::get('slides_autoplay') ?>"
                  style="<?= e(slide_vars(Settings::get('slides_services'), Settings::get('slides_services_phone'), '1x4', '1x2')) ?>">
               <div class="carousel__rail" data-rail><?php require __DIR__ . '/partials/service_cards.php'; ?></div>
               <?php require __DIR__ . '/partials/carousel_nav.php'; ?>
@@ -171,7 +171,7 @@ foreach (Content::sectionOrder() as $section):
               <p class="sec__lede reveal"><?= e(Settings::get('mkt_lede')) ?>
                 <a class="link" href="<?= e(url('marketplace.php')) ?>">Browse the marketplace <span aria-hidden="true">→</span></a></p>
             </header>
-            <div class="carousel mkt__carousel reveal" data-carousel="Product"
+            <div class="carousel mkt__carousel reveal" data-carousel="Product" data-autoplay="<?= (int)Settings::get('slides_autoplay') ?>"
                  style="<?= e(slide_vars(Settings::get('slides_market'), Settings::get('slides_market_phone'), '1x4', '1x2')) ?>">
               <div class="carousel__rail" data-rail>
                 <?php foreach ($products as $p): require __DIR__ . '/partials/product_card.php'; endforeach; ?>

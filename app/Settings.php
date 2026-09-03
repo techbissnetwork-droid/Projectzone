@@ -134,7 +134,10 @@ final class Settings
             'slides_process_phone'   => '4x1',
             'slides_market'          => '1x4',
             'slides_market_phone'    => '1x2',
+            'slides_pillars'         => '1x3',
+            'slides_pillars_phone'   => '2x2',
             'home_products'          => '8',
+            'slides_autoplay'        => '6',
 
             /* section headings */
             'services_eyebrow' => 'The ecosystem',

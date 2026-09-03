@@ -294,6 +294,39 @@
       else if (e.key === 'ArrowLeft') { e.preventDefault(); go(page - 1); }
     });
 
+    /* Advance on its own, if the admin has asked for it. It stops the moment
+       anyone touches the slider — pointer, keyboard or a swipe — and stays
+       stopped, because a carousel that moves under your finger is worse than
+       one that never moves at all. It also respects a reduced-motion setting
+       and pauses while the tab is in the background. */
+    var every = parseInt(wrap.getAttribute('data-autoplay') || '0', 10);
+    if (every > 0 && !reduce) {
+      var timer = 0, stopped = false;
+      var tick = function () {
+        if (stopped || doc.hidden || pages < 2) { return; }
+        go(page >= pages - 1 ? 0 : page + 1);
+      };
+      var start = function () { if (!stopped && !timer) { timer = win.setInterval(tick, every * 1000); } };
+      var stop = function () { win.clearInterval(timer); timer = 0; };
+      var stopForGood = function () { stopped = true; stop(); };
+
+      ['pointerdown', 'keydown', 'wheel', 'touchstart'].forEach(function (ev) {
+        wrap.addEventListener(ev, stopForGood, { passive: true, once: true });
+      });
+      wrap.addEventListener('mouseenter', stop);
+      wrap.addEventListener('mouseleave', start);
+      wrap.addEventListener('focusin', stopForGood);
+      doc.addEventListener('visibilitychange', function () { doc.hidden ? stop() : start(); });
+
+      if ('IntersectionObserver' in win) {
+        new IntersectionObserver(function (e) {
+          e[0].isIntersecting ? start() : stop();
+        }, { threshold: 0.25 }).observe(wrap);
+      } else {
+        start();
+      }
+    }
+
     measure();
     if ('ResizeObserver' in win) new ResizeObserver(measure).observe(rail);
     else win.addEventListener('resize', measure, { passive: true });

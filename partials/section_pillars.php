@@ -31,15 +31,19 @@ function pillar_indicator(string $style): string
       <p class="sec__lede reveal"><?= e(Settings::get('pillars_lede')) ?></p>
     </header>
 
-    <div class="trust__grid">
-      <?php foreach ($pillars as $p): ?>
-        <article class="pillar reveal" data-pillar="<?= e(slugify((string)$p['label'])) ?>">
-          <header><h3><?= e($p['label']) ?></h3><i class="dot dot--live"></i></header>
-          <?php if ($p['body']): ?><p><?= e($p['body']) ?></p><?php endif; ?>
-          <?= pillar_indicator((string)($p['icon'] ?? 'meter')) ?>
-          <?php if ($p['title']): ?><span class="mono"><?= e($p['title']) ?></span><?php endif; ?>
-        </article>
-      <?php endforeach; ?>
+    <div class="carousel trust__carousel reveal" data-carousel="Pillar" data-autoplay="<?= (int)Settings::get('slides_autoplay') ?>"
+         style="<?= e(slide_vars(Settings::get('slides_pillars'), Settings::get('slides_pillars_phone'), '1x3', '2x2')) ?>">
+      <div class="carousel__rail trust__grid" data-rail>
+        <?php foreach ($pillars as $p): ?>
+          <article class="pillar reveal" data-pillar="<?= e(slugify((string)$p['label'])) ?>">
+            <header><h3><?= e($p['label']) ?></h3><i class="dot dot--live"></i></header>
+            <?php if ($p['body']): ?><p><?= e($p['body']) ?></p><?php endif; ?>
+            <?= pillar_indicator((string)($p['icon'] ?? 'meter')) ?>
+            <?php if ($p['title']): ?><span class="mono"><?= e($p['title']) ?></span><?php endif; ?>
+          </article>
+        <?php endforeach; ?>
+      </div>
+      <?php require __DIR__ . '/carousel_nav.php'; ?>
     </div>
   </div>
 </section>

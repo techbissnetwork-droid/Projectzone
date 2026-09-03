@@ -54,7 +54,8 @@ if (post()) {
         $save[$k] = trim((string)($_POST[$k] ?? ''));
     }
     foreach (['slides_services','slides_services_phone','slides_process','slides_process_phone',
-              'slides_market','slides_market_phone','home_products'] as $k) {
+              'slides_market','slides_market_phone','slides_pillars','slides_pillars_phone',
+              'home_products','slides_autoplay'] as $k) {
         if (array_key_exists($k, $_POST)) {
             $save[$k] = trim((string)$_POST[$k]);
         }
@@ -164,6 +165,7 @@ require __DIR__ . '/../partials/app_header.php';
             'Service modules'   => ['slides_services', 'slides_services_phone'],
             'How we work'       => ['slides_process',  'slides_process_phone'],
             'Marketplace strip' => ['slides_market',   'slides_market_phone'],
+            'Technology pillars'=> ['slides_pillars', 'slides_pillars_phone'],
         ] as $label => [$wide, $narrow]): ?>
           <div class="row two">
             <label class="field"><span><?= e($label) ?> <small>desktop</small></span>
@@ -172,8 +174,14 @@ require __DIR__ . '/../partials/app_header.php';
               <input name="<?= e($narrow) ?>" value="<?= e(Settings::get($narrow)) ?>" placeholder="1x2"></label>
           </div>
         <?php endforeach; ?>
-        <label class="field"><span>Products on the home page <small>the marketplace strip pages through them</small></span>
-          <input name="home_products" type="number" min="1" max="48" value="<?= e(Settings::get('home_products')) ?>"></label>
+        <div class="row two">
+          <label class="field"><span>Products on the home page <small>the strip pages through them</small></span>
+            <input name="home_products" type="number" min="1" max="48" value="<?= e(Settings::get('home_products')) ?>"></label>
+          <label class="field"><span>Advance every <small>seconds — 0 to leave the sliders still</small></span>
+            <input name="slides_autoplay" type="number" min="0" max="60" value="<?= e(Settings::get('slides_autoplay')) ?>"></label>
+        </div>
+        <p class="hint">A moving slider stops for good as soon as a visitor touches it, and never
+          moves at all for someone who has asked their device to reduce motion.</p>
       </div>
 
       <?php foreach (HEADING_FIELDS as $sec => $fields): ?>
