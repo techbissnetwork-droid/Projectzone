@@ -6,6 +6,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/style.css">
+<script src="assets/js/data.js"></script>
 
 <a class="skip-link" href="#main">Skip to content</a>
 
@@ -81,7 +82,7 @@
   <div class="container">
     <p class="eyebrow">Client Portal</p>
     <h1>Sign in to your project.</h1>
-    <p class="lead">This is a preview of the client portal sign-in. Enter any email and password to see what the experience will look like.</p>
+    <p class="lead">No password to remember &mdash; enter your email and we&rsquo;ll send a one-time sign-in code.</p>
   </div>
 </section>
 
@@ -89,26 +90,48 @@
   <div class="container-narrow">
     <div class="auth-wrap">
       <div class="hero-panel auth-card raised reveal">
-        <form id="client-login-form" data-validate data-success-target="client-login-success" novalidate>
+        <form id="client-otp-request-form" novalidate>
           <div class="field">
             <label for="client-email">Email <span class="req">*</span></label>
             <input type="email" id="client-email" name="email" required autocomplete="email">
             <span class="field-error" role="alert">Please enter a valid email address.</span>
           </div>
-          <div class="field">
-            <label for="client-password">Password <span class="req">*</span></label>
-            <input type="password" id="client-password" name="password" required autocomplete="current-password">
-            <span class="field-error" role="alert">Please enter your password.</span>
-          </div>
-          <a class="auth-forgot" href="#">Forgot password?</a>
-          <button class="btn btn-primary btn-block" type="submit">Sign In</button>
+          <button class="btn btn-primary btn-block" type="submit">Send Sign-in Code</button>
         </form>
-        <div class="success-panel raised" id="client-login-success">
+
+        <div id="client-otp-panel" hidden>
+          <div class="auth-switch-row">
+            <p>Signing in as <strong id="client-otp-email">&mdash;</strong></p>
+            <button type="button" class="btn-ghost" id="client-otp-change" style="padding:2px 0;">Use a different email</button>
+          </div>
+
+          <div class="otp-demo-box groove" role="status">
+            <p class="otp-demo-label">Your demo sign-in code</p>
+            <p class="otp-demo-code" id="client-otp-code">000000</p>
+            <p class="otp-demo-fine">In a real deployment this code would be emailed to you &mdash; it only appears here because this is a local, no-backend demo.</p>
+          </div>
+
+          <form id="client-otp-verify-form" novalidate>
+            <div class="field">
+              <label for="client-otp-input">6-digit code <span class="req">*</span></label>
+              <input type="text" id="client-otp-input" name="otp" required inputmode="numeric" pattern="[0-9]*" maxlength="6" data-pattern="^\d{6}$" autocomplete="one-time-code">
+              <span class="field-error" role="alert">Enter the 6-digit code shown above.</span>
+            </div>
+            <button class="btn btn-primary btn-block" type="submit">Sign In</button>
+          </form>
+
+          <button type="button" class="btn btn-secondary btn-block" id="client-magic-link" style="margin-top:14px;">Use my magic link instead (demo)</button>
+          <button type="button" class="btn-ghost" id="client-otp-resend" style="display:block;margin:16px auto 0;">Request a new code</button>
+        </div>
+
+        <div class="success-panel raised" id="client-login-success" tabindex="-1">
           <div class="success-dot raised"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="5 13 9 17 19 7"/></svg></div>
           <h3>You&rsquo;re signed in.</h3>
-          <p>This is a preview &mdash; your project dashboard is being finalized. Full client portal access is rolling out soon.</p>
+          <p>Taking you to your project dashboard&hellip;</p>
         </div>
+
         <p class="auth-note">Don&rsquo;t have portal access yet? <a href="contact.html">Contact your project lead.</a></p>
+        <p class="admin-preview-note">This is a local demo: no real email is sent and no real authentication takes place. Your sign-in code and session live only in this browser and are cleared when the tab closes.</p>
       </div>
     </div>
   </div>
@@ -185,3 +208,105 @@
 </footer>
 
 <script src="assets/js/main.js"></script>
+<script>
+(function () {
+  "use strict";
+  if (!window.TechbissDemo) return;
+  var Demo = window.TechbissDemo;
+  var emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  var requestForm = document.getElementById("client-otp-request-form");
+  var emailInput = document.getElementById("client-email");
+  var otpPanel = document.getElementById("client-otp-panel");
+  var otpEmailLabel = document.getElementById("client-otp-email");
+  var otpCodeDisplay = document.getElementById("client-otp-code");
+  var verifyForm = document.getElementById("client-otp-verify-form");
+  var otpInput = document.getElementById("client-otp-input");
+  var magicBtn = document.getElementById("client-magic-link");
+  var resendBtn = document.getElementById("client-otp-resend");
+  var changeBtn = document.getElementById("client-otp-change");
+  var successPanel = document.getElementById("client-login-success");
+
+  var currentEmail = "";
+
+  function setFieldError(input, message) {
+    var field = input.closest(".field");
+    if (!field) return;
+    field.classList.add("has-error");
+    var err = field.querySelector(".field-error");
+    if (err && message) err.textContent = message;
+    input.setAttribute("aria-invalid", "true");
+  }
+
+  function clearFieldError(input) {
+    var field = input.closest(".field");
+    if (!field) return;
+    field.classList.remove("has-error");
+    input.removeAttribute("aria-invalid");
+  }
+
+  function sendCode(email) {
+    currentEmail = email;
+    var code = Demo.requestOtp(email);
+    otpEmailLabel.textContent = email;
+    otpCodeDisplay.textContent = code;
+    otpPanel.hidden = false;
+    requestForm.hidden = true;
+    otpInput.value = "";
+    clearFieldError(otpInput);
+    otpInput.focus();
+  }
+
+  requestForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var value = emailInput.value.trim();
+    if (!value || !emailRe.test(value)) {
+      setFieldError(emailInput, "Enter a valid email address.");
+      emailInput.focus();
+      return;
+    }
+    clearFieldError(emailInput);
+    sendCode(value);
+  });
+
+  function completeSignIn() {
+    Demo.startClientSession(currentEmail);
+    otpPanel.hidden = true;
+    successPanel.classList.add("is-visible");
+    successPanel.focus();
+    window.setTimeout(function () {
+      window.location.href = "client-dashboard.html";
+    }, 500);
+  }
+
+  verifyForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var code = otpInput.value.trim();
+    if (!/^\d{6}$/.test(code)) {
+      setFieldError(otpInput, "Enter the 6-digit code shown above.");
+      return;
+    }
+    if (!Demo.verifyOtp(currentEmail, code)) {
+      setFieldError(otpInput, "That code is incorrect or has expired — request a new one below.");
+      return;
+    }
+    clearFieldError(otpInput);
+    completeSignIn();
+  });
+
+  magicBtn.addEventListener("click", function () {
+    if (!currentEmail) return;
+    completeSignIn();
+  });
+
+  resendBtn.addEventListener("click", function () {
+    if (currentEmail) sendCode(currentEmail);
+  });
+
+  changeBtn.addEventListener("click", function () {
+    otpPanel.hidden = true;
+    requestForm.hidden = false;
+    emailInput.focus();
+  });
+})();
+</script>

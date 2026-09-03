@@ -1,0 +1,166 @@
+<title>Client Dashboard | TECHBISS</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="A local demo of the TECHBISS client project dashboard. No real account or data is involved.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+<script src="assets/js/data.js"></script>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<main id="main" class="admin-shell">
+
+<section class="section-sm" style="padding-bottom:0;">
+  <div class="container">
+    <div class="admin-topbar raised reveal">
+      <div class="admin-topbar-title">
+        <span class="admin-dot" aria-hidden="true"></span>
+        Client Portal <span class="admin-topbar-sep">&middot;</span> <span id="client-dashboard-who">&mdash;</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;">
+        <button type="button" class="admin-back" id="client-sign-out">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Sign Out
+        </button>
+        <a class="admin-back" href="index.html">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+          Back to site
+        </a>
+      </div>
+    </div>
+    <p class="admin-preview-note">This is a local demo: your sign-in session and the project data shown here live only in this browser (sessionStorage / localStorage). Nothing is sent to a server, no data is shared across devices, and this is not a secure login.</p>
+  </div>
+</section>
+
+<section class="section-sm">
+  <div class="container" id="client-dashboard-container">
+    <!-- Populated by script below: either one or more .project-panel blocks, or an empty state. -->
+  </div>
+</section>
+
+</main>
+
+<script src="assets/js/main.js"></script>
+<script>
+(function () {
+  "use strict";
+  if (!window.TechbissDemo) return;
+  var Demo = window.TechbissDemo;
+
+  var email = Demo.getClientSession();
+  if (!email) {
+    window.location.href = "client-login.html";
+    return;
+  }
+
+  Demo.seedIfEmpty();
+
+  var whoEl = document.getElementById("client-dashboard-who");
+  if (whoEl) whoEl.textContent = email;
+
+  document.getElementById("client-sign-out").addEventListener("click", function () {
+    Demo.endClientSession();
+    window.location.href = "index.html";
+  });
+
+  function escapeHtml(str) {
+    return String(str === null || str === undefined ? "" : str).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  var STATUS_CLASS = {
+    "Not Started": "status-pending",
+    "In Progress": "status-on-track",
+    "Completed": "status-complete",
+    "On Hold": "status-attention"
+  };
+
+  function formatDate(value) {
+    if (!value) return "Not set";
+    var d = new Date(value + "T00:00:00");
+    if (isNaN(d.getTime())) return escapeHtml(value);
+    return d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+  }
+
+  function detailItem(label, value) {
+    return (
+      '<div class="project-detail-item"><h4>' + escapeHtml(label) + "</h4><p>" + (value || '<span style="color:var(--ink-faint);font-weight:600;">Not set</span>') + "</p></div>"
+    );
+  }
+
+  function renderProjectPanel(p) {
+    var statusClass = STATUS_CLASS[p.status] || "status-pending";
+    var progress = Math.max(0, Math.min(100, Number(p.progress) || 0));
+    var gaugeId = "gauge-" + p.id;
+
+    var panel = document.createElement("div");
+    panel.className = "project-panel raised reveal";
+    panel.innerHTML =
+      '<div class="project-panel-head">' +
+      "<div>" +
+      "<h3>" + escapeHtml(p.name || "Untitled Project") + "</h3>" +
+      "<span>" + escapeHtml(p.clientBusiness || "") + "</span>" +
+      "</div>" +
+      '<span class="status-badge raised-sm ' + statusClass + '">' + escapeHtml(p.status || "Not Started") + "</span>" +
+      "</div>" +
+      '<div class="project-panel-body">' +
+      '<div class="gauge">' +
+      '<div class="gauge-outer raised">' +
+      '<div class="gauge-ring" id="' + gaugeId + '" data-target="' + progress + '">' +
+      '<div class="gauge-cap raised">' +
+      '<span class="gauge-value"><span class="gauge-num">0</span><sup>%</sup></span>' +
+      "</div>" +
+      "</div>" +
+      "</div>" +
+      '<span class="gauge-label">Progress</span>' +
+      "</div>" +
+      '<div class="project-detail-grid">' +
+      detailItem("Start Date", formatDate(p.startDate)) +
+      detailItem("Target Date", formatDate(p.targetDate)) +
+      detailItem("Domain", p.domain ? escapeHtml(p.domain) : "") +
+      detailItem("Project Owner", p.ownerStaffName ? escapeHtml(p.ownerStaffName) : "") +
+      detailItem("Hosting Provider", p.hostingProvider ? escapeHtml(p.hostingProvider) : "") +
+      detailItem("Hosting Renews", formatDate(p.hostingExpiry)) +
+      detailItem("SSL Provider", p.sslProvider ? escapeHtml(p.sslProvider) : "") +
+      detailItem("SSL Renews", formatDate(p.sslExpiry)) +
+      "</div>" +
+      "</div>" +
+      (p.summary || p.resultMetric
+        ? '<div class="project-summary"><h4>Project Summary</h4><p>' +
+          escapeHtml(p.summary || "") +
+          (p.resultMetric ? ' <strong style="color:var(--accent-text);">' + escapeHtml(p.resultMetric) + "</strong>" : "") +
+          "</p></div>"
+        : "");
+
+    return panel;
+  }
+
+  var container = document.getElementById("client-dashboard-container");
+  var projects = Demo.findProjectsByEmail(email);
+
+  if (!projects.length) {
+    container.innerHTML =
+      '<div class="raised reveal" style="max-width:560px;margin:0 auto;text-align:center;padding:44px 32px;border-radius:var(--radius-lg);">' +
+      "<h2>No projects found for this email yet.</h2>" +
+      '<p>We couldn&rsquo;t find a project on file for <strong>' + escapeHtml(email) + '</strong> in this demo. If you believe this is a mistake, reach out and we&rsquo;ll get your portal access sorted.</p>' +
+      '<a class="btn btn-primary" href="contact.html">Contact Us &rarr;</a>' +
+      "</div>";
+    if (window.TechbissUI) {
+      window.TechbissUI.observeReveal(container.firstElementChild);
+    }
+    return;
+  }
+
+  projects.forEach(function (p) {
+    var panel = renderProjectPanel(p);
+    container.appendChild(panel);
+    if (window.TechbissUI) {
+      window.TechbissUI.observeReveal(panel);
+      window.TechbissUI.observeGauge(panel.querySelector(".gauge-ring"));
+    }
+  });
+})();
+</script>

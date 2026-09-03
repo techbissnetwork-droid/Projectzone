@@ -198,15 +198,19 @@
   });
 
   /* ---------------------------------------------------------------------
-     Case study cards (portfolio) — same expand pattern, plus filter tabs
+     Case study cards (portfolio) — same expand pattern, plus filter tabs.
+     Delegated on document so cards added after page load (e.g. portfolio
+     entries generated from saved demo projects) work with zero extra
+     wiring.
      --------------------------------------------------------------------- */
-  document.querySelectorAll(".case-head").forEach(function (trigger) {
-    trigger.addEventListener("click", function () {
-      var card = trigger.closest(".case-card");
-      var wasOpen = card.getAttribute("data-open") === "true";
-      card.setAttribute("data-open", wasOpen ? "false" : "true");
-      trigger.setAttribute("aria-expanded", wasOpen ? "false" : "true");
-    });
+  document.addEventListener("click", function (e) {
+    var trigger = e.target.closest ? e.target.closest(".case-head") : null;
+    if (!trigger) return;
+    var card = trigger.closest(".case-card");
+    if (!card) return;
+    var wasOpen = card.getAttribute("data-open") === "true";
+    card.setAttribute("data-open", wasOpen ? "false" : "true");
+    trigger.setAttribute("aria-expanded", wasOpen ? "false" : "true");
   });
 
   /* data-filter-group works on any tab set: give it a value that is a CSS
@@ -214,23 +218,24 @@
      for backward compatibility with the original portfolio markup). Each
      matching card carries the same attribute the selector targets, holding
      its category value (e.g. data-industry="retail" or
-     data-category="mobile"). */
+     data-category="mobile"). Buttons and cards are re-queried on every
+     click (rather than cached at load) so chips or cards added later —
+     including a brand-new filter chip for an industry that didn't exist
+     yet — are picked up automatically. */
   document.querySelectorAll("[data-filter-group]").forEach(function (filterTabs) {
-    var buttons = filterTabs.querySelectorAll("button");
     var cardSelector = filterTabs.getAttribute("data-filter-group") || "[data-industry]";
     var cardAttr = cardSelector.replace(/^\[|\]$/g, "");
-    var cards = document.querySelectorAll(cardSelector);
-    buttons.forEach(function (btn) {
-      btn.addEventListener("click", function () {
-        buttons.forEach(function (b) {
-          b.setAttribute("aria-selected", "false");
-        });
-        btn.setAttribute("aria-selected", "true");
-        var filter = btn.getAttribute("data-filter");
-        cards.forEach(function (card) {
-          var match = filter === "all" || card.getAttribute(cardAttr) === filter;
-          card.hidden = !match;
-        });
+    filterTabs.addEventListener("click", function (e) {
+      var btn = e.target.closest ? e.target.closest("button") : null;
+      if (!btn || !filterTabs.contains(btn)) return;
+      filterTabs.querySelectorAll("button").forEach(function (b) {
+        b.setAttribute("aria-selected", "false");
+      });
+      btn.setAttribute("aria-selected", "true");
+      var filter = btn.getAttribute("data-filter");
+      document.querySelectorAll(cardSelector).forEach(function (card) {
+        var match = filter === "all" || card.getAttribute(cardAttr) === filter;
+        card.hidden = !match;
       });
     });
   });
@@ -427,4 +432,53 @@
       }
     });
   });
+
+  /* ---------------------------------------------------------------------
+     Reusable hooks for content inserted after this script has already run
+     (e.g. project gauges on client-dashboard.html, portfolio case-cards
+     built from saved demo projects). Wraps the same animateGauge function
+     and the same reveal/observer behaviour used above, so pages adding
+     markup dynamically don't need to reimplement either.
+     --------------------------------------------------------------------- */
+  window.TechbissUI = {
+    animateGauge: animateGauge,
+    observeGauge: function (el) {
+      if (!el) return;
+      if ("IntersectionObserver" in window) {
+        var io = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                animateGauge(entry.target);
+                io.unobserve(entry.target);
+              }
+            });
+          },
+          { threshold: 0.4 }
+        );
+        io.observe(el);
+      } else {
+        animateGauge(el);
+      }
+    },
+    observeReveal: function (el) {
+      if (!el) return;
+      if ("IntersectionObserver" in window && !reduceMotion) {
+        var io = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                entry.target.classList.add("is-visible");
+                io.unobserve(entry.target);
+              }
+            });
+          },
+          { threshold: 0.15 }
+        );
+        io.observe(el);
+      } else {
+        el.classList.add("is-visible");
+      }
+    }
+  };
 })();

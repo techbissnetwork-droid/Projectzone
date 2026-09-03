@@ -6,6 +6,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/style.css">
+<script src="assets/js/data.js"></script>
 
 <a class="skip-link" href="#main">Skip to content</a>
 
@@ -82,12 +83,13 @@
     <p class="eyebrow">Work</p>
     <h1>Work that shows the system in motion.</h1>
     <p class="lead">A sample of projects across industries &mdash; illustrative case studies showing how TECHBISS scopes, builds, and measures results.</p>
+    <p class="admin-preview-note">Case studies added through the admin demo panel are stored only in this browser (localStorage) and shown here alongside the illustrative examples below.</p>
   </div>
 </section>
 
 <section class="section-sm">
   <div class="container">
-    <div class="segmented raised reveal" role="tablist" aria-label="Filter case studies by industry" data-filter-group>
+    <div class="segmented raised reveal" role="tablist" aria-label="Filter case studies by industry" data-filter-group id="portfolio-filter-tabs">
       <button type="button" role="tab" aria-selected="true" data-filter="all">All</button>
 <button type="button" role="tab" aria-selected="false" data-filter="retail">Retail</button>
 <button type="button" role="tab" aria-selected="false" data-filter="healthcare">Healthcare</button>
@@ -101,7 +103,7 @@
 
 <section class="section-sm">
   <div class="container">
-    <div class="case-grid">
+    <div class="case-grid" id="portfolio-case-grid">
       <div class="case-card raised reveal" data-industry="retail">
   <button class="case-head" type="button" aria-expanded="false" aria-controls="case-aurora-retail-platform">
     <span class="case-tag raised-sm">Retail</span>
@@ -367,3 +369,84 @@
 </footer>
 
 <script src="assets/js/main.js"></script>
+<script>
+(function () {
+  "use strict";
+  if (!window.TechbissDemo) return;
+  var Demo = window.TechbissDemo;
+  Demo.seedIfEmpty();
+
+  var projects = Demo.getProjects().filter(function (p) {
+    return !!p.showOnPortfolio;
+  });
+  if (!projects.length) return;
+
+  var grid = document.getElementById("portfolio-case-grid");
+  var filterTabs = document.getElementById("portfolio-filter-tabs");
+  if (!grid || !filterTabs) return;
+
+  function escapeHtml(str) {
+    return String(str === null || str === undefined ? "" : str).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  function slugify(text) {
+    return String(text || "")
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "") || "general";
+  }
+
+  var chevronSvg =
+    '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
+
+  var existingFilters = {};
+  filterTabs.querySelectorAll("button[data-filter]").forEach(function (btn) {
+    existingFilters[btn.getAttribute("data-filter")] = true;
+  });
+
+  projects.forEach(function (p) {
+    var industryLabel = p.industry || "General";
+    var industrySlug = slugify(industryLabel);
+    var nameSlug = slugify(p.name || p.id);
+    var panelId = "case-demo-" + nameSlug;
+
+    if (!existingFilters[industrySlug]) {
+      var chip = document.createElement("button");
+      chip.type = "button";
+      chip.setAttribute("role", "tab");
+      chip.setAttribute("aria-selected", "false");
+      chip.setAttribute("data-filter", industrySlug);
+      chip.textContent = industryLabel;
+      filterTabs.appendChild(chip);
+      existingFilters[industrySlug] = true;
+    }
+
+    var card = document.createElement("div");
+    card.className = "case-card raised reveal";
+    card.setAttribute("data-industry", industrySlug);
+
+    var resultText = p.resultMetric ? escapeHtml(p.resultMetric) : "";
+    var summaryText = p.summary ? escapeHtml(p.summary) : "Details for this project are being finalized.";
+
+    card.innerHTML =
+      '<button class="case-head" type="button" aria-expanded="false" aria-controls="' + panelId + '">' +
+      '<span class="case-tag raised-sm">' + escapeHtml(industryLabel) + "</span>" +
+      '<span class="case-title"><h3>' + escapeHtml(p.name || "Untitled Project") + "</h3><span>" + escapeHtml(p.clientBusiness || "") + "</span></span>" +
+      (resultText ? '<span class="case-metric">' + resultText + "</span>" : "") +
+      '<span class="case-chevron raised-sm" aria-hidden="true">' + chevronSvg + "</span>" +
+      "</button>" +
+      '<div class="case-collapse" id="' + panelId + '">' +
+      '<div class="case-body"><div class="case-body-inner">' +
+      '<div class="case-block"><h4>Overview</h4><p>' + summaryText + "</p></div>" +
+      '<div class="case-block"><h4>Client</h4><p>' + escapeHtml(p.clientBusiness || "—") + " &mdash; " + escapeHtml(industryLabel) + "</p></div>" +
+      '<div class="case-block"><h4>Result</h4><p>' + (resultText || "This project is still in progress.") + '</p><a class="btn-ghost case-cta" href="contact.html">Discuss a Similar Project &rarr;</a></div>' +
+      "</div></div></div>";
+
+    grid.appendChild(card);
+    if (window.TechbissUI) window.TechbissUI.observeReveal(card);
+  });
+})();
+</script>

@@ -6,6 +6,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/style.css">
+<script src="assets/js/data.js"></script>
 
 <a class="skip-link" href="#main">Skip to content</a>
 
@@ -21,8 +22,21 @@
       <a class="admin-back" href="index.html"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>Back to site</a>
     </div>
     <p class="admin-preview-note">Sample data shown for preview purposes &mdash; nothing here reflects real clients, tickets, or activity.</p>
+    <p class="admin-preview-note">This is a local demo: anything you create in the Projects tab is stored only in this browser&rsquo;s localStorage. It is not sent to a server, isn&rsquo;t secure, and won&rsquo;t appear on another device or browser.</p>
   </div>
 </section>
+
+<section class="section-sm" style="padding-bottom:0;">
+  <div class="container">
+    <div class="segmented raised reveal" role="tablist" aria-label="Admin panel sections" data-tabs="#admin-tab-panels">
+      <button type="button" role="tab" aria-selected="true" data-tab-target="overview">Overview</button>
+      <button type="button" role="tab" aria-selected="false" data-tab-target="projects">Projects</button>
+    </div>
+  </div>
+</section>
+
+<div id="admin-tab-panels">
+<div data-tab-panel="overview">
 
 <section class="section-sm">
   <div class="container">
@@ -75,33 +89,6 @@
   </div>
 </section>
 
-<section class="section-sm band-alt">
-  <div class="container">
-    <div class="section-head reveal" style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:28px;">
-      <div>
-        <h2 style="margin-bottom:6px;">Recent Projects</h2>
-        <p class="section-sub" style="margin:0;">The latest activity across active engagements.</p>
-      </div>
-      <button class="btn btn-secondary btn-sm" type="button" aria-disabled="true">Export</button>
-    </div>
-    <div class="compare-wrap raised reveal">
-      <table class="compare">
-        <thead>
-          <tr><th>Project</th><th>Status</th><th>Last Updated</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>Cascade Outfitters &mdash; Website Redesign</td><td><span class="status-badge raised-sm status-on-track">In Progress</span></td><td>2 hours ago</td></tr>
-          <tr><td>Harborline Legal Partners &mdash; Web Application</td><td><span class="status-badge raised-sm status-on-track">In Progress</span></td><td>3 hours ago</td></tr>
-          <tr><td>Summit Peak Outdoors &mdash; SSL &amp; Security Hardening</td><td><span class="status-badge raised-sm status-on-track">In Progress</span></td><td>6 hours ago</td></tr>
-          <tr><td>Ferro &amp; Vine Bistro Group &mdash; Business Digitization</td><td><span class="status-badge raised-sm status-review">In Review</span></td><td>Yesterday</td></tr>
-          <tr><td>Bright Path Tutoring &mdash; Mobile Application</td><td><span class="status-badge raised-sm status-attention">On Hold</span></td><td>4 days ago</td></tr>
-          <tr><td>Meadowcrest Dental Group &mdash; Domain &amp; Hosting Migration</td><td><span class="status-badge raised-sm status-complete">Complete</span></td><td>1 week ago</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</section>
-
 <section class="section-sm">
   <div class="container">
     <div class="section-head reveal">
@@ -137,6 +124,392 @@
   </div>
 </section>
 
+</div>
+<div data-tab-panel="projects" hidden>
+
+<section class="section-sm">
+  <div class="container">
+    <div class="section-head reveal">
+      <h2 id="project-form-heading">Create Project</h2>
+      <p class="section-sub">Every field feeds the client dashboard and, when &ldquo;Show on Portfolio&rdquo; is on, the public Work page.</p>
+    </div>
+    <form id="project-form" class="raised reveal" style="padding:30px 28px;border-radius:var(--radius-lg);" novalidate>
+      <input type="hidden" id="project-edit-id" value="">
+      <div class="form-grid">
+        <div class="field">
+          <label for="project-name">Project Name <span class="req">*</span></label>
+          <input type="text" id="project-name" required>
+          <span class="field-error" role="alert">This field is required.</span>
+        </div>
+        <div class="field">
+          <label for="project-client-name">Client Contact Name <span class="req">*</span></label>
+          <input type="text" id="project-client-name" required>
+          <span class="field-error" role="alert">This field is required.</span>
+        </div>
+        <div class="field">
+          <label for="project-client-business">Client Business <span class="req">*</span></label>
+          <input type="text" id="project-client-business" required>
+          <span class="field-error" role="alert">This field is required.</span>
+        </div>
+        <div class="field">
+          <label for="project-client-email">Client Email <span class="req">*</span></label>
+          <input type="email" id="project-client-email" required autocomplete="off">
+          <span class="field-error" role="alert">Enter a valid email address.</span>
+          <span class="field-hint">Matched against the email a client signs in with on Client Login.</span>
+        </div>
+        <div class="field">
+          <label for="project-industry">Industry <span class="req">*</span></label>
+          <input type="text" id="project-industry" list="project-industry-options" required>
+          <datalist id="project-industry-options">
+            <option value="Retail"></option>
+            <option value="Healthcare"></option>
+            <option value="Logistics"></option>
+            <option value="Hospitality"></option>
+            <option value="Finance"></option>
+            <option value="Education"></option>
+          </datalist>
+          <span class="field-error" role="alert">This field is required.</span>
+          <span class="field-hint">Pick an existing category, or type a new one &mdash; it becomes its own filter on the Work page.</span>
+        </div>
+        <div class="field">
+          <label for="project-status">Status <span class="req">*</span></label>
+          <select id="project-status" required>
+            <option value="Not Started">Not Started</option>
+            <option value="In Progress" selected>In Progress</option>
+            <option value="Completed">Completed</option>
+            <option value="On Hold">On Hold</option>
+          </select>
+          <span class="field-error" role="alert">Please make a selection.</span>
+        </div>
+        <div class="field">
+          <label for="project-progress">Progress (%)</label>
+          <input type="number" id="project-progress" min="0" max="100" step="1" value="0">
+        </div>
+        <div class="field">
+          <label for="project-start-date">Start Date</label>
+          <input type="date" id="project-start-date">
+        </div>
+        <div class="field">
+          <label for="project-target-date">Target Date</label>
+          <input type="date" id="project-target-date">
+        </div>
+        <div class="field">
+          <label for="project-domain">Domain</label>
+          <input type="text" id="project-domain" placeholder="example.com">
+        </div>
+        <div class="field">
+          <label for="project-hosting-provider">Hosting Provider</label>
+          <input type="text" id="project-hosting-provider">
+        </div>
+        <div class="field">
+          <label for="project-hosting-expiry">Hosting Renewal Date</label>
+          <input type="date" id="project-hosting-expiry">
+        </div>
+        <div class="field">
+          <label for="project-ssl-provider">SSL Provider</label>
+          <input type="text" id="project-ssl-provider">
+        </div>
+        <div class="field">
+          <label for="project-ssl-expiry">SSL Renewal Date</label>
+          <input type="date" id="project-ssl-expiry">
+        </div>
+        <div class="field">
+          <label for="project-owner">Assigned Owner</label>
+          <input type="text" id="project-owner" placeholder="Staff name">
+        </div>
+        <div class="field full">
+          <label for="project-result-metric">Result Metric</label>
+          <input type="text" id="project-result-metric" placeholder="e.g. +38% online revenue">
+        </div>
+        <div class="field full">
+          <label for="project-summary">Project Summary</label>
+          <textarea id="project-summary" rows="3" placeholder="A short, plain-language summary of the project for the client dashboard and portfolio."></textarea>
+        </div>
+        <div class="field full field-toggle-row raised-sm" style="padding:16px 18px;border-radius:var(--radius-sm);">
+          <div class="field-toggle-copy">
+            <label id="project-portfolio-label" for="project-portfolio-toggle">Show on Portfolio</label>
+            <p class="field-hint">When on, this project appears as a public case study on the Work page.</p>
+          </div>
+          <button type="button" class="toggle groove" id="project-portfolio-toggle" aria-pressed="false" aria-labelledby="project-portfolio-label"><div class="toggle-thumb"></div></button>
+        </div>
+      </div>
+      <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:22px;">
+        <button class="btn btn-primary" type="submit" id="project-form-submit">Create Project</button>
+        <button class="btn btn-secondary" type="button" id="project-form-cancel" hidden>Cancel Edit</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<section class="section-sm band-alt">
+  <div class="container">
+    <div class="section-head reveal" style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:28px;">
+      <div>
+        <h2 style="margin-bottom:6px;">All Projects</h2>
+        <p class="section-sub" style="margin:0;">Every project saved in this browser &mdash; edit or remove any of them below.</p>
+      </div>
+      <button class="btn btn-secondary btn-sm" type="button" aria-disabled="true">Export</button>
+    </div>
+    <div class="compare-wrap raised reveal">
+      <table class="compare">
+        <thead>
+          <tr><th>Project</th><th>Client Email</th><th>Status</th><th>Visibility</th><th>Progress</th><th>Actions</th></tr>
+        </thead>
+        <tbody id="project-table-body">
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+</div>
+</div>
+
 </main>
 
 <script src="assets/js/main.js"></script>
+<script>
+(function () {
+  "use strict";
+  if (!window.TechbissDemo) return;
+  var Demo = window.TechbissDemo;
+  Demo.seedIfEmpty();
+
+  var emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  var STATUS_CLASS = {
+    "Not Started": "status-pending",
+    "In Progress": "status-on-track",
+    "Completed": "status-complete",
+    "On Hold": "status-attention"
+  };
+
+  var form = document.getElementById("project-form");
+  var tableBody = document.getElementById("project-table-body");
+  var formHeading = document.getElementById("project-form-heading");
+  var submitBtn = document.getElementById("project-form-submit");
+  var cancelBtn = document.getElementById("project-form-cancel");
+  var editIdInput = document.getElementById("project-edit-id");
+  var portfolioToggle = document.getElementById("project-portfolio-toggle");
+
+  var fields = {
+    name: document.getElementById("project-name"),
+    clientName: document.getElementById("project-client-name"),
+    clientBusiness: document.getElementById("project-client-business"),
+    clientEmail: document.getElementById("project-client-email"),
+    industry: document.getElementById("project-industry"),
+    status: document.getElementById("project-status"),
+    progress: document.getElementById("project-progress"),
+    startDate: document.getElementById("project-start-date"),
+    targetDate: document.getElementById("project-target-date"),
+    domain: document.getElementById("project-domain"),
+    hostingProvider: document.getElementById("project-hosting-provider"),
+    hostingExpiry: document.getElementById("project-hosting-expiry"),
+    sslProvider: document.getElementById("project-ssl-provider"),
+    sslExpiry: document.getElementById("project-ssl-expiry"),
+    ownerStaffName: document.getElementById("project-owner"),
+    resultMetric: document.getElementById("project-result-metric"),
+    summary: document.getElementById("project-summary")
+  };
+
+  var REQUIRED = ["name", "clientName", "clientBusiness", "clientEmail", "industry", "status"];
+
+  function escapeHtml(str) {
+    return String(str === null || str === undefined ? "" : str).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  function setFieldError(input, message) {
+    var field = input.closest(".field");
+    if (!field) return;
+    field.classList.add("has-error");
+    var err = field.querySelector(".field-error");
+    if (err && message) err.textContent = message;
+    input.setAttribute("aria-invalid", "true");
+  }
+
+  function clearFieldError(input) {
+    var field = input.closest(".field");
+    if (!field) return;
+    field.classList.remove("has-error");
+    input.removeAttribute("aria-invalid");
+  }
+
+  function clearAllErrors() {
+    Object.keys(fields).forEach(function (key) {
+      clearFieldError(fields[key]);
+    });
+  }
+
+  function togglePressed(el) {
+    return el.getAttribute("aria-pressed") === "true";
+  }
+
+  portfolioToggle.addEventListener("click", function () {
+    portfolioToggle.setAttribute("aria-pressed", togglePressed(portfolioToggle) ? "false" : "true");
+  });
+
+  function resetForm() {
+    form.reset();
+    editIdInput.value = "";
+    portfolioToggle.setAttribute("aria-pressed", "false");
+    fields.status.value = "In Progress";
+    fields.progress.value = "0";
+    submitBtn.textContent = "Create Project";
+    formHeading.textContent = "Create Project";
+    cancelBtn.hidden = true;
+    clearAllErrors();
+  }
+
+  function validateForm() {
+    var valid = true;
+    REQUIRED.forEach(function (key) {
+      var input = fields[key];
+      var value = input.value.trim();
+      if (!value) {
+        setFieldError(input, input.tagName === "SELECT" ? "Please make a selection." : "This field is required.");
+        valid = false;
+        return;
+      }
+      if (key === "clientEmail" && !emailRe.test(value)) {
+        setFieldError(input, "Enter a valid email address.");
+        valid = false;
+        return;
+      }
+      clearFieldError(input);
+    });
+    return valid;
+  }
+
+  function renderTable() {
+    var projects = Demo.getProjects().slice().sort(function (a, b) {
+      return String(b.startDate || "").localeCompare(String(a.startDate || ""));
+    });
+    tableBody.innerHTML = "";
+
+    if (!projects.length) {
+      var emptyRow = document.createElement("tr");
+      emptyRow.innerHTML = '<td colspan="6" style="text-align:center;color:var(--ink-faint);">No projects yet — create one above.</td>';
+      tableBody.appendChild(emptyRow);
+      return;
+    }
+
+    projects.forEach(function (p) {
+      var statusClass = STATUS_CLASS[p.status] || "status-pending";
+      var visClass = p.showOnPortfolio ? "visibility-public" : "visibility-private";
+      var visLabel = p.showOnPortfolio ? "Public" : "Private";
+      var progress = Math.max(0, Math.min(100, Number(p.progress) || 0));
+      var row = document.createElement("tr");
+      row.innerHTML =
+        "<td>" + escapeHtml(p.name) + '<br><span style="font-size:.78rem;color:var(--ink-faint);">' + escapeHtml(p.clientBusiness || "") + "</span></td>" +
+        "<td>" + escapeHtml(p.clientEmail) + "</td>" +
+        '<td><span class="status-badge raised-sm ' + statusClass + '">' + escapeHtml(p.status || "Not Started") + "</span></td>" +
+        '<td><span class="status-badge raised-sm ' + visClass + '">' + visLabel + "</span></td>" +
+        "<td>" + progress + "%</td>" +
+        '<td><div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;"><button type="button" class="btn btn-secondary btn-sm" data-edit="' +
+        escapeHtml(p.id) +
+        '">Edit</button><button type="button" class="btn btn-secondary btn-sm" style="color:var(--danger);" data-delete="' +
+        escapeHtml(p.id) +
+        '">Delete</button></div></td>';
+      tableBody.appendChild(row);
+    });
+
+    tableBody.querySelectorAll("[data-edit]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        startEdit(btn.getAttribute("data-edit"));
+      });
+    });
+    tableBody.querySelectorAll("[data-delete]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        handleDelete(btn.getAttribute("data-delete"));
+      });
+    });
+  }
+
+  function startEdit(id) {
+    var projects = Demo.getProjects();
+    var project = null;
+    for (var i = 0; i < projects.length; i++) {
+      if (projects[i].id === id) {
+        project = projects[i];
+        break;
+      }
+    }
+    if (!project) return;
+
+    clearAllErrors();
+    editIdInput.value = project.id;
+    fields.name.value = project.name || "";
+    fields.clientName.value = project.clientName || "";
+    fields.clientBusiness.value = project.clientBusiness || "";
+    fields.clientEmail.value = project.clientEmail || "";
+    fields.industry.value = project.industry || "";
+    fields.status.value = project.status || "Not Started";
+    fields.progress.value = project.progress || 0;
+    fields.startDate.value = project.startDate || "";
+    fields.targetDate.value = project.targetDate || "";
+    fields.domain.value = project.domain || "";
+    fields.hostingProvider.value = project.hostingProvider || "";
+    fields.hostingExpiry.value = project.hostingExpiry || "";
+    fields.sslProvider.value = project.sslProvider || "";
+    fields.sslExpiry.value = project.sslExpiry || "";
+    fields.ownerStaffName.value = project.ownerStaffName || "";
+    fields.resultMetric.value = project.resultMetric || "";
+    fields.summary.value = project.summary || "";
+    portfolioToggle.setAttribute("aria-pressed", project.showOnPortfolio ? "true" : "false");
+
+    submitBtn.textContent = "Save Changes";
+    formHeading.textContent = "Edit Project";
+    cancelBtn.hidden = false;
+    form.scrollIntoView({ behavior: "smooth", block: "start" });
+    fields.name.focus();
+  }
+
+  function handleDelete(id) {
+    var ok = window.confirm("Delete this project? This can't be undone in this demo.");
+    if (!ok) return;
+    Demo.deleteProject(id);
+    if (editIdInput.value === id) resetForm();
+    renderTable();
+  }
+
+  cancelBtn.addEventListener("click", resetForm);
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (!validateForm()) {
+      var firstBad = form.querySelector(".has-error input, .has-error select, .has-error textarea");
+      if (firstBad) firstBad.focus();
+      return;
+    }
+
+    var record = {
+      id: editIdInput.value || undefined,
+      name: fields.name.value.trim(),
+      clientName: fields.clientName.value.trim(),
+      clientBusiness: fields.clientBusiness.value.trim(),
+      clientEmail: fields.clientEmail.value.trim(),
+      industry: fields.industry.value.trim(),
+      status: fields.status.value,
+      progress: Math.max(0, Math.min(100, parseInt(fields.progress.value, 10) || 0)),
+      startDate: fields.startDate.value,
+      targetDate: fields.targetDate.value,
+      domain: fields.domain.value.trim(),
+      hostingProvider: fields.hostingProvider.value.trim(),
+      hostingExpiry: fields.hostingExpiry.value,
+      sslProvider: fields.sslProvider.value.trim(),
+      sslExpiry: fields.sslExpiry.value,
+      ownerStaffName: fields.ownerStaffName.value.trim(),
+      resultMetric: fields.resultMetric.value.trim(),
+      summary: fields.summary.value.trim(),
+      showOnPortfolio: togglePressed(portfolioToggle)
+    };
+
+    Demo.saveProject(record);
+    resetForm();
+    renderTable();
+  });
+
+  renderTable();
+})();
+</script>
