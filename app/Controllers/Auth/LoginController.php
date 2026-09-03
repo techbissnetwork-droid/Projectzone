@@ -24,8 +24,6 @@ final class LoginController extends Controller
                 ['grid', 'Catalogue control', 'Publish, retire and price every marketplace product.'],
                 ['settings', 'Configuration', 'SEO, caching, commerce and mail settings without a deploy.'],
             ],
-            'demo' => 'admin@techbiss.com',
-            'demo_password' => 'the password set during installation',
         ],
         'staff' => [
             'eyebrow' => 'Team access',
@@ -39,8 +37,6 @@ final class LoginController extends Controller
                 ['ticket', 'Support queue', 'Client tickets triaged by priority and age.'],
                 ['check-circle', 'Your tasks', 'What is due, what is late, and what you closed.'],
             ],
-            'demo' => 'engineer@techbiss.com',
-            'demo_password' => 'StaffDemo!2026',
         ],
         'client' => [
             'eyebrow' => 'Client access',
@@ -54,8 +50,6 @@ final class LoginController extends Controller
                 ['rocket', 'Deployments', 'Launch a new installation and watch it progress.'],
                 ['ticket', 'Support', 'Raise a ticket and see every reply in one thread.'],
             ],
-            'demo' => 'client@northwind.example',
-            'demo_password' => 'ClientDemo!2026',
         ],
     ];
 

@@ -3,6 +3,31 @@
 $view->extends('layouts.portal');
 $view->start('content');
 ?>
+<?php if ($findings !== []): ?>
+  <section class="panel" style="border-color:rgba(245,165,36,.34);margin-bottom:var(--s-4)">
+    <div class="panel__head" style="background:rgba(245,165,36,.07)">
+      <h3><?= icon('shield') ?> Before you launch</h3>
+      <span class="badge badge--warn"><?= count($findings) ?> to resolve</span>
+    </div>
+    <div class="panel__body" style="padding-block:var(--s-4)">
+      <div class="checklist">
+        <?php foreach ($findings as $finding): ?>
+          <div class="checkrow checkrow--<?= $finding['level'] === 'high' ? 'fail' : 'warn' ?>">
+            <span class="checkrow__icon"><?= icon($finding['level'] === 'high' ? 'alert' : 'info') ?></span>
+            <span>
+              <strong><?= e($finding['title']) ?></strong>
+              <span><?= e($finding['detail']) ?></span>
+            </span>
+            <?php if ($finding['path']): ?>
+              <a class="btn btn--sm btn--ghost" href="<?= e(url($finding['path'])) ?>"><?= e($finding['action']) ?></a>
+            <?php endif; ?>
+          </div>
+        <?php endforeach; ?>
+      </div>
+    </div>
+  </section>
+<?php endif; ?>
+
 <div class="kpis">
   <?php foreach ([
     ['cart', 'Marketplace revenue', money($stats['revenue']), $stats['orders'] . ' orders', 'up'],

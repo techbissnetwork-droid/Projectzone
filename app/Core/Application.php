@@ -66,6 +66,12 @@ final class Application
         $c->bind('cache', static fn () => new Cache($app->path('storage/cache'), (bool) $app->config->get('cache.enabled', true)));
         $c->bind('mailer', static fn () => new Mailer($app->config->get('mail', []), $app->path('storage/logs/mail.log')));
         $c->bind('view', static fn () => new View($app->path('app/Views')));
+        $c->bind('audit', static fn (Container $c) => new SecurityAudit(
+            $c->get('db'),
+            $app->config,
+            $c->get('cache'),
+            $app->isInstalled()
+        ));
         $c->bind('seo', static fn () => new Seo(
             $app->config->get('app.url', 'http://localhost'),
             (string) $app->config->get('app.name', 'TECHBISS')

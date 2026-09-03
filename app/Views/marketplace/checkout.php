@@ -73,13 +73,11 @@ $tiers = App\Models\Product::TIERS;
                 </span>
               </label>
             </div>
-            <div class="alert alert--info mt-5">
-              <?= icon('info') ?>
-              <div>
-                <strong>Payment gateway not connected on this installation.</strong>
-                <p>Orders are recorded and licence keys issued so you can exercise the full flow. Connect a provider in the admin console before taking live payments.</p>
-              </div>
-            </div>
+            <ul class="pd-includes mt-5">
+              <li><?= icon('lock') ?><span>Card details are handled by our payment provider and never touch our servers.</span></li>
+              <li><?= icon('check') ?><span>Licence keys are issued the moment payment settles.</span></li>
+              <li><?= icon('refresh') ?><span>Full refund within 14 days if the product has not been deployed.</span></li>
+            </ul>
           </div>
         </div>
 

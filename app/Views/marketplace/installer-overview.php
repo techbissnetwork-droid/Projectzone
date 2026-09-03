@@ -173,7 +173,7 @@ php bin/techbiss health</div>
 
 <?php $view->partial('partials.cta-band', [
   'title' => 'Try the installer now.',
-  'body' => 'Open it against this installation to see the requirement checks, the URL it detects and the existing-site scan run against real data.',
+  'body' => 'Every product licence includes it. Walk the eight steps and see the requirement checks, the URL it resolves and the existing-site scan run against your own server.',
   'primary' => ['label' => 'Open the installer', 'path' => '/install'],
   'secondary' => ['label' => 'Browse products', 'path' => '/marketplace'],
 ]); ?>

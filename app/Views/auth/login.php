@@ -82,12 +82,6 @@ $view->start('content');
         </button>
       </form>
 
-      <div class="auth__demo">
-        <strong style="color:var(--ink-2)">Demo credentials</strong><br>
-        Email <code><?= e($copy['demo']) ?></code><br>
-        Password <code><?= e($copy['demo_password']) ?></code>
-      </div>
-
       <div class="auth__switch">
         <span class="tiny dim">Wrong portal?</span>
         <?php foreach ($others as $key => $other): ?>

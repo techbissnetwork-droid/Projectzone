@@ -316,6 +316,68 @@ $app->make('db')->statement('DELETE FROM users WHERE id = ?', [$testOwnerId]);
 $app->make('db')->statement('DELETE FROM login_attempts WHERE email = ?', [TEST_OWNER_EMAIL]);
 check('Provisioned test owner removed', (int) $app->make('db')->value('SELECT COUNT(*) FROM users WHERE email = ?', [TEST_OWNER_EMAIL], 0) === 0);
 
+section('No internal text on user-facing pages');
+
+// Sign-in pages must never advertise working credentials, and product pages
+// must not explain how the platform was built.
+foreach (['/admin/login', '/staff/login', '/client/login'] as $path) {
+    $r = request('GET', $path);
+    $leaks = [];
+    foreach (['StaffDemo', 'ClientDemo', 'Demo credentials', 'engineer@techbiss.com',
+              'client@northwind.example', 'admin@techbiss.com'] as $needle) {
+        if (str_contains($r['body'], $needle)) {
+            $leaks[] = $needle;
+        }
+    }
+    check("{$path} exposes no credentials", $leaks === [], implode(', ', $leaks));
+}
+
+foreach ([
+    ['/marketplace/checkout', ['not connected on this installation', 'exercise the full flow']],
+    ['/marketplace/preview/orbit-agency-theme', ['not a live demo instance', 'generated vector compositions']],
+    ['/marketplace/installer', ['this installation to see']],
+] as [$path, $phrases]) {
+    // Checkout needs a cart to render, so seed one first.
+    if (str_contains($path, 'checkout')) {
+        $anyProduct = boot()->make('db')->first("SELECT id FROM products WHERE status = 'published' LIMIT 1");
+        request('POST', '/marketplace/cart/add', ['product_id' => (int) $anyProduct['id'], 'tier' => 'standard']);
+    }
+    $r = request('GET', $path);
+    $found = [];
+    foreach ($phrases as $phrase) {
+        if (str_contains($r['body'], $phrase)) {
+            $found[] = $phrase;
+        }
+    }
+    check("{$path} carries no build notes", $found === [], implode('; ', $found));
+}
+request('POST', '/marketplace/cart/remove', ['product_id' => (int) (boot()->make('db')->first("SELECT id FROM products WHERE status = 'published' LIMIT 1")['id'])]);
+
+section('Launch readiness audit');
+
+$audit = boot()->make('audit');
+boot()->make('cache')->forget('security.audit');
+$findings = $audit->findings();
+check('Seeded accounts are reported to the operator', count($findings) >= 1);
+check(
+    'Seeded accounts are reported as one grouped finding, not one row each',
+    count(array_filter($findings, static fn (array $f): bool => str_contains($f['title'], 'seeded password'))) === 1
+);
+
+// Changing a password must clear that account from the audit.
+$db = boot()->make('db');
+$db->update('users', ['password_hash' => password_hash('AnEntirelyNewSecret!2026', PASSWORD_DEFAULT)],
+    'email = :email', ['email' => 'design@techbiss.com']);
+$audit->forget();
+$after = $audit->findings();
+$stillListed = false;
+foreach ($after as $finding) {
+    if (str_contains((string) $finding['detail'], 'design@techbiss.com')) {
+        $stillListed = true;
+    }
+}
+check('A changed password drops the account from the audit', !$stillListed);
+
 section('Staff workspace');
 
 $r = signIn('staff', 'engineer@techbiss.com', 'StaffDemo!2026');

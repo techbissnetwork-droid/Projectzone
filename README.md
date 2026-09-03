@@ -93,9 +93,11 @@ php bin/techbiss install \
 The default database is SQLite at `storage/db/techbiss.sqlite` — no
 configuration required. MySQL and MariaDB are equally supported.
 
-### Demo accounts
+### Example accounts
 
-Created when demo data is enabled during installation.
+Created only when example content is enabled during installation. These
+credentials are **not** shown anywhere in the interface — a sign-in page that
+advertises a working password is a way in, not a convenience.
 
 | Portal | Email | Password |
 | --- | --- | --- |
@@ -103,7 +105,10 @@ Created when demo data is enabled during installation.
 | Staff | `engineer@techbiss.com` | `StaffDemo!2026` |
 | Client | `client@northwind.example` | `ClientDemo!2026` |
 
-Change or remove the demo accounts before going live.
+The admin dashboard shows a **Before you launch** panel listing every example
+account still carrying its seeded password, and the warning clears itself as
+soon as a password is changed or the account is removed. Install with
+`--no-demo` to skip creating them at all.
 
 ---
 

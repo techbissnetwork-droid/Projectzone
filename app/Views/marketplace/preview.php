@@ -44,9 +44,15 @@ $view->start('content');
     <div class="alert alert--info mt-7">
       <?= icon('info') ?>
       <div>
-        <strong>This is a rendered preview, not a live demo instance.</strong>
-        <p>Previews are generated vector compositions so this page loads in well under a second. A hosted live demo is provisioned for you on request before purchase.</p>
+        <strong>Want to try it with your own content?</strong>
+        <p>We will stand up a private instance loaded with your branding so you can click through the real thing before you buy. It is usually ready the same working day.</p>
       </div>
+    </div>
+    <div class="cluster mt-4">
+      <a class="btn btn--primary" href="<?= e(url('/contact?topic=marketplace&product=' . $product['slug'])) ?>">
+        Request a private demo<?= icon('arrow-right') ?>
+      </a>
+      <a class="btn btn--ghost" href="<?= e(url('/marketplace/' . $product['slug'])) ?>">Back to product</a>
     </div>
   </div>
 </section>

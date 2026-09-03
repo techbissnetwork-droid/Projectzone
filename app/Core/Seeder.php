@@ -91,6 +91,15 @@ final class Seeder
             ['Marcus Feld', 'marcus@vantage.example', 'client', 'Vantage Logistics', 'VP Digital', 'teal'],
         ];
 
+        // Recorded so the admin console can warn while any of these accounts
+        // still carries the password the seeder gave it.
+        $this->db->insert('settings', [
+            'setting_key' => 'seeded_accounts',
+            'setting_value' => $this->json(array_column($people, 1)),
+            'setting_group' => 'security',
+            'updated_at' => gmdate('c'),
+        ]);
+
         foreach ($people as $i => [$name, $email, $role, $company, $title, $colour]) {
             $this->db->insert('users', [
                 'uuid' => bin2hex(random_bytes(8)),

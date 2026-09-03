@@ -78,6 +78,7 @@ final class AdminController extends Controller
         return $this->shell($request, 'admin.dashboard', 'Platform overview',
             'Revenue, pipeline, deployments and fleet health.', [
                 'stats' => $stats,
+                'findings' => $this->app->make('audit')->findings(),
                 'topProducts' => $topProducts,
                 'recentOrders' => $this->db->select('SELECT * FROM orders ORDER BY created_at DESC LIMIT 6'),
                 'recentLeads' => $this->db->select('SELECT * FROM leads ORDER BY created_at DESC LIMIT 6'),
@@ -137,6 +138,7 @@ final class AdminController extends Controller
         }
 
         $this->db->update('users', ['status' => $status, 'updated_at' => gmdate('c')], 'id = :id', ['id' => $id]);
+        $this->app->make('audit')->forget();
         $this->auth->log((int) $this->auth->id(), 'user.status', $user['name'] . ' set to ' . $status, $request->ip());
         $this->session->flash('status', $user['name'] . ' is now ' . $status . '.');
         return $this->back($request, '/admin/users');
