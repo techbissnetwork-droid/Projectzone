@@ -33,12 +33,14 @@ export default function TechnologyPage() {
       </Section>
 
       <Section aria-label="Why technology choices matter" className="border-y border-white/5 bg-white/[0.015]">
-        <SectionHeading
-          eyebrow="Why it matters"
-          title="Technology decisions are business decisions"
-          description="The right stack keeps your systems fast, secure, and maintainable years after launch. The wrong one creates technical debt that slows every future change. We choose tools your business can grow into, backed by active communities and long-term support — not whatever is newest."
-          align="center"
-        />
+        <Reveal>
+          <SectionHeading
+            eyebrow="Why it matters"
+            title="Technology decisions are business decisions"
+            description="The right stack keeps your systems fast, secure, and maintainable years after launch. The wrong one creates technical debt that slows every future change. We choose tools your business can grow into, backed by active communities and long-term support — not whatever is newest."
+            align="center"
+          />
+        </Reveal>
       </Section>
 
       <CtaSection

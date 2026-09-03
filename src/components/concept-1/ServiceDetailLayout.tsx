@@ -47,7 +47,7 @@ export function ServiceDetailLayout({
               <p className="mt-6 max-w-xl text-lg leading-relaxed text-neutral-400">
                 {service.shortDescription}
               </p>
-              <p className="mt-4 max-w-xl text-sm leading-relaxed text-neutral-500">
+              <p className="mt-4 max-w-xl text-sm leading-relaxed text-neutral-400">
                 {service.longDescription}
               </p>
               <div className="mt-9 flex flex-wrap gap-4">

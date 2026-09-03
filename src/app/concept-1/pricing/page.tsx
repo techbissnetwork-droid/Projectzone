@@ -37,7 +37,7 @@ export default function ConceptOnePricingPage() {
           ))}
         </div>
         <Reveal delay={0.2}>
-          <p className="mx-auto mt-10 max-w-2xl text-center text-sm leading-relaxed text-neutral-500">
+          <p className="mx-auto mt-10 max-w-2xl text-center text-sm leading-relaxed text-neutral-400">
             {pricingNote}
           </p>
         </Reveal>

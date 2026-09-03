@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { caseStudies } from "@/lib/site-data";
-import { Section, SectionHeading, Eyebrow } from "@/components/concept-3/Section";
+import { Section, Eyebrow } from "@/components/concept-3/Section";
 import { Reveal } from "@/components/concept-3/Reveal";
 import { PortfolioGrid } from "@/components/concept-3/PortfolioGrid";
 import { CtaSection } from "@/components/concept-3/CtaSection";

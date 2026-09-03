@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { services } from "@/lib/site-data";
-import { Section, SectionHeading, Eyebrow } from "@/components/concept-3/Section";
+import { Section, Eyebrow } from "@/components/concept-3/Section";
 import { Reveal } from "@/components/concept-3/Reveal";
 import { ServiceTabs } from "@/components/concept-3/ServiceTabs";
 import { CtaSection } from "@/components/concept-3/CtaSection";

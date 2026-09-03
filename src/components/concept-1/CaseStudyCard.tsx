@@ -31,7 +31,7 @@ export function CaseStudyCard({ study, className }: { study: CaseStudy; classNam
           </span>
         ))}
       </div>
-      <p className="mt-5 border-t border-white/10 pt-4 text-xs italic leading-relaxed text-neutral-500">
+      <p className="mt-5 border-t border-white/10 pt-4 text-xs italic leading-relaxed text-neutral-400">
         {study.outcome}
       </p>
     </motion.div>
