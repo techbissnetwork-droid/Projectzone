@@ -372,7 +372,8 @@ h3{font-size:clamp(1.1rem,.4vw + 1rem,1.3rem);font-weight:700;}
 
 /* ---------- Page hero (interior pages) ---------- */
 .page-hero{padding-top:clamp(7.5rem,12vw,9.5rem);padding-bottom:clamp(2.5rem,5vw,3.5rem);}
-.page-hero .lede{margin-top:1.2rem;}
+.page-hero h1{font-size:clamp(2.2rem,1.6vw + 1.6rem,3.4rem);max-width:900px;}
+.page-hero .lede{margin-top:1.2rem;max-width:56ch;}
 .page-hero.has-split{display:grid;grid-template-columns:1fr;gap:2.4rem;align-items:end;}
 @media (min-width:800px){.page-hero.has-split{grid-template-columns:1.4fr 1fr;gap:3rem;}}
 .breadcrumb{display:flex;align-items:center;flex-wrap:wrap;gap:.5rem;font-size:.82rem;color:var(--ink-faint);margin-bottom:1.4rem;}

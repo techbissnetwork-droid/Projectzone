@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Domain &amp; Hosting — TECHBISS</title>
+<meta name="description" content="Domain registration, managed hosting, monitoring and zero-downtime migration from TECHBISS — infrastructure that stays online on the day it matters most.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><rect width=%2232%22 height=%2232%22 rx=%229%22 fill=%22%23201c15%22/><path d=%22M6 6h20v20H6z%22 fill=%22%238c8168%22/><path d=%22M26 6L26 26L6 26Z%22 fill=%22%232c3fdc%22/></svg>">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<script>(function(){document.documentElement.classList.add('js-anim');window.addEventListener('error',function(){document.querySelectorAll('[data-reveal]').forEach(function(el){el.classList.add('reveal-in');el.querySelectorAll&&el.querySelectorAll('.ba-after').forEach(function(f){f.classList.add('is-active');});});});setTimeout(function(){document.querySelectorAll('[data-reveal]:not(.reveal-in)').forEach(function(el){el.classList.add('reveal-in');});},2500);})();</script>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header" data-header>
+  <div class="header-inner">
+    <div class="header-shell">
+      <a href="index.html" class="logo"><span class="logo-mark">T</span>TECHBISS</a>
+      <nav class="main-nav" aria-label="Primary">
+        <ul>
+          <li class="has-menu">
+            <button class="nav-link" aria-expanded="false">Services <svg class="chev" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.4"/></svg></button>
+            <div class="mega-menu">
+              <a href="websites.html"><span class="title">Websites</span><span class="desc">Marketing sites & storefronts built to convert.</span></a>
+              <a href="web-applications.html"><span class="title">Web Applications</span><span class="desc">Custom platforms and internal tools.</span></a>
+              <a href="business-digitization.html"><span class="title">Business Digitization</span><span class="desc">Move offline operations online.</span></a>
+              <a href="domain-hosting.html"><span class="title">Domain & Hosting</span><span class="desc">Registration, hosting & infrastructure.</span></a>
+              <a href="ssl-email.html"><span class="title">SSL & Business Email</span><span class="desc">Security and professional email.</span></a>
+              <a href="services.html"><span class="title">All Services →</span><span class="desc">See the full capability map.</span></a>
+            </div>
+          </li>
+          <li><a href="solutions.html" class="nav-link">Solutions</a></li>
+          <li><a href="work.html" class="nav-link">Work</a></li>
+          <li class="has-menu">
+            <button class="nav-link" aria-expanded="false">Company <svg class="chev" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.4"/></svg></button>
+            <div class="mega-menu">
+              <a href="about.html"><span class="title">About</span><span class="desc">Who we are and how we work.</span></a>
+              <a href="process.html"><span class="title">Process</span><span class="desc">Idea to launch, step by step.</span></a>
+              <a href="technology.html"><span class="title">Technology</span><span class="desc">The stack behind every build.</span></a>
+              <a href="pricing.html"><span class="title">Pricing</span><span class="desc">Packages & engagement models.</span></a>
+              <a href="contact.html"><span class="title">Contact</span><span class="desc">Talk to our team.</span></a>
+            </div>
+          </li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <a href="contact.html" class="nav-link nav-link-ghost">Contact</a>
+        <a href="get-started.html" class="btn btn-primary magnetic"><span>Start a Project</span></a>
+        <button class="nav-toggle" aria-label="Open menu" aria-expanded="false" data-nav-toggle>
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Deliberately a sibling of <header>, not nested inside it: .site-header carries
+     a backdrop-filter for the frosted sticky bar, and per spec, filter/backdrop-filter
+     creates a new containing block for position:fixed descendants — a .mobile-nav
+     nested inside it would have its inset:0 resolve against the header bar's own
+     (content-sized) box instead of the viewport, collapsing it to header-bar height
+     instead of covering the screen. Living outside .site-header sidesteps that
+     entirely while .header-inner's higher z-index (see CSS) still keeps the header
+     bar/hamburger clickable above this overlay when it's open. -->
+<div class="mobile-nav" data-mobile-nav>
+  <ul class="mobile-nav-links">
+    <li>
+      <button class="mobile-sub-toggle" aria-expanded="false">Services <svg class="chev" viewBox="0 0 10 6" fill="none" width="14"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.4"/></svg></button>
+      <div class="mobile-sub">
+        <a href="websites.html">Websites</a>
+        <a href="web-applications.html">Web Applications</a>
+        <a href="business-digitization.html">Business Digitization</a>
+        <a href="domain-hosting.html">Domain & Hosting</a>
+        <a href="ssl-email.html">SSL & Business Email</a>
+        <a href="services.html">All Services</a>
+      </div>
+    </li>
+    <li><a href="solutions.html">Solutions</a></li>
+    <li><a href="work.html">Work</a></li>
+    <li>
+      <button class="mobile-sub-toggle" aria-expanded="false">Company <svg class="chev" viewBox="0 0 10 6" fill="none" width="14"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.4"/></svg></button>
+      <div class="mobile-sub">
+        <a href="about.html">About</a>
+        <a href="process.html">Process</a>
+        <a href="technology.html">Technology</a>
+        <a href="pricing.html">Pricing</a>
+        <a href="contact.html">Contact</a>
+      </div>
+    </li>
+  </ul>
+  <div class="mobile-nav-foot">
+    <a href="get-started.html" class="btn btn-primary">Start a Project</a>
+    <a href="work.html" class="btn btn-outline">Explore Our Work</a>
+  </div>
+</div>
+
+<main id="main">
+
+  <!-- PAGE HERO -->
+  <section class="page-hero">
+    <div class="container">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="index.html">Home</a><span class="sep" aria-hidden="true">/</span>
+        <a href="services.html">Services</a><span class="sep" aria-hidden="true">/</span>
+        <span aria-current="page">Domain & Hosting</span>
+      </nav>
+      <span class="eyebrow" data-reveal><span class="eyebrow-swatch" aria-hidden="true"></span>Domain &amp; Hosting</span>
+      <h1 data-reveal data-reveal-delay="60">Nobody buys from a site that's <span class="accent-ink">down</span>.</h1>
+      <p class="lede" data-reveal data-reveal-delay="140">Domain registration, managed hosting and the infrastructure behind it — set up once, monitored around the clock, and built to stay online on your busiest day, not just an average one.</p>
+      <div class="btn-row" data-reveal data-reveal-delay="200" style="gap:.6rem;margin-top:1.4rem;">
+        <span class="badge">9 years building digital systems</span>
+        <span class="badge">150+ digital products shipped</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT'S INCLUDED -->
+  <section>
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow"><span class="eyebrow-swatch" aria-hidden="true"></span>What's Included</span>
+          <h2 data-reveal>Everything that keeps a website online, secure and fast.</h2>
+        </div>
+        <p class="lede" data-reveal>Domain and hosting sound simple until something breaks. Nine years of managing other people's infrastructure has taught us exactly what's worth setting up before that happens.</p>
+      </div>
+      <div class="grid grid-3" data-stagger>
+        <div class="card" data-reveal>
+          <span class="card-index">01</span>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M3 12h18M12 3c2.5 2.5 3.8 5.8 3.8 9s-1.3 6.5-3.8 9c-2.5-2.5-3.8-5.8-3.8-9s1.3-6.5 3.8-9z" stroke="currentColor" stroke-width="1.6"/></svg></div>
+          <h3>Domain Registration &amp; Management</h3>
+          <p>We register, renew and manage your domain so it never lapses, gets forgotten, or ends up locked in someone else's account.</p>
+          <span class="shift-line"><b>Before:</b> a renewal email nobody remembers to open. <b>After:</b> renewed automatically, years in advance.</span>
+        </div>
+        <div class="card" data-reveal>
+          <span class="card-index">02</span>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="6.5" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="4" y="13.5" width="16" height="6.5" rx="1.5" stroke="currentColor" stroke-width="1.6"/><circle cx="7.6" cy="7.25" r=".9" fill="currentColor"/><circle cx="7.6" cy="16.75" r=".9" fill="currentColor"/></svg></div>
+          <h3>Managed Hosting</h3>
+          <p>Your site lives on infrastructure we monitor and maintain directly — not a shared budget host that slows down the moment traffic picks up.</p>
+          <span class="shift-line"><b>Before:</b> a bargain host that buckles on a busy Saturday. <b>After:</b> hosting built to treat your busiest day as normal.</span>
+        </div>
+        <div class="card" data-reveal>
+          <span class="card-index">03</span>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M3 12h4l2 7 4-14 2 7h6" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
+          <h3>Uptime &amp; Monitoring</h3>
+          <p>Automated monitoring checks your site around the clock, and alerts a real person the moment something looks wrong.</p>
+          <span class="shift-line"><b>Before:</b> finding out your site's down from a customer. <b>After:</b> we're already fixing it before you notice.</span>
+        </div>
+        <div class="card" data-reveal>
+          <span class="card-index">04</span>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M7.2 17.8a4.4 4.4 0 01-.6-8.76A5.5 5.5 0 0117 8.5a4 4 0 01-.5 7.96" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 11.5v6M9.6 15l2.4 2.5 2.4-2.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <h3>Backups &amp; Recovery</h3>
+          <p>Automatic, regular backups mean a bad update, a plugin conflict or a mistake is never more than a few clicks from fixed.</p>
+          <span class="shift-line"><b>Before:</b> no backup, hoping nothing ever breaks. <b>After:</b> a restore point from an hour ago, always on hand.</span>
+        </div>
+        <div class="card" data-reveal>
+          <span class="card-index">05</span>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 8.5h13M14.5 5.5l3 3-3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 15.5H7M9.5 12.5l-3 3 3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <h3>Migration From Your Old Host</h3>
+          <p>We handle the move from your current host end-to-end — DNS, files, databases and email — timed to avoid any visible downtime.</p>
+          <span class="shift-line"><b>Before:</b> afraid to touch hosting in case it breaks something. <b>After:</b> migrated overnight, and nobody noticed.</span>
+        </div>
+        <div class="card" data-reveal>
+          <span class="card-index">06</span>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 20v-5M10 20v-9M16 20v-6M20 20V6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M4 11l5-4 4 3 6-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <h3>Scalable Infrastructure for Growth</h3>
+          <p>As traffic and transactions grow, your infrastructure grows with it — no emergency re-platforming the week you go viral.</p>
+          <span class="shift-line"><b>Before:</b> a launch day that crashes the server. <b>After:</b> infrastructure that scales before you have to ask.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOSTING TIERS -->
+  <section class="band">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow"><span class="eyebrow-swatch" aria-hidden="true"></span>Hosting Tiers</span>
+          <h2 data-reveal>Three tiers, built for three different stages of growth.</h2>
+        </div>
+        <p class="lede" data-reveal>Every tier includes free SSL, monitoring and support — the difference is capacity, speed, and how fast we answer when something needs attention.</p>
+      </div>
+      <div class="table-wrap" data-reveal>
+        <table class="compare">
+          <thead>
+            <tr>
+              <th scope="col">Feature</th>
+              <th scope="col">Starter</th>
+              <th scope="col">Business</th>
+              <th scope="col">Enterprise</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">Uptime SLA</th><td>99.5%</td><td>99.9%</td><td>99.99%</td></tr>
+            <tr><th scope="row">Storage</th><td>10 GB SSD</td><td>50 GB SSD</td><td>250+ GB SSD</td></tr>
+            <tr><th scope="row">Bandwidth</th><td>100 GB / month</td><td>Unmetered</td><td>Unmetered</td></tr>
+            <tr><th scope="row">Backups</th><td>Weekly</td><td>Daily</td><td>Daily + on-demand</td></tr>
+            <tr><th scope="row">Free SSL certificate</th><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+            <tr><th scope="row">Staging environment</th><td>—</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+            <tr><th scope="row">Dedicated resources</th><td>—</td><td>—</td><td class="yes">✓</td></tr>
+            <tr><th scope="row">Support response time</th><td>Within 24 hrs</td><td>Within 4 hrs</td><td>Within 1 hr</td></tr>
+            <tr><th scope="row">Best for</th><td>Brochure sites</td><td>Growing stores &amp; bookings</td><td>High-traffic apps</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- MIGRATION REASSURANCE -->
+  <section>
+    <div class="container split">
+      <div>
+        <span class="eyebrow"><span class="eyebrow-swatch" aria-hidden="true"></span>Migrating? No Problem</span>
+        <h2 data-reveal>Moving from your current host doesn't mean going offline.</h2>
+        <p class="lede" data-reveal>We've moved businesses off hosts that were actively failing them, without a single dropped order or bounced email along the way. Here's how.</p>
+        <ul class="feature-list" data-reveal>
+          <li><svg viewBox="0 0 20 20" fill="none"><path d="M4 10l4 4 8-9" stroke="currentColor" stroke-width="2"/></svg>Files, database and DNS copied over before anything live is touched</li>
+          <li><svg viewBox="0 0 20 20" fill="none"><path d="M4 10l4 4 8-9" stroke="currentColor" stroke-width="2"/></svg>Your current site stays online until the new one is fully verified</li>
+          <li><svg viewBox="0 0 20 20" fill="none"><path d="M4 10l4 4 8-9" stroke="currentColor" stroke-width="2"/></svg>Email keeps flowing throughout — nothing gets dropped mid-move</li>
+          <li><svg viewBox="0 0 20 20" fill="none"><path d="M4 10l4 4 8-9" stroke="currentColor" stroke-width="2"/></svg>One switchover, timed for your lowest-traffic hours</li>
+        </ul>
+      </div>
+      <div>
+        <div class="card" data-reveal>
+          <span class="badge">What "no downtime" actually means</span>
+          <h3 style="margin-top:1.1rem;">Your current site stays live the entire time.</h3>
+          <p>We build and test the new environment fully before anything switches over — visitors never see a maintenance page, a broken link, or a gap.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="band">
+    <div class="container">
+      <span class="eyebrow"><span class="eyebrow-swatch" aria-hidden="true"></span>Common Questions</span>
+      <h2 data-reveal style="margin-bottom:2.5rem;">Domain and hosting, answered honestly.</h2>
+      <div class="accordion" data-stagger>
+        <div class="accordion-item" data-reveal>
+          <h3><button class="accordion-trigger" aria-expanded="false" aria-controls="dh-panel-1">What if I already own a domain?<span class="plus" aria-hidden="true"></span></button></h3>
+          <div class="accordion-panel" id="dh-panel-1">
+            <p>That's the most common case — we simply take over management of your existing domain, or help you transfer it to us, rather than issuing a new one. Nothing about the domain name itself changes; only who's keeping it running and paid for changes.</p>
+          </div>
+        </div>
+        <div class="accordion-item" data-reveal>
+          <h3><button class="accordion-trigger" aria-expanded="false" aria-controls="dh-panel-2">Can you migrate us without downtime?<span class="plus" aria-hidden="true"></span></button></h3>
+          <div class="accordion-panel" id="dh-panel-2">
+            <p>In almost every case, yes. We build and fully test your site on the new host first, and only switch the domain over once everything checks out — visitors move from the old version to the new one without ever seeing a gap.</p>
+          </div>
+        </div>
+        <div class="accordion-item" data-reveal>
+          <h3><button class="accordion-trigger" aria-expanded="false" aria-controls="dh-panel-3">What happens if the site goes down?<span class="plus" aria-hidden="true"></span></button></h3>
+          <div class="accordion-panel" id="dh-panel-3">
+            <p>Automated monitoring flags an outage within minutes, and our team is alerted immediately — most issues are resolved before a customer notices, and you'll always know what happened and why.</p>
+          </div>
+        </div>
+        <div class="accordion-item" data-reveal>
+          <h3><button class="accordion-trigger" aria-expanded="false" aria-controls="dh-panel-4">Do you handle SSL too?<span class="plus" aria-hidden="true"></span></button></h3>
+          <div class="accordion-panel" id="dh-panel-4">
+            <p>Yes — every hosting plan includes an SSL certificate as standard, kept renewed automatically so your site stays secure and marked "safe" in every browser. Read more on our <a href="ssl-email.html" class="btn-link" style="border-bottom-width:1px;">SSL &amp; Business Email</a> page.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA BANNER -->
+  <section>
+    <div class="container">
+      <div class="cta-banner" data-reveal>
+        <span class="eyebrow"><span class="eyebrow-swatch" aria-hidden="true"></span>Let's start</span>
+        <h2>Ready to stop worrying about uptime?</h2>
+        <p class="lede">Tell us where you're hosted now — we'll show you exactly what moves, and confirm there's zero downtime before we touch anything.</p>
+        <div class="btn-row">
+          <a href="get-started.html" class="btn btn-primary magnetic"><span>Start a Project</span></a>
+          <a href="contact.html" class="btn btn-outline"><span>Talk to Our Team</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="index.html" class="logo"><span class="logo-mark">T</span>TECHBISS</a>
+        <p>We turn businesses into digital businesses — one before/after at a time.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Services</h4>
+        <ul>
+          <li><a href="websites.html">Websites</a></li>
+          <li><a href="web-applications.html">Web Applications</a></li>
+          <li><a href="business-digitization.html">Business Digitization</a></li>
+          <li><a href="domain-hosting.html">Domain & Hosting</a></li>
+          <li><a href="ssl-email.html">SSL & Business Email</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="about.html">About</a></li>
+          <li><a href="process.html">Process</a></li>
+          <li><a href="technology.html">Technology</a></li>
+          <li><a href="work.html">Work</a></li>
+          <li><a href="case-study.html">Case Study</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Get Started</h4>
+        <ul>
+          <li><a href="solutions.html">Solutions</a></li>
+          <li><a href="pricing.html">Pricing</a></li>
+          <li><a href="get-started.html">Start a Project</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 TECHBISS. All rights reserved.</p>
+      <div class="footer-social">
+        <a href="#" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.4"/><path d="M8 10v6M8 7.5v.01M12 16v-3.5c0-1.5 1-2.5 2.5-2.5S17 11 17 12.5V16" stroke="currentColor" stroke-width="1.4"/></svg></a>
+        <a href="#" aria-label="X"><svg viewBox="0 0 24 24" fill="none"><path d="M4 4l16 16M20 4L4 20" stroke="currentColor" stroke-width="1.4"/></svg></a>
+        <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="1.4"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.4"/></svg></a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1/dist/lenis.min.js"></script>
+<script src="assets/js/main.js"></script>
+</body>
+</html>
