@@ -119,6 +119,65 @@ function tb_migrate(PDO $pdo, string $driver = 'mysql'): array
         $done[] = 'Reordered the home page sections';
     }
 
+    /* 3c · captions written as three-part phrases, shortened to the one word
+            that carries them. Applied only where the text is still exactly what
+            was seeded, so anything an administrator has rewritten is left as
+            they wrote it. */
+    $shorter = [
+        'stat'   => ['Services under one roof' => 'Services',
+                     'Delivery model'          => 'Delivery',
+                     'Infrastructure uptime'   => 'Uptime'],
+        'pillar' => ['certificate valid · auto-renew' => 'auto-renewed',
+                     'auto-scaling · 3 regions'       => '3 regions',
+                     '99.98% · 30-day window'         => '99.98% uptime',
+                     'containerised · reproducible'   => 'containerised',
+                     'responsive · touch-first'       => 'touch-first'],
+        'arch'   => ['Your goals, customers, operations'            => 'Goals & operations',
+                     'Architecture · design system · API contracts' => 'Architecture & APIs',
+                     'iOS · Android · internal'                     => 'iOS & Android',
+                     'Checkout & settlement'                        => 'Checkout',
+                     'Domain communication'                         => 'On your domain',
+                     'Single source of truth'                       => 'One source of truth'],
+    ];
+    if (in_array('content_items', $tables, true)) {
+        /* A stat's caption is its label; a pillar's and an arch node's is its title. */
+        $trimmed = 0;
+        foreach ($shorter as $kind => $map) {
+            $col = $kind === 'stat' ? 'label' : 'title';
+            $up  = $pdo->prepare('UPDATE content_items SET ' . $col . ' = ? WHERE kind = ? AND ' . $col . ' = ?');
+            foreach ($map as $was => $now) {
+                $up->execute([$now, $kind, $was]);
+                $trimmed += $up->rowCount();
+            }
+        }
+        if ($trimmed) {
+            $done[] = 'Shortened ' . $trimmed . ' caption' . ($trimmed === 1 ? '' : 's');
+        }
+    }
+
+    $rewritten = [
+        'hero_eyebrow'  => ['Digital transformation · est. for the next decade', 'Digital transformation'],
+        'hero_lede'     => ['From offline operations to a complete online ecosystem — TECHBISS builds, launches and powers everything your business needs to grow online.',
+                            'From offline to online — we build, launch and run everything your business needs to grow.'],
+        'services_lede' => ['Commission one module, or let us run the entire stack — domain to analytics — as a single system.',
+                            'Take one module, or let us run the whole stack as a single system.'],
+        'arch_lede'     => ['Brand, front-end, application, backend, database, payments, hosting, security and analytics — designed as one architecture so nothing is bolted on later.',
+                            'Site, app, database, payments, hosting and security — designed as one system, not bolted together.'],
+        'pillars_lede'  => ['The things nobody notices until they fail — certificates, backups, response times, capacity — are the things we monitor on your behalf.',
+                            'Certificates, backups, uptime and capacity — the things nobody notices until they fail. We watch them.'],
+        'mkt_lede'      => ['Complete systems we have already built and tested. Buy the source, we install and brand it for you.',
+                            'Systems already built and tested. Buy it, we install and brand it for you.'],
+    ];
+    $upSet = $pdo->prepare('UPDATE settings SET svalue = ?, updated_at = ? WHERE skey = ? AND svalue = ?');
+    $reworded = 0;
+    foreach ($rewritten as $key => [$was, $now]) {
+        $upSet->execute([$now, $ts, $key, $was]);
+        $reworded += $upSet->rowCount();
+    }
+    if ($reworded) {
+        $done[] = 'Shortened ' . $reworded . ' block' . ($reworded === 1 ? '' : 's') . ' of copy';
+    }
+
     /* 3b · a starter payment method, so checkout is never a dead end */
     if (in_array('payment_methods', $tables, true)
         && (int)$pdo->query('SELECT COUNT(*) FROM payment_methods')->fetchColumn() === 0) {

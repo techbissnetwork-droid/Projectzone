@@ -68,9 +68,9 @@ function tb_seed_content(PDO $pdo, string $ts): void
     $blocks = [];
 
     foreach ([
-        ['Services under one roof', '12'],
-        ['Delivery model', 'End-to-end'],
-        ['Infrastructure uptime', '99.98%'],
+        ['Services', '12'],
+        ['Delivery', 'End-to-end'],
+        ['Uptime', '99.98%'],
     ] as $i => $r) { $blocks[] = ['stat', $r[0], $r[1], null, null, null, null, null, $i * 10]; }
 
     foreach ([
@@ -87,23 +87,23 @@ function tb_seed_content(PDO $pdo, string $ts): void
     ] as $i => $r) { $blocks[] = ['process', $r[0], $r[1], $r[2], $r[3], $r[4], null, null, $i * 10]; }
 
     foreach ([
-        ['Secure', 'certificate valid · auto-renew', 'TLS 1.3, firewalled, hardened and access-audited by default.', 'meter'],
-        ['Scalable', 'auto-scaling · 3 regions', 'Capacity that follows demand instead of the other way round.', 'bars'],
+        ['Secure', 'auto-renewed', 'TLS 1.3, firewalled, hardened and access-audited by default.', 'meter'],
+        ['Scalable', '3 regions', 'Capacity that follows demand instead of the other way round.', 'bars'],
         ['Fast', 'lighthouse target', 'Edge-cached, image-optimised, measured against Core Web Vitals.', 'gauge'],
-        ['Reliable', '99.98% · 30-day window', 'Monitored around the clock, with restore-tested backups.', 'ticks'],
-        ['Cloud-ready', 'containerised · reproducible', 'Containerised and portable — you are never locked to one vendor.', 'orbits'],
-        ['Mobile-ready', 'responsive · touch-first', 'Designed for the device most of your customers actually use.', 'devices'],
+        ['Reliable', '99.98% uptime', 'Monitored around the clock, with restore-tested backups.', 'ticks'],
+        ['Cloud-ready', 'containerised', 'Containerised and portable — you are never locked to one vendor.', 'orbits'],
+        ['Mobile-ready', 'touch-first', 'Designed for the device most of your customers actually use.', 'devices'],
     ] as $i => $r) { $blocks[] = ['pillar', $r[0], $r[1], $r[2], null, null, null, $r[3], $i * 10]; }
 
     foreach ([
-        ['BUSINESS', 'Your goals, customers, operations', '0'],
-        ['TECHBISS CORE', 'Architecture · design system · API contracts', '1'],
+        ['BUSINESS', 'Goals & operations', '0'],
+        ['TECHBISS CORE', 'Architecture & APIs', '1'],
         ['WEBSITE', 'Marketing & conversion', '2'],
-        ['APP', 'iOS · Android · internal', '2'],
-        ['PAYMENTS', 'Checkout & settlement', '2'],
-        ['EMAIL', 'Domain communication', '2'],
+        ['APP', 'iOS & Android', '2'],
+        ['PAYMENTS', 'Checkout', '2'],
+        ['EMAIL', 'On your domain', '2'],
         ['HOSTING', 'Edge + origin', '3'],
-        ['DATABASE', 'Single source of truth', '3'],
+        ['DATABASE', 'One source of truth', '3'],
         ['SECURITY', 'TLS · WAF · access', '3'],
         ['CLOUD', 'Scale & backups', '3'],
     ] as $i => $r) { $blocks[] = ['arch', $r[0], $r[1], null, null, $r[2], null, null, $i * 10]; }
