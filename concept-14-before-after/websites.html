@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TECHBISS — Websites Built to Convert, Not Just Exist</title>
+<meta name="description" content="Marketing sites, storefronts, landing pages and member portals — fast, mobile-first, SEO-ready websites TECHBISS builds to turn visitors into customers.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><rect width=%2232%22 height=%2232%22 rx=%229%22 fill=%22%23201c15%22/><path d=%22M6 6h20v20H6z%22 fill=%22%238c8168%22/><path d=%22M26 6L26 26L6 26Z%22 fill=%22%232c3fdc%22/></svg>">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<script>(function(){document.documentElement.classList.add('js-anim');window.addEventListener('error',function(){document.querySelectorAll('[data-reveal]').forEach(function(el){el.classList.add('reveal-in');el.querySelectorAll&&el.querySelectorAll('.ba-after').forEach(function(f){f.classList.add('is-active');});});});setTimeout(function(){document.querySelectorAll('[data-reveal]:not(.reveal-in)').forEach(function(el){el.classList.add('reveal-in');});},2500);})();</script>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header" data-header>
+  <div class="header-inner">
+    <div class="header-shell">
+      <a href="index.html" class="logo"><span class="logo-mark">T</span>TECHBISS</a>
+      <nav class="main-nav" aria-label="Primary">
+        <ul>
+          <li class="has-menu">
+            <button class="nav-link" aria-expanded="false">Services <svg class="chev" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.4"/></svg></button>
+            <div class="mega-menu">
+              <a href="websites.html"><span class="title">Websites</span><span class="desc">Marketing sites & storefronts built to convert.</span></a>
+              <a href="web-applications.html"><span class="title">Web Applications</span><span class="desc">Custom platforms and internal tools.</span></a>
+              <a href="business-digitization.html"><span class="title">Business Digitization</span><span class="desc">Move offline operations online.</span></a>
+              <a href="domain-hosting.html"><span class="title">Domain & Hosting</span><span class="desc">Registration, hosting & infrastructure.</span></a>
+              <a href="ssl-email.html"><span class="title">SSL & Business Email</span><span class="desc">Security and professional email.</span></a>
+              <a href="services.html"><span class="title">All Services →</span><span class="desc">See the full capability map.</span></a>
+            </div>
+          </li>
+          <li><a href="solutions.html" class="nav-link">Solutions</a></li>
+          <li><a href="work.html" class="nav-link">Work</a></li>
+          <li class="has-menu">
+            <button class="nav-link" aria-expanded="false">Company <svg class="chev" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.4"/></svg></button>
+            <div class="mega-menu">
+              <a href="about.html"><span class="title">About</span><span class="desc">Who we are and how we work.</span></a>
+              <a href="process.html"><span class="title">Process</span><span class="desc">Idea to launch, step by step.</span></a>
+              <a href="technology.html"><span class="title">Technology</span><span class="desc">The stack behind every build.</span></a>
+              <a href="pricing.html"><span class="title">Pricing</span><span class="desc">Packages & engagement models.</span></a>
+              <a href="contact.html"><span class="title">Contact</span><span class="desc">Talk to our team.</span></a>
+            </div>
+          </li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <a href="contact.html" class="nav-link nav-link-ghost">Contact</a>
+        <a href="get-started.html" class="btn btn-primary magnetic"><span>Start a Project</span></a>
+        <button class="nav-toggle" aria-label="Open menu" aria-expanded="false" data-nav-toggle>
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Deliberately a sibling of <header>, not nested inside it: .site-header carries
+     a backdrop-filter for the frosted sticky bar, and per spec, filter/backdrop-filter
+     creates a new containing block for position:fixed descendants — a .mobile-nav
+     nested inside it would have its inset:0 resolve against the header bar's own
+     (content-sized) box instead of the viewport, collapsing it to header-bar height
+     instead of covering the screen. Living outside .site-header sidesteps that
+     entirely while .header-inner's higher z-index (see CSS) still keeps the header
+     bar/hamburger clickable above this overlay when it's open. -->
+<div class="mobile-nav" data-mobile-nav>
+  <ul class="mobile-nav-links">
+    <li>
+      <button class="mobile-sub-toggle" aria-expanded="false">Services <svg class="chev" viewBox="0 0 10 6" fill="none" width="14"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.4"/></svg></button>
+      <div class="mobile-sub">
+        <a href="websites.html">Websites</a>
+        <a href="web-applications.html">Web Applications</a>
+        <a href="business-digitization.html">Business Digitization</a>
+        <a href="domain-hosting.html">Domain & Hosting</a>
+        <a href="ssl-email.html">SSL & Business Email</a>
+        <a href="services.html">All Services</a>
+      </div>
+    </li>
+    <li><a href="solutions.html">Solutions</a></li>
+    <li><a href="work.html">Work</a></li>
+    <li>
+      <button class="mobile-sub-toggle" aria-expanded="false">Company <svg class="chev" viewBox="0 0 10 6" fill="none" width="14"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.4"/></svg></button>
+      <div class="mobile-sub">
+        <a href="about.html">About</a>
+        <a href="process.html">Process</a>
+        <a href="technology.html">Technology</a>
+        <a href="pricing.html">Pricing</a>
+        <a href="contact.html">Contact</a>
+      </div>
+    </li>
+  </ul>
+  <div class="mobile-nav-foot">
+    <a href="get-started.html" class="btn btn-primary">Start a Project</a>
+    <a href="work.html" class="btn btn-outline">Explore Our Work</a>
+  </div>
+</div>
+
+<main id="main">
+
+  <!-- PAGE HERO — split: copy left, quick-facts stat callout right.
+       .has-split must share the element with .page-hero (compound selector in
+       style.css) and with .container (for the section's own horizontal gutter/
+       max-width, since .page-hero itself only sets vertical padding) — so this
+       section carries all three classes at once and its two direct children
+       become the grid's two columns, instead of the usual nested .container. -->
+  <section class="page-hero has-split container">
+    <div>
+      <nav class="breadcrumb" aria-label="Breadcrumb" data-reveal>
+        <a href="index.html">Home</a><span class="sep">/</span>
+        <a href="services.html">Services</a><span class="sep">/</span>
+        <span aria-current="page">Websites</span>
+      </nav>
+      <span class="eyebrow" data-reveal data-reveal-delay="60"><span class="eyebrow-swatch" aria-hidden="true"></span>Websites</span>
+      <h1 data-reveal data-reveal-delay="120">A website that turns visitors into <span class="accent-ink">customers</span> — not just traffic.</h1>
+      <p class="lede" data-reveal data-reveal-delay="180">Whatever's live for your business right now — an outdated template, a Facebook page, or nothing at all — we replace it with a site built to load fast, rank well, and convert the people who find it.</p>
+    </div>
+    <div class="stat-row" data-stagger>
+      <div class="stat-cell" data-reveal><div class="stat-number" data-count="6" data-suffix=" wks">0</div><div class="stat-label">Typical timeline to launch</div></div>
+      <div class="stat-cell" data-reveal><div class="stat-number" data-count="100" data-suffix="%">0</div><div class="stat-label">Mobile-first, every build</div></div>
+    </div>
+  </section>
+
+  <!-- TYPES OF WEBSITES -->
+  <section>
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow"><span class="eyebrow-swatch" aria-hidden="true"></span>What we build</span>
+          <h2 data-reveal>Four kinds of websites, one goal: turning visitors into customers.</h2>
+        </div>
+        <p class="lede" data-reveal>Whatever stage your business is at, there's a format built for it — from a focused single-page pitch to a full storefront with checkout.</p>
+      </div>
+      <div class="grid grid-2" data-stagger>
+        <div class="card" data-reveal>
+          <span class="card-index">01</span>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M3 9h18" stroke="currentColor" stroke-width="1.6"/></svg></div>
+          <h3>Marketing Sites</h3><p>Your digital home base — fast, credible, and built around the questions a real customer actually asks before they call or buy.</p>
+          <span class="shift-line"><b>Before:</b> a slow template nobody updates. <b>After:</b> a fast site your team can actually maintain.</span>
+        </div>
+        <div class="card" data-reveal>
+          <span class="card-index">02</span>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M3 4h2l2.4 12.2a2 2 0 002 1.8h8.4a2 2 0 002-1.7L21 9H6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="10" cy="20" r="1.4" stroke="currentColor" stroke-width="1.6"/><circle cx="17" cy="20" r="1.4" stroke="currentColor" stroke-width="1.6"/></svg></div>
+          <h3>Storefronts & E-Commerce</h3><p>Full online stores with product catalogs, cart and secure checkout — built to sell, not just display.</p>
+          <span class="shift-line"><b>Before:</b> "message us to order." <b>After:</b> add to cart, checkout, done.</span>
+        </div>
+        <div class="card" data-reveal>
+          <span class="card-index">03</span>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg></div>
+          <h3>Landing Pages</h3><p>Focused, single-purpose pages built around one offer and one action — for a campaign, a launch, or a specific audience.</p>
+          <span class="shift-line"><b>Before:</b> one page trying to do everything. <b>After:</b> a page built to convert one visitor at a time.</span>
+        </div>
+        <div class="card" data-reveal>
+          <span class="card-index">04</span>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="10.5" r="2.5" stroke="currentColor" stroke-width="1.6"/><path d="M7 17c1-2.2 2.9-3 5-3s4 .8 5 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+          <h3>Member Portals</h3><p>Gated areas where customers log in for content, bookings, documents or account info — not just a contact form.</p>
+          <span class="shift-line"><b>Before:</b> emailing files back and forth. <b>After:</b> clients log in and see it themselves.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BEFORE/AFTER MOMENT — reuses the homepage's .ba-slider component verbatim,
+       with website-specific content in the before/after panels. -->
+  <section class="band">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow"><span class="eyebrow-swatch" aria-hidden="true"></span>The shift</span>
+          <h2 data-reveal>From a page people scroll past to a store that closes the sale.</h2>
+        </div>
+        <p class="lede" data-reveal>Drag the handle. This is the same shift most of our website clients make — from posts and DMs to a real, working storefront.</p>
+      </div>
+
+      <div class="ba-wrap" data-reveal data-reveal-delay="120">
+        <div class="ba-slider" data-ba-slider style="--split:50%;" role="group" aria-label="Before and after: a Facebook page versus a TECHBISS storefront">
+          <span class="ba-label ba-label-before">Before</span>
+          <span class="ba-label ba-label-after">After</span>
+
+          <div class="ba-panel ba-before">
+            <div class="doc-head"><span class="doc-dot"></span> facebook.com</div>
+            <ul class="doc-lines">
+              <li><span class="dl-id">Mon</span><span class="dl-note">"is this still available?"</span></li>
+              <li><span class="dl-id">Tue</span><span class="dl-note">"price in comments?"</span></li>
+              <li class="is-void"><span class="dl-id">Wed</span><span class="dl-note">no reply sent</span></li>
+              <li><span class="dl-id">Thu</span><span class="dl-note">"do you deliver?"</span></li>
+              <li><span class="dl-id">Fri</span><span class="dl-note">still waiting…</span></li>
+            </ul>
+            <div class="doc-foot">No cart. No checkout. Just DMs.</div>
+          </div>
+
+          <div class="ba-panel ba-after">
+            <div class="doc-head"><span class="doc-dot is-live"></span> yourbusiness.com — Live Store</div>
+            <div class="chip-row">
+              <div class="stat-chip"><span class="chip-num" data-count="24">0</span><span class="chip-label">Orders today</span></div>
+              <div class="stat-chip"><span class="chip-num" data-count="4.9" data-suffix="★">0</span><span class="chip-label">Store rating</span></div>
+            </div>
+            <div class="ring-row">
+              <svg class="ring" viewBox="0 0 84 84" width="68" height="68" aria-hidden="true">
+                <circle class="ring-track" cx="42" cy="42" r="36" fill="none" stroke-width="8"/>
+                <circle class="ring-value" cx="42" cy="42" r="36" fill="none" stroke-width="8" stroke-linecap="round"/>
+              </svg>
+              <div class="ring-text"><strong>94%</strong><span>Checkout completion</span></div>
+            </div>
+            <div class="doc-foot">Open, and selling, right now.</div>
+          </div>
+
+          <div class="ba-line" aria-hidden="true"></div>
+          <button type="button" class="ba-handle" data-ba-handle role="slider" aria-orientation="horizontal" aria-valuemin="4" aria-valuemax="96" aria-valuenow="50" aria-label="Comparison position — drag, or use the left and right arrow keys, to see more before or after.">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 7L3 12L8 17M16 7L21 12L16 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+        <p class="ba-hint">Drag the handle — or press <kbd>←</kbd><kbd>→</kbd> — to see the shift.</p>
+      </div>
+
+      <div style="max-width:640px;margin:3rem auto 0;" data-reveal data-reveal-delay="200">
+        <span class="eyebrow"><span class="eyebrow-swatch" aria-hidden="true"></span>Every build includes</span>
+        <ul class="feature-list">
+          <li><svg viewBox="0 0 20 20" fill="none"><path d="M4 10l4 4 8-9" stroke="currentColor" stroke-width="2"/></svg>Fast, secure hosting from day one</li>
+          <li><svg viewBox="0 0 20 20" fill="none"><path d="M4 10l4 4 8-9" stroke="currentColor" stroke-width="2"/></svg>Mobile-first on every screen size</li>
+          <li><svg viewBox="0 0 20 20" fill="none"><path d="M4 10l4 4 8-9" stroke="currentColor" stroke-width="2"/></svg>SEO basics built in, not bolted on</li>
+          <li><svg viewBox="0 0 20 20" fill="none"><path d="M4 10l4 4 8-9" stroke="currentColor" stroke-width="2"/></svg>Analytics wired in from launch</li>
+          <li><svg viewBox="0 0 20 20" fill="none"><path d="M4 10l4 4 8-9" stroke="currentColor" stroke-width="2"/></svg>Secure checkout for stores & bookings</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROCESS FOR THIS SERVICE -->
+  <section>
+    <div class="container">
+      <span class="eyebrow"><span class="eyebrow-swatch" aria-hidden="true"></span>How we build it</span>
+      <h2 data-reveal style="margin-bottom:2.5rem;">From first call to launch, condensed.</h2>
+      <div class="steps">
+        <div class="step" data-reveal><div class="step-num"></div><div><h3>Plan</h3><p>We map your pages, content and goals — what visitors need to see, and what you need them to do once they're there.</p></div></div>
+        <div class="step" data-reveal><div class="step-num"></div><div><h3>Design</h3><p>A look and layout built around your business, not a recycled template with your logo swapped in.</p></div></div>
+        <div class="step" data-reveal><div class="step-num"></div><div><h3>Build & Launch</h3><p>We build, test on real devices, then launch on secured hosting — domain, SSL and email included.</p></div></div>
+        <div class="step" data-reveal><div class="step-num"></div><div><h3>Support</h3><p>We stay on after launch to monitor uptime, ship updates, and help with changes as your site grows.</p></div></div>
+      </div>
+      <div class="btn-row" style="margin-top:2.1rem;"><a href="process.html" class="btn-link">See our full process</a></div>
+    </div>
+  </section>
+
+  <!-- PRICING TEASER — sentence + link, no duplicated pricing cards -->
+  <section class="band section-tight">
+    <div class="container" data-reveal>
+      <span class="eyebrow"><span class="eyebrow-swatch" aria-hidden="true"></span>Pricing</span>
+      <p class="lede" style="max-width:60ch;">Website projects are priced by scope, not guesswork. Most fall into one of a few straightforward packages — hosting, SSL and launch support included.</p>
+      <div class="btn-row" style="margin-top:1.4rem;">
+        <a href="pricing.html" class="btn btn-outline"><span>See Pricing & Packages</span></a>
+        <a href="get-started.html" class="btn-link">Or just tell us what you need →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section>
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow"><span class="eyebrow-swatch" aria-hidden="true"></span>Questions</span>
+          <h2 data-reveal>Questions we hear before every website project.</h2>
+        </div>
+      </div>
+      <div class="accordion" data-reveal>
+        <div class="accordion-item">
+          <button class="accordion-trigger" aria-expanded="false">How long does a website take?<span class="plus" aria-hidden="true"></span></button>
+          <div class="accordion-panel"><p>Most marketing sites and storefronts go live in 4–6 weeks from our first call — discovery and content in the first week or two, build and review in the middle, then launch. Larger stores or custom features can run longer; we'll give you a real date once we understand scope, not a generic estimate.</p></div>
+        </div>
+        <div class="accordion-item">
+          <button class="accordion-trigger" aria-expanded="false">Can I edit the content myself after launch?<span class="plus" aria-hidden="true"></span></button>
+          <div class="accordion-panel"><p>Yes. Every site we build hands you a way to update text, images and basic pages yourself, with a short walkthrough at launch so you're never locked out of your own website. If you'd rather we handle changes for you, that's available too.</p></div>
+        </div>
+        <div class="accordion-item">
+          <button class="accordion-trigger" aria-expanded="false">Do you handle e-commerce?<span class="plus" aria-hidden="true"></span></button>
+          <div class="accordion-panel"><p>Yes — full storefronts with product catalogs, cart, secure checkout and payment processing, not just a "buy now" button bolted onto a brochure site. If you already sell somewhere else, we can usually bring that data with you.</p></div>
+        </div>
+        <div class="accordion-item">
+          <button class="accordion-trigger" aria-expanded="false">What if I already have a domain?<span class="plus" aria-hidden="true"></span></button>
+          <div class="accordion-panel"><p>We build on the domain you already own — just point it at us, or we'll handle the DNS change for you. If you don't have one yet, we can register it as part of the project. Either way, it's covered under <a href="domain-hosting.html">Domain & Hosting</a>.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA BANNER -->
+  <section>
+    <div class="container">
+      <div class="cta-banner" data-reveal>
+        <span class="eyebrow"><span class="eyebrow-swatch" aria-hidden="true"></span>Let's start</span>
+        <h2>What does your website need to become?</h2>
+        <p class="lede">Tell us what's live right now — a template, a Facebook page, or nothing at all — we'll show you exactly what changes, and how fast.</p>
+        <div class="btn-row">
+          <a href="get-started.html" class="btn btn-primary magnetic"><span>Start a Project</span></a>
+          <a href="contact.html" class="btn btn-outline"><span>Talk to Our Team</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="index.html" class="logo"><span class="logo-mark">T</span>TECHBISS</a>
+        <p>We turn businesses into digital businesses — one before/after at a time.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Services</h4>
+        <ul>
+          <li><a href="websites.html">Websites</a></li>
+          <li><a href="web-applications.html">Web Applications</a></li>
+          <li><a href="business-digitization.html">Business Digitization</a></li>
+          <li><a href="domain-hosting.html">Domain & Hosting</a></li>
+          <li><a href="ssl-email.html">SSL & Business Email</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="about.html">About</a></li>
+          <li><a href="process.html">Process</a></li>
+          <li><a href="technology.html">Technology</a></li>
+          <li><a href="work.html">Work</a></li>
+          <li><a href="case-study.html">Case Study</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Get Started</h4>
+        <ul>
+          <li><a href="solutions.html">Solutions</a></li>
+          <li><a href="pricing.html">Pricing</a></li>
+          <li><a href="get-started.html">Start a Project</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 TECHBISS. All rights reserved.</p>
+      <div class="footer-social">
+        <a href="#" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.4"/><path d="M8 10v6M8 7.5v.01M12 16v-3.5c0-1.5 1-2.5 2.5-2.5S17 11 17 12.5V16" stroke="currentColor" stroke-width="1.4"/></svg></a>
+        <a href="#" aria-label="X"><svg viewBox="0 0 24 24" fill="none"><path d="M4 4l16 16M20 4L4 20" stroke="currentColor" stroke-width="1.4"/></svg></a>
+        <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="1.4"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.4"/></svg></a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1/dist/lenis.min.js"></script>
+<script src="assets/js/main.js"></script>
+</body>
+</html>

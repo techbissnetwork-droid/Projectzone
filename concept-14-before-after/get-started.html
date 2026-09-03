@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Start Your Project — TECHBISS</title>
+<meta name="description" content="Tell us where your business runs today — paper, spreadsheets, tools that don't talk to each other — and where you want it to go. No obligation, free consultation, reply within one business day.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><rect width=%2232%22 height=%2232%22 rx=%229%22 fill=%22%23201c15%22/><path d=%22M6 6h20v20H6z%22 fill=%22%238c8168%22/><path d=%22M26 6L26 26L6 26Z%22 fill=%22%232c3fdc%22/></svg>">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<script>(function(){document.documentElement.classList.add('js-anim');window.addEventListener('error',function(){document.querySelectorAll('[data-reveal]').forEach(function(el){el.classList.add('reveal-in');el.querySelectorAll&&el.querySelectorAll('.ba-after').forEach(function(f){f.classList.add('is-active');});});});setTimeout(function(){document.querySelectorAll('[data-reveal]:not(.reveal-in)').forEach(function(el){el.classList.add('reveal-in');});},2500);})();</script>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header" data-header>
+  <div class="header-inner">
+    <div class="header-shell">
+      <a href="index.html" class="logo"><span class="logo-mark">T</span>TECHBISS</a>
+      <nav class="main-nav" aria-label="Primary">
+        <ul>
+          <li class="has-menu">
+            <button class="nav-link" aria-expanded="false">Services <svg class="chev" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.4"/></svg></button>
+            <div class="mega-menu">
+              <a href="websites.html"><span class="title">Websites</span><span class="desc">Marketing sites & storefronts built to convert.</span></a>
+              <a href="web-applications.html"><span class="title">Web Applications</span><span class="desc">Custom platforms and internal tools.</span></a>
+              <a href="business-digitization.html"><span class="title">Business Digitization</span><span class="desc">Move offline operations online.</span></a>
+              <a href="domain-hosting.html"><span class="title">Domain & Hosting</span><span class="desc">Registration, hosting & infrastructure.</span></a>
+              <a href="ssl-email.html"><span class="title">SSL & Business Email</span><span class="desc">Security and professional email.</span></a>
+              <a href="services.html"><span class="title">All Services →</span><span class="desc">See the full capability map.</span></a>
+            </div>
+          </li>
+          <li><a href="solutions.html" class="nav-link">Solutions</a></li>
+          <li><a href="work.html" class="nav-link">Work</a></li>
+          <li class="has-menu">
+            <button class="nav-link" aria-expanded="false">Company <svg class="chev" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.4"/></svg></button>
+            <div class="mega-menu">
+              <a href="about.html"><span class="title">About</span><span class="desc">Who we are and how we work.</span></a>
+              <a href="process.html"><span class="title">Process</span><span class="desc">Idea to launch, step by step.</span></a>
+              <a href="technology.html"><span class="title">Technology</span><span class="desc">The stack behind every build.</span></a>
+              <a href="pricing.html"><span class="title">Pricing</span><span class="desc">Packages & engagement models.</span></a>
+              <a href="contact.html"><span class="title">Contact</span><span class="desc">Talk to our team.</span></a>
+            </div>
+          </li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <a href="contact.html" class="nav-link nav-link-ghost">Contact</a>
+        <a href="get-started.html" class="btn btn-primary magnetic"><span>Start a Project</span></a>
+        <button class="nav-toggle" aria-label="Open menu" aria-expanded="false" data-nav-toggle>
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Deliberately a sibling of <header>, not nested inside it: .site-header carries
+     a backdrop-filter for the frosted sticky bar, and per spec, filter/backdrop-filter
+     creates a new containing block for position:fixed descendants — a .mobile-nav
+     nested inside it would have its inset:0 resolve against the header bar's own
+     (content-sized) box instead of the viewport, collapsing it to header-bar height
+     instead of covering the screen. Living outside .site-header sidesteps that
+     entirely while .header-inner's higher z-index (see CSS) still keeps the header
+     bar/hamburger clickable above this overlay when it's open. -->
+<div class="mobile-nav" data-mobile-nav>
+  <ul class="mobile-nav-links">
+    <li>
+      <button class="mobile-sub-toggle" aria-expanded="false">Services <svg class="chev" viewBox="0 0 10 6" fill="none" width="14"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.4"/></svg></button>
+      <div class="mobile-sub">
+        <a href="websites.html">Websites</a>
+        <a href="web-applications.html">Web Applications</a>
+        <a href="business-digitization.html">Business Digitization</a>
+        <a href="domain-hosting.html">Domain & Hosting</a>
+        <a href="ssl-email.html">SSL & Business Email</a>
+        <a href="services.html">All Services</a>
+      </div>
+    </li>
+    <li><a href="solutions.html">Solutions</a></li>
+    <li><a href="work.html">Work</a></li>
+    <li>
+      <button class="mobile-sub-toggle" aria-expanded="false">Company <svg class="chev" viewBox="0 0 10 6" fill="none" width="14"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.4"/></svg></button>
+      <div class="mobile-sub">
+        <a href="about.html">About</a>
+        <a href="process.html">Process</a>
+        <a href="technology.html">Technology</a>
+        <a href="pricing.html">Pricing</a>
+        <a href="contact.html">Contact</a>
+      </div>
+    </li>
+  </ul>
+  <div class="mobile-nav-foot">
+    <a href="get-started.html" class="btn btn-primary">Start a Project</a>
+    <a href="work.html" class="btn btn-outline">Explore Our Work</a>
+  </div>
+</div>
+
+<main id="main">
+
+  <!-- PAGE HERO -->
+  <section class="page-hero">
+    <div class="container">
+      <nav class="breadcrumb" aria-label="Breadcrumb" data-reveal>
+        <a href="index.html">Home</a><span class="sep">/</span><span aria-current="page">Get Started</span>
+      </nav>
+      <span class="eyebrow" data-reveal data-reveal-delay="40"><span class="eyebrow-swatch" aria-hidden="true"></span>Start your own before/after</span>
+      <h1 data-reveal data-reveal-delay="80" style="max-width:19ch;">This is where your before becomes an after.</h1>
+      <p class="lede" data-reveal data-reveal-delay="120" style="max-width:56ch;">Takes about three minutes, no sales call required yet. Tell us where your business runs today — paper, spreadsheets, tools that don't talk to each other — and we'll come back with a plan for where it runs next.</p>
+    </div>
+  </section>
+
+  <!-- FORM + REASSURANCE -->
+  <section class="section-tight">
+    <div class="container">
+      <div class="form-layout">
+
+        <!-- FORM CARD -->
+        <div class="form-card" data-reveal data-reveal-delay="60">
+
+          <div data-form-wrap>
+            <div class="step-track" data-step-track style="--fill:0;">
+              <div class="step-track-line" aria-hidden="true"></div>
+              <div class="step-track-fill" data-step-fill aria-hidden="true"></div>
+              <div class="step-track-item is-active" data-step-node="1">
+                <span class="step-track-dot">
+                  <span class="step-track-num">1</span>
+                  <svg class="step-track-check" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10l4 4 8-9" stroke="currentColor" stroke-width="2"/></svg>
+                </span>
+                <span class="step-track-label">About your business</span>
+              </div>
+              <div class="step-track-item" data-step-node="2">
+                <span class="step-track-dot">
+                  <span class="step-track-num">2</span>
+                  <svg class="step-track-check" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10l4 4 8-9" stroke="currentColor" stroke-width="2"/></svg>
+                </span>
+                <span class="step-track-label">What you need</span>
+              </div>
+              <div class="step-track-item" data-step-node="3">
+                <span class="step-track-dot">
+                  <span class="step-track-num">3</span>
+                  <svg class="step-track-check" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10l4 4 8-9" stroke="currentColor" stroke-width="2"/></svg>
+                </span>
+                <span class="step-track-label">Timeline & contact</span>
+              </div>
+            </div>
+            <p class="step-track-status" data-step-status aria-live="polite">Step <span data-step-current>1</span> of 3</p>
+
+            <form data-multistep-form novalidate>
+
+              <!-- STEP 1 — About your business -->
+              <fieldset class="form-step" data-form-step="1">
+                <legend class="form-step-legend">About your business</legend>
+
+                <div class="field">
+                  <label for="biz-name">Business name</label>
+                  <input type="text" id="biz-name" name="business-name" autocomplete="organization" placeholder="e.g. Anand Family Grocers">
+                </div>
+                <p class="form-step-hint" data-step1-hint role="alert" hidden>Add a business name so we know who to prepare this for.</p>
+
+                <div class="field">
+                  <label id="industry-label">Industry</label>
+                  <div class="choice-row" role="group" aria-labelledby="industry-label">
+                    <label class="choice-chip"><input type="radio" name="industry" value="Retail"><span>Retail</span></label>
+                    <label class="choice-chip"><input type="radio" name="industry" value="Hospitality"><span>Hospitality</span></label>
+                    <label class="choice-chip"><input type="radio" name="industry" value="Healthcare"><span>Healthcare</span></label>
+                    <label class="choice-chip"><input type="radio" name="industry" value="Professional Services"><span>Professional Services</span></label>
+                    <label class="choice-chip"><input type="radio" name="industry" value="Other"><span>Other</span></label>
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label id="current-state-label">Where does your business run today?</label>
+                  <div class="choice-row" role="group" aria-labelledby="current-state-label">
+                    <label class="choice-chip"><input type="radio" name="current-state" value="Mostly offline/paper-based"><span>Mostly offline/paper-based</span></label>
+                    <label class="choice-chip"><input type="radio" name="current-state" value="Some tools, nothing connected"><span>Some tools, nothing connected</span></label>
+                    <label class="choice-chip"><input type="radio" name="current-state" value="We have systems but they don't talk to each other"><span>We have systems but they don't talk to each other</span></label>
+                    <label class="choice-chip"><input type="radio" name="current-state" value="Fully digital, need something specific"><span>Fully digital, need something specific</span></label>
+                  </div>
+                </div>
+
+                <div class="form-step-actions">
+                  <button type="button" class="btn btn-primary" data-step-next>Next
+                    <svg viewBox="0 0 16 16" fill="none" width="16" height="16" aria-hidden="true"><path d="M4 12L12 4M12 4H5M12 4V11" stroke="currentColor" stroke-width="2"/></svg>
+                  </button>
+                </div>
+              </fieldset>
+
+              <!-- STEP 2 — What do you need -->
+              <fieldset class="form-step" data-form-step="2" hidden>
+                <legend class="form-step-legend">What do you need</legend>
+
+                <div class="field">
+                  <label id="needs-label">Where should we focus? <span class="text-dim" style="font-weight:400;">(pick as many as apply)</span></label>
+                  <div class="choice-row" role="group" aria-labelledby="needs-label">
+                    <label class="choice-chip"><input type="checkbox" name="needs" value="Website"><span>Website</span></label>
+                    <label class="choice-chip"><input type="checkbox" name="needs" value="Web Application"><span>Web Application</span></label>
+                    <label class="choice-chip"><input type="checkbox" name="needs" value="Business Digitization"><span>Business Digitization</span></label>
+                    <label class="choice-chip"><input type="checkbox" name="needs" value="Domain & Hosting"><span>Domain & Hosting</span></label>
+                    <label class="choice-chip"><input type="checkbox" name="needs" value="SSL & Business Email"><span>SSL & Business Email</span></label>
+                    <label class="choice-chip"><input type="checkbox" name="needs" value="Not sure yet"><span>Not sure yet</span></label>
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label for="blockers">Tell us more about what's slowing you down.</label>
+                  <textarea id="blockers" name="blockers" rows="4" placeholder="e.g. Orders still come in by phone and get written on paper — we lose track of them constantly."></textarea>
+                </div>
+
+                <div class="form-step-actions">
+                  <button type="button" class="btn btn-outline" data-step-back>
+                    <svg viewBox="0 0 16 16" fill="none" width="16" height="16" aria-hidden="true"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.6"/></svg> Back
+                  </button>
+                  <button type="button" class="btn btn-primary" data-step-next>Next
+                    <svg viewBox="0 0 16 16" fill="none" width="16" height="16" aria-hidden="true"><path d="M4 12L12 4M12 4H5M12 4V11" stroke="currentColor" stroke-width="2"/></svg>
+                  </button>
+                </div>
+              </fieldset>
+
+              <!-- STEP 3 — Timeline & contact -->
+              <fieldset class="form-step" data-form-step="3" hidden>
+                <legend class="form-step-legend">Timeline & contact</legend>
+
+                <div class="field">
+                  <label id="budget-label">Budget range</label>
+                  <div class="choice-row" role="group" aria-labelledby="budget-label">
+                    <label class="choice-chip"><input type="radio" name="budget" value="Under $2,500"><span>Under $2,500</span></label>
+                    <label class="choice-chip"><input type="radio" name="budget" value="$2,500–$10,000"><span>$2,500–$10,000</span></label>
+                    <label class="choice-chip"><input type="radio" name="budget" value="$10,000+"><span>$10,000+</span></label>
+                    <label class="choice-chip"><input type="radio" name="budget" value="Not sure yet"><span>Not sure yet</span></label>
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label id="timeline-label">Desired timeline</label>
+                  <div class="choice-row" role="group" aria-labelledby="timeline-label">
+                    <label class="choice-chip"><input type="radio" name="timeline" value="ASAP"><span>ASAP</span></label>
+                    <label class="choice-chip"><input type="radio" name="timeline" value="1–3 months"><span>1–3 months</span></label>
+                    <label class="choice-chip"><input type="radio" name="timeline" value="3–6 months"><span>3–6 months</span></label>
+                    <label class="choice-chip"><input type="radio" name="timeline" value="Just exploring"><span>Just exploring</span></label>
+                  </div>
+                </div>
+
+                <div class="field-row">
+                  <div class="field">
+                    <label for="contact-name">Name</label>
+                    <input type="text" id="contact-name" name="contact-name" autocomplete="name" placeholder="Your full name">
+                  </div>
+                  <div class="field">
+                    <label for="contact-email">Email</label>
+                    <input type="email" id="contact-email" name="contact-email" autocomplete="email" placeholder="you@yourbusiness.com">
+                  </div>
+                </div>
+                <div class="field">
+                  <label for="contact-phone">Phone <span class="text-dim" style="font-weight:400;">(optional)</span></label>
+                  <input type="tel" id="contact-phone" name="contact-phone" autocomplete="tel" placeholder="(555) 555-5555">
+                </div>
+
+                <div class="form-step-actions">
+                  <button type="button" class="btn btn-outline" data-step-back>
+                    <svg viewBox="0 0 16 16" fill="none" width="16" height="16" aria-hidden="true"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.6"/></svg> Back
+                  </button>
+                  <button type="submit" class="btn btn-primary magnetic">Start My Project
+                    <svg viewBox="0 0 16 16" fill="none" width="16" height="16" aria-hidden="true"><path d="M4 12L12 4M12 4H5M12 4V11" stroke="currentColor" stroke-width="2"/></svg>
+                  </button>
+                </div>
+              </fieldset>
+
+            </form>
+          </div>
+
+          <!-- CONFIRMATION STATE (swapped in after submit) -->
+          <div class="confirm-state" data-confirm-state tabindex="-1" hidden>
+            <div class="confirm-icon" aria-hidden="true">
+              <svg viewBox="0 0 20 20" fill="none"><path d="M4 10l4 4 8-9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <h3 data-confirm-heading>Thanks — we're on it.</h3>
+            <p class="lede" data-confirm-body style="max-width:none;">We'll review what you told us and reach out within one business day to set up a quick call.</p>
+            <hr class="divider" style="margin:1.8rem 0;">
+            <p class="confirm-next-label">What happens next</p>
+            <div class="steps">
+              <div class="step">
+                <div class="step-num"></div>
+                <div><h3>We review your answers</h3><p>No auto-replies — someone on our team actually reads this.</p></div>
+              </div>
+              <div class="step">
+                <div class="step-num"></div>
+                <div><h3>We schedule a short call</h3><p>15–20 minutes, at a time that works for you.</p></div>
+              </div>
+              <div class="step">
+                <div class="step-num"></div>
+                <div><h3>You get a proposal</h3><p>Clear scope, timeline and price — no obligation to move forward.</p></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- REASSURANCE SIDEBAR -->
+        <aside data-reveal data-reveal-delay="120" style="padding-top:clamp(1.8rem,3.5vw,2.6rem);">
+          <span class="badge">
+            <svg viewBox="0 0 20 20" fill="none" width="14" height="14" aria-hidden="true"><circle cx="10" cy="10" r="4" fill="currentColor"/></svg>
+            9 years turning paper into platforms
+          </span>
+          <ul class="feature-list" style="margin-top:1.7rem;">
+            <li><svg viewBox="0 0 20 20" fill="none"><path d="M4 10l4 4 8-9" stroke="currentColor" stroke-width="2"/></svg>No obligation, ever</li>
+            <li><svg viewBox="0 0 20 20" fill="none"><path d="M4 10l4 4 8-9" stroke="currentColor" stroke-width="2"/></svg>Free initial consultation</li>
+            <li><svg viewBox="0 0 20 20" fill="none"><path d="M4 10l4 4 8-9" stroke="currentColor" stroke-width="2"/></svg>Reply within 1 business day</li>
+            <li><svg viewBox="0 0 20 20" fill="none"><path d="M4 10l4 4 8-9" stroke="currentColor" stroke-width="2"/></svg>Most projects go live in 6–10 weeks</li>
+          </ul>
+          <hr class="divider" style="margin:2rem 0;">
+          <p class="text-dim" style="font-size:.92rem;line-height:1.6;">Want to see typical pricing first? <a href="pricing.html" class="btn-link">Check our packages</a></p>
+          <p class="text-dim" style="font-size:.92rem;line-height:1.6;margin-top:1.1rem;">Prefer to just talk it through? <a href="contact.html" class="btn-link">Contact us directly</a></p>
+        </aside>
+
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="index.html" class="logo"><span class="logo-mark">T</span>TECHBISS</a>
+        <p>We turn businesses into digital businesses — one before/after at a time.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Services</h4>
+        <ul>
+          <li><a href="websites.html">Websites</a></li>
+          <li><a href="web-applications.html">Web Applications</a></li>
+          <li><a href="business-digitization.html">Business Digitization</a></li>
+          <li><a href="domain-hosting.html">Domain & Hosting</a></li>
+          <li><a href="ssl-email.html">SSL & Business Email</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="about.html">About</a></li>
+          <li><a href="process.html">Process</a></li>
+          <li><a href="technology.html">Technology</a></li>
+          <li><a href="work.html">Work</a></li>
+          <li><a href="case-study.html">Case Study</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Get Started</h4>
+        <ul>
+          <li><a href="solutions.html">Solutions</a></li>
+          <li><a href="pricing.html">Pricing</a></li>
+          <li><a href="get-started.html">Start a Project</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 TECHBISS. All rights reserved.</p>
+      <div class="footer-social">
+        <a href="#" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.4"/><path d="M8 10v6M8 7.5v.01M12 16v-3.5c0-1.5 1-2.5 2.5-2.5S17 11 17 12.5V16" stroke="currentColor" stroke-width="1.4"/></svg></a>
+        <a href="#" aria-label="X"><svg viewBox="0 0 24 24" fill="none"><path d="M4 4l16 16M20 4L4 20" stroke="currentColor" stroke-width="1.4"/></svg></a>
+        <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="1.4"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.4"/></svg></a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1/dist/lenis.min.js"></script>
+<script src="assets/js/main.js"></script>
+<script>
+/* ---------------- Get Started — multi-step form ----------------
+   Page-specific: shows one <fieldset data-form-step> at a time, drives the
+   .step-track progress indicator, and swaps the whole form for a confirmation
+   state on submit. Kept independent of main.js's data-reveal system (which is
+   scroll/IntersectionObserver driven and unsuited to elements toggled via
+   the hidden attribute after load). */
+(function(){
+  "use strict";
+  var form = document.querySelector('[data-multistep-form]');
+  var wrap = document.querySelector('[data-form-wrap]');
+  var track = document.querySelector('[data-step-track]');
+  if (!form || !wrap || !track) return;
+
+  var steps = Array.prototype.slice.call(form.querySelectorAll('[data-form-step]'));
+  var totalSteps = steps.length;
+  var nodes = Array.prototype.slice.call(track.querySelectorAll('[data-step-node]'));
+  var statusCurrent = document.querySelector('[data-step-current]');
+  var confirmState = document.querySelector('[data-confirm-state]');
+  var confirmHeading = document.querySelector('[data-confirm-heading]');
+  var nameField = document.getElementById('biz-name');
+  var hint = document.querySelector('[data-step1-hint]');
+
+  function showStep(n){
+    steps.forEach(function(step){
+      var num = parseInt(step.getAttribute('data-form-step'), 10);
+      step.hidden = (num !== n);
+    });
+    nodes.forEach(function(node){
+      var num = parseInt(node.getAttribute('data-step-node'), 10);
+      node.classList.toggle('is-active', num === n);
+      node.classList.toggle('is-done', num < n);
+      if (num === n) node.setAttribute('aria-current', 'step');
+      else node.removeAttribute('aria-current');
+    });
+    track.style.setProperty('--fill', String((n - 1) / (totalSteps - 1)));
+    if (statusCurrent) statusCurrent.textContent = String(n);
+  }
+
+  function focusStep(n){
+    var step = steps[n - 1];
+    var legend = step && step.querySelector('.form-step-legend');
+    if (legend) {
+      legend.setAttribute('tabindex', '-1');
+      legend.focus({ preventScroll: true });
+    }
+  }
+
+  function goNext(stepEl){
+    var num = parseInt(stepEl.getAttribute('data-form-step'), 10);
+    if (num === 1 && nameField && !nameField.value.trim()) {
+      if (hint) hint.hidden = false;
+      nameField.focus();
+      return;
+    }
+    if (hint) hint.hidden = true;
+    if (num < totalSteps) {
+      showStep(num + 1);
+      focusStep(num + 1);
+    }
+  }
+
+  function goBack(stepEl){
+    var num = parseInt(stepEl.getAttribute('data-form-step'), 10);
+    if (num > 1) {
+      showStep(num - 1);
+      focusStep(num - 1);
+    }
+  }
+
+  form.querySelectorAll('[data-step-next]').forEach(function(btn){
+    btn.addEventListener('click', function(){ goNext(btn.closest('[data-form-step]')); });
+  });
+  form.querySelectorAll('[data-step-back]').forEach(function(btn){
+    btn.addEventListener('click', function(){ goBack(btn.closest('[data-form-step]')); });
+  });
+
+  /* Enter in a text field advances instead of risking an implicit submit
+     via a submit button sitting in a later, hidden fieldset. */
+  form.addEventListener('keydown', function(e){
+    if (e.key !== 'Enter' || e.target.tagName === 'TEXTAREA') return;
+    var stepEl = e.target.closest('[data-form-step]');
+    if (!stepEl) return;
+    var num = parseInt(stepEl.getAttribute('data-form-step'), 10);
+    if (num < totalSteps) {
+      e.preventDefault();
+      goNext(stepEl);
+    }
+  });
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var name = nameField ? nameField.value.trim() : '';
+    if (confirmHeading) {
+      confirmHeading.textContent = name ? ('Thanks, ' + name + ' — we’re on it.') : 'Thanks — we’re on it.';
+    }
+    wrap.hidden = true;
+    if (confirmState) {
+      confirmState.hidden = false;
+      confirmState.focus({ preventScroll: true });
+    }
+  });
+
+  /* Keep .is-checked in sync as a fallback for browsers without :has()
+     support — the CSS already styles on :has(input:checked) directly. */
+  form.querySelectorAll('.choice-chip input').forEach(function(input){
+    input.addEventListener('change', function(){
+      if (input.type === 'radio') {
+        form.querySelectorAll('input[type="radio"][name="' + input.name + '"]').forEach(function(radio){
+          var chip = radio.closest('.choice-chip');
+          if (chip) chip.classList.toggle('is-checked', radio.checked);
+        });
+      } else {
+        var chip = input.closest('.choice-chip');
+        if (chip) chip.classList.toggle('is-checked', input.checked);
+      }
+    });
+  });
+
+  showStep(1);
+})();
+</script>
+</body>
+</html>

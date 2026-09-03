@@ -59,6 +59,8 @@ a{color:inherit;text-decoration:none;}
 ul{list-style:none;margin:0;padding:0;}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;}
 input,textarea,select,kbd{font:inherit;color:inherit;}
+fieldset{border:0;margin:0;padding:0;min-width:0;}
+legend{padding:0;width:100%;}
 h1,h2,h3,h4,p,figure{margin:0;}
 ::selection{background:var(--cobalt);color:#fff;}
 .skip-link{position:fixed;left:1rem;top:-4rem;z-index:999;background:var(--cobalt);color:#fff;padding:.75rem 1.25rem;border-radius:var(--radius-pill);transition:top .25s var(--ease);font-weight:700;}
@@ -242,6 +244,8 @@ h3{font-size:clamp(1.1rem,.4vw + 1rem,1.3rem);font-weight:700;}
   .ring-value{transition:none;}
   .doc-dot.is-live{animation:none;}
   .ba-handle{transition:none;}
+  .step-track-fill{transition:none;}
+  .confirm-state{animation:none;}
 }
 
 /* ---------- Strip ---------- */
@@ -394,6 +398,7 @@ h3{font-size:clamp(1.1rem,.4vw + 1rem,1.3rem);font-weight:700;}
 .price-badge{display:inline-flex;align-items:center;gap:.5em;font-family:var(--font-display);font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--cobalt);margin-bottom:1.1rem;width:fit-content;}
 .price-card.is-featured .price-badge{color:var(--cobalt-bright);}
 .price-name{font-family:var(--font-display);font-weight:800;font-size:1.15rem;}
+.price-card.is-featured .price-name{color:#fff;}
 .price-desc{font-size:.88rem;color:var(--ink-dim);margin-top:.4rem;}
 .price-card.is-featured .price-desc{color:rgba(223,227,247,.72);}
 .price-amount{font-family:var(--font-display);font-size:2.4rem;font-weight:800;margin:1rem 0 .2rem;}
@@ -432,6 +437,42 @@ h3{font-size:clamp(1.1rem,.4vw + 1rem,1.3rem);font-weight:700;}
 .choice-chip input{position:absolute;opacity:0;pointer-events:none;}
 .choice-chip.is-checked,.choice-chip:has(input:checked){border-color:var(--cobalt);color:var(--cobalt);background:var(--cobalt-soft);}
 .form-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:clamp(1.8rem,3.5vw,2.6rem);}
+
+/* Form + sidebar layout (get-started, contact) */
+.form-layout{display:grid;grid-template-columns:1fr;gap:2.4rem;align-items:start;}
+@media (min-width:900px){.form-layout{grid-template-columns:1.6fr 1fr;gap:3.2rem;}}
+
+/* Multi-step form: fieldset chrome + actions */
+.form-step-legend{font-family:var(--font-display);font-weight:800;font-size:1.15rem;color:var(--ink);margin-bottom:1.5rem;letter-spacing:-.01em;}
+.form-step-actions{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;justify-content:flex-end;margin-top:.6rem;}
+.form-step-actions [data-step-back]{margin-right:auto;}
+.form-step-hint{font-size:.82rem;color:var(--cobalt-deep);margin:-.8rem 0 1.4rem;}
+
+/* Multi-step form: progress track ("Step X of 3") */
+.step-track{position:relative;display:grid;grid-template-columns:repeat(3,1fr);}
+.step-track-line,.step-track-fill{position:absolute;top:1.15rem;height:2px;left:16.6667%;}
+.step-track-line{right:16.6667%;background:var(--border-strong);}
+.step-track-fill{right:auto;background:var(--cobalt);width:calc(66.6667% * var(--fill,0));transition:width .45s var(--ease);}
+.step-track-item{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:.6rem;text-align:center;padding-inline:.25rem;min-width:0;}
+.step-track-dot{position:relative;width:2.3rem;height:2.3rem;border-radius:50%;background:var(--surface);border:1.5px solid var(--border-strong);display:grid;place-items:center;font-family:var(--font-display);font-weight:800;font-size:.86rem;color:var(--ink-faint);flex-shrink:0;transition:background var(--dur-fast),border-color var(--dur-fast),color var(--dur-fast);}
+.step-track-check{display:none;width:1.1rem;height:1.1rem;}
+.step-track-label{font-size:.72rem;font-weight:600;color:var(--ink-faint);line-height:1.3;}
+.step-track-item.is-active .step-track-dot{border-color:var(--cobalt);color:var(--cobalt);background:var(--cobalt-soft);box-shadow:0 0 0 5px var(--cobalt-soft);}
+.step-track-item.is-active .step-track-label{color:var(--ink);}
+.step-track-item.is-done .step-track-dot{border-color:var(--cobalt);color:#fff;background:var(--cobalt);}
+.step-track-item.is-done .step-track-label{color:var(--ink-dim);}
+.step-track-item.is-done .step-track-num{display:none;}
+.step-track-item.is-done .step-track-check{display:block;}
+.step-track-status{font-size:.76rem;font-weight:700;color:var(--ink-faint);font-family:var(--font-display);letter-spacing:.04em;text-transform:uppercase;text-align:center;margin:.9rem 0 1.8rem;}
+@media (max-width:400px){.step-track-label{font-size:.64rem;}}
+
+/* Multi-step form: post-submit confirmation state */
+.confirm-icon{width:3.4rem;height:3.4rem;border-radius:50%;background:var(--cobalt);color:#fff;display:grid;place-items:center;margin-bottom:1.5rem;}
+.confirm-icon svg{width:1.7rem;height:1.7rem;}
+.confirm-next-label{font-family:var(--font-display);font-weight:700;font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-faint);margin-bottom:.4rem;}
+.confirm-state{animation:confirm-in .5s var(--ease);}
+.confirm-state:focus{outline:none;}
+@keyframes confirm-in{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
 
 /* ---------- Comparison table ---------- */
 .table-wrap{overflow-x:auto;}
