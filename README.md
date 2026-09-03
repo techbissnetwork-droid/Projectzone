@@ -12,9 +12,9 @@ server) to reach the concept chooser and jump into any of the three.
 
 | # | Directory | Direction |
 |---|-----------|-----------|
-| 01 | `concept-01-futuristic-luxury/` | **Futuristic Luxury Tech** — cinematic, dark, gold + electric-cyan accents, Space Grotesk display type, slow deliberate motion. |
-| 02 | `concept-02-minimal-executive/` | **Minimal Executive** — light editorial, serif display type, huge whitespace, restrained micro-interactions, magazine-grade grid. |
-| 03 | `concept-03-immersive-digital/` | **Immersive Digital** — deep-space gradients, layered 3D depth, pinned scroll storytelling, tilting cards, bold Space Grotesk type. |
+| A | `concept-01-structured-precision/` | **Structured Precision** — white/near-black Swiss blueprint aesthetic, single signal-blue accent, zero border-radius, visible grid guides, IBM Plex Mono data labels + Archivo display type. Fast, exact motion. |
+| B | `concept-02-warm-modern/` | **Warm Modern** — cream canvas, warm charcoal ink, terracotta + forest two-tone accent, generous radius, soft organic shapes, Outfit + Plus Jakarta Sans type. Gentle, refined motion. |
+| C | `concept-03-bold-editorial/` | **Bold Editorial** — neo-brutalist white canvas with full-bleed signal-orange color-block sections, true-black hard offset shadows (no blur), Big Shoulders Display + Work Sans type. Snappy, tactile press interactions. |
 
 Each concept is fully self-contained: its own `assets/css/style.css` (design
 tokens + components) and `assets/js/main.js` (motion system), and its own 16
