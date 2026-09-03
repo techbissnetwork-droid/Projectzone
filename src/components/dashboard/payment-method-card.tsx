@@ -25,7 +25,7 @@ export function PaymentMethodCard() {
         <p className="flex items-start gap-2 rounded-lg bg-white/[0.04] p-3 text-[12px] leading-relaxed text-[var(--color-ink-faint)]">
           <Info className="mt-0.5 size-3.5 shrink-0" strokeWidth={1.75} />
           Card updates are handled through our secure billing partner and open in a dedicated,
-          PCI-compliant flow — this preview doesn't collect card details directly.
+          PCI-compliant flow — this preview doesn&rsquo;t collect card details directly.
         </p>
       )}
     </Card>

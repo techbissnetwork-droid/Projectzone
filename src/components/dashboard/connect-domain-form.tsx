@@ -38,7 +38,7 @@ export function ConnectDomainForm() {
               {value.trim()} is being connected
             </p>
             <p className="mt-0.5 text-[12.5px] text-[var(--color-ink-muted)]">
-              DNS propagation can take up to 24 hours. We'll email you once it's active.
+              DNS propagation can take up to 24 hours. We&rsquo;ll email you once it&rsquo;s active.
             </p>
           </div>
         </div>

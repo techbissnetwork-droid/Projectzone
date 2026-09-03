@@ -31,7 +31,7 @@ export function NewTicketForm() {
         <div className="flex-1">
           <p className="text-[14px] font-medium text-[var(--color-ink)]">Ticket submitted</p>
           <p className="mt-0.5 text-[12.5px] text-[var(--color-ink-muted)]">
-            We'll follow up by email — usually within a few hours.
+            We&rsquo;ll follow up by email — usually within a few hours.
           </p>
         </div>
         <button

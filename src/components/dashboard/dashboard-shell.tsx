@@ -97,10 +97,12 @@ function NavList({ pathname, onNavigate }: { pathname: string | null; onNavigate
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [panelOpen, setPanelOpen] = useState(false);
+  const [prevPathname, setPrevPathname] = useState(pathname);
 
-  useEffect(() => {
+  if (pathname !== prevPathname) {
+    setPrevPathname(pathname);
     setPanelOpen(false);
-  }, [pathname]);
+  }
 
   useEffect(() => {
     document.documentElement.style.overflow = panelOpen ? "hidden" : "";

@@ -40,7 +40,7 @@ export function ProcessJourney() {
       </div>
 
       {/* mobile stage-pill tracker */}
-      <div className="sticky top-[3px] z-20 -mx-6 flex gap-2 overflow-x-auto border-b border-[var(--color-border)] bg-[var(--color-bg)]/95 px-6 py-3 backdrop-blur-md scrollbar-none sm:-mx-8 sm:px-8 lg:hidden">
+      <div className="sticky top-[3px] z-20 flex w-full max-w-full gap-2 overflow-x-auto border-b border-[var(--color-border)] bg-[var(--color-bg)]/95 px-6 py-3 backdrop-blur-md scrollbar-none sm:px-8 lg:hidden">
         {processStages.map((stage, i) => (
           <button
             key={stage.index}

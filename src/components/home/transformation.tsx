@@ -100,7 +100,7 @@ export function Transformation() {
               style={{ opacity: digitalOpacity, scale: digitalScale, filter: useTransform(digitalBlur, (v) => `blur(${v}px)`) }}
               className="absolute inset-0 grid grid-cols-2 gap-3 sm:grid-cols-4"
             >
-              {DIGITAL_ITEMS.map((item, i) => (
+              {DIGITAL_ITEMS.map((item) => (
                 <div
                   key={item}
                   className="relative flex items-center justify-center rounded-xl border border-[var(--color-accent-soft)] bg-[linear-gradient(180deg,rgba(81,112,255,0.10),rgba(81,112,255,0.02))] px-3 py-6 text-center text-[13px] font-medium text-[var(--color-ink)] shadow-[0_0_0_1px_rgba(81,112,255,0.08)] sm:text-[14px]"
