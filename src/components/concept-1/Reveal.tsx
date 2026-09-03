@@ -4,6 +4,8 @@ import type { ReactNode } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/cn";
 
+type RevealTag = "div" | "span" | "li";
+
 export function Reveal({
   children,
   className,
@@ -13,34 +15,54 @@ export function Reveal({
   children: ReactNode;
   className?: string;
   delay?: number;
-  as?: "div" | "span" | "li";
+  as?: RevealTag;
 }) {
   const shouldReduceMotion = useReducedMotion();
-  const Component = motion[as];
 
-  if (shouldReduceMotion) {
+  const initial = shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 24 };
+  const whileInView = shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 };
+  const transition = shouldReduceMotion
+    ? { duration: 0.15 }
+    : { duration: 0.6, delay, ease: [0.16, 1, 0.3, 1] as const };
+  const viewport = { once: true, margin: "-80px" } as const;
+
+  if (as === "span") {
     return (
-      <Component
+      <motion.span
         className={cn(className)}
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true, margin: "-80px" }}
-        transition={{ duration: 0.15 }}
+        initial={initial}
+        whileInView={whileInView}
+        viewport={viewport}
+        transition={transition}
       >
         {children}
-      </Component>
+      </motion.span>
+    );
+  }
+
+  if (as === "li") {
+    return (
+      <motion.li
+        className={cn(className)}
+        initial={initial}
+        whileInView={whileInView}
+        viewport={viewport}
+        transition={transition}
+      >
+        {children}
+      </motion.li>
     );
   }
 
   return (
-    <Component
+    <motion.div
       className={cn(className)}
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.6, delay, ease: [0.16, 1, 0.3, 1] }}
+      initial={initial}
+      whileInView={whileInView}
+      viewport={viewport}
+      transition={transition}
     >
       {children}
-    </Component>
+    </motion.div>
   );
 }

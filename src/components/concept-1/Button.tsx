@@ -20,7 +20,7 @@ const variants: Record<Variant, string> = {
     "text-neutral-300 hover:text-neutral-50 bg-transparent",
 };
 
-function Magnetic({ children }: { children: ReactNode }) {
+function Magnetic({ children, fullWidth }: { children: ReactNode; fullWidth?: boolean }) {
   const ref = useRef<HTMLSpanElement>(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -48,7 +48,7 @@ function Magnetic({ children }: { children: ReactNode }) {
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       style={{ x: springX, y: springY }}
-      className="inline-block"
+      className={cn("inline-block", fullWidth && "block w-full")}
     >
       {children}
     </motion.span>
@@ -71,6 +71,7 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
   function Button({ variant = "primary", className, children, ...props }, ref) {
     const classes = cn(base, variants[variant], className);
     const content = <span className="relative z-10">{children}</span>;
+    const fullWidth = typeof className === "string" && className.includes("w-full");
 
     if (typeof props.href === "string") {
       const { href, ...rest } = props as ButtonAsLink;
@@ -84,7 +85,7 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
           {content}
         </Link>
       );
-      return variant === "primary" ? <Magnetic>{link}</Magnetic> : link;
+      return variant === "primary" ? <Magnetic fullWidth={fullWidth}>{link}</Magnetic> : link;
     }
 
     const buttonProps = props as ButtonAsButton;
@@ -93,6 +94,6 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
         {content}
       </button>
     );
-    return variant === "primary" ? <Magnetic>{button}</Magnetic> : button;
+    return variant === "primary" ? <Magnetic fullWidth={fullWidth}>{button}</Magnetic> : button;
   }
 );
