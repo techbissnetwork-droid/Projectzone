@@ -84,19 +84,21 @@ ul,ol,dl,dd{ margin:0; padding:0; list-style:none; }
 img,svg,canvas{ display:block; max-width:100%; }
 a{ color:inherit; text-decoration:none; }
 button{ font:inherit; color:inherit; background:none; border:0; padding:0; cursor:pointer; }
-:focus-visible{ outline:2px solid var(--sig); outline-offset:3px; border-radius:4px; }
+:focus-visible{ outline:2px solid var(--sig); outline-offset:3px; border-radius:3px; }
 
 ::selection{ background:rgba(143,176,255,.28); color:#fff; }
 
 .skip-link{
   position:fixed; top:12px; left:12px; z-index:999; padding:10px 16px;
-  background:var(--bg-3); border:1px solid var(--line-2); border-radius:8px;
+  background:var(--bg-3); border:1px solid var(--line-2); border-radius:6px;
   transform:translateY(-160%); transition:transform .3s var(--e-out);
 }
 .skip-link:focus{ transform:none; }
 
 .shell{ width:100%; min-width:0; max-width:var(--shell); margin-inline:auto; padding-inline:var(--gut); }
-.mono{ font-family:var(--ff-m); font-size:.72em; letter-spacing:.06em; text-transform:uppercase; }
+/* .mono is relative, so nested inside an already-small label it compounded
+   down to 7.2px. It never goes below the bottom of the type scale. */
+.mono{ font-family:var(--ff-m); font-size:max(9px, .72em); letter-spacing:.06em; text-transform:uppercase; }
 .muted{ color:var(--tx-3); }
 
 /* ── ambient film grain ─────────────────────────────────── */
@@ -113,7 +115,7 @@ button{ font:inherit; color:inherit; background:none; border:0; padding:0; curso
 /* ── typography primitives ──────────────────────────────── */
 .eyebrow{
   display:inline-flex; align-items:center; gap:10px;
-  font-family:var(--ff-m); font-size:11.5px; letter-spacing:.16em; text-transform:uppercase;
+  font-family:var(--ff-m); font-size:11px; letter-spacing:.16em; text-transform:uppercase;
   color:var(--tx-3);
 }
 .eyebrow .num{ color:var(--sig); }
@@ -204,8 +206,8 @@ button{ font:inherit; color:inherit; background:none; border:0; padding:0; curso
 .btn--ghost:hover::before{ opacity:1; }
 .btn--ghost:hover{ border-color:var(--line-3); }
 
-.btn--sm{ --pad-y:11px; --pad-x:18px; font-size:13.5px; }
-.btn--lg{ --pad-y:20px; --pad-x:36px; font-size:16.5px; }
+.btn--sm{ --pad-y:11px; --pad-x:18px; font-size:13px; }
+.btn--lg{ --pad-y:20px; --pad-x:36px; font-size:16px; }
 .btn--block{ display:flex; width:100%; }
 
 .link{
@@ -232,11 +234,11 @@ button{ font:inherit; color:inherit; background:none; border:0; padding:0; curso
 .tags{ display:flex; flex-wrap:wrap; gap:7px; }
 .tags span{
   padding:6px 11px; border-radius:7px; border:1px solid var(--line);
-  background:rgba(255,255,255,.018); font-family:var(--ff-m); font-size:10.5px;
+  background:rgba(255,255,255,.018); font-family:var(--ff-m); font-size:10px;
   letter-spacing:.07em; text-transform:uppercase; color:var(--tx-2);
 }
 .ticks{ display:grid; gap:9px; }
-.ticks li{ position:relative; padding-left:22px; color:var(--tx-2); font-size:14.5px; }
+.ticks li{ position:relative; padding-left:22px; color:var(--tx-2); font-size:14px; }
 .ticks li::before{
   content:""; position:absolute; left:0; top:.55em; width:11px; height:6px;
   border-left:1.5px solid var(--sig); border-bottom:1.5px solid var(--sig);
@@ -273,7 +275,7 @@ button{ font:inherit; color:inherit; background:none; border:0; padding:0; curso
              background-color .45s var(--e-out), border-color .45s, opacity .3s;
 }
 .cursor__label{
-  font-family:var(--ff-m); font-size:9.5px; letter-spacing:.1em; text-transform:uppercase;
+  font-family:var(--ff-m); font-size:10px; letter-spacing:.1em; text-transform:uppercase;
   color:#060810; opacity:0; transform:scale(.8); transition:opacity .3s, transform .4s var(--e-out); white-space:nowrap;
 }
 .cursor.is-hot .cursor__ring{ width:52px; height:52px; margin:-26px 0 0 -26px; background:rgba(143,176,255,.14); border-color:rgba(143,176,255,.5); }
@@ -308,7 +310,7 @@ button{ font:inherit; color:inherit; background:none; border:0; padding:0; curso
 .brand__mark{ width:26px; height:26px; color:var(--sig); transition:transform .7s var(--e-out); }
 .brand__mark svg{ width:100%; height:100%; }
 .brand:hover .brand__mark{ transform:rotate(120deg); }
-.brand__word{ font-family:var(--ff-d); font-weight:600; font-size:16.5px; letter-spacing:.16em; }
+.brand__word{ font-family:var(--ff-d); font-weight:600; font-size:16px; letter-spacing:.16em; }
 
 .nav__links{ display:flex; gap:clamp(14px,1.9vw,30px); margin-left:auto; }
 .nav__links a{
@@ -328,7 +330,7 @@ button{ font:inherit; color:inherit; background:none; border:0; padding:0; curso
 
 .burger{ display:none; width:42px; height:42px; margin-left:auto; position:relative; }
 .burger span{
-  position:absolute; left:11px; width:20px; height:1.5px; background:var(--tx); border-radius:2px;
+  position:absolute; left:11px; width:20px; height:1.5px; background:var(--tx); border-radius:3px;
   transition:transform .5s var(--e-out), opacity .3s;
 }
 .burger span:nth-child(1){ top:18px; }
@@ -356,7 +358,7 @@ button{ font:inherit; color:inherit; background:none; border:0; padding:0; curso
 .menu__links i{ font-family:var(--ff-m); font-style:normal; font-size:12px; color:var(--sig); letter-spacing:.1em; }
 .menu__foot{ position:relative; padding:0 var(--gut) calc(28px + env(safe-area-inset-bottom)); display:grid; gap:14px; opacity:0; transition:opacity .6s var(--e-out) .5s; }
 .menu.is-open .menu__foot{ opacity:1; }
-.menu__foot p{ font-family:var(--ff-m); font-size:11.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--tx-3); text-align:center; }
+.menu__foot p{ font-family:var(--ff-m); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--tx-3); text-align:center; }
 
 @media (max-width:1000px){
   .nav__links,.nav__cta{ display:none; }

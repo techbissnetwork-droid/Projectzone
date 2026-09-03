@@ -69,8 +69,8 @@ function tb_seed_content(PDO $pdo, string $ts): void
 
     foreach ([
         ['Services', '12'],
-        ['Delivery', 'End-to-end'],
         ['Uptime', '99.98%'],
+        ['Projects', '140+'],
     ] as $i => $r) { $blocks[] = ['stat', $r[0], $r[1], null, null, null, null, null, $i * 10]; }
 
     foreach ([

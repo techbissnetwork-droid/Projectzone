@@ -155,6 +155,19 @@ function tb_migrate(PDO $pdo, string $driver = 'mysql'): array
         }
     }
 
+    /* The "End-to-end" delivery figure was a phrase, not a number: it sat beside
+       two short figures and forced every value in the row down to fit it. Only
+       removed where it is still exactly as seeded. */
+    if (in_array('content_items', $tables, true)) {
+        $del = $pdo->prepare("DELETE FROM content_items
+                              WHERE kind = 'stat' AND title = 'End-to-end'
+                                AND label IN ('Delivery', 'Delivery model')");
+        $del->execute();
+        if ($del->rowCount()) {
+            $done[] = 'Removed the End-to-end delivery figure';
+        }
+    }
+
     $rewritten = [
         'hero_eyebrow'  => ['Digital transformation · est. for the next decade', 'Digital transformation'],
         'hero_lede'     => ['From offline operations to a complete online ecosystem — TECHBISS builds, launches and powers everything your business needs to grow online.',

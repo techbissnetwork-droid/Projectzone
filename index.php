@@ -66,7 +66,7 @@ require __DIR__ . '/partials/public_header.php';
         <?php foreach ($stats as $s): ?>
           <div><dt><?= e($s['label']) ?></dt>
             <?php $num = (string)$s['title']; $isNum = (bool)preg_match('/^\d+$/', $num); ?>
-            <dd class="<?= $isNum ? '' : 'is-text' ?>"<?= $isNum ? ' data-count="' . e($num) . '"' : '' ?>><?= e($num) ?></dd></div>
+            <dd<?= $isNum ? ' data-count="' . e($num) . '"' : '' ?>><?= e($num) ?></dd></div>
         <?php endforeach; ?>
       </dl>
     <?php endif; ?>

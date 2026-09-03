@@ -31,7 +31,7 @@
 .chipnav{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:clamp(32px,5vw,56px) }
 .chipnav a{
   padding:9px 18px; border-radius:100px; border:1px solid var(--line);
-  font-size:13.5px; color:var(--tx-3); transition:color .35s, border-color .35s, background-color .35s;
+  font-size:13px; color:var(--tx-3); transition:color .35s, border-color .35s, background-color .35s;
 }
 .chipnav a:hover{ color:var(--tx); border-color:var(--line-2) }
 .chipnav a.on{ background:rgba(143,176,255,.12); border-color:rgba(143,176,255,.42); color:var(--tx) }
@@ -65,7 +65,7 @@
 .wcard__title{ font-size:clamp(1.25rem,2vw,1.75rem); letter-spacing:-.035em; transition:color .35s }
 .wcard--lead .wcard__title{ font-size:clamp(1.3rem, 0.85rem + 2.2vw, 2.5rem) }
 .wcard:hover .wcard__title{ color:var(--sig) }
-.wcard__desc{ color:var(--tx-2); font-size:14.5px; max-width:52ch }
+.wcard__desc{ color:var(--tx-2); font-size:14px; max-width:52ch }
 
 /* ── product cards ───────────────────────────────────────── */
 .mkt-strip{ padding:clamp(70px,9vw,130px) 0; background:
@@ -139,7 +139,7 @@
 .detail__meta dl{ display:grid; gap:14px }
 .detail__meta dl div{ display:grid; gap:3px }
 .detail__meta dt{ font-family:var(--ff-m); font-size:10px; letter-spacing:.15em; text-transform:uppercase; color:var(--tx-4) }
-.detail__meta dd{ margin:0; font-size:14.5px }
+.detail__meta dd{ margin:0; font-size:14px }
 .detail__sold{ font-family:var(--ff-m); font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--live) }
 .reslist{ display:grid; gap:14px }
 .reslist li{ display:grid; gap:3px; padding-left:16px; border-left:2px solid rgba(143,176,255,.35) }
@@ -151,16 +151,16 @@
 .pricebox__was{ font-size:14px; color:var(--tx-4); text-decoration:line-through }
 .pricebox__off{ justify-self:start; padding:4px 11px; border-radius:100px; background:rgba(231,187,141,.14);
   color:var(--ember); font-family:var(--ff-m); font-size:10px; letter-spacing:.1em; text-transform:uppercase }
-.pricebox__note{ font-size:12.5px; color:var(--tx-3) }
+.pricebox__note{ font-size:12px; color:var(--tx-3) }
 
 /* ── forms on the public site ────────────────────────────── */
 .wform{ display:grid; gap:18px }
 .wform__row{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px }
 .wform label{ display:grid; gap:8px; min-width:0 }
 .wform label > span{ font-size:13px; color:var(--tx-2); display:flex; gap:8px; align-items:baseline }
-.wform label > span small{ color:var(--tx-4); font-size:11.5px }
+.wform label > span small{ color:var(--tx-4); font-size:11px }
 .wform input, .wform select, .wform textarea{
-  width:100%; padding:14px 16px; border-radius:12px; font:inherit; font-size:15px;
+  width:100%; padding:14px 16px; border-radius:10px; font:inherit; font-size:15px;
   border:1px solid var(--line-2); background:rgba(255,255,255,.028); color:var(--tx);
   transition:border-color .3s, background-color .3s;
 }
@@ -168,10 +168,10 @@
 .wform input:focus, .wform select:focus, .wform textarea:focus{
   outline:none; border-color:var(--sig); background:rgba(143,176,255,.06) }
 .wform input::placeholder, .wform textarea::placeholder{ color:var(--tx-4) }
-.wform__note{ font-size:12.5px; color:var(--tx-3) }
+.wform__note{ font-size:12px; color:var(--tx-3) }
 .hp{ position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden }
 
-.notice{ padding:16px 20px; border-radius:14px; border:1px solid var(--line-2); display:grid; gap:7px; font-size:14.5px }
+.notice{ padding:16px 20px; border-radius:16px; border:1px solid var(--line-2); display:grid; gap:7px; font-size:14px }
 .notice--ok{ border-color:rgba(127,214,180,.4); background:rgba(127,214,180,.08); color:#D6F2E7 }
 .notice--err{ border-color:rgba(240,138,138,.42); background:rgba(240,138,138,.08); color:#FBDCDC }
 .notice .mono{ font-family:var(--ff-m) }
@@ -185,15 +185,15 @@
   border-radius:var(--r-xl); background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.006));
 }
 .infobox h2{ font-size:1.1rem; letter-spacing:-.03em }
-.infobox p{ color:var(--tx-2); font-size:14.5px }
+.infobox p{ color:var(--tx-2); font-size:14px }
 .infobox dl{ display:grid; gap:14px }
 .infobox dl div{ display:grid; gap:3px }
 .infobox dt{ font-family:var(--ff-m); font-size:10px; letter-spacing:.15em; text-transform:uppercase; color:var(--tx-4) }
-.infobox dd{ margin:0; font-size:14.5px }
+.infobox dd{ margin:0; font-size:14px }
 .facts{ display:grid; gap:14px; padding:22px 26px; border:1px solid var(--line); border-radius:var(--r-xl) }
 .facts li{ display:grid; gap:4px }
 .facts span{ font-family:var(--ff-m); font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--tx-4) }
-.facts b{ font-weight:500; font-size:14.5px }
+.facts b{ font-weight:500; font-size:14px }
 
 /* ── auth ────────────────────────────────────────────────── */
 body.authpage .foot__wordmark{ display:none }
@@ -211,7 +211,7 @@ body.authpage .foot__wordmark{ display:none }
   -webkit-backdrop-filter:blur(16px); backdrop-filter:blur(16px); box-shadow:var(--sh-3);
 }
 .auth__title{ font-size:clamp(1.9rem,4vw,2.6rem); letter-spacing:-.04em }
-.auth__lede{ color:var(--tx-2); font-size:14.5px; margin-top:-6px }
+.auth__lede{ color:var(--tx-2); font-size:14px; margin-top:-6px }
 .auth__foot{ font-size:13px; color:var(--tx-3) }
 
 /* ── responsive ──────────────────────────────────────────── */
@@ -236,13 +236,13 @@ body.authpage .foot__wordmark{ display:none }
   .wcard__title, .wcard--lead .wcard__title{ font-size:.95rem; letter-spacing:-.025em }
   .wcard__desc{ display:none }
   .wcard .tags{ display:none }
-  .case__cat{ font-size:8.5px }
+  .case__cat{ font-size:9px }
 
   .pcard__link{ grid-template-rows:auto 1fr }
   .pcard__body{ padding:12px; gap:5px }
   .pcard__title{ font-size:.95rem; letter-spacing:-.025em }
   .pcard__desc{ display:none }
-  .pcard__cat{ font-size:8.5px }
+  .pcard__cat{ font-size:9px }
   .pcard__foot{ margin-top:auto; padding-top:9px }
   .pcard__price{ font-size:.9rem }
   .pcard__price s{ display:none }
@@ -286,7 +286,7 @@ body.authpage .foot__wordmark{ display:none }
 .paypick legend{ font-size:13px; color:var(--tx-2); padding:0 0 4px }
 .paypick__opt{
   display:grid; grid-template-columns:auto minmax(0,1fr); gap:12px; align-items:start;
-  padding:14px 16px; border:1px solid var(--line-2); border-radius:12px; cursor:pointer;
+  padding:14px 16px; border:1px solid var(--line-2); border-radius:10px; cursor:pointer;
   background:rgba(255,255,255,.02); transition:border-color .25s, background-color .25s;
 }
 .paypick__opt:hover{ border-color:var(--line-3) }
@@ -296,7 +296,7 @@ body.authpage .foot__wordmark{ display:none }
 .paypick__opt b{ font-weight:500; font-size:15px; display:flex; align-items:center; gap:8px; flex-wrap:wrap }
 .paypick__opt em{ font-style:normal; font-size:13px; color:var(--tx-3) }
 .paypick__tag{
-  font-family:var(--ff-m); font-size:9.5px; letter-spacing:.12em; text-transform:uppercase;
+  font-family:var(--ff-m); font-size:10px; letter-spacing:.12em; text-transform:uppercase;
   padding:3px 8px; border-radius:100px; background:rgba(143,176,255,.16); color:var(--sig); font-style:normal;
 }
 .paypick__tag--manual{ background:rgba(255,255,255,.06); color:var(--tx-3) }
