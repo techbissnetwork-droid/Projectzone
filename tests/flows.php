@@ -200,11 +200,14 @@ fwrite(STDOUT, "\n  · restoring the development installation\n");
 foreach (glob($root . '/storage/uploads/import-*') ?: [] as $stale) {
     @unlink($stale);
 }
+// Reinstate the installation this suite started from. The owner credentials
+// come from the environment when set, so the suite never bakes in a password.
 exec(sprintf(
-    'php %s install --email=admin@techbiss.com --password=%s --name=%s 2>&1',
+    'php %s install --email=%s --password=%s --name=%s 2>&1',
     escapeshellarg($root . '/bin/techbiss'),
-    escapeshellarg('TechbissDemo!2026'),
-    escapeshellarg('Elena Vasquez')
+    escapeshellarg(getenv('TECHBISS_ADMIN_EMAIL') ?: 'admin@techbiss.com'),
+    escapeshellarg(getenv('TECHBISS_ADMIN_PASSWORD') ?: 'TechbissDemo!2026'),
+    escapeshellarg('Platform Owner')
 ), $out, $code);
 check('Development installation restored', $code === 0);
 @unlink($root . '/storage/install.unlock');
@@ -226,14 +229,37 @@ function signOut(string $portal): void
 
 section('Portal authentication');
 
-$r = signIn('admin', 'admin@techbiss.com', 'wrong-password');
-check('Bad password is rejected', str_contains((string) $r['location'], '/admin/login'));
+/**
+ * The suite provisions its own owner account rather than assuming the password
+ * this installation was set up with, so it runs against any environment. The
+ * account is removed at the end of the portal section.
+ */
+const TEST_OWNER_EMAIL = 'flow-owner@techbiss.test';
+const TEST_OWNER_PASSWORD = 'FlowOwner!2026';
+
+$db = boot()->make('db');
+$db->statement('DELETE FROM users WHERE email = ?', [TEST_OWNER_EMAIL]);
+$testOwnerId = $db->insert('users', [
+    'uuid' => bin2hex(random_bytes(8)),
+    'name' => 'Flow Test Owner',
+    'email' => TEST_OWNER_EMAIL,
+    'password_hash' => password_hash(TEST_OWNER_PASSWORD, PASSWORD_DEFAULT),
+    'role' => 'owner',
+    'status' => 'active',
+    'company' => 'TECHBISS',
+    'avatar_color' => 'blue',
+    'created_at' => gmdate('c'),
+    'updated_at' => gmdate('c'),
+]);
+
+$r = signIn('admin', TEST_OWNER_EMAIL, 'wrong-password');
+check('Bad password is rejected', str_ends_with((string) $r['location'], '/admin/login'));
 
 $r = signIn('admin', 'client@northwind.example', 'ClientDemo!2026');
-check('A client credential cannot open the admin portal', str_contains((string) $r['location'], '/admin/login'));
+check('A client credential cannot open the admin portal', str_ends_with((string) $r['location'], '/admin/login'));
 
-$r = signIn('admin', 'admin@techbiss.com', 'TechbissDemo!2026');
-check('Owner signs into the admin console', str_contains((string) $r['location'], '/admin'), (string) $r['location']);
+$r = signIn('admin', TEST_OWNER_EMAIL, TEST_OWNER_PASSWORD);
+check('Owner signs into the admin console', str_ends_with((string) $r['location'], '/admin'), (string) $r['location']);
 
 section('Admin console');
 
@@ -263,14 +289,32 @@ $after = $app->make('db')->first('SELECT status FROM products WHERE id = ?', [(i
 check('Admin can retire a product', ($after['status'] ?? '') === 'retired');
 request('POST', '/admin/products/status', ['id' => (int) $product['id'], 'status' => 'published']);
 
-$owner = $app->make('db')->first("SELECT id FROM users WHERE role = 'owner' LIMIT 1");
-$r = request('POST', '/admin/users/status', ['id' => (int) $owner['id'], 'status' => 'suspended']);
-$after = $app->make('db')->first('SELECT status FROM users WHERE id = ?', [(int) $owner['id']]);
-check('The only owner cannot be suspended', ($after['status'] ?? '') === 'active');
+// Suspend every other owner so the guard is tested against a genuine
+// last-active-owner state, then restore them.
+$otherOwners = $app->make('db')->select(
+    "SELECT id FROM users WHERE role = 'owner' AND status = 'active' AND id != ?",
+    [$testOwnerId]
+);
+foreach ($otherOwners as $other) {
+    $app->make('db')->update('users', ['status' => 'suspended'], 'id = :id', ['id' => (int) $other['id']]);
+}
+
+$r = request('POST', '/admin/users/status', ['id' => $testOwnerId, 'status' => 'suspended']);
+$after = $app->make('db')->first('SELECT status FROM users WHERE id = ?', [$testOwnerId]);
+check('The last active owner cannot be suspended', ($after['status'] ?? '') === 'active');
+
+foreach ($otherOwners as $other) {
+    $app->make('db')->update('users', ['status' => 'active'], 'id = :id', ['id' => (int) $other['id']]);
+}
 
 signOut('admin');
 $r = request('GET', '/admin');
-check('Signing out revokes admin access', $r['status'] === 302 && str_contains((string) $r['location'], '/admin/login'));
+check('Signing out revokes admin access', $r['status'] === 302 && str_ends_with((string) $r['location'], '/admin/login'));
+
+$app->make('db')->statement('DELETE FROM activity_log WHERE user_id = ?', [$testOwnerId]);
+$app->make('db')->statement('DELETE FROM users WHERE id = ?', [$testOwnerId]);
+$app->make('db')->statement('DELETE FROM login_attempts WHERE email = ?', [TEST_OWNER_EMAIL]);
+check('Provisioned test owner removed', (int) $app->make('db')->value('SELECT COUNT(*) FROM users WHERE email = ?', [TEST_OWNER_EMAIL], 0) === 0);
 
 section('Staff workspace');
 
