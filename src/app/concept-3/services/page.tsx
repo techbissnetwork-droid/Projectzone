@@ -22,7 +22,7 @@ export default function ServicesPage() {
           </h1>
           <p className="mt-6 text-lg leading-relaxed text-slate-400">
             Filter by category to explore exactly what you need, or browse the full catalog below. Every card
-            expands on hover to preview what's included, and every card links to full detail.
+            expands on hover to preview what&apos;s included, and every card links to full detail.
           </p>
         </Reveal>
       </Section>

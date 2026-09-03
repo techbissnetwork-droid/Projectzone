@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { CheckCircle2, Rocket, Check } from "lucide-react";
 import { services } from "@/lib/site-data";
 import { cn } from "@/lib/cn";
@@ -44,7 +44,7 @@ export function InquiryForm() {
         </span>
         <h3 className="font-display text-xl font-semibold text-white">Your project brief is in</h3>
         <p className="max-w-md text-sm text-slate-400">
-          We respond within [Add response time — e.g. 2 business days] with next steps and, if it's a fit, a
+          We respond within [Add response time — e.g. 2 business days] with next steps and, if it&apos;s a fit, a
           time to talk through scope and budget in more detail.
         </p>
         <button

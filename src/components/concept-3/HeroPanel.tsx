@@ -13,6 +13,7 @@ const featured = services
   .map((s, i) => ({
     ...s,
     progress: [82, 64, 91, 58, 97][i] ?? 70,
+    Icon: getIcon(s.icon),
   }));
 
 /**
@@ -24,7 +25,7 @@ const featured = services
 export function HeroPanel() {
   const [active, setActive] = useState(0);
   const current = featured[active];
-  const Icon = getIcon(current.icon);
+  const Icon = current.Icon;
 
   return (
     <div className="relative">
@@ -53,7 +54,7 @@ export function HeroPanel() {
           className="mt-4 flex snap-x gap-2 overflow-x-auto pb-1"
         >
           {featured.map((s, i) => {
-            const TabIcon = getIcon(s.icon);
+            const TabIcon = s.Icon;
             const isActive = i === active;
             return (
               <button

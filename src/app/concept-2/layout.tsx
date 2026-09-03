@@ -28,7 +28,7 @@ export const metadata: Metadata = {
 export default function ConceptTwoLayout({ children }: { children: ReactNode }) {
   return (
     <div
-      className={`${fraunces.variable} ${inter.variable} font-[family-name:var(--font-inter)] flex min-h-screen flex-col bg-white text-neutral-900 antialiased`}
+      className={`${fraunces.variable} ${inter.variable} font-[family-name:var(--font-inter)] flex min-h-screen flex-col overflow-x-clip bg-white text-neutral-900 antialiased`}
     >
       <Nav />
       <main className="flex-1">{children}</main>

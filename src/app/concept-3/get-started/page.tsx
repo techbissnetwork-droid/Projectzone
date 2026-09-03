@@ -23,7 +23,7 @@ export default function GetStartedPage() {
         <Reveal className="max-w-3xl">
           <Eyebrow>Project inquiry</Eyebrow>
           <h1 className="font-display mt-5 text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl">
-            Let's scope your project.
+            Let&apos;s scope your project.
           </h1>
           <p className="mt-6 text-lg leading-relaxed text-slate-400">
             A few details now saves back-and-forth later. Fill in what you know — budget range and scope can
@@ -45,10 +45,10 @@ export default function GetStartedPage() {
                 <ol className="mt-4 flex flex-col gap-3 text-sm text-slate-400">
                   <li>
                     <span className="font-semibold text-slate-200">1.</span> We respond within [Add response
-                    time — e.g. 2 business days] to confirm we've received your brief.
+                    time — e.g. 2 business days] to confirm we&apos;ve received your brief.
                   </li>
                   <li>
-                    <span className="font-semibold text-slate-200">2.</span> If it's a fit, we schedule a short
+                    <span className="font-semibold text-slate-200">2.</span> If it&apos;s a fit, we schedule a short
                     discovery call to clarify scope and budget.
                   </li>
                   <li>

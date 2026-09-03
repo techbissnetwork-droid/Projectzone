@@ -26,7 +26,7 @@ export default function PricingPage() {
             Three starting points. One scoped quote.
           </h1>
           <p className="mt-6 text-lg leading-relaxed text-slate-400">
-            These tiers show typical scope for businesses at different stages — pick the closest fit and we'll
+            These tiers show typical scope for businesses at different stages — pick the closest fit and we&apos;ll
             refine it together during discovery.
           </p>
         </Reveal>

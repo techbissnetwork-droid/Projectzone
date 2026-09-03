@@ -29,7 +29,7 @@ export const metadata: Metadata = {
 export default function ConceptThreeLayout({ children }: { children: React.ReactNode }) {
   return (
     <div
-      className={`${sora.variable} ${manrope.variable} ${manrope.className} flex min-h-screen flex-col bg-[#0b0c14] text-slate-300 antialiased`}
+      className={`${sora.variable} ${manrope.variable} ${manrope.className} flex min-h-screen flex-col overflow-x-clip bg-[#0b0c14] text-slate-300 antialiased`}
     >
       <style>{`
         .font-display {

@@ -39,11 +39,7 @@ function useCountTo(target: number, active: boolean, duration = 1000) {
   const [value, setValue] = useState(0);
   const reduceMotion = useReducedMotion();
   useEffect(() => {
-    if (!active) return;
-    if (reduceMotion) {
-      setValue(target);
-      return;
-    }
+    if (!active || reduceMotion) return;
     const start = performance.now();
     let raf = 0;
     const tick = (now: number) => {
@@ -55,7 +51,7 @@ function useCountTo(target: number, active: boolean, duration = 1000) {
     return () => cancelAnimationFrame(raf);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active]);
-  return value;
+  return active && reduceMotion ? target : value;
 }
 
 function WebsiteVitalsWidget() {

@@ -16,13 +16,17 @@ export function StatCounter({ label, value }: { label: string; value: string }) 
   const shouldReduceMotion = useReducedMotion();
   const parsed = parseNumeric(value);
   const [display, setDisplay] = useState(parsed ? `${parsed.prefix}0${parsed.suffix}` : value);
+  const [lastInView, setLastInView] = useState(false);
+
+  if (isInView && !lastInView) {
+    setLastInView(true);
+    if (shouldReduceMotion && parsed) {
+      setDisplay(value);
+    }
+  }
 
   useEffect(() => {
-    if (!isInView || !parsed) return;
-    if (shouldReduceMotion) {
-      setDisplay(value);
-      return;
-    }
+    if (!isInView || !parsed || shouldReduceMotion) return;
     const controls = animate(0, parsed.number, {
       duration: 1.4,
       ease: [0.16, 1, 0.3, 1],

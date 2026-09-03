@@ -24,16 +24,22 @@ export function Nav() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
+  // Close the mobile drawer whenever the route changes, without a setState
+  // call inside an effect body — adjust state directly during render when
+  // the previously-seen pathname no longer matches (React's recommended
+  // pattern for resetting state in response to a prop/route change).
+  const [lastPathname, setLastPathname] = useState(pathname);
+  if (pathname !== lastPathname) {
+    setLastPathname(pathname);
+    setOpen(false);
+  }
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-
-  useEffect(() => {
-    setOpen(false);
-  }, [pathname]);
 
   useEffect(() => {
     if (!open) return;

@@ -56,8 +56,8 @@ export default function AboutPage() {
           </h1>
           <p className="mt-6 text-lg leading-relaxed text-slate-400">{company.description}</p>
           <p className="mt-4 text-base leading-relaxed text-slate-400">
-            Most businesses don't need more software — they need a coordinated path from where they are today to a
-            complete, credible digital presence. That's the gap TECHBISS fills: one team covering websites, web
+            Most businesses don&apos;t need more software — they need a coordinated path from where they are today to a
+            complete, credible digital presence. That&apos;s the gap TECHBISS fills: one team covering websites, web
             and mobile applications, and the infrastructure — domains, hosting, security, and email — that keeps
             it all running.
           </p>
@@ -82,7 +82,7 @@ export default function AboutPage() {
                 across retail, healthcare, logistics, hospitality, professional services, and beyond.
               </p>
               <p className="mt-3 text-sm leading-relaxed text-slate-400">
-                The starting point differs; the approach doesn't. Every engagement begins with understanding your
+                The starting point differs; the approach doesn&apos;t. Every engagement begins with understanding your
                 business before we design or build anything.
               </p>
             </div>

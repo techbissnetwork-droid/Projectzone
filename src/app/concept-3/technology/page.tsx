@@ -22,7 +22,7 @@ export default function TechnologyPage() {
           </h1>
           <p className="mt-6 text-lg leading-relaxed text-slate-400">
             The technology behind a project matters less as a checklist and more as a decision: every tool below
-            was chosen because it holds up in production, scales with your business, and doesn't lock you into a
+            was chosen because it holds up in production, scales with your business, and doesn&apos;t lock you into a
             single vendor. Explore the categories below.
           </p>
         </Reveal>

@@ -28,7 +28,7 @@ export const metadata: Metadata = {
 export default function ConceptOneLayout({ children }: { children: ReactNode }) {
   return (
     <div
-      className={`${spaceGrotesk.variable} ${inter.variable} min-h-screen bg-[#05060a] font-[var(--font-body)] text-neutral-300 antialiased [&_h1]:font-[var(--font-display)] [&_h2]:font-[var(--font-display)] [&_h3]:font-[var(--font-display)]`}
+      className={`${spaceGrotesk.variable} ${inter.variable} min-h-screen overflow-x-clip bg-[#05060a] font-[var(--font-body)] text-neutral-300 antialiased [&_h1]:font-[var(--font-display)] [&_h2]:font-[var(--font-display)] [&_h3]:font-[var(--font-display)]`}
     >
       <Nav />
       <main>{children}</main>

@@ -35,7 +35,7 @@ export default function ConceptThreeHomePage() {
               We Build What Moves Business Forward.
             </h1>
             <p className="mt-6 max-w-xl text-base leading-relaxed text-slate-400 sm:text-lg">
-              {company.description} Explore the platform below the way you'd explore a product — every card, tab,
+              {company.description} Explore the platform below the way you&apos;d explore a product — every card, tab,
               and panel is live.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -74,7 +74,12 @@ export default function ConceptThreeHomePage() {
             const Icon = statIcons[i % statIcons.length];
             return (
               <RevealItem key={stat.label}>
-                <StatWidget label={stat.label} value={stat.value} icon={Icon} index={i} />
+                <StatWidget
+                  label={stat.label}
+                  value={stat.value}
+                  icon={<Icon className="h-4 w-4" aria-hidden="true" />}
+                  index={i}
+                />
               </RevealItem>
             );
           })}

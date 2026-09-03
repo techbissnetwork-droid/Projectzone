@@ -25,7 +25,7 @@ export default function ContactPage() {
         <Reveal className="max-w-3xl">
           <Eyebrow>Contact</Eyebrow>
           <h1 className="font-display mt-5 text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl">
-            Let's talk about your project.
+            Let&apos;s talk about your project.
           </h1>
           <p className="mt-6 text-lg leading-relaxed text-slate-400">
             Send a message with a bit of detail and the right person on our team will follow up.

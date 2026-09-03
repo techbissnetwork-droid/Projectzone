@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { motion, useInView, useReducedMotion } from "framer-motion";
-import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/cn";
 
 /**
@@ -13,13 +12,13 @@ import { cn } from "@/lib/cn";
 export function StatWidget({
   label,
   value,
-  icon: Icon,
+  icon,
   index = 0,
   className,
 }: {
   label: string;
   value: string;
-  icon?: LucideIcon;
+  icon?: ReactNode;
   index?: number;
   className?: string;
 }) {
@@ -30,11 +29,7 @@ export function StatWidget({
   const [display, setDisplay] = useState(numericMatch ? "0" + numericMatch[2] : value);
 
   useEffect(() => {
-    if (!inView || !numericMatch) return;
-    if (reduceMotion) {
-      setDisplay(value);
-      return;
-    }
+    if (!inView || !numericMatch || reduceMotion) return;
     const target = parseInt(numericMatch[1], 10);
     const suffix = numericMatch[2];
     const duration = 900;
@@ -63,9 +58,9 @@ export function StatWidget({
       transition={{ duration: 0.5, delay: reduceMotion ? 0 : index * 0.08, ease: [0.16, 1, 0.3, 1] }}
     >
       <div className="flex items-center justify-between gap-3">
-        {Icon ? (
+        {icon ? (
           <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500/20 to-blue-500/20 text-violet-300">
-            <Icon className="h-4 w-4" aria-hidden="true" />
+            {icon}
           </span>
         ) : null}
         <span className="h-1.5 w-16 overflow-hidden rounded-full bg-white/10" aria-hidden="true">
@@ -77,7 +72,7 @@ export function StatWidget({
           />
         </span>
       </div>
-      <p className="font-display mt-4 text-3xl font-bold text-white">{display}</p>
+      <p className="font-display mt-4 text-3xl font-bold text-white">{reduceMotion ? value : display}</p>
       <p className="mt-1 text-sm text-slate-400">{label}</p>
     </motion.div>
   );

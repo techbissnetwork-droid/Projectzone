@@ -13,6 +13,7 @@ import { getIcon } from "@/components/concept-3/icon-map";
 
 const service = serviceBySlug("website-development")!;
 const related = services.filter((s) => ["web-application-development", "domain-hosting", "ssl-security"].includes(s.slug));
+const DetailIcon = getIcon(service.icon);
 
 export const metadata: Metadata = {
   title: service.title,
@@ -20,14 +21,13 @@ export const metadata: Metadata = {
 };
 
 export default function WebsiteDevelopmentPage() {
-  const Icon = getIcon(service.icon);
   return (
     <>
       <Section className="pb-8 pt-14 sm:pt-20" aria-label={service.title}>
         <div className="grid grid-cols-1 items-center gap-14 lg:grid-cols-2 lg:gap-10">
           <Reveal>
             <Eyebrow>
-              <Icon className="h-3.5 w-3.5" aria-hidden="true" /> Web Presence
+              <DetailIcon className="h-3.5 w-3.5" aria-hidden="true" /> Web Presence
             </Eyebrow>
             <h1 className="font-display mt-5 text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl">
               {service.title}
