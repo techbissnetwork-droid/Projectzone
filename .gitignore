@@ -1,0 +1,23 @@
+# Runtime state — never committed
+/storage/db/*.sqlite
+/storage/db/*.sqlite-wal
+/storage/db/*.sqlite-shm
+/storage/cache/*
+/storage/logs/*
+/storage/uploads/*
+/storage/backups/*
+/storage/installed.php
+/storage/install.lock
+/storage/install.unlock
+
+# Build output
+/build/*.html
+
+# Local tooling
+.DS_Store
+Thumbs.db
+*.log
+.idea/
+.vscode/
+node_modules/
+vendor/

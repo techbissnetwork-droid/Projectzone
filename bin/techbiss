@@ -1,0 +1,184 @@
+#!/usr/bin/env php
+<?php
+declare(strict_types=1);
+
+/**
+ * TECHBISS command line.
+ *
+ *   bin/techbiss install [--url=] [--driver=] [--email=] [--password=] [--no-demo]
+ *   bin/techbiss migrate
+ *   bin/techbiss seed
+ *   bin/techbiss cache:clear
+ *   bin/techbiss health
+ *   bin/techbiss routes
+ *   bin/techbiss serve [--port=8000]
+ *
+ * The install command is the headless equivalent of the Advanced Installer,
+ * for CI pipelines and container image builds.
+ */
+
+if (PHP_SAPI !== 'cli') {
+    exit(1);
+}
+
+$root = dirname(__DIR__);
+require $root . '/app/Support/autoload.php';
+
+use App\Core\Application;
+use App\Core\Database;
+use App\Core\Installer;
+use App\Core\Migrator;
+use App\Core\Seeder;
+
+$app = new Application($root);
+
+$argvRaw = $argv;
+array_shift($argvRaw);
+$command = array_shift($argvRaw) ?: 'help';
+
+$options = [];
+foreach ($argvRaw as $arg) {
+    if (str_starts_with($arg, '--')) {
+        [$key, $value] = array_pad(explode('=', substr($arg, 2), 2), 2, true);
+        $options[$key] = $value;
+    }
+}
+
+function out(string $message, string $tone = ''): void
+{
+    $colours = ['ok' => "\033[32m", 'err' => "\033[31m", 'warn' => "\033[33m", 'dim' => "\033[90m", 'head' => "\033[1m"];
+    $prefix = $colours[$tone] ?? '';
+    fwrite(STDOUT, $prefix . $message . ($prefix ? "\033[0m" : '') . PHP_EOL);
+}
+
+function renderLog(array $lines): void
+{
+    foreach ($lines as $line) {
+        [$level, $message] = array_pad(explode('|', $line, 2), 2, '');
+        out('  ' . match ($level) { 'ok' => '✓', 'warn' => '!', 'err' => '✗', default => '·' } . ' ' . $message, $level);
+    }
+}
+
+switch ($command) {
+    case 'install':
+        $installer = new Installer($app);
+
+        $driver = (string) ($options['driver'] ?? 'sqlite');
+        $config = [
+            'driver' => $driver,
+            'database' => (string) ($options['database'] ?? ($driver === 'sqlite' ? $root . '/storage/db/techbiss.sqlite' : 'techbiss')),
+            'host' => (string) ($options['host'] ?? '127.0.0.1'),
+            'port' => (int) ($options['port'] ?? 3306),
+            'username' => (string) ($options['username'] ?? 'root'),
+            'password' => (string) ($options['db-password'] ?? ''),
+        ];
+
+        out('TECHBISS installer', 'head');
+        out('');
+
+        $requirements = $installer->requirements();
+        $blocked = false;
+        foreach ($requirements as $req) {
+            $tone = $req['status'] === 'pass' ? 'ok' : ($req['status'] === 'warn' ? 'warn' : 'err');
+            out('  ' . ($req['status'] === 'pass' ? '✓' : ($req['status'] === 'warn' ? '!' : '✗')) . ' ' . $req['label'] . ' — ' . $req['value'], $tone);
+            if ($req['status'] === 'fail' && $req['required']) {
+                $blocked = true;
+            }
+        }
+        if ($blocked) {
+            out('', '');
+            out('Installation blocked: required checks failed.', 'err');
+            exit(1);
+        }
+
+        out('');
+        $test = $installer->testConnection($config);
+        if (!$test['ok']) {
+            out('Database connection failed: ' . $test['message'], 'err');
+            exit(1);
+        }
+        out('  ✓ Database reachable — ' . $test['message'], 'ok');
+
+        $result = $installer->install([
+            'database' => $config,
+            'site_name' => (string) ($options['site'] ?? 'TECHBISS'),
+            'url' => (string) ($options['url'] ?? 'http://localhost:8000'),
+            'detect_url' => !isset($options['url']),
+            'timezone' => (string) ($options['timezone'] ?? 'UTC'),
+            'admin_name' => (string) ($options['name'] ?? 'Platform Owner'),
+            'admin_email' => (string) ($options['email'] ?? 'admin@techbiss.com'),
+            'admin_password' => (string) ($options['password'] ?? 'ChangeMe!2026'),
+            'mode' => (string) ($options['mode'] ?? 'clean'),
+            'demo_data' => !isset($options['no-demo']),
+        ]);
+
+        out('');
+        renderLog($result['log']);
+        out('');
+        if ($result['ok']) {
+            out('Installation complete.', 'ok');
+            out('  Admin: ' . ($options['email'] ?? 'admin@techbiss.com'), 'dim');
+            out('  Sign in at /admin/login', 'dim');
+            exit(0);
+        }
+        out('Installation failed.', 'err');
+        exit(1);
+
+    case 'migrate':
+        $migrator = new Migrator($app->make('db'), $root);
+        $ok = $migrator->run();
+        renderLog($migrator->log());
+        exit($ok ? 0 : 1);
+
+    case 'seed':
+        $seeder = new Seeder($app->make('db'), $root);
+        $seeder->run([
+            'name' => (string) ($options['name'] ?? 'Platform Owner'),
+            'email' => (string) ($options['email'] ?? 'admin@techbiss.com'),
+            'password' => (string) ($options['password'] ?? 'ChangeMe!2026'),
+        ], !isset($options['no-demo']));
+        renderLog($seeder->log());
+        exit(0);
+
+    case 'cache:clear':
+        $cleared = $app->make('cache')->flush();
+        out("Cleared {$cleared} cache entries.", 'ok');
+        exit(0);
+
+    case 'health':
+        $db = $app->make('db');
+        out('Version:    ' . Application::VERSION);
+        out('Installed:  ' . ($app->isInstalled() ? 'yes' : 'no'));
+        try {
+            $db->pdo();
+            out('Database:   connected (' . $db->driver() . ', ' . count($db->tables()) . ' tables)', 'ok');
+        } catch (Throwable $e) {
+            out('Database:   ' . $e->getMessage(), 'err');
+        }
+        exit(0);
+
+    case 'routes':
+        require $root . '/app/routes.php';
+        foreach ($app->router()->staticGetPaths() as $path) {
+            out('  GET  ' . $path);
+        }
+        exit(0);
+
+    case 'serve':
+        $port = (int) ($options['port'] ?? 8000);
+        out("Serving TECHBISS on http://localhost:{$port}", 'ok');
+        passthru(sprintf('php -S localhost:%d -t %s %s', $port, escapeshellarg($root . '/public'), escapeshellarg($root . '/public/index.php')));
+        exit(0);
+
+    default:
+        out('TECHBISS platform CLI', 'head');
+        out('');
+        out('  install       Install the platform (headless Advanced Installer)');
+        out('  migrate       Apply the database schema');
+        out('  seed          Populate catalogue and demo data');
+        out('  cache:clear   Flush the filesystem cache');
+        out('  health        Report platform and database state');
+        out('  routes        List registered GET routes');
+        out('  serve         Start the development server');
+        exit(0);
+}
