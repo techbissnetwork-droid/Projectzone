@@ -209,10 +209,17 @@
     });
   });
 
-  var filterTabs = document.querySelector("[data-filter-group]");
-  if (filterTabs) {
+  /* data-filter-group works on any tab set: give it a value that is a CSS
+     selector for the cards it should filter (defaults to [data-industry]
+     for backward compatibility with the original portfolio markup). Each
+     matching card carries the same attribute the selector targets, holding
+     its category value (e.g. data-industry="retail" or
+     data-category="mobile"). */
+  document.querySelectorAll("[data-filter-group]").forEach(function (filterTabs) {
     var buttons = filterTabs.querySelectorAll("button");
-    var cards = document.querySelectorAll("[data-industry]");
+    var cardSelector = filterTabs.getAttribute("data-filter-group") || "[data-industry]";
+    var cardAttr = cardSelector.replace(/^\[|\]$/g, "");
+    var cards = document.querySelectorAll(cardSelector);
     buttons.forEach(function (btn) {
       btn.addEventListener("click", function () {
         buttons.forEach(function (b) {
@@ -221,12 +228,12 @@
         btn.setAttribute("aria-selected", "true");
         var filter = btn.getAttribute("data-filter");
         cards.forEach(function (card) {
-          var match = filter === "all" || card.getAttribute("data-industry") === filter;
+          var match = filter === "all" || card.getAttribute(cardAttr) === filter;
           card.hidden = !match;
         });
       });
     });
-  }
+  });
 
   /* ---------------------------------------------------------------------
      Generic segmented tabs -> panel switcher (data-tabs / data-tab-panel)
@@ -327,56 +334,67 @@
   });
 
   /* ---------------------------------------------------------------------
-     Contact form validation
+     Form validation — shared by every mock form on the site (contact,
+     client/staff/admin sign-in). Every submission here is client-side
+     only: nothing is ever sent anywhere. A form opts in with
+     [data-validate], names its success panel with [data-success-target]
+     (the id of a .success-panel to reveal), and — only for the admin
+     sign-in mockup — [data-redirect] to continue to a static preview
+     page instead of showing an inline success state.
      --------------------------------------------------------------------- */
-  var form = document.getElementById("contact-form");
-  if (form) {
-    var successPanel = document.getElementById("form-success");
+  var emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  var phoneRe = /^[0-9+()\-.\s]{7,20}$/;
 
-    var emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    var phoneRe = /^[0-9+()\-.\s]{7,20}$/;
+  function fieldOf(input) {
+    return input.closest(".field");
+  }
 
-    function fieldOf(input) {
-      return input.closest(".field");
+  function setError(input, message) {
+    var field = fieldOf(input);
+    if (!field) return;
+    field.classList.add("has-error");
+    var errEl = field.querySelector(".field-error");
+    if (errEl && message) errEl.textContent = message;
+    input.setAttribute("aria-invalid", "true");
+  }
+
+  function clearError(input) {
+    var field = fieldOf(input);
+    if (!field) return;
+    field.classList.remove("has-error");
+    input.removeAttribute("aria-invalid");
+  }
+
+  function validateField(input) {
+    var value = input.value.trim();
+    if (input.hasAttribute("required") && !value) {
+      setError(input, input.tagName === "SELECT" ? "Please make a selection." : "This field is required.");
+      return false;
     }
-
-    function setError(input, message) {
-      var field = fieldOf(input);
-      field.classList.add("has-error");
-      var errEl = field.querySelector(".field-error");
-      if (errEl) errEl.textContent = message;
-      input.setAttribute("aria-invalid", "true");
+    if (input.type === "email" && value && !emailRe.test(value)) {
+      setError(input, "Enter a valid email address.");
+      return false;
     }
-
-    function clearError(input) {
-      var field = fieldOf(input);
-      field.classList.remove("has-error");
-      input.removeAttribute("aria-invalid");
+    if (input.type === "tel" && value && !phoneRe.test(value)) {
+      setError(input, "Enter a valid phone number.");
+      return false;
     }
-
-    function validateField(input) {
-      var value = input.value.trim();
-      if (input.hasAttribute("required") && !value) {
-        setError(input, "This field is required.");
+    if (value && input.hasAttribute("data-pattern")) {
+      var re = new RegExp(input.getAttribute("data-pattern"));
+      if (!re.test(value)) {
+        setError(input, input.getAttribute("data-pattern-message") || "Enter a valid value.");
         return false;
       }
-      if (input.type === "email" && value && !emailRe.test(value)) {
-        setError(input, "Enter a valid email address.");
-        return false;
-      }
-      if (input.type === "tel" && value && !phoneRe.test(value)) {
-        setError(input, "Enter a valid phone number.");
-        return false;
-      }
-      if (input.tagName === "SELECT" && input.hasAttribute("required") && !value) {
-        setError(input, "Please make a selection.");
-        return false;
-      }
-      clearError(input);
-      return true;
     }
+    clearError(input);
+    return true;
+  }
 
+  document.querySelectorAll("form[data-validate]").forEach(function (form) {
+    var successPanel = document.getElementById(form.getAttribute("data-success-target"));
+    var redirect = form.getAttribute("data-redirect");
     var inputs = form.querySelectorAll("input, select, textarea");
+
     inputs.forEach(function (input) {
       input.addEventListener("blur", function () {
         validateField(input);
@@ -396,6 +414,11 @@
         return;
       }
 
+      if (redirect) {
+        window.location.href = redirect;
+        return;
+      }
+
       form.hidden = true;
       if (successPanel) {
         successPanel.classList.add("is-visible");
@@ -403,5 +426,5 @@
         successPanel.focus();
       }
     });
-  }
+  });
 })();

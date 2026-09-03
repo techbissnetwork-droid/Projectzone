@@ -1,0 +1,142 @@
+<title>Admin Panel (Preview) | TECHBISS</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="A visual preview of the TECHBISS internal admin control panel. Illustrative sample data only.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<main id="main" class="admin-shell">
+
+<section class="section-sm" style="padding-bottom:0;">
+  <div class="container">
+    <div class="admin-topbar raised reveal">
+      <div class="admin-topbar-title">
+        <span class="admin-dot" aria-hidden="true"></span>
+        Admin Panel <span class="admin-topbar-sep">&middot;</span> Preview
+      </div>
+      <a class="admin-back" href="index.html"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>Back to site</a>
+    </div>
+    <p class="admin-preview-note">Sample data shown for preview purposes &mdash; nothing here reflects real clients, tickets, or activity.</p>
+  </div>
+</section>
+
+<section class="section-sm">
+  <div class="container">
+    <div class="section-head reveal">
+      <h2>Live snapshot</h2>
+      <p class="section-sub">A quick read on where things stand across active work.</p>
+    </div>
+    <div class="stats-panel raised reveal">
+      <div class="gauge">
+  <div class="gauge-outer raised">
+    <div class="gauge-ring" data-target="34">
+      <div class="gauge-cap raised">
+        <span class="gauge-value"><span class="gauge-num">0</span></span>
+      </div>
+    </div>
+  </div>
+  <span class="gauge-label">Active Projects</span>
+</div>
+      <div class="gauge">
+  <div class="gauge-outer raised">
+    <div class="gauge-ring" data-target="7">
+      <div class="gauge-cap raised">
+        <span class="gauge-value"><span class="gauge-num">0</span></span>
+      </div>
+    </div>
+  </div>
+  <span class="gauge-label">Open Tickets</span>
+</div>
+      <div class="gauge">
+  <div class="gauge-outer raised">
+    <div class="gauge-ring" data-target="99.97">
+      <div class="gauge-cap raised">
+        <span class="gauge-value"><span class="gauge-num">0</span><sup>%</sup></span>
+      </div>
+    </div>
+  </div>
+  <span class="gauge-label">Avg. Uptime</span>
+</div>
+      <div class="gauge">
+  <div class="gauge-outer raised">
+    <div class="gauge-ring" data-target="18">
+      <div class="gauge-cap raised">
+        <span class="gauge-value"><span class="gauge-num">0</span></span>
+      </div>
+    </div>
+  </div>
+  <span class="gauge-label">New Clients (30d)</span>
+</div>
+    </div>
+  </div>
+</section>
+
+<section class="section-sm band-alt">
+  <div class="container">
+    <div class="section-head reveal" style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:28px;">
+      <div>
+        <h2 style="margin-bottom:6px;">Recent Projects</h2>
+        <p class="section-sub" style="margin:0;">The latest activity across active engagements.</p>
+      </div>
+      <button class="btn btn-secondary btn-sm" type="button" aria-disabled="true">Export</button>
+    </div>
+    <div class="compare-wrap raised reveal">
+      <table class="compare">
+        <thead>
+          <tr><th>Project</th><th>Status</th><th>Last Updated</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Cascade Outfitters &mdash; Website Redesign</td><td><span class="status-badge raised-sm status-on-track">In Progress</span></td><td>2 hours ago</td></tr>
+          <tr><td>Harborline Legal Partners &mdash; Web Application</td><td><span class="status-badge raised-sm status-on-track">In Progress</span></td><td>3 hours ago</td></tr>
+          <tr><td>Summit Peak Outdoors &mdash; SSL &amp; Security Hardening</td><td><span class="status-badge raised-sm status-on-track">In Progress</span></td><td>6 hours ago</td></tr>
+          <tr><td>Ferro &amp; Vine Bistro Group &mdash; Business Digitization</td><td><span class="status-badge raised-sm status-review">In Review</span></td><td>Yesterday</td></tr>
+          <tr><td>Bright Path Tutoring &mdash; Mobile Application</td><td><span class="status-badge raised-sm status-attention">On Hold</span></td><td>4 days ago</td></tr>
+          <tr><td>Meadowcrest Dental Group &mdash; Domain &amp; Hosting Migration</td><td><span class="status-badge raised-sm status-complete">Complete</span></td><td>1 week ago</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="section-sm">
+  <div class="container">
+    <div class="section-head reveal">
+      <h2>Recent Activity</h2>
+      <p class="section-sub">A short log of what&rsquo;s moved across the system.</p>
+    </div>
+    <div class="activity-list reveal">
+      <div class="activity-item raised-sm">
+        <p>New support ticket opened &mdash; Harborline Legal Partners (web app access issue)</p>
+        <span class="activity-time">12 min ago</span>
+      </div>
+      <div class="activity-item raised-sm">
+        <p>Invoice sent &mdash; Cascade Outfitters (Website Redesign, Milestone 2)</p>
+        <span class="activity-time">1 hr ago</span>
+      </div>
+      <div class="activity-item raised-sm">
+        <p>SSL certificate renewed &mdash; Summit Peak Outdoors</p>
+        <span class="activity-time">3 hr ago</span>
+      </div>
+      <div class="activity-item raised-sm">
+        <p>New client onboarded &mdash; Meadowcrest Dental Group</p>
+        <span class="activity-time">Yesterday</span>
+      </div>
+      <div class="activity-item raised-sm">
+        <p>Deployment completed &mdash; Ferro &amp; Vine Bistro Group (staging &rarr; production)</p>
+        <span class="activity-time">Yesterday</span>
+      </div>
+      <div class="activity-item raised-sm">
+        <p>Support ticket resolved &mdash; Bright Path Tutoring (login issue)</p>
+        <span class="activity-time">2 days ago</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<script src="assets/js/main.js"></script>
