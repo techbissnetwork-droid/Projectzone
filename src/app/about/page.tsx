@@ -4,7 +4,7 @@ import { PageHero } from "@/components/ui/PageHero";
 import { Section } from "@/components/ui/Section";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { RevealGroup, revealItem, Reveal } from "@/components/ui/Reveal";
+import { RevealGroup, Reveal } from "@/components/ui/Reveal";
 import { Stat } from "@/components/ui/Stat";
 import { CtaBanner } from "@/components/home/CtaBanner";
 import { AboutMotionGrid, AboutMotionItem } from "@/components/about/AboutMotion";

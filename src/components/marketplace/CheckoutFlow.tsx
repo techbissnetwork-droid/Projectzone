@@ -29,7 +29,7 @@ export function CheckoutFlow() {
   const [card, setCard] = React.useState({ number: "", expiry: "", cvc: "" });
   const [errors, setErrors] = React.useState<Record<string, string>>({});
 
-  const orderId = React.useMemo(() => `TB-${Math.floor(100000 + Math.random() * 900000)}`, []);
+  const [orderId, setOrderId] = React.useState("");
 
   function validateAccount() {
     const next: Record<string, string> = {};
@@ -53,6 +53,7 @@ export function CheckoutFlow() {
     setProcessing(true);
     await sleep(1400);
     setProcessing(false);
+    setOrderId(`TB-${Math.floor(100000 + Math.random() * 900000)}`);
     setStep(2);
   }
 

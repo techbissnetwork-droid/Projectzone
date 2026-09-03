@@ -19,6 +19,23 @@ export function Navbar() {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [loginOpen, setLoginOpen] = React.useState(false);
   const [servicesOpen, setServicesOpen] = React.useState(false);
+  const loginRef = React.useRef<HTMLDivElement>(null);
+  const servicesRef = React.useRef<HTMLDivElement>(null);
+  const [canHover, setCanHover] = React.useState(false);
+
+  React.useEffect(() => {
+    const mq = window.matchMedia("(hover: hover) and (pointer: fine)");
+    setCanHover(mq.matches);
+    const onChange = () => setCanHover(mq.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
+  // On touch/hybrid devices, synthetic hover events fire around taps and would
+  // fight with click-to-toggle, so hover-to-open only applies where a real
+  // pointer (mouse) is present; touch always falls back to tap-to-toggle.
+  const hoverHandlers = (setOpen: (v: boolean) => void) =>
+    canHover ? { onMouseEnter: () => setOpen(true), onMouseLeave: () => setOpen(false) } : {};
 
   React.useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -30,7 +47,21 @@ export function Navbar() {
   React.useEffect(() => {
     setMobileOpen(false);
     setLoginOpen(false);
+    setServicesOpen(false);
   }, [pathname]);
+
+  // Touch/tap parity: tapping outside a tap-opened dropdown closes it, since
+  // touch devices can't rely on mouseleave the way desktop hover does.
+  React.useEffect(() => {
+    if (!loginOpen && !servicesOpen) return;
+    function onPointerDown(e: PointerEvent) {
+      const target = e.target as Node;
+      if (loginRef.current && !loginRef.current.contains(target)) setLoginOpen(false);
+      if (servicesRef.current && !servicesRef.current.contains(target)) setServicesOpen(false);
+    }
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => document.removeEventListener("pointerdown", onPointerDown);
+  }, [loginOpen, servicesOpen]);
 
   const isDashboardRoute = pathname?.startsWith("/dashboard");
   if (isDashboardRoute) return null;
@@ -53,20 +84,29 @@ export function Navbar() {
               item.columns ? (
                 <div
                   key={item.label}
+                  ref={servicesRef}
                   className="relative"
-                  onMouseEnter={() => setServicesOpen(true)}
-                  onMouseLeave={() => setServicesOpen(false)}
+                  {...hoverHandlers(setServicesOpen)}
                 >
-                  <Link
-                    href={item.href}
+                  <span
                     className={cn(
-                      "focus-ring flex items-center gap-1 rounded-full px-3.5 py-2 text-sm font-medium text-(--color-ink-muted) transition-colors hover:text-(--color-ink)",
+                      "focus-ring flex items-center gap-0.5 rounded-full text-sm font-medium text-(--color-ink-muted) transition-colors has-[a:hover]:text-(--color-ink)",
                       pathname?.startsWith(item.href) && "text-(--color-ink)",
                     )}
                   >
-                    {item.label}
-                    <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", servicesOpen && "rotate-180")} />
-                  </Link>
+                    <Link href={item.href} className="rounded-full py-2 pl-3.5">
+                      {item.label}
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={() => setServicesOpen((v) => !v)}
+                      aria-expanded={servicesOpen}
+                      aria-label={`${servicesOpen ? "Close" : "Open"} ${item.label} menu`}
+                      className="flex h-8 items-center rounded-full py-2 pr-3.5"
+                    >
+                      <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", servicesOpen && "rotate-180")} />
+                    </button>
+                  </span>
                   <AnimatePresence>
                     {servicesOpen && (
                       <motion.div
@@ -124,12 +164,14 @@ export function Navbar() {
             </Link>
 
             <div
+              ref={loginRef}
               className="relative hidden sm:block"
-              onMouseEnter={() => setLoginOpen(true)}
-              onMouseLeave={() => setLoginOpen(false)}
+              {...hoverHandlers(setLoginOpen)}
             >
               <button
                 type="button"
+                onClick={() => setLoginOpen((v) => !v)}
+                aria-expanded={loginOpen}
                 className="focus-ring flex h-10 w-10 items-center justify-center rounded-full text-(--color-ink-muted) transition-colors hover:bg-(--color-surface-raised) hover:text-(--color-ink)"
                 aria-label="Login"
               >

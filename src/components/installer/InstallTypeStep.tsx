@@ -51,25 +51,22 @@ export function InstallTypeStep({
 }) {
   const [migrateScanDone, setMigrateScanDone] = React.useState(false);
   const [uploadProgress, setUploadProgress] = React.useState(0);
-  const [uploading, setUploading] = React.useState(false);
   const [fileName, setFileName] = React.useState("");
 
   function selectType(type: InstallType) {
     setInstallType(type);
     setMigrateScanDone(false);
     setUploadProgress(0);
-    setUploading(false);
+    setFileName("");
   }
 
   function simulateUpload(name: string) {
     setFileName(name);
-    setUploading(true);
     setUploadProgress(0);
     const interval = setInterval(() => {
       setUploadProgress((p) => {
         if (p >= 100) {
           clearInterval(interval);
-          setUploading(false);
           return 100;
         }
         return Math.min(100, p + Math.random() * 22 + 8);

@@ -52,6 +52,7 @@ export function Button(props: ButtonProps) {
     children,
     icon,
     iconPosition = "right",
+    href,
     ...rest
   } = props;
 
@@ -65,10 +66,9 @@ export function Button(props: ButtonProps) {
     </>
   );
 
-  if ("href" in props && props.href) {
-    const { href, ...anchorRest } = rest as React.AnchorHTMLAttributes<HTMLAnchorElement>;
+  if (href) {
     return (
-      <Link href={props.href} className={classes} {...anchorRest}>
+      <Link href={href} className={classes} {...(rest as React.AnchorHTMLAttributes<HTMLAnchorElement>)}>
         {content}
       </Link>
     );

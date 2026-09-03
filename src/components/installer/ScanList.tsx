@@ -18,7 +18,9 @@ export function ScanList({
 }) {
   const [doneCount, setDoneCount] = React.useState(0);
   const onCompleteRef = React.useRef(onComplete);
-  onCompleteRef.current = onComplete;
+  React.useEffect(() => {
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
 
   React.useEffect(() => {
     setDoneCount(0);
@@ -39,7 +41,6 @@ export function ScanList({
       cancelled = true;
       clearTimeout(t);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items, stepMs]);
 
   return (
