@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100"
-     role="img" aria-label="TECHBISS">
-  <title>TECHBISS</title>
-  <!-- Inherits colour from the surrounding text, so one file serves every
-       one-colour use: dark on light, light on dark, foil, embroidery. -->
-  <path fill="currentColor" fill-rule="evenodd" d="
-    M24 0h52a24 24 0 0 1 24 24v52a24 24 0 0 1-24 24H24A24 24 0 0 1 0 76V24A24 24 0 0 1 24 0Z
-    M22 26h56v14H57v34H43V40H22V26Z"/>
-</svg>
