@@ -53,6 +53,12 @@ if (post()) {
               'hero_cta_primary','hero_cta_secondary','quote'] as $k) {
         $save[$k] = trim((string)($_POST[$k] ?? ''));
     }
+    foreach (['slides_services','slides_services_phone','slides_process','slides_process_phone',
+              'slides_market','slides_market_phone','home_products'] as $k) {
+        if (array_key_exists($k, $_POST)) {
+            $save[$k] = trim((string)$_POST[$k]);
+        }
+    }
     /* Every section heading is editable from the same page. */
     foreach (HEADING_FIELDS as $fields) {
         foreach (array_keys($fields) as $k) {
@@ -147,6 +153,27 @@ require __DIR__ . '/../partials/app_header.php';
       <div class="fieldset" id="quote">
         <p class="legend">Statement quote</p>
         <label class="field"><span>Quote</span><textarea name="quote" rows="3"><?= e(Settings::get('quote')) ?></textarea></label>
+      </div>
+
+      <div class="fieldset" id="slides">
+        <p class="legend">Sliders</p>
+        <p class="hint" style="margin:-4px 0 12px">How many cards each slider shows on a slide,
+          written as <b>rows × columns</b>. <code>1x4</code> is one row of four; <code>4x1</code>
+          is four stacked. Anything unreadable falls back to the default.</p>
+        <?php foreach ([
+            'Service modules'   => ['slides_services', 'slides_services_phone'],
+            'How we work'       => ['slides_process',  'slides_process_phone'],
+            'Marketplace strip' => ['slides_market',   'slides_market_phone'],
+        ] as $label => [$wide, $narrow]): ?>
+          <div class="row two">
+            <label class="field"><span><?= e($label) ?> <small>desktop</small></span>
+              <input name="<?= e($wide) ?>" value="<?= e(Settings::get($wide)) ?>" placeholder="1x4"></label>
+            <label class="field"><span><?= e($label) ?> <small>phone</small></span>
+              <input name="<?= e($narrow) ?>" value="<?= e(Settings::get($narrow)) ?>" placeholder="1x2"></label>
+          </div>
+        <?php endforeach; ?>
+        <label class="field"><span>Products on the home page <small>the marketplace strip pages through them</small></span>
+          <input name="home_products" type="number" min="1" max="48" value="<?= e(Settings::get('home_products')) ?>"></label>
       </div>
 
       <?php foreach (HEADING_FIELDS as $sec => $fields): ?>

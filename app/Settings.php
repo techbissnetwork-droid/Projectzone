@@ -127,6 +127,15 @@ final class Settings
             'section_marketplace' => '1',
             'section_quote'    => '1',
 
+            /* how many cards each slider shows, as rows x columns */
+            'slides_services'        => '1x4',
+            'slides_services_phone'  => '1x2',
+            'slides_process'         => '4x1',
+            'slides_process_phone'   => '4x1',
+            'slides_market'          => '1x4',
+            'slides_market_phone'    => '1x2',
+            'home_products'          => '8',
+
             /* section headings */
             'services_eyebrow' => 'The ecosystem',
             'services_title'   => "Everything your business\nneeds to exist online.",

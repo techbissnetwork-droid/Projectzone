@@ -16,7 +16,8 @@ $secNum = $secNum ?? 5;
       <p class="sec__lede reveal"><?= e(Settings::get('process_lede')) ?></p>
     </header>
 
-    <div class="carousel proc__carousel reveal" data-carousel="Stage">
+    <div class="carousel proc__carousel reveal" data-carousel="Stage"
+         style="<?= e(slide_vars(Settings::get('slides_process'), Settings::get('slides_process_phone'), '4x1', '4x1')) ?>">
       <ol class="carousel__rail" data-rail>
       <?php foreach ($steps as $si => $st): ?>
         <li class="flow__step">

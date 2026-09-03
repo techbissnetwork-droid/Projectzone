@@ -347,15 +347,23 @@ button{ font:inherit; color:inherit; background:none; border:0; padding:0; curso
   content:""; position:absolute; inset:0;
   background:radial-gradient(90% 60% at 80% 0%, rgba(78,118,232,.16), transparent 70%);
 }
-.menu__links{ position:relative; display:flex; flex-direction:column; justify-content:center; gap:6px; padding:96px var(--gut) 0; }
+/* The links share the screen with the button under them. At 10vw a six-item
+   menu was taller than the phone it opened on, and because this row is a fixed
+   grid track with nothing to scroll, the overflow ran underneath the button
+   and the last links could not be reached. */
+.menu__links{
+  position:relative; display:flex; flex-direction:column; justify-content:center;
+  gap:2px; padding:84px var(--gut) 8px;
+  min-height:0; overflow-y:auto; overscroll-behavior:contain;
+}
 .menu__links a{
-  display:flex; align-items:baseline; gap:16px; padding:12px 0;
-  font-family:var(--ff-d); font-size:clamp(2.2rem,10vw,3.6rem); letter-spacing:-.04em;
+  display:flex; align-items:baseline; gap:14px; padding:clamp(8px,1.4vh,14px) 0;
+  font-family:var(--ff-d); font-size:clamp(1.4rem,6vw,2.4rem); letter-spacing:-.035em;
   border-bottom:1px solid var(--line);
   opacity:0; transform:translateY(30px);
 }
 .menu.is-open .menu__links a{ opacity:1; transform:none; transition:opacity .7s var(--e-out) calc(.16s + var(--i,0)*.06s), transform .8s var(--e-out) calc(.16s + var(--i,0)*.06s); }
-.menu__links i{ font-family:var(--ff-m); font-style:normal; font-size:12px; color:var(--sig); letter-spacing:.1em; }
+.menu__links i{ font-family:var(--ff-m); font-style:normal; font-size:10px; color:var(--sig); letter-spacing:.1em; flex:none; }
 .menu__foot{ position:relative; padding:0 var(--gut) calc(28px + env(safe-area-inset-bottom)); display:grid; gap:14px; opacity:0; transition:opacity .6s var(--e-out) .5s; }
 .menu.is-open .menu__foot{ opacity:1; }
 .menu__foot p{ font-family:var(--ff-m); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--tx-3); text-align:center; }

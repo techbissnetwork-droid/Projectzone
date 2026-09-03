@@ -5,7 +5,7 @@
 
 /* ── page headers ────────────────────────────────────────── */
 .pagehead{
-  position:relative; padding:clamp(150px,20vh,230px) 0 clamp(56px,8vh,96px); overflow:hidden;
+  position:relative; padding:clamp(104px,13vh,168px) 0 clamp(40px,6vh,72px); overflow:hidden;
 }
 .pagehead::before{
   content:""; position:absolute; inset:0; pointer-events:none;
@@ -257,7 +257,7 @@ body.authpage .foot__wordmark{ display:none }
 
 
 /* ── custom pages ────────────────────────────────────────── */
-.pagehead--lg{ padding-block:clamp(180px,26vh,300px) clamp(64px,9vh,110px) }
+.pagehead--lg{ padding-block:clamp(120px,16vh,200px) clamp(48px,7vh,84px) }
 .pagehead--lg .pagehead__title{ font-size:clamp(2rem, 0.9rem + 5.6vw, 6.8rem) }
 
 /* Phone plateau — see base.css. An inner page's headline scales like the

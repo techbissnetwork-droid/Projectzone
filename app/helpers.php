@@ -111,6 +111,31 @@ function grid_cols(int $count, int $max = 4, int $min = 3): int
     return $best;
 }
 
+/**
+ * Parse a "rows x columns" slide layout, as typed in the admin: "1x4" is one
+ * row of four, "4x1" is four stacked. Anything unreadable falls back to
+ * $fallback, so a typo can never break the page.
+ */
+function slide_layout(string $value, string $fallback = '1x4'): array
+{
+    foreach ([$value, $fallback] as $try) {
+        if (preg_match('/^\s*(\d{1,2})\s*[x×*]\s*(\d{1,2})\s*$/i', $try, $m)) {
+            $rows = max(1, min(12, (int)$m[1]));
+            $cols = max(1, min(12, (int)$m[2]));
+            return ['rows' => $rows, 'cols' => $cols];
+        }
+    }
+    return ['rows' => 1, 'cols' => 4];
+}
+
+/** The inline custom properties a [data-carousel] needs for both breakpoints. */
+function slide_vars(string $wide, string $narrow, string $fallbackWide = '1x4', string $fallbackNarrow = '1x2'): string
+{
+    $d = slide_layout($wide, $fallbackWide);
+    $m = slide_layout($narrow, $fallbackNarrow);
+    return sprintf('--r-d:%d;--c-d:%d;--r-m:%d;--c-m:%d', $d['rows'], $d['cols'], $m['rows'], $m['cols']);
+}
+
 function e(?string $v): string
 {
     return htmlspecialchars((string)$v, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
