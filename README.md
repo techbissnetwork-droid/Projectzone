@@ -1,36 +1,32 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TECHBISS
 
-## Getting Started
+A premium, multi-page digital transformation platform: marketing site, a digital marketplace for ready-made websites/themes, an Advanced Installer for deploying them, and role-based Admin/Client/Staff portals.
 
-First, run the development server:
+Built with Next.js 16 (App Router), TypeScript, Tailwind CSS v4 and Framer Motion.
+
+## Getting started
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## What's here
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Marketing pages** — Home, Services, Solutions, Work (case studies), Process, About, Resources, Contact — all real routes under `src/app`, several with dynamic sub-pages (`/work/[slug]`, `/resources/[slug]`).
+- **Marketplace** — `/marketplace` browse/search/filter, `/marketplace/[slug]` product detail with a live device-preview mock, `/marketplace/cart`, and a multi-step `/marketplace/checkout`.
+- **Advanced Installer** — `/installer`: URL/environment auto-detection, fresh install vs. migrate-existing-site vs. import-from-backup, guided configuration, and a live deploy log.
+- **Auth & dashboards** — mock, localStorage-backed role auth at `/login/{admin,client,staff}`, each with a protected dashboard under `/dashboard/{role}` (multiple real sub-routes: products, billing, support, clients, marketplace orders, staff directory, settings).
 
-## Learn More
+## Structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+src/
+  app/            routes (App Router)
+  components/     ui/, layout/, and per-feature component folders
+  lib/            data/ (mock content), contexts (auth, cart), utils, types
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Content (products, case studies, team, articles, etc.) lives in `src/lib/data/*` as typed arrays — edit there to change what's shown across the site.
