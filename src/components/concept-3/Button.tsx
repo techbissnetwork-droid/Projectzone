@@ -54,11 +54,11 @@ export function Button({
   const classes = cn(base, variants[variant], sizes[size], className);
   const content = (
     <>
-      {Icon && iconPosition === "leading" ? (
+      {iconPosition === "leading" ? (
         <Icon className="h-4 w-4 shrink-0 transition-transform duration-200 group-hover:-translate-x-0.5" aria-hidden="true" />
       ) : null}
       <span>{children}</span>
-      {Icon && iconPosition === "trailing" ? (
+      {iconPosition === "trailing" ? (
         <Icon className="h-4 w-4 shrink-0 transition-transform duration-200 group-hover:translate-x-0.5" aria-hidden="true" />
       ) : null}
     </>
