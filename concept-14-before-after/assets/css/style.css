@@ -498,3 +498,71 @@ table.compare tbody tr:hover{background:var(--surface-2);}
 /* ---------- Reveal ---------- */
 .js-anim [data-reveal]{opacity:0;transform:translateY(22px);}
 .js-anim [data-reveal].reveal-in{opacity:1;transform:none;transition:opacity .75s var(--ease),transform .75s var(--ease);}
+
+/* ---------- Motion, round two: variety, ambience, a few signature moments ----------
+   The first pass leaned entirely on one move (fade + slide up on scroll). This
+   layer adds: a second reveal style for object/tile elements so cards don't
+   move identically to text; one continuous ambient element (a slow-drifting
+   glow behind the hero and CTA); and a handful of motion moments tied
+   directly to what each element means, not decoration for its own sake —
+   the journey line draws itself, the "live" ring keeps a pulse, the work
+   thumbnails wipe further toward "after" on hover, echoing the hero slider. */
+
+/* Reveal variant: "pop" — scale+fade for tiles/panels/cards. Same specificity
+   as the base [data-reveal] rule above, so it must stay after it to win. */
+.js-anim [data-reveal="pop"]{transform:translateY(16px) scale(.94);}
+.js-anim [data-reveal="pop"].reveal-in{transform:none;transition:opacity .7s var(--ease),transform .6s var(--ease);}
+
+/* Hero + CTA banner: one slow-drifting glow, kept low-contrast so it never
+   competes with the text sitting on top of it. */
+.hero{position:relative;overflow:hidden;}
+.hero::before,.cta-banner::before{content:"";position:absolute;z-index:0;pointer-events:none;border-radius:50%;animation:glow-drift 20s ease-in-out infinite alternate;}
+.hero::before{top:-22%;left:50%;width:min(920px,150vw);height:min(920px,150vw);transform:translateX(-52%);background:radial-gradient(circle,rgba(44,63,220,.15),rgba(44,63,220,.04) 46%,transparent 70%);}
+.cta-banner::before{top:-35%;left:50%;width:min(760px,160%);height:min(760px,160%);transform:translateX(-50%);background:radial-gradient(circle,rgba(114,136,255,.24),transparent 66%);}
+.cta-banner>*{position:relative;z-index:1;}
+@keyframes glow-drift{from{transform:translateX(-54%) translateY(0) scale(1);}to{transform:translateX(-48%) translateY(2.5%) scale(1.07);}}
+
+/* Hero "after" panel: once revealed, the ring keeps a slow living pulse —
+   it's the one dashboard that "updates itself, second by second." */
+.ba-after.is-active .ring-value{animation:ring-glow 2.6s ease-in-out .7s infinite;}
+@keyframes ring-glow{0%,100%{filter:drop-shadow(0 0 2px rgba(114,136,255,.35));}50%{filter:drop-shadow(0 0 10px rgba(114,136,255,.75));}}
+
+/* Digitization journey: the connecting line draws itself in behind the dots
+   instead of sitting there pre-formed — the one graphic on the page whose
+   whole point is "before becoming after, over time." */
+.js-anim .shift-graphic::before{transition:transform 1.15s var(--ease) .25s;}
+@media (max-width:559px){
+  .js-anim .shift-graphic::before{transform:scaleY(0);transform-origin:top;}
+  .js-anim [data-reveal].reveal-in .shift-graphic::before{transform:scaleY(1);}
+}
+@media (min-width:560px){
+  .js-anim .shift-graphic::before{transform:scaleX(0);transform-origin:left;}
+  .js-anim [data-reveal].reveal-in .shift-graphic::before{transform:scaleX(1);}
+}
+.shift-node.is-after .shift-dot{animation:node-pulse 2.4s ease-in-out infinite;}
+.shift-node.is-after:last-child .shift-dot{animation-delay:.4s;}
+@keyframes node-pulse{0%,100%{box-shadow:0 0 0 5px var(--cobalt-soft);}50%{box-shadow:0 0 0 8px var(--cobalt-soft);}}
+
+/* Service cards: the icon gets a little life on hover, the before/after
+   line brightens to confirm there's more underneath, not just a lift. */
+.card .icon{transition:transform var(--dur-mid) var(--ease),background var(--dur-fast),color var(--dur-fast);}
+.card:hover .icon{transform:scale(1.1) rotate(-6deg);background:var(--cobalt-soft);color:var(--cobalt-deep);}
+.shift-line{transition:color var(--dur-fast);}
+.card:hover .shift-line{color:var(--ink);}
+
+/* Work filmstrip: hover a card to see more of "after" — a small echo of
+   the hero's own drag slider, not a generic image hover. */
+.thumb-before,.thumb-after{transition:flex-grow .55s var(--ease);}
+.work-card:hover .thumb-after{flex-grow:1.7;}
+.work-card:hover .thumb-before{flex-grow:.6;}
+.thumb-after::before{animation:glow-pulse 3s ease-in-out infinite;}
+@keyframes glow-pulse{0%,100%{opacity:.22;}50%{opacity:.45;}}
+
+/* Capability marquee: fade the hard edges instead of a visible cut. */
+.strip{-webkit-mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);}
+
+@media (prefers-reduced-motion:reduce){
+  .hero::before,.cta-banner::before,.ba-after.is-active .ring-value,.shift-node.is-after .shift-dot,.thumb-after::before{animation:none;}
+  .js-anim .shift-graphic::before{transition:none;}
+  .thumb-before,.thumb-after{transition:none;}
+}
