@@ -243,6 +243,17 @@ export function getSite(id: string): MySite | undefined {
   return mySites.find((s) => s.id === id);
 }
 
+// Mock aggregate hosting usage — a real implementation would read this from the
+// hosting/infrastructure API per account.
+export function hostingUsage() {
+  const usedGB = mySites.length * 2.4 + 3.8;
+  return { usedGB: Math.round(usedGB * 10) / 10, limitGB: 100, uptime: "99.99%" };
+}
+
+export function nextInvoice(): Invoice | undefined {
+  return invoices.find((inv) => inv.status === "due");
+}
+
 // Deterministic per-site mix so the checklist looks plausible without randomness.
 export function launchChecklist(siteId: string): ChecklistItem[] {
   const site = getSite(siteId);

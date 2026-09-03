@@ -81,6 +81,12 @@ export const categoryGroups: CategoryGroup[] = [
 
 export type Badge = "Featured" | "New" | "Trending" | "Best Seller" | "Free";
 
+export interface ProductReview {
+  name: string;
+  quote: string;
+  rating: number;
+}
+
 export interface Product {
   slug: string;
   name: string;
@@ -99,6 +105,7 @@ export interface Product {
   badges: Badge[];
   gradient: [string, string];
   description: string;
+  sampleReviews?: ProductReview[];
 }
 
 export const products: Product[] = [
@@ -120,6 +127,11 @@ export const products: Product[] = [
     gradient: ["#f2b84b", "#c9a463"],
     description:
       "Restaurant Pro is a complete online ordering and reservation experience — designed to turn hungry visitors into paying customers in three taps or fewer.",
+    sampleReviews: [
+      { name: "Marcus T.", quote: "We swapped in our menu and logo and were taking online orders the same afternoon. Reservations alone paid for the license in a week.", rating: 5 },
+      { name: "Priya N.", quote: "Cleanest restaurant theme I've evaluated. The ordering flow feels like something a much bigger chain would pay six figures for.", rating: 5 },
+      { name: "Dana K.", quote: "Support was quick when I had a question about the menu CMS. Minor learning curve but well worth it.", rating: 4 },
+    ],
   },
   {
     slug: "meridian-corporate",
@@ -139,6 +151,10 @@ export const products: Product[] = [
     gradient: ["#5170ff", "#0b1440"],
     description:
       "Meridian Corporate is built for organizations that need to project scale and credibility — with dedicated investor, press and careers experiences.",
+    sampleReviews: [
+      { name: "Helena R.", quote: "Our board wanted an investor relations page that looked like it belonged to a public company. This delivered on day one.", rating: 5 },
+      { name: "Owen F.", quote: "The newsroom CMS made our comms team self-sufficient — no more filing tickets for a press release update.", rating: 5 },
+    ],
   },
   {
     slug: "studio-agency",
@@ -158,6 +174,11 @@ export const products: Product[] = [
     gradient: ["#7c8cff", "#1a1440"],
     description:
       "Studio Agency is an editorial, motion-rich theme for creative teams who want their portfolio to feel as considered as their client work.",
+    sampleReviews: [
+      { name: "Yuki S.", quote: "The scroll-driven case studies got us two new inbound leads in the first month, both mentioning the site specifically.", rating: 5 },
+      { name: "Ben O.", quote: "Motion feels expensive without being gratuitous. Exactly the tone we wanted for our rebrand.", rating: 5 },
+      { name: "Clara V.", quote: "Took a bit of tuning to fit our proposal process but the foundation is genuinely excellent.", rating: 4 },
+    ],
   },
   {
     slug: "folio-personal",
@@ -177,6 +198,10 @@ export const products: Product[] = [
     gradient: ["#e0e0e0", "#0a0a0a"],
     description:
       "Folio is a quiet, confident personal site for consultants, designers and founders who want substance over spectacle.",
+    sampleReviews: [
+      { name: "Isabel M.", quote: "Exactly the restraint I was looking for. Clients keep mentioning how clean my site feels compared to competitors.", rating: 5 },
+      { name: "Tomas L.", quote: "Set up in an afternoon. The writing module is a nice touch for a personal site at this price.", rating: 5 },
+    ],
   },
   {
     slug: "havenwood-hotel",
@@ -196,6 +221,10 @@ export const products: Product[] = [
     gradient: ["#c9a463", "#3a2a12"],
     description:
       "Havenwood helps independent hotels reduce OTA dependency with a booking experience as polished as a five-star lobby.",
+    sampleReviews: [
+      { name: "Andre P.", quote: "Direct bookings are up almost 30% since launch. Guests say the room browsing feels like a luxury brand site.", rating: 5 },
+      { name: "Mei C.", quote: "The availability engine just works. Our front desk finally isn't fielding duplicate phone bookings.", rating: 5 },
+    ],
   },
   {
     slug: "northfield-school",
@@ -234,6 +263,11 @@ export const products: Product[] = [
     gradient: ["#3ecf8e", "#0a2a1c"],
     description:
       "Meridian Health gives hospitals and clinics a calm, trustworthy front door — with booking that actually reduces phone volume.",
+    sampleReviews: [
+      { name: "Dr. Naomi K.", quote: "Patients tell us it's the calmest healthcare site they've used. Appointment volume through the portal doubled in two months.", rating: 5 },
+      { name: "Felix R.", quote: "The department pages made it trivial to organize twelve specialties without the site feeling cluttered.", rating: 5 },
+      { name: "Sana I.", quote: "Great out of the box, though we did add extra compliance copy ourselves for our region.", rating: 4 },
+    ],
   },
   {
     slug: "cornerstone-realty",
@@ -310,6 +344,10 @@ export const products: Product[] = [
     gradient: ["#0a0a0a", "#e0e0e0"],
     description:
       "Flux is a runway-grade storefront for fashion brands who want their online shop to feel like their flagship store.",
+    sampleReviews: [
+      { name: "Simone A.", quote: "Our conversion rate on mobile jumped after switching. The one-page checkout alone was worth it.", rating: 5 },
+      { name: "Julian W.", quote: "Looks like it belongs on a luxury runway, not a template marketplace. Customization in Brand Studio was painless.", rating: 5 },
+    ],
   },
   {
     slug: "circuit-electronics",
@@ -367,6 +405,10 @@ export const products: Product[] = [
     gradient: ["#b98af0", "#1a0d2a"],
     description:
       "Market gives you the foundation of a full multi-vendor marketplace — vendor accounts, split payments and all.",
+    sampleReviews: [
+      { name: "Rahul D.", quote: "Onboarded our first eleven vendors in a single week. The commission engine handles the messy edge cases we worried about.", rating: 5 },
+      { name: "Charlotte E.", quote: "Big project to stand up but it's a legitimate marketplace foundation, not a toy. Worth the price.", rating: 4 },
+    ],
   },
   {
     slug: "orbit-subscription",
@@ -405,6 +447,11 @@ export const products: Product[] = [
     gradient: ["#5170ff", "#0c1030"],
     description:
       "Reserve replaces the phone-and-notebook booking system with automated scheduling, reminders and payments.",
+    sampleReviews: [
+      { name: "Grace H.", quote: "No-shows dropped noticeably once automated reminders kicked in. Staff scheduling saved us a part-time admin role.", rating: 5 },
+      { name: "Victor M.", quote: "Deposit payments at booking time changed our cash flow overnight. Should have switched years ago.", rating: 5 },
+      { name: "Leila B.", quote: "Solid system. The staff dashboard took our team about a day to get fully comfortable with.", rating: 4 },
+    ],
   },
   {
     slug: "pulse-crm",
@@ -424,6 +471,10 @@ export const products: Product[] = [
     gradient: ["#7c8cff", "#12102c"],
     description:
       "Pulse CRM gives small and mid-size teams a fast, uncluttered pipeline without the enterprise-software overhead.",
+    sampleReviews: [
+      { name: "Aiden C.", quote: "We tried three bloated CRMs before this. Pulse is the first one the whole sales team actually opens daily.", rating: 5 },
+      { name: "Renee S.", quote: "Custom reports gave our manager exactly the pipeline visibility she'd been asking IT for all year.", rating: 4 },
+    ],
   },
   {
     slug: "counter-pos",
@@ -500,6 +551,11 @@ export const products: Product[] = [
     gradient: ["#5170ff", "#0a0e26"],
     description:
       "Gridline is a comprehensive admin dashboard system — components, charts and layouts ready to wire into any backend.",
+    sampleReviews: [
+      { name: "Noah P.", quote: "Cut two sprints off our internal tools rebuild. The chart library alone would've taken us a week to build right.", rating: 5 },
+      { name: "Fatima Z.", quote: "Figma and code are actually in sync, which is rarer than it should be for a kit at this price.", rating: 5 },
+      { name: "Theo N.", quote: "Excellent component coverage. Dark mode needed a couple of small tweaks for our brand palette.", rating: 4 },
+    ],
   },
   {
     slug: "atlas-ui-kit",
@@ -538,6 +594,10 @@ export const products: Product[] = [
     gradient: ["#b98af0", "#160c2a"],
     description:
       "Launchpad is the fastest way to go from idea to a billable SaaS product — marketing site, auth and billing included.",
+    sampleReviews: [
+      { name: "Kai R.", quote: "Went from zero to a billable beta in a weekend. Auth and Stripe billing being pre-wired saved weeks.", rating: 5 },
+      { name: "Sophie L.", quote: "Best starting point we evaluated for our second product. Dashboard shell is genuinely production-grade.", rating: 5 },
+    ],
   },
   {
     slug: "keystone-business-system",
