@@ -55,10 +55,11 @@ function validate(state: FormState): Errors {
   return errors;
 }
 
-// Simulated submission — in production this posts to the intake API.
-async function submitInquiry(_state: FormState): Promise<{ ok: true }> {
+// Simulated submission — in production this posts `state` to the intake API.
+async function submitInquiry(state: FormState): Promise<{ ok: true; ref: string }> {
   await new Promise((resolve) => setTimeout(resolve, 800));
-  return { ok: true };
+  const ref = `${state.email.split("@")[0]}-${Date.now().toString(36)}`;
+  return { ok: true, ref };
 }
 
 const fieldBase =
@@ -73,7 +74,7 @@ export function ContactForm() {
   const setField = <K extends keyof FormState>(key: K, value: FormState[K]) => {
     setState((s) => ({ ...s, [key]: value }));
     if (touched[key]) {
-      setErrors((e) => ({ ...validate({ ...state, [key]: value }) }));
+      setErrors(validate({ ...state, [key]: value }));
     }
   };
 
