@@ -73,6 +73,7 @@
   /* ============ RESET ============ */
   *,*::before,*::after{box-sizing:border-box}
   html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+  section[id], #top{scroll-margin-top:84px}
   body{
     margin:0;
     background:var(--bg);
@@ -257,6 +258,10 @@
     .nav-links{display:none}
     .signin-link{display:none}
     .hamburger{display:inline-flex}
+  }
+  @media (max-width:480px){
+    .nav-actions .btn-primary{display:none}
+    .nav-inner{padding:12px 16px;gap:12px}
   }
 
   .mobile-menu{
