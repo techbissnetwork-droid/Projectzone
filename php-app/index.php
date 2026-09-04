@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/includes/db.php';
+require_installed('install/');
 
 $products = db()->query('SELECT id, name, category AS cat, icon, price, rating, tagline, description AS `desc`, specs_json FROM products ORDER BY sort_order ASC')->fetchAll();
 foreach ($products as &$p) {

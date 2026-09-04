@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/icons.php';
+require_installed('../install/');
 
 $staff = require_staff(); // redirects to login.php if not signed in
 $pdo = db();

@@ -1,5 +1,10 @@
 <?php
-require_once __DIR__ . '/../config.php';
+define('CONFIG_PATH', __DIR__ . '/../config.php');
+define('INSTALL_LOCK_PATH', __DIR__ . '/../install.lock');
+
+if (file_exists(CONFIG_PATH)) {
+    require_once CONFIG_PATH;
+}
 
 if (session_status() === PHP_SESSION_NONE) {
     session_set_cookie_params([
@@ -11,11 +16,42 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+function is_installed(): bool
+{
+    return file_exists(CONFIG_PATH) && file_exists(INSTALL_LOCK_PATH) && defined('DB_HOST');
+}
+
+/**
+ * Call at the top of any real entry point (index.php, admin/*.php, api/*.php).
+ * $installUrl is the relative path to the installer from that file's location.
+ */
+function require_installed(string $installUrl = 'install/'): void
+{
+    if (!is_installed()) {
+        header('Location: ' . $installUrl);
+        exit;
+    }
+}
+
+/** For api/*.php: JSON error instead of redirecting a fetch() call into an HTML page. */
+function require_installed_api(): void
+{
+    if (!is_installed()) {
+        send_json(['error' => 'Site is not set up yet. Visit /install/ in a browser to finish setup.'], 503);
+    }
+}
+
 function db(): PDO
 {
     static $pdo = null;
     if ($pdo !== null) {
         return $pdo;
+    }
+    if (!defined('DB_HOST')) {
+        http_response_code(500);
+        header('Content-Type: application/json');
+        echo json_encode(['error' => 'Site is not configured yet. Visit /install/ to set it up.']);
+        exit;
     }
     $dsn = 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8mb4';
     try {

@@ -23,6 +23,15 @@ a genuinely access-controlled staff admin panel.
   session-gated) and every number on it — business accounts, MRR, open
   tickets, staff, top sellers — is a live query against MySQL. It is not
   linked from anywhere on the public site; you reach it by typing the URL.
+- **A real installer at `/install/`** — auto-detects your site's URL,
+  checks PHP/MySQL requirements, writes `config.php` for you after testing
+  the database connection, and lets you set your own admin password
+  (nothing ships with a hardcoded default). It also tells the difference
+  between a fresh install and an already-installed site: visiting
+  `/install/` again later only offers to run any new pending updates —
+  it will never re-run setup, overwrite `config.php`, or let anyone
+  recreate an admin account once the site is installed. See "Installing"
+  below.
 
 **Not implemented (flagged, not silently faked):**
 - No payment processor — the marketplace "buy" flow does not charge
@@ -43,27 +52,61 @@ a genuinely access-controlled staff admin panel.
 - Any standard host that gives you PHP + MySQL + phpMyAdmin (shared
   hosting, a VPS, etc.)
 
-## Setup
+## Installing (recommended: the web installer)
 
-1. **Create a database** in phpMyAdmin (or your host's control panel).
-   Note the database name, a database username, and its password.
-2. **Import the schema.** In phpMyAdmin, select your new database, open
-   the **Import** tab, choose `schema.sql`, and click **Go**. This creates
-   every table and seeds realistic sample data (businesses, tickets,
-   staff, marketplace products) so the site looks right immediately.
-3. **Edit `config.php`** with the database host, name, username and
-   password from step 1.
-4. **Upload everything** in this folder to your host, keeping the folder
+1. **Create an empty database** in phpMyAdmin (or your host's control
+   panel). Note the database name, a database username, and its password.
+   Don't import anything into it yet — the installer does that.
+2. **Upload everything** in this folder to your host, keeping the folder
    structure intact (`index.php` at the site root, `admin/`, `api/`,
-   `assets/`, `includes/` alongside it).
-5. Visit your domain — the public site should load exactly like the
-   design concept, now backed by MySQL.
+   `assets/`, `includes/`, `install/` alongside it).
+3. **Visit `https://yourdomain.com/install/`** in a browser. It will:
+   - Check PHP version and the `pdo_mysql` extension are present.
+   - Auto-detect your site's URL (you can edit it if it guessed wrong —
+     useful if you installed into a subfolder).
+   - Ask for your database host/name/username/password, test the
+     connection, and write `config.php` for you.
+   - Ask you to create your own admin account (name, email, password) —
+     this becomes your real `/admin/` login. A few illustrative
+     teammates (Devon, Rhea, Jonah) are added alongside you sharing that
+     same password, purely so the admin panel isn't empty on day one;
+     rename, repurpose or delete them once you're in.
+4. Once it says "You're live", the public site and `/admin/` both work
+   immediately. You can delete the `install/` folder for tidiness — it
+   isn't required for security, since the installer permanently refuses
+   to reconfigure the database or create another admin account once a
+   site is installed (see "How the installer protects itself" below).
 
-## Staff admin login
+**Re-running `/install/` later** (e.g. after uploading a future update
+that adds a new `install/migrations/*.php` file) detects it's already
+installed and only offers to run the new pending update(s) — it never
+touches your existing data or asks for database credentials again.
 
-Visit `/admin/` (it will redirect you to `/admin/login.php`). The seed
-data creates four staff accounts, all sharing one starter password so you
-can log in immediately:
+### How the installer protects itself
+
+The moment install finishes, it writes `install.lock`. From then on,
+`/install/`:
+- Will never show the database-credentials form again (so a leftover
+  `install/` folder can't be used to repoint a live site at a different
+  database).
+- Will never show the "create admin account" form again (so it can't be
+  used to mint a new admin login on a site that already has one).
+- Only remaining action is "run pending migrations" — safe, additive,
+  and using the same `CREATE TABLE IF NOT EXISTS` / count-before-seed
+  pattern as the initial install, so it never drops or duplicates data.
+
+## Manual setup (alternative, if you'd rather not use the web installer)
+
+1. Create a database and import `schema.sql` via phpMyAdmin's Import tab
+   — this creates every table and seeds sample data directly.
+2. Copy `config.sample.php` to `config.php` and fill in your database
+   host/name/username/password (and `SITE_URL`).
+3. Manually create an empty `install.lock` file next to `config.php` (any
+   content, e.g. just today's date) — this tells the app setup is
+   complete, matching what the web installer would have written.
+4. Upload everything to your host as in step 2 above.
+
+With this path, the seed staff logins all share one starter password:
 
 | Email | Role |
 |---|---|
@@ -72,19 +115,16 @@ can log in immediately:
 | rhea@techbiss.com | Head of Design |
 | admin@techbiss.com | VP Client Success |
 
-**Password for all four:** `techbiss-admin-2026`
-
-**Change this before putting the site anywhere public.** The quickest way:
-run this once on your server (PHP CLI or a one-off script) to generate a
-new hash, then update each row's `password_hash` in phpMyAdmin:
+**Password for all four:** `techbiss-admin-2026` — **change this before
+putting the site anywhere public.** Generate a new hash and update each
+row's `password_hash` in phpMyAdmin:
 
 ```php
 <?php echo password_hash('your-new-password', PASSWORD_DEFAULT);
 ```
 
-Or simpler: sign in as each staff member and give them a proper
-"change my password" flow — this is a natural next step (see below), not
-yet built.
+(This is exactly the problem the web installer avoids — with it, you pick
+your own password at setup time and no shared default ever exists.)
 
 ## Security notes
 
@@ -118,19 +158,23 @@ yet built.
 ## File structure
 
 ```
-index.php              Public site shell — queries products, renders the SPA
-assets/style.css        All site styling (unchanged from the design concept)
-assets/app.js           All site behavior — now talks to api/*.php instead of faking submissions
-api/contact.php         Saves contact form submissions
-api/signup.php          Creates a customer account
-api/login.php           Signs a customer in
-api/logout.php          Signs a customer out
-api/me.php              Returns the signed-in customer, if any
-admin/login.php         Staff sign-in (separate from customer accounts)
-admin/logout.php        Staff sign-out
-admin/index.php         The real admin panel — session-gated, queries MySQL directly
-includes/db.php         Database connection, session setup, auth helpers
-includes/icons.php      Small icon set used by the server-rendered admin panel
-config.php              Edit this: your database host/name/user/password
-schema.sql              Import this into phpMyAdmin to create + seed the database
+index.php                          Public site shell — queries products, renders the SPA
+assets/style.css                    All site styling (unchanged from the design concept)
+assets/app.js                       All site behavior — talks to api/*.php instead of faking submissions
+api/contact.php                     Saves contact form submissions
+api/signup.php                      Creates a customer account
+api/login.php                       Signs a customer in
+api/logout.php                      Signs a customer out
+api/me.php                          Returns the signed-in customer, if any
+admin/login.php                     Staff sign-in (separate from customer accounts)
+admin/logout.php                    Staff sign-out
+admin/index.php                     The real admin panel — session-gated, queries MySQL directly
+install/index.php                   The web installer — requirements, DB setup, admin account, migrations
+install/reset.php                   Lets install/ retry a botched DB step; permanently inert once installed
+install/migrations/001_initial.php  Creates every table, seeds sample data + your admin account
+includes/db.php                     Database connection, session setup, auth helpers, install-guard
+includes/migrate.php                Tiny migration runner used by install/
+includes/icons.php                  Small icon set used by the server-rendered admin panel
+config.sample.php                   Template — the installer writes the real config.php for you
+schema.sql                          Manual-setup alternative to the installer (see "Manual setup" above)
 ```

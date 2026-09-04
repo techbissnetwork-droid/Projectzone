@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../includes/db.php';
 header('Content-Type: application/json');
+require_installed_api();
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     send_json(['error' => 'Method not allowed'], 405);

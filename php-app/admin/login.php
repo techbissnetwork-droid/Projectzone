@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/icons.php';
+require_installed('../install/');
 
 if (current_staff()) {
     header('Location: index.php');
