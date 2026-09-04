@@ -16,30 +16,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $id = (int)($_POST['id'] ?? 0);
         $name = trim((string)($_POST['name'] ?? ''));
         $email = trim(strtolower((string)($_POST['email'] ?? '')));
-        $password = (string)($_POST['password'] ?? '');
 
         if ($name === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
             flash('Enter a name and a valid email address.', 'error');
-        } elseif ($id === 0 && strlen($password) < 8) {
-            flash('New users need a password of at least 8 characters.', 'error');
-        } elseif ($password !== '' && strlen($password) < 8) {
-            flash('Password must be at least 8 characters (leave blank to keep the current one).', 'error');
         } else {
             $dupe = $pdo->prepare('SELECT id FROM customers WHERE email = ? AND id != ?');
             $dupe->execute([$email, $id]);
             if ($dupe->fetch()) {
                 flash('Another user already uses that email.', 'error');
             } elseif ($id > 0) {
-                if ($password !== '') {
-                    $pdo->prepare('UPDATE customers SET name=?, email=?, password_hash=? WHERE id=?')
-                        ->execute([$name, $email, password_hash($password, PASSWORD_DEFAULT), $id]);
-                } else {
-                    $pdo->prepare('UPDATE customers SET name=?, email=? WHERE id=?')->execute([$name, $email, $id]);
-                }
+                $pdo->prepare('UPDATE customers SET name=?, email=? WHERE id=?')->execute([$name, $email, $id]);
                 flash('User updated.');
             } else {
-                $pdo->prepare('INSERT INTO customers (name, email, password_hash) VALUES (?,?,?)')
-                    ->execute([$name, $email, password_hash($password, PASSWORD_DEFAULT)]);
+                $pdo->prepare('INSERT INTO customers (name, email) VALUES (?,?)')->execute([$name, $email]);
                 flash('User created.');
             }
         }
@@ -95,7 +84,7 @@ $token = csrf_token();
         <div class="field"><label>Name</label><input name="name" required value="<?= e($editing['name'] ?? '') ?>"></div>
         <div class="field"><label>Email</label><input type="email" name="email" required value="<?= e($editing['email'] ?? '') ?>"></div>
       </div>
-      <div class="field"><label>Password <?= $editing ? '(leave blank to keep current)' : '' ?></label><input type="password" name="password" minlength="8" <?= $editing ? '' : 'required' ?>></div>
+      <p style="font-size:.78rem;color:var(--ink-faint);margin:-6px 0 14px;">No password needed — they'll sign in with a one-time code emailed to this address.</p>
       <div class="flex gap-12">
         <button class="btn btn-primary" type="submit"><?= $editing ? 'Save changes' : 'Add user' ?></button>
         <?php if ($editing): ?><a href="users.php" class="btn btn-ghost">Cancel</a><?php endif; ?>

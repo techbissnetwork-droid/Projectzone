@@ -40,8 +40,28 @@ CREATE TABLE `customers` (
   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   `name` VARCHAR(120) NOT NULL,
   `email` VARCHAR(190) NOT NULL UNIQUE,
-  `password_hash` VARCHAR(255) NOT NULL,
+  `password_hash` VARCHAR(255) NULL,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ---------------------------------------------------------------
+-- otp_codes — one-time codes/magic links for customer login and
+-- email-change verification. Customers have no password; this is
+-- their only sign-in path.
+-- ---------------------------------------------------------------
+DROP TABLE IF EXISTS `otp_codes`;
+CREATE TABLE `otp_codes` (
+  `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `customer_id` INT UNSIGNED NOT NULL,
+  `purpose` VARCHAR(30) NOT NULL,
+  `code_hash` VARCHAR(64) NOT NULL,
+  `token_hash` VARCHAR(64) NULL,
+  `new_email` VARCHAR(190) NULL,
+  `attempts` TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  `expires_at` DATETIME NOT NULL,
+  `used_at` DATETIME NULL,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (`customer_id`) REFERENCES `customers`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ---------------------------------------------------------------

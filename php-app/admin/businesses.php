@@ -27,7 +27,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $ownerRaw = trim((string)($_POST['owner_id'] ?? ''));
         $newUserName = trim((string)($_POST['new_user_name'] ?? ''));
         $newUserEmail = trim(strtolower((string)($_POST['new_user_email'] ?? '')));
-        $newUserPassword = (string)($_POST['new_user_password'] ?? '');
 
         $errors = [];
         if ($name === '' || $sector === '') {
@@ -47,8 +46,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($creatingNewUser) {
             if ($newUserName === '' || !filter_var($newUserEmail, FILTER_VALIDATE_EMAIL)) {
                 $errors[] = 'Enter a name and a valid email for the new user.';
-            } elseif (strlen($newUserPassword) < 8) {
-                $errors[] = 'New users need a password of at least 8 characters.';
             } else {
                 $dupe = $pdo->prepare('SELECT id FROM customers WHERE email = ?');
                 $dupe->execute([$newUserEmail]);
@@ -65,8 +62,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $ownerId = null;
             if ($creatingNewUser) {
-                $pdo->prepare('INSERT INTO customers (name, email, password_hash) VALUES (?,?,?)')
-                    ->execute([$newUserName, $newUserEmail, password_hash($newUserPassword, PASSWORD_DEFAULT)]);
+                $pdo->prepare('INSERT INTO customers (name, email) VALUES (?,?)')
+                    ->execute([$newUserName, $newUserEmail]);
                 $ownerId = (int)$pdo->lastInsertId();
             } elseif ($ownerRaw !== '') {
                 $ownerId = (int)$ownerRaw;
@@ -180,11 +177,11 @@ $token = csrf_token();
           <?php endforeach; ?>
         </select>
       </div>
-      <div class="grid grid-3" style="gap:16px;" id="newUserFields">
+      <div class="grid grid-2" style="gap:16px;" id="newUserFields">
         <div class="field"><label>New user — name</label><input name="new_user_name" placeholder="Only if creating a new user"></div>
         <div class="field"><label>New user — email</label><input type="email" name="new_user_email"></div>
-        <div class="field"><label>New user — password</label><input type="password" name="new_user_password" minlength="8" placeholder="Min 8 characters"></div>
       </div>
+      <p style="font-size:.78rem;color:var(--ink-faint);margin:-6px 0 14px;" id="newUserHint">No password needed — they'll sign in with a one-time code emailed to this address.</p>
       <div class="flex gap-12">
         <button class="btn btn-primary" type="submit"><?= $editing ? 'Save changes' : 'Add business' ?></button>
         <?php if ($editing): ?><a href="businesses.php" class="btn btn-ghost">Cancel</a><?php endif; ?>

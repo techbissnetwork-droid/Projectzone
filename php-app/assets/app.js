@@ -680,11 +680,15 @@ Pages['/login'] = function(){
     +'<div class="card" style="max-width:440px;">'
       +'<h3 style="margin-bottom:18px;">Sign in</h3>'
       +'<div id="authPanels">'
-        +'<form id="signinForm" onsubmit="return false;">'
+        +'<form id="emailStepForm" onsubmit="return false;">'
           +'<div class="field"><label for="liEmail">Email</label><input id="liEmail" type="email" required placeholder="you@company.com"></div>'
-          +'<div class="field"><label for="liPass">Password</label><input id="liPass" type="password" required placeholder="••••••••"></div>'
-          +'<div class="flex items-center" style="justify-content:flex-end;margin-bottom:20px;"><a href="'+BP+'/contact" style="font-size:.85rem;color:var(--accent-1);font-weight:600;">Forgot password?</a></div>'
-          +'<button class="btn btn-primary btn-block magnetic" type="submit">Sign in</button>'
+          +'<button class="btn btn-primary btn-block magnetic" type="submit">Send me a code</button>'
+        +'</form>'
+        +'<form id="codeStepForm" onsubmit="return false;" hidden>'
+          +'<p class="lede" id="codeStepLede" style="margin-bottom:14px;"></p>'
+          +'<div class="field"><label for="liCode">6-digit code</label><input id="liCode" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="000000"></div>'
+          +'<button class="btn btn-primary btn-block magnetic" type="submit">Verify &amp; sign in</button>'
+          +'<button class="btn btn-ghost btn-block" type="button" id="resendCodeBtn" style="margin-top:10px;">Resend code</button>'
         +'</form>'
         +'<p id="loginMsg" class="badge success" style="display:none;margin-top:16px;">'+ico('check')+' Welcome back — redirecting…</p>'
         +'<p id="loginError" class="badge danger" hidden style="margin-top:16px;"></p>'
@@ -882,6 +886,26 @@ Pages['/account'] = function(){
       +'<a href="'+BP+'/contact" class="card-link" style="margin-bottom:14px;">'+ico('chat')+' Open a support ticket</a>'
       +'<button id="accountLogoutBtn" class="btn btn-ghost btn-block" type="button">'+ico('logout')+' Log out</button>'
     +'</div>'
+    +'<div class="card" style="margin-top:16px;">'
+      +'<div class="card-head">'+blobIcon('mail','sm',true)+'<h3>Change email</h3></div>'
+      +'<div id="emailChangeStep1">'
+        +'<p class="lede" style="margin-bottom:14px;">We\'ll verify your current email, then your new one, before making the change.</p>'
+        +'<form id="emailChangeForm" onsubmit="return false;">'
+          +'<div class="field"><label for="ecNewEmail">New email address</label><input id="ecNewEmail" type="email" required placeholder="you@newdomain.com"></div>'
+          +'<button class="btn btn-primary" type="submit">Start email change</button>'
+        +'</form>'
+      +'</div>'
+      +'<div id="emailChangeStep2" hidden>'
+        +'<p class="lede" style="margin-bottom:14px;" id="ecStepLede"></p>'
+        +'<form id="emailChangeCodeForm" onsubmit="return false;">'
+          +'<div class="field"><label for="ecCode">6-digit code</label><input id="ecCode" inputmode="numeric" maxlength="6" placeholder="000000"></div>'
+          +'<button class="btn btn-primary" type="submit">Verify</button>'
+          +'<button class="btn btn-ghost" type="button" id="ecCancelBtn" style="margin-left:10px;">Cancel</button>'
+        +'</form>'
+      +'</div>'
+      +'<p id="ecMsg" class="badge success" style="display:none;margin-top:14px;">'+ico('check')+' Email updated.</p>'
+      +'<p id="ecError" class="badge danger" hidden style="margin-top:14px;"></p>'
+    +'</div>'
   +'</div></section>';
 };
 /* The real staff admin panel is a separate, session-protected PHP app at /admin/ — not part of this client-side SPA. */
@@ -1016,28 +1040,91 @@ function wireContact(){
   });
 }
 function wireLogin(){
-  function bindForm(fid,mid,eid,endpoint){
-    var f = $('#'+fid);
-    f.addEventListener('submit', function(){
-      var errEl = $('#'+eid); errEl.hidden = true;
-      var btn = f.querySelector('button[type=submit]'); btn.disabled = true;
-      var payload = { email: $('#liEmail').value, password: $('#liPass').value };
-      fetch(endpoint, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) })
-        .then(function(r){ return r.json().then(function(data){ return {ok:r.ok, data:data}; }); })
-        .then(function(res){
-          btn.disabled = false;
-          if(!res.ok){ errEl.textContent = res.data.error || 'Something went wrong — please try again.'; errEl.hidden = false; return; }
-          AUTH_USER = res.data.user || AUTH_USER;
-          $('#'+mid).style.display='inline-flex';
-          setTimeout(function(){ navigate('/dashboard'); }, 700);
-        })
-        .catch(function(){
-          btn.disabled = false;
-          errEl.textContent = 'Could not reach the server — please try again.'; errEl.hidden = false;
-        });
-    });
+  var emailForm = $('#emailStepForm'), codeForm = $('#codeStepForm');
+  var errEl = $('#loginError'), msgEl = $('#loginMsg');
+  var currentEmail = '';
+
+  function showError(text){ errEl.textContent = text; errEl.hidden = false; }
+
+  function completeLogin(user){
+    AUTH_USER = user || AUTH_USER;
+    msgEl.style.display = 'inline-flex';
+    setTimeout(function(){ navigate('/dashboard'); }, 700);
   }
-  bindForm('signinForm','loginMsg','loginError',BP+'/api/login.php');
+
+  function requestCode(email, silent){
+    return fetch(BP+'/api/otp-request.php', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email: email }) })
+      .then(function(r){ return r.json().then(function(data){ return {ok:r.ok, data:data}; }); })
+      .then(function(res){
+        if(!res.ok){ if(!silent) showError(res.data.error || 'Something went wrong — please try again.'); return false; }
+        return true;
+      })
+      .catch(function(){ if(!silent) showError('Could not reach the server — please try again.'); return false; });
+  }
+
+  emailForm.addEventListener('submit', function(){
+    errEl.hidden = true;
+    var email = $('#liEmail').value.trim();
+    if(!email){ showError('Enter your email address.'); return; }
+    var btn = emailForm.querySelector('button[type=submit]'); btn.disabled = true;
+    requestCode(email).then(function(ok){
+      btn.disabled = false;
+      if(!ok) return;
+      currentEmail = email;
+      $('#codeStepLede').textContent = 'We sent a 6-digit code to '+email+'. It\'s good for 10 minutes.';
+      emailForm.hidden = true;
+      codeForm.hidden = false;
+      $('#liCode').focus();
+    });
+  });
+
+  codeForm.addEventListener('submit', function(){
+    errEl.hidden = true;
+    var code = $('#liCode').value.trim();
+    if(!code){ showError('Enter the code we sent you.'); return; }
+    var btn = codeForm.querySelector('button[type=submit]'); btn.disabled = true;
+    fetch(BP+'/api/otp-verify.php', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email: currentEmail, code: code }) })
+      .then(function(r){ return r.json().then(function(data){ return {ok:r.ok, data:data}; }); })
+      .then(function(res){
+        btn.disabled = false;
+        if(!res.ok){ showError(res.data.error || 'That code is invalid or has expired.'); return; }
+        completeLogin(res.data.user);
+      })
+      .catch(function(){
+        btn.disabled = false;
+        showError('Could not reach the server — please try again.');
+      });
+  });
+
+  var resendBtn = $('#resendCodeBtn');
+  resendBtn.addEventListener('click', function(){
+    errEl.hidden = true;
+    resendBtn.disabled = true;
+    requestCode(currentEmail).then(function(ok){
+      if(ok){ resendBtn.textContent = 'Code sent'; setTimeout(function(){ resendBtn.textContent = 'Resend code'; resendBtn.disabled = false; }, 30000); }
+      else { resendBtn.disabled = false; }
+    });
+  });
+
+  // Magic-link: /login?token=... verifies automatically and signs in.
+  var params = new URLSearchParams(location.search);
+  var token = params.get('token');
+  if(token){
+    emailForm.hidden = true;
+    $('#codeStepLede').textContent = '';
+    codeForm.hidden = true;
+    fetch(BP+'/api/otp-verify.php', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ token: token }) })
+      .then(function(r){ return r.json().then(function(data){ return {ok:r.ok, data:data}; }); })
+      .then(function(res){
+        if(!res.ok){
+          emailForm.hidden = false;
+          showError(res.data.error || 'That link is invalid or has expired — request a new code below.');
+          return;
+        }
+        completeLogin(res.data.user);
+      })
+      .catch(function(){ emailForm.hidden = false; showError('Could not reach the server — please try again.'); });
+  }
 }
 
 function wireProductDetail(id){
@@ -1286,6 +1373,67 @@ function doLogout(){
 function wireAccount(){
   var btn = $('#accountLogoutBtn');
   if(btn){ btn.onclick = function(e){ e.preventDefault(); doLogout(); }; }
+
+  var step1 = $('#emailChangeStep1'), step2 = $('#emailChangeStep2');
+  var errEl = $('#ecError'), msgEl = $('#ecMsg');
+  var stage = null; // 'old' | 'new'
+
+  function ecShowError(text){ errEl.textContent = text; errEl.hidden = false; }
+  function ecPost(action, payload){
+    return fetch(BP+'/api/account-email-change.php', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(Object.assign({ action: action }, payload || {}))
+    }).then(function(r){ return r.json().then(function(data){ return {ok:r.ok, data:data}; }); });
+  }
+
+  var changeForm = $('#emailChangeForm');
+  if(changeForm){
+    changeForm.addEventListener('submit', function(){
+      errEl.hidden = true;
+      var email = $('#ecNewEmail').value.trim();
+      var btn2 = changeForm.querySelector('button[type=submit]'); btn2.disabled = true;
+      ecPost('request', { new_email: email }).then(function(res){
+        btn2.disabled = false;
+        if(!res.ok){ ecShowError(res.data.error || 'Something went wrong — please try again.'); return; }
+        stage = 'old';
+        $('#ecStepLede').textContent = 'We sent a code to your current email ('+esc((AUTH_USER&&AUTH_USER.email)||'')+') to confirm it\'s you.';
+        step1.hidden = true; step2.hidden = false;
+      }).catch(function(){ btn2.disabled = false; ecShowError('Could not reach the server — please try again.'); });
+    });
+  }
+
+  var codeForm = $('#emailChangeCodeForm');
+  if(codeForm){
+    codeForm.addEventListener('submit', function(){
+      errEl.hidden = true;
+      var code = $('#ecCode').value.trim();
+      var btn2 = codeForm.querySelector('button[type=submit]'); btn2.disabled = true;
+      var action = stage === 'old' ? 'verify_old' : 'verify_new';
+      ecPost(action, { code: code }).then(function(res){
+        btn2.disabled = false;
+        if(!res.ok){ ecShowError(res.data.error || 'That code is invalid or has expired.'); return; }
+        if(stage === 'old'){
+          stage = 'new';
+          $('#ecStepLede').textContent = 'Now enter the code we just sent to your new email address.';
+          $('#ecCode').value = '';
+        } else {
+          if(res.data.email && AUTH_USER){ AUTH_USER.email = res.data.email; }
+          step2.hidden = true;
+          msgEl.style.display = 'inline-flex';
+        }
+      }).catch(function(){ btn2.disabled = false; ecShowError('Could not reach the server — please try again.'); });
+    });
+  }
+
+  var cancelBtn = $('#ecCancelBtn');
+  if(cancelBtn){
+    cancelBtn.addEventListener('click', function(){
+      stage = null;
+      errEl.hidden = true;
+      step2.hidden = true; step1.hidden = false;
+      $('#ecCode').value = '';
+    });
+  }
 }
 var transitioning=false;
 function resetTransition(){

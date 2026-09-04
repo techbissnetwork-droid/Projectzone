@@ -99,6 +99,69 @@ function current_customer(): ?array
     return $row ?: null;
 }
 
+/**
+ * Customers have no password — they sign in with an emailed one-time
+ * code or a magic link, and the same mechanism backs the two-step
+ * (verify old email, then verify new email) email-change flow on the
+ * account page. otp_issue() throws if one was already issued for this
+ * customer+purpose in the last 60 seconds, as a simple resend limiter.
+ */
+function otp_issue(int $customerId, string $purpose, ?string $newEmail = null, int $ttlMinutes = 10): array
+{
+    $pdo = db();
+    $recent = $pdo->prepare(
+        'SELECT id FROM otp_codes WHERE customer_id = ? AND purpose = ? AND used_at IS NULL AND created_at > (NOW() - INTERVAL 60 SECOND)'
+    );
+    $recent->execute([$customerId, $purpose]);
+    if ($recent->fetch()) {
+        throw new RuntimeException('Please wait a moment before requesting another code.');
+    }
+    $code = str_pad((string)random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+    $token = bin2hex(random_bytes(32));
+    $stmt = $pdo->prepare(
+        'INSERT INTO otp_codes (customer_id, purpose, code_hash, token_hash, new_email, expires_at) VALUES (?,?,?,?,?,?)'
+    );
+    $stmt->execute([
+        $customerId, $purpose, hash('sha256', $code), hash('sha256', $token), $newEmail,
+        date('Y-m-d H:i:s', time() + $ttlMinutes * 60),
+    ]);
+    return ['id' => (int)$pdo->lastInsertId(), 'code' => $code, 'token' => $token];
+}
+
+function otp_verify_code(int $customerId, string $purpose, string $code): ?array
+{
+    $pdo = db();
+    $stmt = $pdo->prepare(
+        "SELECT * FROM otp_codes WHERE customer_id = ? AND purpose = ? AND used_at IS NULL AND expires_at > NOW() ORDER BY id DESC LIMIT 1"
+    );
+    $stmt->execute([$customerId, $purpose]);
+    $row = $stmt->fetch();
+    if (!$row || (int)$row['attempts'] >= 5) {
+        return null;
+    }
+    if (!hash_equals($row['code_hash'], hash('sha256', $code))) {
+        $pdo->prepare('UPDATE otp_codes SET attempts = attempts + 1 WHERE id = ?')->execute([$row['id']]);
+        return null;
+    }
+    $pdo->prepare('UPDATE otp_codes SET used_at = NOW() WHERE id = ?')->execute([$row['id']]);
+    return $row;
+}
+
+function otp_verify_token(string $purpose, string $token): ?array
+{
+    $pdo = db();
+    $stmt = $pdo->prepare(
+        'SELECT * FROM otp_codes WHERE purpose = ? AND token_hash = ? AND used_at IS NULL AND expires_at > NOW() LIMIT 1'
+    );
+    $stmt->execute([$purpose, hash('sha256', $token)]);
+    $row = $stmt->fetch();
+    if (!$row) {
+        return null;
+    }
+    $pdo->prepare('UPDATE otp_codes SET used_at = NOW() WHERE id = ?')->execute([$row['id']]);
+    return $row;
+}
+
 function current_staff(): ?array
 {
     if (empty($_SESSION['staff_id'])) {
