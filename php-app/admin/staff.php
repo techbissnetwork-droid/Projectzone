@@ -5,6 +5,7 @@ require_once __DIR__ . '/../includes/admin_layout.php';
 require_installed('../install/');
 
 $staff = require_staff();
+require_staff_access($staff, 'staff.php');
 $pdo = db();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -19,6 +20,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $password = (string)($_POST['password'] ?? '');
         $initials = strtoupper(substr($name, 0, 1) . substr(strrchr($name, ' ') ?: '', 1, 1)) ?: 'ST';
 
+        $editingOwner = false;
+        if ($id > 0) {
+            $ownerCheck = $pdo->prepare('SELECT is_owner FROM staff WHERE id = ?');
+            $ownerCheck->execute([$id]);
+            $editingOwner = (bool)$ownerCheck->fetchColumn();
+        }
+        if ($editingOwner) {
+            $permissions = null;
+        } elseif (isset($_POST['full_access'])) {
+            $permissions = null;
+        } else {
+            $selected = [];
+            foreach (STAFF_SECTIONS as $key => $label) {
+                if (isset($_POST['perm_' . $key])) {
+                    $selected[] = $key;
+                }
+            }
+            if ($id === (int)$staff['id']) {
+                // Never let someone remove their own access to this page.
+                $selected[] = 'staff';
+                $selected = array_values(array_unique($selected));
+            }
+            $permissions = json_encode($selected);
+        }
+
         if ($name === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
             flash('Enter a name and a valid email address.', 'error');
         } elseif ($id === 0 && strlen($password) < 8) {
@@ -32,23 +58,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 flash('Another staff account already uses that email.', 'error');
             } elseif ($id > 0) {
                 if ($password !== '') {
-                    $stmt = $pdo->prepare('UPDATE staff SET name=?, email=?, role=?, initials=?, password_hash=? WHERE id=?');
-                    $stmt->execute([$name, $email, $role, $initials, password_hash($password, PASSWORD_DEFAULT), $id]);
+                    $stmt = $pdo->prepare('UPDATE staff SET name=?, email=?, role=?, initials=?, permissions=?, password_hash=? WHERE id=?');
+                    $stmt->execute([$name, $email, $role, $initials, $permissions, password_hash($password, PASSWORD_DEFAULT), $id]);
                 } else {
-                    $stmt = $pdo->prepare('UPDATE staff SET name=?, email=?, role=?, initials=? WHERE id=?');
-                    $stmt->execute([$name, $email, $role, $initials, $id]);
+                    $stmt = $pdo->prepare('UPDATE staff SET name=?, email=?, role=?, initials=?, permissions=? WHERE id=?');
+                    $stmt->execute([$name, $email, $role, $initials, $permissions, $id]);
                 }
                 flash('Staff account updated.');
             } else {
-                $stmt = $pdo->prepare('INSERT INTO staff (name, email, role, initials, password_hash) VALUES (?,?,?,?,?)');
-                $stmt->execute([$name, $email, $role, $initials, password_hash($password, PASSWORD_DEFAULT)]);
+                $stmt = $pdo->prepare('INSERT INTO staff (name, email, role, initials, permissions, password_hash) VALUES (?,?,?,?,?,?)');
+                $stmt->execute([$name, $email, $role, $initials, $permissions, password_hash($password, PASSWORD_DEFAULT)]);
                 flash('Staff account created.');
             }
         }
     } elseif ($action === 'delete') {
         $id = (int)($_POST['id'] ?? 0);
+        $target = $pdo->prepare('SELECT is_owner FROM staff WHERE id = ?');
+        $target->execute([$id]);
         $total = (int)$pdo->query('SELECT COUNT(*) FROM staff')->fetchColumn();
-        if ($total <= 1) {
+        if ($target->fetchColumn()) {
+            flash('Can\'t remove the owner account.', 'error');
+        } elseif ($total <= 1) {
             flash('Can\'t delete the last remaining staff account.', 'error');
         } else {
             $pdo->prepare('UPDATE tickets SET assignee_staff_id = NULL WHERE assignee_staff_id = ?')->execute([$id]);
@@ -74,7 +104,7 @@ $staffList = $pdo->query(
 $token = csrf_token();
 ?>
 <!doctype html>
-<html lang="en">
+<html lang="en"<?= palette_attr() ?>>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -106,6 +136,24 @@ $token = csrf_token();
         <div class="field"><label>Role / title</label><input name="role" value="<?= e($editing['role'] ?? '') ?>" placeholder="e.g. Head of Design"></div>
         <div class="field"><label>Password <?= $editing ? '(leave blank to keep current)' : '' ?></label><input type="password" name="password" minlength="8" <?= $editing ? '' : 'required' ?>></div>
       </div>
+      <?php if ($editing && !empty($editing['is_owner'])): ?>
+      <p class="badge" style="margin-bottom:14px;"><?= ico('shield') ?> Owner account — always has full access to every section.</p>
+      <?php else: ?>
+      <?php $editingPerms = $editing ? staff_permissions($editing) : null; ?>
+      <div class="field">
+        <label class="flex items-center gap-8" style="margin-bottom:10px;">
+          <input type="checkbox" name="full_access" id="fullAccessBox" <?= $editingPerms === null ? 'checked' : '' ?>> Full access (every section)
+        </label>
+        <p style="font-size:.78rem;color:var(--ink-faint);margin:0 0 10px;">Uncheck to limit this person to specific sections below.</p>
+        <div class="flex gap-12" style="flex-wrap:wrap;">
+          <?php foreach (STAFF_SECTIONS as $key => $label): ?>
+          <label class="flex items-center gap-8" style="font-size:.85rem;background:var(--surface-2);padding:8px 14px;border-radius:var(--r-full);border:1px solid var(--border);">
+            <input type="checkbox" name="perm_<?= e($key) ?>" <?= ($editingPerms === null || in_array($key, $editingPerms ?? [], true)) ? 'checked' : '' ?>> <?= e($label) ?>
+          </label>
+          <?php endforeach; ?>
+        </div>
+      </div>
+      <?php endif; ?>
       <div class="flex gap-12">
         <button class="btn btn-primary" type="submit"><?= $editing ? 'Save changes' : 'Add staff account' ?></button>
         <?php if ($editing): ?><a href="staff.php" class="btn btn-ghost">Cancel</a><?php endif; ?>
@@ -114,27 +162,36 @@ $token = csrf_token();
   </div>
 
   <div class="card">
-    <div class="table-wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Open tickets</th><th></th></tr></thead><tbody>
+    <div class="table-wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Access</th><th>Open tickets</th><th></th></tr></thead><tbody>
       <?php foreach ($staffList as $s): ?>
       <tr>
         <td style="font-weight:600;"><?= e($s['name']) ?></td>
         <td><?= e($s['email']) ?></td>
         <td><?= e($s['role']) ?></td>
+        <td>
+          <?php $sPerms = staff_permissions($s); ?>
+          <?php if ($sPerms === null): ?><span class="badge">Full access</span>
+          <?php elseif (empty($sPerms)): ?><span class="badge">Dashboard only</span>
+          <?php else: ?><span class="badge"><?= e(implode(', ', array_map(fn($k) => STAFF_SECTIONS[$k] ?? $k, $sPerms))) ?></span>
+          <?php endif; ?>
+        </td>
         <td><?= (int)$s['open_count'] ?></td>
         <td class="admin-actions-cell">
           <a class="icon-btn" href="staff.php?edit=<?= (int)$s['id'] ?>" aria-label="Edit"><?= ico('edit') ?></a>
+          <?php if (empty($s['is_owner'])): ?>
           <form method="post" onsubmit="return confirm('Remove <?= e(addslashes($s['name'])) ?>? Their open tickets will become unassigned.');">
             <input type="hidden" name="action" value="delete">
             <input type="hidden" name="csrf" value="<?= e($token) ?>">
             <input type="hidden" name="id" value="<?= (int)$s['id'] ?>">
             <button class="icon-btn danger" type="submit" aria-label="Delete"><?= ico('trash') ?></button>
           </form>
+          <?php endif; ?>
         </td>
       </tr>
       <?php endforeach; ?>
     </tbody></table></div>
   </div>
 </main>
-<?= admin_bottomnav('staff.php') ?>
+<?= admin_bottomnav($staff, 'staff.php') ?>
 </body>
 </html>

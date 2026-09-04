@@ -31,6 +31,7 @@ var ICONS = {
   puzzle:'<path d="M9 4h4v2.3a1.7 1.7 0 0 0 2.9 1.2A1.7 1.7 0 0 1 19 8.8V13h-2.3a1.7 1.7 0 0 0 0 3.4H19V20H9v-4h-2a2 2 0 1 1 0-4h2Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>',
   globe:'<circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 12h17M12 3.5c2.4 2.3 3.6 5.2 3.6 8.5s-1.2 6.2-3.6 8.5c-2.4-2.3-3.6-5.2-3.6-8.5S9.6 5.8 12 3.5Z" stroke="currentColor" stroke-width="1.6"/>',
   lock:'<rect x="5" y="10.5" width="14" height="9" rx="3" stroke="currentColor" stroke-width="1.8"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" stroke="currentColor" stroke-width="1.8"/>',
+  logout:'<path d="M9 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M14 8l4.5 4-4.5 4M18.2 12H9.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
   monitor:'<rect x="3.5" y="4.5" width="17" height="12" rx="2.4" stroke="currentColor" stroke-width="1.8"/><path d="M8.5 20h7M12 16.5V20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
   calendar:'<rect x="4" y="5.5" width="16" height="14.5" rx="2.6" stroke="currentColor" stroke-width="1.8"/><path d="M4 10h16M8 3.5v3M16 3.5v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
   mail:'<rect x="3.5" y="5.5" width="17" height="13" rx="2.4" stroke="currentColor" stroke-width="1.8"/><path d="M4.5 7 12 13l7.5-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
@@ -406,7 +407,7 @@ Pages['/'] = function(){
 };
 
 Pages['/services'] = function(){
-  return '<section class="hero" style="padding-bottom:20px;"><div class="container">'
+  return '<section class="hero hero-sub" style="padding-bottom:20px;"><div class="container">'
     +'<span class="eyebrow">Services</span><h1 style="max-width:16ch;">Everything it takes to go from offline to online.</h1>'
     +'<p class="lede">Website or app, domain, hosting, email, publishing, SEO — pick what you need, or hand us the whole thing.</p>'
   +'</div></section>'
@@ -432,7 +433,7 @@ Pages['/services'] = function(){
 };
 
 Pages['/solutions'] = function(){
-  return '<section class="hero" style="padding-bottom:20px;"><div class="container">'
+  return '<section class="hero hero-sub" style="padding-bottom:20px;"><div class="container">'
     +'<span class="eyebrow">Who we help</span><h1 style="max-width:18ch;">Built for people bringing a business online — not enterprise IT.</h1>'
     +'<p class="lede">Different business, different needs. The care we put into the work doesn\'t change.</p>'
   +'</div></section>'
@@ -452,7 +453,7 @@ Pages['/solutions'] = function(){
 
 Pages['/marketplace'] = function(){
   var cats = ['All','Templates','Bundles','AI Agents','Dashboards','Themes'];
-  return '<section class="hero" style="padding-bottom:10px;"><div class="container">'
+  return '<section class="hero hero-sub" style="padding-bottom:10px;"><div class="container">'
     +'<span class="eyebrow">Marketplace</span><h1 style="max-width:16ch;">Ready-made themes you can brand as your own.</h1>'
     +'<p class="lede">Flip a card to preview it. Buy a theme, drop in your logo and colors, and launch — every listing is built and maintained by the TECHBISS studio.</p>'
   +'</div></section>'
@@ -486,7 +487,7 @@ Pages['/marketplace/detail'] = function(id){
 };
 
 Pages['/work'] = function(){
-  return '<section class="hero" style="padding-bottom:20px;"><div class="container">'
+  return '<section class="hero hero-sub" style="padding-bottom:20px;"><div class="container">'
     +'<span class="eyebrow">Work</span><h1 style="max-width:18ch;">Real businesses, now online.</h1>'
     +'<p class="lede">A few of the shops, studios and teams behind the stats on our homepage.</p>'
   +'</div></section>'
@@ -510,7 +511,7 @@ Pages['/process'] = function(){
     {t:'Launch', icon:'rocket', d:'We publish it — to the web, the app stores, or both — and make sure nothing breaks on day one.', out:['Go-live checklist','App store submission, if needed','You get the keys, not just a login']},
     {t:'Grow', icon:'chart', d:'SEO, small updates and support keep new customers finding and using it after launch.', out:['Monthly SEO check-in','Small updates included','Support when you need it']}
   ];
-  return '<section class="hero" style="padding-bottom:20px;"><div class="container">'
+  return '<section class="hero hero-sub" style="padding-bottom:20px;"><div class="container">'
     +'<span class="eyebrow">Process</span><h1 style="max-width:16ch;">Five stages. No surprises in between.</h1>'
     +'<p class="lede">Every project — big or small — moves through the same five stages, so you always know what\'s next.</p>'
   +'</div></section>'
@@ -540,7 +541,7 @@ Pages['/about'] = function(){
     {i:'RS', n:'Rhea Solano', r:'Head of Design'},
     {i:'JT', n:'Jonah Traeger', r:'VP Client Success'}
   ];
-  return '<section class="hero" style="padding-bottom:20px;"><div class="container">'
+  return '<section class="hero hero-sub" style="padding-bottom:20px;"><div class="container">'
     +'<span class="eyebrow">About</span><h1 style="max-width:16ch;">Started because getting online shouldn\'t be this hard.</h1>'
     +'<p class="lede">TECHBISS began by building one shop owner a website over a weekend. Nine years later, the same conviction runs the platform: we build every project like it\'s the most important one — because to the person running the business, it is.</p>'
   +'</div></section>'
@@ -574,7 +575,7 @@ Pages['/resources'] = function(){
     {t:'Live: Ready-made theme or custom build — how to choose', k:'Webinars', icon:'shield', min:'30 min'},
     {t:'App Store Launch Kit — v4.0 release notes', k:'Changelog', icon:'box', min:'4 min read'}
   ];
-  return '<section class="hero" style="padding-bottom:10px;"><div class="container">'
+  return '<section class="hero hero-sub" style="padding-bottom:10px;"><div class="container">'
     +'<span class="eyebrow">Resources</span><h1 style="max-width:16ch;">Field notes for getting online.</h1>'
     +'<p class="lede">Guides, recordings and release notes from the team actually building this.</p>'
   +'</div></section>'
@@ -601,7 +602,7 @@ Pages['/pricing'] = function(){
     {n:'Growth', m:99, y:79, d:'For businesses adding bookings, an online store, or an app.', f:['Everything in Starter','Priority support','Marketplace theme credit','Monthly SEO check-in','App store update handling'], cta:'Start with Growth', rec:true},
     {n:'Custom Build', m:null, y:null, d:'A website or app built from scratch around your business.', f:['Custom design & development','Dedicated project lead','Domain, hosting, SSL & email included','App Store & Play Store publishing','Free ranking check-up'], cta:'Get a free quote'}
   ];
-  return '<section class="hero" style="padding-bottom:20px;"><div class="container text-center">'
+  return '<section class="hero hero-sub" style="padding-bottom:20px;"><div class="container text-center">'
     +'<span class="eyebrow">Pricing</span><h1 style="max-width:20ch;margin-inline:auto;">Straightforward care plans. Custom builds, quoted upfront.</h1>'
     +'<div class="toggle-pill" id="priceToggle" style="margin-top:20px;"><button class="active" data-p="m">Monthly</button><button data-p="y">Annual — save 20%</button></div>'
   +'</div></section>'
@@ -633,7 +634,7 @@ Pages['/pricing'] = function(){
 
 Pages['/contact'] = function(){
   var S = window.SITE_SETTINGS || {};
-  return '<section class="hero" style="padding-bottom:20px;"><div class="container">'
+  return '<section class="hero hero-sub" style="padding-bottom:20px;"><div class="container">'
     +'<span class="eyebrow">Contact</span><h1 style="max-width:18ch;">Tell us about your business. We\'ll tell you what it takes to get online.</h1>'
     +'<p class="lede">Most first calls happen within two business days.</p>'
   +'</div></section>'
@@ -686,7 +687,7 @@ Pages['/login'] = function(){
 
 
 Pages['/dashboard'] = function(){
-  return '<section class="hero" style="padding-bottom:12px;"><div class="container">'
+  return '<section class="hero hero-sub" style="padding-bottom:12px;"><div class="container">'
     +'<span class="eyebrow">Client dashboard preview</span><h1 style="max-width:20ch;">Welcome back, '+((AUTH_USER&&AUTH_USER.name)||'there')+'.</h1>'
     +'<p class="lede">A look at the dashboard you get once your site or app is live.</p>'
   +'</div></section>'
@@ -717,6 +718,25 @@ Pages['/dashboard'] = function(){
         +'<a href="#/contact" class="card-link" style="margin-top:12px;">Open a new ticket '+ico('arrow')+'</a></div>'
         +'<div class="card" style="background:var(--grad);color:#fff2ea;border:none;"><div class="card-head">'+blobIcon('users','sm',false)+'<h3 style="color:#fff2ea;">Book a check-in call</h3></div><p style="color:rgba(255,242,234,.9);">A monthly look at your site\'s performance and what to do next.</p><a href="#/contact" class="btn" style="background:#fff2ea;color:var(--accent-1);">Schedule now</a></div>'
       +'</div>'
+    +'</div>'
+  +'</div></section>';
+};
+Pages['/account'] = function(){
+  var u = AUTH_USER || {};
+  return '<section class="hero hero-sub" style="padding-bottom:12px;"><div class="container">'
+    +'<span class="eyebrow">Your account</span><h1 style="max-width:16ch;">Profile</h1>'
+    +'<p class="lede">Manage your sign-in and account details.</p>'
+  +'</div></section>'
+  +'<section class="section tone-a" style="padding-top:10px;"><div class="container" style="max-width:640px;">'
+    +'<div class="card" style="text-align:center;padding:32px 24px;">'
+      +'<div class="avatar-blob" style="margin:0 auto 16px;">'+((u.name||'U').charAt(0).toUpperCase())+'</div>'
+      +'<h3 style="margin-bottom:2px;">'+(u.name||'Your account')+'</h3>'
+      +'<p style="color:var(--ink-faint);">'+(u.email||'')+'</p>'
+    +'</div>'
+    +'<div class="card" style="margin-top:16px;">'
+      +'<a href="#/dashboard" class="card-link" style="margin-bottom:14px;">'+ico('chart')+' View dashboard</a>'
+      +'<a href="#/contact" class="card-link" style="margin-bottom:14px;">'+ico('chat')+' Open a support ticket</a>'
+      +'<button id="accountLogoutBtn" class="btn btn-ghost btn-block" type="button">'+ico('logout')+' Log out</button>'
     +'</div>'
   +'</div></section>';
 };
@@ -1064,7 +1084,7 @@ function refreshAuth(){
 }
 function doRender(){
   var r = parseRoute();
-  if(r.key==='/dashboard' && !AUTH_USER){ location.hash = '#/login'; return; }
+  if((r.key==='/dashboard'||r.key==='/account') && !AUTH_USER){ location.hash = '#/login'; return; }
   var view = $('#view');
   view.innerHTML = Pages[r.key](r.param);
   window.scrollTo(0,0);
@@ -1072,23 +1092,23 @@ function doRender(){
   var afterMap = {
     '/': wireHome, '/work': wireWork, '/marketplace': wireMarketplace,
     '/resources': wireResources, '/pricing': wirePricing, '/contact': wireContact,
-    '/login': wireLogin
+    '/login': wireLogin, '/account': wireAccount
   };
   if(r.key==='/marketplace/detail'){ wireProductDetail(r.param); }
   else if(afterMap[r.key]){ afterMap[r.key](); }
   moveNavBlob(currentNavLink());
-  $all('.nav-link, #mobileNav a, .dock-item[data-path]').forEach(function(a){ a.classList.toggle('active', a.dataset.path===r.nav); });
   var loginBtn = $('#navLoginBtn');
-  var dockLogin = $('.dock-item[data-path="/login"]');
+  var dockLogin = $('.dock-item[data-path="/login"], .dock-item[data-path="/account"]');
   if(AUTH_USER){
-    loginBtn.textContent = 'Log out';
-    loginBtn.setAttribute('href','#');
-    loginBtn.style.display = (r.nav==='/login') ? 'none' : '';
-    loginBtn.onclick = function(e){ e.preventDefault(); fetch('api/logout.php',{method:'POST'}).then(function(){ AUTH_USER=null; location.hash='#/'; }); };
+    loginBtn.textContent = 'Profile';
+    loginBtn.setAttribute('href','#/account');
+    loginBtn.style.display = (r.nav==='/account') ? 'none' : '';
+    loginBtn.onclick = null;
     if(dockLogin){
-      dockLogin.querySelector('span').textContent = 'Log out';
-      dockLogin.setAttribute('href','#');
-      dockLogin.onclick = function(e){ e.preventDefault(); fetch('api/logout.php',{method:'POST'}).then(function(){ AUTH_USER=null; location.hash='#/'; }); };
+      dockLogin.querySelector('span').textContent = 'Profile';
+      dockLogin.setAttribute('href','#/account');
+      dockLogin.dataset.path = '/account';
+      dockLogin.onclick = null;
     }
   } else {
     loginBtn.textContent = 'Log in';
@@ -1098,9 +1118,18 @@ function doRender(){
     if(dockLogin){
       dockLogin.querySelector('span').textContent = 'Log in';
       dockLogin.setAttribute('href','#/login');
+      dockLogin.dataset.path = '/login';
       dockLogin.onclick = null;
     }
   }
+  $all('.nav-link, #mobileNav a, .dock-item[data-path]').forEach(function(a){ a.classList.toggle('active', a.dataset.path===r.nav); });
+}
+function doLogout(){
+  return fetch('api/logout.php',{method:'POST'}).then(function(){ AUTH_USER=null; location.hash='#/'; });
+}
+function wireAccount(){
+  var btn = $('#accountLogoutBtn');
+  if(btn){ btn.onclick = function(e){ e.preventDefault(); doLogout(); }; }
 }
 var transitioning=false;
 function resetTransition(){

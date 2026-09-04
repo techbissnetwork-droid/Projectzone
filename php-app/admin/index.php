@@ -36,7 +36,7 @@ $statusTone = ['Active' => 'success', 'Trial' => 'warning', 'Past due' => 'dange
 $priTone = ['High' => 'danger', 'Normal' => 'warning', 'Low' => 'success'];
 ?>
 <!doctype html>
-<html lang="en">
+<html lang="en"<?= palette_attr() ?>>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -117,6 +117,6 @@ $priTone = ['High' => 'danger', 'Normal' => 'warning', 'Low' => 'success'];
     </div>
   </div>
 </main>
-<?= admin_bottomnav('index.php') ?>
+<?= admin_bottomnav($staff, 'index.php') ?>
 </body>
 </html>

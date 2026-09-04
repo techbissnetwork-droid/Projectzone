@@ -5,6 +5,7 @@ require_once __DIR__ . '/../includes/admin_layout.php';
 require_installed('../install/');
 
 $staff = require_staff();
+require_staff_access($staff, 'businesses.php');
 $pdo = db();
 
 $PLANS = ['Starter', 'Growth', 'App + Web', 'Scale'];
@@ -56,7 +57,7 @@ $statusTone = ['Active' => 'success', 'Trial' => 'warning', 'Past due' => 'dange
 $token = csrf_token();
 ?>
 <!doctype html>
-<html lang="en">
+<html lang="en"<?= palette_attr() ?>>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -125,6 +126,6 @@ $token = csrf_token();
     </tbody></table></div>
   </div>
 </main>
-<?= admin_bottomnav('businesses.php') ?>
+<?= admin_bottomnav($staff, 'businesses.php') ?>
 </body>
 </html>

@@ -28,10 +28,9 @@ $socialImagePath = get_setting('social_image_path', 'assets/social-default.png')
 $baseUrl = defined('SITE_URL') ? rtrim(SITE_URL, '/') : '';
 $canonicalUrl = $baseUrl !== '' ? $baseUrl . '/' : '';
 $socialImageUrl = $baseUrl !== '' ? $baseUrl . '/' . ltrim($socialImagePath, '/') : $socialImagePath;
-$colorPalette = get_setting('color_palette', '');
 ?>
 <!doctype html>
-<html lang="en"<?= $colorPalette !== '' ? ' data-palette="' . e($colorPalette) . '"' : '' ?>>
+<html lang="en"<?= palette_attr() ?>>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -77,7 +76,7 @@ $colorPalette = get_setting('color_palette', '');
       </g>
     </svg>
     <div class="splash-word">techbiss</div>
-    <div class="splash-hint">click anywhere to skip</div>
+    <div class="splash-hint">Websites &amp; apps, fully handled.</div>
   </div>
 </div>
 
@@ -128,7 +127,7 @@ $colorPalette = get_setting('color_palette', '');
     <span>Marketplace</span>
   </a>
   <a href="#/login" class="dock-item" data-path="/login">
-    <svg viewBox="0 0 24 24" fill="none"><rect x="5" y="10.5" width="14" height="9" rx="3" stroke="currentColor" stroke-width="1.8"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" stroke="currentColor" stroke-width="1.8"/></svg>
+    <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8.2" r="3.4" stroke="currentColor" stroke-width="1.8"/><path d="M4.8 20c1.1-3.6 4-5.6 7.2-5.6s6.1 2 7.2 5.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
     <span>Log in</span>
   </a>
   <button class="dock-item" id="dockMenuBtn" aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobileSheet">

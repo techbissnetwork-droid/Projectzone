@@ -5,6 +5,7 @@ require_once __DIR__ . '/../includes/admin_layout.php';
 require_installed('../install/');
 
 $staff = require_staff();
+require_staff_access($staff, 'tickets.php');
 $pdo = db();
 
 $PRIORITIES = ['Low', 'Normal', 'High'];
@@ -61,7 +62,7 @@ $statusTone = ['Open' => 'danger', 'In progress' => 'warning', 'Closed' => 'succ
 $token = csrf_token();
 ?>
 <!doctype html>
-<html lang="en">
+<html lang="en"<?= palette_attr() ?>>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -136,6 +137,6 @@ $token = csrf_token();
     </tbody></table></div>
   </div>
 </main>
-<?= admin_bottomnav('tickets.php') ?>
+<?= admin_bottomnav($staff, 'tickets.php') ?>
 </body>
 </html>

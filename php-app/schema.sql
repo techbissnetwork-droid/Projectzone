@@ -16,17 +16,21 @@ CREATE TABLE `staff` (
   `email` VARCHAR(190) NOT NULL UNIQUE,
   `password_hash` VARCHAR(255) NOT NULL,
   `role` VARCHAR(60) NOT NULL DEFAULT 'Staff',
+  `permissions` TEXT NULL,
+  `is_owner` TINYINT(1) NOT NULL DEFAULT 0,
   `initials` VARCHAR(4) NOT NULL DEFAULT '',
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Seed staff login: admin@techbiss.com / techbiss-admin-2026
 -- CHANGE THIS PASSWORD before going live — see README.md.
-INSERT INTO `staff` (`name`, `email`, `password_hash`, `role`, `initials`) VALUES
-('Mara Aldous', 'mara@techbiss.com', '$2y$12$KqXcJRwo2G4x/oavDaIVPuv754B8wk0ECXzkK4BWlcq0lzqQDrTha', 'Founder & CEO', 'MA'),
-('Devon Kwan', 'devon@techbiss.com', '$2y$12$KqXcJRwo2G4x/oavDaIVPuv754B8wk0ECXzkK4BWlcq0lzqQDrTha', 'Head of Engineering', 'DK'),
-('Rhea Solano', 'rhea@techbiss.com', '$2y$12$KqXcJRwo2G4x/oavDaIVPuv754B8wk0ECXzkK4BWlcq0lzqQDrTha', 'Head of Design', 'RS'),
-('Jonah Traeger', 'admin@techbiss.com', '$2y$12$KqXcJRwo2G4x/oavDaIVPuv754B8wk0ECXzkK4BWlcq0lzqQDrTha', 'VP Client Success', 'JT');
+-- `permissions` NULL = full admin access. `is_owner` accounts always keep
+-- full access and can't be deleted — Mara's account is the owner here.
+INSERT INTO `staff` (`name`, `email`, `password_hash`, `role`, `permissions`, `is_owner`, `initials`) VALUES
+('Mara Aldous', 'mara@techbiss.com', '$2y$12$KqXcJRwo2G4x/oavDaIVPuv754B8wk0ECXzkK4BWlcq0lzqQDrTha', 'Founder & CEO', NULL, 1, 'MA'),
+('Devon Kwan', 'devon@techbiss.com', '$2y$12$KqXcJRwo2G4x/oavDaIVPuv754B8wk0ECXzkK4BWlcq0lzqQDrTha', 'Head of Engineering', NULL, 0, 'DK'),
+('Rhea Solano', 'rhea@techbiss.com', '$2y$12$KqXcJRwo2G4x/oavDaIVPuv754B8wk0ECXzkK4BWlcq0lzqQDrTha', 'Head of Design', NULL, 0, 'RS'),
+('Jonah Traeger', 'admin@techbiss.com', '$2y$12$KqXcJRwo2G4x/oavDaIVPuv754B8wk0ECXzkK4BWlcq0lzqQDrTha', 'VP Client Success', NULL, 0, 'JT');
 
 -- ---------------------------------------------------------------
 -- customers — real accounts created via the public sign-up form.

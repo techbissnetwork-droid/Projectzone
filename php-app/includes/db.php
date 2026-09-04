@@ -102,7 +102,7 @@ function current_staff(): ?array
     if (empty($_SESSION['staff_id'])) {
         return null;
     }
-    $stmt = db()->prepare('SELECT id, name, email, role FROM staff WHERE id = ?');
+    $stmt = db()->prepare('SELECT id, name, email, role, permissions, is_owner FROM staff WHERE id = ?');
     $stmt->execute([$_SESSION['staff_id']]);
     $row = $stmt->fetch();
     return $row ?: null;
@@ -116,6 +116,39 @@ function require_staff(): array
         exit;
     }
     return $staff;
+}
+
+/**
+ * NULL return = full access to every admin section. A non-null array lists
+ * the specific section keys (e.g. "businesses", "settings" — the admin
+ * page filename without ".php") this staff member is allowed into.
+ */
+function staff_permissions(array $staff): ?array
+{
+    if (!empty($staff['is_owner']) || ($staff['permissions'] ?? null) === null || $staff['permissions'] === '') {
+        return null;
+    }
+    $decoded = json_decode((string)$staff['permissions'], true);
+    return is_array($decoded) ? $decoded : [];
+}
+
+function staff_can(array $staff, string $page): bool
+{
+    $key = pathinfo($page, PATHINFO_FILENAME);
+    if ($key === 'index') {
+        return true;
+    }
+    $perms = staff_permissions($staff);
+    return $perms === null || in_array($key, $perms, true);
+}
+
+function require_staff_access(array $staff, string $page): void
+{
+    if (!staff_can($staff, $page)) {
+        flash("You don't have access to that section.", 'error');
+        header('Location: index.php');
+        exit;
+    }
 }
 
 function csrf_token(): string
@@ -158,6 +191,12 @@ function get_setting(string $key, string $default = ''): string
 {
     $all = all_settings();
     return $all[$key] ?? $default;
+}
+
+function palette_attr(): string
+{
+    $p = get_setting('color_palette', '');
+    return $p !== '' ? ' data-palette="' . e($p) . '"' : '';
 }
 
 function logo_mark_html(bool $gradient = true): string

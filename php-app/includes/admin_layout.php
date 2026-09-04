@@ -8,10 +8,26 @@ const ADMIN_NAV = [
     ['path' => 'settings.php', 'label' => 'Settings', 'icon' => 'settings'],
 ];
 
+// Sections an admin can grant/withhold per staff member (Dashboard excluded — always available).
+const STAFF_SECTIONS = [
+    'businesses' => 'Businesses',
+    'tickets' => 'Tickets',
+    'products' => 'Products',
+    'staff' => 'Staff & permissions',
+    'settings' => 'Settings',
+];
+
+function admin_visible_nav(array $staff): array
+{
+    return array_values(array_filter(ADMIN_NAV, function ($item) use ($staff) {
+        return staff_can($staff, $item['path']);
+    }));
+}
+
 function admin_header(array $staff, string $active): string
 {
     $links = '';
-    foreach (ADMIN_NAV as $item) {
+    foreach (admin_visible_nav($staff) as $item) {
         $cls = $item['path'] === $active ? 'admin-nav-link active' : 'admin-nav-link';
         $links .= '<a href="' . e($item['path']) . '" class="' . $cls . '">' . e($item['label']) . '</a>';
     }
@@ -46,10 +62,11 @@ function admin_header(array $staff, string $active): string
         . '})();</script>';
 }
 
-function admin_bottomnav(string $active): string
+function admin_bottomnav(array $staff, string $active): string
 {
-    $primary = array_slice(ADMIN_NAV, 0, 3);
-    $overflow = array_slice(ADMIN_NAV, 3);
+    $visible = admin_visible_nav($staff);
+    $primary = array_slice($visible, 0, 3);
+    $overflow = array_slice($visible, 3);
     $activeInOverflow = false;
 
     $items = '';
