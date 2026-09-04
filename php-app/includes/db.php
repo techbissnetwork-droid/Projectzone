@@ -136,6 +136,30 @@ function e(string $s): string
     return htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
 }
 
+function all_settings(): array
+{
+    static $cache = null;
+    if ($cache !== null) {
+        return $cache;
+    }
+    try {
+        $rows = db()->query('SELECT id, value FROM settings')->fetchAll();
+    } catch (PDOException $e) {
+        return [];
+    }
+    $cache = [];
+    foreach ($rows as $r) {
+        $cache[$r['id']] = $r['value'];
+    }
+    return $cache;
+}
+
+function get_setting(string $key, string $default = ''): string
+{
+    $all = all_settings();
+    return $all[$key] ?? $default;
+}
+
 function flash(string $message, string $type = 'success'): void
 {
     $_SESSION['flash'] = ['message' => $message, 'type' => $type];

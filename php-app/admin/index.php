@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/icons.php';
+require_once __DIR__ . '/../includes/admin_layout.php';
 require_installed('../install/');
 
 $staff = require_staff(); // redirects to login.php if not signed in
@@ -11,7 +12,7 @@ $mrrCents = (int)$pdo->query('SELECT COALESCE(SUM(mrr_cents),0) s FROM businesse
 $productCount = (int)$pdo->query('SELECT COUNT(*) c FROM products')->fetch()['c'];
 $openTickets = (int)$pdo->query("SELECT COUNT(*) c FROM tickets WHERE status != 'Closed'")->fetch()['c'];
 
-$accounts = $pdo->query('SELECT * FROM businesses ORDER BY last_activity_at DESC')->fetchAll();
+$accounts = $pdo->query('SELECT * FROM businesses ORDER BY last_activity_at DESC LIMIT 8')->fetchAll();
 
 $queue = $pdo->query(
     "SELECT t.id, t.title, t.priority, b.name AS business_name, s.initials AS assignee_initials, s.name AS assignee_name
@@ -20,7 +21,7 @@ $queue = $pdo->query(
      LEFT JOIN staff s ON s.id = t.assignee_staff_id
      WHERE t.status != 'Closed'
      ORDER BY FIELD(t.priority,'High','Normal','Low'), t.created_at DESC
-     LIMIT 10"
+     LIMIT 8"
 )->fetchAll();
 
 $staffList = $pdo->query(
@@ -29,7 +30,7 @@ $staffList = $pdo->query(
      FROM staff s ORDER BY s.id"
 )->fetchAll();
 
-$sellers = $pdo->query('SELECT name, rating FROM products ORDER BY rating DESC, sort_order ASC LIMIT 3')->fetchAll();
+$sellers = $pdo->query('SELECT name, rating FROM products ORDER BY rating DESC, sort_order ASC LIMIT 5')->fetchAll();
 
 $statusTone = ['Active' => 'success', 'Trial' => 'warning', 'Past due' => 'danger'];
 $priTone = ['High' => 'danger', 'Normal' => 'warning', 'Low' => 'success'];
@@ -39,42 +40,29 @@ $priTone = ['High' => 'danger', 'Normal' => 'warning', 'Low' => 'success'];
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Admin control center — TECHBISS</title>
+<title>Dashboard — TECHBISS Admin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/style.css">
-<style>
-.admin-bar{ display:flex; justify-content:space-between; align-items:center; padding:18px 0; }
-.admin-bar .who{ font-size:.85rem; color:var(--ink-faint); }
-</style>
+<link rel="stylesheet" href="../assets/style.css?v=<?= @filemtime(__DIR__ . '/../assets/style.css') ?: '1' ?>">
 </head>
 <body>
-<main class="container" style="padding-top:8px;padding-bottom:60px;">
-  <div class="admin-bar">
-    <div class="flex items-center gap-12">
-      <div class="logo-mark" style="width:36px;height:36px;"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="6" fill="var(--accent-1)"/><rect x="7.5" y="7.5" width="9" height="2.6" rx="1.3" fill="#fff2ea"/><rect x="10.7" y="7.5" width="2.6" height="9.5" rx="1.3" fill="#fff2ea"/></svg></div>
-      <b style="font-family:var(--font-display);">techbiss admin</b>
-    </div>
-    <div class="flex items-center gap-12">
-      <span class="who">Signed in as <?= e($staff['name']) ?> · <?= e($staff['role']) ?></span>
-      <a href="logout.php" class="btn btn-ghost btn-sm"><?= ico('logout') ?> Log out</a>
-    </div>
-  </div>
-
+<?= admin_header($staff, 'index.php') ?>
+<main class="admin-page">
+  <?= admin_flash_html() ?>
   <span class="badge warning" style="margin-bottom:14px;"><?= ico('shield') ?> Internal — staff access only</span>
   <h1 style="max-width:22ch;margin-bottom:6px;">Every client, every ticket, one screen.</h1>
   <p class="lede" style="margin-bottom:28px;">All figures below are live from the database.</p>
 
   <div class="grid grid-4" style="margin-bottom:28px;">
-    <div class="card tilt"><?= blob_icon('users', 'sm', true) ?><div class="stat" style="margin-top:12px;"><div class="num"><?= number_format($businessCount) ?></div><div class="label">Businesses on platform</div></div></div>
+    <a class="card tilt" href="businesses.php" style="display:block;color:inherit;"><?= blob_icon('box', 'sm', true) ?><div class="stat" style="margin-top:12px;"><div class="num"><?= number_format($businessCount) ?></div><div class="label">Businesses on platform</div></div></a>
     <div class="card tilt"><?= blob_icon('chart', 'sm', true) ?><div class="stat" style="margin-top:12px;"><div class="num">$<?= number_format($mrrCents / 100, 0) ?></div><div class="label">Monthly recurring revenue</div></div></div>
-    <div class="card tilt"><?= blob_icon('box', 'sm', true) ?><div class="stat" style="margin-top:12px;"><div class="num"><?= number_format($productCount) ?></div><div class="label">Marketplace products live</div></div></div>
-    <div class="card tilt"><?= blob_icon('chat', 'sm', true) ?><div class="stat" style="margin-top:12px;"><div class="num"><?= number_format($openTickets) ?></div><div class="label">Open support tickets</div></div></div>
+    <a class="card tilt" href="products.php" style="display:block;color:inherit;"><?= blob_icon('star', 'sm', true) ?><div class="stat" style="margin-top:12px;"><div class="num"><?= number_format($productCount) ?></div><div class="label">Marketplace products live</div></div></a>
+    <a class="card tilt" href="tickets.php" style="display:block;color:inherit;"><?= blob_icon('chat', 'sm', true) ?><div class="stat" style="margin-top:12px;"><div class="num"><?= number_format($openTickets) ?></div><div class="label">Open support tickets</div></div></a>
   </div>
 
   <div class="card" style="margin-bottom:22px;">
-    <div class="card-head"><?= blob_icon('users', 'sm', true) ?><h3>Business accounts</h3></div>
+    <div class="card-head" style="justify-content:space-between;"><div class="flex items-center gap-12"><?= blob_icon('box', 'sm', true) ?><h3>Business accounts</h3></div><a href="businesses.php" class="card-link">Manage all <?= ico('arrow') ?></a></div>
     <div class="table-wrap"><table><thead><tr><th>Business</th><th>Plan</th><th>MRR</th><th>Status</th><th>Last activity</th></tr></thead><tbody>
       <?php foreach ($accounts as $a): ?>
       <tr>
@@ -85,12 +73,13 @@ $priTone = ['High' => 'danger', 'Normal' => 'warning', 'Low' => 'success'];
         <td style="color:var(--ink-faint);"><?= e(time_ago($a['last_activity_at'])) ?></td>
       </tr>
       <?php endforeach; ?>
+      <?php if (!$accounts): ?><tr><td colspan="5" style="color:var(--ink-faint);">No businesses yet.</td></tr><?php endif; ?>
     </tbody></table></div>
   </div>
 
   <div class="hero-grid" style="align-items:flex-start;gap:26px;">
     <div class="card">
-      <div class="card-head"><?= blob_icon('chat', 'sm', true) ?><h3>Support queue — all clients</h3></div>
+      <div class="card-head" style="justify-content:space-between;"><div class="flex items-center gap-12"><?= blob_icon('chat', 'sm', true) ?><h3>Support queue</h3></div><a href="tickets.php" class="card-link">Manage all <?= ico('arrow') ?></a></div>
       <?php foreach ($queue as $q): ?>
       <div class="flex justify-between items-center" style="padding:12px 0;border-bottom:1px solid var(--border-soft);">
         <div>
@@ -107,7 +96,7 @@ $priTone = ['High' => 'danger', 'Normal' => 'warning', 'Low' => 'success'];
     </div>
     <div style="display:flex;flex-direction:column;gap:22px;">
       <div class="card">
-        <h3>Staff</h3>
+        <div class="card-head" style="justify-content:space-between;"><h3>Staff</h3><a href="staff.php" class="card-link">Manage <?= ico('arrow') ?></a></div>
         <?php foreach ($staffList as $s): ?>
         <div class="flex items-center gap-12" style="padding:12px 0;border-bottom:1px solid var(--border-soft);">
           <div class="avatar-blob" style="width:38px;height:38px;font-size:.75rem;"><?= e($s['initials']) ?></div>
@@ -117,7 +106,7 @@ $priTone = ['High' => 'danger', 'Normal' => 'warning', 'Low' => 'success'];
         <?php endforeach; ?>
       </div>
       <div class="card">
-        <h3>Top marketplace sellers</h3>
+        <div class="card-head" style="justify-content:space-between;"><h3>Top marketplace sellers</h3><a href="products.php" class="card-link">Manage <?= ico('arrow') ?></a></div>
         <?php foreach ($sellers as $p): ?>
         <div class="flex justify-between items-center" style="padding:10px 0;border-bottom:1px solid var(--border-soft);">
           <span style="font-size:.9rem;"><?= e($p['name']) ?></span>
@@ -128,5 +117,6 @@ $priTone = ['High' => 'danger', 'Normal' => 'warning', 'Low' => 'success'];
     </div>
   </div>
 </main>
+<?= admin_bottomnav('index.php') ?>
 </body>
 </html>

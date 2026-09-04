@@ -21,10 +21,20 @@ a genuinely access-controlled staff admin panel.
   (it isn't wired to per-business real data yet — see "Natural next
   steps" below).
 - The **staff admin panel** at `/admin/` is a completely separate app from
-  the public SPA. It requires a real staff login (`admin/login.php`,
-  session-gated) and every number on it — business accounts, MRR, open
-  tickets, staff, top sellers — is a live query against MySQL. It is not
-  linked from anywhere on the public site; you reach it by typing the URL.
+  the public SPA, with its own header (logo, section nav, signed-in-as,
+  log out) and its own bottom nav on mobile — not linked from the public
+  site; you reach it by typing the URL. It requires a real staff login
+  (session-gated) and is full read/write, not just a dashboard:
+  - **Businesses** — add, edit, delete client accounts (plan, MRR, status).
+  - **Tickets** — create, edit, reassign, change status/priority, delete.
+  - **Products** — add, edit, delete marketplace listings; changes go
+    live on the public marketplace immediately.
+  - **Staff** — add, edit, delete staff accounts (a delete is blocked if
+    it would remove the last remaining account, so you can't lock
+    yourself out).
+  - **Settings** — edit the homepage headline/subheading, footer
+    tagline, and contact email/phone shown across the public site, all
+    live immediately with no redeploy. See "Site settings" below.
 - **A real installer at `/install/`** — auto-detects your site's URL,
   checks PHP/MySQL requirements, writes `config.php` for you after testing
   the database connection, and lets you set your own admin password
@@ -129,6 +139,25 @@ row's `password_hash` in phpMyAdmin:
 (This is exactly the problem the web installer avoids — with it, you pick
 your own password at setup time and no shared default ever exists.)
 
+## Site settings
+
+Admin > Settings edits a small `settings` key/value table and covers the
+content that's genuinely site-wide: the homepage headline (in two parts,
+so the highlighted word/phrase keeps its accent color), the homepage
+subheading, the footer tagline, and the contact email/phone shown in the
+footer and on the Contact page. It does not (yet) cover every string on
+the site — full-page copy for Services/Solutions/Pricing/etc. is still
+in `assets/app.js`, since making literally every sentence on the site
+database-editable would mean rebuilding the whole site as a page-builder,
+which was out of scope here. Extending this table with more keys and
+wiring them into the relevant `Pages['/...']` function in `assets/app.js`
+(same pattern as the homepage) is the natural way to grow it.
+
+**Trust note:** settings and product fields are staff-only input and are
+rendered as-is (no HTML sanitization) on the public site, the same way a
+CMS trusts logged-in editors with post content. Don't give admin accounts
+to anyone you wouldn't trust to edit the site's HTML directly.
+
 ## Security notes
 
 - Passwords are hashed with PHP's `password_hash()` (bcrypt) — never
@@ -154,30 +183,39 @@ your own password at setup time and no shared default ever exists.)
 - A real marketplace checkout (Stripe/PayPal) and an `orders` table.
 - Outbound email for contact form submissions and password resets.
 - A "change password" flow for both customers and staff.
-- Letting staff update ticket status / reassign tickets from the admin
-  panel (right now the admin panel is read-only — it reflects the
-  database but doesn't yet write back to it beyond auth).
+- Extending Admin > Settings to cover more of the site's copy (see
+  "Site settings" above) — currently just the homepage headline/sub,
+  footer tagline, and contact details.
 
 ## File structure
 
 ```
-index.php                          Public site shell — queries products, renders the SPA
-assets/style.css                    All site styling (unchanged from the design concept)
-assets/app.js                       All site behavior — talks to api/*.php instead of faking submissions
-api/contact.php                     Saves contact form submissions
-api/signup.php                      Creates a customer account
-api/login.php                       Signs a customer in
-api/logout.php                      Signs a customer out
-api/me.php                          Returns the signed-in customer, if any
-admin/login.php                     Staff sign-in (separate from customer accounts)
-admin/logout.php                    Staff sign-out
-admin/index.php                     The real admin panel — session-gated, queries MySQL directly
-install/index.php                   The web installer — requirements, DB setup, admin account, migrations
-install/reset.php                   Lets install/ retry a botched DB step; permanently inert once installed
-install/migrations/001_initial.php  Creates every table, seeds sample data + your admin account
-includes/db.php                     Database connection, session setup, auth helpers, install-guard
-includes/migrate.php                Tiny migration runner used by install/
-includes/icons.php                  Small icon set used by the server-rendered admin panel
-config.sample.php                   Template — the installer writes the real config.php for you
-schema.sql                          Manual-setup alternative to the installer (see "Manual setup" above)
+index.php                            Public site shell — queries products + settings, renders the SPA
+assets/style.css                      All site styling, admin panel included
+assets/app.js                         All public-site behavior — talks to api/*.php instead of faking submissions
+api/contact.php                       Saves contact form submissions
+api/newsletter.php                    Saves Resources page newsletter signups
+api/signup.php                        Creates a customer account
+api/login.php                         Signs a customer in
+api/logout.php                        Signs a customer out
+api/me.php                            Returns the signed-in customer, if any
+admin/login.php                       Staff sign-in (separate from customer accounts)
+admin/logout.php                      Staff sign-out
+admin/index.php                       Dashboard — KPIs + recent activity, links into every section below
+admin/businesses.php                  Business accounts — add/edit/delete
+admin/tickets.php                     Support tickets — add/edit/reassign/delete
+admin/products.php                    Marketplace products — add/edit/delete (live on the public site)
+admin/staff.php                       Staff accounts — add/edit/delete (can't delete the last one)
+admin/settings.php                    Homepage headline/sub, footer tagline, contact email/phone
+install/index.php                     The web installer — requirements, DB setup, admin account, migrations
+install/reset.php                     Lets install/ retry a botched DB step; permanently inert once installed
+install/migrations/001_initial.php    Creates the core tables, seeds sample data + your admin account
+install/migrations/002_newsletter.php Adds newsletter_subscribers
+install/migrations/003_settings.php   Adds the settings table, seeded with the original hardcoded copy
+includes/db.php                       Database connection, session setup, auth/flash/settings helpers, install-guard
+includes/migrate.php                  Tiny migration runner used by install/
+includes/icons.php                    Icon set used by the server-rendered admin panel
+includes/admin_layout.php             Shared admin header + bottom nav, used by every admin/*.php page
+config.sample.php                     Template — the installer writes the real config.php for you
+schema.sql                            Manual-setup alternative to the installer (see "Manual setup" above)
 ```

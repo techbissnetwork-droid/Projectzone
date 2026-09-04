@@ -1,0 +1,130 @@
+<?php
+require_once __DIR__ . '/../includes/db.php';
+require_once __DIR__ . '/../includes/icons.php';
+require_once __DIR__ . '/../includes/admin_layout.php';
+require_installed('../install/');
+
+$staff = require_staff();
+$pdo = db();
+
+$PLANS = ['Starter', 'Growth', 'App + Web', 'Scale'];
+$STATUSES = ['Active', 'Trial', 'Past due'];
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $action = $_POST['action'] ?? '';
+    if (!csrf_check((string)($_POST['csrf'] ?? ''))) {
+        flash('Your session expired — please try again.', 'error');
+    } elseif ($action === 'save') {
+        $id = (int)($_POST['id'] ?? 0);
+        $name = trim((string)($_POST['name'] ?? ''));
+        $sector = trim((string)($_POST['sector'] ?? ''));
+        $plan = in_array($_POST['plan'] ?? '', $PLANS, true) ? $_POST['plan'] : $PLANS[0];
+        $status = in_array($_POST['status'] ?? '', $STATUSES, true) ? $_POST['status'] : $STATUSES[0];
+        $mrr = max(0, (float)($_POST['mrr'] ?? 0));
+        if ($name === '' || $sector === '') {
+            flash('Business name and sector are required.', 'error');
+        } else {
+            $mrrCents = (int)round($mrr * 100);
+            if ($id > 0) {
+                $stmt = $pdo->prepare('UPDATE businesses SET name=?, sector=?, plan=?, status=?, mrr_cents=? WHERE id=?');
+                $stmt->execute([$name, $sector, $plan, $status, $mrrCents, $id]);
+                flash('Business updated.');
+            } else {
+                $stmt = $pdo->prepare('INSERT INTO businesses (name, sector, plan, status, mrr_cents, last_activity_at) VALUES (?,?,?,?,?,NOW())');
+                $stmt->execute([$name, $sector, $plan, $status, $mrrCents]);
+                flash('Business added.');
+            }
+        }
+    } elseif ($action === 'delete') {
+        $id = (int)($_POST['id'] ?? 0);
+        $pdo->prepare('DELETE FROM businesses WHERE id=?')->execute([$id]);
+        flash('Business removed.');
+    }
+    header('Location: businesses.php');
+    exit;
+}
+
+$editing = null;
+if (isset($_GET['edit'])) {
+    $stmt = $pdo->prepare('SELECT * FROM businesses WHERE id=?');
+    $stmt->execute([(int)$_GET['edit']]);
+    $editing = $stmt->fetch() ?: null;
+}
+
+$accounts = $pdo->query('SELECT * FROM businesses ORDER BY last_activity_at DESC')->fetchAll();
+$statusTone = ['Active' => 'success', 'Trial' => 'warning', 'Past due' => 'danger'];
+$token = csrf_token();
+?>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Businesses — TECHBISS Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css?v=<?= @filemtime(__DIR__ . '/../assets/style.css') ?: '1' ?>">
+</head>
+<body>
+<?= admin_header($staff, 'businesses.php') ?>
+<main class="admin-page">
+  <?= admin_flash_html() ?>
+  <div class="admin-toolbar">
+    <div><h1 style="margin-bottom:4px;">Businesses</h1><p class="lede" style="margin-bottom:0;">Every client account on the platform.</p></div>
+  </div>
+
+  <div class="card admin-form-card">
+    <div class="card-head"><?= blob_icon($editing ? 'edit' : 'plus', 'sm', true) ?><h3><?= $editing ? 'Edit business' : 'Add a business' ?></h3></div>
+    <form method="post">
+      <input type="hidden" name="action" value="save">
+      <input type="hidden" name="csrf" value="<?= e($token) ?>">
+      <input type="hidden" name="id" value="<?= e((string)($editing['id'] ?? 0)) ?>">
+      <div class="grid grid-2" style="gap:16px;">
+        <div class="field"><label>Business name</label><input name="name" required value="<?= e($editing['name'] ?? '') ?>"></div>
+        <div class="field"><label>Sector</label><input name="sector" required value="<?= e($editing['sector'] ?? '') ?>" placeholder="e.g. Bakery, Fitness, Retail"></div>
+      </div>
+      <div class="grid grid-3" style="gap:16px;">
+        <div class="field"><label>Plan</label><select name="plan">
+          <?php foreach ($PLANS as $p): ?><option value="<?= e($p) ?>" <?= ($editing['plan'] ?? '') === $p ? 'selected' : '' ?>><?= e($p) ?></option><?php endforeach; ?>
+        </select></div>
+        <div class="field"><label>Status</label><select name="status">
+          <?php foreach ($STATUSES as $s): ?><option value="<?= e($s) ?>" <?= ($editing['status'] ?? '') === $s ? 'selected' : '' ?>><?= e($s) ?></option><?php endforeach; ?>
+        </select></div>
+        <div class="field"><label>MRR (USD/mo)</label><input type="number" min="0" step="1" name="mrr" value="<?= e((string)(($editing['mrr_cents'] ?? 0) / 100)) ?>"></div>
+      </div>
+      <div class="flex gap-12">
+        <button class="btn btn-primary" type="submit"><?= $editing ? 'Save changes' : 'Add business' ?></button>
+        <?php if ($editing): ?><a href="businesses.php" class="btn btn-ghost">Cancel</a><?php endif; ?>
+      </div>
+    </form>
+  </div>
+
+  <div class="card">
+    <div class="table-wrap"><table><thead><tr><th>Business</th><th>Sector</th><th>Plan</th><th>MRR</th><th>Status</th><th>Last activity</th><th></th></tr></thead><tbody>
+      <?php foreach ($accounts as $a): ?>
+      <tr>
+        <td style="font-weight:600;"><?= e($a['name']) ?></td>
+        <td><?= e($a['sector']) ?></td>
+        <td><?= e($a['plan']) ?></td>
+        <td>$<?= number_format($a['mrr_cents'] / 100, 0) ?></td>
+        <td><span class="badge <?= $statusTone[$a['status']] ?? '' ?>"><?= e($a['status']) ?></span></td>
+        <td style="color:var(--ink-faint);"><?= e(time_ago($a['last_activity_at'])) ?></td>
+        <td class="admin-actions-cell">
+          <a class="icon-btn" href="businesses.php?edit=<?= (int)$a['id'] ?>" aria-label="Edit"><?= ico('edit') ?></a>
+          <form method="post" onsubmit="return confirm('Delete <?= e(addslashes($a['name'])) ?>? This also removes its tickets.');">
+            <input type="hidden" name="action" value="delete">
+            <input type="hidden" name="csrf" value="<?= e($token) ?>">
+            <input type="hidden" name="id" value="<?= (int)$a['id'] ?>">
+            <button class="icon-btn danger" type="submit" aria-label="Delete"><?= ico('trash') ?></button>
+          </form>
+        </td>
+      </tr>
+      <?php endforeach; ?>
+      <?php if (!$accounts): ?><tr><td colspan="7" style="color:var(--ink-faint);">No businesses yet — add your first one above.</td></tr><?php endif; ?>
+    </tbody></table></div>
+  </div>
+</main>
+<?= admin_bottomnav('businesses.php') ?>
+</body>
+</html>

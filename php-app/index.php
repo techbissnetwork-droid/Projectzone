@@ -10,6 +10,15 @@ foreach ($products as &$p) {
     unset($p['specs_json']);
 }
 unset($p);
+
+$siteSettings = [
+    'heroHeadlineMain' => get_setting('hero_headline_main', 'Your business, finally'),
+    'heroHeadlineAccent' => get_setting('hero_headline_accent', 'open online.'),
+    'heroSubheadline' => get_setting('hero_subheadline', 'TECHBISS builds your website or app from the ground up, then handles the domain, hosting, SSL, business email and app store publishing — so you launch with everything already working, and people can actually find you.'),
+    'contactEmail' => get_setting('contact_email', 'hello@techbiss.com'),
+    'contactPhone' => get_setting('contact_phone', '+1 (415) 555-0148'),
+];
+$siteTagline = get_setting('site_tagline', 'We help offline businesses get online — website or app, domain, hosting, email and everything after launch.');
 ?>
 <!doctype html>
 <html lang="en">
@@ -122,9 +131,9 @@ unset($p);
           <span class="logo-mark"><svg viewBox="0 0 24 24" fill="none"><g><rect x="3" y="3" width="18" height="18" rx="6" fill="url(#logoGrad)"/><rect x="7.5" y="7.5" width="9" height="2.6" rx="1.3" fill="#fff2ea"/><rect x="10.7" y="7.5" width="2.6" height="9.5" rx="1.3" fill="#fff2ea"/></g></svg></span>
           <b>techbiss</b>
         </a>
-        <p style="max-width:32ch;">We help offline businesses get online — website or app, domain, hosting, email and everything after launch.</p>
+        <p style="max-width:32ch;"><?= e($siteTagline) ?></p>
         <div class="flex gap-12" style="margin-top:18px;">
-          <a href="#/contact" class="badge">hello@techbiss.com</a>
+          <a href="#/contact" class="badge"><?= e($siteSettings['contactEmail']) ?></a>
         </div>
       </div>
       <div>
@@ -148,6 +157,7 @@ unset($p);
 
 <script>
   var PRODUCTS_DATA = <?= json_encode($products, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>;
+  var SITE_SETTINGS = <?= json_encode($siteSettings, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>;
 </script>
 <script src="assets/app.js?v=<?= @filemtime(__DIR__ . '/assets/app.js') ?: '1' ?>"></script>
 </body>

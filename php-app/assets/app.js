@@ -217,12 +217,9 @@ ROUTES.forEach(function(r){
   a.innerHTML = r.label + ico('arrow');
   mobileNav.appendChild(a);
 });
-['/login'].forEach(function(p,i){
-  var labels=['Log in'];
-  var a = document.createElement('a');
-  a.href='#'+p; a.dataset.path=p; a.innerHTML=labels[i]+ico('arrow');
-  mobileNav.appendChild(a);
-});
+/* "Log in" is intentionally left out of this menu — the bottom dock (visible
+   at the same widths this menu opens from) already has its own dedicated
+   Log in icon, so listing it again here would just duplicate it. */
 var burger=$('#navBurger'), sheet=$('#mobileSheet'), backdrop=$('#sheetBackdrop'), dockMenuBtn=$('#dockMenuBtn');
 function openSheet(o){
   sheet.classList.toggle('open',o); backdrop.classList.toggle('open',o);
@@ -339,11 +336,12 @@ function statBlock(num,label){ return '<div class="stat"><div class="num grad-te
 var Pages = {};
 
 Pages['/'] = function(){
+  var S = window.SITE_SETTINGS || {};
   return ''
   +'<section class="hero"><div class="container hero-grid">'
     +'<div><span class="eyebrow">Websites & apps, fully handled</span>'
-    +'<h1>Your business, finally <span class="grad-text">open online.</span></h1>'
-    +'<p class="lede">TECHBISS builds your website or app from the ground up, then handles the domain, hosting, SSL, business email and app store publishing — so you launch with everything already working, and people can actually find you.</p>'
+    +'<h1>'+(S.heroHeadlineMain||'Your business, finally')+' <span class="grad-text">'+(S.heroHeadlineAccent||'open online.')+'</span></h1>'
+    +'<p class="lede">'+(S.heroSubheadline||'TECHBISS builds your website or app from the ground up, then handles the domain, hosting, SSL, business email and app store publishing — so you launch with everything already working, and people can actually find you.')+'</p>'
     +'<div class="hero-cta"><a href="#/services" class="btn btn-primary magnetic">See what we build '+ico('arrow')+'</a><a href="#/contact" class="btn btn-ghost magnetic">Book a free call</a></div>'
     +'<div class="hero-stats">'+statBlock('1,900+','Businesses & apps launched')+statBlock('38','Countries served')+statBlock('4.9/5','Customer rating')+statBlock('72 hrs','To your first draft')+'</div>'
     +'</div>'
@@ -629,6 +627,7 @@ Pages['/pricing'] = function(){
 };
 
 Pages['/contact'] = function(){
+  var S = window.SITE_SETTINGS || {};
   return '<section class="hero" style="padding-bottom:20px;"><div class="container">'
     +'<span class="eyebrow">Contact</span><h1 style="max-width:18ch;">Tell us about your business. We\'ll tell you what it takes to get online.</h1>'
     +'<p class="lede">Most first calls happen within two business days.</p>'
@@ -649,8 +648,8 @@ Pages['/contact'] = function(){
       +'<div id="contactSuccess" hidden style="text-align:center;padding:20px 0;">'+blobIcon('check','lg')+'<h3>Message sent</h3><p>Thanks — a real human will reply within two business days.</p></div>'
     +'</div>'
     +'<div style="display:flex;flex-direction:column;gap:20px;">'
-      +'<div class="card"><div class="card-head">'+blobIcon('mail','sm',true)+'<h3 style="font-size:1.05rem;">Email</h3></div><p style="font-size:.9rem;">hello@techbiss.com</p></div>'
-      +'<div class="card"><div class="card-head">'+blobIcon('phone','sm',true)+'<h3 style="font-size:1.05rem;">Phone</h3></div><p style="font-size:.9rem;">+1 (415) 555-0148</p></div>'
+      +'<div class="card"><div class="card-head">'+blobIcon('mail','sm',true)+'<h3 style="font-size:1.05rem;">Email</h3></div><p style="font-size:.9rem;">'+(S.contactEmail||'hello@techbiss.com')+'</p></div>'
+      +'<div class="card"><div class="card-head">'+blobIcon('phone','sm',true)+'<h3 style="font-size:1.05rem;">Phone</h3></div><p style="font-size:.9rem;">'+(S.contactPhone||'+1 (415) 555-0148')+'</p></div>'
       +'<div class="card"><div class="card-head">'+blobIcon('globe','sm',true)+'<h3 style="font-size:1.05rem;">Studios</h3></div><p style="font-size:.9rem;">San Francisco · Lisbon · Singapore</p></div>'
     +'</div>'
   +'</div></section>';
