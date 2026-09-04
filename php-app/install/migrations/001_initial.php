@@ -55,6 +55,7 @@ return function (PDO $pdo, array $context): void {
         `category` VARCHAR(60) NOT NULL,
         `icon` VARCHAR(40) NOT NULL,
         `price` DECIMAL(8,2) NOT NULL,
+        `pricing_type` ENUM('monthly','fixed') NOT NULL DEFAULT 'monthly',
         `rating` DECIMAL(2,1) NOT NULL,
         `tagline` TEXT NOT NULL,
         `description` TEXT NOT NULL,

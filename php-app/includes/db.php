@@ -160,6 +160,16 @@ function get_setting(string $key, string $default = ''): string
     return $all[$key] ?? $default;
 }
 
+function logo_mark_html(bool $gradient = true): string
+{
+    $path = get_setting('logo_path', '');
+    if ($path !== '') {
+        return '<span class="logo-mark"><img src="' . e($path) . '" alt="" style="width:100%;height:100%;object-fit:contain;border-radius:inherit;"></span>';
+    }
+    $fill = $gradient ? 'url(#logoGrad)' : 'var(--accent-1)';
+    return '<span class="logo-mark"><svg viewBox="0 0 24 24" fill="none"><g><rect x="3" y="3" width="18" height="18" rx="6" fill="' . $fill . '"/><rect x="7.5" y="7.5" width="9" height="2.6" rx="1.3" fill="#fff2ea"/><rect x="10.7" y="7.5" width="2.6" height="9.5" rx="1.3" fill="#fff2ea"/></g></svg></span>';
+}
+
 function flash(string $message, string $type = 'success'): void
 {
     $_SESSION['flash'] = ['message' => $message, 'type' => $type];

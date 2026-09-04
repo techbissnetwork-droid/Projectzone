@@ -33,8 +33,10 @@ a genuinely access-controlled staff admin panel.
     it would remove the last remaining account, so you can't lock
     yourself out).
   - **Settings** — edit the homepage headline/subheading, footer
-    tagline, and contact email/phone shown across the public site, all
-    live immediately with no redeploy. See "Site settings" below.
+    tagline, contact email/phone, SEO title/meta description, the
+    social-share image, the logo, the favicon, and the default light/dark
+    theme for new visitors — all live immediately with no redeploy. See
+    "Site settings" below.
 - **A real installer at `/install/`** — auto-detects your site's URL,
   checks PHP/MySQL requirements, writes `config.php` for you after testing
   the database connection, and lets you set your own admin password
@@ -47,8 +49,10 @@ a genuinely access-controlled staff admin panel.
 
 **Not implemented (flagged, not silently faked):**
 - No payment processor — the marketplace "buy" flow does not charge
-  anyone. Wire Stripe/PayPal into a new `api/checkout.php` before
-  accepting real orders.
+  anyone, for either monthly or one-time-priced products (see Products
+  in the admin panel — each product has a Monthly/Fixed pricing type,
+  which only controls the "/mo" label, not actual billing). Wire
+  Stripe/PayPal into a new `api/checkout.php` before accepting real orders.
 - No outbound email — the contact form saves to the database but does not
   send a notification email. Add `mail()`/PHPMailer/a transactional email
   API in `api/contact.php` if you want that.
@@ -141,22 +145,47 @@ your own password at setup time and no shared default ever exists.)
 
 ## Site settings
 
-Admin > Settings edits a small `settings` key/value table and covers the
-content that's genuinely site-wide: the homepage headline (in two parts,
-so the highlighted word/phrase keeps its accent color), the homepage
-subheading, the footer tagline, and the contact email/phone shown in the
-footer and on the Contact page. It does not (yet) cover every string on
-the site — full-page copy for Services/Solutions/Pricing/etc. is still
-in `assets/app.js`, since making literally every sentence on the site
-database-editable would mean rebuilding the whole site as a page-builder,
-which was out of scope here. Extending this table with more keys and
-wiring them into the relevant `Pages['/...']` function in `assets/app.js`
-(same pattern as the homepage) is the natural way to grow it.
+Admin > Settings edits a small `settings` key/value table, split into
+three groups:
+
+**Homepage & footer** — the homepage headline (in two parts, so the
+highlighted word/phrase keeps its accent color), the homepage subheading,
+the footer tagline, and the contact email/phone shown in the footer and
+on the Contact page.
+
+**SEO & social sharing** — the page title (browser tab + search results),
+the meta description, and the social share image (`og:image`/
+`twitter:image`, shown when the site link is pasted into Slack, iMessage,
+Twitter/X, etc. — recommended 1200×630px). The site ships with a default
+brand-colored share image and favicon (built from `assets/brand/*-source.svg`)
+so these all look right before you ever touch Settings.
+
+**Branding & appearance** — upload a custom logo (replaces the default
+"T" mark everywhere: public header/footer and the admin header) and a
+custom favicon, and choose the default light/dark theme for **new**
+visitors (Automatic/Light/Dark — anyone who has already toggled the
+theme themselves keeps their own choice; this only sets what a first-time
+visitor sees). Uploaded files are saved to `assets/uploads/` (created
+automatically — needs to be writable by the web server, same requirement
+as `install/` needing to write `config.php`) and are capped at 2MB;
+allowed types are PNG/JPG/WebP for the logo and social image, PNG only
+for the favicon.
+
+It does not (yet) cover every string on the site — full-page copy for
+Services/Solutions/Pricing/etc. is still in `assets/app.js`, since making
+literally every sentence on the site database-editable would mean
+rebuilding the whole site as a page-builder, which was out of scope here.
+Extending the `settings` table with more keys and wiring them into the
+relevant `Pages['/...']` function in `assets/app.js` (same pattern as the
+homepage) is the natural way to grow it.
 
 **Trust note:** settings and product fields are staff-only input and are
 rendered as-is (no HTML sanitization) on the public site, the same way a
 CMS trusts logged-in editors with post content. Don't give admin accounts
-to anyone you wouldn't trust to edit the site's HTML directly.
+to anyone you wouldn't trust to edit the site's HTML directly. Uploaded
+images are validated as real images (`getimagesize()`) and capped at
+2MB, but are not otherwise re-encoded — don't upload files from sources
+you don't trust.
 
 ## Security notes
 
@@ -184,8 +213,9 @@ to anyone you wouldn't trust to edit the site's HTML directly.
 - Outbound email for contact form submissions and password resets.
 - A "change password" flow for both customers and staff.
 - Extending Admin > Settings to cover more of the site's copy (see
-  "Site settings" above) — currently just the homepage headline/sub,
-  footer tagline, and contact details.
+  "Site settings" above) — currently the homepage headline/sub, footer
+  tagline, contact details, SEO/social fields, logo/favicon and default
+  theme.
 
 ## File structure
 
@@ -206,16 +236,21 @@ admin/businesses.php                  Business accounts — add/edit/delete
 admin/tickets.php                     Support tickets — add/edit/reassign/delete
 admin/products.php                    Marketplace products — add/edit/delete (live on the public site)
 admin/staff.php                       Staff accounts — add/edit/delete (can't delete the last one)
-admin/settings.php                    Homepage headline/sub, footer tagline, contact email/phone
+admin/settings.php                    Homepage/footer copy, SEO/social fields, logo/favicon uploads, default theme
 install/index.php                     The web installer — requirements, DB setup, admin account, migrations
 install/reset.php                     Lets install/ retry a botched DB step; permanently inert once installed
 install/migrations/001_initial.php    Creates the core tables, seeds sample data + your admin account
 install/migrations/002_newsletter.php Adds newsletter_subscribers
 install/migrations/003_settings.php   Adds the settings table, seeded with the original hardcoded copy
-includes/db.php                       Database connection, session setup, auth/flash/settings helpers, install-guard
+install/migrations/004_pricing_type.php  Adds products.pricing_type (monthly vs. one-time fixed price)
+install/migrations/005_branding_seo.php  Adds SEO/social/logo/favicon/default-theme settings
+includes/db.php                       Database connection, session setup, auth/flash/settings/logo helpers, install-guard
 includes/migrate.php                  Tiny migration runner used by install/
 includes/icons.php                    Icon set used by the server-rendered admin panel
-includes/admin_layout.php             Shared admin header + bottom nav, used by every admin/*.php page
+includes/admin_layout.php             Shared admin header (incl. theme toggle) + bottom nav, used by every admin/*.php page
+assets/brand/*-source.svg             Source vector art for the default logo/social image (not served directly)
+assets/favicon.ico, apple-touch-icon.png, social-default.png  Default brand assets, generated from assets/brand/
+assets/uploads/                       Staff-uploaded logo/favicon/social image land here (gitignored, created on first upload)
 config.sample.php                     Template — the installer writes the real config.php for you
 schema.sql                            Manual-setup alternative to the installer (see "Manual setup" above)
 ```

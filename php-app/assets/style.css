@@ -264,8 +264,6 @@ button{ cursor:pointer; }
 .dock-item:hover{ color:var(--accent-1); }
 .dock-item:hover svg{ transform:translateY(-2px); }
 .dock-item.active{ color:var(--accent-1); }
-.dock-item[href="#/contact"]{ color:var(--accent-1); }
-.dock-item[href="#/contact"] span{ font-weight:700; }
 @media (min-width:1361px){ .bottom-dock{ display:none; } }
 @media (max-width:1360px){ .footer{ padding-bottom:calc(72px + env(safe-area-inset-bottom,0px)); } }
 
@@ -524,7 +522,7 @@ main{ display:block; }
 .admin-header-actions{ display:flex; align-items:center; gap:14px; flex:none; }
 .admin-who{ display:flex; flex-direction:column; line-height:1.25; font-size:.85rem; font-weight:600; text-align:right; }
 .admin-who small{ font-weight:500; font-size:.72rem; color:var(--ink-faint); }
-@media (max-width:900px){
+@media (max-width:1360px){
   .admin-nav{ display:none; }
   .admin-who{ display:none; }
   .admin-header-actions .btn span{ display:none; }
@@ -554,7 +552,7 @@ main{ display:block; }
   .admin-page{ padding-bottom:calc(90px + env(safe-area-inset-bottom,0px)); }
 }
 .admin-bottomnav{ display:none; }
-@media (max-width:900px){ .admin-bottomnav{ display:flex; } }
+@media (max-width:1360px){ .admin-bottomnav{ display:flex; } }
 .dock-menu{ flex:1 1 0; position:relative; }
 .dock-menu > summary{
   flex:1 1 0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;

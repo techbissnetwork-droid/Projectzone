@@ -59,16 +59,21 @@ function blobIcon(name,size,soft){ return '<div class="blob-icon '+(size||'')+' 
    2. THEME
 =================================================================== */
 var root = document.documentElement;
-function applyTheme(t){
+function applyTheme(t, persist){
   if(t){ root.setAttribute('data-theme', t); } else { root.removeAttribute('data-theme'); }
-  try{ localStorage.setItem('bloom-theme', t||''); }catch(e){}
+  if(persist!==false){ try{ localStorage.setItem('bloom-theme', t||''); }catch(e){} }
   var pressed = (t==='dark') || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches);
   $('#themeToggle').setAttribute('aria-pressed', String(pressed));
 }
 (function initTheme(){
   var saved = null;
   try{ saved = localStorage.getItem('bloom-theme'); }catch(e){}
-  applyTheme(saved || '');
+  var S = window.SITE_SETTINGS || {};
+  var siteDefault = (S.defaultTheme && S.defaultTheme!=='auto') ? S.defaultTheme : '';
+  /* Only persist when the visitor has already made an explicit choice —
+     otherwise a later admin-configured default couldn't reach anyone
+     who merely loaded the site without ever touching the toggle. */
+  applyTheme(saved!==null ? saved : siteDefault, false);
 })();
 $('#themeToggle').addEventListener('click', function(){
   var current = root.getAttribute('data-theme');
@@ -761,7 +766,7 @@ function wireMarketplace(){
           +'<p style="font-size:.85rem;">'+p.tagline+'</p>'
           +'<div class="pf-preview">'+ico(p.icon)+'</div>'
           +'<div class="pf-tags" style="justify-content:space-between;align-items:center;"><div style="display:flex;gap:6px;flex-wrap:wrap;"><span class="badge">'+p.cat+'</span>'+(p.rating>=4.9?'<span class="badge grad">Popular</span>':'')+'</div><span class="pf-rating">'+ico('star')+' '+p.rating+'</span></div>'
-          +'<div class="pf-foot"><span class="pf-price">'+fmtMoney(p.price)+'<span> /mo</span></span><span class="pf-hint">Flip to preview '+ico('refresh')+'</span></div>'
+          +'<div class="pf-foot"><span class="pf-price">'+fmtMoney(p.price)+(p.pricing_type==='fixed'?'':'<span> /mo</span>')+'</span><span class="pf-hint">Flip to preview '+ico('refresh')+'</span></div>'
         +'</div>'
         +'<div class="flip-face flip-back">'
           +'<div><h3 style="color:#fff2ea;font-size:1.05rem;">'+p.name+'</h3>'
@@ -944,7 +949,7 @@ function wireProductDetail(id){
       +'</div></div>'
       +'<div class="card" style="background:var(--grad-soft);position:sticky;top:110px;">'
         +'<h3>Your summary</h3><p style="font-size:.85rem;">'+p.name+' — '+TIERS.filter(function(t){return t.k===state.tier;})[0].n+' plan</p>'
-        +'<div style="font-family:var(--font-display);font-weight:800;font-size:2rem;margin:14px 0;" id="pdTotal">'+fmtMoney(total())+'<span style="font-size:.9rem;color:var(--ink-faint);font-weight:600;"> /mo</span></div>'
+        +'<div style="font-family:var(--font-display);font-weight:800;font-size:2rem;margin:14px 0;" id="pdTotal">'+fmtMoney(total())+(p.pricing_type==='fixed'?'':'<span style="font-size:.9rem;color:var(--ink-faint);font-weight:600;"> /mo</span>')+'</div>'
         +'<button class="btn btn-primary btn-block magnetic" data-goto="purchase">Continue to purchase '+ico('arrow')+'</button>'
       +'</div></div>';
   }

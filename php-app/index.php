@@ -2,7 +2,7 @@
 require_once __DIR__ . '/includes/db.php';
 require_installed('install/');
 
-$products = db()->query('SELECT id, name, category AS cat, icon, price, rating, tagline, description AS `desc`, specs_json FROM products ORDER BY sort_order ASC')->fetchAll();
+$products = db()->query('SELECT id, name, category AS cat, icon, price, pricing_type, rating, tagline, description AS `desc`, specs_json FROM products ORDER BY sort_order ASC')->fetchAll();
 foreach ($products as &$p) {
     $p['price'] = (float)$p['price'];
     $p['rating'] = (float)$p['rating'];
@@ -17,16 +17,37 @@ $siteSettings = [
     'heroSubheadline' => get_setting('hero_subheadline', 'TECHBISS builds your website or app from the ground up, then handles the domain, hosting, SSL, business email and app store publishing — so you launch with everything already working, and people can actually find you.'),
     'contactEmail' => get_setting('contact_email', 'hello@techbiss.com'),
     'contactPhone' => get_setting('contact_phone', '+1 (415) 555-0148'),
+    'defaultTheme' => get_setting('default_theme', 'auto'),
 ];
 $siteTagline = get_setting('site_tagline', 'We help offline businesses get online — website or app, domain, hosting, email and everything after launch.');
+
+$seoTitle = get_setting('seo_title', 'TECHBISS — Get your business online');
+$metaDescription = get_setting('meta_description', 'TECHBISS helps offline businesses get online: websites, apps, domains, hosting, email and everything after launch.');
+$faviconPath = get_setting('favicon_path', 'assets/favicon.ico');
+$socialImagePath = get_setting('social_image_path', 'assets/social-default.png');
+$baseUrl = defined('SITE_URL') ? rtrim(SITE_URL, '/') : '';
+$canonicalUrl = $baseUrl !== '' ? $baseUrl . '/' : '';
+$socialImageUrl = $baseUrl !== '' ? $baseUrl . '/' . ltrim($socialImagePath, '/') : $socialImagePath;
 ?>
 <!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>TECHBISS — Get your business online</title>
-<meta name="description" content="TECHBISS helps offline businesses get online: websites, apps, domains, hosting, email and everything after launch.">
+<title><?= e($seoTitle) ?></title>
+<meta name="description" content="<?= e($metaDescription) ?>">
+<?php if ($canonicalUrl !== ''): ?><link rel="canonical" href="<?= e($canonicalUrl) ?>"><?php endif; ?>
+<link rel="icon" href="<?= e($faviconPath) ?>">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="<?= e($seoTitle) ?>">
+<meta property="og:description" content="<?= e($metaDescription) ?>">
+<meta property="og:image" content="<?= e($socialImageUrl) ?>">
+<?php if ($canonicalUrl !== ''): ?><meta property="og:url" content="<?= e($canonicalUrl) ?>"><?php endif; ?>
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="<?= e($seoTitle) ?>">
+<meta name="twitter:description" content="<?= e($metaDescription) ?>">
+<meta name="twitter:image" content="<?= e($socialImageUrl) ?>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -68,7 +89,7 @@ $siteTagline = get_setting('site_tagline', 'We help offline businesses get onlin
 <header class="site-header">
   <div class="container nav-wrap">
     <a href="#/" class="logo" aria-label="TECHBISS home">
-      <span class="logo-mark"><svg viewBox="0 0 24 24" fill="none"><g><rect x="3" y="3" width="18" height="18" rx="6" fill="url(#logoGrad)"/><rect x="7.5" y="7.5" width="9" height="2.6" rx="1.3" fill="#fff2ea"/><rect x="10.7" y="7.5" width="2.6" height="9.5" rx="1.3" fill="#fff2ea"/></g></svg></span>
+      <?= logo_mark_html(true) ?>
       <b>techbiss</b>
     </a>
     <nav class="nav-links" id="navLinks" aria-label="Primary">
@@ -105,10 +126,6 @@ $siteTagline = get_setting('site_tagline', 'We help offline businesses get onlin
     <svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="20" r="1.4" stroke="currentColor" stroke-width="1.6"/><circle cx="17" cy="20" r="1.4" stroke="currentColor" stroke-width="1.6"/><path d="M3 4h2l2.2 11h10.4L20 8H6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
     <span>Marketplace</span>
   </a>
-  <a href="#/contact" class="dock-item" data-path="/contact">
-    <svg viewBox="0 0 24 24" fill="none"><rect x="4" y="5.5" width="16" height="14.5" rx="2.6" stroke="currentColor" stroke-width="1.8"/><path d="M4 10h16M8 3.5v3M16 3.5v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-    <span>Book a call</span>
-  </a>
   <a href="#/login" class="dock-item" data-path="/login">
     <svg viewBox="0 0 24 24" fill="none"><rect x="5" y="10.5" width="14" height="9" rx="3" stroke="currentColor" stroke-width="1.8"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" stroke="currentColor" stroke-width="1.8"/></svg>
     <span>Log in</span>
@@ -128,7 +145,7 @@ $siteTagline = get_setting('site_tagline', 'We help offline businesses get onlin
     <div class="footer-grid">
       <div>
         <a href="#/" class="logo" style="margin-bottom:14px;">
-          <span class="logo-mark"><svg viewBox="0 0 24 24" fill="none"><g><rect x="3" y="3" width="18" height="18" rx="6" fill="url(#logoGrad)"/><rect x="7.5" y="7.5" width="9" height="2.6" rx="1.3" fill="#fff2ea"/><rect x="10.7" y="7.5" width="2.6" height="9.5" rx="1.3" fill="#fff2ea"/></g></svg></span>
+          <?= logo_mark_html(true) ?>
           <b>techbiss</b>
         </a>
         <p style="max-width:32ch;"><?= e($siteTagline) ?></p>

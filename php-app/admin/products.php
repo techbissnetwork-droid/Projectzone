@@ -8,6 +8,7 @@ $staff = require_staff();
 $pdo = db();
 
 $CATEGORIES = ['Templates', 'AI Agents', 'Dashboards', 'Bundles', 'Themes'];
+$PRICING_TYPES = ['monthly' => 'Monthly subscription', 'fixed' => 'One-time fixed price'];
 
 function slugify_id(string $name, PDO $pdo, ?string $keepId = null): string
 {
@@ -40,6 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $category = in_array($_POST['category'] ?? '', $CATEGORIES, true) ? $_POST['category'] : $CATEGORIES[0];
         $icon = trim((string)($_POST['icon'] ?? 'box'));
         $price = max(0, (float)($_POST['price'] ?? 0));
+        $pricingType = array_key_exists($_POST['pricing_type'] ?? '', $PRICING_TYPES) ? $_POST['pricing_type'] : 'monthly';
         $rating = min(5, max(0, (float)($_POST['rating'] ?? 4.5)));
         $tagline = trim((string)($_POST['tagline'] ?? ''));
         $desc = trim((string)($_POST['description'] ?? ''));
@@ -49,14 +51,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($name === '' || $tagline === '') {
             flash('Name and tagline are required.', 'error');
         } elseif ($existingId !== '') {
-            $stmt = $pdo->prepare('UPDATE products SET name=?, category=?, icon=?, price=?, rating=?, tagline=?, description=?, specs_json=? WHERE id=?');
-            $stmt->execute([$name, $category, $icon, $price, $rating, $tagline, $desc, json_encode($specs), $existingId]);
+            $stmt = $pdo->prepare('UPDATE products SET name=?, category=?, icon=?, price=?, pricing_type=?, rating=?, tagline=?, description=?, specs_json=? WHERE id=?');
+            $stmt->execute([$name, $category, $icon, $price, $pricingType, $rating, $tagline, $desc, json_encode($specs), $existingId]);
             flash('Product updated.');
         } else {
             $id = slugify_id($name, $pdo);
             $maxSort = (int)$pdo->query('SELECT COALESCE(MAX(sort_order),0) FROM products')->fetchColumn();
-            $stmt = $pdo->prepare('INSERT INTO products (id, name, category, icon, price, rating, tagline, description, specs_json, sort_order) VALUES (?,?,?,?,?,?,?,?,?,?)');
-            $stmt->execute([$id, $name, $category, $icon, $price, $rating, $tagline, $desc, json_encode($specs), $maxSort + 1]);
+            $stmt = $pdo->prepare('INSERT INTO products (id, name, category, icon, price, pricing_type, rating, tagline, description, specs_json, sort_order) VALUES (?,?,?,?,?,?,?,?,?,?,?)');
+            $stmt->execute([$id, $name, $category, $icon, $price, $pricingType, $rating, $tagline, $desc, json_encode($specs), $maxSort + 1]);
             flash('Product added — now live on the public marketplace.');
         }
     } elseif ($action === 'delete') {
@@ -109,9 +111,12 @@ $token = csrf_token();
           <?php foreach ($CATEGORIES as $c): ?><option value="<?= e($c) ?>" <?= ($editing['category'] ?? '') === $c ? 'selected' : '' ?>><?= e($c) ?></option><?php endforeach; ?>
         </select></div>
       </div>
-      <div class="grid grid-3" style="gap:16px;">
+      <div class="grid grid-4" style="gap:16px;">
         <div class="field"><label>Icon name</label><input name="icon" value="<?= e($editing['icon'] ?? 'box') ?>" placeholder="cart, chat, box, star…"></div>
-        <div class="field"><label>Price (USD/mo)</label><input type="number" min="0" step="1" name="price" value="<?= e((string)($editing['price'] ?? 99)) ?>"></div>
+        <div class="field"><label>Price (USD)</label><input type="number" min="0" step="1" name="price" value="<?= e((string)($editing['price'] ?? 99)) ?>"></div>
+        <div class="field"><label>Pricing type</label><select name="pricing_type">
+          <?php foreach ($PRICING_TYPES as $val => $label): ?><option value="<?= e($val) ?>" <?= ($editing['pricing_type'] ?? 'monthly') === $val ? 'selected' : '' ?>><?= e($label) ?></option><?php endforeach; ?>
+        </select></div>
         <div class="field"><label>Rating (0–5)</label><input type="number" min="0" max="5" step="0.1" name="rating" value="<?= e((string)($editing['rating'] ?? 4.8)) ?>"></div>
       </div>
       <div class="field"><label>Tagline (one line, shown on the card)</label><input name="tagline" required value="<?= e($editing['tagline'] ?? '') ?>"></div>
@@ -130,7 +135,7 @@ $token = csrf_token();
       <tr>
         <td style="font-weight:600;"><?= e($p['name']) ?></td>
         <td><?= e($p['category']) ?></td>
-        <td>$<?= number_format((float)$p['price'], 0) ?>/mo</td>
+        <td>$<?= number_format((float)$p['price'], 0) ?><?= $p['pricing_type'] === 'monthly' ? '/mo' : '' ?></td>
         <td><span class="badge"><?= ico('star') ?> <?= number_format((float)$p['rating'], 1) ?></span></td>
         <td class="admin-actions-cell">
           <a class="icon-btn" href="products.php?edit=<?= urlencode($p['id']) ?>" aria-label="Edit"><?= ico('edit') ?></a>

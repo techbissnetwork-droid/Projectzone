@@ -95,6 +95,7 @@ CREATE TABLE `products` (
   `category` VARCHAR(60) NOT NULL,
   `icon` VARCHAR(40) NOT NULL,
   `price` DECIMAL(8,2) NOT NULL,
+  `pricing_type` ENUM('monthly','fixed') NOT NULL DEFAULT 'monthly',
   `rating` DECIMAL(2,1) NOT NULL,
   `tagline` TEXT NOT NULL,
   `description` TEXT NOT NULL,
@@ -151,6 +152,12 @@ INSERT INTO `settings` (`id`, `value`) VALUES
 ('hero_subheadline', 'TECHBISS builds your website or app from the ground up, then handles the domain, hosting, SSL, business email and app store publishing — so you launch with everything already working, and people can actually find you.'),
 ('site_tagline', 'We help offline businesses get online — website or app, domain, hosting, email and everything after launch.'),
 ('contact_email', 'hello@techbiss.com'),
-('contact_phone', '+1 (415) 555-0148');
+('contact_phone', '+1 (415) 555-0148'),
+('seo_title', 'TECHBISS — Get your business online'),
+('meta_description', 'TECHBISS helps offline businesses get online: websites, apps, domains, hosting, email and everything after launch.'),
+('logo_path', ''),
+('favicon_path', 'assets/favicon.ico'),
+('social_image_path', 'assets/social-default.png'),
+('default_theme', 'auto');
 
 SET FOREIGN_KEY_CHECKS = 1;

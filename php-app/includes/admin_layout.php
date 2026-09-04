@@ -15,19 +15,35 @@ function admin_header(array $staff, string $active): string
         $cls = $item['path'] === $active ? 'admin-nav-link active' : 'admin-nav-link';
         $links .= '<a href="' . e($item['path']) . '" class="' . $cls . '">' . e($item['label']) . '</a>';
     }
+    $defaultTheme = get_setting('default_theme', 'auto');
     return '<header class="admin-header">'
         . '<div class="container admin-header-inner">'
         . '<a href="index.php" class="logo" aria-label="TECHBISS admin home">'
-        . '<span class="logo-mark"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="6" fill="var(--accent-1)"/><rect x="7.5" y="7.5" width="9" height="2.6" rx="1.3" fill="#fff2ea"/><rect x="10.7" y="7.5" width="2.6" height="9.5" rx="1.3" fill="#fff2ea"/></svg></span>'
+        . logo_mark_html(false)
         . '<b>techbiss</b><span class="admin-badge">admin</span>'
         . '</a>'
         . '<nav class="admin-nav" aria-label="Admin sections">' . $links . '</nav>'
         . '<div class="admin-header-actions">'
+        . '<button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" aria-pressed="false">'
+        . '<span class="theme-icon-wrap">'
+        . '<svg class="theme-icon sun" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.8"/><path d="M12 2v2M12 20v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2 12h2M20 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>'
+        . '<svg class="theme-icon moon" viewBox="0 0 24 24" fill="none"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+        . '</span></button>'
         . '<span class="admin-who">' . e($staff['name']) . '<small>' . e($staff['role']) . '</small></span>'
         . '<a href="logout.php" class="btn btn-ghost btn-sm" aria-label="Log out">' . ico('logout') . ' <span>Log out</span></a>'
         . '</div>'
         . '</div>'
-        . '</header>';
+        . '</header>'
+        . '<script>(function(){'
+        . 'var root=document.documentElement,DEF=' . json_encode($defaultTheme) . ';'
+        . 'function apply(t,persist){ if(t){root.setAttribute("data-theme",t);}else{root.removeAttribute("data-theme");} if(persist!==false){try{localStorage.setItem("bloom-theme",t||"");}catch(e){}} var btn=document.getElementById("themeToggle"); if(btn){btn.setAttribute("aria-pressed", String(t==="dark"||(!t&&window.matchMedia("(prefers-color-scheme: dark)").matches)));} }'
+        . 'var saved=null; try{saved=localStorage.getItem("bloom-theme");}catch(e){}'
+        . 'apply(saved!==null?saved:(DEF!=="auto"?DEF:""), false);'
+        . 'document.getElementById("themeToggle").addEventListener("click",function(){'
+        . 'var cur=root.getAttribute("data-theme"); var isDark=cur?cur==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;'
+        . 'apply(isDark?"light":"dark");'
+        . '});'
+        . '})();</script>';
 }
 
 function admin_bottomnav(string $active): string
