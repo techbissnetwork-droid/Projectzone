@@ -68,6 +68,17 @@ a genuinely access-controlled staff admin panel.
 - MySQL 5.7+ or MariaDB 10.4+
 - Any standard host that gives you PHP + MySQL + phpMyAdmin (shared
   hosting, a VPS, etc.)
+- **Apache with `mod_rewrite` enabled** (nearly all shared hosting has
+  this on by default). The public site uses clean URLs (`/services`,
+  not `/#/services`), which needs the included `.htaccess` to route
+  every non-file request back to `index.php`. If your host uses nginx
+  instead of Apache, `.htaccess` is ignored — add this to your server
+  block instead:
+  ```
+  location / {
+      try_files $uri $uri/ /index.php;
+  }
+  ```
 
 ## Installing (recommended: the web installer)
 

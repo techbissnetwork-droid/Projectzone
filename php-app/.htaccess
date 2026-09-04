@@ -1,0 +1,9 @@
+# Clean URLs: TECHBISS is a single-page app served from index.php. Any
+# request that isn't an existing file or folder (assets/, admin/, install/,
+# api/, config.php, ...) falls through to index.php, which renders the
+# same shell for every route — the URL itself is then read by
+# assets/app.js to pick which page to show.
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [L]

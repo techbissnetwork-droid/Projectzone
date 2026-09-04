@@ -49,6 +49,16 @@ $socialImagePath = get_setting('social_image_path', 'assets/social-default.png')
 $baseUrl = defined('SITE_URL') ? rtrim(SITE_URL, '/') : '';
 $canonicalUrl = $baseUrl !== '' ? $baseUrl . '/' : '';
 $socialImageUrl = $baseUrl !== '' ? $baseUrl . '/' . ltrim($socialImagePath, '/') : $socialImagePath;
+
+// The URL path the app is installed under — usually '' (domain root), but
+// support a subfolder install too (e.g. SITE_URL = https://example.com/techbiss).
+// Used to build clean, hash-free links (/services) that still resolve
+// correctly if the site isn't at the domain root.
+$basePath = '';
+if ($baseUrl !== '') {
+    $urlPath = (string)parse_url($baseUrl, PHP_URL_PATH);
+    $basePath = rtrim($urlPath, '/');
+}
 ?>
 <!doctype html>
 <html lang="en"<?= palette_attr() ?>>
@@ -58,8 +68,8 @@ $socialImageUrl = $baseUrl !== '' ? $baseUrl . '/' . ltrim($socialImagePath, '/'
 <title><?= e($seoTitle) ?></title>
 <meta name="description" content="<?= e($metaDescription) ?>">
 <?php if ($canonicalUrl !== ''): ?><link rel="canonical" href="<?= e($canonicalUrl) ?>"><?php endif; ?>
-<link rel="icon" href="<?= e($faviconPath) ?>">
-<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="icon" href="<?= e($basePath) ?>/<?= e($faviconPath) ?>">
+<link rel="apple-touch-icon" href="<?= e($basePath) ?>/assets/apple-touch-icon.png">
 <meta property="og:type" content="website">
 <meta property="og:title" content="<?= e($seoTitle) ?>">
 <meta property="og:description" content="<?= e($metaDescription) ?>">
@@ -72,7 +82,7 @@ $socialImageUrl = $baseUrl !== '' ? $baseUrl . '/' . ltrim($socialImagePath, '/'
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=<?= @filemtime(__DIR__ . '/assets/style.css') ?: '1' ?>">
+<link rel="stylesheet" href="<?= e($basePath) ?>/assets/style.css?v=<?= @filemtime(__DIR__ . '/assets/style.css') ?: '1' ?>">
 </head>
 <body>
 
@@ -109,8 +119,8 @@ $socialImageUrl = $baseUrl !== '' ? $baseUrl . '/' . ltrim($socialImagePath, '/'
 
 <header class="site-header">
   <div class="container nav-wrap">
-    <a href="#/" class="logo" aria-label="TECHBISS home">
-      <?= logo_mark_html(true) ?>
+    <a href="/" class="logo" aria-label="TECHBISS home">
+      <?= logo_mark_html(true, $basePath !== '' ? $basePath . '/' : '/') ?>
       <b>techbiss</b>
     </a>
     <nav class="nav-links" id="navLinks" aria-label="Primary">
@@ -123,8 +133,8 @@ $socialImageUrl = $baseUrl !== '' ? $baseUrl . '/' . ltrim($socialImagePath, '/'
           <svg id="themeIconMoon" class="theme-icon moon" viewBox="0 0 24 24" fill="none"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </span>
       </button>
-      <a href="#/login" class="btn btn-ghost btn-sm" id="navLoginBtn">Log in</a>
-      <a href="#/contact" class="btn btn-primary btn-sm">Book a call</a>
+      <a href="/login" class="btn btn-ghost btn-sm" id="navLoginBtn">Log in</a>
+      <a href="/contact" class="btn btn-primary btn-sm">Book a call</a>
       <button class="nav-burger" id="navBurger" aria-label="Open menu" aria-expanded="false">
         <svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
       </button>
@@ -139,15 +149,15 @@ $socialImageUrl = $baseUrl !== '' ? $baseUrl . '/' . ltrim($socialImagePath, '/'
 </div>
 
 <nav class="bottom-dock" aria-label="Quick access">
-  <a href="#/" class="dock-item" data-path="/">
+  <a href="/" class="dock-item" data-path="/">
     <svg viewBox="0 0 24 24" fill="none"><path d="M4 11.5 12 4l8 7.5M6 10v9.5a1 1 0 0 0 1 1h3.5V15a1.5 1.5 0 0 1 1.5-1.5v0A1.5 1.5 0 0 1 13.5 15v5.5H17a1 1 0 0 0 1-1V10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
     <span>Home</span>
   </a>
-  <a href="#/marketplace" class="dock-item" data-path="/marketplace">
+  <a href="/marketplace" class="dock-item" data-path="/marketplace">
     <svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="20" r="1.4" stroke="currentColor" stroke-width="1.6"/><circle cx="17" cy="20" r="1.4" stroke="currentColor" stroke-width="1.6"/><path d="M3 4h2l2.2 11h10.4L20 8H6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
     <span>Marketplace</span>
   </a>
-  <a href="#/login" class="dock-item" data-path="/login">
+  <a href="/login" class="dock-item" data-path="/login">
     <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8.2" r="3.4" stroke="currentColor" stroke-width="1.8"/><path d="M4.8 20c1.1-3.6 4-5.6 7.2-5.6s6.1 2 7.2 5.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
     <span>Log in</span>
   </a>
@@ -165,26 +175,26 @@ $socialImageUrl = $baseUrl !== '' ? $baseUrl . '/' . ltrim($socialImagePath, '/'
   <div class="container">
     <div class="footer-grid">
       <div>
-        <a href="#/" class="logo" style="margin-bottom:14px;">
-          <?= logo_mark_html(true) ?>
+        <a href="/" class="logo" style="margin-bottom:14px;">
+          <?= logo_mark_html(true, $basePath !== '' ? $basePath . '/' : '/') ?>
           <b>techbiss</b>
         </a>
         <p style="max-width:32ch;"><?= e($siteTagline) ?></p>
         <div class="flex gap-12" style="margin-top:18px;">
-          <a href="#/contact" class="badge"><?= e($siteSettings['contactEmail']) ?></a>
+          <a href="/contact" class="badge"><?= e($siteSettings['contactEmail']) ?></a>
         </div>
       </div>
       <div>
         <h4>Company</h4>
-        <a href="#/about">About</a><a href="#/work">Case studies</a><a href="#/process">How we work</a><a href="#/resources">Resources</a>
+        <a href="/about">About</a><a href="/work">Case studies</a><a href="/process">How we work</a><a href="/resources">Resources</a>
       </div>
       <div>
         <h4>Platform</h4>
-        <a href="#/services">Services</a><a href="#/solutions">Solutions</a><a href="#/marketplace">Marketplace</a>
+        <a href="/services">Services</a><a href="/solutions">Solutions</a><a href="/marketplace">Marketplace</a>
       </div>
       <div>
         <h4>Get started</h4>
-        <a href="#/pricing">Pricing</a><a href="#/contact">Contact</a><a href="#/login">Log in</a>
+        <a href="/pricing">Pricing</a><a href="/contact">Contact</a><a href="/login">Log in</a>
       </div>
     </div>
     <div class="footer-bottom">
@@ -194,6 +204,7 @@ $socialImageUrl = $baseUrl !== '' ? $baseUrl . '/' . ltrim($socialImagePath, '/'
 </footer>
 
 <script>
+  var BASE_PATH = <?= json_encode($basePath) ?>;
   var PRODUCTS_DATA = <?= json_encode($products, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>;
   var SITE_SETTINGS = <?= json_encode($siteSettings, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>;
   var SERVICES_DATA = <?= json_encode($contentSections['services'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>;

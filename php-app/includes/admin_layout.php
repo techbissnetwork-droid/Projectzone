@@ -37,7 +37,7 @@ function admin_header(array $staff, string $active): string
     return '<header class="admin-header">'
         . '<div class="container admin-header-inner">'
         . '<a href="index.php" class="logo" aria-label="TECHBISS admin home">'
-        . logo_mark_html(false)
+        . logo_mark_html(false, '../')
         . '<b>techbiss</b><span class="admin-badge">admin</span>'
         . '</a>'
         . '<nav class="admin-nav" aria-label="Admin sections">' . $links . '</nav>'

@@ -4,6 +4,7 @@
 /* ===================================================================
    0. UTIL / MOTION PREFS
 =================================================================== */
+var BP = window.BASE_PATH || '';
 var reduceQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 var motionOK = !reduceQuery.matches;
 reduceQuery.addEventListener && reduceQuery.addEventListener('change', function(e){ motionOK = !e.matches; });
@@ -195,7 +196,7 @@ var ROUTES = [
 var navLinksEl = $('#navLinks');
 ROUTES.forEach(function(r){
   var a = document.createElement('a');
-  a.href = '#'+r.path; a.className='nav-link'; a.textContent=r.label; a.dataset.path=r.path;
+  a.href = BP+r.path; a.className='nav-link'; a.textContent=r.label; a.dataset.path=r.path;
   navLinksEl.appendChild(a);
 });
 var navBlob = $('#navBlob');
@@ -219,7 +220,7 @@ navLinksEl.addEventListener('mouseleave', function(){ moveNavBlob(currentNavLink
 var mobileNav = $('#mobileNav');
 ROUTES.forEach(function(r){
   var a = document.createElement('a');
-  a.href='#'+r.path; a.dataset.path=r.path;
+  a.href=BP+r.path; a.dataset.path=r.path;
   a.innerHTML = r.label + ico('arrow');
   mobileNav.appendChild(a);
 });
@@ -327,7 +328,7 @@ function wave(variant, fill, flip){
 function serviceCard(s){
   return '<div class="card tilt"><div class="card-head">'+blobIcon(s.icon,'sm')+'<h3>'+s.name+'</h3></div><p>'+s.blurb+'</p><ul style="margin:0 0 18px;display:flex;flex-direction:column;gap:8px;">'+
     s.bullets.map(function(b){ return '<li style="display:flex;gap:8px;align-items:flex-start;color:var(--ink-soft);font-size:.9rem;">'+ico('check','').replace('width:22px','width:16px')+'<span>'+b+'</span></li>'; }).join('')+
-    '</ul><a href="#/contact" class="card-link">Talk to us '+ico('arrow')+'</a></div>';
+    '</ul><a href="'+BP+'/contact" class="card-link">Talk to us '+ico('arrow')+'</a></div>';
 }
 function solutionCard(s){
   return '<div class="card tilt"><div class="card-head">'+blobIcon(s.icon,'sm')+'<h3>'+s.name+'</h3></div><ul style="display:flex;flex-direction:column;gap:8px;">'+
@@ -348,7 +349,7 @@ Pages['/'] = function(){
     +'<div><span class="eyebrow">Websites & apps, fully handled</span>'
     +'<h1>'+(S.heroHeadlineMain||'We help offline businesses')+' <span class="grad-text">'+(S.heroHeadlineAccent||'thrive online.')+'</span></h1>'
     +'<p class="lede">'+(S.heroSubheadline||'TECHBISS builds your website or app, then sets up your domain, hosting, email and app store listing — so you launch with everything working and ready to be found.')+'</p>'
-    +'<div class="hero-cta"><a href="#/services" class="btn btn-primary magnetic">See what we build '+ico('arrow')+'</a><a href="#/contact" class="btn btn-ghost magnetic">Book a free call</a></div>'
+    +'<div class="hero-cta"><a href="'+BP+'/services" class="btn btn-primary magnetic">See what we build '+ico('arrow')+'</a><a href="'+BP+'/contact" class="btn btn-ghost magnetic">Book a free call</a></div>'
     +'<div class="hero-stats">'+statBlock(S.stat1Value||'1,900+',S.stat1Label||'Businesses & apps launched')+statBlock(S.stat2Value||'38',S.stat2Label||'Countries served')+statBlock(S.stat3Value||'4.9/5',S.stat3Label||'Customer rating')+statBlock(S.stat4Value||'72 hrs',S.stat4Label||'To your first draft')+'</div>'
     +'</div>'
     +'<div class="hero-visual"><svg class="hero-blob-main" viewBox="0 0 200 200"><path fill="url(#heroGrad)" d="M52,-64C67,-54,78,-38,81,-20C84,-2,79,17,68,33C57,49,40,62,20,69C0,76,-24,77,-42,66C-60,55,-72,32,-75,8C-78,-16,-72,-42,-56,-58C-40,-74,-14,-80,7,-83C28,-86,37,-74,52,-64Z" transform="translate(100 100)"/><defs><linearGradient id="heroGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" style="stop-color:var(--accent-1)"/><stop offset="55%" style="stop-color:var(--accent-3)"/><stop offset="100%" style="stop-color:var(--accent-2)"/></linearGradient></defs></svg>'
@@ -380,7 +381,7 @@ Pages['/'] = function(){
         return '<div class="card tilt"><div class="card-head">'+blobIcon(['compass','spark','code','chart'][i],'sm',true)+'<h3 style="font-size:1.05rem;">'+(i+1)+'. '+t+'</h3></div><p style="font-size:.88rem;">'+['We learn your business and what \'done\' should look like.','Your site or app takes shape before we build anything final.','We build it, and connect your domain, hosting and email.','SEO and small updates keep new customers finding you.'][i]+'</p></div>';
       }).join('')
     +'</div>'
-    +'<div class="text-center" style="margin-top:34px;"><a href="#/process" class="btn btn-soft magnetic">See the full process '+ico('arrow')+'</a></div>'
+    +'<div class="text-center" style="margin-top:34px;"><a href="'+BP+'/process" class="btn btn-soft magnetic">See the full process '+ico('arrow')+'</a></div>'
   +'</div></section>'
   +wave('a','var(--bg)',true)
 
@@ -389,7 +390,7 @@ Pages['/'] = function(){
     +'<div class="grid grid-3">'+CASESTUDIES.slice(0,3).map(function(c){
       return '<div class="card tilt"><div class="card-head">'+blobIcon(c.icon,'sm')+'<h3>'+c.client+'</h3></div><p>'+c.body+'</p>'
       +'<div class="stat" style="margin-bottom:14px;">'+statBlock(c.stat,c.statLabel)+'</div>'
-      +'<div class="flex items-center justify-between"><a href="#/work" class="card-link">Read the story '+ico('arrow')+'</a><span class="badge">'+c.sector+'</span></div></div>';
+      +'<div class="flex items-center justify-between"><a href="'+BP+'/work" class="card-link">Read the story '+ico('arrow')+'</a><span class="badge">'+c.sector+'</span></div></div>';
     }).join('')+'</div>'
   +'</div></section>'
 
@@ -402,7 +403,7 @@ Pages['/'] = function(){
   +'<section class="section tone-c"><div class="container text-center">'
     +'<h2 style="max-width:20ch;margin-inline:auto;">Ready to take your business online?</h2>'
     +'<p class="lede" style="margin:0 auto 28px;">Tell us about your business, we\'ll tell you exactly what it takes to get you live.</p>'
-    +'<div class="hero-cta" style="justify-content:center;"><a href="#/contact" class="btn btn-primary magnetic">Book a free call</a><a href="#/pricing" class="btn btn-ghost magnetic">See pricing</a></div>'
+    +'<div class="hero-cta" style="justify-content:center;"><a href="'+BP+'/contact" class="btn btn-primary magnetic">Book a free call</a><a href="'+BP+'/pricing" class="btn btn-ghost magnetic">See pricing</a></div>'
   +'</div></section>';
 };
 
@@ -417,7 +418,7 @@ Pages['/services'] = function(){
         +blobIcon(s.icon,'lg')
         +'<div><h3 style="font-size:1.35rem;">'+s.name+'</h3><p>'+s.blurb+'</p>'
         +'<ul style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">'+s.bullets.map(function(b){return '<li style="display:flex;gap:8px;font-size:.9rem;color:var(--ink-soft);">'+ico('check')+'<span>'+b+'</span></li>';}).join('')+'</ul>'
-        +'<a href="#/contact" class="card-link">Start a conversation '+ico('arrow')+'</a></div></div>';
+        +'<a href="'+BP+'/contact" class="card-link">Start a conversation '+ico('arrow')+'</a></div></div>';
     }).join('')+'</div>'
   +'</div></section>'
   +wave('a','var(--bg-alt)')
@@ -468,7 +469,7 @@ Pages['/marketplace'] = function(){
 Pages['/marketplace/detail'] = function(id){
   var p = PRODUCTS.filter(function(x){return x.id===id;})[0] || PRODUCTS[0];
   return '<section class="hero" style="padding-bottom:0;"><div class="container">'
-    +'<a href="#/marketplace" class="card-link" style="margin-bottom:18px;">'+ico('arrow').replace('12h14','14h-14').replace('M13 6l6 6-6 6','M11 6l-6 6 6 6')+' Back to marketplace</a>'
+    +'<a href="'+BP+'/marketplace" class="card-link" style="margin-bottom:18px;">'+ico('arrow').replace('12h14','14h-14').replace('M13 6l6 6-6 6','M11 6l-6 6 6 6')+' Back to marketplace</a>'
     +'<div class="hero-grid" style="align-items:flex-start;">'
       +'<div>'
         +'<span class="badge grad">'+p.cat+'</span>'
@@ -614,7 +615,7 @@ Pages['/pricing'] = function(){
         +'<h3>'+t.n+'</h3><p style="font-size:.9rem;">'+t.d+'</p>'
         +'<div style="margin:14px 0 20px;"><span class="price-amt" data-m="'+t.m+'" data-y="'+t.y+'" style="font-family:var(--font-display);font-weight:800;font-size:2.2rem;">'+(t.m?fmtMoney(t.m):'Custom')+'</span>'+(t.m?'<span style="color:var(--ink-faint);"> /mo</span>':'')+'</div>'
         +'<ul style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px;">'+t.f.map(function(f){return '<li style="display:flex;gap:8px;font-size:.9rem;">'+ico('check')+'<span>'+f+'</span></li>';}).join('')+'</ul>'
-        +'<a href="#/contact" class="btn '+(t.rec?'btn-primary':'btn-ghost')+' btn-block">'+t.cta+'</a>'
+        +'<a href="'+BP+'/contact" class="btn '+(t.rec?'btn-primary':'btn-ghost')+' btn-block">'+t.cta+'</a>'
       +'</div>';
     }).join('')+'</div>'
   +'</div></section>'
@@ -670,7 +671,7 @@ Pages['/login'] = function(){
         +'<form id="signinForm" onsubmit="return false;">'
           +'<div class="field"><label for="liEmail">Email</label><input id="liEmail" type="email" required placeholder="you@company.com"></div>'
           +'<div class="field"><label for="liPass">Password</label><input id="liPass" type="password" required placeholder="••••••••"></div>'
-          +'<div class="flex justify-between items-center" style="margin-bottom:20px;"><label class="flex items-center gap-8" style="font-size:.85rem;"><input type="checkbox"> Remember me</label><a href="#/contact" style="font-size:.85rem;color:var(--accent-1);font-weight:600;">Forgot password?</a></div>'
+          +'<div class="flex justify-between items-center" style="margin-bottom:20px;"><label class="flex items-center gap-8" style="font-size:.85rem;"><input type="checkbox"> Remember me</label><a href="'+BP+'/contact" style="font-size:.85rem;color:var(--accent-1);font-weight:600;">Forgot password?</a></div>'
           +'<button class="btn btn-primary btn-block magnetic" type="submit">Sign in</button>'
         +'</form>'
         +'<p id="loginMsg" class="badge success" style="display:none;margin-top:16px;">'+ico('check')+' Welcome back — redirecting…</p>'
@@ -716,8 +717,8 @@ Pages['/dashboard'] = function(){
         +'<div class="card"><h3>Support tickets</h3>'
           +ticketRow('#1042','Checkout error on mobile Safari','warning','Open')
           +ticketRow('#1039','Add a holiday hours banner','success','In progress')
-        +'<a href="#/contact" class="card-link" style="margin-top:12px;">Open a new ticket '+ico('arrow')+'</a></div>'
-        +'<div class="card" style="background:var(--grad);color:#fff2ea;border:none;"><div class="card-head">'+blobIcon('users','sm',false)+'<h3 style="color:#fff2ea;">Book a check-in call</h3></div><p style="color:rgba(255,242,234,.9);">A monthly look at your site\'s performance and what to do next.</p><a href="#/contact" class="btn" style="background:#fff2ea;color:var(--accent-1);">Schedule now</a></div>'
+        +'<a href="'+BP+'/contact" class="card-link" style="margin-top:12px;">Open a new ticket '+ico('arrow')+'</a></div>'
+        +'<div class="card" style="background:var(--grad);color:#fff2ea;border:none;"><div class="card-head">'+blobIcon('users','sm',false)+'<h3 style="color:#fff2ea;">Book a check-in call</h3></div><p style="color:rgba(255,242,234,.9);">A monthly look at your site\'s performance and what to do next.</p><a href="'+BP+'/contact" class="btn" style="background:#fff2ea;color:var(--accent-1);">Schedule now</a></div>'
       +'</div>'
     +'</div>'
   +'</div></section>';
@@ -735,8 +736,8 @@ Pages['/account'] = function(){
       +'<p style="color:var(--ink-faint);">'+(u.email||'')+'</p>'
     +'</div>'
     +'<div class="card" style="margin-top:16px;">'
-      +'<a href="#/dashboard" class="card-link" style="margin-bottom:14px;">'+ico('chart')+' View dashboard</a>'
-      +'<a href="#/contact" class="card-link" style="margin-bottom:14px;">'+ico('chat')+' Open a support ticket</a>'
+      +'<a href="'+BP+'/dashboard" class="card-link" style="margin-bottom:14px;">'+ico('chart')+' View dashboard</a>'
+      +'<a href="'+BP+'/contact" class="card-link" style="margin-bottom:14px;">'+ico('chat')+' Open a support ticket</a>'
       +'<button id="accountLogoutBtn" class="btn btn-ghost btn-block" type="button">'+ico('logout')+' Log out</button>'
     +'</div>'
   +'</div></section>';
@@ -793,7 +794,7 @@ function wireMarketplace(){
           +'<div><h3 style="color:#fff2ea;font-size:1.05rem;">'+p.name+'</h3>'
           +'<p style="font-size:.85rem;">'+p.desc+'</p>'
           +'<div class="fb-specs">'+p.specs.slice(0,3).map(function(s){return '<div class="flex items-center gap-8">'+ico('check')+'<span>'+s+'</span></div>';}).join('')+'</div></div>'
-          +'<a href="#/marketplace/detail/'+p.id+'" class="btn" style="background:#fff2ea;color:var(--accent-1);">View details '+ico('arrow')+'</a>'
+          +'<a href="'+BP+'/marketplace/detail/'+p.id+'" class="btn" style="background:#fff2ea;color:var(--accent-1);">View details '+ico('arrow')+'</a>'
         +'</div>'
       +'</div>'
       +'<button class="flip-peek" aria-label="Toggle preview">'+ico('refresh')+'</button>'
@@ -830,7 +831,7 @@ function wireResources(){
       var err = $('#newsError'); err.hidden = true;
       var email = $('#newsEmail').value;
       var btn = form.querySelector('button[type=submit]'); btn.disabled = true;
-      fetch('api/newsletter.php', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email:email}) })
+      fetch(BP+'/api/newsletter.php', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email:email}) })
         .then(function(r){ return r.json().then(function(data){ return {ok:r.ok, data:data}; }); })
         .then(function(res){
           if(!res.ok){ btn.disabled=false; err.textContent = res.data.error || 'Something went wrong — please try again.'; err.hidden = false; return; }
@@ -865,7 +866,7 @@ function wireContact(){
   form.addEventListener('submit', function(){
     var err = $('#contactError'); err.hidden = true;
     var btn = form.querySelector('button[type=submit]'); btn.disabled = true;
-    fetch('api/contact.php', {
+    fetch(BP+'/api/contact.php', {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
         name: $('#cName').value, email: $('#cEmail').value,
@@ -900,8 +901,8 @@ function wireLogin(){
   tabs.addEventListener('click', function(e){
     var b=e.target.closest('button'); if(!b) return;
     $all('button',tabs).forEach(function(x){x.classList.remove('active');}); b.classList.add('active');
-    if(b.dataset.t==='signup'){ panels.innerHTML = signup; bindForm('signupForm','signupMsg','signupError','api/signup.php'); }
-    else { panels.innerHTML = signin + '<p id="loginMsg" class="badge success" style="display:none;margin-top:16px;">'+ico('check')+' Welcome back — redirecting…</p><p id="loginError" class="badge danger" hidden style="margin-top:16px;"></p>'; bindForm('signinForm','loginMsg','loginError','api/login.php'); attachTilt(panels); }
+    if(b.dataset.t==='signup'){ panels.innerHTML = signup; bindForm('signupForm','signupMsg','signupError',BP+'/api/signup.php'); }
+    else { panels.innerHTML = signin + '<p id="loginMsg" class="badge success" style="display:none;margin-top:16px;">'+ico('check')+' Welcome back — redirecting…</p><p id="loginError" class="badge danger" hidden style="margin-top:16px;"></p>'; bindForm('signinForm','loginMsg','loginError',BP+'/api/login.php'); attachTilt(panels); }
   });
   function bindForm(fid,mid,eid,endpoint){
     var f = $('#'+fid);
@@ -919,7 +920,7 @@ function wireLogin(){
           if(!res.ok){ errEl.textContent = res.data.error || 'Something went wrong — please try again.'; errEl.hidden = false; return; }
           AUTH_USER = res.data.user || AUTH_USER;
           $('#'+mid).style.display='inline-flex';
-          setTimeout(function(){ location.hash = '#/dashboard'; }, 700);
+          setTimeout(function(){ navigate('/dashboard'); }, 700);
         })
         .catch(function(){
           btn.disabled = false;
@@ -927,7 +928,7 @@ function wireLogin(){
         });
     });
   }
-  bindForm('signinForm','loginMsg','loginError','api/login.php');
+  bindForm('signinForm','loginMsg','loginError',BP+'/api/login.php');
 }
 
 function wireProductDetail(id){
@@ -1001,7 +1002,7 @@ function wireProductDetail(id){
       +'<h3 id="deployTitle">'+(deployed?'You\'re live.':'Deploying '+p.name+'…')+'</h3>'
       +'<div class="progress-track" style="margin:18px 0;"><div class="progress-fill" id="deployFill" style="width:'+(deployed?100:0)+'%;"></div></div>'
       +'<div class="deploy-log" id="deployLog">'+rows.map(function(r,i){return '<div class="row'+(deployed?' on':'')+'" data-i="'+i+'"><span class="dot">'+(deployed?ico('check').replace('width:22px;height:22px','width:11px;height:11px'):'')+'</span><span>'+r+'</span></div>';}).join('')+'</div>'
-      +(deployed?'<a href="#/dashboard" class="btn btn-primary magnetic">Launch workspace '+ico('arrow')+'</a>':'<button class="btn btn-ghost" id="startDeploy">Start deployment</button>')
+      +(deployed?'<a href="'+BP+'/dashboard" class="btn btn-primary magnetic">Launch workspace '+ico('arrow')+'</a>':'<button class="btn btn-ghost" id="startDeploy">Start deployment</button>')
     +'</div>';
   }
   var renderers = {preview:renderPreview, customize:renderCustomize, purchase:renderPurchase, deploy:renderDeploy};
@@ -1065,27 +1066,37 @@ function wireProductDetail(id){
 /* ===================================================================
    12. ROUTER
 =================================================================== */
+function currentPathname(){
+  var p = location.pathname;
+  if(BP && p.indexOf(BP)===0){ p = p.slice(BP.length); }
+  return p || '/';
+}
 function currentBasePath(){
-  var h = location.hash.replace(/^#/,'') || '/';
+  var h = currentPathname();
   if(h.indexOf('/marketplace/detail')===0) return '/marketplace';
   return h;
 }
 function parseRoute(){
-  var h = location.hash.replace(/^#/,'') || '/';
+  var h = currentPathname();
   var m = h.match(/^\/marketplace\/detail\/(.+)$/);
   if(m) return {key:'/marketplace/detail', param:m[1], nav:'/marketplace'};
   return {key: Pages[h] ? h : '/', param:null, nav:h};
 }
+function navigate(path){
+  if(currentPathname() === path) return;
+  history.pushState(null, '', BP+path);
+  runTransition();
+}
 var wipe = $('#routeWipe');
 var AUTH_USER = null;
 function refreshAuth(){
-  return fetch('api/me.php').then(function(r){ return r.ok ? r.json() : null; })
+  return fetch(BP+'/api/me.php').then(function(r){ return r.ok ? r.json() : null; })
     .then(function(data){ AUTH_USER = (data && data.user) || null; return AUTH_USER; })
     .catch(function(){ AUTH_USER = null; return null; });
 }
 function doRender(){
   var r = parseRoute();
-  if((r.key==='/dashboard'||r.key==='/account') && !AUTH_USER){ location.hash = '#/login'; return; }
+  if((r.key==='/dashboard'||r.key==='/account') && !AUTH_USER){ navigate('/login'); return; }
   var view = $('#view');
   view.innerHTML = Pages[r.key](r.param);
   window.scrollTo(0,0);
@@ -1102,23 +1113,23 @@ function doRender(){
   var dockLogin = $('.dock-item[data-path="/login"], .dock-item[data-path="/account"]');
   if(AUTH_USER){
     loginBtn.textContent = 'Profile';
-    loginBtn.setAttribute('href','#/account');
+    loginBtn.setAttribute('href',BP+'/account');
     loginBtn.style.display = (r.nav==='/account') ? 'none' : '';
     loginBtn.onclick = null;
     if(dockLogin){
       dockLogin.querySelector('span').textContent = 'Profile';
-      dockLogin.setAttribute('href','#/account');
+      dockLogin.setAttribute('href',BP+'/account');
       dockLogin.dataset.path = '/account';
       dockLogin.onclick = null;
     }
   } else {
     loginBtn.textContent = 'Log in';
-    loginBtn.setAttribute('href','#/login');
+    loginBtn.setAttribute('href',BP+'/login');
     loginBtn.onclick = null;
     if(r.nav==='/dashboard'||r.nav==='/login'){ loginBtn.style.display='none'; } else { loginBtn.style.display=''; }
     if(dockLogin){
       dockLogin.querySelector('span').textContent = 'Log in';
-      dockLogin.setAttribute('href','#/login');
+      dockLogin.setAttribute('href',BP+'/login');
       dockLogin.dataset.path = '/login';
       dockLogin.onclick = null;
     }
@@ -1126,7 +1137,7 @@ function doRender(){
   $all('.nav-link, #mobileNav a, .dock-item[data-path]').forEach(function(a){ a.classList.toggle('active', a.dataset.path===r.nav); });
 }
 function doLogout(){
-  return fetch('api/logout.php',{method:'POST'}).then(function(){ AUTH_USER=null; location.hash='#/'; });
+  return fetch(BP+'/api/logout.php',{method:'POST'}).then(function(){ AUTH_USER=null; navigate('/'); });
 }
 function wireAccount(){
   var btn = $('#accountLogoutBtn');
@@ -1137,7 +1148,7 @@ function resetTransition(){
   transitioning=false;
   wipe.classList.remove('covering');
 }
-window.addEventListener('hashchange', function(){
+function runTransition(){
   if(transitioning) return;
   transitioning=true;
   if(!motionOK){ try{ doRender(); }catch(e){} transitioning=false; return; }
@@ -1154,10 +1165,36 @@ window.addEventListener('hashchange', function(){
       });
     }
   }, 270);
-});
+}
+window.addEventListener('popstate', runTransition);
 window.addEventListener('resize', function(){ moveNavBlob(currentNavLink()); });
 window.addEventListener('pageshow', function(e){ if(e.persisted) resetTransition(); });
 document.addEventListener('visibilitychange', function(){ if(!document.hidden && transitioning) resetTransition(); });
+
+/* Intercept clicks on internal links (plain "/path" hrefs, e.g. from
+   router.forEach-built nav or the '+BP+' links baked into page markup)
+   and route them through pushState instead of a full page load. */
+document.addEventListener('click', function(e){
+  if(e.defaultPrevented || e.button!==0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+  var a = e.target.closest('a');
+  if(!a) return;
+  var href = a.getAttribute('href');
+  if(!href || href.charAt(0)!=='/' || a.target==='_blank' || a.hasAttribute('download')) return;
+  var path = (BP && href.indexOf(BP)===0) ? href.slice(BP.length) : href;
+  if(path==='') path='/';
+  e.preventDefault();
+  navigate(path);
+});
+
+/* One-time migration for old bookmarked/shared hash links (#/services)
+   so they land on the clean equivalent (/services) instead. */
+(function migrateHashLink(){
+  var h = location.hash;
+  if(h.indexOf('#/')===0){
+    history.replaceState(null, '', BP+h.slice(1));
+  }
+})();
+
 refreshAuth().then(doRender);
 
 })();
