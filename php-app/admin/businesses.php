@@ -24,35 +24,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $mrr = max(0, (float)($_POST['mrr'] ?? 0));
         $contactEmail = trim((string)($_POST['contact_email'] ?? ''));
         $contactPhone = trim((string)($_POST['contact_phone'] ?? ''));
-        $loginEmail = trim(strtolower((string)($_POST['login_email'] ?? '')));
-        $loginPassword = (string)($_POST['login_password'] ?? '');
+        $ownerRaw = trim((string)($_POST['owner_id'] ?? ''));
+        $newUserName = trim((string)($_POST['new_user_name'] ?? ''));
+        $newUserEmail = trim(strtolower((string)($_POST['new_user_email'] ?? '')));
+        $newUserPassword = (string)($_POST['new_user_password'] ?? '');
 
         $errors = [];
         if ($name === '' || $sector === '') {
             $errors[] = 'Business name and sector are required.';
+        } else {
+            $dupeName = $pdo->prepare('SELECT id FROM businesses WHERE name = ? AND id != ?');
+            $dupeName->execute([$name, $id]);
+            if ($dupeName->fetch()) {
+                $errors[] = 'Another business already uses that name.';
+            }
         }
         if ($contactEmail !== '' && !filter_var($contactEmail, FILTER_VALIDATE_EMAIL)) {
             $errors[] = 'That contact email doesn\'t look valid.';
         }
-        if ($loginEmail !== '' && !filter_var($loginEmail, FILTER_VALIDATE_EMAIL)) {
-            $errors[] = 'That client login email doesn\'t look valid.';
-        }
 
-        $existingCustomerId = null;
-        if ($id > 0) {
-            $row = $pdo->prepare('SELECT customer_id FROM businesses WHERE id = ?');
-            $row->execute([$id]);
-            $existingCustomerId = $row->fetchColumn() ?: null;
-        }
-        if ($loginEmail !== '' && !$errors) {
-            $dupe = $pdo->prepare('SELECT id FROM customers WHERE email = ? AND id != ?');
-            $dupe->execute([$loginEmail, (int)$existingCustomerId]);
-            if ($dupe->fetch()) {
-                $errors[] = 'Another client login already uses that email.';
-            } elseif (!$existingCustomerId && strlen($loginPassword) < 8) {
-                $errors[] = 'Set a password of at least 8 characters to create this client\'s login.';
-            } elseif ($loginPassword !== '' && strlen($loginPassword) < 8) {
-                $errors[] = 'Password must be at least 8 characters (leave blank to keep the current one).';
+        $creatingNewUser = $newUserEmail !== '';
+        if ($creatingNewUser) {
+            if ($newUserName === '' || !filter_var($newUserEmail, FILTER_VALIDATE_EMAIL)) {
+                $errors[] = 'Enter a name and a valid email for the new user.';
+            } elseif (strlen($newUserPassword) < 8) {
+                $errors[] = 'New users need a password of at least 8 characters.';
+            } else {
+                $dupe = $pdo->prepare('SELECT id FROM customers WHERE email = ?');
+                $dupe->execute([$newUserEmail]);
+                if ($dupe->fetch()) {
+                    $errors[] = 'Another user already uses that email — pick them from the Owner list instead.';
+                }
             }
         }
 
@@ -60,32 +62,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             flash(implode(' ', $errors), 'error');
         } else {
             $mrrCents = (int)round($mrr * 100);
-            if ($id > 0) {
-                $stmt = $pdo->prepare('UPDATE businesses SET name=?, sector=?, plan=?, status=?, mrr_cents=?, contact_email=?, contact_phone=? WHERE id=?');
-                $stmt->execute([$name, $sector, $plan, $status, $mrrCents, $contactEmail, $contactPhone, $id]);
-                flash('Business updated.');
-            } else {
-                $stmt = $pdo->prepare('INSERT INTO businesses (name, sector, plan, status, mrr_cents, contact_email, contact_phone, last_activity_at) VALUES (?,?,?,?,?,?,?,NOW())');
-                $stmt->execute([$name, $sector, $plan, $status, $mrrCents, $contactEmail, $contactPhone]);
-                $id = (int)$pdo->lastInsertId();
-                flash('Business added.');
+
+            $ownerId = null;
+            if ($creatingNewUser) {
+                $pdo->prepare('INSERT INTO customers (name, email, password_hash) VALUES (?,?,?)')
+                    ->execute([$newUserName, $newUserEmail, password_hash($newUserPassword, PASSWORD_DEFAULT)]);
+                $ownerId = (int)$pdo->lastInsertId();
+            } elseif ($ownerRaw !== '') {
+                $ownerId = (int)$ownerRaw;
             }
 
-            if ($loginEmail !== '') {
-                if ($existingCustomerId) {
-                    if ($loginPassword !== '') {
-                        $pdo->prepare('UPDATE customers SET name=?, email=?, password_hash=? WHERE id=?')
-                            ->execute([$name, $loginEmail, password_hash($loginPassword, PASSWORD_DEFAULT), $existingCustomerId]);
-                    } else {
-                        $pdo->prepare('UPDATE customers SET name=?, email=? WHERE id=?')
-                            ->execute([$name, $loginEmail, $existingCustomerId]);
-                    }
-                } else {
-                    $pdo->prepare('INSERT INTO customers (name, email, password_hash) VALUES (?,?,?)')
-                        ->execute([$name, $loginEmail, password_hash($loginPassword, PASSWORD_DEFAULT)]);
-                    $newCustomerId = (int)$pdo->lastInsertId();
-                    $pdo->prepare('UPDATE businesses SET customer_id=? WHERE id=?')->execute([$newCustomerId, $id]);
-                }
+            if ($id > 0) {
+                $stmt = $pdo->prepare('UPDATE businesses SET name=?, sector=?, plan=?, status=?, mrr_cents=?, contact_email=?, contact_phone=?, customer_id=? WHERE id=?');
+                $stmt->execute([$name, $sector, $plan, $status, $mrrCents, $contactEmail, $contactPhone, $ownerId, $id]);
+                flash('Business updated.');
+            } else {
+                $stmt = $pdo->prepare('INSERT INTO businesses (name, sector, plan, status, mrr_cents, contact_email, contact_phone, customer_id, last_activity_at) VALUES (?,?,?,?,?,?,?,?,NOW())');
+                $stmt->execute([$name, $sector, $plan, $status, $mrrCents, $contactEmail, $contactPhone, $ownerId]);
+                flash('Business added.');
             }
         }
     } elseif ($action === 'delete') {
@@ -93,23 +87,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $pdo->prepare('DELETE FROM businesses WHERE id=?')->execute([$id]);
         flash('Business removed.');
     }
-    header('Location: businesses.php');
+    header('Location: businesses.php' . (!empty($_GET['owner']) ? '?owner=' . (int)$_GET['owner'] : ''));
     exit;
 }
 
+$ownerFilter = (int)($_GET['owner'] ?? 0);
+
 $editing = null;
-$editingLoginEmail = '';
 if (isset($_GET['edit'])) {
-    $stmt = $pdo->prepare('SELECT b.*, c.email AS login_email FROM businesses b LEFT JOIN customers c ON c.id = b.customer_id WHERE b.id=?');
+    $stmt = $pdo->prepare('SELECT * FROM businesses WHERE id=?');
     $stmt->execute([(int)$_GET['edit']]);
     $editing = $stmt->fetch() ?: null;
-    $editingLoginEmail = $editing['login_email'] ?? '';
 }
 
-$accounts = $pdo->query(
-    'SELECT b.*, c.email AS login_email, (SELECT COUNT(*) FROM projects p WHERE p.business_id = b.id) AS project_count
-     FROM businesses b LEFT JOIN customers c ON c.id = b.customer_id ORDER BY b.last_activity_at DESC'
-)->fetchAll();
+$users = $pdo->query('SELECT id, name, email FROM customers ORDER BY name')->fetchAll();
+$currentOwnerId = $editing['customer_id'] ?? ($ownerFilter ?: null);
+
+$sql = 'SELECT b.*, c.name AS owner_name, c.email AS owner_email, (SELECT COUNT(*) FROM projects p WHERE p.business_id = b.id) AS project_count
+        FROM businesses b LEFT JOIN customers c ON c.id = b.customer_id';
+$params = [];
+if ($ownerFilter) {
+    $sql .= ' WHERE b.customer_id = ?';
+    $params[] = $ownerFilter;
+}
+$sql .= ' ORDER BY b.last_activity_at DESC';
+$stmt = $pdo->prepare($sql);
+$stmt->execute($params);
+$accounts = $stmt->fetchAll();
+
+$ownerFilterName = null;
+if ($ownerFilter) {
+    $u = $pdo->prepare('SELECT name FROM customers WHERE id = ?');
+    $u->execute([$ownerFilter]);
+    $ownerFilterName = $u->fetchColumn() ?: null;
+}
+
 $statusTone = ['Active' => 'success', 'Trial' => 'warning', 'Past due' => 'danger'];
 $token = csrf_token();
 ?>
@@ -129,7 +141,11 @@ $token = csrf_token();
 <main class="admin-page">
   <?= admin_flash_html() ?>
   <div class="admin-toolbar">
-    <div><h1 style="margin-bottom:4px;">Businesses</h1><p class="lede" style="margin-bottom:0;">Every client account on the platform.</p></div>
+    <div>
+      <?php if ($ownerFilterName): ?><a href="users.php" class="card-link" style="margin-bottom:8px;"><?= ico('arrow') ?> Back to Users</a><?php endif; ?>
+      <h1 style="margin-bottom:4px;">Businesses<?= $ownerFilterName ? ' — ' . e($ownerFilterName) : '' ?></h1>
+      <p class="lede" style="margin-bottom:0;"><?= $ownerFilterName ? 'Businesses owned by this user.' : 'Every client account on the platform.' ?></p>
+    </div>
   </div>
 
   <div class="card admin-form-card">
@@ -156,12 +172,19 @@ $token = csrf_token();
         <div class="field"><label>Contact phone / WhatsApp</label><input name="contact_phone" value="<?= e($editing['contact_phone'] ?? '') ?>" placeholder="+1 555 0100"></div>
       </div>
       <div class="field">
-        <label>Client login <?= $editingLoginEmail !== '' ? '(update)' : '(optional — creates their dashboard access)' ?></label>
-        <div class="grid grid-2" style="gap:16px;">
-          <input type="email" name="login_email" value="<?= e($editingLoginEmail) ?>" placeholder="Login email">
-          <input type="password" name="login_password" minlength="8" placeholder="<?= $editingLoginEmail !== '' ? 'New password (leave blank to keep)' : 'Password (min 8 characters)' ?>">
-        </div>
-        <p style="font-size:.78rem;color:var(--ink-faint);margin-top:6px;">Set an email + password here to give this business's owner sign-in access to their dashboard. Leave blank if they don't need one.</p>
+        <label>Owner</label>
+        <select name="owner_id">
+          <option value="">No owner yet</option>
+          <?php foreach ($users as $u): ?>
+          <option value="<?= (int)$u['id'] ?>" <?= $currentOwnerId == $u['id'] ? 'selected' : '' ?>><?= e($u['name']) ?> — <?= e($u['email']) ?></option>
+          <?php endforeach; ?>
+        </select>
+        <p style="font-size:.78rem;color:var(--ink-faint);margin-top:6px;">Pick an existing user above, or fill in the fields below to create a new one — a new user takes priority over the selection.</p>
+      </div>
+      <div class="grid grid-3" style="gap:16px;">
+        <div class="field"><label>New user — name</label><input name="new_user_name" placeholder="Only if creating a new user"></div>
+        <div class="field"><label>New user — email</label><input type="email" name="new_user_email"></div>
+        <div class="field"><label>New user — password</label><input type="password" name="new_user_password" minlength="8" placeholder="Min 8 characters"></div>
       </div>
       <div class="flex gap-12">
         <button class="btn btn-primary" type="submit"><?= $editing ? 'Save changes' : 'Add business' ?></button>
@@ -171,13 +194,13 @@ $token = csrf_token();
   </div>
 
   <div class="card">
-    <div class="table-wrap"><table><thead><tr><th>Business</th><th>Sector</th><th>Plan</th><th>Login</th><th>Projects</th><th>Status</th><th>Last activity</th><th></th></tr></thead><tbody>
+    <div class="table-wrap"><table><thead><tr><th>Business</th><th>Sector</th><th>Plan</th><th>Owner</th><th>Projects</th><th>Status</th><th>Last activity</th><th></th></tr></thead><tbody>
       <?php foreach ($accounts as $a): ?>
       <tr>
         <td style="font-weight:600;"><?= e($a['name']) ?></td>
         <td><?= e($a['sector']) ?></td>
         <td><?= e($a['plan']) ?></td>
-        <td><?= $a['login_email'] ? '<span class="badge success">' . e($a['login_email']) . '</span>' : '<span class="badge">None</span>' ?></td>
+        <td><?= $a['owner_name'] ? '<a class="card-link" href="users.php?edit=' . (int)$a['customer_id'] . '">' . e($a['owner_name']) . '</a>' : '<span class="badge">None</span>' ?></td>
         <td><a class="card-link" href="projects.php?business=<?= (int)$a['id'] ?>"><?= (int)$a['project_count'] ?> <?= ico('arrow') ?></a></td>
         <td><span class="badge <?= $statusTone[$a['status']] ?? '' ?>"><?= e($a['status']) ?></span></td>
         <td style="color:var(--ink-faint);"><?= e(time_ago($a['last_activity_at'])) ?></td>

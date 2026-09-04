@@ -1,6 +1,7 @@
 <?php
 const ADMIN_NAV = [
     ['path' => 'index.php', 'label' => 'Dashboard', 'icon' => 'grid'],
+    ['path' => 'users.php', 'label' => 'Users', 'icon' => 'users'],
     ['path' => 'businesses.php', 'label' => 'Businesses', 'icon' => 'box'],
     ['path' => 'tickets.php', 'label' => 'Tickets', 'icon' => 'chat'],
     ['path' => 'products.php', 'label' => 'Products', 'icon' => 'star'],
@@ -11,6 +12,7 @@ const ADMIN_NAV = [
 
 // Sections an admin can grant/withhold per staff member (Dashboard excluded — always available).
 const STAFF_SECTIONS = [
+    'users' => 'Users',
     'businesses' => 'Businesses',
     'tickets' => 'Tickets',
     'products' => 'Products',

@@ -209,12 +209,12 @@ button{ cursor:pointer; }
 }
 .nav-wrap{ display:flex; align-items:center; justify-content:space-between; gap:20px; width:100%; }
 .logo{ display:flex; align-items:center; gap:11px; font-family:var(--font-display); font-weight:700; font-size:1.2rem; }
-.logo-mark{ width:32px; height:32px; flex:none; display:flex; }
+.logo-mark{ width:40px; height:40px; flex:none; display:flex; }
 .logo-mark svg{ width:100%; height:100%; overflow:visible; }
 .logo-mark g{ animation:logoBreathe 5s ease-in-out infinite; transform-box:fill-box; transform-origin:center; transition:transform .45s cubic-bezier(.34,1.56,.64,1); }
 .logo:hover .logo-mark g{ animation-play-state:paused; transform:rotate(-10deg) scale(1.08); }
 @keyframes logoBreathe{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.06); } }
-.logo b{ color:var(--ink); letter-spacing:-.01em; }
+.logo b{ color:var(--ink); letter-spacing:-.01em; text-transform:uppercase; }
 
 .site-header .container{ max-width:1400px; }
 .nav-links{ position:relative; display:flex; align-items:center; gap:1px; flex:1 1 auto; justify-content:center; min-width:0; }
@@ -520,7 +520,7 @@ tr:last-child td{ border-bottom:none; }
 @keyframes splashSquarePop{ 0%{ transform:scale(.5) rotate(-8deg); opacity:0; } 65%{ transform:scale(1.1) rotate(3deg); opacity:1; } 100%{ transform:scale(1) rotate(0deg); opacity:1; } }
 @keyframes splashBar{ from{ transform:scaleX(0); opacity:0; } to{ transform:scaleX(1); opacity:1; } }
 @keyframes splashStem{ from{ transform:scaleY(0); opacity:0; } to{ transform:scaleY(1); opacity:1; } }
-.splash-word{ font-family:var(--font-display); font-weight:800; font-size:1.3rem; letter-spacing:.02em; opacity:0; animation:splashfade .6s ease .5s forwards; }
+.splash-word{ font-family:var(--font-display); font-weight:800; font-size:1.3rem; letter-spacing:.02em; text-transform:uppercase; opacity:0; animation:splashfade .6s ease .5s forwards; }
 @keyframes splashfade{ to{ opacity:1; } }
 .splash-hint{ font-size:.78rem; color:var(--ink-faint); opacity:0; animation:splashfade .6s ease .9s forwards; }
 
