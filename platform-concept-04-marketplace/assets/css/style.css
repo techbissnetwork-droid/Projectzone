@@ -593,8 +593,10 @@ button.chip{cursor:pointer;}
 
 @media (max-width:760px){
   .marketplace-controls{flex-direction:column;align-items:stretch;}
-  .search-field{max-width:none;}
-  .control-group{justify-content:space-between;}
+  .search-field{max-width:none;width:100%;}
+  .control-group{justify-content:space-between;width:100%;flex-wrap:wrap;row-gap:.6rem;}
+  .select-field{flex:1;min-width:140px;}
+  .select-field select{width:100%;}
 }
 
 /* ---------------------------------------------------------------------------

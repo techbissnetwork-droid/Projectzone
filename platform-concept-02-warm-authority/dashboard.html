@@ -111,7 +111,7 @@
         <div class="dash-content">
 
           <!-- OVERVIEW -->
-          <section class="dash-panel is-active" id="panel-overview">
+          <section class="dash-panel is-active" id="overview">
             <div class="dash-panel-head">
               <div><h2>Overview</h2><p>A snapshot of everything running on TECHBISS right now.</p></div>
             </div>
@@ -159,7 +159,7 @@
           </section>
 
           <!-- PROJECTS -->
-          <section class="dash-panel" id="panel-projects">
+          <section class="dash-panel" id="projects">
             <div class="dash-panel-head">
               <div><h2>Projects</h2><p>What our team is actively building for you.</p></div>
             </div>
@@ -194,7 +194,7 @@
           </section>
 
           <!-- WEBSITES & APPS -->
-          <section class="dash-panel" id="panel-websites">
+          <section class="dash-panel" id="websites">
             <div class="dash-panel-head">
               <div><h2>Websites &amp; Apps</h2><p>Everything that's live, with the last 30 days of traffic.</p></div>
             </div>
@@ -239,7 +239,7 @@
           </section>
 
           <!-- DOMAINS & HOSTING -->
-          <section class="dash-panel" id="panel-domains">
+          <section class="dash-panel" id="domains">
             <div class="dash-panel-head">
               <div><h2>Domains &amp; Hosting</h2><p>Renewal and SSL status across every property.</p></div>
             </div>
@@ -258,7 +258,7 @@
           </section>
 
           <!-- BILLING -->
-          <section class="dash-panel" id="panel-billing">
+          <section class="dash-panel" id="billing">
             <div class="dash-panel-head">
               <div><h2>Billing &amp; Invoices</h2><p>Every invoice, in one place.</p></div>
             </div>
@@ -276,7 +276,7 @@
           </section>
 
           <!-- SUPPORT -->
-          <section class="dash-panel" id="panel-support">
+          <section class="dash-panel" id="support">
             <div class="dash-panel-head">
               <div><h2>Support</h2><p>Open a new conversation or follow up on an existing one.</p></div>
             </div>
@@ -385,7 +385,7 @@
     var found = tabs.some(function(t){ return t.getAttribute('data-tab') === tabId; });
     if (!found) tabId = 'overview';
     tabs.forEach(function(t){ t.setAttribute('aria-selected', t.getAttribute('data-tab') === tabId ? 'true' : 'false'); });
-    panels.forEach(function(p){ p.classList.toggle('is-active', p.id === 'panel-' + tabId); });
+    panels.forEach(function(p){ p.classList.toggle('is-active', p.id === tabId); });
     if (updateHash !== false) {
       if (history.replaceState) history.replaceState(null, '', '#' + tabId);
       else location.hash = tabId;
