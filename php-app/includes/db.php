@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/mailer.php';
+
 define('CONFIG_PATH', __DIR__ . '/../config.php');
 define('INSTALL_LOCK_PATH', __DIR__ . '/../install.lock');
 
@@ -262,6 +264,11 @@ function palette_attr(): string
 {
     $p = get_setting('color_palette', '');
     return $p !== '' ? ' data-palette="' . e($p) . '"' : '';
+}
+
+function logo_motion_attr(): string
+{
+    return get_setting('logo_animation', 'on') === 'off' ? ' data-logo-motion="off"' : '';
 }
 
 /**

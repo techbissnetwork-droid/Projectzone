@@ -17,6 +17,7 @@ $TEXT_FIELDS = [
 ];
 $THEME_OPTIONS = ['auto' => 'Automatic (matches visitor device)', 'light' => 'Light', 'dark' => 'Dark'];
 $LOGO_STYLE_OPTIONS = ['icon_text' => 'Icon + site name', 'icon_only' => 'Icon only (no site name)', 'text_only' => 'Site name only (no icon)'];
+$LOGO_MOTION_OPTIONS = ['on' => 'On (gentle idle tilt)', 'off' => 'Off (static)'];
 $PALETTE_OPTIONS = [
     '' => 'Bloom (coral & amber — default)',
     'fresh' => 'Fresh (teal & lime)',
@@ -78,8 +79,18 @@ function branding_remove(string $settingKey, string $defaultValue, string $destB
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $action = $_POST['action'] ?? 'save';
     if (!csrf_check((string)($_POST['csrf'] ?? ''))) {
         flash('Your session expired — please try again.', 'error');
+    } elseif ($action === 'test_email') {
+        $to = trim((string)($_POST['test_email_to'] ?? ''));
+        if (!filter_var($to, FILTER_VALIDATE_EMAIL)) {
+            flash('Enter a valid email address to send the test to.', 'error');
+        } elseif (send_mail($to, 'TECHBISS SMTP test', "This is a test email from your TECHBISS admin panel.\n\nIf you received this, your SMTP settings are working correctly.")) {
+            flash('Test email sent to ' . $to . ' — check its inbox (and spam folder).');
+        } else {
+            flash('Could not send the test email — double check your SMTP settings, or check the server error log for details.', 'error');
+        }
     } else {
         $errors = [];
 
@@ -93,6 +104,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute(['color_palette', $palette]);
         $logoStyle = array_key_exists($_POST['logo_style'] ?? '', $LOGO_STYLE_OPTIONS) ? $_POST['logo_style'] : 'icon_text';
         $stmt->execute(['logo_style', $logoStyle]);
+        $logoMotion = array_key_exists($_POST['logo_animation'] ?? '', $LOGO_MOTION_OPTIONS) ? $_POST['logo_animation'] : 'on';
+        $stmt->execute(['logo_animation', $logoMotion]);
+
+        $stmt->execute(['smtp_host', trim((string)($_POST['smtp_host'] ?? ''))]);
+        $stmt->execute(['smtp_port', (string)max(1, (int)($_POST['smtp_port'] ?? 587))]);
+        $stmt->execute(['smtp_user', trim((string)($_POST['smtp_user'] ?? ''))]);
+        $stmt->execute(['smtp_pass', (string)($_POST['smtp_pass'] ?? '')]);
+        $smtpEncryption = in_array($_POST['smtp_encryption'] ?? '', ['tls', 'ssl', 'none'], true) ? $_POST['smtp_encryption'] : 'tls';
+        $stmt->execute(['smtp_encryption', $smtpEncryption]);
+        $stmt->execute(['smtp_from_email', trim((string)($_POST['smtp_from_email'] ?? ''))]);
+        $stmt->execute(['smtp_from_name', trim((string)($_POST['smtp_from_name'] ?? ''))]);
 
         if (isset($_POST['remove_logo'])) {
             branding_remove('logo_path', '', 'logo');
@@ -128,7 +150,7 @@ $faviconPath = $current['favicon_path'] ?? 'assets/favicon.ico';
 $socialPath = $current['social_image_path'] ?? 'assets/social-default.png';
 ?>
 <!doctype html>
-<html lang="en"<?= palette_attr() ?>>
+<html lang="en"<?= palette_attr() . logo_motion_attr() ?>>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -148,6 +170,7 @@ $socialPath = $current['social_image_path'] ?? 'assets/social-default.png';
   </div>
 
   <form method="post" enctype="multipart/form-data">
+    <input type="hidden" name="action" value="save">
     <input type="hidden" name="csrf" value="<?= e($token) ?>">
 
     <div class="settings-tabs">
@@ -155,12 +178,14 @@ $socialPath = $current['social_image_path'] ?? 'assets/social-default.png';
       <input type="radio" name="stab" id="tab-stats" class="tab-radio">
       <input type="radio" name="stab" id="tab-seo" class="tab-radio">
       <input type="radio" name="stab" id="tab-branding" class="tab-radio">
+      <input type="radio" name="stab" id="tab-email" class="tab-radio">
 
       <div class="tab-labels">
         <label for="tab-general"><?= ico('edit') ?> General</label>
         <label for="tab-stats"><?= ico('chart') ?> Stats</label>
         <label for="tab-seo"><?= ico('star') ?> SEO &amp; Social</label>
         <label for="tab-branding"><?= ico('grid') ?> Branding</label>
+        <label for="tab-email"><?= ico('mail') ?> Email</label>
       </div>
 
     <div class="tab-panel" id="panel-general">
@@ -248,6 +273,13 @@ $socialPath = $current['social_image_path'] ?? 'assets/social-default.png';
             <?php endforeach; ?>
           </select>
         </div>
+        <div class="field"><label>Logo animation</label>
+          <select name="logo_animation">
+            <?php foreach ($LOGO_MOTION_OPTIONS as $val => $label): ?>
+            <option value="<?= e($val) ?>" <?= ($current['logo_animation'] ?? 'on') === $val ? 'selected' : '' ?>><?= e($label) ?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
         <div class="field"><label>Favicon</label>
           <div class="flex items-center gap-12" style="flex-wrap:wrap;">
             <img class="settings-preview" src="../<?= e($faviconPath) ?>" alt="">
@@ -280,10 +312,46 @@ $socialPath = $current['social_image_path'] ?? 'assets/social-default.png';
     </div>
     </div>
 
+    <div class="tab-panel" id="panel-email">
+    <div class="card admin-form-card">
+      <p style="font-size:.85rem;color:var(--ink-faint);margin-bottom:16px;">Used to send customer login codes, magic links and email-change verifications. Leave the host blank to fall back to the server's built-in mail sending (works on many hosts, but for reliable delivery a real SMTP provider — e.g. your email host, SendGrid, Mailgun — is recommended.)</p>
+      <div class="grid grid-2" style="gap:16px;">
+        <div class="field"><label>SMTP host</label><input name="smtp_host" value="<?= e($current['smtp_host'] ?? '') ?>" placeholder="smtp.yourprovider.com"></div>
+        <div class="field"><label>Port</label><input type="number" name="smtp_port" value="<?= e($current['smtp_port'] ?? '587') ?>"></div>
+      </div>
+      <div class="grid grid-2" style="gap:16px;">
+        <div class="field"><label>Username</label><input name="smtp_user" value="<?= e($current['smtp_user'] ?? '') ?>" autocomplete="off"></div>
+        <div class="field"><label>Password</label><input type="password" name="smtp_pass" value="<?= e($current['smtp_pass'] ?? '') ?>" autocomplete="new-password"></div>
+      </div>
+      <div class="grid grid-2" style="gap:16px;">
+        <div class="field"><label>Encryption</label>
+          <select name="smtp_encryption">
+            <?php foreach (['tls' => 'STARTTLS (port 587, most common)', 'ssl' => 'SSL/TLS (port 465)', 'none' => 'None'] as $val => $label): ?>
+            <option value="<?= e($val) ?>" <?= ($current['smtp_encryption'] ?? 'tls') === $val ? 'selected' : '' ?>><?= e($label) ?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+        <div class="field"><label>From name</label><input name="smtp_from_name" value="<?= e($current['smtp_from_name'] ?? '') ?>" placeholder="<?= e($current['site_name'] ?? 'TECHBISS') ?>"></div>
+      </div>
+      <div class="field"><label>From email</label><input type="email" name="smtp_from_email" value="<?= e($current['smtp_from_email'] ?? '') ?>" placeholder="<?= e($current['contact_email'] ?? 'hello@techbiss.com') ?>"></div>
+    </div>
+    </div>
+
     </div>
 
     <button class="btn btn-primary" type="submit">Save settings</button>
   </form>
+
+  <div class="card admin-form-card" style="margin-top:22px;">
+    <div class="card-head"><?= blob_icon('mail', 'sm', true) ?><h3>Send a test email</h3></div>
+    <p class="lede" style="margin-bottom:14px;">Save your SMTP settings above first, then send a test to confirm they work.</p>
+    <form method="post" class="flex gap-12" style="flex-wrap:wrap;align-items:flex-end;">
+      <input type="hidden" name="action" value="test_email">
+      <input type="hidden" name="csrf" value="<?= e($token) ?>">
+      <div class="field" style="margin-bottom:0;flex:1;min-width:220px;"><label>Send to</label><input type="email" name="test_email_to" required placeholder="you@example.com"></div>
+      <button class="btn btn-ghost" type="submit">Send test</button>
+    </form>
+  </div>
 </main>
 <?= admin_bottomnav($staff, 'settings.php') ?>
 </body>

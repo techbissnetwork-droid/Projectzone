@@ -214,6 +214,8 @@ button{ cursor:pointer; }
 .logo-mark g{ animation:logoBreathe 5s ease-in-out infinite; transform-box:fill-box; transform-origin:center; transition:transform .45s cubic-bezier(.34,1.56,.64,1); }
 .logo:hover .logo-mark g{ animation-play-state:paused; transform:rotate(-10deg) scale(1.08); }
 @keyframes logoBreathe{ 0%,100%{ transform:scale(1) rotate(0deg); } 25%{ transform:scale(1.06) rotate(-7deg); } 50%{ transform:scale(1) rotate(0deg); } 75%{ transform:scale(1.06) rotate(7deg); } }
+:root[data-logo-motion="off"] .logo-mark g{ animation:none; }
+:root[data-logo-motion="off"] .logo:hover .logo-mark g{ transform:none; }
 .logo b{ color:var(--ink); letter-spacing:-.01em; text-transform:uppercase; }
 
 .site-header .container{ max-width:1400px; }
@@ -301,6 +303,14 @@ button{ cursor:pointer; }
 .dock-item:hover svg{ transform:translateY(-2px); }
 .dock-item.active{ color:var(--accent-1); }
 @media (min-width:1361px){ .bottom-dock{ display:none; } }
+.wa-float{
+  position:fixed; right:20px; bottom:24px; z-index:510;
+  width:54px; height:54px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  background:#25d366; color:#fff; box-shadow:var(--shadow-lg); transition:transform .2s ease;
+}
+.wa-float:hover{ transform:scale(1.08); }
+.wa-float svg{ width:26px; height:26px; }
+@media (max-width:1360px){ .wa-float{ bottom:calc(84px + env(safe-area-inset-bottom,0px)); } }
 @media (max-width:1360px){ .footer{ padding-bottom:calc(72px + env(safe-area-inset-bottom,0px)); } }
 
 /* ============================= BLOB BACKGROUND LAYER ============================= */
@@ -652,13 +662,15 @@ main{ display:block; }
 #tab-general:checked ~ .tab-labels label[for="tab-general"],
 #tab-stats:checked ~ .tab-labels label[for="tab-stats"],
 #tab-seo:checked ~ .tab-labels label[for="tab-seo"],
-#tab-branding:checked ~ .tab-labels label[for="tab-branding"]{
+#tab-branding:checked ~ .tab-labels label[for="tab-branding"],
+#tab-email:checked ~ .tab-labels label[for="tab-email"]{
   background:var(--grad-soft); color:var(--accent-1); border-color:transparent;
 }
 #tab-general:checked ~ #panel-general,
 #tab-stats:checked ~ #panel-stats,
 #tab-seo:checked ~ #panel-seo,
-#tab-branding:checked ~ #panel-branding{ display:block; }
+#tab-branding:checked ~ #panel-branding,
+#tab-email:checked ~ #panel-email{ display:block; }
 .content-item{ background:var(--surface-2); }
 .content-item summary::-webkit-details-marker{ display:none; }
 

@@ -62,7 +62,7 @@ if ($baseUrl !== '') {
 }
 ?>
 <!doctype html>
-<html lang="en"<?= palette_attr() ?>>
+<html lang="en"<?= palette_attr() . logo_motion_attr() ?>>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -167,6 +167,12 @@ if ($baseUrl !== '') {
     <span>Menu</span>
   </button>
 </nav>
+
+<?php if ($siteSettings['whatsappNumber'] !== ''): ?>
+<a class="wa-float" href="https://wa.me/<?= e(preg_replace('/\D+/', '', $siteSettings['whatsappNumber'])) ?>" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">
+  <svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16v10H9l-4 3.5V16H4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+</a>
+<?php endif; ?>
 
 <main id="main">
   <div id="view"></div>
