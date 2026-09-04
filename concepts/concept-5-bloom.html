@@ -374,6 +374,9 @@ button{ cursor:pointer; }
 .card h3{ font-size:1.2rem; margin-bottom:10px; }
 .card p{ margin-bottom:16px; font-size:.95rem; }
 .card .blob-icon{ margin-bottom:18px; }
+.card-head{ display:flex; align-items:center; gap:14px; margin-bottom:16px; }
+.card-head .blob-icon{ margin-bottom:0; }
+.card-head h3{ margin-bottom:0; }
 .card-link{ display:inline-flex; align-items:center; gap:6px; font-family:var(--font-display); font-weight:600; color:var(--accent-1); font-size:.9rem; }
 .card-link svg{ width:16px; height:16px; transition:transform .3s ease; }
 .card:hover .card-link svg{ transform:translateX(4px); }
@@ -1077,12 +1080,12 @@ function wave(variant, fill, flip){
   return '<svg class="wave'+(flip?' wave-top':'')+'" viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="'+paths[variant]+'" fill="'+fill+'"/></svg>';
 }
 function serviceCard(s){
-  return '<div class="card tilt">'+blobIcon(s.icon)+'<h3>'+s.name+'</h3><p>'+s.blurb+'</p><ul style="margin:0 0 18px;display:flex;flex-direction:column;gap:8px;">'+
+  return '<div class="card tilt"><div class="card-head">'+blobIcon(s.icon,'sm')+'<h3>'+s.name+'</h3></div><p>'+s.blurb+'</p><ul style="margin:0 0 18px;display:flex;flex-direction:column;gap:8px;">'+
     s.bullets.map(function(b){ return '<li style="display:flex;gap:8px;align-items:flex-start;color:var(--ink-soft);font-size:.9rem;">'+ico('check','').replace('width:22px','width:16px')+'<span>'+b+'</span></li>'; }).join('')+
     '</ul><a href="#/contact" class="card-link">Talk to us '+ico('arrow')+'</a></div>';
 }
 function solutionCard(s){
-  return '<div class="card tilt">'+blobIcon(s.icon)+'<h3>'+s.name+'</h3><ul style="display:flex;flex-direction:column;gap:8px;">'+
+  return '<div class="card tilt"><div class="card-head">'+blobIcon(s.icon,'sm')+'<h3>'+s.name+'</h3></div><ul style="display:flex;flex-direction:column;gap:8px;">'+
     s.out.map(function(o){ return '<li style="display:flex;gap:8px;align-items:flex-start;color:var(--ink-soft);font-size:.9rem;">'+ico('check')+'<span>'+o+'</span></li>'; }).join('')+
     '</ul></div>';
 }
@@ -1128,7 +1131,7 @@ Pages['/'] = function(){
     +'<div class="section-head"><span class="eyebrow">How we work</span><h2>A process built to remove surprises</h2></div>'
     +'<div class="grid grid-4">'
       +['Discover','Design','Build','Grow'].map(function(t,i){
-        return '<div class="card tilt">'+blobIcon(['compass','spark','code','chart'][i],'sm',true)+'<h3 style="font-size:1.05rem;">'+(i+1)+'. '+t+'</h3><p style="font-size:.88rem;">'+['We map the real problem before touching a backlog.','Interfaces and architecture, sketched together.','Senior engineers ship in two-week increments.','Dashboards and support that keep compounding.'][i]+'</p></div>';
+        return '<div class="card tilt"><div class="card-head">'+blobIcon(['compass','spark','code','chart'][i],'sm',true)+'<h3 style="font-size:1.05rem;">'+(i+1)+'. '+t+'</h3></div><p style="font-size:.88rem;">'+['We map the real problem before touching a backlog.','Interfaces and architecture, sketched together.','Senior engineers ship in two-week increments.','Dashboards and support that keep compounding.'][i]+'</p></div>';
       }).join('')
     +'</div>'
     +'<div class="text-center" style="margin-top:34px;"><a href="#/process" class="btn btn-soft magnetic">See the full process '+ico('arrow')+'</a></div>'
