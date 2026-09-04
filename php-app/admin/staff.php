@@ -167,7 +167,7 @@ $token = csrf_token();
   </div>
 
   <div class="card">
-    <div class="table-wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Access</th><th>Open tickets</th><th>Marketing earnings</th><th></th></tr></thead><tbody>
+    <div class="table-wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Access</th><th>Open tickets</th><th></th></tr></thead><tbody>
       <?php foreach ($staffList as $s): ?>
       <tr>
         <td style="font-weight:600;"><?= e($s['name']) ?></td>
@@ -181,7 +181,6 @@ $token = csrf_token();
           <?php endif; ?>
         </td>
         <td><?= (int)$s['open_count'] ?></td>
-        <td><?= ((int)$s['marketing_earnings_cents']) > 0 ? '$' . number_format(((int)$s['marketing_earnings_cents']) / 100, 2) : '—' ?></td>
         <td class="admin-actions-cell">
           <?php if (empty($s['is_owner']) || (int)$s['id'] === (int)$staff['id']): ?>
           <a class="icon-btn" href="staff.php?edit=<?= (int)$s['id'] ?>" aria-label="Edit"><?= ico('edit') ?></a>

@@ -19,7 +19,7 @@ CREATE TABLE `staff` (
   `permissions` TEXT NULL,
   `is_owner` TINYINT(1) NOT NULL DEFAULT 0,
   `initials` VARCHAR(4) NOT NULL DEFAULT '',
-  `marketing_earnings_cents` INT UNSIGNED NOT NULL DEFAULT 0,
+  `marketing_daily_goal` INT UNSIGNED NULL,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -35,8 +35,8 @@ INSERT INTO `staff` (`name`, `email`, `password_hash`, `role`, `permissions`, `i
 
 -- ---------------------------------------------------------------
 -- marketing_leads — offline businesses staff find in the field.
--- Each submission earns the submitting staff member a small incentive
--- (staff.marketing_earnings_cents), tallied regardless of review outcome.
+-- Staff are held to a daily submission goal — settings.marketing_daily_goal_default
+-- unless a staff member has their own staff.marketing_daily_goal override.
 -- ---------------------------------------------------------------
 DROP TABLE IF EXISTS `marketing_leads`;
 CREATE TABLE `marketing_leads` (
@@ -225,6 +225,7 @@ INSERT INTO `settings` (`id`, `value`) VALUES
 ('site_name', 'TECHBISS'),
 ('logo_style', 'icon_text'),
 ('logo_animation', 'on'),
+('marketing_daily_goal_default', '5'),
 ('smtp_host', ''),
 ('smtp_port', '587'),
 ('smtp_user', ''),
