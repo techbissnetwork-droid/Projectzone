@@ -1,4 +1,5 @@
 <title>TECHBISS — Nordic Precision</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap">
 <style>
 /* ============================================================
    TECHBISS — "Nordic Precision" concept
@@ -286,6 +287,7 @@ tbody tr:hover{ background:var(--surface-2); }
   .primary-nav{ display:none; }
   .hamburger{ display:inline-flex; }
   .signin-link{ display:none; }
+  #header-cta{ display:none; }
 }
 
 /* mobile menu */
@@ -645,7 +647,7 @@ main{ display:block; }
       <button class="icon-btn" id="theme-toggle" type="button" aria-pressed="false" aria-label="Toggle dark mode">
         <svg id="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="4.4"></circle><path d="M12 2.5v2.4M12 19.1v2.4M4.2 4.2l1.7 1.7M18.1 18.1l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.2 19.8l1.7-1.7M18.1 5.9l1.7-1.7"></path></svg>
       </button>
-      <a class="btn btn-primary" href="#contact" style="display:none" id="header-cta">Request Briefing</a>
+      <a class="btn btn-primary btn-sm" href="#contact" id="header-cta">Request Briefing</a>
       <button class="icon-btn hamburger" id="hamburger-btn" type="button" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 6h18M3 12h18M3 18h18"></path></svg>
       </button>
@@ -1500,5 +1502,862 @@ main{ display:block; }
 </div>
 
 <script>
-PLACEHOLDER_SCRIPT
+(function(){
+  "use strict";
+  var root = document.documentElement;
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(!reduceMotion){ root.classList.add('motion'); }
+
+  /* ---------------- THEME ---------------- */
+  var themeBtn = document.getElementById('theme-toggle');
+  var themeIcon = document.getElementById('theme-icon');
+  var THEME_KEY = 'techbiss-theme';
+  function applyThemeIcon(isDark){
+    themeBtn.setAttribute('aria-pressed', isDark ? 'true' : 'false');
+    themeBtn.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+    themeIcon.innerHTML = isDark
+      ? '<path d="M20 14.5A8.5 8.5 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5Z"></path>'
+      : '<circle cx="12" cy="12" r="4.4"></circle><path d="M12 2.5v2.4M12 19.1v2.4M4.2 4.2l1.7 1.7M18.1 18.1l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.2 19.8l1.7-1.7M18.1 5.9l1.7-1.7"></path>';
+  }
+  try{
+    var stored = localStorage.getItem(THEME_KEY);
+    if(stored === 'dark'){ root.setAttribute('data-theme','dark'); applyThemeIcon(true); }
+    else if(stored === 'light'){ root.setAttribute('data-theme','light'); applyThemeIcon(false); }
+    else { applyThemeIcon(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches); }
+  }catch(e){ applyThemeIcon(false); }
+  themeBtn.addEventListener('click', function(){
+    var isDark = root.getAttribute('data-theme') === 'dark';
+    if(isDark){ root.setAttribute('data-theme','light'); applyThemeIcon(false); try{ localStorage.setItem(THEME_KEY,'light'); }catch(e){} }
+    else { root.setAttribute('data-theme','dark'); applyThemeIcon(true); try{ localStorage.setItem(THEME_KEY,'dark'); }catch(e){} }
+  });
+
+  /* ---------------- LOADER ---------------- */
+  var loader = document.getElementById('loader');
+  var loadDelay = reduceMotion ? 50 : 1350;
+  window.setTimeout(function(){ loader.setAttribute('data-hide','true'); }, loadDelay);
+  loader.addEventListener('transitionend', function(){ loader.style.display='none'; });
+
+  /* ---------------- MOBILE MENU ---------------- */
+  var menu = document.getElementById('mobile-menu');
+  var hamburgerBtn = document.getElementById('hamburger-btn');
+  function openMenu(){
+    menu.setAttribute('data-open','true');
+    hamburgerBtn.setAttribute('aria-expanded','true');
+    var firstLink = menu.querySelector('.mobile-nav a');
+    if(firstLink) firstLink.focus();
+    document.addEventListener('keydown', menuKeydown);
+  }
+  function closeMenu(){
+    menu.setAttribute('data-open','false');
+    hamburgerBtn.setAttribute('aria-expanded','false');
+    hamburgerBtn.focus();
+    document.removeEventListener('keydown', menuKeydown);
+  }
+  function menuKeydown(e){
+    if(e.key === 'Escape'){ closeMenu(); return; }
+    if(e.key === 'Tab'){
+      var focusables = menu.querySelectorAll('a, button');
+      if(!focusables.length) return;
+      var first = focusables[0], last = focusables[focusables.length-1];
+      if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+      else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+    }
+  }
+  hamburgerBtn.addEventListener('click', openMenu);
+  document.getElementById('mobile-menu-close').addEventListener('click', closeMenu);
+  menu.querySelectorAll('[data-menu-close]').forEach(function(el){ el.addEventListener('click', closeMenu); });
+
+  /* ---------------- ROUTER ---------------- */
+  var ROUTES = ['home','services','solutions','marketplace','product','work','process','about','resources','pricing','contact','login','installer','dashboard'];
+  var sections = {};
+  ROUTES.forEach(function(r){ sections[r] = document.querySelector('.route[data-route="'+r+'"]'); });
+  var navLinks = document.querySelectorAll('.primary-nav a, .mobile-nav a');
+
+  function currentRoute(){
+    var h = (location.hash || '#home').replace('#','');
+    return ROUTES.indexOf(h) === -1 ? 'home' : h;
+  }
+
+  function showRoute(route, opts){
+    opts = opts || {};
+    Object.keys(sections).forEach(function(r){
+      if(!sections[r]) return;
+      sections[r].classList.toggle('is-active', r === route);
+    });
+    navLinks.forEach(function(a){
+      var href = a.getAttribute('href') || '';
+      if(href === '#'+route){ a.setAttribute('aria-current','page'); }
+      else { a.removeAttribute('aria-current'); }
+    });
+    if(route === 'product'){ renderProduct(currentProduct); }
+    if(!opts.silent){ window.scrollTo({ top:0, behavior: reduceMotion ? 'auto' : 'smooth' }); }
+    armReveal();
+  }
+  window.addEventListener('hashchange', function(){ showRoute(currentRoute()); });
+  if(!location.hash){ location.hash = '#home'; }
+  showRoute(currentRoute(), { silent:true });
+
+  /* ---------------- REVEAL ON SCROLL ---------------- */
+  var revealObserver = ('IntersectionObserver' in window) ? new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting){ entry.target.classList.add('is-visible'); revealObserver.unobserve(entry.target); }
+    });
+  }, { threshold:.14, rootMargin:'0px 0px -6% 0px' }) : null;
+
+  function armReveal(){
+    if(!revealObserver) return;
+    document.querySelectorAll('.route.is-active .reveal').forEach(function(el){
+      if(!el.classList.contains('is-visible')){ revealObserver.observe(el); }
+    });
+  }
+
+  /* ---------------- ANIMATED COUNTERS ---------------- */
+  var counterObserver = ('IntersectionObserver' in window) ? new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting){ runCounter(entry.target); counterObserver.unobserve(entry.target); }
+    });
+  }, { threshold:.5 }) : null;
+
+  function runCounter(el){
+    var target = parseFloat(el.getAttribute('data-count'));
+    var decimals = parseInt(el.getAttribute('data-decimals') || '0', 10);
+    var prefix = el.getAttribute('data-prefix') || '';
+    var suffix = el.getAttribute('data-suffix') || '';
+    if(reduceMotion){ el.textContent = prefix + target.toFixed(decimals) + suffix; return; }
+    var start = null; var dur = 1400;
+    function step(ts){
+      if(start === null) start = ts;
+      var p = Math.min((ts-start)/dur, 1);
+      var eased = 1 - Math.pow(1-p, 3);
+      var val = target * eased;
+      el.textContent = prefix + val.toFixed(decimals) + suffix;
+      if(p < 1){ window.requestAnimationFrame(step); }
+    }
+    window.requestAnimationFrame(step);
+  }
+  document.querySelectorAll('[data-count]').forEach(function(el){
+    if(counterObserver){ counterObserver.observe(el); } else { runCounter(el); }
+  });
+
+  /* hero visual draw trigger */
+  var heroVisual = document.getElementById('hero-visual');
+  if(heroVisual && revealObserver){
+    var hv = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){ if(e.isIntersecting){ heroVisual.classList.add('is-visible'); hv.unobserve(heroVisual); } });
+    }, { threshold:.3 });
+    hv.observe(heroVisual);
+  } else if(heroVisual){ heroVisual.classList.add('is-visible'); }
+
+  /* ---------------- DRAGGABLE CAROUSEL ---------------- */
+  (function(){
+    var track = document.getElementById('home-carousel');
+    if(!track) return;
+    var isDown = false, startX, scrollLeft;
+    track.addEventListener('pointerdown', function(e){
+      isDown = true; track.setPointerCapture(e.pointerId);
+      startX = e.clientX; scrollLeft = track.scrollLeft;
+    });
+    track.addEventListener('pointermove', function(e){
+      if(!isDown) return;
+      track.scrollLeft = scrollLeft - (e.clientX - startX);
+    });
+    ['pointerup','pointercancel','pointerleave'].forEach(function(ev){
+      track.addEventListener(ev, function(){ isDown = false; });
+    });
+    var cardWidth = function(){ var c = track.querySelector('.cs-card'); return c ? c.offsetWidth + 19.2 : 300; };
+    document.getElementById('carousel-prev').addEventListener('click', function(){ track.scrollBy({ left:-cardWidth(), behavior: reduceMotion?'auto':'smooth' }); });
+    document.getElementById('carousel-next').addEventListener('click', function(){ track.scrollBy({ left:cardWidth(), behavior: reduceMotion?'auto':'smooth' }); });
+  })();
+
+  /* ---------------- SOLUTIONS ---------------- */
+  var SOLUTIONS = [
+    { id:'financial-services', name:'Financial Services', summary:'Core banking, payments and capital markets infrastructure engineered for regulatory scrutiny and sub-second settlement.', points:['Real-time payment rails & core banking modernization','Regulatory reporting automation (Basel III/IV, MiFID II)','Fraud detection and AML transaction monitoring'], stat:{ value:'40%', label:'faster settlement cycles' } },
+    { id:'healthcare', name:'Healthcare & Life Sciences', summary:'Interoperable, HIPAA-aligned data platforms connecting clinical, payer and research systems.', points:['FHIR-native clinical data interoperability','Clinical trial data pipelines & analytics','Patient data security and consent management'], stat:{ value:'22', label:'EHR systems unified per program' } },
+    { id:'manufacturing', name:'Manufacturing & Supply Chain', summary:'Connected factory floors and resilient, AI-forecasted supply networks.', points:['IoT & predictive maintenance platforms','Demand forecasting and inventory optimization','Supplier risk and logistics visibility'], stat:{ value:'27%', label:'average cost reduction' } },
+    { id:'public-sector', name:'Public Sector & Government', summary:'Secure, citizen-facing digital services built to sovereign compliance standards.', points:['FedRAMP / sovereign-cloud aligned architectures','Citizen services digitization','Legacy mainframe modernization'], stat:{ value:'120+', label:'jurisdictions served' } },
+    { id:'retail', name:'Retail & Commerce', summary:'Unified commerce platforms spanning storefront, fulfillment and personalization.', points:['Composable commerce architecture','Real-time inventory & fulfillment orchestration','AI-driven personalization & pricing'], stat:{ value:'3.2x', label:'faster release velocity' } },
+    { id:'energy', name:'Energy & Utilities', summary:'Grid resilience, outage prediction and regulatory-grade data infrastructure for utility operators.', points:['Smart grid & load-balancing platforms','Outage prediction and resilience modeling','Regulatory compliance & emissions reporting'], stat:{ value:'99.99%', label:'grid platform uptime' } }
+  ];
+  (function(){
+    var tablist = document.getElementById('sol-tablist');
+    var panel = document.getElementById('sol-panel');
+    if(!tablist) return;
+    SOLUTIONS.forEach(function(sol, i){
+      var li = document.createElement('li');
+      var btn = document.createElement('button');
+      btn.type = 'button'; btn.role = 'tab';
+      btn.id = 'sol-tab-'+sol.id;
+      btn.setAttribute('aria-selected', i===0 ? 'true':'false');
+      btn.setAttribute('aria-controls','sol-panel');
+      btn.textContent = sol.name;
+      btn.addEventListener('click', function(){ selectSolution(sol.id); });
+      li.appendChild(btn); tablist.appendChild(li);
+    });
+    function selectSolution(id){
+      var sol = SOLUTIONS.filter(function(s){ return s.id===id; })[0];
+      tablist.querySelectorAll('button').forEach(function(b){
+        b.setAttribute('aria-selected', b.id === 'sol-tab-'+id ? 'true':'false');
+      });
+      panel.setAttribute('aria-labelledby','sol-tab-'+id);
+      panel.innerHTML =
+        '<span class="coord">FIG. 0'+(SOLUTIONS.indexOf(sol)+1)+' / '+sol.name.toUpperCase()+'</span>'+
+        '<h3 style="margin-top:.6rem;">'+sol.name+'</h3>'+
+        '<p class="muted">'+sol.summary+'</p>'+
+        '<ul style="list-style:none;padding:0;margin:1.2rem 0;display:flex;flex-direction:column;gap:.7rem;">'+
+        sol.points.map(function(p){ return '<li style="display:flex;gap:.6em;font-size:.92rem;"><span class="mono" style="color:var(--accent);">›</span>'+p+'</li>'; }).join('')+
+        '</ul>'+
+        '<div class="stat" style="display:inline-block;"><span class="stat-num">'+sol.stat.value+'</span><span class="stat-label">'+sol.stat.label+'</span></div>';
+    }
+    selectSolution(SOLUTIONS[0].id);
+  })();
+
+  /* ---------------- MARKETPLACE ---------------- */
+  var PRODUCTS = [
+    { id:'p1', name:'FlowPilot Automation Studio', vendor:'TECHBISS Labs', category:'Automation Modules', rating:4.8, price:'$18,500', priceUnit:'one-time', blurb:'Visual workflow builder for cross-system process automation with 120+ prebuilt connectors.', desc:'FlowPilot Automation Studio is a visual, low-code workflow builder used to automate cross-system business processes without custom middleware. It ships with 120+ prebuilt connectors spanning ERP, CRM, ticketing and data platforms, plus a versioned workflow runtime with rollback and audit trails.', features:['Drag-and-drop workflow designer','120+ prebuilt system connectors','Versioned runs with rollback & audit trail','Role-based approval steps','On-prem or cloud runtime'] },
+    { id:'p2', name:'Sentinel Copilot', vendor:'TECHBISS Labs', category:'AI Agents & Copilots', rating:4.6, price:'$2,400', priceUnit:'/mo', blurb:'A conversational AI agent trained on your operational runbooks for tier-1 incident triage.', desc:'Sentinel Copilot is a conversational agent trained on your operational runbooks and historical incident data. It performs first-pass triage on tier-1 incidents, suggests remediation steps sourced from prior resolutions, and escalates with full context when human judgment is required.', features:['Runbook-grounded incident triage','Automated context handoff to on-call engineers','Continuous learning from resolved tickets','Slack / Teams / PagerDuty integration','Full audit log of every suggestion'] },
+    { id:'p3', name:'LedgerSync Reconciliation Kit', vendor:'Meridian Fintech Partners', category:'Industry Solution Kits', rating:4.7, price:'$32,000', priceUnit:'one-time', blurb:'Pre-built reconciliation and settlement workflows for banking back-office modernization.', desc:'LedgerSync bundles pre-built reconciliation and settlement workflows purpose-built for banking back-office modernization. It includes exception-handling logic tuned for multi-currency, multi-entity ledgers and reduces reconciliation cycle time from days to hours.', features:['Multi-currency, multi-entity reconciliation','Automated exception routing & resolution','Real-time settlement status dashboard','Regulatory audit export','Core banking system connectors'] },
+    { id:'p4', name:'Aegis Compliance Pack', vendor:'Northwind Security Collective', category:'Security & Compliance Packs', rating:4.9, price:'$14,200', priceUnit:'one-time', blurb:'Continuous control-mapping for SOC2, ISO 27001 and NIST CSF with automated evidence capture.', desc:'Aegis maps your infrastructure and access controls continuously against SOC2, ISO 27001 and NIST CSF frameworks, automatically capturing evidence as configurations change so audit season stops being a fire drill.', features:['Continuous control mapping across 3 frameworks','Automated evidence capture','Drift alerts on control-breaking changes','Audit-ready export packages','Read-only integration — no agent required'] },
+    { id:'p5', name:'Bridgeline ERP Connector', vendor:'TECHBISS Labs', category:'Integration Connectors', rating:4.4, price:'$4,800', priceUnit:'/yr', blurb:'Bidirectional sync between legacy ERP cores and modern data platforms, zero-downtime cutover.', desc:'Bridgeline keeps legacy ERP cores and modern data platforms in bidirectional sync during and after modernization, enabling zero-downtime cutover and a safe rollback path if issues surface post-migration.', features:['Bidirectional real-time sync','Schema-mapping toolkit','Zero-downtime cutover mode','Conflict resolution rules engine','Supports SAP, Oracle, and Microsoft Dynamics cores'] },
+    { id:'p6', name:'Pulse Ops Dashboard Suite', vendor:'Cascade Analytics', category:'Analytics Dashboards', rating:4.5, price:'$9,600', priceUnit:'/yr', blurb:'Composable operational dashboards for supply chain, revenue and workforce telemetry.', desc:'Pulse Ops is a composable dashboard suite for operational telemetry — supply chain flow, revenue pacing, and workforce utilization — built on a shared semantic layer so every team is reading from the same numbers.', features:['Composable, drag-and-drop dashboard builder','Shared semantic data layer','Supply chain, revenue & workforce templates','Scheduled report distribution','Row-level access controls'] },
+    { id:'p7', name:'Cortex Forecast Agent', vendor:'TECHBISS Labs', category:'AI Agents & Copilots', rating:4.7, price:'$3,100', priceUnit:'/mo', blurb:'Demand-forecasting agent that ingests ERP, POS and weather signals for SKU-level planning.', desc:'Cortex ingests ERP, point-of-sale and external signal data (including weather and macro indicators) to produce SKU-level demand forecasts, with explainable confidence bands your planning team can defend to leadership.', features:['SKU-level demand forecasting','External signal ingestion (weather, macro)','Explainable confidence intervals','Automated reorder recommendations','Weekly model recalibration'] },
+    { id:'p8', name:'Helios Grid Resilience Kit', vendor:'Vantage Energy Systems', category:'Industry Solution Kits', rating:4.6, price:'$48,000', priceUnit:'one-time', blurb:'Load-balancing and outage-prediction toolkit purpose-built for utility grid operators.', desc:'Helios combines real-time load-balancing algorithms with an outage-prediction model trained on historical grid telemetry, weather and maintenance records — purpose-built for utility operators managing aging infrastructure.', features:['Real-time load-balancing engine','Outage prediction modeling','Maintenance scheduling optimization','Regulatory emissions reporting module','SCADA system integration'] },
+    { id:'p9', name:'ClearPath Migration Runner', vendor:'TECHBISS Labs', category:'Automation Modules', rating:4.3, price:'$1,200', priceUnit:'/mo', blurb:'Automated legacy-to-cloud migration orchestration with rollback-safe checkpoints.', desc:'ClearPath orchestrates legacy-to-cloud migrations as a series of rollback-safe checkpoints rather than one high-risk cutover, giving delivery teams a way to pause, validate and resume without re-running completed stages.', features:['Checkpointed migration orchestration','One-click rollback to prior checkpoint','Pre-flight compatibility scanning','Live migration status dashboard','Supports AWS, Azure and GCP targets'] }
+  ];
+  var CATEGORIES = ['All','Automation Modules','AI Agents & Copilots','Industry Solution Kits','Security & Compliance Packs','Integration Connectors','Analytics Dashboards'];
+  var currentProduct = PRODUCTS[0];
+  var mktState = { category:'All', search:'' };
+
+  function starString(rating){
+    var full = Math.round(rating);
+    var s = '';
+    for(var i=0;i<5;i++){ s += i < full ? '★' : '☆'; }
+    return s + ' ' + rating.toFixed(1);
+  }
+
+  function renderMarketplace(){
+    var grid = document.getElementById('mkt-grid');
+    if(!grid) return;
+    var list = PRODUCTS.filter(function(p){
+      var catOk = mktState.category === 'All' || p.category === mktState.category;
+      var q = mktState.search.trim().toLowerCase();
+      var searchOk = !q || (p.name+' '+p.vendor+' '+p.category).toLowerCase().indexOf(q) !== -1;
+      return catOk && searchOk;
+    });
+    if(!list.length){
+      grid.innerHTML = '<div class="empty-state">No products match those filters. Try clearing the search or category.</div>';
+      return;
+    }
+    grid.innerHTML = list.map(function(p){
+      return '<article class="card prod-card" tabindex="0" role="button" aria-label="Preview '+p.name+'" data-id="'+p.id+'">'+
+        '<span class="cat">'+p.category+'</span>'+
+        '<h3 style="font-size:1.1rem;">'+p.name+'</h3>'+
+        '<p class="muted" style="font-size:.86rem;">'+p.blurb+'</p>'+
+        '<div class="mono" style="font-size:.72rem;color:var(--ink-muted);">by '+p.vendor+'</div>'+
+        '<div class="prod-foot"><span class="stars">'+starString(p.rating)+'</span><span class="price">'+p.price+' <small class="muted" style="font-size:.6em;">'+(p.priceUnit==='one-time'?'one-time':p.priceUnit)+'</small></span></div>'+
+      '</article>';
+    }).join('');
+    grid.querySelectorAll('.prod-card').forEach(function(card){
+      card.addEventListener('click', function(){ openProductModal(card.getAttribute('data-id')); });
+      card.addEventListener('keydown', function(e){ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); openProductModal(card.getAttribute('data-id')); } });
+    });
+  }
+
+  (function(){
+    var chips = document.getElementById('mkt-chips');
+    if(!chips) return;
+    CATEGORIES.forEach(function(cat){
+      var chip = document.createElement('button');
+      chip.type = 'button'; chip.className = 'chip'; chip.textContent = cat;
+      chip.setAttribute('aria-pressed', cat === 'All' ? 'true':'false');
+      chip.addEventListener('click', function(){
+        mktState.category = cat;
+        chips.querySelectorAll('.chip').forEach(function(c){ c.setAttribute('aria-pressed','false'); });
+        chip.setAttribute('aria-pressed','true');
+        renderMarketplace();
+      });
+      chips.appendChild(chip);
+    });
+    document.getElementById('mkt-search').addEventListener('input', function(e){
+      mktState.search = e.target.value; renderMarketplace();
+    });
+    renderMarketplace();
+  })();
+
+  var mktModal = document.getElementById('mkt-modal');
+  var mktModalLastFocus = null;
+  function openProductModal(id){
+    var p = PRODUCTS.filter(function(x){ return x.id === id; })[0];
+    if(!p) return;
+    currentProduct = p;
+    document.getElementById('mkt-modal-cat').textContent = p.category;
+    document.getElementById('mkt-modal-title').textContent = p.name;
+    document.getElementById('mkt-modal-desc').textContent = p.blurb;
+    document.getElementById('mkt-modal-stars').textContent = starString(p.rating);
+    document.getElementById('mkt-modal-price').textContent = p.price + ' ' + (p.priceUnit==='one-time'?'one-time':p.priceUnit);
+    mktModalLastFocus = document.activeElement;
+    mktModal.setAttribute('data-open','true');
+    mktModal.setAttribute('aria-hidden','false');
+    document.getElementById('mkt-modal-close').focus();
+    document.addEventListener('keydown', modalKeydown);
+  }
+  function closeProductModal(){
+    mktModal.setAttribute('data-open','false');
+    mktModal.setAttribute('aria-hidden','true');
+    document.removeEventListener('keydown', modalKeydown);
+    if(mktModalLastFocus){ mktModalLastFocus.focus(); }
+  }
+  function modalKeydown(e){
+    if(e.key === 'Escape'){ closeProductModal(); return; }
+    if(e.key === 'Tab'){
+      var focusables = mktModal.querySelectorAll('button, a, input');
+      if(!focusables.length) return;
+      var first = focusables[0], last = focusables[focusables.length-1];
+      if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+      else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+    }
+  }
+  document.getElementById('mkt-modal-close').addEventListener('click', closeProductModal);
+  mktModal.addEventListener('click', function(e){ if(e.target === mktModal){ closeProductModal(); } });
+  document.getElementById('mkt-modal-view').addEventListener('click', function(){ closeProductModal(); location.hash = '#product'; });
+  document.getElementById('mkt-modal-buy').addEventListener('click', function(){ closeProductModal(); location.hash = '#product'; window.setTimeout(function(){ var el = document.getElementById('buy-toast'); if(el) flashToast(); }, 350); });
+
+  function flashToast(){
+    var el = document.getElementById('buy-toast');
+    if(!el) return;
+    el.setAttribute('data-show','true');
+    window.setTimeout(function(){ el.setAttribute('data-show','false'); }, 3200);
+  }
+
+  function renderProduct(p){
+    var wrap = document.getElementById('product-content');
+    if(!wrap || !p) return;
+    wrap.innerHTML =
+      '<div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem;align-items:flex-start;margin:.8rem 0 1.6rem;">'+
+        '<div><h2 style="margin-bottom:.3rem;">'+p.name+'</h2><p class="mono" style="color:var(--ink-muted);font-size:.85rem;margin:0;">by '+p.vendor+' · '+p.category+'</p></div>'+
+        '<span class="stars" style="font-size:1.1rem;">'+starString(p.rating)+'</span>'+
+      '</div>'+
+      '<div class="grid grid-2 gap" style="align-items:flex-start;">'+
+        '<div>'+
+          '<p>'+p.desc+'</p>'+
+          '<h3 style="font-size:1.15rem;margin-top:1.4rem;">What is included</h3>'+
+          '<ul style="list-style:none;padding:0;display:flex;flex-direction:column;gap:.6rem;">'+
+            p.features.map(function(f){ return '<li style="display:flex;gap:.6em;font-size:.92rem;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px;color:var(--accent);flex:none;margin-top:.2em;"><path d="M4 12l6 6L20 6"/></svg>'+f+'</li>'; }).join('')+
+          '</ul>'+
+          '<h3 style="font-size:1.15rem;margin-top:1.8rem;">Reviews</h3>'+
+          '<div style="display:flex;flex-direction:column;gap:1rem;">'+
+            '<div class="card"><div class="row-between"><b>Dana K., VP Platform Engineering</b><span class="stars">★★★★★</span></div><p class="muted" style="margin:.5rem 0 0;font-size:.9rem;">Deployed in under three weeks against our staging environment — the rollback checkpoints saved us during our first cutover attempt.</p></div>'+
+            '<div class="card"><div class="row-between"><b>Priya R., Director of Operations</b><span class="stars">★★★★☆</span></div><p class="muted" style="margin:.5rem 0 0;font-size:.9rem;">Strong out of the box. Documentation for the less common connectors could be more thorough.</p></div>'+
+          '</div>'+
+        '</div>'+
+        '<div class="card" style="position:sticky;top:90px;">'+
+          '<span class="price" style="font-size:1.7rem;">'+p.price+'</span>'+
+          '<span class="muted mono" style="font-size:.75rem;">'+(p.priceUnit==='one-time'?'one-time license':'billed '+p.priceUnit.replace('/',''))+'</span>'+
+          '<button class="btn btn-primary btn-block" type="button" id="product-buy-btn" style="margin-top:1rem;">Purchase</button>'+
+          '<a class="btn btn-ghost btn-block" href="#marketplace" style="margin-top:.7rem;">Back to Marketplace</a>'+
+          '<div class="card-note">Deployed via Installer · supports standard rollback</div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="badge mono" id="buy-toast" data-show="false" style="position:fixed;bottom:1.6rem;right:1.6rem;z-index:400;transition:opacity .3s var(--ease), transform .3s var(--ease);opacity:0;transform:translateY(10px);pointer-events:none;">Added to procurement queue</div>';
+    var buyBtn = document.getElementById('product-buy-btn');
+    if(buyBtn){ buyBtn.addEventListener('click', flashToast); }
+  }
+
+  var toastStyleTag = document.createElement('style');
+  toastStyleTag.textContent = '#buy-toast[data-show="true"]{opacity:1 !important;transform:none !important;}#buy-toast{background:var(--ink);color:var(--bg);padding:.8em 1.2em;border:none;}';
+  document.head.appendChild(toastStyleTag);
+
+  /* ---------------- WORK / CASE STUDIES ---------------- */
+  var CASES = [
+    { id:'c1', industry:'Financial Services', title:'40% faster settlement cycle', client:'Meridian Capital Group · Tier-1 Bank', challenge:'Three legacy settlement cores, incompatible batch windows, and a growing backlog of failed cross-currency trades threatened same-day settlement SLAs.', approach:'Consolidated settlement logic onto a single event-driven platform, replacing overnight batch reconciliation with real-time matching and exception routing.', result:'Settlement cycle time dropped 40% and failed-trade backlog fell by two-thirds within the first quarter post-launch.', metric:{ value:'40%', label:'faster settlement cycle' } },
+    { id:'c2', industry:'Supply Chain & Logistics', title:'27% logistics cost reduction', client:'Northfield Logistics · Logistics Network', challenge:'Manual route planning and reactive fleet dispatch across 1,800 vehicles led to chronic underutilization and rising fuel costs.', approach:'Deployed an AI-driven routing and demand-forecasting platform integrated directly with dispatch and telematics systems.', result:'Fleet utilization improved 31% and total logistics cost fell 27% within two quarters of full rollout.', metric:{ value:'27%', label:'cost reduction' } },
+    { id:'c3', industry:'Telecommunications', title:'14-country cloud migration', client:'Axiom Telecom Group · Telecom Group', challenge:'Core billing and OSS/BSS systems ran on aging on-premise infrastructure across 14 countries with inconsistent compliance posture.', approach:'Executed a phased, checkpointed migration to a unified multi-cloud landing zone, market by market, with zero customer-facing downtime.', result:'All 14 markets migrated on schedule with zero unplanned billing outages and a 34% reduction in infrastructure spend.', metric:{ value:'14', label:'countries migrated' } },
+    { id:'c4', industry:'Healthcare & Life Sciences', title:'Interoperable data platform', client:'Cascade Health Network · Healthcare Network', challenge:'22 disparate EHR instances across acquired hospital systems made longitudinal patient records and population health reporting nearly impossible.', approach:'Built a FHIR-native data platform unifying clinical records with strict consent management and role-based access controls.', result:'Unified longitudinal records for 4.1M patients and cut population-health report generation from weeks to hours.', metric:{ value:'22→1', label:'EHR systems unified' } }
+  ];
+  (function(){
+    var chips = document.getElementById('work-chips');
+    var grid = document.getElementById('work-grid');
+    if(!chips || !grid) return;
+    var industries = ['All'].concat(CASES.map(function(c){ return c.industry; }));
+    var state = 'All';
+    function render(){
+      var list = CASES.filter(function(c){ return state === 'All' || c.industry === state; });
+      grid.innerHTML = list.map(function(c){
+        return '<article class="card case-card">'+
+          '<div class="case-meta"><span>'+c.industry+'</span><span>'+c.client.split('·')[1]+'</span></div>'+
+          '<h3>'+c.title+'</h3>'+
+          '<p class="mono muted" style="font-size:.78rem;margin-bottom:0;">'+c.client+'</p>'+
+          '<div class="case-block"><h4>Challenge</h4><p class="muted" style="font-size:.9rem;">'+c.challenge+'</p></div>'+
+          '<div class="case-block"><h4>Approach</h4><p class="muted" style="font-size:.9rem;">'+c.approach+'</p></div>'+
+          '<div class="case-block"><h4>Result</h4><p class="muted" style="font-size:.9rem;">'+c.result+'</p></div>'+
+          '<div class="case-metric"><b>'+c.metric.value+'</b><span class="mono" style="font-size:.7rem;color:var(--ink-muted);">'+c.metric.label+'</span></div>'+
+        '</article>';
+      }).join('');
+    }
+    industries.forEach(function(ind){
+      var chip = document.createElement('button');
+      chip.type='button'; chip.className='chip'; chip.textContent = ind;
+      chip.setAttribute('aria-pressed', ind==='All'?'true':'false');
+      chip.addEventListener('click', function(){
+        state = ind;
+        chips.querySelectorAll('.chip').forEach(function(c){ c.setAttribute('aria-pressed','false'); });
+        chip.setAttribute('aria-pressed','true');
+        render();
+      });
+      chips.appendChild(chip);
+    });
+    render();
+  })();
+
+  /* ---------------- PROCESS SCROLL PROGRESS ---------------- */
+  (function(){
+    var steps = document.querySelectorAll('.proc-step');
+    if(!steps.length || !('IntersectionObserver' in window)) return;
+    var stepObs = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        var idx = parseInt(entry.target.getAttribute('data-step'),10);
+        if(entry.isIntersecting){
+          entry.target.classList.add('done');
+          for(var i=0;i<steps.length;i++){
+            var s = steps[i]; var sIdx = parseInt(s.getAttribute('data-step'),10);
+            var fill = s.querySelector('.proc-line-fill');
+            if(fill){ fill.style.height = sIdx <= idx ? '100%' : fill.style.height; }
+          }
+        }
+      });
+    }, { threshold:.5 });
+    steps.forEach(function(s){ stepObs.observe(s); });
+  })();
+
+  /* ---------------- RESOURCES ---------------- */
+  var ARTICLES = [
+    { title:'What "cloud-native" actually costs at enterprise scale', cat:'Cloud', read:'9 min' },
+    { title:'Grounding AI agents in real operational data', cat:'AI', read:'11 min' },
+    { title:'A zero-trust checklist for regulated industries', cat:'Security', read:'7 min' },
+    { title:'Building a data platform that survives an acquisition', cat:'Data', read:'12 min' },
+    { title:'Why transformation roadmaps fail in year two', cat:'Strategy', read:'8 min' },
+    { title:'Grid resilience: what utilities can learn from hyperscalers', cat:'Industry', read:'10 min' }
+  ];
+  (function(){
+    var chips = document.getElementById('res-chips');
+    var grid = document.getElementById('res-grid');
+    if(!chips || !grid) return;
+    var cats = ['All','Cloud','AI','Security','Data','Strategy','Industry'];
+    var state = 'All';
+    function render(){
+      var list = ARTICLES.filter(function(a){ return state==='All' || a.cat === state; });
+      grid.innerHTML = list.map(function(a){
+        return '<article class="card"><span class="tag mono">'+a.cat+'</span><h3 style="font-size:1.05rem;">'+a.title+'</h3><div class="res-meta"><span>Insight</span><span>'+a.read+' read</span></div></article>';
+      }).join('');
+    }
+    cats.forEach(function(c){
+      var chip = document.createElement('button');
+      chip.type='button'; chip.className='chip'; chip.textContent = c;
+      chip.setAttribute('aria-pressed', c==='All'?'true':'false');
+      chip.addEventListener('click', function(){
+        state = c;
+        chips.querySelectorAll('.chip').forEach(function(x){ x.setAttribute('aria-pressed','false'); });
+        chip.setAttribute('aria-pressed','true');
+        render();
+      });
+      chips.appendChild(chip);
+    });
+    render();
+  })();
+
+  (function(){
+    var form = document.getElementById('newsletter-form');
+    if(!form) return;
+    var field = document.getElementById('nl-field');
+    var success = document.getElementById('nl-success');
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      var input = document.getElementById('nl-email');
+      var ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value.trim());
+      if(!ok){
+        field.setAttribute('data-invalid','true');
+        form.classList.add('shake');
+        window.setTimeout(function(){ form.classList.remove('shake'); }, 450);
+        return;
+      }
+      field.removeAttribute('data-invalid');
+      form.style.display = 'none';
+      success.setAttribute('data-show','true');
+    });
+  })();
+
+  /* ---------------- PRICING ---------------- */
+  (function(){
+    var monthlyBtn = document.getElementById('bill-monthly');
+    var annualBtn = document.getElementById('bill-annual');
+    if(!monthlyBtn) return;
+    var vals = document.querySelectorAll('.price-val');
+    function setBilling(annual){
+      monthlyBtn.setAttribute('aria-pressed', annual? 'false':'true');
+      annualBtn.setAttribute('aria-pressed', annual? 'true':'false');
+      vals.forEach(function(el){
+        var base = parseFloat(el.getAttribute('data-monthly'));
+        var target = annual ? Math.round(base * 0.82) : base;
+        var suffixEl = el.parentElement.querySelector('small');
+        if(suffixEl){ suffixEl.textContent = annual ? '/mo, billed yearly' : '/mo'; }
+        tweenNumber(el, target);
+      });
+    }
+    function tweenNumber(el, target){
+      var start = parseFloat((el.textContent||'0').replace(/,/g,'')) || 0;
+      if(reduceMotion){ el.textContent = target.toLocaleString('en-US'); return; }
+      var t0 = null; var dur = 500;
+      function step(ts){
+        if(t0===null) t0 = ts;
+        var p = Math.min((ts-t0)/dur,1);
+        var val = Math.round(start + (target-start) * (1-Math.pow(1-p,3)));
+        el.textContent = val.toLocaleString('en-US');
+        if(p<1){ window.requestAnimationFrame(step); }
+      }
+      window.requestAnimationFrame(step);
+    }
+    monthlyBtn.addEventListener('click', function(){ setBilling(false); });
+    annualBtn.addEventListener('click', function(){ setBilling(true); });
+  })();
+
+  var FAQ = [
+    { q:'How quickly can a new engagement start?', a:'Starter and Growth engagements typically kick off within two weeks of contract signature. Enterprise and Global Scale programs begin with a two-week discovery sprint before the full team mobilizes.' },
+    { q:'Can we start with a pilot before a full engagement?', a:'Yes. Most clients begin with a scoped pilot on a single workload before expanding to a full program — pilots roll into the Growth or Enterprise tier without re-contracting.' },
+    { q:'Do you work inside our existing cloud environment?', a:'Yes. We architect within your existing AWS, Azure, GCP, or sovereign-cloud environment rather than requiring migration to a proprietary platform.' },
+    { q:'What does "24/7 mission-critical support" include?', a:'Enterprise and Global Scale tiers include a dedicated on-call SRE rotation with sub-15-minute response for severity-1 incidents, and direct escalation to your named principal architect.' },
+    { q:'Can pricing be adjusted for multi-year commitments?', a:'Global Scale contracts are quoted per program and typically include multi-year pricing locks — talk to our sales team for a tailored proposal.' }
+  ];
+  (function(){
+    var list = document.getElementById('faq-list');
+    if(!list) return;
+    list.innerHTML = FAQ.map(function(f,i){
+      return '<div class="faq-item"><button class="faq-trigger" id="faq-t'+i+'" aria-expanded="false" aria-controls="faq-p'+i+'">'+f.q+'<span class="plus mono">+</span></button>'+
+      '<div class="faq-panel" id="faq-p'+i+'" role="region" aria-labelledby="faq-t'+i+'"><p class="faq-panel-in">'+f.a+'</p></div></div>';
+    }).join('');
+    list.querySelectorAll('.faq-trigger').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var panel = document.getElementById(btn.getAttribute('aria-controls'));
+        var open = btn.getAttribute('aria-expanded') === 'true';
+        btn.setAttribute('aria-expanded', open ? 'false':'true');
+        panel.style.maxHeight = open ? '0px' : panel.scrollHeight + 'px';
+      });
+    });
+  })();
+
+  /* ---------------- CONTACT FORM ---------------- */
+  (function(){
+    var form = document.getElementById('contact-form');
+    if(!form) return;
+    var success = document.getElementById('contact-success');
+    function validateField(id, validFn){
+      var field = document.getElementById(id);
+      var input = field.querySelector('input, select, textarea');
+      var ok = validFn(input.value);
+      field.setAttribute('data-invalid', ok ? 'false':'true');
+      return ok;
+    }
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      var checks = [
+        validateField('f-name', function(v){ return v.trim().length > 1; }),
+        validateField('f-email', function(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()); }),
+        validateField('f-company', function(v){ return v.trim().length > 1; }),
+        validateField('f-region', function(v){ return v.trim().length > 0; }),
+        validateField('f-message', function(v){ return v.trim().length > 9; })
+      ];
+      var allOk = checks.every(Boolean);
+      if(!allOk){
+        form.classList.add('shake');
+        window.setTimeout(function(){ form.classList.remove('shake'); }, 450);
+        var firstInvalid = form.querySelector('[data-invalid="true"] input, [data-invalid="true"] select, [data-invalid="true"] textarea');
+        if(firstInvalid) firstInvalid.focus();
+        return;
+      }
+      form.style.display = 'none';
+      success.setAttribute('data-show','true');
+    });
+    form.querySelectorAll('input, select, textarea').forEach(function(input){
+      input.addEventListener('blur', function(){
+        var field = input.closest('.field');
+        if(field.getAttribute('data-invalid') === 'true'){
+          if(input.value.trim().length > 0){ field.setAttribute('data-invalid','false'); }
+        }
+      });
+    });
+  })();
+
+  /* ---------------- LOGIN ---------------- */
+  (function(){
+    var pwInput = document.getElementById('login-pw');
+    var pwToggle = document.getElementById('pw-toggle');
+    if(pwToggle){
+      pwToggle.addEventListener('click', function(){
+        var show = pwInput.type === 'password';
+        pwInput.type = show ? 'text' : 'password';
+        pwToggle.setAttribute('aria-pressed', show ? 'true':'false');
+        pwToggle.setAttribute('aria-label', show ? 'Hide password':'Show password');
+      });
+    }
+    var loginForm = document.getElementById('login-form');
+    if(loginForm){
+      loginForm.addEventListener('submit', function(e){
+        e.preventDefault();
+        var emailField = document.getElementById('f-login-email');
+        var pwField = document.getElementById('f-login-pw');
+        var emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(document.getElementById('login-email').value.trim());
+        var pwOk = document.getElementById('login-pw').value.length >= 8;
+        emailField.setAttribute('data-invalid', emailOk ? 'false':'true');
+        pwField.setAttribute('data-invalid', pwOk ? 'false':'true');
+        if(!emailOk || !pwOk){
+          loginForm.classList.add('shake');
+          window.setTimeout(function(){ loginForm.classList.remove('shake'); }, 450);
+          return;
+        }
+        var note = document.getElementById('login-demo-note');
+        note.textContent = 'Credentials look valid — this preview does not connect to a real authentication system.';
+        note.style.color = 'var(--accent)';
+      });
+    }
+    var main = document.getElementById('login-main');
+    var alt = document.getElementById('login-alt');
+    var showReq = document.getElementById('show-request-access');
+    var showMain = document.getElementById('show-login-main');
+    if(showReq){ showReq.addEventListener('click', function(e){ e.preventDefault(); main.setAttribute('data-show','false'); alt.setAttribute('data-show','true'); }); }
+    if(showMain){ showMain.addEventListener('click', function(e){ e.preventDefault(); alt.setAttribute('data-show','false'); main.setAttribute('data-show','true'); }); }
+    var reqForm = document.getElementById('request-form');
+    if(reqForm){
+      reqForm.addEventListener('submit', function(e){
+        e.preventDefault();
+        var nameOk = document.getElementById('req-name').value.trim().length > 1;
+        var emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(document.getElementById('req-email').value.trim());
+        document.getElementById('f-req-name').setAttribute('data-invalid', nameOk ? 'false':'true');
+        document.getElementById('f-req-email').setAttribute('data-invalid', emailOk ? 'false':'true');
+        if(!nameOk || !emailOk){
+          reqForm.classList.add('shake');
+          window.setTimeout(function(){ reqForm.classList.remove('shake'); }, 450);
+          return;
+        }
+        reqForm.style.display = 'none';
+        document.getElementById('request-success').setAttribute('data-show','true');
+      });
+    }
+  })();
+
+  /* ---------------- INSTALLER WIZARD ---------------- */
+  (function(){
+    var stepper = document.getElementById('stepper');
+    var panelEl = document.getElementById('wizard-panel');
+    var backBtn = document.getElementById('wiz-back');
+    var nextBtn = document.getElementById('wiz-next');
+    if(!stepper) return;
+    var STEPS = ['Select','Detect','Configure','Migrate','Install','Verify','Launch'];
+    var cur = 0;
+    var wiz = { module:null, scanned:false, configured:false, migrated:false, installed:false, verified:false };
+
+    function renderStepper(){
+      stepper.innerHTML = STEPS.map(function(s,i){
+        var cls = i===cur ? 'active' : (i<cur ? 'done':'');
+        var conn = i>0 ? '<span class="conn" aria-hidden="true"></span>' : '';
+        return conn+'<li class="'+cls+'"><span class="dot">'+(i<cur? '✓' : (i+1))+'</span><span class="lbl">'+s+'</span></li>';
+      }).join('');
+    }
+
+    function canAdvance(){
+      switch(cur){
+        case 0: return !!wiz.module;
+        case 1: return wiz.scanned;
+        case 2: return wiz.configured;
+        case 3: return wiz.migrated;
+        case 4: return wiz.installed;
+        case 5: return wiz.verified;
+        default: return false;
+      }
+    }
+
+    function renderPanel(){
+      backBtn.disabled = cur === 0;
+      nextBtn.textContent = cur === STEPS.length-1 ? 'Finish' : 'Next';
+      nextBtn.style.display = cur === STEPS.length-1 ? 'none' : 'inline-flex';
+
+      if(cur === 0){
+        var mods = [
+          { id:'cloud', name:'Cloud Migration Suite', desc:'Landing zone, workload assessment and migration orchestration.' },
+          { id:'ai', name:'AI Copilot Deployment', desc:'Deploy a grounded AI agent against your operational data.' },
+          { id:'security', name:'Security Baseline Pack', desc:'Zero-trust controls and continuous compliance mapping.' },
+          { id:'data', name:'Data Platform Starter', desc:'Governed lakehouse foundation with starter pipelines.' }
+        ];
+        panelEl.innerHTML = '<span class="coord">STEP 01 / SELECT</span><h3 style="margin-top:.6rem;">Choose a module to deploy</h3>'+
+          '<div class="mod-pick" role="radiogroup" aria-label="Module">'+
+          mods.map(function(m){
+            return '<label><input type="radio" name="module" value="'+m.id+'" '+(wiz.module===m.id?'checked':'')+'><span><b style="display:block;">'+m.name+'</b><span class="muted" style="font-size:.85rem;">'+m.desc+'</span></span></label>';
+          }).join('')+'</div>';
+        panelEl.querySelectorAll('input[name="module"]').forEach(function(r){
+          r.addEventListener('change', function(){ wiz.module = r.value; syncNext(); });
+        });
+      }
+
+      else if(cur === 1){
+        panelEl.innerHTML = '<span class="coord">STEP 02 / DETECT</span><h3 style="margin-top:.6rem;">Scan target environment</h3>'+
+          '<p class="muted">We will scan for existing workloads, clusters and configuration that affect this deployment.</p>'+
+          '<button class="btn btn-primary" type="button" id="scan-btn">Start Scan</button>'+
+          '<ul class="scan-list" id="scan-list"></ul>';
+        var scanBtn = document.getElementById('scan-btn');
+        var scanList = document.getElementById('scan-list');
+        if(wiz.scanned){
+          renderScanResults(scanList, true);
+          scanBtn.disabled = true; scanBtn.textContent = 'Scan Complete';
+        }
+        scanBtn.addEventListener('click', function(){
+          scanBtn.disabled = true; scanBtn.textContent = 'Scanning…';
+          var items = ['Detected: AWS us-east-1 tenant','Detected: 342 active workloads','Detected: Kubernetes v1.29 cluster','Detected: Legacy SQL Server instance (EOL flag)','Detected: 3 IAM policies requiring review'];
+          var delay = reduceMotion ? 20 : 500;
+          items.forEach(function(text, i){
+            window.setTimeout(function(){
+              var li = document.createElement('li');
+              li.style.animationDelay = '0ms';
+              li.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12l6 6L20 6"/></svg><span>'+text+'</span>';
+              scanList.appendChild(li);
+              if(i === items.length-1){
+                wiz.scanned = true; scanBtn.textContent = 'Scan Complete'; syncNext();
+              }
+            }, delay * (i+1));
+          });
+        });
+      }
+
+      else if(cur === 2){
+        panelEl.innerHTML = '<span class="coord">STEP 03 / CONFIGURE</span><h3 style="margin-top:.6rem;">Environment settings</h3>'+
+          '<div class="field"><label for="cfg-name">Environment name</label><input type="text" id="cfg-name" value="'+(wiz.envName||'')+'" placeholder="production-us-east"></div>'+
+          '<div class="field"><label for="cfg-region">Region</label><select id="cfg-region"><option>us-east-1</option><option>eu-west-1</option><option>ap-southeast-1</option></select></div>'+
+          '<label class="check-field" style="margin-bottom:.7rem;"><input type="checkbox" id="cfg-audit" checked>Enable audit logging</label><br>'+
+          '<label class="check-field"><input type="checkbox" id="cfg-scale">Enable auto-scaling</label>';
+        var nameInput = document.getElementById('cfg-name');
+        nameInput.addEventListener('input', function(){ wiz.envName = nameInput.value; wiz.configured = nameInput.value.trim().length > 2; syncNext(); });
+        wiz.configured = nameInput.value.trim().length > 2;
+      }
+
+      else if(cur === 3){
+        panelEl.innerHTML = '<span class="coord">STEP 04 / IMPORT &amp; MIGRATE</span><h3 style="margin-top:.6rem;">Migrating configuration &amp; data</h3>'+
+          '<div class="progress-track"><div class="progress-fill" id="mig-fill"></div></div><div class="progress-pct mono" id="mig-pct">0%</div>'+
+          '<div class="terminal" id="mig-term" aria-live="polite"></div>'+
+          (wiz.migrated ? '' : '<button class="btn btn-ghost" type="button" id="mig-start" style="margin-top:1rem;">Start Migration</button>');
+        var startBtn = document.getElementById('mig-start');
+        if(wiz.migrated){
+          document.getElementById('mig-fill').style.width='100%';
+          document.getElementById('mig-pct').textContent='100%';
+          var lines = migrationLog();
+          document.getElementById('mig-term').innerHTML = lines.map(function(l){ return '<div class="ok">'+l+'</div>'; }).join('');
+        }
+        if(startBtn){
+          startBtn.addEventListener('click', function(){
+            startBtn.disabled = true; startBtn.textContent = 'Migrating…';
+            var fill = document.getElementById('mig-fill');
+            var pct = document.getElementById('mig-pct');
+            var term = document.getElementById('mig-term');
+            var lines = migrationLog();
+            var n = 0; var p = 0;
+            var interval = window.setInterval(function(){
+              p += 8;
+              if(p > 100) p = 100;
+              fill.style.width = p + '%';
+              pct.textContent = p + '%';
+              if(n < lines.length && p >= (n+1) * (100/lines.length)){
+                var d = document.createElement('div'); d.className='ok'; d.textContent = lines[n];
+                term.appendChild(d); term.scrollTop = term.scrollHeight;
+                n++;
+              }
+              if(p >= 100){
+                window.clearInterval(interval);
+                wiz.migrated = true; syncNext();
+                startBtn.textContent = 'Migration Complete';
+              }
+            }, reduceMotion ? 10 : 220);
+          });
+        }
+      }
+
+      else if(cur === 4){
+        panelEl.innerHTML = '<span class="coord">STEP 05 / INSTALL</span><h3 style="margin-top:.6rem;">Installing module</h3>'+
+          '<div class="progress-track"><div class="progress-fill" id="ins-fill"></div></div><div class="progress-pct mono" id="ins-pct">0%</div>';
+        var fill = document.getElementById('ins-fill');
+        var pct = document.getElementById('ins-pct');
+        if(wiz.installed){ fill.style.width='100%'; pct.textContent='100%'; }
+        else {
+          var p = 0;
+          var interval = window.setInterval(function(){
+            p += 6;
+            if(p>100) p=100;
+            fill.style.width = p+'%'; pct.textContent = p+'%';
+            if(p>=100){ window.clearInterval(interval); wiz.installed = true; syncNext(); }
+          }, reduceMotion ? 8 : 140);
+        }
+      }
+
+      else if(cur === 5){
+        var checks = ['Configuration validated','Security baseline applied','Connectivity verified','Data integrity check passed'];
+        panelEl.innerHTML = '<span class="coord">STEP 06 / VERIFY</span><h3 style="margin-top:.6rem;">Running verification checklist</h3>'+
+          '<ul class="check-list" id="verify-list">'+checks.map(function(c){ return '<li><span class="cb"></span><span>'+c+'</span></li>'; }).join('')+'</ul>';
+        var items = panelEl.querySelectorAll('#verify-list li');
+        if(wiz.verified){
+          items.forEach(function(li){ li.classList.add('done'); li.querySelector('.cb').textContent='✓'; });
+        } else {
+          items.forEach(function(li, i){
+            window.setTimeout(function(){
+              li.classList.add('done'); li.querySelector('.cb').textContent = '✓';
+              if(i === items.length-1){ wiz.verified = true; syncNext(); }
+            }, (reduceMotion?15:550) * (i+1));
+          });
+        }
+      }
+
+      else if(cur === 6){
+        panelEl.innerHTML = '<div class="launch-success"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 12l6 6L20 6"></path></svg>'+
+          '<span class="coord">STEP 07 / LAUNCH</span><h3 style="margin-top:.6rem;">Deployment complete</h3>'+
+          '<p class="muted">Your module is live and reporting healthy telemetry. You can review it now in the operations dashboard.</p>'+
+          '<a class="btn btn-primary" href="#dashboard">Go to Dashboard</a></div>';
+      }
+    }
+
+    function migrationLog(){
+      return ['[00:01] Establishing secure channel…','[00:04] Transferring schema (14 tables)…','[00:09] Validating referential integrity…','[00:13] Reindexing target tables…','[00:18] Migration checkpoint saved.'];
+    }
+    function renderScanResults(scanList, instant){
+      var items = ['Detected: AWS us-east-1 tenant','Detected: 342 active workloads','Detected: Kubernetes v1.29 cluster','Detected: Legacy SQL Server instance (EOL flag)','Detected: 3 IAM policies requiring review'];
+      scanList.innerHTML = items.map(function(t){ return '<li style="opacity:1;transform:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12l6 6L20 6"/></svg><span>'+t+'</span></li>'; }).join('');
+    }
+    function syncNext(){ nextBtn.disabled = !canAdvance(); }
+
+    backBtn.addEventListener('click', function(){ if(cur>0){ cur--; renderStepper(); renderPanel(); syncNext(); } });
+    nextBtn.addEventListener('click', function(){ if(cur < STEPS.length-1 && canAdvance()){ cur++; renderStepper(); renderPanel(); syncNext(); } });
+
+    renderStepper(); renderPanel(); syncNext();
+  })();
+
+  /* ---------------- DASHBOARD TABS ---------------- */
+  (function(){
+    var tabs = [ ['tab-admin','panel-admin'], ['tab-client','panel-client'], ['tab-staff','panel-staff'] ];
+    var tabBtns = tabs.map(function(t){ return document.getElementById(t[0]); });
+    if(!tabBtns[0]) return;
+    function select(id){
+      tabs.forEach(function(t){
+        var btn = document.getElementById(t[0]); var panel = document.getElementById(t[1]);
+        var active = t[0] === id;
+        btn.setAttribute('aria-selected', active ? 'true':'false');
+        panel.classList.toggle('is-active', active);
+        panel.hidden = !active;
+      });
+    }
+    tabBtns.forEach(function(btn, i){
+      btn.addEventListener('click', function(){ select(btn.id); });
+      btn.addEventListener('keydown', function(e){
+        if(e.key==='ArrowRight' || e.key==='ArrowLeft'){
+          e.preventDefault();
+          var dir = e.key==='ArrowRight' ? 1 : -1;
+          var next = tabBtns[(i+dir+tabBtns.length)%tabBtns.length];
+          next.focus(); select(next.id);
+        }
+      });
+    });
+  })();
+
+})();
 </script>

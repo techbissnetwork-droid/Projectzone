@@ -380,6 +380,8 @@
   /* ---------- contact ---------- */
   .contact-layout{display:grid;grid-template-columns:1.2fr .8fr;gap:3rem;}
   @media(max-width:900px){.contact-layout{grid-template-columns:1fr;}}
+  @media(max-width:860px){.about-intro-grid{grid-template-columns:1fr !important;}}
+  @media(max-width:820px){.product-detail-grid{grid-template-columns:1fr !important;}}
   .office-card{border-top:1px solid var(--line);padding:1.4rem 0;}
   .office-card h4{font-family:var(--font-display);margin-bottom:.3em;}
 
@@ -496,7 +498,7 @@
 
   ::selection{background:var(--accent);color:var(--accent-ink);}
 </style>
-<div id="app" class="js">
+<div id="app">
   <a href="#main" class="skip-link">Skip to content</a>
   <div id="intro" aria-hidden="true">
     <svg viewBox="0 0 400 140" role="img" aria-label="TECHBISS">
@@ -1155,6 +1157,7 @@
 <script>
 (function(){
 "use strict";
+document.getElementById("app").classList.add("js");
 
 /* ============================================================
    DATA
@@ -2198,15 +2201,13 @@ function initInstaller(){
   var stepperWrap = document.getElementById("installer-stepper");
   if(!stepperWrap) return;
   document.getElementById("scan-start").addEventListener("click", runScan);
-  document.getElementById("migrate-start").addEventListener("click", function(btn){
-    return function(){
-      this.disabled = true;
-      runProgress("migrate-progress","migrate-log", MIGRATE_LOGS, function(){
-        installState.migrateDone = true;
-        updateInstallerNav();
-      });
-    };
-  }(null));
+  document.getElementById("migrate-start").addEventListener("click", function(){
+    this.disabled = true;
+    runProgress("migrate-progress","migrate-log", MIGRATE_LOGS, function(){
+      installState.migrateDone = true;
+      updateInstallerNav();
+    });
+  });
   document.getElementById("install-start").addEventListener("click", function(){
     this.disabled = true;
     runProgress("install-progress","install-log", INSTALL_LOGS, function(){
@@ -2233,5 +2234,233 @@ function resetInstaller(){
   showInstallStep();
 }
 
+/* ============================================================
+   DASHBOARD
+   ============================================================ */
+function barChartSvgHtml(values, labels){
+  var max = Math.max.apply(null, values);
+  return '<div class="bar-chart">' + values.map(function(v,i){
+    var h = Math.round((v/max)*100);
+    return '<div class="bar-col"><div class="bar" style="height:'+h+'%;" title="'+labels[i]+': '+v+'"></div><span class="bar-lbl">'+labels[i]+'</span></div>';
+  }).join("") + '</div>';
+}
+function lineChartSvgHtml(values){
+  var max = Math.max.apply(null, values), min = Math.min.apply(null, values);
+  var w = 300, h = 150, pad = 10;
+  var pts = values.map(function(v,i){
+    var x = pad + (i/(values.length-1))*(w-pad*2);
+    var y = h - pad - ((v-min)/(max-min||1))*(h-pad*2);
+    return [x,y];
+  });
+  var line = pts.map(function(p,i){ return (i===0?"M":"L")+p[0].toFixed(1)+" "+p[1].toFixed(1); }).join(" ");
+  var area = line + " L "+pts[pts.length-1][0].toFixed(1)+" "+(h-pad)+" L "+pts[0][0].toFixed(1)+" "+(h-pad)+" Z";
+  var dots = pts.map(function(p){ return '<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="3"></circle>'; }).join("");
+  return '<svg class="line-chart" viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none"><path class="area" d="'+area+'"/><path class="line" d="'+line+'"/>'+dots+'</svg>';
+}
+function statusPill(status){
+  var cls = status==="Active"||status==="Resolved"||status==="Paid" ? "pill-green" : (status==="Pending"||status==="In Progress" ? "pill-amber":"pill-grey");
+  return '<span class="pill '+cls+'">'+status+'</span>';
+}
+
+function renderDashAdmin(){
+  return '<div class="kpi-grid">'+
+    '<div class="kpi-card"><div class="kpi-label">Active tenants</div><div class="kpi-val">2,184</div><div class="kpi-delta up">▲ 4.2% this quarter</div></div>'+
+    '<div class="kpi-card"><div class="kpi-label">MRR</div><div class="kpi-val">$6.84M</div><div class="kpi-delta up">▲ 7.1% MoM</div></div>'+
+    '<div class="kpi-card"><div class="kpi-label">Platform uptime</div><div class="kpi-val">99.99%</div><div class="kpi-delta up">▲ steady</div></div>'+
+    '<div class="kpi-card"><div class="kpi-label">Open support tickets</div><div class="kpi-val">57</div><div class="kpi-delta down">▼ 12% vs last week</div></div>'+
+  '</div>'+
+  '<div class="dash-grid">'+
+    '<div class="panel"><h3>Revenue, trailing 6 months</h3>'+lineChartSvgHtml([4.1,4.6,5.0,5.4,6.1,6.84])+'</div>'+
+    '<div class="panel"><h3>Recent platform activity</h3><div class="activity-list">'+
+      ['New tenant onboarded — Basecourse Bank','Marketplace purchase — Meridian Threat Response Pack','Support escalation resolved — Waybound Telecom','Region added — AP Southeast now GA','SLA breach auto-flagged — ticket #4021'].map(function(t,i){
+        return '<div class="activity-item"><span class="activity-dot"></span><div><div>'+t+'</div><div class="activity-time">'+(i+1)+'h ago</div></div></div>';
+      }).join("")+
+    '</div></div>'+
+  '</div>'+
+  '<div class="panel table-scroll"><h3>Tenant accounts</h3><table class="data-table">'+
+    '<thead><tr><th>Tenant</th><th>Plan</th><th>MRR</th><th>Status</th></tr></thead><tbody>'+
+    [["Basecourse Bank","Enterprise","$38,000","Active"],["Northfield Health","Growth","$14,500","Active"],["Tallybrook Retail","Growth","$14,500","Pending"],["Arva Energy Grid","Global Scale","Custom","Active"],["Contour Public Works","Starter","$4,900","Active"]].map(function(r){
+      return "<tr><td>"+r[0]+"</td><td>"+r[1]+"</td><td>"+r[2]+"</td><td>"+statusPill(r[3])+"</td></tr>";
+    }).join("")+
+  '</tbody></table></div>';
+}
+function renderDashClient(){
+  return '<div class="kpi-grid">'+
+    '<div class="kpi-card"><div class="kpi-label">Active projects</div><div class="kpi-val">4</div><div class="kpi-delta up">▲ 1 new this month</div></div>'+
+    '<div class="kpi-card"><div class="kpi-label">Modules deployed</div><div class="kpi-val">11</div><div class="kpi-delta up">▲ 2 pending install</div></div>'+
+    '<div class="kpi-card"><div class="kpi-label">Open invoices</div><div class="kpi-val">$92,400</div><div class="kpi-delta down">▼ due in 14 days</div></div>'+
+    '<div class="kpi-card"><div class="kpi-label">Support SLA</div><div class="kpi-val">12h</div><div class="kpi-delta up">On track</div></div>'+
+  '</div>'+
+  '<div class="dash-grid">'+
+    '<div class="panel"><h3>Deployed modules by category</h3>'+barChartSvgHtml([4,3,2,2],["Automation","AI Agents","Security","Analytics"])+'</div>'+
+    '<div class="panel"><h3>Recent activity</h3><div class="activity-list">'+
+      ['Invoice #INV-2291 issued — $38,400','Meridian Threat Response Pack — install verified','New engagement kicked off — Q3 Cloud Migration','Ledgerline Reconciliation Agent — configuration updated'].map(function(t,i){
+        return '<div class="activity-item"><span class="activity-dot"></span><div><div>'+t+'</div><div class="activity-time">'+(i+1)+'d ago</div></div></div>';
+      }).join("")+
+    '</div></div>'+
+  '</div>'+
+  '<div class="panel table-scroll"><h3>Project status</h3><table class="data-table">'+
+    '<thead><tr><th>Project</th><th>Lead</th><th>Phase</th><th>Status</th></tr></thead><tbody>'+
+    [["Core Settlement Rebuild","A. Ferreira","Migrate","In Progress"],["Threat Response Rollout","J. Osei","Verify","In Progress"],["Revenue Dashboard v2","M. Lindqvist","Launch","Resolved"],["Regional Cloud Expansion","A. Ferreira","Architect","Pending"]].map(function(r){
+      return "<tr><td>"+r[0]+"</td><td>"+r[1]+"</td><td>"+r[2]+"</td><td>"+statusPill(r[3])+"</td></tr>";
+    }).join("")+
+  '</tbody></table></div>';
+}
+function renderDashStaff(){
+  return '<div class="kpi-grid">'+
+    '<div class="kpi-card"><div class="kpi-label">Assigned tickets</div><div class="kpi-val">9</div><div class="kpi-delta down">▼ 2 closed today</div></div>'+
+    '<div class="kpi-card"><div class="kpi-label">Utilization</div><div class="kpi-val">87%</div><div class="kpi-delta up">▲ within target</div></div>'+
+    '<div class="kpi-card"><div class="kpi-label">Tasks due this week</div><div class="kpi-val">14</div><div class="kpi-delta up">On schedule</div></div>'+
+    '<div class="kpi-card"><div class="kpi-label">Avg. resolution time</div><div class="kpi-val">6.2h</div><div class="kpi-delta up">▲ improving</div></div>'+
+  '</div>'+
+  '<div class="dash-grid">'+
+    '<div class="panel"><h3>Utilization, trailing 6 weeks</h3>'+barChartSvgHtml([78,82,85,80,89,87],["W1","W2","W3","W4","W5","W6"])+'</div>'+
+    '<div class="panel"><h3>Team activity</h3><div class="activity-list">'+
+      ['Closed ticket #4021 — SLA breach root-caused','Picked up new task — Configure staging region','Paired with J. Osei on threat pack rollout','Submitted timesheet for week 34'].map(function(t,i){
+        return '<div class="activity-item"><span class="activity-dot"></span><div><div>'+t+'</div><div class="activity-time">'+(i+1)+'h ago</div></div></div>';
+      }).join("")+
+    '</div></div>'+
+  '</div>'+
+  '<div class="panel table-scroll"><h3>Assigned tickets</h3><table class="data-table">'+
+    '<thead><tr><th>Ticket</th><th>Client</th><th>Priority</th><th>Status</th></tr></thead><tbody>'+
+    [["#4032 — API latency spike","Basecourse Bank","High","In Progress"],["#4028 — SSO config request","Northfield Health","Medium","Pending"],["#4011 — Dashboard export bug","Tallybrook Retail","Low","Resolved"],["#4005 — Onboarding checklist","Arva Energy Grid","Medium","Resolved"]].map(function(r){
+      return "<tr><td>"+r[0]+"</td><td>"+r[1]+"</td><td>"+r[2]+"</td><td>"+statusPill(r[3])+"</td></tr>";
+    }).join("")+
+  '</tbody></table></div>';
+}
+var dashTabRenderers = { admin: renderDashAdmin, client: renderDashClient, staff: renderDashStaff };
+var currentDashTab = "admin";
+function renderDashboard(){
+  var mount = document.getElementById("dashboard-mount");
+  if(!mount) return;
+  mount.innerHTML = '<div id="dpanel-'+currentDashTab+'" role="tabpanel">' + dashTabRenderers[currentDashTab]() + '</div>';
+  var bars = mount.querySelectorAll(".bar");
+  bars.forEach(function(b){ var target = b.style.height; b.style.height = "0%"; requestAnimationFrame(function(){ requestAnimationFrame(function(){ b.style.height = target; }); }); });
+}
+function initDashboardTabs(){
+  var tabs = { admin: document.getElementById("dtab-admin"), client: document.getElementById("dtab-client"), staff: document.getElementById("dtab-staff") };
+  Object.keys(tabs).forEach(function(key){
+    if(!tabs[key]) return;
+    tabs[key].addEventListener("click", function(){
+      currentDashTab = key;
+      Object.keys(tabs).forEach(function(k){ tabs[k].setAttribute("aria-selected", k===key ? "true":"false"); });
+      renderDashboard();
+    });
+  });
+}
+
+/* ============================================================
+   MARKETPLACE SEARCH WIRING
+   ============================================================ */
+function initMarketplaceSearch(){
+  var input = document.getElementById("marketplace-search");
+  if(!input) return;
+  input.addEventListener("input", function(){
+    marketplaceState.query = input.value;
+    renderMarketplaceGrid();
+  });
+}
+
+/* ============================================================
+   ROUTER
+   ============================================================ */
+var VALID_ROUTES = ["home","services","solutions","marketplace","product","work","process","about","resources","pricing","contact","login","installer","dashboard"];
+function currentRouteId(){
+  var hash = (location.hash || "#home").replace("#","");
+  return VALID_ROUTES.indexOf(hash) > -1 ? hash : "home";
+}
+function router(){
+  var routeId = currentRouteId();
+  var sections = document.querySelectorAll(".route");
+  sections.forEach(function(sec){
+    var isActive = sec.getAttribute("data-route") === routeId;
+    sec.setAttribute("data-active", isActive ? "true":"false");
+    if(isActive){
+      sec.classList.remove("route-transition-enter");
+      void sec.offsetWidth;
+      if(!reduceMotion) sec.classList.add("route-transition-enter");
+    }
+  });
+  document.querySelectorAll("[data-nav]").forEach(function(link){
+    var isCurrent = link.getAttribute("href") === "#"+routeId;
+    if(isCurrent) link.setAttribute("aria-current","page"); else link.removeAttribute("aria-current");
+  });
+  if(!reduceMotion) window.scrollTo({ top:0, behavior:"auto" });
+  else window.scrollTo(0,0);
+
+  // per-route render triggers (idempotent, cheap to re-run)
+  if(routeId === "home"){ initReveal(); initCounters(); }
+  if(routeId === "services"){ initReveal(); }
+  if(routeId === "solutions"){ initReveal(); }
+  if(routeId === "marketplace"){ renderMarketplaceGrid(); }
+  if(routeId === "product"){ renderProductDetail(); }
+  if(routeId === "work"){ initReveal(); }
+  if(routeId === "process"){ initReveal(); }
+  if(routeId === "about"){ initReveal(); initCounters(); renderPresence(); }
+  if(routeId === "resources"){ initReveal(); }
+  if(routeId === "pricing"){ initReveal(); }
+  if(routeId === "installer"){ /* preserve wizard state across re-entry */ }
+  if(routeId === "dashboard"){ renderDashboard(); }
+
+  document.getElementById("main").focus({ preventScroll:true });
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+document.addEventListener("DOMContentLoaded", function(){
+  document.getElementById("main").setAttribute("tabindex","-1");
+
+  initIntro();
+  initTheme();
+  initMobileMenu();
+  initModal();
+
+  renderServices();
+  renderTrustStrip();
+  renderHomeCarousel();
+  initCarouselDrag();
+  renderProcessMini();
+
+  renderSolutions();
+
+  renderMarketplaceFilters();
+  initMarketplaceSearch();
+  renderMarketplaceGrid();
+
+  renderProductDetail(PRODUCTS[0]);
+
+  renderWorkFilters();
+  renderWork();
+
+  renderProcessTimeline();
+
+  renderPresence();
+
+  renderResourceFilters();
+  renderResources();
+  initNewsletter();
+
+  renderTiers();
+  renderCompareTable();
+  initPriceToggle();
+  renderFaq();
+
+  initContactForm();
+  initLoginForm();
+
+  initInstaller();
+
+  initDashboardTabs();
+  renderDashboard();
+
+  initGrain();
+
+  window.addEventListener("hashchange", router);
+  router();
+});
+
+})();
+</script>
 
 
