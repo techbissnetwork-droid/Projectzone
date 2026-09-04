@@ -121,8 +121,8 @@ $token = csrf_token();
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/style.css?v=<?= @filemtime(__DIR__ . '/../assets/style.css') ?: '1' ?>">
 <style>.expiry-chip{ display:inline-flex; align-items:center; gap:4px; padding:3px 9px; border-radius:var(--r-full); font-size:.74rem; font-weight:600; background:var(--surface-2); }
-.expiry-chip.soon{ background:rgba(217,119,6,.15); color:#b45309; }
-.expiry-chip.overdue{ background:rgba(220,38,38,.15); color:#dc2626; }</style>
+.expiry-chip.soon{ background:rgba(217,154,43,.15); color:var(--warning); }
+.expiry-chip.overdue{ background:rgba(224,96,74,.15); color:var(--danger); }</style>
 </head>
 <body>
 <?= admin_header($staff, 'businesses.php') ?>

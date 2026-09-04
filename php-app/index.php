@@ -216,6 +216,6 @@ if ($baseUrl !== '') {
   var TEAM_DATA = <?= json_encode($contentSections['team'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>;
   var VALUES_DATA = <?= json_encode($contentSections['values'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>;
 </script>
-<script src="assets/app.js?v=<?= @filemtime(__DIR__ . '/assets/app.js') ?: '1' ?>"></script>
+<script src="<?= e($basePath) ?>/assets/app.js?v=<?= @filemtime(__DIR__ . '/assets/app.js') ?: '1' ?>"></script>
 </body>
 </html>

@@ -15,7 +15,7 @@ $ICON_CHOICES = [
     'monitor', 'code', 'globe', 'rocket', 'chart', 'cart', 'heart', 'gear',
     'spark', 'flag', 'box', 'shield', 'users', 'chat', 'star', 'compass',
     'target', 'bolt', 'layers', 'refresh', 'mail', 'phone', 'calendar',
-    'lock', 'book', 'search', 'cloud',
+    'lock', 'book', 'search', 'cloud', 'puzzle',
 ];
 
 /**

@@ -9,20 +9,24 @@ if (!$customer) {
 }
 
 $pdo = db();
-$stmt = $pdo->prepare('SELECT id, name FROM businesses WHERE customer_id = ?');
+$stmt = $pdo->prepare('SELECT id, name FROM businesses WHERE customer_id = ? ORDER BY id');
 $stmt->execute([$customer['id']]);
-$business = $stmt->fetch();
+$businesses = $stmt->fetchAll();
 
-if (!$business) {
-    send_json(['business' => null, 'projects' => []]);
+if (!$businesses) {
+    send_json(['businesses' => []]);
 }
 
-$stmt = $pdo->prepare(
+$projStmt = $pdo->prepare(
     'SELECT id, title, status, progress_pct, domain,
             domain_expires_at, hosting_expires_at, ssl_expires_at, email_expires_at, notes
      FROM projects WHERE business_id = ? ORDER BY created_at DESC'
 );
-$stmt->execute([$business['id']]);
-$projects = $stmt->fetchAll();
 
-send_json(['business' => ['name' => $business['name']], 'projects' => $projects]);
+$result = [];
+foreach ($businesses as $b) {
+    $projStmt->execute([$b['id']]);
+    $result[] = ['id' => (int)$b['id'], 'name' => $b['name'], 'projects' => $projStmt->fetchAll()];
+}
+
+send_json(['businesses' => $result]);

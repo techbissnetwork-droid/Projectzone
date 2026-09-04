@@ -6,7 +6,7 @@ const ADMIN_NAV = [
     ['path' => 'tickets.php', 'label' => 'Tickets', 'icon' => 'chat'],
     ['path' => 'products.php', 'label' => 'Products', 'icon' => 'star'],
     ['path' => 'content.php', 'label' => 'Content', 'icon' => 'edit'],
-    ['path' => 'staff.php', 'label' => 'Staff', 'icon' => 'users'],
+    ['path' => 'staff.php', 'label' => 'Staff', 'icon' => 'shield'],
     ['path' => 'settings.php', 'label' => 'Settings', 'icon' => 'settings'],
 ];
 

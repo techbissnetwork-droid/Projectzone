@@ -10,7 +10,6 @@ var motionOK = !reduceQuery.matches;
 reduceQuery.addEventListener && reduceQuery.addEventListener('change', function(e){ motionOK = !e.matches; });
 function $(sel,ctx){ return (ctx||document).querySelector(sel); }
 function $all(sel,ctx){ return Array.prototype.slice.call((ctx||document).querySelectorAll(sel)); }
-function el(html){ var d=document.createElement('div'); d.innerHTML=html.trim(); return d.firstElementChild; }
 function fmtMoney(n){ return '$' + n.toLocaleString('en-US'); }
 var ESC_MAP = {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'};
 /* Every field that ultimately comes from an admin-editable source (Content,
@@ -107,11 +106,14 @@ $('#themeToggle').addEventListener('click', function(){
   function dismiss(){
     s.classList.add('hide');
     try{ sessionStorage.setItem('bloomIntro','1'); }catch(e){}
-    document.removeEventListener('click', dismiss);
+    document.removeEventListener('pointerdown', dismiss, true);
     document.removeEventListener('keydown', dismiss);
     setTimeout(function(){ s.remove(); }, 550);
   }
-  document.addEventListener('click', dismiss);
+  // Use the capture-phase pointerdown (not click) so pointer-events:none
+  // lands before the browser hit-tests the click, and the click itself
+  // reaches whatever the user actually meant to press underneath.
+  document.addEventListener('pointerdown', dismiss, true);
   document.addEventListener('keydown', dismiss);
   setTimeout(dismiss, motionOK ? 1400 : 250);
 })();
@@ -599,7 +601,7 @@ Pages['/resources'] = function(){
   +'<section class="section tone-c"><div class="container text-center">'
     +'<h2 style="max-width:20ch;margin-inline:auto;">Get the next field note before anyone else</h2>'
     +'<form id="newsForm" class="flex" style="max-width:420px;margin:24px auto 0;gap:10px;" onsubmit="return false;">'
-      +'<input type="email" id="newsEmail" required placeholder="you@company.com" aria-label="Email address" style="flex:1;padding:14px 18px;border-radius:var(--r-full);border:1.5px solid var(--border);background:var(--surface);outline:none;">'
+      +'<input type="email" id="newsEmail" required placeholder="you@company.com" aria-label="Email address" style="flex:1;min-width:0;padding:14px 18px;border-radius:var(--r-full);border:1.5px solid var(--border);background:var(--surface);outline:none;">'
       +'<button class="btn btn-primary" type="submit">Subscribe</button>'
     +'</form><p id="newsMsg" class="badge success" style="display:none;margin-top:14px;">'+ico('check')+' You\'re on the list — welcome!</p>'
     +'<p id="newsError" class="badge danger" hidden style="margin-top:14px;"></p>'
@@ -681,7 +683,7 @@ Pages['/login'] = function(){
         +'<form id="signinForm" onsubmit="return false;">'
           +'<div class="field"><label for="liEmail">Email</label><input id="liEmail" type="email" required placeholder="you@company.com"></div>'
           +'<div class="field"><label for="liPass">Password</label><input id="liPass" type="password" required placeholder="••••••••"></div>'
-          +'<div class="flex justify-between items-center" style="margin-bottom:20px;"><label class="flex items-center gap-8" style="font-size:.85rem;"><input type="checkbox"> Remember me</label><a href="'+BP+'/contact" style="font-size:.85rem;color:var(--accent-1);font-weight:600;">Forgot password?</a></div>'
+          +'<div class="flex items-center" style="justify-content:flex-end;margin-bottom:20px;"><a href="'+BP+'/contact" style="font-size:.85rem;color:var(--accent-1);font-weight:600;">Forgot password?</a></div>'
           +'<button class="btn btn-primary btn-block magnetic" type="submit">Sign in</button>'
         +'</form>'
         +'<p id="loginMsg" class="badge success" style="display:none;margin-top:16px;">'+ico('check')+' Welcome back — redirecting…</p>'
@@ -730,11 +732,15 @@ function dashProjectCard(p){
     +(p.notes?'<p style="font-size:.9rem;color:var(--ink-soft);margin:0;">'+esc(p.notes)+'</p>':'')
   +'</div>';
 }
-function dashRequestFormHTML(){
+function dashRequestFormHTML(businesses){
+  var picker = (businesses && businesses.length > 1)
+    ? '<div class="field"><label for="reqBiz">Which business is this for?</label><select id="reqBiz">'+businesses.map(function(b){ return '<option value="'+b.id+'">'+esc(b.name)+'</option>'; }).join('')+'</select></div>'
+    : '';
   return '<div class="card" style="margin-top:18px;">'
     +'<div class="card-head">'+blobIcon('plus','sm',true)+'<h3>Request a new project</h3></div>'
     +'<p class="lede" style="margin-bottom:14px;">Need a new site, app, or something added to what you already have? Tell us here and we\'ll follow up.</p>'
     +'<form id="reqProjectForm" onsubmit="return false;">'
+      +picker
       +'<div class="field"><label for="reqTitle">What do you need?</label><input id="reqTitle" required placeholder="e.g. A new online store"></div>'
       +'<div class="field"><label for="reqDesc">Any details?</label><textarea id="reqDesc" placeholder="Optional — anything that helps us scope it."></textarea></div>'
       +'<button class="btn btn-primary" type="submit">Send request</button>'
@@ -750,7 +756,10 @@ function wireRequestForm(){
     var errEl = $('#reqError'), msgEl = $('#reqMsg');
     errEl.hidden = true;
     var btn = f.querySelector('button[type=submit]'); btn.disabled = true;
-    fetch(BP+'/api/project-request.php', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ title: $('#reqTitle').value, description: $('#reqDesc').value }) })
+    var bizSel = $('#reqBiz');
+    var payload = { title: $('#reqTitle').value, description: $('#reqDesc').value };
+    if(bizSel) payload.business_id = bizSel.value;
+    fetch(BP+'/api/project-request.php', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) })
       .then(function(r){ return r.json().then(function(data){ return {ok:r.ok, data:data}; }); })
       .then(function(res){
         btn.disabled = false;
@@ -768,18 +777,28 @@ function wireRequestForm(){
 function wireDashboard(){
   var body = $('#dashBody');
   fetch(BP+'/api/dashboard.php').then(function(r){ return r.json(); }).then(function(data){
-    if(!data.business){
+    var businesses = data.businesses || [];
+    if(!businesses.length){
       body.innerHTML = dashEmptyState('users','Your project isn\'t linked yet','Once our team sets up your account, your project status will show up here.','<a href="'+BP+'/contact" class="btn btn-primary">Contact us</a>');
       return;
     }
-    if(!data.projects || !data.projects.length){
-      body.innerHTML = dashEmptyState('rocket','No projects yet','Your project will show up here once it kicks off.') + dashRequestFormHTML();
-      wireRequestForm();
-      return;
+    var anyProjects = businesses.some(function(b){ return b.projects && b.projects.length; });
+    var html = '';
+    businesses.forEach(function(b){
+      if(businesses.length > 1){
+        html += '<h3 style="margin:'+(html?'28px':'0')+' 0 12px;">'+esc(b.name)+'</h3>';
+      }
+      if(b.projects && b.projects.length){
+        html += b.projects.map(dashProjectCard).join('');
+      } else {
+        html += dashEmptyState('rocket','No projects yet','This business\'s project will show up here once it kicks off.');
+      }
+    });
+    if(anyProjects){
+      html += '<div class="card" style="background:var(--grad);color:#fff2ea;border:none;"><div class="card-head">'+blobIcon('users','sm',false)+'<h3 style="color:#fff2ea;">Need something changed?</h3></div><p style="color:rgba(255,242,234,.9);">Reach out any time — we\'ll take it from there.</p><a href="'+BP+'/contact" class="btn" style="background:#fff2ea;color:var(--accent-1);">Contact us</a></div>';
     }
-    body.innerHTML = data.projects.map(dashProjectCard).join('')
-      +'<div class="card" style="background:var(--grad);color:#fff2ea;border:none;"><div class="card-head">'+blobIcon('users','sm',false)+'<h3 style="color:#fff2ea;">Need something changed?</h3></div><p style="color:rgba(255,242,234,.9);">Reach out any time — we\'ll take it from there.</p><a href="'+BP+'/contact" class="btn" style="background:#fff2ea;color:var(--accent-1);">Contact us</a></div>'
-      +dashRequestFormHTML();
+    html += dashRequestFormHTML(businesses);
+    body.innerHTML = html;
     wireRequestForm();
   }).catch(function(){
     body.innerHTML = '<p class="badge danger">Could not load your project details — please try again.</p>';

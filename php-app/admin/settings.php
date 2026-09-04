@@ -216,9 +216,9 @@ $socialPath = $current['social_image_path'] ?? 'assets/social-default.png';
       <div class="field"><label>Page title (browser tab, search results)</label><input name="seo_title" value="<?= e($current['seo_title'] ?? '') ?>"></div>
       <div class="field"><label>Meta description (search results snippet)</label><textarea name="meta_description"><?= e($current['meta_description'] ?? '') ?></textarea></div>
       <div class="field"><label>Social share image</label>
-        <div class="flex items-center gap-12">
+        <div class="flex items-center gap-12" style="flex-wrap:wrap;">
           <img class="settings-preview" src="../<?= e($socialPath) ?>" alt="" style="width:100px;height:56px;">
-          <input type="file" name="social_image" accept="image/png,image/jpeg">
+          <input type="file" name="social_image" accept="image/png,image/jpeg" style="min-width:0;max-width:100%;">
         </div>
         <?php if (($current['social_image_path'] ?? 'assets/social-default.png') !== 'assets/social-default.png'): ?>
         <label class="flex items-center gap-8" style="font-size:.8rem;margin-top:8px;"><input type="checkbox" name="remove_social_image"> Remove custom social image (revert to default)</label>
@@ -232,9 +232,9 @@ $socialPath = $current['social_image_path'] ?? 'assets/social-default.png';
     <div class="card admin-form-card">
       <div class="grid grid-2" style="gap:16px;">
         <div class="field"><label>Logo</label>
-          <div class="flex items-center gap-12">
+          <div class="flex items-center gap-12" style="flex-wrap:wrap;">
             <img class="settings-preview" src="<?= $logoPath !== '' ? '../' . e($logoPath) : '../assets/brand/logo-512.png' ?>" alt="">
-            <input type="file" name="logo" accept="image/png,image/jpeg,image/webp">
+            <input type="file" name="logo" accept="image/png,image/jpeg,image/webp" style="min-width:0;max-width:100%;">
           </div>
           <?php if ($logoPath !== ''): ?>
           <label class="flex items-center gap-8" style="font-size:.8rem;margin-top:8px;"><input type="checkbox" name="remove_logo"> Remove custom logo (revert to the default TECHBISS mark)</label>
@@ -249,9 +249,9 @@ $socialPath = $current['social_image_path'] ?? 'assets/social-default.png';
           </select>
         </div>
         <div class="field"><label>Favicon</label>
-          <div class="flex items-center gap-12">
+          <div class="flex items-center gap-12" style="flex-wrap:wrap;">
             <img class="settings-preview" src="../<?= e($faviconPath) ?>" alt="">
-            <input type="file" name="favicon" accept="image/png">
+            <input type="file" name="favicon" accept="image/png" style="min-width:0;max-width:100%;">
           </div>
           <?php if (($current['favicon_path'] ?? 'assets/favicon.ico') !== 'assets/favicon.ico'): ?>
           <label class="flex items-center gap-8" style="font-size:.8rem;margin-top:8px;"><input type="checkbox" name="remove_favicon"> Remove custom favicon (revert to default)</label>

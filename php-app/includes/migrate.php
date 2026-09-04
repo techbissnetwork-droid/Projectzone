@@ -53,9 +53,3 @@ function run_migration(PDO $pdo, string $file, array $context = []): void
     $stmt = $pdo->prepare('INSERT INTO schema_migrations (id) VALUES (?)');
     $stmt->execute([$id]);
 }
-
-function has_ever_migrated(PDO $pdo): bool
-{
-    ensure_migrations_table($pdo);
-    return (int)$pdo->query('SELECT COUNT(*) FROM schema_migrations')->fetchColumn() > 0;
-}

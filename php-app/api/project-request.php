@@ -13,16 +13,33 @@ if (!$customer) {
 }
 
 $pdo = db();
-$stmt = $pdo->prepare('SELECT id FROM businesses WHERE customer_id = ?');
+$stmt = $pdo->prepare('SELECT id FROM businesses WHERE customer_id = ? ORDER BY id');
 $stmt->execute([$customer['id']]);
-$business = $stmt->fetch();
-if (!$business) {
+$businesses = $stmt->fetchAll();
+if (!$businesses) {
     send_json(['error' => 'Your account isn\'t linked to a business yet — please use the Contact page instead.'], 400);
 }
 
 $body = json_body();
 $title = trim((string)($body['title'] ?? ''));
 $description = trim((string)($body['description'] ?? ''));
+$requestedId = (int)($body['business_id'] ?? 0);
+
+if (count($businesses) === 1) {
+    $businessId = (int)$businesses[0]['id'];
+} else {
+    $businessId = null;
+    foreach ($businesses as $b) {
+        if ((int)$b['id'] === $requestedId) {
+            $businessId = $requestedId;
+            break;
+        }
+    }
+    if ($businessId === null) {
+        send_json(['error' => 'Please choose which business this request is for.'], 400);
+    }
+}
+
 if ($title === '') {
     send_json(['error' => 'Please describe what you\'d like built.'], 400);
 }
@@ -34,6 +51,6 @@ if ($description !== '') {
 $ticketTitle = mb_substr($ticketTitle, 0, 255);
 
 $stmt = $pdo->prepare('INSERT INTO tickets (business_id, title, priority, status) VALUES (?, ?, ?, ?)');
-$stmt->execute([$business['id'], $ticketTitle, 'Normal', 'Open']);
+$stmt->execute([$businessId, $ticketTitle, 'Normal', 'Open']);
 
 send_json(['ok' => true]);

@@ -321,6 +321,7 @@ button{ cursor:pointer; }
 
 /* ============================= GRIDS & CARDS ============================= */
 .grid{ display:grid; gap:26px; }
+.grid > *{ min-width:0; }
 .grid-2{ grid-template-columns:repeat(2,1fr); }
 .grid-3{ grid-template-columns:repeat(3,1fr); }
 .grid-4{ grid-template-columns:repeat(4,1fr); }
@@ -445,10 +446,10 @@ button{ cursor:pointer; }
 .step-line.done{ background:var(--grad); }
 
 /* ============================= FORMS ============================= */
-.field{ display:flex; flex-direction:column; gap:8px; margin-bottom:20px; }
+.field{ display:flex; flex-direction:column; gap:8px; margin-bottom:20px; min-width:0; }
 .field label{ font-family:var(--font-display); font-weight:600; font-size:.88rem; }
 .field input, .field select, .field textarea{
-  padding:14px 16px; border-radius:16px; border:1.5px solid var(--border); background:var(--surface); outline:none;
+  width:100%; min-width:0; padding:14px 16px; border-radius:16px; border:1.5px solid var(--border); background:var(--surface); outline:none;
   transition:border-color .25s ease, box-shadow .25s ease;
 }
 .field input:focus, .field select:focus, .field textarea:focus{ border-color:var(--accent-1); box-shadow:0 0 0 4px var(--grad-soft); }
@@ -650,23 +651,13 @@ main{ display:block; }
 #tab-general:checked ~ .tab-labels label[for="tab-general"],
 #tab-stats:checked ~ .tab-labels label[for="tab-stats"],
 #tab-seo:checked ~ .tab-labels label[for="tab-seo"],
-#tab-branding:checked ~ .tab-labels label[for="tab-branding"],
-#tab-c-services:checked ~ .tab-labels label[for="tab-c-services"],
-#tab-c-industries:checked ~ .tab-labels label[for="tab-c-industries"],
-#tab-c-cases:checked ~ .tab-labels label[for="tab-c-cases"],
-#tab-c-pricing:checked ~ .tab-labels label[for="tab-c-pricing"],
-#tab-c-team:checked ~ .tab-labels label[for="tab-c-team"]{
+#tab-branding:checked ~ .tab-labels label[for="tab-branding"]{
   background:var(--grad-soft); color:var(--accent-1); border-color:transparent;
 }
 #tab-general:checked ~ #panel-general,
 #tab-stats:checked ~ #panel-stats,
 #tab-seo:checked ~ #panel-seo,
-#tab-branding:checked ~ #panel-branding,
-#tab-c-services:checked ~ #panel-c-services,
-#tab-c-industries:checked ~ #panel-c-industries,
-#tab-c-cases:checked ~ #panel-c-cases,
-#tab-c-pricing:checked ~ #panel-c-pricing,
-#tab-c-team:checked ~ #panel-c-team{ display:block; }
+#tab-branding:checked ~ #panel-branding{ display:block; }
 .content-item{ background:var(--surface-2); }
 .content-item summary::-webkit-details-marker{ display:none; }
 
