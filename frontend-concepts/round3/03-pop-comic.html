@@ -1191,20 +1191,20 @@
   });
   function priceFmt(n){ return "$" + n.toLocaleString("en-US"); }
   products.forEach(function(p, idx){
-    var card = document.createElement("button");
-    card.type = "button";
+    var card = document.createElement("div");
     card.className = "panel panel--hover product-card";
     card.dataset.cat = p.cat;
     card.dataset.idx = idx;
-    card.setAttribute("aria-haspopup","dialog");
     card.innerHTML =
       '<span class="eyebrow product-cat">'+p.cat+'</span>' +
       '<h3>'+p.name+'</h3>' +
       '<span class="product-vendor">by '+p.vendor+'</span>' +
       starRow(p.rating) +
       '<p class="product-blurb">'+p.blurb+'</p>' +
-      '<div class="product-foot"><span class="product-price">'+priceFmt(p.price)+'</span><span class="btn btn--sm btn--yellow">Preview</span></div>';
-    card.addEventListener("click", function(){ openModal(p, card); });
+      '<div class="product-foot"><span class="product-price">'+priceFmt(p.price)+'</span>' +
+      '<button type="button" class="btn btn--sm btn--yellow" aria-haspopup="dialog" aria-label="Preview '+p.name+'">Preview</button></div>';
+    var trigger = card.querySelector("button");
+    trigger.addEventListener("click", function(){ openModal(p, trigger); });
     marketGrid.appendChild(card);
   });
   function applyFilter(cat){

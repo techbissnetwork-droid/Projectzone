@@ -1,0 +1,1475 @@
+<title>TECHBISS — Kinetic Op</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Work+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* ============================================================
+   TOKENS
+   ============================================================ */
+:root{
+  --bg:#f5f5f2;
+  --surface:#ffffff;
+  --ink:#0a0a0a;
+  --ink-muted:#55555a;
+  --accent:#ff1053;
+  --accent-ink:#ffffff;
+  --line:#0a0a0a;
+  --line-soft:#d6d6d1;
+  --font-display:"Anton","Arial Narrow",Impact,sans-serif;
+  --font-body:"Work Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --ease:cubic-bezier(.65,0,.35,1);
+  --dur-s:.16s;
+  --dur-m:.4s;
+  --dur-l:.8s;
+  --stripe-w:10px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0a0a0a;
+    --surface:#141414;
+    --ink:#f5f5f2;
+    --ink-muted:#a3a3a0;
+    --line:#f5f5f2;
+    --line-soft:#2b2b29;
+    --accent:#ff1053;
+    --accent-ink:#0a0a0a;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0a0a0a;
+  --surface:#141414;
+  --ink:#f5f5f2;
+  --ink-muted:#a3a3a0;
+  --line:#f5f5f2;
+  --line-soft:#2b2b29;
+  --accent:#ff1053;
+  --accent-ink:#0a0a0a;
+  color-scheme:dark;
+}
+:root[data-theme="light"]{ color-scheme:light; }
+
+*,*::before,*::after{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} }
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+#app{background:var(--bg);color:var(--ink);transition:background var(--dur-m) var(--ease),color var(--dur-m) var(--ease);}
+img,svg{max-width:100%;display:block;}
+a{color:inherit;text-decoration:none;}
+button,input,select,textarea{font-family:inherit;color:inherit;font-size:1em;}
+h1,h2,h3,h4,p,fieldset,figure{margin:0;padding:0;border:0;}
+ul{margin:0;padding:0;list-style:none;}
+::selection{background:var(--accent);color:var(--accent-ink);}
+:focus{outline:none;}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px;}
+.visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;padding:0;margin:-1px;}
+
+.wrap{max-width:1280px;margin:0 auto;padding-inline:clamp(20px,5vw,56px);}
+.eyebrow{font-family:var(--font-display);font-weight:400;letter-spacing:.14em;text-transform:uppercase;font-size:.78rem;color:var(--accent);display:flex;align-items:center;gap:10px;}
+.eyebrow::before{content:"";width:22px;height:3px;background:var(--accent);display:block;}
+h2.section-title{font-family:var(--font-display);font-weight:400;text-transform:uppercase;letter-spacing:.01em;font-size:clamp(2.1rem,5.4vw,4rem);line-height:.96;margin-top:10px;}
+.section-lede{font-size:1.05rem;line-height:1.6;color:var(--ink-muted);max-width:56ch;margin-top:16px;}
+.section-head{margin-bottom:clamp(36px,6vw,64px);}
+section{position:relative;padding-block:clamp(64px,10vw,120px);}
+
+/* ============================================================
+   OP-ART STRUCTURAL DEVICES
+   ============================================================ */
+.stripe-band{
+  background-image:repeating-linear-gradient(45deg,var(--ink) 0 var(--stripe-w),var(--bg) var(--stripe-w) calc(var(--stripe-w)*2),var(--ink) calc(var(--stripe-w)*2) calc(var(--stripe-w)*3),var(--accent) calc(var(--stripe-w)*3) calc(var(--stripe-w)*3.4),var(--ink) calc(var(--stripe-w)*3.4) calc(var(--stripe-w)*4.4),var(--bg) calc(var(--stripe-w)*4.4) calc(var(--stripe-w)*5.4));
+  background-size:200% 200%;
+  background-position:var(--shift,0) 0;
+}
+.stripe-divider{height:14px;width:100%;background-image:repeating-linear-gradient(-45deg,var(--ink) 0 8px,var(--bg) 8px 16px,var(--accent) 16px 19px,var(--bg) 19px 27px);background-size:220% 220%;background-position:var(--shift,0) 0;}
+.stripe-rule{height:5px;width:100%;background-image:repeating-linear-gradient(90deg,var(--ink) 0 6px,var(--bg) 6px 12px);}
+.card-stripe-top{height:9px;width:100%;background-image:repeating-linear-gradient(-45deg,var(--ink) 0 5px,transparent 5px 10px,var(--accent) 10px 12px,transparent 12px 17px);background-color:var(--surface);}
+@media (prefers-reduced-motion: no-preference){ .stripe-band,.stripe-divider{ transition:background-position 0s; } }
+
+/* ============================================================
+   SKIP LINK
+   ============================================================ */
+.skip-link{position:fixed;top:-100px;left:16px;z-index:9999;background:var(--accent);color:var(--accent-ink);padding:12px 20px;font-weight:700;transition:top var(--dur-s) var(--ease);}
+.skip-link:focus{top:16px;}
+
+/* ============================================================
+   LOADER
+   ============================================================ */
+#loader{position:fixed;inset:0;z-index:10000;background:var(--bg);display:flex;align-items:center;justify-content:center;transition:opacity .5s var(--ease),visibility .5s var(--ease);}
+#loader.hide{opacity:0;visibility:hidden;pointer-events:none;}
+.loader-rings{position:relative;width:min(46vw,220px);aspect-ratio:1;}
+.loader-rings span{position:absolute;inset:0;border-radius:50%;border:3px solid var(--ink);opacity:0;transform:scale(.1);animation:loaderPulse 1.6s var(--ease) forwards;}
+.loader-rings span:nth-child(1){animation-delay:0s;border-color:var(--ink);}
+.loader-rings span:nth-child(2){animation-delay:.12s;border-color:var(--accent);}
+.loader-rings span:nth-child(3){animation-delay:.24s;border-color:var(--ink);}
+.loader-rings span:nth-child(4){animation-delay:.36s;border-color:var(--accent);}
+.loader-mark{position:absolute;font-family:var(--font-display);font-size:1.4rem;letter-spacing:.05em;color:var(--ink);}
+@keyframes loaderPulse{0%{opacity:1;transform:scale(.05);}70%{opacity:1;}100%{opacity:0;transform:scale(1);}}
+@media (prefers-reduced-motion: reduce){
+  .loader-rings span{animation:none;opacity:1;transform:scale(1);border-width:1.5px;}
+  #loader{transition:opacity .18s linear;}
+}
+
+/* ============================================================
+   HEADER / NAV
+   ============================================================ */
+.site-header{position:sticky;top:0;z-index:900;background:var(--bg);border-bottom:2px solid var(--ink);}
+.site-header .nav{display:flex;align-items:center;justify-content:space-between;gap:24px;padding-block:16px;}
+.wordmark{font-family:var(--font-display);font-size:1.5rem;letter-spacing:.02em;text-transform:uppercase;white-space:nowrap;}
+.wordmark .dot{color:var(--accent);}
+.nav-links{display:flex;gap:28px;}
+.nav-links a{font-weight:600;font-size:.92rem;text-transform:uppercase;letter-spacing:.03em;position:relative;padding-bottom:4px;}
+.nav-links a::after{content:"";position:absolute;left:0;bottom:0;width:0;height:2px;background:var(--accent);transition:width var(--dur-s) var(--ease);}
+.nav-links a:hover::after,.nav-links a:focus-visible::after{width:100%;}
+.nav-actions{display:flex;align-items:center;gap:16px;}
+.icon-btn{width:40px;height:40px;display:flex;align-items:center;justify-content:center;border:2px solid var(--ink);background:var(--surface);cursor:pointer;transition:transform var(--dur-s) var(--ease),background var(--dur-s) var(--ease);}
+.icon-btn:hover{background:var(--ink);border-color:var(--ink);}
+.icon-btn:hover svg{stroke:var(--bg);}
+.icon-btn svg{stroke:var(--ink);transition:stroke var(--dur-s) var(--ease);}
+.signin-link{font-weight:600;font-size:.92rem;text-transform:uppercase;letter-spacing:.03em;}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 26px;font-weight:700;font-size:.9rem;text-transform:uppercase;letter-spacing:.04em;cursor:pointer;border:2px solid var(--ink);transition:transform var(--dur-s) var(--ease),box-shadow var(--dur-s) var(--ease),background var(--dur-s) var(--ease),color var(--dur-s) var(--ease);}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);}
+.btn-primary:hover{transform:translate(-3px,-3px);box-shadow:5px 5px 0 var(--ink);}
+.btn-outline{background:transparent;color:var(--ink);}
+.btn-outline:hover{transform:translate(-3px,-3px);box-shadow:5px 5px 0 var(--accent);}
+.btn-block-ink{background:var(--ink);border-color:var(--ink);color:var(--bg);}
+.btn-block-ink:hover{transform:translate(-3px,-3px);box-shadow:5px 5px 0 var(--accent);}
+.hamburger{display:none;width:44px;height:44px;border:2px solid var(--ink);background:var(--surface);cursor:pointer;flex-direction:column;align-items:center;justify-content:center;gap:5px;}
+.hamburger span{width:20px;height:2px;background:var(--ink);transition:transform var(--dur-s) var(--ease),opacity var(--dur-s) var(--ease);}
+.hamburger[aria-expanded="true"] span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.hamburger[aria-expanded="true"] span:nth-child(2){opacity:0;}
+.hamburger[aria-expanded="true"] span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+
+.mobile-menu{position:fixed;inset:0 0 0 auto;top:0;width:min(86vw,420px);height:100vh;background:var(--bg);border-left:2px solid var(--ink);z-index:950;transform:translateX(100%);transition:transform var(--dur-m) var(--ease);display:flex;flex-direction:column;}
+.mobile-menu.open{transform:translateX(0);}
+.mobile-menu .stripe-divider{flex-shrink:0;}
+.mobile-menu-inner{padding:28px;display:flex;flex-direction:column;gap:22px;overflow-y:auto;flex:1;}
+.mobile-menu-top{display:flex;justify-content:flex-end;}
+.mobile-menu a{font-family:var(--font-display);font-size:1.6rem;text-transform:uppercase;}
+.mobile-menu-actions{margin-top:auto;display:flex;flex-direction:column;gap:14px;}
+.scrim{position:fixed;inset:0;background:rgba(10,10,10,.5);z-index:940;opacity:0;visibility:hidden;transition:opacity var(--dur-m) var(--ease),visibility var(--dur-m) var(--ease);}
+.scrim.show{opacity:1;visibility:visible;}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero{padding-top:clamp(48px,8vw,88px);}
+.hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(32px,6vw,64px);align-items:center;}
+.hero-copy h1{font-family:var(--font-display);font-weight:400;text-transform:uppercase;font-size:clamp(2.6rem,6.4vw,5.2rem);line-height:.94;letter-spacing:-.01em;margin-top:14px;}
+.hero-copy h1 em{font-style:normal;color:var(--accent);}
+.hero-copy p{margin-top:22px;font-size:1.15rem;line-height:1.6;color:var(--ink-muted);max-width:54ch;}
+.hero-ctas{margin-top:32px;display:flex;flex-wrap:wrap;gap:16px;}
+
+.hero-visual{position:relative;aspect-ratio:1;width:100%;max-width:480px;margin-inline:auto;}
+.opart-wheel{position:absolute;inset:0;border-radius:50%;overflow:hidden;border:3px solid var(--ink);background:var(--surface);}
+.opart-wheel::before{content:"";position:absolute;inset:0;border-radius:50%;background:repeating-radial-gradient(circle at center,var(--ink) 0 3px,var(--bg) 3px 7px,var(--ink) 7px 10px,var(--bg) 10px 16px,var(--ink) 16px 18px,var(--bg) 18px 26px,var(--ink) 26px 27px,var(--bg) 27px 38px);animation:opRingPulse 7s ease-in-out infinite;}
+.opart-wheel::after{content:"";position:absolute;inset:14%;border-radius:50%;background:repeating-conic-gradient(from 0deg,var(--accent) 0deg 3.5deg,transparent 3.5deg 9deg);animation:opSpin 40s linear infinite;}
+.opart-core{position:absolute;inset:41%;border-radius:50%;background:var(--ink);border:3px solid var(--bg);z-index:2;}
+.opart-core::after{content:"";position:absolute;inset:30%;border-radius:50%;background:var(--accent);}
+@keyframes opRingPulse{0%,100%{background-size:100% 100%;}50%{background-size:112% 112%;}}
+@keyframes opSpin{to{transform:rotate(360deg);}}
+@media (prefers-reduced-motion: reduce){
+  .opart-wheel::before,.opart-wheel::after{animation:none;}
+}
+
+.stats-row{margin-top:clamp(52px,8vw,84px);display:grid;grid-template-columns:repeat(4,1fr);border:2px solid var(--ink);}
+.stat-tile{padding:26px 18px;border-left:2px solid var(--ink);text-align:left;}
+.stat-tile:first-child{border-left:0;}
+.stat-num{font-family:var(--font-display);font-size:clamp(1.9rem,3.6vw,2.9rem);color:var(--accent);line-height:1;}
+.stat-label{margin-top:10px;font-size:.82rem;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-muted);font-weight:600;}
+
+/* ============================================================
+   TRUSTED-BY STRIP
+   ============================================================ */
+.trusted{padding-block:0;}
+.trusted-band{padding-block:44px;}
+.trusted-inner{max-width:1280px;margin:0 auto;padding-inline:clamp(20px,5vw,56px);}
+.trusted-label{font-family:var(--font-display);color:var(--surface);text-transform:uppercase;font-size:.85rem;letter-spacing:.1em;margin-bottom:20px;}
+.trusted-row{display:flex;flex-wrap:wrap;gap:14px;}
+.client-chip{background:var(--surface);border:2px solid var(--ink);padding:12px 22px;font-family:var(--font-display);font-size:1.05rem;text-transform:uppercase;letter-spacing:.02em;}
+
+/* ============================================================
+   SERVICES
+   ============================================================ */
+.cards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+.svc-card{background:var(--surface);border:2px solid var(--ink);display:flex;flex-direction:column;transition:transform var(--dur-s) var(--ease),box-shadow var(--dur-s) var(--ease);}
+.svc-card:hover{transform:translate(-4px,-4px);box-shadow:6px 6px 0 var(--accent);}
+.svc-body{padding:26px 24px 28px;}
+.svc-icon{width:52px;height:52px;border:2px solid var(--ink);display:flex;align-items:center;justify-content:center;margin-bottom:18px;}
+.svc-icon svg{width:28px;height:28px;stroke:var(--ink);fill:none;stroke-width:1.7;}
+.svc-body h3{font-family:var(--font-display);font-weight:400;text-transform:uppercase;font-size:1.3rem;line-height:1.05;}
+.svc-body p{margin-top:12px;font-size:.94rem;line-height:1.55;color:var(--ink-muted);}
+.svc-bullets{margin-top:16px;display:flex;flex-direction:column;gap:7px;}
+.svc-bullets li{font-size:.85rem;font-weight:600;padding-left:16px;position:relative;}
+.svc-bullets li::before{content:"";position:absolute;left:0;top:.5em;width:8px;height:2px;background:var(--accent);}
+
+/* ============================================================
+   SOLUTIONS
+   ============================================================ */
+.tabs{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:32px;}
+.tab-chip{border:2px solid var(--ink);background:var(--surface);padding:11px 20px;font-weight:700;font-size:.88rem;text-transform:uppercase;letter-spacing:.02em;cursor:pointer;transition:background var(--dur-s) var(--ease),color var(--dur-s) var(--ease),transform var(--dur-s) var(--ease);}
+.tab-chip:hover{transform:translateY(-2px);}
+.tab-chip[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);}
+.tab-panel{border:2px solid var(--ink);background:var(--surface);padding:clamp(26px,4vw,44px);display:grid;grid-template-columns:1fr 1fr;gap:32px;}
+.tab-panel h3{font-family:var(--font-display);font-weight:400;text-transform:uppercase;font-size:1.9rem;}
+.tab-panel p{margin-top:14px;font-size:1rem;line-height:1.6;color:var(--ink-muted);}
+.tab-stat-list{display:flex;flex-direction:column;gap:0;border-top:2px solid var(--line-soft);}
+.tab-stat{display:flex;justify-content:space-between;align-items:baseline;padding:14px 0;border-bottom:2px solid var(--line-soft);}
+.tab-stat .num{font-family:var(--font-display);font-size:1.5rem;color:var(--accent);}
+.tab-stat .lbl{font-size:.85rem;color:var(--ink-muted);font-weight:600;}
+
+/* ============================================================
+   MARKETPLACE
+   ============================================================ */
+.filter-chips{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:30px;}
+.filter-chip{border:2px solid var(--ink);background:transparent;padding:9px 18px;font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:.02em;cursor:pointer;transition:background var(--dur-s) var(--ease),color var(--dur-s) var(--ease);}
+.filter-chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink);}
+.product-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+.product-card{background:var(--surface);border:2px solid var(--ink);display:flex;flex-direction:column;text-align:left;cursor:pointer;transition:transform var(--dur-s) var(--ease),box-shadow var(--dur-s) var(--ease);width:100%;padding:0;}
+.product-card:hover{transform:translate(-4px,-4px);box-shadow:6px 6px 0 var(--ink);}
+.product-body{padding:22px;}
+.product-cat{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);}
+.product-body h3{font-family:var(--font-display);font-weight:400;text-transform:uppercase;font-size:1.3rem;margin-top:8px;}
+.product-vendor{font-size:.82rem;color:var(--ink-muted);margin-top:4px;}
+.product-blurb{font-size:.88rem;line-height:1.5;color:var(--ink-muted);margin-top:12px;}
+.product-meta{display:flex;justify-content:space-between;align-items:center;margin-top:18px;padding-top:16px;border-top:2px solid var(--line-soft);}
+.product-rating{font-size:.85rem;font-weight:700;}
+.product-rating .stars{color:var(--accent);}
+.product-price{font-family:var(--font-display);font-size:1.15rem;}
+
+/* modal */
+.modal-scrim{position:fixed;inset:0;background:rgba(10,10,10,.6);z-index:970;opacity:0;visibility:hidden;transition:opacity var(--dur-m) var(--ease),visibility var(--dur-m) var(--ease);display:flex;align-items:center;justify-content:center;padding:20px;}
+.modal-scrim.show{opacity:1;visibility:visible;}
+.modal{background:var(--surface);border:3px solid var(--ink);max-width:560px;width:100%;max-height:88vh;overflow-y:auto;transform:translateY(24px) scale(.98);opacity:0;transition:transform var(--dur-m) var(--ease),opacity var(--dur-m) var(--ease);}
+.modal-scrim.show .modal{transform:translateY(0) scale(1);opacity:1;}
+.modal-top{display:flex;justify-content:space-between;align-items:flex-start;padding:22px 22px 0;}
+.modal-close{width:38px;height:38px;border:2px solid var(--ink);background:var(--bg);cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.modal-body{padding:6px 24px 28px;}
+.modal-body h3{font-family:var(--font-display);font-weight:400;text-transform:uppercase;font-size:1.8rem;}
+.modal-body .product-vendor{margin-top:6px;}
+.modal-body p{margin-top:16px;font-size:.95rem;line-height:1.6;color:var(--ink-muted);}
+.modal-price-row{display:flex;align-items:baseline;justify-content:space-between;margin-top:22px;padding-top:18px;border-top:2px solid var(--line-soft);}
+.modal-price{font-family:var(--font-display);font-size:2rem;color:var(--accent);}
+.modal-body .btn{width:100%;margin-top:20px;}
+
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);border:2px solid var(--accent);padding:16px 26px;font-weight:700;font-size:.92rem;display:flex;align-items:center;gap:12px;z-index:1000;opacity:0;visibility:hidden;transition:opacity var(--dur-m) var(--ease),transform var(--dur-m) var(--ease),visibility var(--dur-m) var(--ease);}
+.toast.show{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0);}
+.toast svg{stroke:var(--accent);width:20px;height:20px;flex-shrink:0;}
+
+/* ============================================================
+   PROCESS
+   ============================================================ */
+.timeline{position:relative;display:flex;flex-direction:column;}
+.timeline-track{position:absolute;left:39px;top:0;bottom:0;width:6px;background:var(--line-soft);}
+.timeline-track-fill{position:absolute;left:0;top:0;width:100%;height:var(--fill,0%);background:var(--accent);transition:height .25s linear;}
+.timeline-step{position:relative;padding-left:100px;padding-bottom:56px;}
+.timeline-step:last-child{padding-bottom:0;}
+.timeline-num{position:absolute;left:0;top:-6px;font-family:var(--font-display);font-size:clamp(2.6rem,5vw,4rem);line-height:1;width:84px;color:var(--line-soft);transition:color var(--dur-m) var(--ease);}
+.timeline-step.is-active .timeline-num{color:var(--accent);}
+.timeline-step h3{font-family:var(--font-display);font-weight:400;text-transform:uppercase;font-size:1.7rem;}
+.timeline-step p{margin-top:10px;font-size:.95rem;line-height:1.6;color:var(--ink-muted);max-width:60ch;}
+.timeline-connector{margin-top:16px;height:8px;max-width:220px;}
+
+/* ============================================================
+   CASE STUDIES
+   ============================================================ */
+.carousel-wrap{position:relative;}
+.carousel-viewport{overflow:hidden;cursor:grab;border:2px solid var(--ink);}
+.carousel-viewport.dragging{cursor:grabbing;}
+.carousel-track{display:flex;transition:transform var(--dur-m) var(--ease);will-change:transform;}
+.case-slide{flex:0 0 100%;padding:clamp(28px,5vw,52px);display:grid;grid-template-columns:1fr 1fr;gap:36px;background:var(--surface);user-select:none;}
+.case-slide .metric{font-family:var(--font-display);font-size:clamp(2.4rem,6vw,3.6rem);color:var(--accent);line-height:1;}
+.case-slide .metric-label{margin-top:10px;font-size:.85rem;text-transform:uppercase;letter-spacing:.04em;font-weight:700;color:var(--ink-muted);}
+.case-slide .case-org{font-size:.8rem;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-muted);font-weight:700;margin-top:22px;}
+.case-block{margin-top:14px;}
+.case-block h4{font-family:var(--font-display);font-weight:400;text-transform:uppercase;font-size:.95rem;letter-spacing:.03em;color:var(--accent);}
+.case-block p{margin-top:6px;font-size:.9rem;line-height:1.55;color:var(--ink-muted);}
+.carousel-controls{display:flex;justify-content:space-between;align-items:center;margin-top:24px;}
+.carousel-arrows{display:flex;gap:10px;}
+.carousel-dots{display:flex;gap:10px;}
+.carousel-dot{width:12px;height:12px;border-radius:50%;border:2px solid var(--ink);background:transparent;cursor:pointer;padding:0;}
+.carousel-dot[aria-current="true"]{background:var(--accent);border-color:var(--accent);}
+
+/* ============================================================
+   PRICING
+   ============================================================ */
+.billing-toggle{display:flex;align-items:center;gap:14px;margin-bottom:36px;}
+.billing-toggle span{font-weight:700;font-size:.9rem;text-transform:uppercase;letter-spacing:.03em;color:var(--ink-muted);}
+.billing-toggle span.active{color:var(--ink);}
+.switch{width:58px;height:32px;border:2px solid var(--ink);background:var(--surface);position:relative;cursor:pointer;padding:0;flex-shrink:0;}
+.switch-knob{position:absolute;top:2px;left:2px;width:24px;height:24px;background:var(--ink);transition:transform var(--dur-s) var(--ease),background var(--dur-s) var(--ease);}
+.switch[aria-checked="true"] .switch-knob{transform:translateX(24px);background:var(--accent);}
+.save-badge{background:var(--accent);color:var(--accent-ink);font-size:.72rem;font-weight:700;text-transform:uppercase;padding:4px 9px;letter-spacing:.03em;}
+.pricing-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;align-items:stretch;}
+.price-card{border:2px solid var(--ink);background:var(--surface);display:flex;flex-direction:column;padding:28px 24px;}
+.price-card.recommended{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);transform:translateY(-10px);}
+.price-card.recommended .price-feat li::before{background:var(--accent-ink);}
+.price-card.recommended .price-muted{color:rgba(255,255,255,.85);}
+.price-tag{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;}
+.price-card h3{font-family:var(--font-display);font-weight:400;text-transform:uppercase;font-size:1.5rem;margin-top:6px;}
+.price-amount{font-family:var(--font-display);font-size:clamp(2rem,3.4vw,2.6rem);margin-top:16px;display:flex;align-items:baseline;gap:6px;}
+.price-amount .per{font-family:var(--font-body);font-size:.8rem;font-weight:600;color:var(--ink-muted);}
+.price-card.recommended .price-amount .per{color:rgba(255,255,255,.85);}
+.price-muted{font-size:.82rem;color:var(--ink-muted);margin-top:4px;}
+.price-feat{margin-top:22px;display:flex;flex-direction:column;gap:10px;flex:1;}
+.price-feat li{font-size:.86rem;padding-left:18px;position:relative;line-height:1.4;}
+.price-feat li::before{content:"";position:absolute;left:0;top:.55em;width:9px;height:2px;background:var(--accent);}
+.price-card .btn{margin-top:24px;width:100%;}
+.price-card.recommended .btn-outline{border-color:var(--accent-ink);color:var(--accent-ink);}
+.price-card.recommended .btn-outline:hover{box-shadow:5px 5px 0 var(--ink);}
+
+/* ============================================================
+   FAQ
+   ============================================================ */
+.accordion{border-top:2px solid var(--ink);max-width:820px;}
+.acc-item{border-bottom:2px solid var(--ink);}
+.acc-trigger{width:100%;display:flex;justify-content:space-between;align-items:center;gap:20px;padding:22px 4px;background:none;border:0;text-align:left;cursor:pointer;font-family:var(--font-display);font-weight:400;text-transform:uppercase;font-size:1.15rem;}
+.acc-plus{flex-shrink:0;width:26px;height:26px;position:relative;}
+.acc-plus::before,.acc-plus::after{content:"";position:absolute;background:var(--ink);top:50%;left:50%;}
+.acc-plus::before{width:16px;height:2px;transform:translate(-50%,-50%);}
+.acc-plus::after{width:2px;height:16px;transform:translate(-50%,-50%);transition:transform var(--dur-s) var(--ease);}
+.acc-trigger[aria-expanded="true"] .acc-plus::after{transform:translate(-50%,-50%) rotate(90deg);}
+.acc-panel{display:grid;grid-template-rows:0fr;transition:grid-template-rows var(--dur-m) var(--ease);}
+.acc-panel-inner{overflow:hidden;}
+.acc-item.open .acc-panel{grid-template-rows:1fr;}
+.acc-panel p{font-size:.95rem;line-height:1.6;color:var(--ink-muted);padding:0 4px 24px;max-width:70ch;}
+
+/* ============================================================
+   CONTACT
+   ============================================================ */
+.contact-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:clamp(32px,6vw,64px);}
+.contact-side p{font-size:1rem;line-height:1.65;color:var(--ink-muted);margin-top:16px;max-width:44ch;}
+.contact-detail{margin-top:28px;display:flex;flex-direction:column;gap:14px;}
+.contact-detail div{display:flex;flex-direction:column;gap:2px;}
+.contact-detail .lbl{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-muted);font-weight:700;}
+.contact-detail .val{font-weight:700;}
+form#contactForm{display:flex;flex-direction:column;gap:18px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.field{display:flex;flex-direction:column;gap:6px;}
+.field label{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;}
+.field input,.field textarea,.field select{border:2px solid var(--ink);background:var(--surface);padding:13px 14px;font-size:.95rem;transition:box-shadow var(--dur-s) var(--ease);}
+.field input:focus,.field textarea:focus,.field select:focus{outline:none;box-shadow:0 0 0 3px var(--accent);}
+.field textarea{resize:vertical;min-height:110px;}
+.field.error input,.field.error textarea,.field.error select{border-color:var(--accent);}
+.field-error{font-size:.78rem;color:var(--accent);font-weight:700;min-height:1em;}
+.form-success{display:none;border:2px solid var(--ink);background:var(--surface);padding:28px;align-items:center;gap:16px;}
+.form-success.show{display:flex;}
+.form-success svg{stroke:var(--accent);width:34px;height:34px;flex-shrink:0;}
+.form-success h3{font-family:var(--font-display);font-weight:400;text-transform:uppercase;font-size:1.2rem;}
+.form-success p{font-size:.9rem;color:var(--ink-muted);margin-top:4px;}
+#contactForm.hidden{display:none;}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.site-footer{background:var(--ink);color:var(--bg);}
+.footer-strip-top,.footer-strip-bottom{height:14px;}
+.footer-main{padding-block:clamp(48px,7vw,80px);}
+.footer-grid{display:grid;grid-template-columns:1.4fr repeat(4,1fr);gap:32px;}
+.footer-brand .wordmark{color:var(--bg);}
+.footer-brand p{margin-top:16px;font-size:.9rem;line-height:1.6;color:#b6b6b2;max-width:34ch;}
+.footer-col h4{font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);font-weight:700;}
+.footer-col ul{margin-top:16px;display:flex;flex-direction:column;gap:10px;}
+.footer-col a{font-size:.9rem;color:#d6d6d2;transition:color var(--dur-s) var(--ease);}
+.footer-col a:hover{color:var(--bg);}
+.footer-bottom{border-top:1px solid #2b2b29;padding-block:24px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px;align-items:center;}
+.footer-legal{font-size:.8rem;color:#8f8f8b;}
+.footer-social{display:flex;gap:14px;}
+.footer-social a{width:36px;height:36px;border:1px solid #3a3a37;display:flex;align-items:center;justify-content:center;transition:border-color var(--dur-s) var(--ease),background var(--dur-s) var(--ease);}
+.footer-social a:hover{background:var(--accent);border-color:var(--accent);}
+.footer-social svg{width:16px;height:16px;stroke:var(--bg);}
+
+/* ============================================================
+   REVEAL
+   ============================================================ */
+.js .reveal{opacity:0;transform:translateY(28px);transition:opacity .7s var(--ease),transform .7s var(--ease);}
+.js .reveal.in-view{opacity:1;transform:translateY(0);}
+@media (prefers-reduced-motion: reduce){
+  .js .reveal{opacity:1;transform:none;transition:none;}
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width:1024px){
+  .hero-grid{grid-template-columns:1fr;}
+  .hero-visual{max-width:340px;}
+  .cards-grid{grid-template-columns:repeat(2,1fr);}
+  .product-grid{grid-template-columns:repeat(2,1fr);}
+  .pricing-grid{grid-template-columns:repeat(2,1fr);}
+  .price-card.recommended{transform:none;}
+  .footer-grid{grid-template-columns:1fr 1fr 1fr;}
+  .tab-panel{grid-template-columns:1fr;}
+  .case-slide{grid-template-columns:1fr;}
+}
+@media (max-width:860px){
+  .nav-links{display:none;}
+  .signin-link{display:none;}
+  .hamburger{display:flex;}
+  .stats-row{grid-template-columns:repeat(2,1fr);}
+  .stat-tile:nth-child(3){border-left:0;}
+}
+@media (max-width:640px){
+  .cards-grid{grid-template-columns:1fr;}
+  .product-grid{grid-template-columns:1fr;}
+  .pricing-grid{grid-template-columns:1fr;}
+  .form-row{grid-template-columns:1fr;}
+  .footer-grid{grid-template-columns:1fr 1fr;}
+  .contact-grid{grid-template-columns:1fr;}
+  .timeline-step{padding-left:76px;}
+  .timeline-track{left:31px;}
+  .timeline-num{font-size:2.2rem;width:64px;}
+  .hero-copy .btn{width:100%;}
+}
+</style>
+<div id="app">
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<div id="loader" aria-hidden="true">
+  <div class="loader-rings">
+    <span></span><span></span><span></span><span></span>
+  </div>
+  <div class="loader-mark">TECHBISS</div>
+</div>
+
+<div class="scrim" id="scrim"></div>
+
+<header class="site-header">
+  <nav class="nav wrap" aria-label="Primary">
+    <a href="#hero" class="wordmark">TECHBISS<span class="dot">.</span></a>
+    <ul class="nav-links" role="list">
+      <li><a href="#services">Services</a></li>
+      <li><a href="#solutions">Solutions</a></li>
+      <li><a href="#marketplace">Marketplace</a></li>
+      <li><a href="#process">Process</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <div class="nav-actions">
+      <button class="icon-btn" id="themeToggle" type="button" aria-label="Switch to dark theme" aria-pressed="false">
+        <svg id="themeIcon" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
+      </button>
+      <a href="#" class="signin-link">Sign in</a>
+      <a href="#contact" class="btn btn-primary">Start a Project</a>
+      <button class="hamburger" id="hamburgerBtn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+  <div class="mobile-menu" id="mobileMenu" role="dialog" aria-modal="true" aria-label="Mobile navigation">
+    <div class="stripe-divider" aria-hidden="true"></div>
+    <div class="mobile-menu-inner">
+      <div class="mobile-menu-top">
+        <button class="icon-btn" id="mobileMenuClose" type="button" aria-label="Close menu">
+          <svg width="18" height="18" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4l16 16M20 4L4 20"></path></svg>
+        </button>
+      </div>
+      <a href="#services" data-mobile-link>Services</a>
+      <a href="#solutions" data-mobile-link>Solutions</a>
+      <a href="#marketplace" data-mobile-link>Marketplace</a>
+      <a href="#process" data-mobile-link>Process</a>
+      <a href="#pricing" data-mobile-link>Pricing</a>
+      <a href="#contact" data-mobile-link>Contact</a>
+      <div class="mobile-menu-actions">
+        <a href="#" class="btn btn-outline">Sign in</a>
+        <a href="#contact" class="btn btn-primary" data-mobile-link>Start a Project</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ============ HERO ============ -->
+  <section id="hero" class="hero wrap" aria-labelledby="hero-heading">
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow">Global Digital Transformation</p>
+        <h1 id="hero-heading">Engineering the <em>Next</em><br>Global Economy</h1>
+        <p>TECHBISS designs, builds and operates the cloud, AI, security and data infrastructure behind the world's most consequential enterprises — at a scale few platforms attempt and none replicate.</p>
+        <div class="hero-ctas">
+          <a href="#contact" class="btn btn-primary">Start a Project</a>
+          <a href="#services" class="btn btn-outline">Explore Capabilities</a>
+        </div>
+      </div>
+      <div class="hero-visual" role="img" aria-label="Animated concentric op-art wheel representing kinetic precision">
+        <div class="opart-wheel"></div>
+        <div class="opart-core"></div>
+      </div>
+    </div>
+
+    <div class="stats-row reveal" aria-label="Company statistics">
+      <div class="stat-tile">
+        <div class="stat-num" data-target="120" data-suffix="+">0</div>
+        <div class="stat-label">Countries of Operation</div>
+      </div>
+      <div class="stat-tile">
+        <div class="stat-num" data-target="4.2" data-decimals="1" data-prefix="$" data-suffix="T">$0T</div>
+        <div class="stat-label">Client AUM Modernized</div>
+      </div>
+      <div class="stat-tile">
+        <div class="stat-num" data-target="99.99" data-decimals="2" data-suffix="%">0%</div>
+        <div class="stat-label">Platform Uptime</div>
+      </div>
+      <div class="stat-tile">
+        <div class="stat-num" data-target="3400" data-comma="1" data-suffix="+">0</div>
+        <div class="stat-label">Engineers &amp; Architects</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TRUSTED BY ============ -->
+  <section id="trusted" class="trusted" aria-labelledby="trusted-heading">
+    <h2 id="trusted-heading" class="visually-hidden">Trusted by global enterprises</h2>
+    <div class="trusted-band stripe-band" id="trustedBand">
+      <div class="trusted-inner">
+        <p class="trusted-label">Trusted across every regulated industry</p>
+        <div class="trusted-row">
+          <span class="client-chip">Halberd Financial</span>
+          <span class="client-chip">Nordwell Health</span>
+          <span class="client-chip">Continental Freight Co.</span>
+          <span class="client-chip">Meridian Telecom Group</span>
+          <span class="client-chip">Ferrovia Energy</span>
+          <span class="client-chip">Union Public Systems</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SERVICES ============ -->
+  <section id="services" class="wrap" aria-labelledby="services-heading">
+    <div class="section-head reveal">
+      <p class="eyebrow">What We Build</p>
+      <h2 id="services-heading" class="section-title">Six Disciplines. One Platform.</h2>
+      <p class="section-lede">Full-lifecycle engineering across the systems that run the global economy — from infrastructure to strategy, built and operated as one integrated capability.</p>
+    </div>
+    <div class="cards-grid" id="servicesGrid"></div>
+  </section>
+
+  <!-- ============ SOLUTIONS ============ -->
+  <section id="solutions" class="wrap" aria-labelledby="solutions-heading">
+    <div class="section-head reveal">
+      <p class="eyebrow">Industries</p>
+      <h2 id="solutions-heading" class="section-title">Built for Regulated,<br>High-Stakes Sectors</h2>
+      <p class="section-lede">Select an industry to see how TECHBISS engineers outcomes specific to its risk, regulatory and operating environment.</p>
+    </div>
+    <div class="tabs reveal" role="tablist" aria-label="Industries" id="solutionsTabs"></div>
+    <div class="tab-panel reveal" id="solutionsPanel"></div>
+  </section>
+
+  <!-- ============ MARKETPLACE ============ -->
+  <section id="marketplace" class="wrap" aria-labelledby="marketplace-heading">
+    <div class="section-head reveal">
+      <p class="eyebrow">TECHBISS Marketplace</p>
+      <h2 id="marketplace-heading" class="section-title">Deploy Ready-Built<br>Capability</h2>
+      <p class="section-lede">Pre-engineered modules, agents and industry kits — vetted, benchmarked, and deployable inside your existing environment.</p>
+    </div>
+    <div class="filter-chips reveal" id="filterChips" role="group" aria-label="Filter marketplace by category"></div>
+    <div class="product-grid reveal" id="productGrid"></div>
+  </section>
+
+  <!-- ============ PROCESS ============ -->
+  <section id="process" class="wrap" aria-labelledby="process-heading">
+    <div class="section-head reveal">
+      <p class="eyebrow">Methodology</p>
+      <h2 id="process-heading" class="section-title">Six Stages.<br>Zero Guesswork.</h2>
+      <p class="section-lede">A disciplined delivery model refined across thousands of enterprise engagements — from first discovery workshop to global scale.</p>
+    </div>
+    <div class="timeline reveal" id="timeline">
+      <div class="timeline-track"><div class="timeline-track-fill" id="timelineFill"></div></div>
+    </div>
+  </section>
+
+  <!-- ============ CASE STUDIES ============ -->
+  <section id="case-studies" class="wrap" aria-labelledby="cases-heading">
+    <div class="section-head reveal">
+      <p class="eyebrow">Proof at Scale</p>
+      <h2 id="cases-heading" class="section-title">Outcomes, Not Anecdotes</h2>
+      <p class="section-lede">Drag, swipe, or use the controls to move through recent engagements.</p>
+    </div>
+    <div class="carousel-wrap reveal">
+      <div class="carousel-viewport" id="carouselViewport" tabindex="0" role="region" aria-roledescription="carousel" aria-label="Case studies">
+        <div class="carousel-track" id="carouselTrack"></div>
+      </div>
+      <div class="carousel-controls">
+        <div class="carousel-dots" id="carouselDots" role="tablist" aria-label="Choose case study"></div>
+        <div class="carousel-arrows">
+          <button class="icon-btn" id="carouselPrev" type="button" aria-label="Previous case study">
+            <svg width="16" height="16" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"><path d="M15 5l-7 7 7 7"></path></svg>
+          </button>
+          <button class="icon-btn" id="carouselNext" type="button" aria-label="Next case study">
+            <svg width="16" height="16" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"><path d="M9 5l7 7-7 7"></path></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PRICING ============ -->
+  <section id="pricing" class="wrap" aria-labelledby="pricing-heading">
+    <div class="section-head reveal">
+      <p class="eyebrow">Engagement Plans</p>
+      <h2 id="pricing-heading" class="section-title">Scale the Partnership<br>as You Grow</h2>
+      <p class="section-lede">Every tier includes named delivery leadership and a dedicated security review. Annual billing saves roughly 17%.</p>
+    </div>
+    <div class="billing-toggle reveal">
+      <span id="labelMonthly" class="active">Monthly</span>
+      <button class="switch" id="billingSwitch" role="switch" aria-checked="false" aria-label="Toggle annual billing">
+        <span class="switch-knob"></span>
+      </button>
+      <span id="labelAnnual">Annual</span>
+      <span class="save-badge">Save ~17%</span>
+    </div>
+    <div class="pricing-grid reveal" id="pricingGrid"></div>
+  </section>
+
+  <!-- ============ FAQ ============ -->
+  <section id="faq" class="wrap" aria-labelledby="faq-heading">
+    <div class="section-head reveal">
+      <p class="eyebrow">Common Questions</p>
+      <h2 id="faq-heading" class="section-title">FAQ</h2>
+    </div>
+    <div class="accordion reveal" id="accordion"></div>
+  </section>
+
+  <!-- ============ CONTACT ============ -->
+  <section id="contact" class="wrap" aria-labelledby="contact-heading">
+    <div class="contact-grid">
+      <div class="contact-side reveal">
+        <p class="eyebrow">Get in Touch</p>
+        <h2 id="contact-heading" class="section-title">Let's Engineer<br>What's Next</h2>
+        <p>Tell us about your transformation mandate. A TECHBISS principal will respond within one business day.</p>
+        <div class="contact-detail">
+          <div><span class="lbl">Global HQ</span><span class="val">One Meridian Plaza, Singapore 018956</span></div>
+          <div><span class="lbl">Enterprise Sales</span><span class="val">sales@techbiss.example</span></div>
+          <div><span class="lbl">24/7 Operations</span><span class="val">+1 (800) 555-0134</span></div>
+        </div>
+      </div>
+      <div class="reveal">
+        <form id="contactForm" novalidate>
+          <div class="form-row">
+            <div class="field" id="field-name">
+              <label for="inpName">Full name</label>
+              <input type="text" id="inpName" name="name" autocomplete="name" required aria-describedby="err-name">
+              <span class="field-error" id="err-name"></span>
+            </div>
+            <div class="field" id="field-email">
+              <label for="inpEmail">Work email</label>
+              <input type="email" id="inpEmail" name="email" autocomplete="email" required aria-describedby="err-email">
+              <span class="field-error" id="err-email"></span>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="field" id="field-company">
+              <label for="inpCompany">Company</label>
+              <input type="text" id="inpCompany" name="company" autocomplete="organization" required aria-describedby="err-company">
+              <span class="field-error" id="err-company"></span>
+            </div>
+            <div class="field" id="field-interest">
+              <label for="inpInterest">Primary interest</label>
+              <select id="inpInterest" name="interest">
+                <option value="cloud">Cloud &amp; Infrastructure</option>
+                <option value="ai">AI &amp; Automation</option>
+                <option value="security">Cybersecurity</option>
+                <option value="data">Data &amp; Analytics</option>
+                <option value="software">Enterprise Software</option>
+                <option value="consulting">Strategy &amp; Consulting</option>
+              </select>
+            </div>
+          </div>
+          <div class="field" id="field-message">
+            <label for="inpMessage">Project details</label>
+            <textarea id="inpMessage" name="message" required aria-describedby="err-message"></textarea>
+            <span class="field-error" id="err-message"></span>
+          </div>
+          <button type="submit" class="btn btn-primary" id="submitBtn">Send Message</button>
+        </form>
+        <div class="form-success" id="formSuccess" role="status" aria-live="polite">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg>
+          <div>
+            <h3>Message received</h3>
+            <p>A TECHBISS principal will be in touch within one business day.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="footer-strip-top stripe-band" id="footerStripTop" aria-hidden="true"></div>
+  <div class="footer-main wrap">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="#hero" class="wordmark">TECHBISS<span class="dot">.</span></a>
+        <p>Engineering the cloud, AI, security and data infrastructure behind the next global economy.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#services">Services</a></li>
+          <li><a href="#solutions">Solutions</a></li>
+          <li><a href="#process">Process</a></li>
+          <li><a href="#contact">Careers</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Platform</h4>
+        <ul>
+          <li><a href="#marketplace">Marketplace</a></li>
+          <li><a href="#pricing">Pricing</a></li>
+          <li><a href="#case-studies">Case Studies</a></li>
+          <li><a href="#faq">FAQ</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Resources</h4>
+        <ul>
+          <li><a href="#">Research Library</a></li>
+          <li><a href="#">Security Trust Center</a></li>
+          <li><a href="#">Developer Docs</a></li>
+          <li><a href="#">Investor Relations</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="#contact">Sales</a></li>
+          <li><a href="#contact">Support</a></li>
+          <li><a href="#contact">Partnerships</a></li>
+          <li><a href="#contact">Press</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="wrap footer-bottom">
+    <p class="footer-legal">© 2026 TECHBISS Global Holdings. All rights reserved. Registered in 120+ jurisdictions worldwide.</p>
+    <div class="footer-social" aria-label="Social links">
+      <a href="#" aria-label="TECHBISS on LinkedIn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="1"></rect><path d="M7 10v7M7 7v.01M12 17v-4.5a2 2 0 0 1 4 0V17M12 10v7"></path></svg></a>
+      <a href="#" aria-label="TECHBISS on X"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4l16 16M20 4L4 20"></path></svg></a>
+      <a href="#" aria-label="TECHBISS on YouTube"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="6" width="18" height="12" rx="2"></rect><path d="M11 10l4 2-4 2z"></path></svg></a>
+    </div>
+  </div>
+  <div class="footer-strip-bottom stripe-band" aria-hidden="true"></div>
+</footer>
+
+<div class="modal-scrim" id="modalScrim">
+  <div class="modal" id="productModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-top">
+      <span class="visually-hidden" id="modalTitle">Product preview</span>
+      <span></span>
+      <button class="modal-close" id="modalClose" type="button" aria-label="Close preview">
+        <svg width="16" height="16" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"><path d="M4 4l16 16M20 4L4 20"></path></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite">
+  <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg>
+  <span id="toastMsg">Purchase confirmed. A specialist will reach out to provision access.</span>
+</div>
+
+</div>
+<script>
+(function(){
+"use strict";
+
+var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+document.documentElement.classList.add('js');
+
+/* ============================================================
+   DATA
+   ============================================================ */
+var ICONS = {
+  cloud:'<path d="M7 18a4 4 0 0 1-.6-7.96A5.5 5.5 0 0 1 17 9.5a4.5 4.5 0 0 1 .5 8.98"></path><path d="M8 18h9"></path>',
+  ai:'<path d="M12 3v3M12 18v3M3 12h3M18 12h3M6 6l2 2M16 16l2 2M18 6l-2 2M8 16l-2 2"></path><circle cx="12" cy="12" r="4"></circle>',
+  shield:'<path d="M12 3l8 3v6c0 4.5-3.2 7.8-8 9-4.8-1.2-8-4.5-8-9V6l8-3z"></path><path d="M9 12l2 2 4-4"></path>',
+  data:'<path d="M4 19h4V10H4v9zM10 19h4V5h-4v14zM16 19h4v-7h-4v7z"></path>',
+  code:'<path d="M8 6L2 12l6 6M16 6l6 6-6 6M13 4l-2 16"></path>',
+  compass:'<circle cx="12" cy="12" r="9"></circle><path d="M15 9l-2 6-6 2 2-6z"></path>'
+};
+
+var services = [
+  {icon:'cloud',name:'Cloud &amp; Infrastructure Modernization',desc:'We re-platform legacy estates onto elastic, multi-cloud infrastructure engineered for resilience at global scale.',bullets:['Multi-cloud architecture &amp; FinOps','Zero-downtime migration engineering','Site reliability &amp; 24/7 operations']},
+  {icon:'ai',name:'AI &amp; Intelligent Automation',desc:'Enterprise-grade agents and automation pipelines that remove manual work from the highest-cost processes.',bullets:['Enterprise LLM &amp; agent orchestration','Process mining &amp; workflow automation','Model risk &amp; governance frameworks']},
+  {icon:'shield',name:'Cybersecurity &amp; Risk Engineering',desc:'Zero-trust security architecture and continuous threat operations for organizations that cannot afford downtime.',bullets:['Zero-trust architecture design','24/7 threat detection &amp; response','Regulatory &amp; compliance engineering']},
+  {icon:'data',name:'Data, Analytics &amp; AI Platforms',desc:'Unified data fabric and analytics platforms that turn fragmented enterprise data into governed, real-time intelligence.',bullets:['Enterprise data fabric &amp; governance','Real-time analytics pipelines','Predictive &amp; prescriptive modeling']},
+  {icon:'code',name:'Enterprise Software Engineering',desc:'Custom platforms and systems integration built to enterprise-grade reliability, security and scale requirements.',bullets:['Custom platform &amp; product engineering','API &amp; systems integration','Legacy modernization &amp; re-architecture']},
+  {icon:'compass',name:'Digital Transformation Strategy',desc:'Executive advisory and operating-model redesign that align technology investment with enterprise strategy.',bullets:['Operating model redesign','Change management at scale','Executive advisory &amp; roadmapping']}
+];
+
+var industries = [
+  {name:'Financial Services',desc:'We modernize core banking, payments and risk infrastructure for institutions operating under the world’s toughest regulatory regimes, without interrupting settlement.',stats:[['40%','Faster settlement cycles'],['180+','Institutions modernized'],['Basel III','Compliance-native architecture']]},
+  {name:'Healthcare &amp; Life Sciences',desc:'Interoperable data platforms and secure clinical systems that connect providers, payers and research networks under strict privacy mandates.',stats:[['220','Facilities on one data platform'],['HIPAA/GDPR','Compliant by design'],['61%','Faster clinical data exchange']]},
+  {name:'Manufacturing &amp; Supply Chain',desc:'Connected factory floors and resilient supply networks powered by real-time telemetry, predictive maintenance and automated planning.',stats:[['27%','Logistics cost reduction'],['14','Countries on one control tower'],['99.5%','On-time fulfillment']]},
+  {name:'Public Sector &amp; Government',desc:'Secure, citizen-scale digital services and infrastructure modernization delivered under public accountability and audit requirements.',stats:[['31','National-scale deployments'],['FedRAMP','High-baseline capable'],['9M+','Citizens served digitally']]},
+  {name:'Retail &amp; Commerce',desc:'Unified commerce platforms spanning storefront, fulfillment and personalization engines built for global peak-load resilience.',stats:[['3.2x','Peak-load capacity'],['48','Markets on one platform'],['22%','Conversion uplift']]},
+  {name:'Energy &amp; Utilities',desc:'Grid modernization, predictive asset management and decarbonization data platforms for utilities operating critical infrastructure.',stats:[['19%','Downtime reduction'],['70+','Grid operators supported'],['Real-time','Load forecasting']]}
+];
+
+var products = [
+  {name:'FlowState RPA Suite',vendor:'Meridian Labs',cat:'Automation Modules',rating:4.8,price:12400,blurb:'Enterprise RPA orchestration with built-in exception handling and audit trails for regulated back-office workflows.'},
+  {name:'Argus Copilot',vendor:'Nighthouse AI',cat:'AI Agents &amp; Copilots',rating:4.9,price:28000,blurb:'A governed enterprise AI copilot that automates research, drafting and analysis across knowledge-heavy teams.'},
+  {name:'Ledger-Ready Banking Kit',vendor:'Vantage Systems',cat:'Industry Solution Kits',rating:4.7,price:48000,blurb:'A pre-built core banking accelerator covering onboarding, ledgers and real-time payments compliance.'},
+  {name:'SentinelGrid Compliance Pack',vendor:'Ironclad Security',cat:'Security &amp; Compliance Packs',rating:4.6,price:18500,blurb:'Continuous controls monitoring mapped to SOC 2, ISO 27001 and regional data-residency requirements.'},
+  {name:'Bridgeline Connector Hub',vendor:'Corda Interop',cat:'Integration Connectors',rating:4.5,price:1200,blurb:'Pre-built connectors linking legacy ERPs and modern SaaS systems through one governed integration layer.'},
+  {name:'Pulse Analytics Dashboard',vendor:'Ferrograph Data',cat:'Analytics Dashboards',rating:4.8,price:9600,blurb:'Real-time executive dashboards with anomaly detection tuned for enterprise operational metrics.'}
+];
+var categories = ['All','Automation Modules','AI Agents &amp; Copilots','Industry Solution Kits','Security &amp; Compliance Packs','Integration Connectors','Analytics Dashboards'];
+
+var processSteps = [
+  {n:'01',t:'Discover',d:'We map current-state systems, risk exposure and business objectives with your operating teams and executive sponsors.'},
+  {n:'02',t:'Architect',d:'Target-state architecture, security model and migration sequencing are designed and validated against your constraints.'},
+  {n:'03',t:'Build',d:'Cross-functional delivery pods build the platform in governed increments, with continuous integration and security testing.'},
+  {n:'04',t:'Migrate',d:'Data and workloads move on a zero-downtime cutover plan, with rollback paths validated before every production change.'},
+  {n:'05',t:'Launch',d:'Go-live is run under a dedicated command center with real-time monitoring and 24/7 incident response on standby.'},
+  {n:'06',t:'Scale',d:'We tune, expand and operate the platform long-term, extending it to new markets, products and regulatory regimes.'}
+];
+
+var caseStudies = [
+  {org:'Global Tier-1 Bank',metric:'40%',metricLabel:'Faster settlement cycle',challenge:'Legacy mainframe settlement systems could not support real-time cross-border payment volumes.',approach:'Re-architected core settlement onto a resilient, event-driven cloud platform with zero-downtime cutover.',result:'Settlement cycles dropped 40%, with full regulatory continuity across 22 jurisdictions.'},
+  {org:'Pan-Continental Logistics Network',metric:'27%',metricLabel:'Cost reduction',challenge:'Fragmented regional logistics systems created blind spots and duplicated freight costs.',approach:'Deployed a unified control tower with predictive routing across the full carrier network.',result:'Logistics costs fell 27% while on-time delivery improved to 99.5%.'},
+  {org:'Multinational Telecom Group',metric:'14',metricLabel:'Countries migrated',challenge:'Aging on-premise infrastructure across 14 national operating companies limited product velocity.',approach:'Executed a phased multi-cloud migration with country-specific data-residency controls.',result:'All 14 markets now run on a shared cloud backbone with 60% faster feature rollout.'},
+  {org:'Regional Healthcare Network',metric:'220',metricLabel:'Facilities interoperable',challenge:'220 facilities operated on incompatible clinical data systems, slowing care coordination.',approach:'Built a governed, HIPAA-compliant interoperable data platform connecting every facility in real time.',result:'Clinical data exchange time fell 61%, improving coordinated care across the network.'}
+];
+
+var pricingTiers = [
+  {tag:'Starter',name:'Starter',monthly:2400,annual:2000,desc:'For focused modernization projects with a single business unit.',recommended:false,features:['One delivery pod (5 engineers)','Core cloud &amp; security baseline','Business-hours support','Quarterly roadmap review','Marketplace module access']},
+  {tag:'Growth',name:'Growth',monthly:8900,annual:7400,desc:'For multi-team transformation programs across a region.',recommended:false,features:['Three delivery pods','Full-stack engineering &amp; AI capability','24/5 support with 4-hour SLA','Monthly executive reporting','Dedicated security review','Marketplace + custom connectors']},
+  {tag:'Enterprise',name:'Enterprise',monthly:24000,annual:19900,desc:'For global programs spanning infrastructure, data and AI.',recommended:true,features:['Dedicated multi-pod delivery team','Named principal architect','24/7 support with 1-hour SLA','Continuous security operations','Custom platform engineering','Priority marketplace access']},
+  {tag:'Global Scale',name:'Global Scale',monthly:null,annual:null,desc:'For $1B+ enterprises operating across every major region.',recommended:false,features:['Unlimited delivery pods','Embedded executive advisory','Custom regulatory engineering','Global 24/7 command center','Dedicated R&amp;D allocation','Board-level reporting cadence']}
+];
+
+var faqs = [
+  {q:'How quickly can TECHBISS mobilize a delivery team?',a:'Most engagements mobilize a dedicated delivery pod within 10 business days of contract signature, following a structured discovery workshop with your stakeholders.'},
+  {q:'Do you operate systems after go-live, or only build them?',a:'Both. Every engagement can include long-term operations, from 24/7 site reliability to managed security operations, so the platform stays performant long after launch.'},
+  {q:'How is data residency and regulatory compliance handled?',a:'We architect for data residency and compliance from day one, with region-specific controls mapped to frameworks including GDPR, HIPAA, Basel III and FedRAMP as applicable.'},
+  {q:'Can marketplace modules be customized for our environment?',a:'Yes. Every marketplace module is designed for configuration and extension, and our engineering teams can adapt any module to your existing systems and governance requirements.'},
+  {q:'What does the Global Scale tier include that Enterprise does not?',a:'Global Scale is a custom-scoped partnership with unlimited delivery capacity, embedded executive advisory, and a dedicated global operations center — priced against your specific footprint.'}
+];
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+function $(sel,ctx){ return (ctx||document).querySelector(sel); }
+function $all(sel,ctx){ return Array.prototype.slice.call((ctx||document).querySelectorAll(sel)); }
+function money(n){ return '$'+n.toLocaleString('en-US'); }
+function stars(r){
+  var full = Math.round(r);
+  var s='';
+  for(var i=0;i<5;i++){ s += (i<full?'★':'☆'); }
+  return s;
+}
+
+/* ============================================================
+   LOADER
+   ============================================================ */
+function initLoader(){
+  var loader = $('#loader');
+  var hide = function(){ loader.classList.add('hide'); document.body.style.overflow=''; };
+  document.body.style.overflow='hidden';
+  if(reduceMotion){
+    setTimeout(hide, 250);
+  } else {
+    setTimeout(hide, 1500);
+  }
+  loader.addEventListener('click', hide);
+}
+
+/* ============================================================
+   THEME TOGGLE
+   ============================================================ */
+function initTheme(){
+  var root = document.documentElement;
+  var btn = $('#themeToggle');
+  var icon = $('#themeIcon');
+  var STORE_KEY = 'techbiss-theme';
+  var sunPath = '<circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path>';
+  var moonPath = '<path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"></path>';
+
+  function systemPrefersDark(){
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  function currentIsDark(){
+    var explicit = root.getAttribute('data-theme');
+    if(explicit === 'dark') return true;
+    if(explicit === 'light') return false;
+    return systemPrefersDark();
+  }
+  function paintIcon(){
+    var dark = currentIsDark();
+    icon.innerHTML = dark ? sunPath : moonPath;
+    btn.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+    btn.setAttribute('aria-pressed', dark ? 'true' : 'false');
+  }
+
+  var stored = null;
+  try { stored = localStorage.getItem(STORE_KEY); } catch(e){}
+  if(stored === 'dark' || stored === 'light'){ root.setAttribute('data-theme', stored); }
+  paintIcon();
+
+  btn.addEventListener('click', function(){
+    var next = currentIsDark() ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem(STORE_KEY, next); } catch(e){}
+    paintIcon();
+  });
+}
+
+/* ============================================================
+   MOBILE MENU
+   ============================================================ */
+function initMobileMenu(){
+  var btn = $('#hamburgerBtn');
+  var menu = $('#mobileMenu');
+  var closeBtn = $('#mobileMenuClose');
+  var scrim = $('#scrim');
+  function open(){
+    menu.classList.add('open');
+    scrim.classList.add('show');
+    btn.setAttribute('aria-expanded','true');
+    document.body.style.overflow='hidden';
+    closeBtn.focus();
+  }
+  function close(){
+    menu.classList.remove('open');
+    scrim.classList.remove('show');
+    btn.setAttribute('aria-expanded','false');
+    document.body.style.overflow='';
+    btn.focus();
+  }
+  btn.addEventListener('click', function(){
+    menu.classList.contains('open') ? close() : open();
+  });
+  closeBtn.addEventListener('click', close);
+  scrim.addEventListener('click', close);
+  $all('[data-mobile-link]', menu).forEach(function(a){ a.addEventListener('click', close); });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' && menu.classList.contains('open')) close();
+  });
+}
+
+/* ============================================================
+   RENDER: SERVICES
+   ============================================================ */
+function renderServices(){
+  var grid = $('#servicesGrid');
+  grid.innerHTML = services.map(function(s){
+    return '<article class="svc-card reveal">'+
+      '<div class="card-stripe-top" aria-hidden="true"></div>'+
+      '<div class="svc-body">'+
+        '<div class="svc-icon" aria-hidden="true"><svg viewBox="0 0 24 24">'+ICONS[s.icon]+'</svg></div>'+
+        '<h3>'+s.name+'</h3>'+
+        '<p>'+s.desc+'</p>'+
+        '<ul class="svc-bullets">'+s.bullets.map(function(b){return '<li>'+b+'</li>';}).join('')+'</ul>'+
+      '</div>'+
+    '</article>';
+  }).join('');
+}
+
+/* ============================================================
+   RENDER: SOLUTIONS TABS
+   ============================================================ */
+function renderSolutions(){
+  var tabsEl = $('#solutionsTabs');
+  var panelEl = $('#solutionsPanel');
+  tabsEl.innerHTML = industries.map(function(ind,i){
+    return '<button class="tab-chip" role="tab" id="tab-'+i+'" aria-controls="panelcontent" aria-selected="'+(i===0?'true':'false')+'" data-idx="'+i+'">'+ind.name+'</button>';
+  }).join('');
+
+  function paint(i){
+    var ind = industries[i];
+    panelEl.innerHTML =
+      '<div><h3>'+ind.name+'</h3><p>'+ind.desc+'</p></div>'+
+      '<div class="tab-stat-list">'+ind.stats.map(function(st){
+        return '<div class="tab-stat"><span class="num">'+st[0]+'</span><span class="lbl">'+st[1]+'</span></div>';
+      }).join('')+'</div>';
+    $all('.tab-chip', tabsEl).forEach(function(chip,idx){
+      chip.setAttribute('aria-selected', idx===i ? 'true':'false');
+    });
+  }
+  paint(0);
+  tabsEl.addEventListener('click', function(e){
+    var btn = e.target.closest('.tab-chip');
+    if(!btn) return;
+    paint(parseInt(btn.getAttribute('data-idx'),10));
+  });
+  tabsEl.addEventListener('keydown', function(e){
+    var chips = $all('.tab-chip', tabsEl);
+    var i = chips.indexOf(document.activeElement);
+    if(i === -1) return;
+    if(e.key === 'ArrowRight'){ e.preventDefault(); chips[(i+1)%chips.length].focus(); chips[(i+1)%chips.length].click(); }
+    if(e.key === 'ArrowLeft'){ e.preventDefault(); chips[(i-1+chips.length)%chips.length].focus(); chips[(i-1+chips.length)%chips.length].click(); }
+  });
+}
+
+/* ============================================================
+   RENDER: MARKETPLACE
+   ============================================================ */
+var activeCategory = 'All';
+function renderFilterChips(){
+  var el = $('#filterChips');
+  el.innerHTML = categories.map(function(c){
+    return '<button class="filter-chip" type="button" aria-pressed="'+(c===activeCategory?'true':'false')+'" data-cat="'+c+'">'+c+'</button>';
+  }).join('');
+  el.addEventListener('click', function(e){
+    var btn = e.target.closest('.filter-chip');
+    if(!btn) return;
+    activeCategory = btn.getAttribute('data-cat');
+    renderFilterChips();
+    renderProductGrid();
+  });
+}
+function renderProductGrid(){
+  var el = $('#productGrid');
+  var list = products.filter(function(p){ return activeCategory==='All' || p.cat===activeCategory; });
+  el.innerHTML = list.map(function(p,i){
+    return '<button class="product-card" type="button" data-idx="'+products.indexOf(p)+'" aria-haspopup="dialog">'+
+      '<div class="card-stripe-top" aria-hidden="true"></div>'+
+      '<div class="product-body">'+
+        '<div class="product-cat">'+p.cat+'</div>'+
+        '<h3>'+p.name+'</h3>'+
+        '<div class="product-vendor">by '+p.vendor+'</div>'+
+        '<p class="product-blurb">'+p.blurb+'</p>'+
+        '<div class="product-meta"><span class="product-rating"><span class="stars">'+stars(p.rating)+'</span> '+p.rating+'</span><span class="product-price">'+money(p.price)+'</span></div>'+
+      '</div>'+
+    '</button>';
+  }).join('');
+  if(!list.length){ el.innerHTML = '<p class="section-lede">No products in this category yet.</p>'; }
+}
+
+var lastFocusedEl = null;
+function openModal(idx){
+  var p = products[idx];
+  lastFocusedEl = document.activeElement;
+  var scrim = $('#modalScrim');
+  var body = $('#modalBody');
+  body.innerHTML =
+    '<div class="product-cat">'+p.cat+'</div>'+
+    '<h3>'+p.name+'</h3>'+
+    '<div class="product-vendor">by '+p.vendor+'</div>'+
+    '<p>'+p.blurb+' Fully governed for enterprise deployment with audit logging, SSO and role-based access built in.</p>'+
+    '<div class="modal-price-row"><span class="modal-price">'+money(p.price)+'</span><span class="product-rating"><span class="stars">'+stars(p.rating)+'</span> '+p.rating+'</span></div>'+
+    '<button class="btn btn-primary" id="purchaseBtn" type="button">Purchase Access</button>';
+  scrim.classList.add('show');
+  $('#productModal').focus();
+  document.body.style.overflow='hidden';
+  $('#purchaseBtn').addEventListener('click', function(){
+    closeModal();
+    showToast();
+  });
+}
+function closeModal(){
+  var scrim = $('#modalScrim');
+  scrim.classList.remove('show');
+  document.body.style.overflow='';
+  if(lastFocusedEl) lastFocusedEl.focus();
+}
+function initModal(){
+  var scrim = $('#modalScrim');
+  var modal = $('#productModal');
+  modal.setAttribute('tabindex','-1');
+  $('#productGrid').addEventListener('click', function(e){
+    var card = e.target.closest('.product-card');
+    if(!card) return;
+    openModal(parseInt(card.getAttribute('data-idx'),10));
+  });
+  $('#modalClose').addEventListener('click', closeModal);
+  scrim.addEventListener('click', function(e){ if(e.target === scrim) closeModal(); });
+  document.addEventListener('keydown', function(e){
+    if(!scrim.classList.contains('show')) return;
+    if(e.key === 'Escape'){ closeModal(); return; }
+    if(e.key === 'Tab'){
+      var focusable = $all('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])', modal).filter(function(el){ return !el.disabled && el.offsetParent !== null; });
+      if(!focusable.length) return;
+      var first = focusable[0], last = focusable[focusable.length-1];
+      if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+      else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+    }
+  });
+}
+function showToast(){
+  var toast = $('#toast');
+  toast.classList.add('show');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(function(){ toast.classList.remove('show'); }, 4200);
+}
+
+/* ============================================================
+   RENDER: PROCESS TIMELINE
+   ============================================================ */
+function renderProcess(){
+  var el = $('#timeline');
+  el.innerHTML = '<div class="timeline-track"><div class="timeline-track-fill" id="timelineFill"></div></div>' +
+    processSteps.map(function(s){
+      return '<div class="timeline-step reveal" data-step>'+
+        '<div class="timeline-num">'+s.n+'</div>'+
+        '<h3>'+s.t+'</h3>'+
+        '<p>'+s.d+'</p>'+
+        '<div class="timeline-connector stripe-rule" aria-hidden="true"></div>'+
+      '</div>';
+    }).join('');
+}
+
+function updateTimelineProgress(){
+  var container = $('#timeline');
+  var fill = $('#timelineFill');
+  if(!container || !fill) return;
+  var rect = container.getBoundingClientRect();
+  var vh = window.innerHeight || document.documentElement.clientHeight;
+  var total = rect.height;
+  var traveled = (vh*0.75) - rect.top;
+  var pct = total > 0 ? Math.max(0, Math.min(1, traveled/total)) : 0;
+  fill.style.setProperty('--fill', (pct*100)+'%');
+  var steps = $all('[data-step]', container);
+  var activeCount = Math.round(pct * steps.length);
+  steps.forEach(function(st,i){
+    st.classList.toggle('is-active', i < activeCount);
+  });
+}
+
+/* ============================================================
+   RENDER: CASE STUDY CAROUSEL
+   ============================================================ */
+var carouselIndex = 0;
+function renderCarousel(){
+  var track = $('#carouselTrack');
+  var dots = $('#carouselDots');
+  track.innerHTML = caseStudies.map(function(c){
+    return '<div class="case-slide">'+
+      '<div>'+
+        '<div class="metric">'+c.metric+'</div>'+
+        '<div class="metric-label">'+c.metricLabel+'</div>'+
+        '<div class="case-org">'+c.org+'</div>'+
+      '</div>'+
+      '<div>'+
+        '<div class="case-block"><h4>Challenge</h4><p>'+c.challenge+'</p></div>'+
+        '<div class="case-block"><h4>Approach</h4><p>'+c.approach+'</p></div>'+
+        '<div class="case-block"><h4>Result</h4><p>'+c.result+'</p></div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+  dots.innerHTML = caseStudies.map(function(c,i){
+    return '<button class="carousel-dot" type="button" role="tab" aria-label="Go to case study '+(i+1)+'" aria-current="'+(i===0?'true':'false')+'" data-idx="'+i+'"></button>';
+  }).join('');
+}
+function goToSlide(i){
+  var track = $('#carouselTrack');
+  var count = caseStudies.length;
+  carouselIndex = Math.max(0, Math.min(count-1, i));
+  track.style.transform = 'translateX(-'+(carouselIndex*100)+'%)';
+  $all('.carousel-dot').forEach(function(d,idx){
+    d.setAttribute('aria-current', idx===carouselIndex ? 'true':'false');
+  });
+}
+function initCarouselDrag(){
+  var viewport = $('#carouselViewport');
+  var track = $('#carouselTrack');
+  var startX = 0, currentX = 0, dragging = false, baseTranslate = 0;
+
+  function pct(){ return viewport.getBoundingClientRect().width || 1; }
+
+  function down(x){
+    dragging = true;
+    startX = x;
+    baseTranslate = -carouselIndex * pct();
+    track.style.transition = 'none';
+    viewport.classList.add('dragging');
+  }
+  function move(x){
+    if(!dragging) return;
+    currentX = x;
+    var delta = currentX - startX;
+    track.style.transform = 'translateX('+(baseTranslate+delta)+'px)';
+  }
+  function up(){
+    if(!dragging) return;
+    dragging = false;
+    viewport.classList.remove('dragging');
+    track.style.transition = '';
+    var delta = currentX - startX;
+    var threshold = pct() * 0.18;
+    if(delta > threshold) goToSlide(carouselIndex-1);
+    else if(delta < -threshold) goToSlide(carouselIndex+1);
+    else goToSlide(carouselIndex);
+    currentX = startX = 0;
+  }
+
+  viewport.addEventListener('mousedown', function(e){ down(e.clientX); });
+  window.addEventListener('mousemove', function(e){ move(e.clientX); });
+  window.addEventListener('mouseup', up);
+  viewport.addEventListener('touchstart', function(e){ down(e.touches[0].clientX); }, {passive:true});
+  viewport.addEventListener('touchmove', function(e){ move(e.touches[0].clientX); }, {passive:true});
+  viewport.addEventListener('touchend', up);
+
+  viewport.addEventListener('keydown', function(e){
+    if(e.key === 'ArrowRight'){ e.preventDefault(); goToSlide(carouselIndex+1); }
+    if(e.key === 'ArrowLeft'){ e.preventDefault(); goToSlide(carouselIndex-1); }
+  });
+  $('#carouselPrev').addEventListener('click', function(){ goToSlide(carouselIndex-1); });
+  $('#carouselNext').addEventListener('click', function(){ goToSlide(carouselIndex+1); });
+  $('#carouselDots').addEventListener('click', function(e){
+    var dot = e.target.closest('.carousel-dot');
+    if(!dot) return;
+    goToSlide(parseInt(dot.getAttribute('data-idx'),10));
+  });
+  window.addEventListener('resize', function(){ goToSlide(carouselIndex); });
+}
+
+/* ============================================================
+   RENDER: PRICING
+   ============================================================ */
+var billingAnnual = false;
+function renderPricing(){
+  var grid = $('#pricingGrid');
+  grid.innerHTML = pricingTiers.map(function(t,i){
+    var priceHtml;
+    if(t.monthly === null){
+      priceHtml = '<div class="price-amount">Custom</div><div class="price-muted">Scoped to your global footprint</div>';
+    } else {
+      priceHtml = '<div class="price-amount"><span class="price-value" data-monthly="'+t.monthly+'" data-annual="'+t.annual+'">$'+t.monthly.toLocaleString('en-US')+'</span><span class="per">/mo</span></div><div class="price-muted">billed '+(billingAnnual?'annually':'monthly')+'</div>';
+    }
+    return '<div class="price-card'+(t.recommended?' recommended':'')+'">'+
+      '<span class="price-tag">'+(t.recommended?'Recommended — ':'')+t.tag+'</span>'+
+      '<h3>'+t.name+'</h3>'+
+      priceHtml+
+      '<p class="price-muted">'+t.desc+'</p>'+
+      '<ul class="price-feat">'+t.features.map(function(f){return '<li>'+f+'</li>';}).join('')+'</ul>'+
+      '<button type="button" class="btn '+(t.recommended?'btn-block-ink':'btn-outline')+'">'+(t.monthly===null?'Contact Sales':'Choose '+t.name)+'</button>'+
+    '</div>';
+  }).join('');
+}
+function animateNumber(el, from, to, duration){
+  var start = null;
+  function step(ts){
+    if(!start) start = ts;
+    var p = Math.min(1, (ts-start)/duration);
+    var eased = 1 - Math.pow(1-p, 3);
+    var val = Math.round(from + (to-from)*eased);
+    el.textContent = '$'+val.toLocaleString('en-US');
+    if(p < 1) requestAnimationFrame(step);
+    else el.textContent = '$'+to.toLocaleString('en-US');
+  }
+  if(reduceMotion){ el.textContent = '$'+to.toLocaleString('en-US'); return; }
+  requestAnimationFrame(step);
+}
+function initBillingToggle(){
+  var sw = $('#billingSwitch');
+  sw.addEventListener('click', function(){
+    billingAnnual = !billingAnnual;
+    sw.setAttribute('aria-checked', billingAnnual ? 'true':'false');
+    $('#labelMonthly').classList.toggle('active', !billingAnnual);
+    $('#labelAnnual').classList.toggle('active', billingAnnual);
+    $all('.price-value').forEach(function(el){
+      var from = parseInt(el.getAttribute(billingAnnual?'data-monthly':'data-annual'),10);
+      var to = parseInt(el.getAttribute(billingAnnual?'data-annual':'data-monthly'),10);
+      animateNumber(el, from, to, 380);
+    });
+    $all('.price-muted').forEach(function(el){
+      if(el.previousElementSibling && el.previousElementSibling.classList && el.previousElementSibling.classList.contains('price-amount')){
+        el.textContent = 'billed '+(billingAnnual?'annually':'monthly');
+      }
+    });
+  });
+}
+
+/* ============================================================
+   RENDER: FAQ ACCORDION
+   ============================================================ */
+function renderFaq(){
+  var el = $('#accordion');
+  el.innerHTML = faqs.map(function(f,i){
+    return '<div class="acc-item" id="acc-item-'+i+'">'+
+      '<h3><button class="acc-trigger" id="acc-trigger-'+i+'" aria-expanded="false" aria-controls="acc-panel-'+i+'">'+f.q+'<span class="acc-plus" aria-hidden="true"></span></button></h3>'+
+      '<div class="acc-panel" id="acc-panel-'+i+'" role="region" aria-labelledby="acc-trigger-'+i+'"><div class="acc-panel-inner"><p>'+f.a+'</p></div></div>'+
+    '</div>';
+  }).join('');
+  el.addEventListener('click', function(e){
+    var trigger = e.target.closest('.acc-trigger');
+    if(!trigger) return;
+    var item = trigger.closest('.acc-item');
+    var isOpen = item.classList.contains('open');
+    $all('.acc-item', el).forEach(function(it){
+      it.classList.remove('open');
+      $('.acc-trigger', it).setAttribute('aria-expanded','false');
+    });
+    if(!isOpen){
+      item.classList.add('open');
+      trigger.setAttribute('aria-expanded','true');
+    }
+  });
+}
+
+/* ============================================================
+   STAT COUNTERS
+   ============================================================ */
+function initCounters(){
+  var tiles = $all('.stat-num');
+  var seen = new WeakSet ? new WeakSet() : null;
+  var done = {};
+  var obs = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(!entry.isIntersecting) return;
+      var el = entry.target;
+      var key = el.getAttribute('data-target')+el.getAttribute('data-suffix');
+      if(done[key]) return;
+      done[key] = true;
+      runCounter(el);
+      obs.unobserve(el);
+    });
+  }, {threshold:0.4});
+  tiles.forEach(function(t){ obs.observe(t); });
+}
+function runCounter(el){
+  var target = parseFloat(el.getAttribute('data-target'));
+  var decimals = parseInt(el.getAttribute('data-decimals')||'0',10);
+  var prefix = el.getAttribute('data-prefix')||'';
+  var suffix = el.getAttribute('data-suffix')||'';
+  var comma = el.getAttribute('data-comma')==='1';
+  function format(v){
+    var num = decimals ? v.toFixed(decimals) : Math.round(v).toString();
+    if(comma){ num = Math.round(v).toLocaleString('en-US'); }
+    return prefix+num+suffix;
+  }
+  if(reduceMotion){ el.textContent = format(target); return; }
+  var duration = 1600;
+  var start = null;
+  function step(ts){
+    if(!start) start = ts;
+    var p = Math.min(1, (ts-start)/duration);
+    var eased = 1 - Math.pow(1-p,3);
+    el.textContent = format(target*eased);
+    if(p < 1) requestAnimationFrame(step);
+    else el.textContent = format(target);
+  }
+  requestAnimationFrame(step);
+}
+
+/* ============================================================
+   SCROLL REVEAL
+   ============================================================ */
+function initReveal(){
+  var els = $all('.reveal');
+  if(!('IntersectionObserver' in window)){
+    els.forEach(function(el){ el.classList.add('in-view'); });
+    return;
+  }
+  var obs = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting){
+        entry.target.classList.add('in-view');
+        obs.unobserve(entry.target);
+      }
+    });
+  }, {threshold:0.12, rootMargin:'0px 0px -40px 0px'});
+  els.forEach(function(el){ obs.observe(el); });
+}
+
+/* ============================================================
+   OP-ART SCROLL PHASE SHIFT
+   ============================================================ */
+function initStripeShift(){
+  if(reduceMotion) return;
+  var bands = $all('.stripe-band');
+  var ticking = false;
+  function update(){
+    var y = window.scrollY || window.pageYOffset;
+    var shift = (y * 0.06) % 100;
+    bands.forEach(function(b){ b.style.setProperty('--shift', shift+'%'); });
+    updateTimelineProgress();
+    ticking = false;
+  }
+  window.addEventListener('scroll', function(){
+    if(!ticking){ requestAnimationFrame(update); ticking = true; }
+  }, {passive:true});
+  update();
+}
+
+/* ============================================================
+   CONTACT FORM VALIDATION
+   ============================================================ */
+function initContactForm(){
+  var form = $('#contactForm');
+  var success = $('#formSuccess');
+  var emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  function setError(id, msg){
+    var field = $('#field-'+id);
+    var err = $('#err-'+id);
+    if(msg){ field.classList.add('error'); err.textContent = msg; }
+    else { field.classList.remove('error'); err.textContent = ''; }
+  }
+
+  function validate(){
+    var ok = true;
+    var name = $('#inpName').value.trim();
+    var email = $('#inpEmail').value.trim();
+    var company = $('#inpCompany').value.trim();
+    var message = $('#inpMessage').value.trim();
+
+    if(!name){ setError('name','Please enter your full name.'); ok = false; } else setError('name','');
+    if(!email){ setError('email','Please enter your work email.'); ok = false; }
+    else if(!emailRe.test(email)){ setError('email','Enter a valid email address.'); ok = false; }
+    else setError('email','');
+    if(!company){ setError('company','Please enter your company name.'); ok = false; } else setError('company','');
+    if(!message || message.length < 10){ setError('message','Tell us a little more (10+ characters).'); ok = false; } else setError('message','');
+
+    return ok;
+  }
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    if(!validate()){
+      var firstError = form.querySelector('.field.error input, .field.error textarea');
+      if(firstError) firstError.focus();
+      return;
+    }
+    form.classList.add('hidden');
+    success.classList.add('show');
+    form.reset();
+  });
+
+  $all('input,textarea', form).forEach(function(el){
+    el.addEventListener('input', function(){
+      var id = el.closest('.field').id.replace('field-','');
+      if($('#field-'+id).classList.contains('error')) validate();
+    });
+  });
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+function init(){
+  initLoader();
+  initTheme();
+  initMobileMenu();
+  renderServices();
+  renderSolutions();
+  renderFilterChips();
+  renderProductGrid();
+  initModal();
+  renderProcess();
+  renderCarousel();
+  goToSlide(0);
+  initCarouselDrag();
+  renderPricing();
+  initBillingToggle();
+  renderFaq();
+  initCounters();
+  initContactForm();
+  initStripeShift();
+  initReveal();
+  setTimeout(updateTimelineProgress, 100);
+}
+
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+
+})();
+</script>
