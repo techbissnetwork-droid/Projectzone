@@ -432,6 +432,15 @@ button{ cursor:pointer; }
 .pf-cover{ display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:16px; }
 .pf-rating{ display:inline-flex; align-items:center; gap:5px; font-family:var(--font-display); font-weight:700; font-size:.78rem; color:var(--ink-soft); background:var(--surface-2); padding:5px 10px; border-radius:var(--r-full); flex:none; }
 .pf-rating .icon{ width:12px; height:12px; color:#f0a83c; }
+.pf-preview{
+  flex:1; min-height:56px; margin:12px 0; border-radius:16px; overflow:hidden; position:relative;
+  display:flex; align-items:center; justify-content:center;
+  background:
+    radial-gradient(120% 160% at 18% 15%, color-mix(in srgb, var(--accent-1) 18%, var(--surface-2)) 0%, transparent 60%),
+    radial-gradient(120% 160% at 88% 92%, color-mix(in srgb, var(--accent-2) 18%, var(--surface-2)) 0%, transparent 60%),
+    var(--surface-2);
+}
+.pf-preview .icon{ width:38%; height:38%; max-width:56px; max-height:56px; color:var(--accent-1); opacity:.45; }
 .pf-tags{ display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap; }
 .pf-foot{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:auto; padding-top:16px; border-top:1px solid var(--border-soft); }
 .pf-price{ font-family:var(--font-display); font-weight:800; font-size:1.2rem; color:var(--ink); }
@@ -1533,7 +1542,8 @@ function wireMarketplace(){
       return '<div class="flip-card"><div class="flip-inner">'
         +'<div class="flip-face flip-front">'
           +'<div class="card-head" style="margin-bottom:12px;">'+blobIcon(p.icon,'sm')+'<h3 style="font-size:1.05rem;">'+p.name+'</h3></div>'
-          +'<p style="font-size:.85rem;flex:1;">'+p.tagline+'</p>'
+          +'<p style="font-size:.85rem;">'+p.tagline+'</p>'
+          +'<div class="pf-preview">'+ico(p.icon)+'</div>'
           +'<div class="pf-tags" style="justify-content:space-between;align-items:center;"><div style="display:flex;gap:6px;flex-wrap:wrap;"><span class="badge">'+p.cat+'</span>'+(p.rating>=4.9?'<span class="badge grad">Popular</span>':'')+'</div><span class="pf-rating">'+ico('star')+' '+p.rating+'</span></div>'
           +'<div class="pf-foot"><span class="pf-price">'+fmtMoney(p.price)+'<span> /mo</span></span><span class="pf-hint">Flip to preview '+ico('refresh')+'</span></div>'
         +'</div>'
