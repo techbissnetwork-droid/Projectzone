@@ -1,0 +1,1659 @@
+<!DOCTYPE html>
+<html lang="en" data-mode="ink">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TECHBISS — Monolith</title>
+<meta name="description" content="TECHBISS is a global digital transformation platform — cloud, AI, engineering and managed operations at enterprise scale. Monolith: a kinetic editorial concept in black, white and signal yellow.">
+<meta name="theme-color" content="#000000">
+<meta property="og:title" content="TECHBISS — Monolith">
+<meta property="og:description" content="A kinetic editorial concept for a global digital transformation platform.">
+<meta property="og:type" content="website">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@100..900&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<style>
+/* ============ RESET ============ */
+*,*::before,*::after{box-sizing:border-box;}
+html{-webkit-text-size-adjust:100%;scroll-behavior:auto;}
+body{margin:0;}
+img,svg{max-width:100%;display:block;}
+button,input,textarea,select{font:inherit;color:inherit;}
+a{color:inherit;}
+ul{list-style:none;margin:0;padding:0;}
+h1,h2,h3,h4,p,figure{margin:0;}
+
+/* ============ TOKENS ============ */
+:root{
+  --bg:#000000; --fg:#ffffff; --fg-dim:rgba(255,255,255,.62); --fg-faint:rgba(255,255,255,.32);
+  --line:rgba(255,255,255,.22); --line-strong:rgba(255,255,255,.5);
+  --surface:#0b0b0b; --surface-2:#141414;
+  --accent:#F5FF3D; --accent-fg:#000000;
+  --font-display:'Big Shoulders Display','Arial Narrow',sans-serif;
+  --font-body:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  --font-mono:'IBM Plex Mono','SFMono-Regular',Menlo,Consolas,monospace;
+  --gutter:clamp(14px,2.2vw,28px);
+  --pad:clamp(18px,4.6vw,64px);
+  --dur-fast:.18s; --dur:.4s; --dur-slow:.6s;
+  --ease:cubic-bezier(.22,.7,.24,1);
+  color-scheme:dark;
+}
+[data-mode="paper"]{
+  --bg:#ffffff; --fg:#000000; --fg-dim:rgba(0,0,0,.64); --fg-faint:rgba(0,0,0,.34);
+  --line:rgba(0,0,0,.2); --line-strong:rgba(0,0,0,.5);
+  --surface:#f3f3f1; --surface-2:#e9e9e6;
+  --accent:#F5FF3D; --accent-fg:#000000;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:light){
+  :root:not([data-mode="ink"]):not([data-mode="paper"]){
+    --bg:#ffffff; --fg:#000000; --fg-dim:rgba(0,0,0,.64); --fg-faint:rgba(0,0,0,.34);
+    --line:rgba(0,0,0,.2); --line-strong:rgba(0,0,0,.5);
+    --surface:#f3f3f1; --surface-2:#e9e9e6;
+    color-scheme:light;
+  }
+}
+
+/* ============ BASE ============ */
+html,body{background:var(--bg);color:var(--fg);}
+body{
+  font-family:var(--font-body);
+  font-size:16px;line-height:1.5;
+  transition:background var(--dur-slow) var(--ease),color var(--dur-slow) var(--ease);
+  overflow-x:hidden;
+}
+::selection{background:var(--accent);color:var(--accent-fg);}
+.wrap{padding-inline:var(--pad);}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:var(--gutter);}
+main{display:block;}
+hr.rule{border:none;border-top:1px solid var(--line);margin:0;}
+.mono{font-family:var(--font-mono);letter-spacing:.02em;}
+.eyebrow{
+  font-family:var(--font-mono);font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--fg-dim);display:flex;align-items:center;gap:.6em;
+}
+.eyebrow .dot{width:6px;height:6px;background:var(--accent);flex:none;}
+h1,h2,h3,h4{font-family:var(--font-display);font-weight:700;letter-spacing:-0.01em;text-wrap:balance;text-transform:uppercase;}
+.display-1{font-size:clamp(3rem,9vw,8.5rem);line-height:.92;font-weight:800;}
+.display-2{font-size:clamp(2.2rem,6vw,5.2rem);line-height:.95;font-weight:800;}
+.display-3{font-size:clamp(1.6rem,3.6vw,2.9rem);line-height:1;font-weight:700;}
+h3{font-size:clamp(1.2rem,2.2vw,1.6rem);}
+h4{font-size:1.05rem;letter-spacing:0;}
+p{max-width:65ch;}
+p.lede{font-size:clamp(1.05rem,1.6vw,1.4rem);color:var(--fg-dim);font-weight:400;line-height:1.45;}
+.mark{background:var(--accent);color:#000;padding:0 .12em;box-decoration-break:clone;-webkit-box-decoration-break:clone;}
+.underline-mark{position:relative;display:inline-block;}
+.underline-mark::after{content:"";position:absolute;left:-.02em;right:-.02em;bottom:.02em;height:.18em;background:var(--accent);z-index:-1;}
+
+/* ============ SKIP LINK ============ */
+.skip-link{
+  position:fixed;top:-100%;left:0;z-index:1000;background:var(--accent);color:#000;
+  padding:.8em 1.2em;font-family:var(--font-mono);font-weight:600;font-size:.85rem;
+  transition:top var(--dur-fast) var(--ease);
+}
+.skip-link:focus{top:0;}
+
+/* ============ FOCUS ============ */
+:focus{outline:none;}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;}
+a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:3px;}
+
+/* ============ HEADER ============ */
+.site-header{
+  position:sticky;top:0;z-index:200;background:var(--bg);border-bottom:1px solid var(--line);
+}
+.header-inner{
+  display:flex;align-items:center;justify-content:space-between;gap:1rem;
+  padding-block:.9rem;
+}
+.logo{
+  font-family:var(--font-display);font-weight:800;font-size:1.5rem;letter-spacing:-.01em;
+  text-decoration:none;display:flex;align-items:center;gap:.5em;text-transform:uppercase;
+}
+.logo .dot{width:9px;height:9px;background:var(--accent);border-radius:0;}
+.primary-nav{display:flex;align-items:center;gap:clamp(.9rem,2vw,1.8rem);}
+.primary-nav a{
+  font-family:var(--font-mono);font-size:.82rem;letter-spacing:.04em;text-decoration:none;
+  position:relative;padding:.3em 0;color:var(--fg-dim);
+}
+.primary-nav a::after{
+  content:"";position:absolute;left:0;bottom:0;height:2px;width:0;background:var(--accent);
+  transition:width var(--dur-fast) var(--ease);
+}
+.primary-nav a:hover,.primary-nav a:focus-visible{color:var(--fg);}
+.primary-nav a:hover::after,.primary-nav a:focus-visible::after,.primary-nav a[aria-current="page"]::after{width:100%;}
+.primary-nav a[aria-current="page"]{color:var(--fg);}
+@media (max-width:920px){.primary-nav{display:none;}}
+.header-actions{display:flex;align-items:center;gap:.4rem;}
+.icon-btn{
+  width:2.4rem;height:2.4rem;display:inline-flex;align-items:center;justify-content:center;
+  background:transparent;border:1px solid var(--line);cursor:pointer;color:var(--fg);
+  transition:background var(--dur-fast) var(--ease),border-color var(--dur-fast) var(--ease);
+}
+.icon-btn:hover{border-color:var(--fg);}
+.icon-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;}
+.icon-btn.is-active{background:var(--accent);border-color:var(--accent);color:#000;}
+
+/* ============ INDEX OVERLAY (full menu) ============ */
+.index-overlay{
+  position:fixed;inset:0;z-index:500;background:var(--bg);color:var(--fg);
+  display:flex;flex-direction:column;
+  transform:translateY(-100%);transition:transform var(--dur-slow) var(--ease);
+}
+.index-overlay.is-open{transform:translateY(0);}
+.index-top{display:flex;justify-content:space-between;align-items:center;padding:.9rem var(--pad);border-bottom:1px solid var(--line);}
+.index-search{
+  background:transparent;border:none;border-bottom:1px solid var(--line);color:var(--fg);
+  font-family:var(--font-mono);font-size:.9rem;padding:.4em 0;width:min(46vw,320px);
+}
+.index-search::placeholder{color:var(--fg-faint);}
+.index-body{flex:1;overflow-y:auto;padding:2vw var(--pad) 4vw;}
+.index-list{display:grid;grid-template-columns:repeat(2,1fr);}
+.index-list li{border-bottom:1px solid var(--line);}
+.index-list a{
+  display:flex;align-items:baseline;gap:1em;padding:.55em 0;text-decoration:none;
+  font-family:var(--font-display);font-size:clamp(1.4rem,3.4vw,2.6rem);font-weight:700;text-transform:uppercase;
+  color:var(--fg);transition:color var(--dur-fast) var(--ease),padding-left var(--dur-fast) var(--ease);
+}
+.index-list a .num{font-family:var(--font-mono);font-size:.9rem;font-weight:400;color:var(--fg-faint);}
+.index-list a:hover,.index-list a:focus-visible{color:var(--accent);padding-left:.4em;}
+.index-list li[hidden]{display:none;}
+@media (max-width:720px){.index-list{grid-template-columns:1fr;}}
+
+/* ============ MARQUEE ============ */
+.marquee{
+  border-block:1px solid var(--line);overflow:hidden;background:var(--surface);
+  padding-block:.7rem;
+}
+.marquee-track{display:flex;width:max-content;animation:marquee 26s linear infinite;}
+.marquee:hover .marquee-track,.marquee:focus-within .marquee-track{animation-play-state:paused;}
+.marquee-group{display:flex;flex:none;}
+.marquee-item{
+  font-family:var(--font-mono);font-size:.85rem;letter-spacing:.05em;text-transform:uppercase;
+  padding-inline:1.6rem;white-space:nowrap;display:flex;align-items:center;gap:.8rem;color:var(--fg-dim);
+}
+.marquee-item svg{width:14px;height:14px;stroke:var(--accent);fill:none;flex:none;}
+@keyframes marquee{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+/* ============ BUTTONS ============ */
+.btn{
+  display:inline-flex;align-items:center;gap:.6em;font-family:var(--font-mono);font-size:.85rem;
+  letter-spacing:.04em;text-decoration:none;padding:.9em 1.4em;border:1px solid var(--fg);
+  background:transparent;color:var(--fg);cursor:pointer;position:relative;overflow:hidden;text-transform:uppercase;
+}
+.btn::before{
+  content:"";position:absolute;inset:0;background:var(--fg);transform:translateY(101%);
+  transition:transform var(--dur-fast) var(--ease);z-index:0;
+}
+.btn span,.btn svg{position:relative;z-index:1;}
+.btn svg{width:16px;height:16px;stroke:currentColor;fill:none;transition:transform var(--dur-fast) var(--ease);}
+.btn:hover::before,.btn:focus-visible::before{transform:translateY(0);}
+.btn:hover,.btn:focus-visible{color:var(--bg);}
+.btn:hover svg,.btn:focus-visible svg{transform:translateX(3px);}
+.btn-primary{background:var(--accent);color:#000;border-color:var(--accent);}
+.btn-primary::before{background:#000;}
+.btn-primary:hover,.btn-primary:focus-visible{color:var(--accent);}
+.btn-block{width:100%;justify-content:center;}
+.btn[disabled]{opacity:.4;cursor:not-allowed;}
+.btn[disabled]:hover::before{transform:translateY(101%);}
+
+/* ============ SECTIONS ============ */
+section{padding-block:clamp(3rem,8vw,7rem);}
+section.tight{padding-block:clamp(2rem,5vw,3.5rem);}
+.section-head{display:flex;justify-content:space-between;align-items:flex-end;gap:2rem;margin-bottom:clamp(1.6rem,4vw,3rem);flex-wrap:wrap;}
+.section-num{font-family:var(--font-mono);font-size:.8rem;color:var(--fg-faint);}
+
+/* ============ HERO ============ */
+.hero{padding-top:clamp(2.5rem,7vw,5rem);}
+.hero-head{grid-column:1/13;border-bottom:1px solid var(--line);padding-bottom:clamp(1.2rem,3vw,2rem);}
+.hero-headline{margin-block:.4em .5em;}
+.hero-sub-row{grid-column:1/13;display:flex;justify-content:space-between;gap:2rem;flex-wrap:wrap;padding-block:1.6rem;}
+.hero-sub-row p{grid-column:span 6;}
+.hero-cta{display:flex;gap:.9rem;flex-wrap:wrap;}
+
+/* ============ KINETIC / SCRUB ============ */
+.kinetic-pin{
+  height:280vh;position:relative;
+}
+.kinetic-stage{
+  position:sticky;top:0;height:100vh;display:flex;flex-direction:column;justify-content:center;
+  overflow:hidden;border-block:1px solid var(--line);background:var(--bg);
+}
+.kinetic-line{
+  font-family:var(--font-display);font-weight:800;text-transform:uppercase;white-space:nowrap;
+  font-size:clamp(3rem,13vw,11rem);line-height:1;will-change:transform;
+}
+.kinetic-line.k2{color:transparent;-webkit-text-stroke:1.5px var(--fg);}
+.kinetic-line.k3 .accent-word{color:var(--accent);}
+.kinetic-caption{position:absolute;bottom:var(--pad);left:var(--pad);right:var(--pad);display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:.75rem;color:var(--fg-faint);}
+
+/* static fallback for reduced motion */
+.kinetic-static{padding-block:clamp(2rem,6vw,4rem);border-block:1px solid var(--line);}
+.kinetic-static h2{font-size:clamp(2.4rem,7vw,6rem);line-height:1;margin-bottom:.3em;}
+.kinetic-static h2 .accent-word{color:var(--accent);}
+
+/* ============ SERVICES STRIP ============ */
+.service-strip{grid-column:1/13;}
+.service-row{
+  display:grid;grid-template-columns:subgrid;grid-column:1/13;border-top:1px solid var(--line);
+  padding-block:1.4rem;align-items:center;gap:var(--gutter);
+}
+.service-row:last-child{border-bottom:1px solid var(--line);}
+.service-row .idx{grid-column:span 1;font-family:var(--font-mono);color:var(--fg-faint);font-size:.85rem;}
+.service-row .icon{grid-column:span 1;width:28px;height:28px;stroke:var(--fg);fill:none;}
+.service-row .name{grid-column:span 6;font-family:var(--font-display);font-size:clamp(1.2rem,2.6vw,2rem);text-transform:uppercase;font-weight:700;}
+.service-row .desc{grid-column:span 4;color:var(--fg-dim);font-size:.92rem;}
+@media (max-width:800px){
+  .service-row{grid-template-columns:repeat(12,1fr);}
+  .service-row .name{grid-column:span 8;}
+  .service-row .desc{grid-column:1/13;margin-top:.4rem;}
+}
+
+/* ============ STAT STRIP ============ */
+.stat-strip{grid-column:1/13;display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+.stat{padding:1.6rem 1rem;border-left:1px solid var(--line);}
+.stat:first-child{border-left:none;}
+.stat .num{font-family:var(--font-display);font-size:clamp(2rem,5vw,3.6rem);font-weight:800;}
+.stat .label{font-family:var(--font-mono);font-size:.72rem;color:var(--fg-dim);text-transform:uppercase;letter-spacing:.04em;margin-top:.3rem;}
+@media (max-width:760px){.stat-strip{grid-template-columns:repeat(2,1fr);}.stat:nth-child(2n+1){border-left:none;}.stat:nth-child(n+3){border-top:1px solid var(--line);}}
+
+/* ============ CARDS ============ */
+.card-grid{grid-column:1/13;display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);}
+.card{background:var(--bg);padding:clamp(1.4rem,3vw,2rem);display:flex;flex-direction:column;gap:.9rem;transition:background var(--dur-fast) var(--ease);}
+.card:hover{background:var(--surface);}
+.card .icon-box{width:2.6rem;height:2.6rem;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;}
+.card .icon-box svg{width:20px;height:20px;stroke:var(--fg);fill:none;}
+.card h3{text-transform:none;}
+.card p{color:var(--fg-dim);font-size:.92rem;}
+.card ul{display:flex;flex-direction:column;gap:.4rem;margin-top:.2rem;}
+.card ul li{font-size:.85rem;color:var(--fg-dim);display:flex;gap:.5em;align-items:flex-start;}
+.card ul li svg{width:14px;height:14px;stroke:var(--accent);fill:none;flex:none;margin-top:.2em;}
+@media (max-width:920px){.card-grid{grid-template-columns:repeat(2,1fr);}}
+@media (max-width:600px){.card-grid{grid-template-columns:1fr;}}
+
+/* ============ PULLQUOTE ============ */
+.pullquote{grid-column:2/12;border-top:2px solid var(--fg);border-bottom:2px solid var(--fg);padding-block:2rem;margin-block:1rem;}
+.pullquote blockquote{font-family:var(--font-display);font-size:clamp(1.6rem,4vw,3rem);line-height:1.05;font-weight:700;text-transform:uppercase;}
+.pullquote cite{display:block;margin-top:1rem;font-family:var(--font-mono);font-style:normal;font-size:.8rem;color:var(--fg-dim);}
+
+/* ============ FOOTER ============ */
+.site-footer{border-top:1px solid var(--line);margin-top:4rem;padding-block:clamp(2rem,5vw,3.5rem);}
+.footer-grid{grid-column:1/13;display:grid;grid-template-columns:repeat(12,1fr);gap:var(--gutter);}
+.footer-brand{grid-column:span 4;}
+.footer-col{grid-column:span 2;display:flex;flex-direction:column;gap:.55rem;}
+.footer-col h4{font-size:.8rem;color:var(--fg-dim);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.3rem;}
+.footer-col a{font-size:.85rem;text-decoration:none;color:var(--fg-dim);}
+.footer-col a:hover,.footer-col a:focus-visible{color:var(--fg);}
+.footer-bottom{grid-column:1/13;display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-top:2.4rem;padding-top:1.2rem;border-top:1px solid var(--line);font-family:var(--font-mono);font-size:.75rem;color:var(--fg-faint);}
+@media (max-width:920px){.footer-brand{grid-column:1/13;}.footer-col{grid-column:span 4;}}
+@media (max-width:600px){.footer-col{grid-column:span 6;}}
+
+/* ============ ROUTE TRANSITION ============ */
+#view{will-change:opacity;}
+#view.leaving{animation:cutOut .16s var(--ease) forwards;}
+#view.entering{animation:cutIn .22s var(--ease) forwards;}
+@keyframes cutOut{to{opacity:0;transform:translateY(-6px);}}
+@keyframes cutIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+/* ============ PAGE HEADERS ============ */
+.page-head{padding-top:clamp(2rem,6vw,3.5rem);padding-bottom:clamp(1.4rem,3vw,2rem);border-bottom:1px solid var(--line);}
+.page-head .eyebrow{margin-bottom:.8rem;}
+.byline{display:flex;gap:1.6rem;flex-wrap:wrap;font-family:var(--font-mono);font-size:.75rem;color:var(--fg-faint);margin-top:1rem;}
+
+/* ============ REVEAL ============ */
+.reveal{opacity:0;transform:translateY(18px);transition:opacity var(--dur-slow) var(--ease),transform var(--dur-slow) var(--ease);}
+.reveal.is-visible{opacity:1;transform:translateY(0);}
+
+/* ============ FORMS ============ */
+.field{display:flex;flex-direction:column;gap:.4rem;margin-bottom:1.2rem;}
+.field label{font-family:var(--font-mono);font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;color:var(--fg-dim);}
+.field input,.field textarea,.field select{
+  background:transparent;border:1px solid var(--line);color:var(--fg);padding:.8em .9em;font-family:var(--font-body);font-size:.95rem;
+  transition:border-color var(--dur-fast) var(--ease);
+}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--fg);}
+.field textarea{resize:vertical;min-height:110px;}
+.field.has-error input,.field.has-error textarea{border-color:#ff5555;}
+.field .err{font-family:var(--font-mono);font-size:.72rem;color:#ff6b6b;min-height:1em;}
+.form-success{border:1px solid var(--accent);padding:2rem;display:flex;flex-direction:column;gap:.6rem;align-items:flex-start;}
+.form-success svg{width:34px;height:34px;stroke:var(--accent);fill:none;}
+
+/* ============ PRICING ============ */
+.billing-toggle{display:inline-flex;align-items:center;gap:.8rem;font-family:var(--font-mono);font-size:.8rem;}
+.switch{position:relative;width:52px;height:28px;border:1px solid var(--fg);background:transparent;cursor:pointer;padding:0;}
+.switch .knob{position:absolute;top:2px;left:2px;width:20px;height:20px;background:var(--fg);transition:transform var(--dur-fast) var(--ease);}
+.switch[aria-pressed="true"] .knob{transform:translateX(24px);background:var(--accent);}
+.pricing-grid{grid-column:1/13;display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line);}
+.tier{padding:clamp(1.4rem,3vw,2.2rem);border-left:1px solid var(--line);display:flex;flex-direction:column;gap:1rem;}
+.tier:first-child{border-left:none;}
+.tier.is-feature{background:var(--fg);color:var(--bg);}
+.tier.is-feature .tier-badge{background:var(--accent);color:#000;}
+.tier-badge{align-self:flex-start;font-family:var(--font-mono);font-size:.68rem;text-transform:uppercase;padding:.25em .6em;border:1px solid currentColor;}
+.tier .price{font-family:var(--font-display);font-size:clamp(2rem,4vw,3rem);font-weight:800;}
+.tier .price small{font-family:var(--font-mono);font-size:.9rem;font-weight:400;}
+.tier ul{display:flex;flex-direction:column;gap:.55rem;margin:.6rem 0;}
+.tier ul li{display:flex;gap:.5em;font-size:.88rem;align-items:flex-start;}
+.tier ul li svg{width:14px;height:14px;stroke:var(--accent);fill:none;flex:none;margin-top:.2em;}
+.tier.is-feature ul li svg{stroke:#000;}
+@media (max-width:900px){.pricing-grid{grid-template-columns:1fr;}.tier{border-left:none;border-top:1px solid var(--line);}.tier:first-child{border-top:none;}}
+
+/* ============ MARKETPLACE ============ */
+.mkt-grid{grid-column:1/13;display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);}
+.mkt-card{background:var(--bg);padding:1.6rem;display:flex;flex-direction:column;gap:.8rem;text-align:left;cursor:pointer;border:none;color:var(--fg);font-family:var(--font-body);}
+.mkt-card:hover{background:var(--surface);}
+.mkt-tag{font-family:var(--font-mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;color:var(--fg-dim);border:1px solid var(--line);padding:.2em .5em;align-self:flex-start;}
+.mkt-card h3{text-transform:none;font-size:1.15rem;}
+.mkt-card p{font-size:.86rem;color:var(--fg-dim);}
+.mkt-price{font-family:var(--font-mono);font-size:.85rem;margin-top:auto;padding-top:.6rem;border-top:1px solid var(--line);display:flex;justify-content:space-between;}
+@media (max-width:920px){.mkt-grid{grid-template-columns:repeat(2,1fr);}}
+@media (max-width:600px){.mkt-grid{grid-template-columns:1fr;}}
+
+/* modal */
+.modal-overlay{position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;padding:4vw;opacity:0;pointer-events:none;transition:opacity var(--dur) var(--ease);}
+[data-mode="paper"] .modal-overlay{background:rgba(0,0,0,.55);}
+.modal-overlay.is-open{opacity:1;pointer-events:auto;}
+.modal{
+  background:var(--bg);border:1px solid var(--line-strong);max-width:640px;width:100%;max-height:86vh;overflow-y:auto;
+  padding:clamp(1.4rem,3vw,2.4rem);transform:translateY(16px);transition:transform var(--dur) var(--ease);
+}
+.modal-overlay.is-open .modal{transform:translateY(0);}
+.modal-head{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;margin-bottom:1.2rem;}
+.modal-steps{display:flex;gap:.4rem;font-family:var(--font-mono);font-size:.68rem;text-transform:uppercase;color:var(--fg-faint);margin-bottom:1.2rem;flex-wrap:wrap;}
+.modal-steps span{padding:.2em .5em;border:1px solid var(--line);}
+.modal-steps span.is-active{border-color:var(--accent);color:var(--fg);}
+.addon-row{display:flex;justify-content:space-between;align-items:center;padding:.7rem 0;border-bottom:1px solid var(--line);gap:1rem;}
+.addon-row label{font-size:.9rem;display:flex;gap:.6rem;align-items:center;}
+.addon-row .price{font-family:var(--font-mono);font-size:.85rem;color:var(--fg-dim);}
+.checkbox{position:relative;width:18px;height:18px;border:1px solid var(--fg);flex:none;display:inline-flex;align-items:center;justify-content:center;}
+.checkbox svg{width:12px;height:12px;stroke:var(--accent);fill:none;opacity:0;transition:opacity var(--dur-fast) var(--ease);}
+input[type=checkbox]:checked + .checkbox svg{opacity:1;}
+input[type=checkbox]{position:absolute;opacity:0;width:18px;height:18px;cursor:pointer;}
+.total-row{display:flex;justify-content:space-between;align-items:baseline;padding-top:1rem;margin-top:.6rem;border-top:2px solid var(--fg);}
+.total-row .amount{font-family:var(--font-display);font-size:2rem;font-weight:800;}
+.progress-track{height:6px;background:var(--surface-2);border:1px solid var(--line);margin-block:1rem;}
+.progress-fill{height:100%;background:var(--accent);width:0%;transition:width .3s var(--ease);}
+.deploy-log{font-family:var(--font-mono);font-size:.78rem;color:var(--fg-dim);display:flex;flex-direction:column;gap:.35rem;min-height:6em;}
+.deploy-log .line{opacity:0;animation:logIn .3s var(--ease) forwards;}
+@keyframes logIn{to{opacity:1;}}
+.deploy-success{display:flex;flex-direction:column;align-items:flex-start;gap:.7rem;padding-top:1rem;}
+.deploy-success svg{width:36px;height:36px;stroke:var(--accent);fill:none;}
+.modal-actions{display:flex;justify-content:flex-end;gap:.7rem;margin-top:1.4rem;}
+
+/* ============ INSTALLER ============ */
+.stepper{grid-column:1/13;display:flex;gap:0;margin-bottom:2.4rem;border:1px solid var(--line);overflow-x:auto;}
+.step-tab{flex:1;min-width:110px;padding:.8rem 1rem;font-family:var(--font-mono);font-size:.7rem;text-transform:uppercase;text-align:center;border-left:1px solid var(--line);color:var(--fg-faint);position:relative;}
+.step-tab:first-child{border-left:none;}
+.step-tab .n{display:block;font-family:var(--font-display);font-size:1.3rem;font-weight:800;color:var(--fg-faint);}
+.step-tab.is-active{color:var(--fg);background:var(--surface);}
+.step-tab.is-active .n{color:var(--accent);}
+.step-tab.is-done .n::after{content:" ✓";display:none;}
+.step-tab.is-done{color:var(--fg-dim);}
+.install-panel{grid-column:1/13;}
+.select-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gutter);}
+.select-card{border:1px solid var(--line);padding:1.4rem;cursor:pointer;background:transparent;color:var(--fg);text-align:left;font-family:var(--font-body);display:flex;flex-direction:column;gap:.6rem;}
+.select-card svg{width:22px;height:22px;stroke:var(--fg);fill:none;}
+.select-card.is-selected{border-color:var(--accent);background:var(--surface);}
+.select-card.is-selected svg{stroke:var(--accent);}
+.scan-list{display:flex;flex-direction:column;gap:.6rem;font-family:var(--font-mono);font-size:.85rem;}
+.scan-item{display:flex;justify-content:space-between;padding:.6rem .9rem;border:1px solid var(--line);opacity:0;transform:translateX(-8px);transition:opacity .3s var(--ease),transform .3s var(--ease);}
+.scan-item.is-in{opacity:1;transform:translateX(0);}
+.scan-item .ok{color:var(--accent);}
+.import-item{margin-bottom:1rem;}
+.import-item .head{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:.8rem;margin-bottom:.3rem;}
+.checklist li{display:flex;justify-content:space-between;align-items:center;padding:.7rem 0;border-bottom:1px solid var(--line);font-family:var(--font-mono);font-size:.85rem;}
+.checklist li svg{width:16px;height:16px;stroke:var(--fg-faint);fill:none;transition:stroke var(--dur-fast) var(--ease);}
+.checklist li.is-verified svg{stroke:var(--accent);}
+@media (max-width:800px){.select-cards{grid-template-columns:1fr;}}
+
+/* ============ DASHBOARD ============ */
+.dash-tabs{display:flex;gap:.5rem;grid-column:1/13;margin-bottom:1.6rem;}
+.dash-tab{font-family:var(--font-mono);font-size:.78rem;text-transform:uppercase;padding:.6em 1.1em;border:1px solid var(--line);background:transparent;color:var(--fg-dim);cursor:pointer;}
+.dash-tab.is-active{border-color:var(--fg);color:var(--fg);}
+.preview-badge{font-family:var(--font-mono);font-size:.68rem;text-transform:uppercase;background:var(--accent);color:#000;padding:.3em .7em;margin-left:.6rem;}
+.kpi-grid{grid-column:1/13;display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-bottom:var(--gutter);}
+.kpi{background:var(--bg);padding:1.2rem;}
+.kpi .label{font-family:var(--font-mono);font-size:.7rem;color:var(--fg-dim);text-transform:uppercase;}
+.kpi .val{font-family:var(--font-display);font-size:2rem;font-weight:800;margin-top:.3rem;}
+.kpi .delta{font-family:var(--font-mono);font-size:.72rem;color:var(--accent);}
+.dash-chart{grid-column:1/8;border:1px solid var(--line);padding:1.4rem;}
+.dash-activity{grid-column:8/13;border:1px solid var(--line);padding:1.4rem;}
+.activity-item{display:flex;gap:.8rem;padding:.6rem 0;border-bottom:1px solid var(--line);font-size:.85rem;}
+.activity-item time{font-family:var(--font-mono);font-size:.72rem;color:var(--fg-faint);flex:none;width:3.6em;}
+@media (max-width:900px){.dash-chart,.dash-activity{grid-column:1/13;}.kpi-grid{grid-template-columns:repeat(2,1fr);}}
+
+/* ============ TIMELINE ============ */
+.timeline{grid-column:1/13;border-left:1px solid var(--line);}
+.timeline-item{position:relative;padding:0 0 2.4rem 2rem;}
+.timeline-item::before{content:"";position:absolute;left:-5px;top:.3rem;width:9px;height:9px;background:var(--accent);}
+.timeline-item .yr{font-family:var(--font-mono);font-size:.8rem;color:var(--fg-dim);}
+
+/* ============ AVATARS ============ */
+.avatar{width:64px;height:64px;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);font-family:var(--font-display);font-weight:800;font-size:1.4rem;flex:none;}
+
+/* ============ OFFICES ============ */
+.office-grid{grid-column:1/13;display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);}
+.office{background:var(--bg);padding:1.3rem;}
+.office h4{margin-bottom:.4rem;}
+.office p{font-size:.82rem;color:var(--fg-dim);}
+@media (max-width:900px){.office-grid{grid-template-columns:repeat(2,1fr);}}
+
+/* ============ WORK ============ */
+.work-list{grid-column:1/13;}
+.work-item{border-top:1px solid var(--line);padding-block:2rem;display:grid;grid-template-columns:repeat(12,1fr);gap:var(--gutter);align-items:center;}
+.work-item:last-child{border-bottom:1px solid var(--line);}
+.work-item .tag{grid-column:span 2;font-family:var(--font-mono);font-size:.72rem;color:var(--fg-dim);text-transform:uppercase;}
+.work-item h3{grid-column:span 5;text-transform:none;}
+.work-item p{grid-column:span 3;color:var(--fg-dim);font-size:.85rem;}
+.work-item .metric{grid-column:span 2;font-family:var(--font-display);font-size:2.4rem;font-weight:800;color:var(--accent);text-align:right;}
+@media (max-width:900px){.work-item{grid-template-columns:repeat(2,1fr);}.work-item .tag,.work-item h3,.work-item p,.work-item .metric{grid-column:span 2;text-align:left;}}
+
+/* ============ PROCESS ============ */
+.process-list{grid-column:1/13;}
+.process-item{display:grid;grid-template-columns:repeat(12,1fr);gap:var(--gutter);border-top:1px solid var(--line);padding-block:2rem;}
+.process-item:last-child{border-bottom:1px solid var(--line);}
+.process-item .n{grid-column:span 2;font-family:var(--font-display);font-size:clamp(2.2rem,5vw,4rem);font-weight:800;color:var(--fg-faint);}
+.process-item .body{grid-column:span 8;}
+.process-item p{color:var(--fg-dim);margin-top:.5rem;}
+@media (max-width:800px){.process-item .n{grid-column:span 3;}.process-item .body{grid-column:span 9;}}
+
+/* ============ RESOURCES ============ */
+.res-card h3{text-transform:none;font-size:1.1rem;}
+.res-meta{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:.7rem;color:var(--fg-faint);text-transform:uppercase;}
+
+/* ============ SOLUTIONS ============ */
+.sol-list{grid-column:1/13;}
+.sol-item{border-top:1px solid var(--line);padding-block:1.8rem;display:grid;grid-template-columns:repeat(12,1fr);gap:var(--gutter);}
+.sol-item:last-child{border-bottom:1px solid var(--line);}
+.sol-item h3{grid-column:span 4;text-transform:none;}
+.sol-item p{grid-column:span 7;color:var(--fg-dim);}
+@media (max-width:800px){.sol-item h3,.sol-item p{grid-column:1/13;}}
+
+/* ============ LOGIN ============ */
+.auth-wrap{grid-column:4/10;}
+@media (max-width:800px){.auth-wrap{grid-column:1/13;}}
+.sso-row{display:flex;gap:.7rem;margin-bottom:1.4rem;}
+.sso-btn{flex:1;border:1px solid var(--line);background:transparent;color:var(--fg);padding:.8em;display:flex;align-items:center;justify-content:center;gap:.5em;font-family:var(--font-mono);font-size:.78rem;cursor:pointer;}
+.sso-btn:hover{border-color:var(--fg);}
+.divider{display:flex;align-items:center;gap:1rem;font-family:var(--font-mono);font-size:.7rem;color:var(--fg-faint);margin-block:1.2rem;text-transform:uppercase;}
+.divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--line);}
+.forgot{font-family:var(--font-mono);font-size:.78rem;color:var(--fg-dim);text-decoration:underline;}
+
+/* util */
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
+.center-text{text-align:center;}
+.mt-2{margin-top:2rem;}
+.flex-between{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;}
+
+/* ============ REDUCED MOTION ============ */
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important;scroll-behavior:auto !important;}
+  .marquee-track{animation:none !important;}
+  .reveal{opacity:1;transform:none;}
+}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- ICON SPRITE -->
+<svg style="display:none" aria-hidden="true">
+<symbol id="icon-cloud" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18a4.5 4.5 0 0 1-.6-8.96A5.5 5.5 0 0 1 17.2 9.1 4 4 0 0 1 17 18H7Z"/></symbol>
+<symbol id="icon-spark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M18 6l-2.5 2.5M8.5 15.5 6 18"/></symbol>
+<symbol id="icon-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 4.5 3 7.5 8 9 5-1.5 8-4.5 8-9V6l-8-3Z"/><path d="m9 12 2 2 4-4"/></symbol>
+<symbol id="icon-code" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 8-4 4 4 4M15 8l4 4-4 4"/></symbol>
+<symbol id="icon-layers" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 13 9 5 9-5"/></symbol>
+<symbol id="icon-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18 14 14 0 0 1 0-18Z"/></symbol>
+<symbol id="icon-arrow-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M14 6l6 6-6 6"/></symbol>
+<symbol id="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m4 12 6 6L20 6"/></symbol>
+<symbol id="icon-chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 8 7 7 7-7"/></symbol>
+<symbol id="icon-cart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2l2.2 11.2a2 2 0 0 0 2 1.8h7.6a2 2 0 0 0 2-1.6L20.5 8H6"/><circle cx="9" cy="20" r="1.3"/><circle cx="17" cy="20" r="1.3"/></symbol>
+<symbol id="icon-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 19h16"/></symbol>
+<symbol id="icon-gauge" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 13 16 9M9 4h6"/></symbol>
+<symbol id="icon-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M16 8.5a2.5 2.5 0 1 1 0-5M15 14c2.8.3 5 2.7 5 6"/></symbol>
+<symbol id="icon-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.4-2.3.9a7 7 0 0 0-2-1.2L14.2 3H9.8l-.4 2.6a7 7 0 0 0-2 1.2l-2.3-.9-2 3.4 2 1.5a7 7 0 0 0 0 2.4l-2 1.5 2 3.4 2.3-.9a7 7 0 0 0 2 1.2l.4 2.6h4.4l.4-2.6a7 7 0 0 0 2-1.2l2.3.9 2-3.4-2-1.5c.1-.4.1-.8.1-1.2Z"/></symbol>
+<symbol id="icon-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+<symbol id="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></symbol>
+<symbol id="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></symbol>
+<symbol id="icon-package" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3.5 7.5 8.5-4 8.5 4-8.5 4-8.5-4Z"/><path d="M3.5 7.5v9l8.5 4 8.5-4v-9M12 11.5V20.5"/></symbol>
+<symbol id="icon-terminal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 7 5 5-5 5M13 18h6"/></symbol>
+<symbol id="icon-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+<symbol id="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+</svg>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a href="#/" class="logo"><span class="dot" aria-hidden="true"></span>TECHBISS</a>
+    <nav class="primary-nav" aria-label="Primary">
+      <a href="#/services" data-route="/services">Services</a>
+      <a href="#/solutions" data-route="/solutions">Solutions</a>
+      <a href="#/work" data-route="/work">Work</a>
+      <a href="#/pricing" data-route="/pricing">Pricing</a>
+      <a href="#/about" data-route="/about">About</a>
+    </nav>
+    <div class="header-actions">
+      <button class="icon-btn" id="loginBtn" aria-label="Client login" title="Client login" data-nav="/login"><svg><use href="#icon-users"></use></svg></button>
+      <button class="icon-btn" id="cartBtn" aria-label="Marketplace" title="Marketplace" data-nav="/marketplace"><svg><use href="#icon-cart"></use></svg></button>
+      <button class="icon-btn" id="modeToggle" aria-label="Toggle polarity — switch between dark and light mode" aria-pressed="false"><svg id="modeIcon"><use href="#icon-moon"></use></svg></button>
+      <button class="icon-btn" id="menuToggle" aria-haspopup="true" aria-expanded="false" aria-controls="indexOverlay" aria-label="Open full index menu"><svg><use href="#icon-menu"></use></svg></button>
+    </div>
+  </div>
+</header>
+
+<div class="index-overlay" id="indexOverlay" role="dialog" aria-modal="true" aria-label="Site index">
+  <div class="index-top">
+    <span class="eyebrow mono"><span class="dot"></span>Index — All Sections</span>
+    <div class="flex-between" style="gap:.6rem;">
+      <label class="vh" for="indexSearch">Filter index</label>
+      <input type="search" id="indexSearch" class="index-search" placeholder="Filter…">
+      <button class="icon-btn" id="indexClose" aria-label="Close index menu"><svg><use href="#icon-close"></use></svg></button>
+    </div>
+  </div>
+  <nav class="index-body" aria-label="All routes">
+    <ul class="index-list" id="indexList"></ul>
+  </nav>
+</div>
+
+<a class="skip-link vh" id="main-anchor"></a>
+<main id="main" tabindex="-1">
+  <div id="view"></div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap footer-grid">
+    <div class="footer-brand">
+      <a href="#/" class="logo"><span class="dot" aria-hidden="true"></span>TECHBISS</a>
+      <p style="margin-top:1rem;color:var(--fg-dim);font-size:.88rem;max-width:32ch;">A global digital transformation platform — infrastructure, AI-native products, and mission-critical systems at scale.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <a href="#/about">About</a>
+      <a href="#/work">Work</a>
+      <a href="#/process">Process</a>
+      <a href="#/resources">Resources</a>
+    </div>
+    <div class="footer-col">
+      <h4>Platform</h4>
+      <a href="#/services">Services</a>
+      <a href="#/solutions">Solutions</a>
+      <a href="#/marketplace">Marketplace</a>
+      <a href="#/pricing">Pricing</a>
+    </div>
+    <div class="footer-col">
+      <h4>Account</h4>
+      <a href="#/login">Login</a>
+      <a href="#/dashboard">Dashboard</a>
+      <a href="#/installer">Installer</a>
+      <a href="#/contact">Contact</a>
+    </div>
+    <div class="footer-col">
+      <h4>Connect</h4>
+      <a href="#/contact">Global Offices</a>
+      <a href="#">LinkedIn</a>
+      <a href="#">X / Twitter</a>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 TECHBISS. Concept 03 — Monolith.</span>
+      <span>Kinetic Editorial System — Black / White / Signal Yellow</span>
+    </div>
+  </div>
+</footer>
+
+<div class="modal-overlay" id="mktModal" role="dialog" aria-modal="true" aria-labelledby="mktModalTitle" hidden>
+  <div class="modal" id="mktModalBody"></div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ============================================================
+   POLARITY MODE
+   ============================================================ */
+var MODE_KEY = 'techbiss-monolith-mode';
+function getStoredMode(){ try{ return localStorage.getItem(MODE_KEY); }catch(e){ return null; } }
+function setStoredMode(v){ try{ localStorage.setItem(MODE_KEY, v); }catch(e){} }
+function initMode(){
+  var stored = getStoredMode();
+  var mode = stored;
+  if(!mode){
+    var prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+    mode = prefersLight ? 'paper' : 'ink';
+  }
+  applyMode(mode, false);
+}
+function applyMode(mode, persist){
+  document.documentElement.setAttribute('data-mode', mode);
+  var btn = document.getElementById('modeToggle');
+  var icon = document.getElementById('modeIcon');
+  var isPaper = mode === 'paper';
+  btn.setAttribute('aria-pressed', String(isPaper));
+  btn.setAttribute('aria-label', isPaper ? 'Switch to dark polarity' : 'Switch to light polarity');
+  icon.innerHTML = '<use href="#icon-' + (isPaper ? 'sun' : 'moon') + '"></use>';
+  if(persist) setStoredMode(mode);
+}
+document.getElementById('modeToggle').addEventListener('click', function(){
+  var current = document.documentElement.getAttribute('data-mode');
+  applyMode(current === 'paper' ? 'ink' : 'paper', true);
+});
+initMode();
+
+/* ============================================================
+   MAGNETIC BUTTONS
+   ============================================================ */
+var magTicking = false, magX = 0, magY = 0, magTarget = null;
+function magneticMove(e){
+  if(!e.target.closest) return;
+  var el = e.target.closest('.btn, .icon-btn');
+  if(el){
+    var r = el.getBoundingClientRect();
+    magX = (e.clientX - (r.left + r.width/2)) * 0.25;
+    magY = (e.clientY - (r.top + r.height/2)) * 0.25;
+    magTarget = el;
+  } else if(magTarget){
+    magX = 0; magY = 0;
+  }
+  if(!magTicking){
+    magTicking = true;
+    requestAnimationFrame(function(){
+      if(magTarget) magTarget.style.transform = 'translate(' + magX + 'px,' + magY + 'px)';
+      magTicking = false;
+    });
+  }
+}
+var REDUCE_MOTION = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+if(!REDUCE_MOTION){
+  document.addEventListener('pointermove', magneticMove);
+  document.addEventListener('pointerout', function(e){
+    if(e.target.closest && e.target.closest('.btn, .icon-btn')){
+      e.target.closest('.btn, .icon-btn').style.transform = '';
+      magTarget = null;
+    }
+  });
+}
+
+/* ============================================================
+   ICON HELPER
+   ============================================================ */
+function icon(name, cls){ return '<svg' + (cls ? ' class="'+cls+'"':'') + ' aria-hidden="true"><use href="#icon-'+name+'"></use></svg>'; }
+
+/* ============================================================
+   CONTENT DATA
+   ============================================================ */
+var SERVICES = [
+  {icon:'cloud', name:'Cloud & Infrastructure', desc:'Resilient, cost-efficient cloud foundations built for scale.', bullets:['Multi-cloud architecture & migration','Kubernetes & platform engineering','Cost governance and FinOps']},
+  {icon:'spark', name:'AI & Automation', desc:'Production-grade AI systems embedded into real workflows.', bullets:['LLM & agentic system design','MLOps and model lifecycle','Intelligent process automation']},
+  {icon:'code', name:'Enterprise Software Engineering', desc:'Custom platforms built to withstand a decade of change.', bullets:['Full-stack product delivery','API & systems integration','Legacy modernization']},
+  {icon:'layers', name:'Digital Product Design', desc:'Interfaces engineered for clarity, speed, and trust.', bullets:['Design systems at scale','UX research & service design','Accessibility-first delivery']},
+  {icon:'shield', name:'Cybersecurity & Risk', desc:'Zero-trust security woven into every layer of delivery.', bullets:['Threat modeling & pen testing','Compliance & risk frameworks','Zero-trust architecture']},
+  {icon:'gauge', name:'Managed Operations', desc:'Round-the-clock operations that keep critical systems live.', bullets:['24/7 SRE & incident response','Observability & SLO management','Continuous optimization']}
+];
+var INDUSTRIES = [
+  {name:'Financial Services', desc:'Core modernization and real-time risk infrastructure for banks, insurers and capital markets firms operating under strict regulatory demands.'},
+  {name:'Healthcare & Life Sciences', desc:'Interoperable, compliant platforms that connect clinical, operational and research data without compromising patient trust.'},
+  {name:'Retail & Commerce', desc:'Unified commerce engines that turn fragmented channels into one fast, personalized buying experience.'},
+  {name:'Manufacturing & Industry 4.0', desc:'Connected factory floors — predictive maintenance, digital twins and supply chain visibility end to end.'},
+  {name:'Public Sector', desc:'Secure, citizen-facing digital services delivered on infrastructure built to withstand scale and scrutiny.'}
+];
+var MODULES = [
+  {id:'erp', tag:'ERP', name:'Core ERP Accelerator', desc:'Pre-built finance, procurement and inventory modules on a modern core.', price:4200, addons:[{name:'Multi-entity consolidation',price:900},{name:'Advanced analytics pack',price:650},{name:'Priority support SLA',price:500}]},
+  {id:'aiops', tag:'AI', name:'AI Ops Copilot', desc:'An operations copilot that triages incidents and proposes fixes.', price:3600, addons:[{name:'Custom model fine-tuning',price:1200},{name:'On-call automation',price:700},{name:'Extended data retention',price:300}]},
+  {id:'zt', tag:'Security', name:'Zero-Trust Security Suite', desc:'Identity-first access control across every environment you run.', price:5100, addons:[{name:'Continuous pen testing',price:1400},{name:'SOC integration',price:800},{name:'Hardware key rollout',price:600}]},
+  {id:'commerce', tag:'Commerce', name:'Commerce Engine', desc:'Headless commerce core with unified checkout and inventory.', price:3900, addons:[{name:'Subscription billing module',price:750},{name:'Marketplace connector',price:500},{name:'Loyalty & rewards engine',price:650}]},
+  {id:'fabric', tag:'Data', name:'Data Fabric Connector', desc:'A governed data layer that unifies sources across the enterprise.', price:4700, addons:[{name:'Real-time streaming layer',price:1100},{name:'Data quality monitoring',price:600},{name:'Lineage & catalog module',price:550}]},
+  {id:'legacy', tag:'Migration', name:'Legacy Migration Toolkit', desc:'Automated pathways off legacy cores with minimal downtime risk.', price:5600, addons:[{name:'Mainframe adapter pack',price:1500},{name:'Parallel-run validation',price:900},{name:'Rollback safety net',price:400}]}
+];
+var CASE_STUDIES = [
+  {tag:'Financial Services', title:'Modernizing a core banking platform without a single day of downtime', metric:'99.99%', metricLabel:'Uptime during migration', desc:'A phased, zero-downtime migration off a 20-year-old core.'},
+  {tag:'Retail & Commerce', title:'Unifying eleven regional storefronts into one commerce engine', metric:'3.2x', metricLabel:'Faster checkout conversion', desc:'A single headless commerce core replacing eleven legacy stacks.'},
+  {tag:'Manufacturing', title:'Predictive maintenance across 40 production sites', metric:'-31%', metricLabel:'Unplanned downtime', desc:'Sensor fabric and predictive models rolled out at global scale.'},
+  {tag:'Healthcare', title:'A compliant data fabric connecting 200+ clinical systems', metric:'6 wks', metricLabel:'Time to first integration', desc:'Interoperability infrastructure built for strict regulatory review.'}
+];
+var PROCESS = [
+  {n:'01', name:'Discover', desc:'We map your systems, constraints and ambitions before writing a line of code — aligning stakeholders on what actually matters.'},
+  {n:'02', name:'Design', desc:'Architecture and experience take shape together, validated against real constraints, not slideware.'},
+  {n:'03', name:'Build', desc:'Cross-functional pods ship in short, reviewable increments, integrated continuously into your environment.'},
+  {n:'04', name:'Deploy', desc:'Progressive rollouts, feature flags and rollback plans mean launches are boring — in the best way.'},
+  {n:'05', name:'Optimize', desc:'We stay on as operators — tuning performance, cost and reliability long after go-live.'}
+];
+var LEADERSHIP = [
+  {name:'Alena Voss', role:'Chief Executive Officer', mono:'AV'},
+  {name:'Marcus Idowu', role:'Chief Technology Officer', mono:'MI'},
+  {name:'Priya Ramesh', role:'Chief AI Officer', mono:'PR'},
+  {name:'Tomas Novak', role:'Chief Security Officer', mono:'TN'},
+  {name:'Elena Kade', role:'SVP, Global Operations', mono:'EK'}
+];
+var MILESTONES = [
+  {yr:'2014', text:'Founded as an infrastructure consultancy for enterprise cloud migration.'},
+  {yr:'2017', text:'Expanded into 15 countries; launched managed operations division.'},
+  {yr:'2020', text:'Crossed 1,000 engineers; opened AI & Automation practice.'},
+  {yr:'2023', text:'Launched the TECHBISS Marketplace for pre-built enterprise modules.'},
+  {yr:'2026', text:'Operating in 40+ countries at a $10B+ platform valuation.'}
+];
+var RESOURCES = [
+  {title:'What zero-downtime migration actually requires', cat:'Infrastructure', time:'8 min'},
+  {title:'Designing AI copilots people actually trust', cat:'AI & Automation', time:'6 min'},
+  {title:'The real cost of legacy core systems', cat:'Strategy', time:'5 min'},
+  {title:'Zero-trust is an operating model, not a product', cat:'Security', time:'7 min'},
+  {title:'Data fabrics vs. data warehouses, plainly explained', cat:'Data', time:'9 min'},
+  {title:'Inside a 40-site predictive maintenance rollout', cat:'Manufacturing', time:'6 min'}
+];
+var OFFICES = [
+  {city:'New York', addr:'1 Liberty Plaza, NY 10006', line:'+1 212 555 0148'},
+  {city:'London', addr:'20 Fenchurch St, EC3M 3BY', line:'+44 20 7946 0192'},
+  {city:'Singapore', addr:'1 Raffles Place, 048616', line:'+65 6812 3355'},
+  {city:'São Paulo', addr:'Av. Paulista 1374, 01310-100', line:'+55 11 4004 8281'}
+];
+
+var ROUTES_META = [
+  {path:'/', title:'Home'},
+  {path:'/services', title:'Services'},
+  {path:'/solutions', title:'Solutions'},
+  {path:'/marketplace', title:'Marketplace'},
+  {path:'/product', title:'Product Details'},
+  {path:'/work', title:'Work'},
+  {path:'/process', title:'Process'},
+  {path:'/about', title:'About'},
+  {path:'/resources', title:'Resources'},
+  {path:'/pricing', title:'Pricing'},
+  {path:'/contact', title:'Contact'},
+  {path:'/login', title:'Login'},
+  {path:'/installer', title:'Installer'},
+  {path:'/dashboard', title:'Dashboard'}
+];
+
+/* ============================================================
+   SHARED MARKUP HELPERS
+   ============================================================ */
+function pageHead(eyebrow, title, sub){
+  return '<div class="wrap page-head"><p class="eyebrow"><span class="dot"></span>'+eyebrow+'</p>' +
+    '<h1 class="display-2">'+title+'</h1>' +
+    (sub ? '<p class="lede mt-2">'+sub+'</p>' : '') +
+    '<div class="byline mono"><span>TECHBISS Editorial</span><span>Issue No. 03</span><span>Est. Read '+ (Math.max(2, Math.round(title.length/9))) +' min</span></div>' +
+    '</div>';
+}
+function statStrip(stats){
+  return '<div class="wrap"><div class="grid"><div class="stat-strip">' +
+    stats.map(function(s){ return '<div class="stat reveal"><div class="num" data-count="'+s.raw+'" data-suffix="'+s.suffix+'">0</div><div class="label">'+s.label+'</div></div>'; }).join('') +
+    '</div></div></div>';
+}
+function marquee(){
+  var items = ['Cloud & Infrastructure','AI & Automation','Enterprise Engineering','Product Design','Cybersecurity & Risk','Managed Operations','1,200+ Engineers','40+ Countries','98.7% Uptime SLA'];
+  var group = items.map(function(t){ return '<span class="marquee-item">'+icon('spark')+t+'</span>'; }).join('');
+  return '<div class="marquee" role="group" aria-label="Service capabilities ticker"><div class="marquee-track">' +
+    '<div class="marquee-group">'+group+'</div><div class="marquee-group" aria-hidden="true">'+group+'</div>' +
+    '</div></div>';
+}
+function footerBackTo(){ return ''; }
+
+/* ============================================================
+   VIEW: HOME
+   ============================================================ */
+function viewHome(){
+  var svcRows = SERVICES.map(function(s,i){
+    return '<div class="service-row reveal">' +
+      '<span class="idx mono">0'+(i+1)+'</span>' +
+      icon(s.icon,'icon') +
+      '<span class="name">'+s.name+'</span>' +
+      '<span class="desc">'+s.desc+'</span>' +
+      '</div>';
+  }).join('');
+
+  var mktCards = MODULES.slice(0,3).map(function(m){
+    return '<div class="card reveal"><span class="mkt-tag">'+m.tag+'</span><h3>'+m.name+'</h3><p>'+m.desc+'</p>' +
+      '<span class="mono" style="font-size:.85rem;color:var(--fg-dim);margin-top:auto;">From $'+m.price.toLocaleString()+'/mo</span></div>';
+  }).join('');
+
+  return '' +
+  '<section class="hero">' +
+    '<div class="wrap grid">' +
+      '<div class="hero-head">' +
+        '<p class="eyebrow"><span class="dot"></span>Global Digital Transformation Platform</p>' +
+        '<h1 class="display-1 hero-headline">Systems built for <span class="mark">what\'s next.</span></h1>' +
+      '</div>' +
+      '<div class="hero-sub-row">' +
+        '<p class="lede">TECHBISS partners with enterprises to modernize infrastructure, build AI-native products, and run mission-critical systems at scale — across 40+ countries.</p>' +
+        '<div class="hero-cta">' +
+          '<a class="btn btn-primary" href="#/services"><span>Explore Services</span>'+icon('arrow-right')+'</a>' +
+          '<a class="btn" href="#/work"><span>See Our Work</span>'+icon('arrow-right')+'</a>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+  '</section>' +
+
+  marquee() +
+
+  (REDUCE_MOTION ? kineticStatic() : '<div class="kinetic-pin" id="kineticPin"><div class="kinetic-stage" id="kineticStage">' +
+    '<div class="kinetic-line k1" id="kL1">Infrastructure.</div>' +
+    '<div class="kinetic-line k2" id="kL2">Intelligence.</div>' +
+    '<div class="kinetic-line k3" id="kL3">Operated at <span class="accent-word">scale.</span></div>' +
+    '<div class="kinetic-caption"><span class="mono">Scroll to progress —</span><span class="mono">Sec. 01 / Home</span></div>' +
+  '</div></div>') +
+
+  '<section aria-labelledby="svc-h">' +
+    '<div class="wrap grid">' +
+      '<div class="section-head service-strip"><h2 id="svc-h" class="display-3">What we do</h2><span class="section-num mono">01 / 06</span></div>' +
+      svcRows +
+    '</div>' +
+  '</section>' +
+
+  '<section aria-labelledby="why-h" style="background:var(--surface);border-block:1px solid var(--line);">' +
+    '<div class="wrap grid"><div class="section-head" style="grid-column:1/13;"><h2 id="why-h" class="display-3">Why TECHBISS</h2><span class="section-num mono">By The Numbers</span></div></div>' +
+    statStrip([
+      {raw:1200,suffix:'+',label:'Engineers Worldwide'},
+      {raw:40,suffix:'+',label:'Countries Operated'},
+      {raw:98.7,suffix:'%',label:'Uptime SLA'},
+      {raw:10,suffix:'B+',label:'Platform Valuation ($)'}
+    ]) +
+  '</section>' +
+
+  '<section aria-labelledby="mkt-h">' +
+    '<div class="wrap grid">' +
+      '<div class="section-head" style="grid-column:1/13;"><h2 id="mkt-h" class="display-3">From the Marketplace</h2><a class="btn" href="#/marketplace"><span>View all modules</span>'+icon('arrow-right')+'</a></div>' +
+      '<div class="card-grid">'+mktCards+'</div>' +
+    '</div>' +
+  '</section>' +
+
+  '<section aria-labelledby="case-h">' +
+    '<div class="wrap grid">' +
+      '<div class="pullquote reveal">' +
+        '<blockquote>“TECHBISS didn\'t just migrate our core — they rebuilt how our teams ship for the next decade.”</blockquote>' +
+        '<cite>— VP Engineering, a global logistics network</cite>' +
+      '</div>' +
+    '</div>' +
+  '</section>';
+}
+function kineticStatic(){
+  return '<section class="kinetic-static wrap"><h2>Infrastructure.</h2><h2>Intelligence.</h2><h2>Operated at <span class="accent-word">scale.</span></h2></section>';
+}
+function initHomeMotion(viewEl){
+  if(REDUCE_MOTION || typeof gsap === 'undefined') return null;
+  var ctx = gsap.context(function(){
+    gsap.set(['#kL1','#kL2','#kL3'], {x: function(i){ return [10,-6,4][i] + '%'; }});
+    gsap.timeline({scrollTrigger:{trigger:'#kineticPin', start:'top top', end:'bottom bottom', scrub:1}})
+      .to('#kL1', {x:'-60%', scale:0.7, ease:'none'}, 0)
+      .to('#kL2', {x:'40%', scale:1.15, ease:'none'}, 0)
+      .to('#kL3', {x:'-25%', skewX:-4, ease:'none'}, 0)
+      .to('#kineticStage', {backgroundColor: 'var(--surface)', ease:'none'}, 0);
+  }, viewEl);
+  return ctx;
+}
+function initCounters(viewEl){
+  var els = viewEl.querySelectorAll('[data-count]');
+  if(!els.length) return;
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting){
+        animateCount(entry.target);
+        io.unobserve(entry.target);
+      }
+    });
+  }, {threshold:0.4});
+  els.forEach(function(el){ io.observe(el); });
+}
+function animateCount(el){
+  var target = parseFloat(el.getAttribute('data-count'));
+  var suffix = el.getAttribute('data-suffix') || '';
+  var isDecimal = target % 1 !== 0;
+  if(REDUCE_MOTION){ el.textContent = (isDecimal?target.toFixed(1):target) + suffix; return; }
+  var start = performance.now(), dur = 1200;
+  function tick(now){
+    var p = Math.min(1, (now-start)/dur);
+    var eased = 1 - Math.pow(1-p, 3);
+    var val = target * eased;
+    el.textContent = (isDecimal ? val.toFixed(1) : Math.round(val)) + suffix;
+    if(p < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+/* ============================================================
+   VIEW: SERVICES
+   ============================================================ */
+function viewServices(){
+  var cards = SERVICES.map(function(s){
+    return '<div class="card reveal"><div class="icon-box">'+icon(s.icon)+'</div><h3>'+s.name+'</h3><p>'+s.desc+'</p>' +
+      '<ul>'+s.bullets.map(function(b){ return '<li>'+icon('check')+'<span>'+b+'</span></li>'; }).join('')+'</ul></div>';
+  }).join('');
+  return pageHead('What We Do','Six disciplines. One platform.','Every engagement draws on the same integrated bench — engineers, architects and operators working from one methodology.') +
+  '<section><div class="wrap grid"><div class="card-grid">'+cards+'</div></div></section>';
+}
+
+/* ============================================================
+   VIEW: SOLUTIONS
+   ============================================================ */
+function viewSolutions(){
+  var rows = INDUSTRIES.map(function(ind,i){
+    return '<div class="sol-item reveal"><h3><span class="mono" style="color:var(--fg-faint);font-size:.9rem;">0'+(i+1)+' — </span>'+ind.name+'</h3><p>'+ind.desc+'</p></div>';
+  }).join('');
+  return pageHead('By Industry','Built for the sector you operate in.','Domain-specific accelerators, compliance patterns and reference architectures — not generic playbooks.') +
+  '<section><div class="wrap grid"><div class="sol-list">'+rows+'</div></div></section>';
+}
+
+/* ============================================================
+   VIEW: MARKETPLACE (with interactive purchase/deploy flow)
+   ============================================================ */
+var mktState = { module:null, step:'preview', addons:{}, deploying:false };
+function viewMarketplace(){
+  var cards = MODULES.map(function(m){
+    return '<button class="mkt-card reveal" data-module="'+m.id+'" aria-haspopup="dialog">' +
+      '<span class="mkt-tag">'+m.tag+'</span><h3>'+m.name+'</h3><p>'+m.desc+'</p>' +
+      '<span class="mkt-price"><span>Starting at</span><span>$'+m.price.toLocaleString()+'/mo</span></span></button>';
+  }).join('');
+  return pageHead('Marketplace','Pre-built modules. Deploy in days, not quarters.','Preview any module, customize with add-ons, and simulate a full deployment — right here.') +
+  '<section><div class="wrap grid"><div class="mkt-grid">'+cards+'</div></div></section>';
+}
+function bindMarketplace(viewEl){
+  viewEl.querySelectorAll('[data-module]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var m = MODULES.filter(function(x){ return x.id === btn.getAttribute('data-module'); })[0];
+      mktState = {module:m, step:'preview', addons:{}, deploying:false};
+      openModal();
+      renderModal();
+    });
+  });
+}
+var modalLastFocus = null;
+function openModal(){
+  var overlay = document.getElementById('mktModal');
+  modalLastFocus = document.activeElement;
+  overlay.hidden = false;
+  requestAnimationFrame(function(){ overlay.classList.add('is-open'); });
+  document.addEventListener('keydown', modalKeydown);
+}
+function closeModal(){
+  var overlay = document.getElementById('mktModal');
+  overlay.classList.remove('is-open');
+  document.removeEventListener('keydown', modalKeydown);
+  setTimeout(function(){ overlay.hidden = true; if(modalLastFocus) modalLastFocus.focus(); }, 250);
+}
+function modalKeydown(e){
+  var overlay = document.getElementById('mktModal');
+  if(e.key === 'Escape'){ closeModal(); return; }
+  if(e.key === 'Tab'){
+    var focusables = overlay.querySelectorAll('button, input, a[href], [tabindex]:not([tabindex="-1"])');
+    if(!focusables.length) return;
+    var first = focusables[0], last = focusables[focusables.length-1];
+    if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+    else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+  }
+}
+function calcTotal(){
+  var m = mktState.module, total = m.price;
+  m.addons.forEach(function(a){ if(mktState.addons[a.name]) total += a.price; });
+  return total;
+}
+function stepsBar(active){
+  var steps = ['preview','customize','purchase','deploy'];
+  return '<div class="modal-steps">' + steps.map(function(s){
+    return '<span class="'+(s===active?'is-active':'')+'">'+s+'</span>';
+  }).join('') + '</div>';
+}
+function renderModal(){
+  var body = document.getElementById('mktModalBody');
+  var m = mktState.module;
+  var html = '';
+  if(mktState.step === 'preview'){
+    html = '<div class="modal-head"><h2 id="mktModalTitle" class="display-3" style="text-transform:none;">'+m.name+'</h2>' +
+      '<button class="icon-btn" id="mktClose" aria-label="Close preview">'+icon('close')+'</button></div>' +
+      stepsBar('preview') +
+      '<p style="color:var(--fg-dim);">'+m.desc+'</p>' +
+      '<p class="mono" style="margin-top:1rem;font-size:.85rem;">Base price: <strong style="color:var(--fg);">$'+m.price.toLocaleString()+'/mo</strong></p>' +
+      '<div class="modal-actions"><button class="btn" id="mktCancel">Cancel</button><button class="btn btn-primary" id="mktNext"><span>Customize</span>'+icon('arrow-right')+'</button></div>';
+  } else if(mktState.step === 'customize'){
+    html = '<div class="modal-head"><h2 id="mktModalTitle" class="display-3" style="text-transform:none;">Customize</h2>' +
+      '<button class="icon-btn" id="mktClose" aria-label="Close">'+icon('close')+'</button></div>' +
+      stepsBar('customize') +
+      m.addons.map(function(a){
+        var checked = mktState.addons[a.name] ? 'checked' : '';
+        return '<div class="addon-row"><label><span class="checkbox"><input type="checkbox" data-addon="'+a.name+'" '+checked+'>' + icon('check') + '</span>'+a.name+'</label><span class="price mono">+$'+a.price+'/mo</span></div>';
+      }).join('') +
+      '<div class="total-row"><span class="mono">Monthly total</span><span class="amount" id="mktTotal">$'+calcTotal().toLocaleString()+'</span></div>' +
+      '<div class="modal-actions"><button class="btn" id="mktBack">Back</button><button class="btn btn-primary" id="mktNext"><span>Continue to Purchase</span>'+icon('arrow-right')+'</button></div>';
+  } else if(mktState.step === 'purchase'){
+    var selected = m.addons.filter(function(a){ return mktState.addons[a.name]; });
+    html = '<div class="modal-head"><h2 id="mktModalTitle" class="display-3" style="text-transform:none;">Order Summary</h2>' +
+      '<button class="icon-btn" id="mktClose" aria-label="Close">'+icon('close')+'</button></div>' +
+      stepsBar('purchase') +
+      '<div class="addon-row"><span>'+m.name+' (base)</span><span class="price mono">$'+m.price.toLocaleString()+'/mo</span></div>' +
+      selected.map(function(a){ return '<div class="addon-row"><span>'+a.name+'</span><span class="price mono">+$'+a.price+'/mo</span></div>'; }).join('') +
+      '<div class="total-row"><span class="mono">Due monthly</span><span class="amount">$'+calcTotal().toLocaleString()+'</span></div>' +
+      '<div class="modal-actions"><button class="btn" id="mktBack">Back</button><button class="btn btn-primary" id="mktConfirm"><span>Confirm & Deploy</span>'+icon('arrow-right')+'</button></div>';
+  } else if(mktState.step === 'deploy'){
+    html = '<div class="modal-head"><h2 id="mktModalTitle" class="display-3" style="text-transform:none;">Deploying</h2>' +
+      '<button class="icon-btn" id="mktClose" aria-label="Close">'+icon('close')+'</button></div>' +
+      stepsBar('deploy') +
+      '<div class="progress-track"><div class="progress-fill" id="deployFill"></div></div>' +
+      '<div class="deploy-log" id="deployLog" role="status" aria-live="polite"></div>' +
+      '<div id="deployDone"></div>';
+  }
+  body.innerHTML = html;
+  bindModalButtons();
+  var closeBtn = document.getElementById('mktClose');
+  if(closeBtn) closeBtn.focus();
+}
+function bindModalButtons(){
+  var close = document.getElementById('mktClose'); if(close) close.addEventListener('click', closeModal);
+  var cancel = document.getElementById('mktCancel'); if(cancel) cancel.addEventListener('click', closeModal);
+  var back = document.getElementById('mktBack'); if(back) back.addEventListener('click', function(){
+    mktState.step = mktState.step === 'customize' ? 'preview' : 'customize'; renderModal();
+  });
+  var next = document.getElementById('mktNext'); if(next) next.addEventListener('click', function(){
+    mktState.step = mktState.step === 'preview' ? 'customize' : 'purchase'; renderModal();
+  });
+  var confirm = document.getElementById('mktConfirm'); if(confirm) confirm.addEventListener('click', function(){
+    mktState.step = 'deploy'; renderModal(); runDeploySequence();
+  });
+  document.querySelectorAll('[data-addon]').forEach(function(cb){
+    cb.addEventListener('change', function(){
+      mktState.addons[cb.getAttribute('data-addon')] = cb.checked;
+      var totalEl = document.getElementById('mktTotal');
+      if(totalEl) totalEl.textContent = '$' + calcTotal().toLocaleString();
+    });
+  });
+}
+function runDeploySequence(){
+  var stages = ['Provisioning environment…','Applying configuration…','Running integration checks…','Registering endpoints…','Finalizing deployment…'];
+  var log = document.getElementById('deployLog');
+  var fill = document.getElementById('deployFill');
+  var i = 0;
+  function step(){
+    if(i < stages.length){
+      var line = document.createElement('div');
+      line.className = 'line';
+      line.textContent = '> ' + stages[i];
+      log.appendChild(line);
+      i++;
+      fill.style.width = Math.round((i/stages.length)*100) + '%';
+      setTimeout(step, REDUCE_MOTION ? 60 : 550);
+    } else {
+      var doneEl = document.getElementById('deployDone');
+      doneEl.innerHTML = '<div class="deploy-success">'+icon('check')+'<h3 style="text-transform:none;">'+mktState.module.name+' is live.</h3>' +
+        '<p style="color:var(--fg-dim);font-size:.9rem;">Simulated deployment complete — this is a design preview, no real environment was provisioned.</p>' +
+        '<button class="btn btn-primary" id="mktDone"><span>Done</span></button></div>';
+      document.getElementById('mktDone').addEventListener('click', closeModal);
+      document.getElementById('mktDone').focus();
+    }
+  }
+  step();
+}
+
+/* ============================================================
+   VIEW: PRODUCT DETAILS
+   ============================================================ */
+function viewProduct(){
+  var features = ['Real-time incident triage across cloud, network and application layers','Suggested remediations ranked by historical resolution success','Automated runbooks with human-in-the-loop approval','Deep integration with existing ticketing and on-call tools','Continuous learning from resolved incidents'];
+  var tiers = [
+    {name:'Team', price:'$1,200', cadence:'/mo', features:['Up to 25 monitored services','Standard incident triage','Email support']},
+    {name:'Business', price:'$3,600', cadence:'/mo', features:['Up to 150 monitored services','Automated remediation runbooks','Priority support, 24/7'], featured:true},
+    {name:'Enterprise', price:'Custom', cadence:'', features:['Unlimited services','Custom model fine-tuning','Dedicated solutions architect']}
+  ];
+  return pageHead('Marketplace / Product','AI Ops Copilot','An operations copilot that watches your systems, triages incidents, and proposes fixes before your team even opens the alert.') +
+  '<section><div class="wrap grid">' +
+    '<div style="grid-column:1/7;" class="reveal"><h2 class="display-3" style="margin-bottom:1rem;">What it does</h2><ul style="display:flex;flex-direction:column;gap:.8rem;">' +
+    features.map(function(f){ return '<li style="display:flex;gap:.7em;color:var(--fg-dim);"><span style="flex:none;">'+icon('check')+'</span>'+f+'</li>'; }).join('') +
+    '</ul></div>' +
+    '<div style="grid-column:8/13;" class="pullquote reveal" style="grid-column:8/13;border-top:2px solid var(--fg);border-bottom:2px solid var(--fg);padding:1.6rem;">' +
+      '<blockquote style="font-size:clamp(1.2rem,2.2vw,1.6rem);">“Mean time to resolution dropped by half within the first quarter.”</blockquote>' +
+      '<cite>— VP Engineering, a global logistics network</cite>' +
+    '</div>' +
+  '</div></section>' +
+  '<section><div class="wrap grid"><div class="section-head" style="grid-column:1/13;"><h2 class="display-3">Pricing</h2></div>' +
+    '<div class="pricing-grid">' + tiers.map(function(t){
+      return '<div class="tier'+(t.featured?' is-feature':'')+' reveal">' +
+        (t.featured?'<span class="tier-badge">Most Popular</span>':'') +
+        '<h3 style="text-transform:none;">'+t.name+'</h3>' +
+        '<div class="price">'+t.price+' <small>'+t.cadence+'</small></div>' +
+        '<ul>'+t.features.map(function(f){ return '<li>'+icon('check')+'<span>'+f+'</span></li>'; }).join('')+'</ul>' +
+        '<a class="btn'+(t.featured?' btn-primary':'')+' btn-block" href="#/marketplace"><span>Choose '+t.name+'</span></a>' +
+      '</div>';
+    }).join('') + '</div>' +
+  '</div></section>';
+}
+
+/* ============================================================
+   VIEW: WORK
+   ============================================================ */
+function viewWork(){
+  var rows = CASE_STUDIES.map(function(c){
+    return '<div class="work-item reveal"><span class="tag mono">'+c.tag+'</span><h3>'+c.title+'</h3><p>'+c.desc+'</p><span class="metric">'+c.metric+'</span></div>';
+  }).join('');
+  return pageHead('Case Studies','Proof, not promises.','A sample of engagements across industries — generalized to protect client confidentiality.') +
+  '<section><div class="wrap grid"><div class="work-list">'+rows+'</div></div></section>';
+}
+
+/* ============================================================
+   VIEW: PROCESS
+   ============================================================ */
+function viewProcess(){
+  var items = PROCESS.map(function(p){
+    return '<div class="process-item reveal"><span class="n mono">'+p.n+'</span><div class="body"><h3>'+p.name+'</h3><p>'+p.desc+'</p></div></div>';
+  }).join('');
+  return pageHead('Methodology','Five steps. One accountable team.','The same sequence runs through every engagement, from a six-week pilot to a multi-year platform build.') +
+  '<section><div class="wrap grid"><div class="process-list">'+items+'</div></div></section>';
+}
+
+/* ============================================================
+   VIEW: ABOUT
+   ============================================================ */
+function viewAbout(){
+  var leaders = LEADERSHIP.map(function(l){
+    return '<div class="reveal" style="display:flex;gap:1rem;align-items:center;"><div class="avatar">'+l.mono+'</div><div><h4>'+l.name+'</h4><p class="mono" style="font-size:.8rem;color:var(--fg-dim);">'+l.role+'</p></div></div>';
+  }).join('');
+  var timeline = MILESTONES.map(function(m){
+    return '<div class="timeline-item reveal"><span class="yr">'+m.yr+'</span><p style="margin-top:.3rem;">'+m.text+'</p></div>';
+  }).join('');
+  return pageHead('About TECHBISS','Built by operators, not just architects.','We exist to make digital transformation boring — predictable, measurable, and durable — for the enterprises the world depends on.') +
+  statStrip([{raw:1200,suffix:'+',label:'Engineers Worldwide'},{raw:40,suffix:'+',label:'Countries'},{raw:98.7,suffix:'%',label:'Uptime SLA'},{raw:10,suffix:'B+',label:'Valuation ($)'}]) +
+  '<section><div class="wrap grid"><div class="section-head" style="grid-column:1/13;"><h2 class="display-3">Leadership</h2></div>' +
+  '<div style="grid-column:1/13;display:grid;grid-template-columns:repeat(2,1fr);gap:1.6rem;">'+leaders+'</div></div></section>' +
+  '<section><div class="wrap grid"><div class="section-head" style="grid-column:1/13;"><h2 class="display-3">Milestones</h2></div><div class="timeline">'+timeline+'</div></div></section>';
+}
+
+/* ============================================================
+   VIEW: RESOURCES
+   ============================================================ */
+function viewResources(){
+  var cards = RESOURCES.map(function(r){
+    return '<a href="#" class="card res-card reveal" style="text-decoration:none;"><span class="res-meta"><span>'+r.cat+'</span><span>'+r.time+' read</span></span><h3>'+r.title+'</h3></a>';
+  }).join('');
+  return pageHead('Resources','Field notes from the platform.','Short, practical writing from the engineers and architects doing the work.') +
+  '<section><div class="wrap grid"><div class="card-grid">'+cards+'</div></div></section>';
+}
+
+/* ============================================================
+   VIEW: PRICING
+   ============================================================ */
+function viewPricing(){
+  var tiers = [
+    {name:'Starter', monthly:2400, annual:2000, features:['Up to 10 services','Standard support','Community resources']},
+    {name:'Growth', monthly:6800, annual:5600, features:['Up to 75 services','Priority support, 24/7','Dedicated solutions architect'], featured:true},
+    {name:'Enterprise', monthly:null, annual:null, features:['Unlimited scale','Custom SLA & compliance','Embedded engineering team']}
+  ];
+  var tierHtml = tiers.map(function(t){
+    var priceStr = t.monthly === null ? 'Custom' : ('$' + t.monthly.toLocaleString());
+    return '<div class="tier'+(t.featured?' is-feature':'')+' reveal" data-monthly="'+t.monthly+'" data-annual="'+t.annual+'">' +
+      (t.featured?'<span class="tier-badge">Most Popular</span>':'') +
+      '<h3 style="text-transform:none;">'+t.name+'</h3>' +
+      '<div class="price"><span class="price-amount">'+priceStr+'</span> <small>'+(t.monthly===null?'':'/mo')+'</small></div>' +
+      '<ul>'+t.features.map(function(f){ return '<li>'+icon('check')+'<span>'+f+'</span></li>'; }).join('')+'</ul>' +
+      '<a class="btn'+(t.featured?' btn-primary':'')+' btn-block" href="#/contact"><span>'+(t.monthly===null?'Talk to Sales':'Get Started')+'</span></a>' +
+    '</div>';
+  }).join('');
+  return pageHead('Pricing','Straightforward plans. No hidden platform fees.','Every tier includes core infrastructure, security baseline and platform support.') +
+  '<section><div class="wrap grid">' +
+    '<div style="grid-column:1/13;display:flex;justify-content:center;margin-bottom:2rem;">' +
+      '<div class="billing-toggle"><span id="billMonthlyLbl">Monthly</span>' +
+      '<button class="switch" id="billingSwitch" role="switch" aria-checked="false" aria-label="Toggle annual billing"><span class="knob"></span></button>' +
+      '<span id="billAnnualLbl">Annual <span class="mono" style="color:var(--accent);">(save ~17%)</span></span></div>' +
+    '</div>' +
+    '<div class="pricing-grid">'+tierHtml+'</div>' +
+  '</div></section>';
+}
+function bindPricing(viewEl){
+  var sw = viewEl.querySelector('#billingSwitch');
+  if(!sw) return;
+  sw.addEventListener('click', function(){
+    var annual = sw.getAttribute('aria-checked') !== 'true';
+    sw.setAttribute('aria-checked', String(annual));
+    sw.setAttribute('aria-pressed', String(annual));
+    viewEl.querySelectorAll('.tier[data-monthly]').forEach(function(t){
+      var m = t.getAttribute('data-monthly'), a = t.getAttribute('data-annual');
+      if(m === 'null') return;
+      var amountEl = t.querySelector('.price-amount');
+      var val = annual ? a : m;
+      amountEl.textContent = '$' + Number(val).toLocaleString();
+    });
+  });
+}
+
+/* ============================================================
+   VIEW: CONTACT
+   ============================================================ */
+function viewContact(){
+  var offices = OFFICES.map(function(o){
+    return '<div class="office reveal"><h4>'+o.city+'</h4><p>'+o.addr+'</p><p class="mono">'+o.line+'</p></div>';
+  }).join('');
+  return pageHead('Contact','Let\'s talk about what you\'re building.','Reach a regional office directly, or send a message and a solutions architect will follow up within one business day.') +
+  '<section><div class="wrap grid"><div class="office-grid">'+offices+'</div></div></section>' +
+  '<section><div class="wrap grid">' +
+    '<div style="grid-column:3/11;">' +
+      '<form id="contactForm" novalidate>' +
+        '<div class="field" id="fName"><label for="cName">Name</label><input type="text" id="cName" name="name" autocomplete="name" required><span class="err" id="errName"></span></div>' +
+        '<div class="field" id="fEmail"><label for="cEmail">Email</label><input type="email" id="cEmail" name="email" autocomplete="email" required><span class="err" id="errEmail"></span></div>' +
+        '<div class="field" id="fMsg"><label for="cMsg">Message</label><textarea id="cMsg" name="message" required></textarea><span class="err" id="errMsg"></span></div>' +
+        '<button class="btn btn-primary" type="submit"><span>Send Message</span>'+icon('arrow-right')+'</button>' +
+      '</form>' +
+      '<div id="contactSuccess" hidden></div>' +
+    '</div>' +
+  '</div></section>';
+}
+function bindContact(viewEl){
+  var form = viewEl.querySelector('#contactForm');
+  if(!form) return;
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var valid = true;
+    var name = form.querySelector('#cName'), email = form.querySelector('#cEmail'), msg = form.querySelector('#cMsg');
+    [ ['fName','errName',name,function(v){return v.trim().length>0;},'Name is required.'],
+      ['fEmail','errEmail',email,function(v){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);},'Enter a valid email address.'],
+      ['fMsg','errMsg',msg,function(v){return v.trim().length>=10;},'Message must be at least 10 characters.']
+    ].forEach(function(row){
+      var fieldEl = viewEl.querySelector('#'+row[0]);
+      var errEl = viewEl.querySelector('#'+row[1]);
+      var ok = row[3](row[2].value);
+      fieldEl.classList.toggle('has-error', !ok);
+      errEl.textContent = ok ? '' : row[4];
+      if(!ok) valid = false;
+    });
+    if(!valid) return;
+    form.hidden = true;
+    var success = viewEl.querySelector('#contactSuccess');
+    success.hidden = false;
+    success.innerHTML = '<div class="form-success">'+icon('check')+'<h3 style="text-transform:none;">Message received.</h3><p style="color:var(--fg-dim);">A solutions architect will follow up within one business day.</p></div>';
+    success.focus && success.setAttribute('tabindex','-1');
+    success.focus();
+  });
+}
+
+/* ============================================================
+   VIEW: LOGIN
+   ============================================================ */
+function viewLogin(){
+  return pageHead('Client Portal','Sign in to your workspace.', null) +
+  '<section><div class="wrap grid"><div class="auth-wrap">' +
+    '<div class="sso-row">' +
+      '<button class="sso-btn" type="button">'+icon('globe')+'SSO</button>' +
+      '<button class="sso-btn" type="button">'+icon('shield')+'Security Key</button>' +
+    '</div>' +
+    '<div class="divider">or continue with email</div>' +
+    '<form id="loginForm" novalidate>' +
+      '<div class="field"><label for="lEmail">Email</label><input type="email" id="lEmail" required autocomplete="email"></div>' +
+      '<div class="field"><label for="lPass">Password</label><input type="password" id="lPass" required autocomplete="current-password"></div>' +
+      '<div class="flex-between" style="margin-bottom:1.4rem;"><a class="forgot" href="#">Forgot password?</a></div>' +
+      '<button class="btn btn-primary btn-block" type="submit"><span>Sign In</span>'+icon('arrow-right')+'</button>' +
+    '</form>' +
+    '<div id="loginSuccess" hidden></div>' +
+  '</div></div></section>';
+}
+function bindLogin(viewEl){
+  var form = viewEl.querySelector('#loginForm');
+  if(!form) return;
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    form.hidden = true;
+    var success = viewEl.querySelector('#loginSuccess');
+    success.hidden = false;
+    success.innerHTML = '<div class="form-success">'+icon('check')+'<h3 style="text-transform:none;">Signed in.</h3><p style="color:var(--fg-dim);">Welcome back — redirecting to your dashboard preview.</p>' +
+      '<a class="btn btn-primary" href="#/dashboard" style="margin-top:.6rem;"><span>Go to Dashboard</span>'+icon('arrow-right')+'</a></div>';
+    success.setAttribute('tabindex','-1');
+    success.focus();
+  });
+}
+
+/* ============================================================
+   VIEW: INSTALLER
+   ============================================================ */
+var INSTALLER_STEPS = ['Select','Detect','Configure','Import','Install','Verify','Launch'];
+var instState = { step:0, stack:null, scanRevealed:0, importProgress:[0,0,0], installLines:0, verified:0 };
+function viewInstaller(){
+  var tabs = INSTALLER_STEPS.map(function(s,i){
+    var cls = i === instState.step ? 'is-active' : (i < instState.step ? 'is-done' : '');
+    return '<div class="step-tab '+cls+'"><span class="n mono">0'+(i+1)+'</span>'+s+'</div>';
+  }).join('');
+  return pageHead('Installer','Bring your stack online.','A guided, simulated setup — select your environment, verify detected services, and launch.') +
+  '<section><div class="wrap grid">' +
+    '<div class="stepper">'+tabs+'</div>' +
+    '<div class="install-panel" id="installPanel"></div>' +
+  '</div></section>';
+}
+var STACKS = [
+  {id:'aws', name:'AWS Environment', icon:'cloud', desc:'Detect and connect existing AWS infrastructure.'},
+  {id:'azure', name:'Azure Environment', icon:'layers', desc:'Detect and connect existing Azure infrastructure.'},
+  {id:'hybrid', name:'Hybrid / On-Prem', icon:'terminal', desc:'Connect on-prem systems alongside cloud services.'}
+];
+function renderInstallerPanel(){
+  var panel = document.getElementById('installPanel');
+  if(!panel) return;
+  var html = '';
+  if(instState.step === 0){
+    html = '<h2 class="display-3" style="margin-bottom:1rem;">Select your environment</h2>' +
+      '<div class="select-cards">' + STACKS.map(function(s){
+        var sel = instState.stack === s.id ? ' is-selected' : '';
+        return '<button class="select-card'+sel+'" data-stack="'+s.id+'">'+icon(s.icon)+'<h4>'+s.name+'</h4><p style="font-size:.85rem;color:var(--fg-dim);">'+s.desc+'</p></button>';
+      }).join('') + '</div>' +
+      '<div class="modal-actions"><button class="btn btn-primary" id="instNext" '+(instState.stack?'':'disabled')+'><span>Continue</span>'+icon('arrow-right')+'</button></div>';
+  } else if(instState.step === 1){
+    var services = ['Compute cluster','Object storage','Managed database','Identity provider','Load balancer'];
+    html = '<h2 class="display-3" style="margin-bottom:1rem;">Detecting services</h2>' +
+      '<div class="scan-list" id="scanList">' + services.map(function(s,i){
+        return '<div class="scan-item'+(i<instState.scanRevealed?' is-in':'')+'"><span>'+s+'</span><span class="ok">'+(i<instState.scanRevealed?'DETECTED':'…')+'</span></div>';
+      }).join('') + '</div>' +
+      '<div class="modal-actions"><button class="btn btn-primary" id="instNext" '+(instState.scanRevealed>=services.length?'':'disabled')+'><span>Continue</span>'+icon('arrow-right')+'</button></div>';
+  } else if(instState.step === 2){
+    html = '<h2 class="display-3" style="margin-bottom:1rem;">Configure</h2>' +
+      '<div class="field"><label for="instOrg">Organization name</label><input type="text" id="instOrg" placeholder="Acme Global"></div>' +
+      '<div class="field"><label for="instRegion">Primary region</label><select id="instRegion"><option>US East</option><option>EU West</option><option>AP Southeast</option></select></div>' +
+      '<div class="modal-actions"><button class="btn btn-primary" id="instNext"><span>Continue</span>'+icon('arrow-right')+'</button></div>';
+  } else if(instState.step === 3){
+    var items = ['User accounts','Configuration secrets','Historical data'];
+    html = '<h2 class="display-3" style="margin-bottom:1rem;">Import & migrate</h2>' +
+      items.map(function(it,i){
+        var pct = instState.importProgress[i];
+        return '<div class="import-item"><div class="head"><span>'+it+'</span><span>'+pct+'%</span></div><div class="progress-track"><div class="progress-fill" style="width:'+pct+'%;"></div></div></div>';
+      }).join('') +
+      '<div class="modal-actions"><button class="btn btn-primary" id="instNext" '+(instState.importProgress.every(function(p){return p>=100;})?'':'disabled')+'><span>Continue</span>'+icon('arrow-right')+'</button></div>';
+  } else if(instState.step === 4){
+    var lines = ['Pulling base images…','Applying network policy…','Registering services…','Running health checks…'];
+    html = '<h2 class="display-3" style="margin-bottom:1rem;">Installing</h2>' +
+      '<div class="deploy-log" id="installLog" role="status" aria-live="polite">' +
+      lines.slice(0, instState.installLines).map(function(l){ return '<div class="line" style="opacity:1;">> '+l+'</div>'; }).join('') +
+      '</div>' +
+      '<div class="modal-actions"><button class="btn btn-primary" id="instNext" '+(instState.installLines>=lines.length?'':'disabled')+'><span>Continue</span>'+icon('arrow-right')+'</button></div>';
+  } else if(instState.step === 5){
+    var checks = ['Network connectivity','Service health','Access policies','Data integrity'];
+    html = '<h2 class="display-3" style="margin-bottom:1rem;">Verify</h2>' +
+      '<ul class="checklist">' + checks.map(function(c,i){
+        return '<li class="'+(i<instState.verified?'is-verified':'')+'"><span>'+c+'</span>'+icon(i<instState.verified?'check':'chevron-down')+'</li>';
+      }).join('') + '</ul>' +
+      '<div class="modal-actions"><button class="btn btn-primary" id="instNext" '+(instState.verified>=checks.length?'':'disabled')+'><span>Continue</span>'+icon('arrow-right')+'</button></div>';
+  } else if(instState.step === 6){
+    html = '<div class="deploy-success">'+icon('check')+'<h2 class="display-3" style="text-transform:none;">Environment launched.</h2>' +
+      '<p style="color:var(--fg-dim);">This simulated setup is complete. In production, your team would land here in the live Dashboard.</p>' +
+      '<a class="btn btn-primary" href="#/dashboard"><span>Preview Dashboard</span>'+icon('arrow-right')+'</a></div>';
+  }
+  panel.innerHTML = html;
+  bindInstallerPanel();
+}
+function bindInstallerPanel(){
+  document.querySelectorAll('[data-stack]').forEach(function(c){
+    c.addEventListener('click', function(){ instState.stack = c.getAttribute('data-stack'); renderInstallerPanel(); });
+  });
+  var next = document.getElementById('instNext');
+  if(next) next.addEventListener('click', advanceInstaller);
+}
+function advanceInstaller(){
+  instState.step++;
+  refreshStepper();
+  renderInstallerPanel();
+  runInstallerAutomation();
+}
+function refreshStepper(){
+  var tabs = document.querySelectorAll('.step-tab');
+  tabs.forEach(function(t,i){
+    t.classList.toggle('is-active', i===instState.step);
+    t.classList.toggle('is-done', i<instState.step);
+  });
+}
+function runInstallerAutomation(){
+  var t = REDUCE_MOTION ? 40 : 500;
+  if(instState.step === 1 && instState.scanRevealed < 5){
+    var reveal = function(){
+      instState.scanRevealed++;
+      renderInstallerPanel();
+      if(instState.scanRevealed < 5) setTimeout(reveal, t);
+    };
+    setTimeout(reveal, t);
+  }
+  if(instState.step === 3 && instState.importProgress.some(function(p){return p<100;})){
+    var tick = function(){
+      instState.importProgress = instState.importProgress.map(function(p){ return Math.min(100, p + (10 + Math.random()*15)); }).map(Math.round);
+      renderInstallerPanel();
+      if(instState.importProgress.some(function(p){return p<100;})) setTimeout(tick, t);
+    };
+    setTimeout(tick, t);
+  }
+  if(instState.step === 4 && instState.installLines < 4){
+    var log = function(){
+      instState.installLines++;
+      renderInstallerPanel();
+      if(instState.installLines < 4) setTimeout(log, t);
+    };
+    setTimeout(log, t);
+  }
+  if(instState.step === 5 && instState.verified < 4){
+    var verify = function(){
+      instState.verified++;
+      renderInstallerPanel();
+      if(instState.verified < 4) setTimeout(verify, t);
+    };
+    setTimeout(verify, t);
+  }
+}
+
+/* ============================================================
+   VIEW: DASHBOARD
+   ============================================================ */
+var dashState = { tab:'admin' };
+var DASH_DATA = {
+  admin:{ kpis:[{label:'Active Services',val:'482',delta:'+12 this week'},{label:'Uptime',val:'99.98%',delta:'On target'},{label:'Open Incidents',val:'3',delta:'-2 vs last week'},{label:'Monthly Spend',val:'$184K',delta:'-4.2% vs budget'}],
+    chart:[42,58,49,66,71,64,80,76,88,92,85,97], activity:[{t:'09:12',x:'Deployment completed: Commerce Engine v4.2'},{t:'08:55',x:'Alert resolved: elevated latency, EU-West'},{t:'08:20',x:'New user provisioned: ops-team-14'},{t:'07:48',x:'Scheduled backup completed'}]},
+  client:{ kpis:[{label:'Modules Active',val:'6',delta:'2 in trial'},{label:'SLA Compliance',val:'99.9%',delta:'This quarter'},{label:'Support Tickets',val:'2',delta:'Avg. 3h response'},{label:'Next Invoice',val:'$8.4K',delta:'Due in 12 days'}],
+    chart:[30,34,38,36,44,50,48,55,60,58,66,70], activity:[{t:'Mon',x:'Usage report generated for August'},{t:'Fri',x:'Add-on activated: Advanced analytics pack'},{t:'Wed',x:'Support ticket #4482 closed'},{t:'Tue',x:'Invoice #1183 paid'}]},
+  staff:{ kpis:[{label:'Assigned Tasks',val:'17',delta:'5 due today'},{label:'On-call Load',val:'Low',delta:'Next rotation Fri'},{label:'PRs Reviewed',val:'34',delta:'This sprint'},{label:'Utilization',val:'86%',delta:'Within target'}],
+    chart:[55,60,58,64,62,68,72,70,75,78,74,80], activity:[{t:'11:02',x:'Code review completed: data-fabric-connector'},{t:'10:40',x:'Runbook updated: incident response L2'},{t:'09:15',x:'Sprint planning notes published'},{t:'08:30',x:'Standup summary posted'}]}
+};
+function viewDashboard(){
+  return pageHead('Client Portal Preview','Dashboard','A preview of the operational dashboard your team would use post-launch.') +
+  '<section><div class="wrap grid">' +
+    '<div class="dash-tabs" style="align-items:center;">' +
+      '<button class="dash-tab is-active" data-tab="admin">Admin</button>' +
+      '<button class="dash-tab" data-tab="client">Client</button>' +
+      '<button class="dash-tab" data-tab="staff">Staff</button>' +
+      '<span class="preview-badge">Preview</span>' +
+    '</div>' +
+    '<div id="dashBody" style="display:contents;"></div>' +
+  '</div></section>';
+}
+function renderDash(){
+  var host = document.getElementById('dashBody');
+  if(!host) return;
+  var data = DASH_DATA[dashState.tab];
+  var kpis = data.kpis.map(function(k){
+    return '<div class="kpi reveal"><div class="label">'+k.label+'</div><div class="val">'+k.val+'</div><div class="delta">'+k.delta+'</div></div>';
+  }).join('');
+  var activity = data.activity.map(function(a){
+    return '<div class="activity-item"><time>'+a.t+'</time><span>'+a.x+'</span></div>';
+  }).join('');
+  host.innerHTML = '<div class="kpi-grid">'+kpis+'</div>' +
+    '<div class="dash-chart reveal"><h4 style="margin-bottom:.8rem;">Weekly Throughput Index</h4>' + buildChart(data.chart) + '</div>' +
+    '<div class="dash-activity reveal"><h4 style="margin-bottom:.8rem;">Recent Activity</h4>' + activity + '</div>';
+}
+function buildChart(values){
+  var w = 480, h = 180, pad = 24;
+  var max = Math.max.apply(null, values), min = 0;
+  var step = (w - pad*2) / (values.length - 1);
+  var pts = values.map(function(v,i){
+    var x = pad + i*step;
+    var y = h - pad - ((v-min)/(max-min)) * (h - pad*2);
+    return x+','+y;
+  });
+  var path = 'M' + pts.join(' L');
+  var areaPath = path + ' L' + (pad + (values.length-1)*step) + ',' + (h-pad) + ' L' + pad + ',' + (h-pad) + ' Z';
+  var months = ['J','F','M','A','M','J','J','A','S','O','N','D'];
+  var labels = values.map(function(v,i){
+    var x = pad + i*step;
+    return '<text x="'+x+'" y="'+(h-4)+'" font-family="IBM Plex Mono, monospace" font-size="9" fill="var(--fg-faint)" text-anchor="middle">'+months[i]+'</text>';
+  }).join('');
+  return '<svg viewBox="0 0 '+w+' '+h+'" role="img" aria-label="Line chart showing throughput index rising from '+values[0]+' to '+values[values.length-1]+' over twelve months" style="width:100%;height:auto;overflow:visible;">' +
+    '<path d="'+areaPath+'" fill="var(--accent)" opacity="0.08" stroke="none"></path>' +
+    '<path d="'+path+'" fill="none" stroke="var(--accent)" stroke-width="2"></path>' +
+    pts.map(function(p){ var xy=p.split(','); return '<circle cx="'+xy[0]+'" cy="'+xy[1]+'" r="2.5" fill="var(--fg)"></circle>'; }).join('') +
+    labels +
+  '</svg>';
+}
+function bindDashboard(viewEl){
+  viewEl.querySelectorAll('.dash-tab').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      viewEl.querySelectorAll('.dash-tab').forEach(function(b){ b.classList.remove('is-active'); });
+      btn.classList.add('is-active');
+      dashState.tab = btn.getAttribute('data-tab');
+      renderDash();
+    });
+  });
+  renderDash();
+}
+
+/* ============================================================
+   404
+   ============================================================ */
+function viewNotFound(){
+  return pageHead('404','Page not found.', null) +
+  '<section><div class="wrap"><a class="btn btn-primary" href="#/"><span>Return home</span>'+icon('arrow-right')+'</a></div></section>';
+}
+
+/* ============================================================
+   ROUTER
+   ============================================================ */
+var ROUTES = {
+  '/': {title:'Home', render:viewHome},
+  '/services': {title:'Services', render:viewServices},
+  '/solutions': {title:'Solutions', render:viewSolutions},
+  '/marketplace': {title:'Marketplace', render:viewMarketplace},
+  '/product': {title:'AI Ops Copilot', render:viewProduct},
+  '/work': {title:'Work', render:viewWork},
+  '/process': {title:'Process', render:viewProcess},
+  '/about': {title:'About', render:viewAbout},
+  '/resources': {title:'Resources', render:viewResources},
+  '/pricing': {title:'Pricing', render:viewPricing},
+  '/contact': {title:'Contact', render:viewContact},
+  '/login': {title:'Login', render:viewLogin},
+  '/installer': {title:'Installer', render:viewInstaller},
+  '/dashboard': {title:'Dashboard', render:viewDashboard}
+};
+var currentCtx = null;
+
+function buildIndexList(){
+  var list = document.getElementById('indexList');
+  list.innerHTML = ROUTES_META.map(function(r,i){
+    return '<li data-label="'+r.title.toLowerCase()+'"><a href="#'+r.path+'"><span class="num">'+String(i+1).padStart(2,'0')+'</span>'+r.title+'</a></li>';
+  }).join('');
+}
+buildIndexList();
+
+function getPath(){
+  var hash = window.location.hash.replace(/^#/, '');
+  if(!hash) return '/';
+  return hash;
+}
+function updateNavCurrent(path){
+  document.querySelectorAll('.primary-nav a').forEach(function(a){
+    if(a.getAttribute('data-route') === path) a.setAttribute('aria-current','page');
+    else a.removeAttribute('aria-current');
+  });
+}
+function cleanupInstallerAndDash(){
+  instState = { step:0, stack:null, scanRevealed:0, importProgress:[0,0,0], installLines:0, verified:0 };
+  dashState = { tab:'admin' };
+}
+function initReveals(viewEl){
+  var els = viewEl.querySelectorAll('.reveal');
+  if(!els.length) return;
+  if(REDUCE_MOTION){ els.forEach(function(el){ el.classList.add('is-visible'); }); return; }
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting){ entry.target.classList.add('is-visible'); io.unobserve(entry.target); }
+    });
+  }, {threshold:0.12});
+  els.forEach(function(el){ io.observe(el); });
+}
+
+function render(){
+  var path = getPath();
+  var route = ROUTES[path] || null;
+  var view = document.getElementById('view');
+
+  if(currentCtx && currentCtx.revert) currentCtx.revert();
+  currentCtx = null;
+
+  function doRender(){
+    view.innerHTML = route ? route.render() : viewNotFound();
+    document.title = 'TECHBISS — ' + (route ? route.title : 'Not Found');
+    updateNavCurrent(path);
+
+    if(path === '/marketplace') bindMarketplace(view);
+    if(path === '/pricing') bindPricing(view);
+    if(path === '/contact') bindContact(view);
+    if(path === '/login') bindLogin(view);
+    if(path === '/installer'){ refreshStepper(); renderInstallerPanel(); }
+    if(path === '/dashboard') bindDashboard(view);
+    if(path === '/') currentCtx = initHomeMotion(view);
+
+    initReveals(view);
+    initCounters(view);
+    if(typeof ScrollTrigger !== 'undefined') ScrollTrigger.refresh();
+
+    var h1 = view.querySelector('h1');
+    if(h1){ h1.setAttribute('tabindex','-1'); h1.focus(); }
+    window.scrollTo(0,0);
+
+    view.classList.remove('entering');
+    void view.offsetWidth;
+    view.classList.add('entering');
+  }
+
+  if(path !== '/installer' && path !== '/dashboard') cleanupInstallerAndDash();
+
+  if(REDUCE_MOTION){
+    doRender();
+  } else {
+    view.classList.add('leaving');
+    setTimeout(function(){ view.classList.remove('leaving'); doRender(); }, 150);
+  }
+}
+window.addEventListener('hashchange', render);
+render();
+
+/* ============================================================
+   HEADER MENU / INDEX OVERLAY
+   ============================================================ */
+var menuToggle = document.getElementById('menuToggle');
+var indexOverlay = document.getElementById('indexOverlay');
+var indexClose = document.getElementById('indexClose');
+var indexSearch = document.getElementById('indexSearch');
+var lastMenuFocus = null;
+function openIndex(){
+  lastMenuFocus = document.activeElement;
+  indexOverlay.classList.add('is-open');
+  menuToggle.setAttribute('aria-expanded','true');
+  document.addEventListener('keydown', indexKeydown);
+  setTimeout(function(){ indexSearch.focus(); }, 260);
+}
+function closeIndex(){
+  indexOverlay.classList.remove('is-open');
+  menuToggle.setAttribute('aria-expanded','false');
+  document.removeEventListener('keydown', indexKeydown);
+  if(lastMenuFocus) lastMenuFocus.focus();
+}
+function indexKeydown(e){
+  if(e.key === 'Escape'){ closeIndex(); return; }
+  if(e.key === 'Tab'){
+    var focusables = indexOverlay.querySelectorAll('button, input, a[href]');
+    var visible = Array.prototype.filter.call(focusables, function(el){ return el.offsetParent !== null; });
+    if(!visible.length) return;
+    var first = visible[0], last = visible[visible.length-1];
+    if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+    else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+  }
+}
+menuToggle.addEventListener('click', function(){
+  indexOverlay.classList.contains('is-open') ? closeIndex() : openIndex();
+});
+indexClose.addEventListener('click', closeIndex);
+indexOverlay.querySelectorAll('.index-list a').forEach(function(a){
+  a.addEventListener('click', closeIndex);
+});
+indexSearch.addEventListener('input', function(){
+  var q = indexSearch.value.trim().toLowerCase();
+  document.querySelectorAll('#indexList li').forEach(function(li){
+    var label = li.getAttribute('data-label');
+    li.hidden = q.length > 0 && label.indexOf(q) === -1;
+  });
+});
+
+document.getElementById('loginBtn').addEventListener('click', function(){ window.location.hash = '#/login'; });
+document.getElementById('cartBtn').addEventListener('click', function(){ window.location.hash = '#/marketplace'; });
+
+})();
+</script>
+</body>
+</html>
