@@ -323,9 +323,10 @@ html.motion [data-reveal="mass"].in{opacity:1;transform:none}
 .stage{position:relative}
 .stage-plates{position:relative;display:flex;flex-direction:column;gap:14px}
 .plate{position:relative;background:var(--panel);border:1px solid var(--rule);padding:clamp(26px,4vw,64px);display:grid;gap:clamp(18px,3vw,46px);grid-template-columns:1fr}
-.stage--pinned{height:100vh;display:flex;align-items:center;overflow:hidden}
+.stage--pinned{height:100vh;overflow:hidden}
+.stage--pinned>.wrap{position:relative;height:100%}
 .stage--pinned .stage-plates{position:absolute;inset:0;display:block;gap:0}
-.stage--pinned .plate{position:absolute;inset:auto 0;top:50%;transform:translateY(-50%)}
+.stage--pinned .plate{position:absolute;inset:0;align-content:center;overflow:auto;will-change:transform,opacity}
 .plate-num{font-family:var(--disp);font-weight:900;font-stretch:66%;font-size:clamp(4rem,17vw,15rem);line-height:.7;color:transparent;-webkit-text-stroke:2px var(--rule-strong);letter-spacing:-.05em}
 @media (min-width:900px){.plate{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);align-items:center}}
 
@@ -530,8 +531,9 @@ tbody tr:hover{background:var(--panel-2)}
   html.motion [data-reveal]{opacity:1 !important;transform:none !important}
   .metal{animation:none;background-position:30% 0}
   .stage--pinned{height:auto;display:block;overflow:visible}
+  .stage--pinned>.wrap{height:auto}
   .stage--pinned .stage-plates{position:relative;display:flex;flex-direction:column;gap:14px}
-  .stage--pinned .plate{position:relative;top:auto;transform:none}
+  .stage--pinned .plate{position:relative;inset:auto;transform:none;overflow:visible}
 }
 </style>
 </head>
@@ -845,12 +847,13 @@ function bindMagnets(scope){
       if (!r) r = el.getBoundingClientRect();
       var dx = (e.clientX - (r.left + r.width/2)) * 0.28;
       var dy = (e.clientY - (r.top + r.height/2)) * 0.34;
-      el.style.transform = 'translate3d('+dx+'px,'+dy+'px,0)';
+      /* pressed into the material, not lifted off it */
+      el.style.transform = 'translate3d('+dx+'px,'+dy+'px,0) scale(.972)';
     });
     el.addEventListener('mouseleave', function(){
       r = null;
       el.style.transition = 'transform .9s '+EASE;
-      el.style.transform = 'translate3d(0,0,0)';
+      el.style.transform = 'translate3d(0,0,0) scale(1)';
       setTimeout(function(){ el.style.transition=''; }, 900);
     });
   });
@@ -963,7 +966,7 @@ function drawLineChart(el){
   var lastX = X(series.length-1).toFixed(1), lastY = Y(series[series.length-1]).toFixed(1);
 
   el.innerHTML =
-    '<svg viewBox="0 0 '+W+' '+H+'" width="100%" style="display:block;min-width:560px" role="img" aria-label="Platform throughput, twelve months, rising from '+series[0]+' to '+series[series.length-1]+' million transactions">' +
+    '<svg viewBox="0 0 '+W+' '+H+'" width="100%" style="display:block;min-width:560px" role="img" aria-label="Twelve-month trend, rising from '+series[0]+' to '+series[series.length-1]+'">' +
       '<defs><linearGradient id="tbFill" x1="0" y1="0" x2="0" y2="1">' +
         '<stop offset="0%" stop-color="var(--accent)" stop-opacity="0.30"></stop>' +
         '<stop offset="100%" stop-color="var(--accent)" stop-opacity="0"></stop>' +
@@ -1093,8 +1096,8 @@ function render(){
     observeAll(viewEl);
     bindMagnets(viewEl);
     bindTilt(viewEl);
-    if (INIT[r.path]) INIT[r.path](r);
     if (r.path === 'marketplace' && r.sub === 'product') INIT.product(r);
+    else if (INIT[r.path]) INIT[r.path](r);
     if (HAS_GSAP && window.ScrollTrigger) ScrollTrigger.refresh();
     /* entrance */
     if (!reduced && HAS_GSAP){
@@ -1891,7 +1894,7 @@ VIEWS.pricing = function(){
        ['Is the survey fee really credited back?','In full, against any engagement starting within twelve months. Roughly a third of surveys do not lead to one, and we consider that a feature.'],
        ['Can we buy modules without the platform?','Yes, from the marketplace. They will run standalone, though the change ledger and structural review only apply inside an ATLAS estate.'],
        ['What happens if we want to leave?','Exit rehearsal is part of every engagement above Atrium, run twice yearly. Portability is a design constraint, not a concession.']].map(function(q,i){
-        return '<div style="background:var(--ground);padding:clamp(20px,2.4vw,32px)" data-reveal style="--d:'+(i*70)+'ms">' +
+        return '<div data-reveal style="background:var(--ground);padding:clamp(20px,2.4vw,32px);--d:'+(i*70)+'ms">' +
           '<h3 class="h-4" style="font-size:1.1rem">'+esc(q[0])+'</h3>' +
           '<p class="body-s" style="margin-top:10px">'+esc(q[1])+'</p></div>';
       }).join('') +
@@ -1929,7 +1932,7 @@ VIEWS.contact = function(){
             '<p class="body-s">Enquiry logged as <b class="num">TB-2026-4471</b>. A structural engineer will reply within one working day. This is a demonstration form — nothing was transmitted.</p>' +
           '</div></div>' +
       '</form>' +
-      '<div style="display:flex;flex-direction:column;gap:22px" data-reveal style="--d:120ms">' +
+      '<div data-reveal style="display:flex;flex-direction:column;gap:22px;--d:120ms">' +
         '<div class="slab" style="padding:clamp(22px,3vw,34px);display:flex;flex-direction:column;gap:4px">' +
           '<div class="level-tag" style="margin-bottom:12px">Direct lines</div>' +
           [['Rotterdam (HQ)','+31 10 555 0192'],['Singapore','+65 6555 0144'],['Austin','+1 512 555 0177'],['Regulatory deadlines','deadline@techbiss.example']].map(function(k){
