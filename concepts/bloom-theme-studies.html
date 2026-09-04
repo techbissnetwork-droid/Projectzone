@@ -1,0 +1,308 @@
+<title>Bloom Theme Studies</title>
+<meta name="description" content="Ten color themes for the TECHBISS Bloom concept, each shown as a live animated preview panel — morphing blob, floating chip, shimmering CTA — not just a swatch.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#faf8f4; --surface:#ffffff; --surface-2:#f3efe8;
+  --ink:#241c14; --ink-soft:#5c5044; --ink-faint:#8d8175;
+  --border:#e7e0d6; --border-soft:#efe9e0;
+  --r-lg:20px; --r-full:999px;
+  --shadow-sm:0 2px 10px -4px rgba(40,30,15,.10);
+  --shadow-md:0 16px 32px -14px rgba(40,30,15,.18);
+  --font-display:'Outfit',system-ui,sans-serif;
+  --font-body:'Inter',system-ui,sans-serif;
+  --accent-1:#ff6a52;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#17140f; --surface:#211d17; --surface-2:#2a251d;
+    --ink:#f5efe6; --ink-soft:#c9beae; --ink-faint:#8f8574;
+    --border:#38322a; --border-soft:#2f2a23;
+    --shadow-sm:0 2px 10px -4px rgba(0,0,0,.4);
+    --shadow-md:0 18px 36px -16px rgba(0,0,0,.55);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#17140f; --surface:#211d17; --surface-2:#2a251d;
+  --ink:#f5efe6; --ink-soft:#c9beae; --ink-faint:#8f8574;
+  --border:#38322a; --border-soft:#2f2a23;
+  --shadow-sm:0 2px 10px -4px rgba(0,0,0,.4);
+  --shadow-md:0 18px 36px -16px rgba(0,0,0,.55);
+}
+
+*{ box-sizing:border-box; }
+body{ margin:0; background:var(--bg); color:var(--ink); font-family:var(--font-body); line-height:1.5; -webkit-font-smoothing:antialiased; }
+h1,h2{ font-family:var(--font-display); margin:0; text-wrap:balance; }
+p{ margin:0; }
+
+.wrap{ max-width:1240px; margin:0 auto; padding:56px 28px 80px; }
+.page-head{ max-width:680px; }
+.eyebrow{ font-family:var(--font-display); font-weight:700; font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; color:var(--accent-1); margin-bottom:14px; }
+.page-head h1{ font-size:clamp(1.9rem,3.6vw,2.5rem); font-weight:700; letter-spacing:-.01em; }
+.page-head p.lede{ margin-top:14px; color:var(--ink-soft); font-size:1.02rem; max-width:58ch; }
+
+.controls{ display:flex; align-items:center; margin:30px 0 40px; }
+.theme-btn{ display:inline-flex; align-items:center; gap:8px; padding:9px 18px; border-radius:var(--r-full); border:1.5px solid var(--border); background:var(--surface); color:var(--ink); font-family:var(--font-display); font-weight:600; font-size:.85rem; cursor:pointer; box-shadow:var(--shadow-sm); }
+.theme-btn:hover{ border-color:var(--accent-1); }
+
+.grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:24px; }
+
+.theme-card{ background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--r-lg); box-shadow:var(--shadow-sm); overflow:hidden; transition:box-shadow .3s ease, border-color .3s ease; }
+.theme-card:hover{ box-shadow:var(--shadow-md); border-color:var(--border); }
+
+.preview{
+  position:relative; height:196px; margin:16px 16px 0; border-radius:14px; overflow:hidden;
+  background:
+    radial-gradient(120% 140% at 15% 10%, color-mix(in srgb, var(--t1) 38%, var(--surface-2)) 0%, transparent 60%),
+    radial-gradient(120% 140% at 85% 90%, color-mix(in srgb, var(--t2) 34%, var(--surface-2)) 0%, transparent 60%),
+    var(--surface-2);
+}
+.blob{ position:absolute; background:linear-gradient(135deg,var(--t1),var(--t2)); border-radius:42% 58% 68% 32% / 45% 40% 60% 55%; }
+.blob-1{ width:150px; height:150px; top:-46px; right:-38px; opacity:.95; animation:blobmorph 7.5s ease-in-out infinite, driftA 10s ease-in-out infinite; }
+.blob-2{ width:96px; height:96px; bottom:-30px; left:-24px; opacity:.55; animation:blobmorph2 8.5s ease-in-out infinite, driftB 11s ease-in-out infinite; }
+@keyframes blobmorph{ 0%,100%{ border-radius:42% 58% 68% 32% / 45% 40% 60% 55%; } 33%{ border-radius:58% 42% 40% 60% / 62% 55% 45% 38%; } 66%{ border-radius:36% 64% 58% 42% / 40% 60% 40% 60%; } }
+@keyframes blobmorph2{ 0%,100%{ border-radius:60% 40% 45% 55% / 40% 55% 45% 60%; } 50%{ border-radius:40% 60% 55% 45% / 58% 42% 58% 42%; } }
+@keyframes driftA{ 0%,100%{ transform:translate(0,0) scale(1); } 50%{ transform:translate(-8px,10px) scale(1.05); } }
+@keyframes driftB{ 0%,100%{ transform:translate(0,0) scale(1); } 50%{ transform:translate(10px,-8px) scale(1.08); } }
+
+.p-chip{
+  position:absolute; top:14px; left:14px; display:inline-flex; align-items:center; gap:6px;
+  background:rgba(255,255,255,.88); color:#2a2620; padding:6px 11px; border-radius:var(--r-full);
+  font-family:var(--font-display); font-weight:700; font-size:.64rem; box-shadow:0 6px 14px -6px rgba(0,0,0,.25);
+  animation:floaty 5.2s ease-in-out infinite;
+}
+.p-chip .dot{ width:6px; height:6px; border-radius:50%; background:linear-gradient(135deg,var(--t1),var(--t2)); }
+@keyframes floaty{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-6px); } }
+
+.p-content{ position:absolute; inset:0; display:flex; flex-direction:column; justify-content:flex-end; padding:18px; }
+.p-eyebrow{ font-family:var(--font-display); font-weight:700; font-size:.6rem; text-transform:uppercase; letter-spacing:.09em; color:rgba(255,255,255,.88); text-shadow:0 1px 6px rgba(0,0,0,.2); }
+.p-title{ font-family:var(--font-display); font-weight:700; font-size:1.08rem; color:#fff; margin:5px 0 12px; text-shadow:0 2px 10px rgba(0,0,0,.2); }
+.p-btn{
+  position:relative; overflow:hidden; display:inline-flex; align-items:center; gap:6px; width:fit-content;
+  padding:9px 16px; border-radius:var(--r-full); background:#fff; color:var(--t1);
+  font-family:var(--font-display); font-weight:700; font-size:.78rem; box-shadow:0 8px 18px -8px rgba(0,0,0,.3);
+}
+.p-btn::after{
+  content:''; position:absolute; inset:0; transform:translateX(-130%);
+  background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.75) 50%,transparent 70%);
+  animation:shimmer 3.4s ease-in-out infinite;
+}
+@keyframes shimmer{ 0%,55%{ transform:translateX(-130%); } 100%{ transform:translateX(130%); } }
+
+.theme-meta{ padding:16px 20px 20px; }
+.theme-name-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.theme-name{ font-family:var(--font-display); font-weight:700; font-size:1.05rem; }
+.swatches{ display:flex; gap:5px; }
+.swatch{ width:15px; height:15px; border-radius:50%; border:2px solid var(--surface); box-shadow:0 0 0 1px var(--border-soft); }
+.theme-desc{ color:var(--ink-faint); font-size:.85rem; margin-top:6px; line-height:1.45; }
+
+.page-foot{ margin-top:52px; padding-top:28px; border-top:1px solid var(--border-soft); color:var(--ink-faint); font-size:.92rem; }
+.page-foot b{ color:var(--ink); }
+
+@media (max-width:520px){ .wrap{ padding:40px 18px 60px; } }
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{ animation-duration:.001ms !important; animation-iteration-count:1 !important; }
+}
+</style>
+
+<div class="wrap">
+
+  <div class="page-head">
+    <div class="eyebrow">Techbiss — Bloom concept</div>
+    <h1>Ten color themes, each in motion</h1>
+    <p class="lede">Not swatches — live preview panels. Every theme runs its own morphing blob pair, a floating status chip, and a shimmering CTA, so you can judge the color and the motion together, the way it'll actually feel on the site.</p>
+  </div>
+
+  <div class="controls">
+    <button class="theme-btn" id="themeToggle" aria-pressed="false">🌙 Dark mode</button>
+  </div>
+
+  <div class="grid">
+
+    <section class="theme-card" style="--t1:#ff6a52; --t2:#ffb648;">
+      <div class="preview">
+        <div class="blob blob-1"></div><div class="blob blob-2"></div>
+        <div class="p-chip"><span class="dot"></span>Live</div>
+        <div class="p-content">
+          <span class="p-eyebrow">Marketplace</span>
+          <span class="p-title">Deploy in minutes</span>
+          <span class="p-btn">Get started<svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </div>
+      </div>
+      <div class="theme-meta">
+        <div class="theme-name-row"><span class="theme-name">Bloom</span><span class="swatches"><span class="swatch" style="background:#ff6a52"></span><span class="swatch" style="background:#ffb648"></span></span></div>
+        <p class="theme-desc">The current default — coral to amber. Warm, appetite-driving, the friendliest of the ten.</p>
+      </div>
+    </section>
+
+    <section class="theme-card" style="--t1:#0ea394; --t2:#8fd14f;">
+      <div class="preview">
+        <div class="blob blob-1"></div><div class="blob blob-2"></div>
+        <div class="p-chip"><span class="dot"></span>Live</div>
+        <div class="p-content">
+          <span class="p-eyebrow">Marketplace</span>
+          <span class="p-title">Deploy in minutes</span>
+          <span class="p-btn">Get started<svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </div>
+      </div>
+      <div class="theme-meta">
+        <div class="theme-name-row"><span class="theme-name">Fresh</span><span class="swatches"><span class="swatch" style="background:#0ea394"></span><span class="swatch" style="background:#8fd14f"></span></span></div>
+        <p class="theme-desc">Teal to lime. Reads as sustainability/health-tech more than pure "growth" — cooler and calmer.</p>
+      </div>
+    </section>
+
+    <section class="theme-card" style="--t1:#7c5cff; --t2:#4fc3f7;">
+      <div class="preview">
+        <div class="blob blob-1"></div><div class="blob blob-2"></div>
+        <div class="p-chip"><span class="dot"></span>Live</div>
+        <div class="p-content">
+          <span class="p-eyebrow">Marketplace</span>
+          <span class="p-title">Deploy in minutes</span>
+          <span class="p-btn">Get started<svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </div>
+      </div>
+      <div class="theme-meta">
+        <div class="theme-name-row"><span class="theme-name">Dusk</span><span class="swatches"><span class="swatch" style="background:#7c5cff"></span><span class="swatch" style="background:#4fc3f7"></span></span></div>
+        <p class="theme-desc">Violet to sky. Closer to the Aurora concept's palette — pick this only if you want Bloom to lean more "platform," less "botanical."</p>
+      </div>
+    </section>
+
+    <section class="theme-card" style="--t1:#e0457a; --t2:#f6b93b;">
+      <div class="preview">
+        <div class="blob blob-1"></div><div class="blob blob-2"></div>
+        <div class="p-chip"><span class="dot"></span>Live</div>
+        <div class="p-content">
+          <span class="p-eyebrow">Marketplace</span>
+          <span class="p-title">Deploy in minutes</span>
+          <span class="p-btn">Get started<svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </div>
+      </div>
+      <div class="theme-meta">
+        <div class="theme-name-row"><span class="theme-name">Ember</span><span class="swatches"><span class="swatch" style="background:#e0457a"></span><span class="swatch" style="background:#f6b93b"></span></span></div>
+        <p class="theme-desc">Rose to gold. Bolder and more "premium fashion" than Bloom — best if the brand should feel a little more upscale.</p>
+      </div>
+    </section>
+
+    <section class="theme-card" style="--t1:#ff6a3d; --t2:#ff4f8b;">
+      <div class="preview">
+        <div class="blob blob-1"></div><div class="blob blob-2"></div>
+        <div class="p-chip"><span class="dot"></span>Live</div>
+        <div class="p-content">
+          <span class="p-eyebrow">Marketplace</span>
+          <span class="p-title">Deploy in minutes</span>
+          <span class="p-btn">Get started<svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </div>
+      </div>
+      <div class="theme-meta">
+        <div class="theme-name-row"><span class="theme-name">Sunrise</span><span class="swatches"><span class="swatch" style="background:#ff6a3d"></span><span class="swatch" style="background:#ff4f8b"></span></span></div>
+        <p class="theme-desc">Orange to pink. The most energetic of the ten — good for a launch/marketing moment, tiring as an everyday UI color.</p>
+      </div>
+    </section>
+
+    <section class="theme-card" style="--t1:#0098c9; --t2:#2f6fed;">
+      <div class="preview">
+        <div class="blob blob-1"></div><div class="blob blob-2"></div>
+        <div class="p-chip"><span class="dot"></span>Live</div>
+        <div class="p-content">
+          <span class="p-eyebrow">Marketplace</span>
+          <span class="p-title">Deploy in minutes</span>
+          <span class="p-btn">Get started<svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </div>
+      </div>
+      <div class="theme-meta">
+        <div class="theme-name-row"><span class="theme-name">Lagoon</span><span class="swatches"><span class="swatch" style="background:#0098c9"></span><span class="swatch" style="background:#2f6fed"></span></span></div>
+        <p class="theme-desc">Cyan to deep blue. Trustworthy and enterprise-y — the safest, most "fintech dashboard" option here.</p>
+      </div>
+    </section>
+
+    <section class="theme-card" style="--t1:#a83df0; --t2:#6a5cff;">
+      <div class="preview">
+        <div class="blob blob-1"></div><div class="blob blob-2"></div>
+        <div class="p-chip"><span class="dot"></span>Live</div>
+        <div class="p-content">
+          <span class="p-eyebrow">Marketplace</span>
+          <span class="p-title">Deploy in minutes</span>
+          <span class="p-btn">Get started<svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </div>
+      </div>
+      <div class="theme-meta">
+        <div class="theme-name-row"><span class="theme-name">Orchid</span><span class="swatches"><span class="swatch" style="background:#a83df0"></span><span class="swatch" style="background:#6a5cff"></span></span></div>
+        <p class="theme-desc">Magenta to indigo. Creative-tools energy — leans more "design software" than "enterprise platform."</p>
+      </div>
+    </section>
+
+    <section class="theme-card" style="--t1:#7ec242; --t2:#17a672;">
+      <div class="preview">
+        <div class="blob blob-1"></div><div class="blob blob-2"></div>
+        <div class="p-chip"><span class="dot"></span>Live</div>
+        <div class="p-content">
+          <span class="p-eyebrow">Marketplace</span>
+          <span class="p-title">Deploy in minutes</span>
+          <span class="p-btn">Get started<svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </div>
+      </div>
+      <div class="theme-meta">
+        <div class="theme-name-row"><span class="theme-name">Citrus</span><span class="swatches"><span class="swatch" style="background:#7ec242"></span><span class="swatch" style="background:#17a672"></span></span></div>
+        <p class="theme-desc">Lime to emerald. Leans hardest into "growth/bloom" literally — the most botanical-feeling of the set after Bloom itself.</p>
+      </div>
+    </section>
+
+    <section class="theme-card" style="--t1:#7a63d1; --t2:#c9718a;">
+      <div class="preview">
+        <div class="blob blob-1"></div><div class="blob blob-2"></div>
+        <div class="p-chip"><span class="dot"></span>Live</div>
+        <div class="p-content">
+          <span class="p-eyebrow">Marketplace</span>
+          <span class="p-title">Deploy in minutes</span>
+          <span class="p-btn">Get started<svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </div>
+      </div>
+      <div class="theme-meta">
+        <div class="theme-name-row"><span class="theme-name">Slate Bloom</span><span class="swatches"><span class="swatch" style="background:#7a63d1"></span><span class="swatch" style="background:#c9718a"></span></span></div>
+        <p class="theme-desc">Muted mauve to dusty rose. The quietest, most "grown-up SaaS" option — lowest saturation of the ten.</p>
+      </div>
+    </section>
+
+    <section class="theme-card" style="--t1:#4a3aff; --t2:#e0389c;">
+      <div class="preview">
+        <div class="blob blob-1"></div><div class="blob blob-2"></div>
+        <div class="p-chip"><span class="dot"></span>Live</div>
+        <div class="p-content">
+          <span class="p-eyebrow">Marketplace</span>
+          <span class="p-title">Deploy in minutes</span>
+          <span class="p-btn">Get started<svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </div>
+      </div>
+      <div class="theme-meta">
+        <div class="theme-name-row"><span class="theme-name">Midnight Bloom</span><span class="swatches"><span class="swatch" style="background:#4a3aff"></span><span class="swatch" style="background:#e0389c"></span></span></div>
+        <p class="theme-desc">Indigo to magenta. The boldest and most saturated of the ten — striking, but works hardest against Bloom's light-first, gentle brief.</p>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="page-foot">
+    Every card runs the same component (blob pair, chip, CTA) with only <b>--t1</b> and <b>--t2</b> swapped — so a theme choice here is a true drop-in for Bloom's existing <code>--accent-1</code> / <code>--accent-3</code> tokens, no other changes required.
+  </div>
+
+</div>
+
+<script>
+(function(){
+  var root = document.documentElement;
+  var btn = document.getElementById('themeToggle');
+  function setTheme(mode){
+    if(mode==='dark'){ root.setAttribute('data-theme','dark'); btn.textContent='☀️ Light mode'; btn.setAttribute('aria-pressed','true'); }
+    else{ root.setAttribute('data-theme','light'); btn.textContent='🌙 Dark mode'; btn.setAttribute('aria-pressed','false'); }
+    try{ localStorage.setItem('bloomThemeStudiesTheme', mode); }catch(e){}
+  }
+  btn.addEventListener('click', function(){ setTheme(root.getAttribute('data-theme')==='dark' ? 'light' : 'dark'); });
+  try{
+    var saved = localStorage.getItem('bloomThemeStudiesTheme');
+    if(saved) setTheme(saved);
+  }catch(e){}
+})();
+</script>
