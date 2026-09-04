@@ -20,50 +20,52 @@ use App\Core\Request;
 const ORIGIN = 'https://preview.techbiss.local';
 
 $pages = [
-    ['/', 'Home', 'Marketing'],
-    ['/services', 'Services', 'Marketing'],
-    ['/solutions', 'Solutions', 'Marketing'],
-    ['/solutions/financial-services', 'Financial Services', 'Marketing'],
-    ['/work', 'Work', 'Marketing'],
-    ['/work/northwind-settlement-platform', 'Case study', 'Marketing'],
-    ['/process', 'Process', 'Marketing'],
-    ['/about', 'About', 'Marketing'],
-    ['/pricing', 'Pricing', 'Marketing'],
-    ['/resources', 'Resources', 'Marketing'],
-    ['/resources/core-web-vitals-budget-ci', 'Article', 'Marketing'],
-    ['/contact', 'Contact', 'Marketing'],
-    ['/marketplace', 'Marketplace', 'Marketplace'],
-    ['/marketplace/atlas-corporate-platform', 'Product detail', 'Marketplace'],
-    ['/marketplace/installer', 'Advanced Installer', 'Marketplace'],
-    ['/marketplace/licensing', 'Licensing', 'Marketplace'],
-    ['/marketplace/cart', 'Cart', 'Marketplace'],
-    ['/admin/login', 'Admin Login', 'Portals'],
-    ['/staff/login', 'Staff Login', 'Portals'],
-    ['/client/login', 'Client Login', 'Portals'],
-    ['/legal/privacy', 'Privacy', 'Marketing'],
+    ['/', 'Home'],
+    ['/services', 'Services'],
+    ['/solutions', 'Solutions'],
+    ['/work', 'Work'],
+    ['/process', 'Process'],
+    ['/about', 'About'],
+    ['/pricing', 'Pricing'],
+    ['/resources', 'Resources'],
+    ['/contact', 'Contact'],
+    ['/contact/thank-you', 'Thank you'],
+    ['/marketplace', 'Marketplace'],
+    ['/marketplace/installer', 'Advanced Installer'],
+    ['/marketplace/licensing', 'Licensing'],
+    ['/marketplace/cart', 'Cart'],
+    ['/admin/login', 'Admin sign in'],
+    ['/staff/login', 'Staff sign in'],
+    ['/client/login', 'Client sign in'],
+    ['/legal/privacy', 'Privacy'],
+    ['/legal/terms', 'Terms'],
+    ['/legal/security', 'Security'],
+    ['/legal/accessibility', 'Accessibility'],
 ];
+
+
 
 // Extra pages are appended only when their route exists, so this script keeps
 // working while the platform is still being built out.
 $optional = [
-    ['/install/step/requirements', 'Installer — Requirements', 'Installer'],
-    ['/install/step/environment', 'Installer — Environment', 'Installer'],
-    ['/install/step/database', 'Installer — Database', 'Installer'],
-    ['/install/step/detection', 'Installer — Existing site', 'Installer'],
-    ['/install/step/migration', 'Installer — Migration', 'Installer'],
-    ['/install/step/configuration', 'Installer — Configuration', 'Installer'],
-    ['/install/step/deploy', 'Installer — Deploy', 'Installer'],
-    ['/admin', 'Admin Dashboard', 'Portals'],
-    ['/admin/products', 'Admin — Products', 'Portals'],
-    ['/admin/orders', 'Admin — Orders', 'Portals'],
-    ['/admin/leads', 'Admin — Leads', 'Portals'],
-    ['/admin/deployments', 'Admin — Deployments', 'Portals'],
-    ['/staff', 'Staff Workspace', 'Portals'],
-    ['/staff/pipeline', 'Staff — Pipeline', 'Portals'],
-    ['/staff/tickets', 'Staff — Tickets', 'Portals'],
-    ['/client', 'Client Dashboard', 'Portals'],
-    ['/client/licenses', 'Client — Licences', 'Portals'],
-    ['/client/deployments', 'Client — Deployments', 'Portals'],
+    ['/install/step/requirements', 'Installer — Requirements'],
+    ['/install/step/environment', 'Installer — Environment'],
+    ['/install/step/database', 'Installer — Database'],
+    ['/install/step/detection', 'Installer — Existing site'],
+    ['/install/step/migration', 'Installer — Migration'],
+    ['/install/step/configuration', 'Installer — Configuration'],
+    ['/install/step/deploy', 'Installer — Deploy'],
+    ['/admin', 'Admin Dashboard'],
+    ['/admin/products', 'Admin — Products'],
+    ['/admin/orders', 'Admin — Orders'],
+    ['/admin/leads', 'Admin — Leads'],
+    ['/admin/deployments', 'Admin — Deployments'],
+    ['/staff', 'Staff Workspace'],
+    ['/staff/pipeline', 'Staff — Pipeline'],
+    ['/staff/tickets', 'Staff — Tickets'],
+    ['/client', 'Client Dashboard'],
+    ['/client/licenses', 'Client — Licences'],
+    ['/client/deployments', 'Client — Deployments'],
 ];
 
 $app = new Application($root);
@@ -102,6 +104,35 @@ function signOutOf(Application $app, string $portal): void
     $_GET = [];
     $_POST = ['_token' => $app->make('csrf')->token()];
     $app->handle(Request::capture());
+}
+
+/**
+ * Every detail page the site links to. Capturing all of them means a visitor
+ * can click anywhere in the interface without reaching a route that was never
+ * exported, which is what makes explanatory preview messaging unnecessary.
+ *
+ * @return list<array{0:string,1:string}>
+ */
+function detailPages(Application $app): array
+{
+    $detail = [];
+    foreach ($app->make('db')->select("SELECT slug FROM products WHERE status = 'published'") as $row) {
+        $detail[] = ['/marketplace/' . $row['slug'], 'Product'];
+        $detail[] = ['/marketplace/preview/' . $row['slug'], 'Preview'];
+    }
+    foreach ($app->make('db')->select('SELECT slug FROM case_studies') as $row) {
+        $detail[] = ['/work/' . $row['slug'], 'Case study'];
+    }
+    foreach ($app->make('db')->select('SELECT slug FROM resources') as $row) {
+        $detail[] = ['/resources/' . $row['slug'], 'Article'];
+    }
+    foreach ($app->config()->get('solutions', []) as $solution) {
+        $detail[] = ['/solutions/' . $solution['slug'], 'Solution'];
+    }
+    foreach (array_keys(App\Models\Product::CATEGORIES) as $category) {
+        $detail[] = ['/marketplace?category=' . $category, 'Category'];
+    }
+    return $detail;
 }
 
 /** Render one path through the real request pipeline. */
@@ -178,8 +209,9 @@ function rewrite(string $html): string
     return $html;
 }
 
+$pages = array_merge($pages, detailPages($app));
+
 $sections = [];
-$groups = [];
 $home = render($app, '/');
 $header = rewrite(between($home, '<header class="header"', '</header>'));
 $footer = rewrite(between($home, '<footer class="footer">', '</footer>'));
@@ -251,7 +283,7 @@ function portalFor(string $path, array $credentials): ?string
 }
 
 $activePortal = null;
-foreach ($all as [$path, $label, $group]) {
+foreach ($all as [$path, $label]) {
     // Reconcile the session with what this page needs: a login page must be
     // captured signed out, a dashboard signed into its own portal.
     $needed = portalFor($path, $portalCredentials);
@@ -289,11 +321,9 @@ foreach ($all as [$path, $label, $group]) {
     $sections[] = [
         'path' => $path,
         'label' => $label,
-        'group' => $group,
         'standalone' => $standalone,
         'html' => $content,
     ];
-    $groups[$group][] = ['path' => $path, 'label' => $label];
     fwrite(STDOUT, sprintf("  ✓ %-46s %6.1f KB\n", $path, strlen($content) / 1024));
 }
 
@@ -318,25 +348,12 @@ foreach (['sora-var-latin', 'manrope-var-latin'] as $face) {
     $criticalCss = str_replace('/assets/fonts/' . $face . '.woff2', $dataUri, $criticalCss);
 }
 
-$navHtml = '';
-foreach ($groups as $group => $items) {
-    $navHtml .= '<div class="pv-group"><span class="pv-group__label">' . htmlspecialchars($group, ENT_QUOTES) . '</span>';
-    foreach ($items as $item) {
-        $navHtml .= sprintf(
-            '<button type="button" class="pv-tab" data-goto="%s">%s</button>',
-            htmlspecialchars($item['path'], ENT_QUOTES),
-            htmlspecialchars($item['label'], ENT_QUOTES)
-        );
-    }
-    $navHtml .= '</div>';
-}
-
 $sectionsHtml = '';
 foreach ($sections as $section) {
     $sectionsHtml .= sprintf(
-        '<div class="pv-page%s" data-path="%s" hidden>%s</div>',
-        $section['standalone'] ? ' pv-page--standalone' : '',
+        '<div class="tb-page" data-path="%s" data-standalone="%s" hidden>%s</div>',
         htmlspecialchars($section['path'], ENT_QUOTES),
+        $section['standalone'] ? '1' : '0',
         $section['html']
     );
 }
@@ -349,109 +366,92 @@ $document = <<<HTML
 <style>{$criticalCss}</style>
 <style>{$mainCss}</style>
 <style>{$motionCss}</style>
-<style>
-/* Preview chrome — the switcher that stands in for real server routing. */
-.pv-bar{position:sticky;top:0;z-index:200;display:flex;align-items:center;gap:.75rem;
-  padding:.6rem clamp(.9rem,3vw,1.5rem);background:var(--bg-elev);border-bottom:1px solid var(--line);
-  overflow-x:auto;scrollbar-width:none}
-.pv-bar::-webkit-scrollbar{display:none}
-.pv-brand{display:flex;align-items:center;gap:.5rem;font-size:var(--t--2);font-weight:700;
-  letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);white-space:nowrap;flex:none}
-.pv-brand b{width:8px;height:8px;border-radius:50%;background:var(--accent-grad)}
-.pv-group{display:flex;align-items:center;gap:.25rem;flex:none;padding-left:.75rem;
-  border-left:1px solid var(--line)}
-.pv-group__label{font-size:.625rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);
-  margin-right:.25rem;white-space:nowrap}
-.pv-tab{flex:none;padding:.35rem .7rem;border-radius:var(--r-full);border:1px solid transparent;
-  font-size:var(--t--2);font-weight:540;color:var(--ink-2);white-space:nowrap;
-  transition:background var(--d-1),color var(--d-1),border-color var(--d-1)}
-.pv-tab[aria-current="true"]{background:var(--accent-soft);border-color:var(--accent-line);color:var(--ink)}
-@media (hover:hover){.pv-tab:hover{background:var(--surface-2);color:var(--ink)}}
-.pv-page[hidden]{display:none!important}
-.pv-shell[hidden]{display:none!important}
-.pv-note{position:fixed;left:50%;bottom:1rem;transform:translateX(-50%) translateY(200%);
-  z-index:210;padding:.6rem 1rem;border-radius:var(--r-full);background:var(--surface-3);
-  border:1px solid var(--line-2);font-size:var(--t--2);color:var(--ink-2);
-  transition:transform var(--d-3) var(--ease-expo);pointer-events:none;white-space:nowrap;max-width:90vw}
-.pv-note.is-on{transform:translateX(-50%)}
-</style>
+<style>.tb-page[hidden]{display:none!important}.tb-shell[hidden]{display:none!important}</style>
 
-<nav class="pv-bar" aria-label="Preview pages">
-  <span class="pv-brand"><b></b>TECHBISS preview</span>
-  {$navHtml}
-</nav>
+<div class="scroll-rail" data-scroll-rail aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
 
-<div class="pv-shell" data-shell>
+<div class="tb-shell" data-shell>
   {$header}
 </div>
 <main id="main">{$sectionsHtml}</main>
-<div class="pv-shell" data-shell>
+<div class="tb-shell" data-shell>
   {$footer}
   {$drawer}
 </div>
-<div class="pv-note" data-note></div>
 
 <script>{$appJs}</script>
 <script>
-/* Hash router standing in for the platform's server-side routing. */
+/* Resolves the site's own links against the exported pages. Anchors and query
+   strings fall back to their base path, and an unmatched path walks up its
+   segments, so every link in the interface lands somewhere real. */
 (function(){
-  var pages = Array.prototype.slice.call(document.querySelectorAll('.pv-page'));
-  var tabs = Array.prototype.slice.call(document.querySelectorAll('.pv-tab'));
+  var pages = Array.prototype.slice.call(document.querySelectorAll('.tb-page'));
   var shells = Array.prototype.slice.call(document.querySelectorAll('[data-shell]'));
-  var note = document.querySelector('[data-note]');
-  var noteTimer = null;
+  var known = {};
+  pages.forEach(function(page){ known[page.dataset.path] = page; });
 
-  function known(path){ return pages.some(function(p){ return p.dataset.path === path; }); }
-
-  function toast(message){
-    if (!note) return;
-    note.textContent = message;
-    note.classList.add('is-on');
-    clearTimeout(noteTimer);
-    noteTimer = setTimeout(function(){ note.classList.remove('is-on'); }, 2600);
+  function resolve(path){
+    if (known[path]) return path;
+    var bare = path.split('#')[0].split('?')[0];
+    if (known[bare]) return bare;
+    var parts = bare.replace(/\/+$/, '').split('/');
+    while (parts.length > 1) {
+      parts.pop();
+      var candidate = parts.join('/') || '/';
+      if (known[candidate]) return candidate;
+    }
+    return '/';
   }
 
-  function show(path, push){
-    if (!known(path)) {
-      toast('“' + path + '” is a live route on the real platform — not in this static preview.');
-      return;
-    }
+  function show(path, anchor){
+    var target = resolve(path);
     var standalone = false;
     pages.forEach(function(page){
-      var active = page.dataset.path === path;
+      var active = page.dataset.path === target;
       page.hidden = !active;
-      if (active) standalone = page.classList.contains('pv-page--standalone');
+      if (active) standalone = page.dataset.standalone === '1';
     });
     shells.forEach(function(shell){ shell.hidden = standalone; });
-    tabs.forEach(function(tab){ tab.setAttribute('aria-current', tab.dataset.goto === path ? 'true' : 'false'); });
-    if (push !== false && location.hash !== '#' + path) history.replaceState({}, '', '#' + path);
+    if (location.hash !== '#' + path) history.replaceState({}, '', '#' + path);
+
+    if (anchor) {
+      var el = document.getElementById(anchor);
+      if (el) { el.scrollIntoView({ block: 'start' }); return; }
+    }
     window.scrollTo(0, 0);
   }
-
-  tabs.forEach(function(tab){
-    tab.addEventListener('click', function(){ show(tab.dataset.goto); });
-  });
 
   document.addEventListener('click', function(e){
     var link = e.target.closest('a[href^="#/"]');
     if (!link) return;
     e.preventDefault();
-    show(link.getAttribute('href').slice(1));
+    var href = link.getAttribute('href').slice(1);
+    show(href, href.split('#')[1] || null);
     var drawer = document.querySelector('[data-drawer]');
     if (drawer) drawer.classList.remove('is-open');
     document.body.style.overflow = '';
   });
 
-  document.addEventListener('submit', function(e){
-    e.preventDefault();
-    toast('Forms post to the server on the real platform. This preview is static.');
+  // Same-page anchors inside an exported section.
+  document.addEventListener('click', function(e){
+    var link = e.target.closest('a[href^="#"]:not([href^="#/"])');
+    if (!link) return;
+    var id = link.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (el) { e.preventDefault(); el.scrollIntoView({ block: 'start' }); }
   });
+
+  // Forms need a server; keep them inert rather than navigating away.
+  document.addEventListener('submit', function(e){ e.preventDefault(); });
 
   window.addEventListener('hashchange', function(){
-    show(location.hash.slice(1) || '/', false);
+    var h = location.hash.slice(1) || '/';
+    show(h, h.split('#')[1] || null);
   });
 
-  show(location.hash.slice(1) || '/', false);
+  var initial = location.hash.slice(1) || '/';
+  show(initial, initial.split('#')[1] || null);
 })();
 </script>
 HTML;
