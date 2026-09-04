@@ -1,0 +1,2104 @@
+<title>TECHBISS — Verdant Grid</title>
+<style>
+  /* ============ TOKENS ============ */
+  :root {
+    --bg: #ffffff;
+    --surface: #f5faf3;
+    --surface-2: #eaf5e4;
+    --ink: #0e1a0d;
+    --ink-muted: #55654f;
+    --accent-1: #3fb84f;
+    --accent-1-rgb: 63,184,79;
+    --accent-2: #b6e84a;
+    --accent-2-rgb: 182,232,74;
+    --accent-3: #0d5c3f;
+    --grid-line: #d3e8cc;
+    --border: #cfe4c8;
+    --shadow: rgba(14,26,13,0.10);
+    --on-accent: #06210c;
+    --white: #ffffff;
+    --font-display: 'Hanken Grotesk', 'Segoe UI', Arial, sans-serif;
+    --font-body: 'Inter', 'Segoe UI', Arial, sans-serif;
+    --font-mono: 'Courier New', Courier, monospace;
+    --radius-sm: 8px;
+    --radius-md: 16px;
+    --radius-lg: 28px;
+    --container: 1240px;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0a120a;
+      --surface: #101c10;
+      --surface-2: #142317;
+      --ink: #eef7ea;
+      --ink-muted: #9db594;
+      --accent-1: #4ed461;
+      --accent-1-rgb: 78,212,97;
+      --accent-2: #c8f05e;
+      --accent-2-rgb: 200,240,94;
+      --accent-3: #16a06c;
+      --grid-line: #1e2e1c;
+      --border: #1e2e1c;
+      --shadow: rgba(0,0,0,0.45);
+      --on-accent: #06210c;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0a120a;
+    --surface: #101c10;
+    --surface-2: #142317;
+    --ink: #eef7ea;
+    --ink-muted: #9db594;
+    --accent-1: #4ed461;
+    --accent-1-rgb: 78,212,97;
+    --accent-2: #c8f05e;
+    --accent-2-rgb: 200,240,94;
+    --accent-3: #16a06c;
+    --grid-line: #1e2e1c;
+    --border: #1e2e1c;
+    --shadow: rgba(0,0,0,0.45);
+    --on-accent: #06210c;
+    color-scheme: dark;
+  }
+
+  /* ============ RESET / BASE ============ */
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); }
+  .page {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--ink);
+    overflow-x: hidden;
+    width: 100%;
+  }
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    color: var(--ink);
+    line-height: 1.08;
+    margin: 0;
+    text-wrap: balance;
+    letter-spacing: -0.01em;
+  }
+  p { margin: 0; color: var(--ink-muted); line-height: 1.6; }
+  a { color: inherit; text-decoration: none; }
+  button { font-family: inherit; cursor: pointer; }
+  ul { margin: 0; padding: 0; list-style: none; }
+  img, svg { display: block; max-width: 100%; }
+  .container {
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+  .mono {
+    font-family: var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  ::selection { background: var(--accent-2); color: var(--on-accent); }
+
+  :focus-visible {
+    outline: 3px solid var(--accent-1);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .skip-link {
+    position: absolute;
+    top: -60px; left: 12px;
+    background: var(--accent-1);
+    color: var(--on-accent);
+    padding: 10px 18px;
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+    z-index: 999;
+    transition: top .2s ease;
+  }
+  .skip-link:focus { top: 12px; }
+
+  /* ============ GRID FIELD (signature device) ============ */
+  .grid-field {
+    position: relative;
+    background-image:
+      repeating-linear-gradient(to right, var(--grid-line) 0 1px, transparent 1px 8.3334%),
+      repeating-linear-gradient(to bottom, var(--grid-line) 0 1px, transparent 1px 64px);
+    background-position: -1px 0, 0 -1px;
+  }
+  .grid-field::before,
+  .grid-field::after { content: none; }
+  .grid-coord {
+    position: absolute;
+    font-size: 10px;
+    color: var(--ink-muted);
+    opacity: 0.55;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    pointer-events: none;
+  }
+  .grid-coord::before {
+    content: "";
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--accent-1);
+    display: inline-block;
+  }
+
+  /* ============ INTRO LOADER ============ */
+  .intro-loader {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    background: var(--bg);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background-image:
+      repeating-linear-gradient(to right, var(--grid-line) 0 1px, transparent 1px 8.3334%),
+      repeating-linear-gradient(to bottom, var(--grid-line) 0 1px, transparent 1px 64px);
+  }
+  .intro-loader.is-active { display: flex; }
+  .intro-loader.is-leaving { animation: loaderOut .5s ease forwards; }
+  @keyframes loaderOut { to { opacity: 0; visibility: hidden; } }
+  .intro-loader .loader-mark {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 15px;
+    letter-spacing: 0.12em;
+    color: var(--accent-3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+  }
+  .loader-ring {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    border: 3px solid var(--grid-line);
+    border-top-color: var(--accent-1);
+    animation: spin 0.9s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ============ NAV ============ */
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 500;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 76px;
+    gap: 20px;
+  }
+  .wordmark {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 20px;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+  .wordmark .mark {
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    background: var(--accent-1);
+    position: relative;
+    flex-shrink: 0;
+  }
+  .wordmark .mark::before,
+  .wordmark .mark::after {
+    content: "";
+    position: absolute;
+    background: var(--on-accent);
+    border-radius: 2px;
+  }
+  .wordmark .mark::before { width: 14px; height: 3px; top: 13.5px; left: 8px; }
+  .wordmark .mark::after { width: 3px; height: 14px; top: 8px; left: 13.5px; }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+  }
+  .nav-links a {
+    font-size: 14.5px;
+    font-weight: 600;
+    color: var(--ink-muted);
+    position: relative;
+    padding: 6px 2px;
+  }
+  .nav-links a:hover, .nav-links a:focus-visible { color: var(--ink); }
+  .nav-links a::after {
+    content: "";
+    position: absolute;
+    left: 0; bottom: -2px;
+    width: 0; height: 2px;
+    background: var(--accent-1);
+    transition: width .2s ease;
+  }
+  .nav-links a:hover::after { width: 100%; }
+
+  .nav-actions { display: flex; align-items: center; gap: 14px; }
+  .signin-link { font-size: 14.5px; font-weight: 600; color: var(--ink-muted); }
+  .signin-link:hover { color: var(--ink); }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-weight: 700;
+    font-size: 14.5px;
+    padding: 12px 22px;
+    border-radius: 999px;
+    border: 2px solid transparent;
+    transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease, color .18s ease;
+    white-space: nowrap;
+  }
+  .btn-primary {
+    background: var(--accent-1);
+    color: var(--on-accent);
+    box-shadow: 0 6px 18px rgba(var(--accent-1-rgb),0.32);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(var(--accent-1-rgb),0.4); }
+  .btn-secondary {
+    background: transparent;
+    color: var(--ink);
+    border-color: var(--border);
+  }
+  .btn-secondary:hover { border-color: var(--accent-1); color: var(--accent-1); transform: translateY(-2px); }
+  .btn-ghost {
+    background: var(--surface);
+    color: var(--ink);
+    border-color: var(--border);
+  }
+  .btn-sm { padding: 9px 16px; font-size: 13px; }
+
+  .theme-toggle {
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink);
+    flex-shrink: 0;
+  }
+  .theme-toggle:hover { border-color: var(--accent-1); }
+  .theme-toggle svg { width: 19px; height: 19px; }
+  .theme-toggle .sun { display: none; }
+  :root[data-theme="dark"] .theme-toggle .moon { display: none; }
+  :root[data-theme="dark"] .theme-toggle .sun { display: block; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .theme-toggle .moon { display: none; }
+    :root:not([data-theme="light"]) .theme-toggle .sun { display: block; }
+  }
+
+  .hamburger {
+    display: none;
+    width: 42px; height: 42px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .hamburger span {
+    display: block;
+    width: 18px; height: 2px;
+    background: var(--ink);
+    border-radius: 2px;
+    transition: transform .25s ease, opacity .25s ease;
+  }
+  .hamburger[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+  .hamburger[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+  .hamburger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+  .mobile-menu {
+    position: fixed;
+    inset: 0 0 0 auto;
+    width: min(86vw, 360px);
+    height: 100%;
+    background: var(--bg);
+    border-left: 1px solid var(--border);
+    z-index: 900;
+    transform: translateX(100%);
+    transition: transform .32s cubic-bezier(.4,0,.2,1);
+    display: flex;
+    flex-direction: column;
+    padding: 90px 28px 28px;
+    gap: 26px;
+  }
+  .mobile-menu.is-open { transform: translateX(0); }
+  .mobile-menu a { font-size: 19px; font-weight: 700; font-family: var(--font-display); color: var(--ink); }
+  .mobile-menu .mm-actions { margin-top: auto; display: flex; flex-direction: column; gap: 12px; }
+  .scrim {
+    position: fixed; inset: 0; background: rgba(6,20,8,0.4);
+    z-index: 850; opacity: 0; pointer-events: none; transition: opacity .3s ease;
+  }
+  .scrim.is-open { opacity: 1; pointer-events: auto; }
+
+  /* ============ HERO ============ */
+  .hero {
+    position: relative;
+    padding: 96px 0 64px;
+    overflow: hidden;
+  }
+  .hero-grid-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    -webkit-mask-image: linear-gradient(to bottom, black 55%, transparent 100%);
+            mask-image: linear-gradient(to bottom, black 55%, transparent 100%);
+  }
+  .hero-inner {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: 40px;
+    align-items: center;
+  }
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 14px 7px 8px;
+    border-radius: 999px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--accent-3);
+    margin-bottom: 22px;
+  }
+  .eyebrow .dot {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: var(--accent-2);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .eyebrow .dot svg { width: 11px; height: 11px; }
+
+  .hero h1 {
+    font-size: clamp(2.4rem, 5vw, 4rem);
+    font-weight: 800;
+  }
+  .hero h1 em {
+    font-style: normal;
+    color: var(--accent-1);
+  }
+  .hero .lede {
+    margin-top: 22px;
+    font-size: 18px;
+    max-width: 46ch;
+    color: var(--ink-muted);
+  }
+  .hero-ctas { display: flex; gap: 14px; margin-top: 34px; flex-wrap: wrap; }
+
+  .hero-visual {
+    position: relative;
+    aspect-ratio: 1/1;
+    max-width: 460px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .growth-svg circle, .growth-svg path, .growth-svg line { vector-effect: non-scaling-stroke; }
+  .growth-svg .ring {
+    fill: none;
+    stroke: var(--grid-line);
+    stroke-width: 1;
+    transform-origin: 200px 200px;
+  }
+  .growth-svg .ring-accent {
+    fill: none;
+    stroke-width: 1.6;
+    transform-origin: 200px 200px;
+  }
+  .growth-svg .branch {
+    fill: none;
+    stroke: var(--accent-1);
+    stroke-width: 2;
+    stroke-linecap: round;
+  }
+  .growth-svg .branch-sub { stroke: var(--accent-2); stroke-width: 1.6; }
+  .growth-svg .node { fill: var(--accent-1); }
+  .growth-svg .node-lg { fill: var(--accent-3); }
+  .growth-svg .core { fill: var(--accent-1); }
+
+  .js-animate .growth-svg .ring,
+  .js-animate .growth-svg .ring-accent {
+    animation: ringIn .9s cubic-bezier(.2,.7,.2,1) both;
+  }
+  .js-animate .growth-svg .ring:nth-of-type(1) { animation-delay: .05s; }
+  .js-animate .growth-svg .ring:nth-of-type(2) { animation-delay: .15s; }
+  .js-animate .growth-svg .ring-accent:nth-of-type(3) { animation-delay: .25s; }
+  @keyframes ringIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .js-animate .growth-svg .branch {
+    stroke-dasharray: 200;
+    stroke-dashoffset: 200;
+    animation: branchIn .7s ease-out forwards;
+    animation-delay: .5s;
+  }
+  .js-animate .growth-svg .node {
+    opacity: 0; transform: scale(0); transform-box: fill-box; transform-origin: center;
+    animation: nodeIn .4s ease-out forwards;
+    animation-delay: 1.05s;
+  }
+  .js-animate .growth-svg .core {
+    opacity: 0; transform: scale(0); transform-box: fill-box; transform-origin: center;
+    animation: nodeIn .5s cubic-bezier(.3,1.6,.6,1) forwards;
+    animation-delay: .0s;
+  }
+  @keyframes branchIn { to { stroke-dashoffset: 0; } }
+  @keyframes nodeIn { to { opacity: 1; transform: scale(1); } }
+
+  /* Stats */
+  .stat-row {
+    margin-top: 68px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    position: relative;
+    z-index: 1;
+  }
+  .stat-tile {
+    padding: 22px 20px;
+    border-left: 1px solid var(--grid-line);
+  }
+  .stat-tile:last-child { border-right: 1px solid var(--grid-line); }
+  .stat-value {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(1.5rem, 2.4vw, 2.1rem);
+    color: var(--accent-3);
+  }
+  .stat-label {
+    margin-top: 6px;
+    font-size: 13px;
+    color: var(--ink-muted);
+    font-weight: 600;
+  }
+
+  /* ============ SECTION SCAFFOLD ============ */
+  section { padding: 100px 0; position: relative; }
+  .section-head { max-width: 640px; margin-bottom: 52px; }
+  .section-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent-3);
+    margin-bottom: 14px;
+  }
+  .section-tag .grid-coord-inline {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--ink-muted);
+    letter-spacing: 0.08em;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+  .section-head h2 {
+    font-size: clamp(1.7rem, 3vw, 2.5rem);
+    font-weight: 800;
+  }
+  .section-head p { margin-top: 14px; font-size: 16px; max-width: 56ch; }
+  .alt-surface { background: var(--surface); }
+
+  .reveal { opacity: 1; transform: none; }
+  .reveal-init { opacity: 0; transform: translateY(28px); transition: opacity .7s cubic-bezier(.2,.7,.2,1), transform .7s cubic-bezier(.2,.7,.2,1); }
+  .reveal-init.is-revealed { opacity: 1; transform: none; }
+
+  /* ============ TRUSTED BY ============ */
+  .trust-strip { padding: 40px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .trust-label { font-size: 12px; font-weight: 700; color: var(--ink-muted); margin-bottom: 24px; text-align: center; }
+  .trust-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    background-image:
+      repeating-linear-gradient(to right, var(--grid-line) 0 1px, transparent 1px calc(100%/6));
+  }
+  .trust-logo {
+    padding: 18px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 16px;
+    color: var(--ink-muted);
+    letter-spacing: -0.01em;
+    opacity: 0.75;
+    transition: opacity .2s ease, color .2s ease;
+  }
+  .trust-logo:hover { opacity: 1; color: var(--accent-3); }
+  .trust-logo .sq { width: 9px; height: 9px; background: var(--accent-2); display: inline-block; margin-right: 7px; border-radius: 2px; }
+
+  /* ============ SERVICES ============ */
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--grid-line);
+    border: 1px solid var(--grid-line);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+  .service-card {
+    background: var(--bg);
+    padding: 32px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    transition: background .2s ease;
+  }
+  .service-card:hover { background: var(--surface); }
+  .icon-badge {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: var(--accent-1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .icon-badge svg { width: 24px; height: 24px; stroke: var(--on-accent); }
+  .service-card h3 { font-size: 18px; font-weight: 700; }
+  .service-card .desc { font-size: 14.5px; }
+  .service-bullets { display: flex; flex-direction: column; gap: 8px; margin-top: auto; padding-top: 8px; }
+  .service-bullets li { font-size: 13px; color: var(--ink); font-weight: 600; display: flex; gap: 8px; align-items: flex-start; }
+  .service-bullets li::before { content: "▸"; color: var(--accent-1); flex-shrink: 0; }
+
+  /* ============ SOLUTIONS ============ */
+  .tab-chips { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 32px; }
+  .tab-chip {
+    padding: 11px 20px;
+    border-radius: 999px;
+    border: 1.5px solid var(--border);
+    background: var(--bg);
+    font-weight: 700;
+    font-size: 13.5px;
+    color: var(--ink-muted);
+    transition: all .2s ease;
+  }
+  .tab-chip:hover { border-color: var(--accent-1); color: var(--ink); }
+  .tab-chip[aria-selected="true"] {
+    background: var(--accent-1);
+    border-color: var(--accent-1);
+    color: var(--on-accent);
+  }
+  .solution-panel {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 44px;
+    background: var(--surface);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+  }
+  .solution-panel h3 { font-size: 24px; font-weight: 800; margin-bottom: 14px; }
+  .solution-panel .desc { font-size: 15px; }
+  .solution-stats { display: flex; flex-direction: column; gap: 18px; }
+  .sol-stat { display: flex; align-items: baseline; gap: 12px; border-top: 1px solid var(--border); padding-top: 14px; }
+  .sol-stat:first-child { border-top: none; padding-top: 0; }
+  .sol-stat .num { font-family: var(--font-display); font-weight: 800; font-size: 22px; color: var(--accent-3); min-width: 70px; }
+  .sol-stat .lbl { font-size: 13.5px; color: var(--ink-muted); font-weight: 600; }
+
+  /* ============ MARKETPLACE ============ */
+  .filter-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 36px; }
+  .filter-chip {
+    padding: 9px 16px;
+    border-radius: 8px;
+    border: 1.5px solid var(--border);
+    background: var(--bg);
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--ink-muted);
+  }
+  .filter-chip[aria-pressed="true"] { background: var(--accent-2); border-color: var(--accent-2); color: var(--on-accent); }
+  .product-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  .product-card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 24px;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    text-align: left;
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+  }
+  .product-card:hover { transform: translateY(-4px); box-shadow: 0 14px 30px var(--shadow); border-color: var(--accent-1); }
+  .product-cat {
+    align-self: flex-start;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent-3);
+    background: var(--surface-2);
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+  .product-card h3 { font-size: 17px; font-weight: 700; }
+  .product-vendor { font-size: 12.5px; color: var(--ink-muted); font-weight: 600; }
+  .product-blurb { font-size: 13.5px; }
+  .product-foot { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 10px; border-top: 1px solid var(--border); }
+  .product-rating { font-size: 13px; font-weight: 700; color: var(--accent-3); display: flex; align-items: center; gap: 4px; }
+  .product-price { font-family: var(--font-display); font-weight: 800; font-size: 15px; }
+
+  /* Modal */
+  .modal-scrim {
+    position: fixed; inset: 0; background: rgba(6,20,8,0.55);
+    z-index: 1500; display: none; align-items: center; justify-content: center; padding: 24px;
+  }
+  .modal-scrim.is-open { display: flex; }
+  .modal-box {
+    background: var(--bg);
+    border-radius: var(--radius-lg);
+    max-width: 480px; width: 100%;
+    padding: 36px;
+    position: relative;
+    border: 1px solid var(--border);
+    max-height: 88vh;
+    overflow-y: auto;
+  }
+  .modal-close {
+    position: absolute; top: 18px; right: 18px;
+    width: 34px; height: 34px; border-radius: 50%;
+    background: var(--surface); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .modal-cat { font-size: 11px; font-weight: 700; color: var(--accent-3); background: var(--surface-2); padding: 4px 10px; border-radius: 999px; display: inline-block; margin-bottom: 14px; }
+  .modal-box h3 { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+  .modal-vendor { font-size: 13px; color: var(--ink-muted); font-weight: 600; margin-bottom: 18px; }
+  .modal-box p.desc { font-size: 14.5px; margin-bottom: 22px; }
+  .modal-price-row { display: flex; align-items: center; justify-content: space-between; padding: 18px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); margin-bottom: 22px; }
+  .modal-price { font-family: var(--font-display); font-weight: 800; font-size: 24px; color: var(--accent-3); }
+
+  .toast {
+    position: fixed; bottom: 28px; left: 50%; transform: translate(-50%, 20px);
+    background: var(--accent-3); color: #fff;
+    padding: 14px 24px; border-radius: 999px;
+    font-weight: 700; font-size: 14px;
+    display: flex; align-items: center; gap: 10px;
+    z-index: 2200; opacity: 0; pointer-events: none;
+    transition: opacity .3s ease, transform .3s ease;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+  }
+  .toast.is-visible { opacity: 1; transform: translate(-50%, 0); }
+
+  /* ============ PROCESS ============ */
+  .process-track {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0;
+  }
+  .process-track .connector {
+    position: absolute;
+    top: 27px; left: calc(100%/12); right: calc(100%/12);
+    height: 2px;
+    background: var(--grid-line);
+    z-index: 0;
+  }
+  .process-track .connector-fill {
+    position: absolute;
+    top: 0; left: 0; height: 100%;
+    width: 0%;
+    background: var(--accent-1);
+    transition: width 1.4s cubic-bezier(.2,.7,.2,1);
+  }
+  .process-step { position: relative; z-index: 1; padding: 0 14px; text-align: center; }
+  .step-marker {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 2px solid var(--grid-line);
+    margin: 0 auto 20px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 18px;
+    color: var(--ink-muted);
+    transition: border-color .4s ease, color .4s ease, transform .4s ease, background .4s ease;
+  }
+  .process-step.is-active .step-marker {
+    border-color: var(--accent-1);
+    color: var(--accent-1);
+    background: var(--surface);
+    transform: scale(1.1);
+  }
+  .process-step h3 { font-size: 15.5px; font-weight: 700; margin-bottom: 8px; }
+  .process-step p { font-size: 13px; }
+
+  /* ============ CASE STUDIES ============ */
+  .carousel-wrap { position: relative; }
+  .carousel-track {
+    display: flex;
+    gap: 22px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    cursor: grab;
+    padding-bottom: 10px;
+    scrollbar-width: none;
+    user-select: none;
+  }
+  .carousel-track::-webkit-scrollbar { display: none; }
+  .carousel-track.is-dragging { cursor: grabbing; scroll-snap-type: none; }
+  .case-card {
+    scroll-snap-align: start;
+    flex: 0 0 min(560px, 84vw);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 36px;
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .case-metric {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(2rem, 4vw, 2.6rem);
+    color: var(--accent-1);
+  }
+  .case-card h3 { font-size: 18px; font-weight: 700; }
+  .case-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 4px; }
+  .case-grid div h4 { font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent-3); font-weight: 700; margin-bottom: 6px; }
+  .case-grid div p { font-size: 13.5px; }
+  .carousel-dots { display: flex; gap: 8px; justify-content: center; margin-top: 26px; }
+  .carousel-dots button { width: 8px; height: 8px; border-radius: 50%; border: none; background: var(--grid-line); padding: 0; }
+  .carousel-dots button[aria-current="true"] { background: var(--accent-1); width: 22px; border-radius: 4px; }
+
+  /* ============ PRICING ============ */
+  .price-toggle-row { display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 44px; }
+  .price-toggle-row span { font-size: 14px; font-weight: 700; color: var(--ink-muted); }
+  .price-toggle-row span.active { color: var(--ink); }
+  .save-badge { font-size: 11px; font-weight: 700; background: var(--accent-2); color: var(--on-accent); padding: 3px 8px; border-radius: 999px; }
+  .switch { width: 52px; height: 28px; border-radius: 999px; background: var(--surface-2); border: 1.5px solid var(--border); position: relative; flex-shrink: 0; }
+  .switch .knob { position: absolute; top: 2px; left: 2px; width: 21px; height: 21px; border-radius: 50%; background: var(--accent-1); transition: transform .25s ease; }
+  .switch[aria-checked="true"] .knob { transform: translateX(24px); }
+
+  .pricing-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  .price-card {
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 28px 24px;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    position: relative;
+  }
+  .price-card.is-recommended { border-color: var(--accent-2); border-width: 2px; background: var(--surface); }
+  .rec-badge {
+    position: absolute; top: -13px; left: 24px;
+    background: var(--accent-2); color: var(--on-accent);
+    font-size: 11px; font-weight: 800; padding: 5px 12px; border-radius: 999px;
+  }
+  .price-card h3 { font-size: 18px; font-weight: 700; }
+  .price-amount { font-family: var(--font-display); font-weight: 800; font-size: 34px; }
+  .price-amount span { font-size: 14px; font-weight: 600; color: var(--ink-muted); }
+  .price-card .tagline { font-size: 13px; }
+  .price-features { display: flex; flex-direction: column; gap: 10px; }
+  .price-features li { font-size: 13.5px; display: flex; gap: 8px; align-items: flex-start; color: var(--ink); font-weight: 500; }
+  .price-features li svg { flex-shrink: 0; width: 16px; height: 16px; stroke: var(--accent-1); margin-top: 2px; }
+  .price-card .btn { margin-top: auto; width: 100%; }
+
+  /* ============ FAQ ============ */
+  .faq-list { border-top: 1px solid var(--border); max-width: 780px; }
+  .faq-item { border-bottom: 1px solid var(--border); }
+  .faq-q {
+    width: 100%; text-align: left; background: none; border: none;
+    padding: 24px 4px; display: flex; align-items: center; justify-content: space-between;
+    font-family: var(--font-display); font-weight: 700; font-size: 16.5px; color: var(--ink);
+    gap: 18px;
+  }
+  .faq-q .plus { width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--border); flex-shrink: 0; position: relative; transition: transform .3s ease, border-color .3s ease; }
+  .faq-q .plus::before, .faq-q .plus::after { content: ""; position: absolute; background: var(--ink); border-radius: 2px; }
+  .faq-q .plus::before { width: 10px; height: 2px; top: 11px; left: 7px; }
+  .faq-q .plus::after { width: 2px; height: 10px; top: 7px; left: 11px; transition: opacity .2s ease; }
+  .faq-item[data-open="true"] .plus { transform: rotate(90deg); border-color: var(--accent-1); }
+  .faq-item[data-open="true"] .plus::after { opacity: 0; }
+  .faq-a { max-height: 0; overflow: hidden; transition: max-height .35s ease; }
+  .faq-a-inner { padding: 0 4px 24px; font-size: 14.5px; max-width: 64ch; }
+
+  /* ============ CONTACT ============ */
+  .contact-grid { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 56px; }
+  .contact-info { display: flex; flex-direction: column; gap: 24px; }
+  .contact-info-item { display: flex; gap: 14px; }
+  .contact-info-item .ico { width: 40px; height: 40px; border-radius: 50%; background: var(--surface); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .contact-info-item .ico svg { width: 18px; height: 18px; stroke: var(--accent-3); }
+  .contact-info-item h4 { font-size: 14.5px; font-weight: 700; margin-bottom: 4px; }
+  .contact-info-item p { font-size: 13.5px; }
+
+  .contact-form {
+    background-image:
+      repeating-linear-gradient(to right, var(--grid-line) 0 1px, transparent 1px calc(100%/2)),
+      repeating-linear-gradient(to bottom, var(--grid-line) 0 1px, transparent 1px 90px);
+    border: 1px solid var(--grid-line);
+    border-radius: var(--radius-md);
+    padding: 32px;
+    position: relative;
+  }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px; }
+  .form-row.full { grid-template-columns: 1fr; }
+  .field label { display: block; font-size: 12.5px; font-weight: 700; color: var(--ink); margin-bottom: 7px; }
+  .field input, .field select, .field textarea {
+    width: 100%; padding: 12px 14px; border-radius: var(--radius-sm);
+    border: 1.5px solid var(--border); background: var(--bg); color: var(--ink);
+    font-family: inherit; font-size: 14px;
+  }
+  .field textarea { resize: vertical; min-height: 100px; }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--accent-1); }
+  .field.has-error input, .field.has-error textarea { border-color: #d3453f; }
+  .field-error { font-size: 12px; color: #c8392f; margin-top: 6px; display: none; font-weight: 600; }
+  .field.has-error .field-error { display: block; }
+  .form-success {
+    display: none; align-items: center; gap: 12px;
+    background: var(--surface-2); border: 1px solid var(--accent-1);
+    border-radius: var(--radius-sm); padding: 16px 18px; margin-top: 16px;
+    font-weight: 700; font-size: 14px; color: var(--accent-3);
+  }
+  .form-success.is-visible { display: flex; animation: successIn .4s ease; }
+  @keyframes successIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+  .form-success svg { width: 20px; height: 20px; stroke: var(--accent-1); flex-shrink: 0; }
+
+  /* ============ FOOTER ============ */
+  .site-footer { background: var(--accent-3); color: #eafbe9; padding: 72px 0 30px; }
+  .footer-top { display: grid; grid-template-columns: 1.4fr repeat(4, 1fr); gap: 40px; padding-bottom: 50px; }
+  .footer-brand .wordmark { color: #fff; }
+  .footer-brand .wordmark .mark { background: var(--accent-2); }
+  .footer-brand .wordmark .mark::before, .footer-brand .wordmark .mark::after { background: var(--accent-3); }
+  .footer-brand p { color: #bfe6c9; font-size: 13.5px; margin-top: 14px; max-width: 32ch; }
+  .footer-col h5 { font-size: 12.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #a8dcb2; margin-bottom: 18px; }
+  .footer-col ul { display: flex; flex-direction: column; gap: 11px; }
+  .footer-col a { font-size: 13.5px; color: #eafbe9; opacity: 0.85; }
+  .footer-col a:hover { opacity: 1; text-decoration: underline; }
+  .footer-bottom { display: flex; align-items: center; justify-content: space-between; padding-top: 28px; border-top: 1px solid rgba(255,255,255,0.15); flex-wrap: wrap; gap: 16px; }
+  .footer-bottom p { color: #a8dcb2; font-size: 12.5px; }
+  .social-row { display: flex; gap: 12px; }
+  .social-row a { width: 36px; height: 36px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; }
+  .social-row a svg { width: 16px; height: 16px; stroke: #eafbe9; }
+  .social-row a:hover { background: rgba(255,255,255,0.1); }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 1024px) {
+    .hero-inner { grid-template-columns: 1fr; }
+    .hero-visual { max-width: 340px; order: -1; }
+    .services-grid { grid-template-columns: repeat(2, 1fr); }
+    .product-grid { grid-template-columns: repeat(2, 1fr); }
+    .pricing-grid { grid-template-columns: repeat(2, 1fr); }
+    .solution-panel { grid-template-columns: 1fr; }
+    .contact-grid { grid-template-columns: 1fr; }
+    .footer-top { grid-template-columns: 1fr 1fr; }
+    .process-track { grid-template-columns: repeat(3, 1fr); row-gap: 40px; }
+    .process-track .connector { display: none; }
+  }
+  @media (max-width: 768px) {
+    .nav-links { display: none; }
+    .signin-link { display: none; }
+    .nav-actions .btn-primary { display: none; }
+    .hamburger { display: flex; }
+    .stat-row { grid-template-columns: repeat(2, 1fr); }
+    .services-grid { grid-template-columns: 1fr; }
+    .trust-grid { grid-template-columns: repeat(3, 1fr); }
+    .product-grid { grid-template-columns: 1fr; }
+    .pricing-grid { grid-template-columns: 1fr; }
+    section { padding: 68px 0; }
+    .process-track { grid-template-columns: 1fr 1fr; }
+    .footer-top { grid-template-columns: 1fr; gap: 32px; }
+    .form-row { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 480px) {
+    .stat-row { grid-template-columns: 1fr 1fr; }
+    .container { padding: 0 18px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+</style>
+<div class="page" data-js="pending">
+
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <div class="intro-loader" id="introLoader" aria-hidden="true">
+    <div class="loader-mark">
+      <div class="loader-ring"></div>
+      TECHBISS
+    </div>
+  </div>
+
+  <!-- ============ HEADER ============ -->
+  <header class="site-header">
+    <div class="container nav-inner">
+      <a href="#main" class="wordmark">
+        <span class="mark" aria-hidden="true"></span>
+        TECHBISS
+      </a>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="#services">Services</a>
+        <a href="#solutions">Solutions</a>
+        <a href="#marketplace">Marketplace</a>
+        <a href="#process">Process</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <div class="nav-actions">
+        <a href="#contact" class="signin-link">Sign in</a>
+        <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode">
+          <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+        </button>
+        <a href="#contact" class="btn btn-primary">Book a Consult</a>
+        <button class="hamburger" id="hamburgerBtn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="scrim" id="scrim"></div>
+  <nav class="mobile-menu" id="mobileMenu" aria-label="Mobile" aria-hidden="true">
+    <a href="#services">Services</a>
+    <a href="#solutions">Solutions</a>
+    <a href="#marketplace">Marketplace</a>
+    <a href="#process">Process</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#contact">Contact</a>
+    <div class="mm-actions">
+      <a href="#contact" class="signin-link">Sign in</a>
+      <a href="#contact" class="btn btn-primary">Book a Consult</a>
+    </div>
+  </nav>
+
+  <main id="main">
+    <!-- ============ HERO ============ -->
+    <section class="hero" aria-labelledby="hero-heading">
+      <div class="hero-grid-bg grid-field" aria-hidden="true">
+        <span class="grid-coord mono" style="top:8%; left:4%;">COL 01 / ROW 01</span>
+        <span class="grid-coord mono" style="top:62%; right:3%;">COL 11 / ROW 06</span>
+      </div>
+      <div class="container">
+        <div class="hero-inner">
+          <div>
+            <span class="eyebrow">
+              <span class="dot" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#06210c" stroke-width="2.5" stroke-linecap="round"><path d="M5 12l5 5L19 7"/></svg>
+              </span>
+              Sustainable infrastructure for global scale
+            </span>
+            <h1 id="hero-heading">Engineering the Next Global Economy, <em>Efficiently.</em></h1>
+            <p class="lede">TECHBISS designs and operates the cloud, AI, security, and data infrastructure that $10B+ enterprises run on — built for growth that scales without scaling waste.</p>
+            <div class="hero-ctas">
+              <a href="#contact" class="btn btn-primary">Start a Transformation</a>
+              <a href="#services" class="btn btn-secondary">Explore Services</a>
+            </div>
+          </div>
+          <div class="hero-visual" aria-hidden="true">
+            <svg class="growth-svg" viewBox="0 0 400 400" width="100%" height="100%">
+              <circle class="ring" cx="200" cy="200" r="80"></circle>
+              <circle class="ring" cx="200" cy="200" r="120"></circle>
+              <circle class="ring-accent" cx="200" cy="200" r="160" stroke="var(--accent-2)"></circle>
+              <line class="branch" x1="200" y1="200" x2="200" y2="70"></line>
+              <line class="branch" x1="200" y1="200" x2="313" y2="135"></line>
+              <line class="branch" x1="200" y1="200" x2="313" y2="265"></line>
+              <line class="branch" x1="200" y1="200" x2="200" y2="330"></line>
+              <line class="branch" x1="200" y1="200" x2="87" y2="265"></line>
+              <line class="branch" x1="200" y1="200" x2="87" y2="135"></line>
+              <line class="branch branch-sub" x1="200" y1="70" x2="248" y2="40"></line>
+              <line class="branch branch-sub" x1="313" y1="135" x2="352" y2="108"></line>
+              <line class="branch branch-sub" x1="313" y1="265" x2="352" y2="292"></line>
+              <circle class="node" cx="200" cy="70" r="7"></circle>
+              <circle class="node" cx="313" cy="135" r="7"></circle>
+              <circle class="node" cx="313" cy="265" r="7"></circle>
+              <circle class="node" cx="200" cy="330" r="7"></circle>
+              <circle class="node" cx="87" cy="265" r="7"></circle>
+              <circle class="node" cx="87" cy="135" r="7"></circle>
+              <circle class="node node-lg" cx="248" cy="40" r="5"></circle>
+              <circle class="node node-lg" cx="352" cy="108" r="5"></circle>
+              <circle class="node node-lg" cx="352" cy="292" r="5"></circle>
+              <circle class="core" cx="200" cy="200" r="22"></circle>
+            </svg>
+          </div>
+        </div>
+
+        <div class="stat-row grid-field" data-count-row>
+          <div class="stat-tile">
+            <div class="stat-value" data-count-to="120" data-suffix="+">0</div>
+            <div class="stat-label">Countries Operating</div>
+          </div>
+          <div class="stat-tile">
+            <div class="stat-value" data-count-to="4.2" data-prefix="$" data-suffix="T" data-decimals="1">$0T</div>
+            <div class="stat-label">Client AUM Modernized</div>
+          </div>
+          <div class="stat-tile">
+            <div class="stat-value" data-count-to="99.99" data-suffix="%" data-decimals="2">0%</div>
+            <div class="stat-label">Platform Uptime</div>
+          </div>
+          <div class="stat-tile">
+            <div class="stat-value" data-count-to="3400" data-suffix="+">0</div>
+            <div class="stat-label">Engineers &amp; Architects</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ TRUSTED BY ============ -->
+    <section class="trust-strip" aria-labelledby="trust-heading">
+      <div class="container">
+        <p class="trust-label mono" id="trust-heading">Trusted by category-defining enterprises</p>
+        <div class="trust-grid">
+          <div class="trust-logo"><span class="sq" aria-hidden="true"></span>Meridian Bank</div>
+          <div class="trust-logo"><span class="sq" aria-hidden="true"></span>Northfield Energy</div>
+          <div class="trust-logo"><span class="sq" aria-hidden="true"></span>Cascadia Health</div>
+          <div class="trust-logo"><span class="sq" aria-hidden="true"></span>Portline Logistics</div>
+          <div class="trust-logo"><span class="sq" aria-hidden="true"></span>Vantex Retail</div>
+          <div class="trust-logo"><span class="sq" aria-hidden="true"></span>Halcyon Telecom</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SERVICES ============ -->
+    <section id="services" aria-labelledby="services-heading">
+      <div class="container">
+        <div class="section-head reveal-init">
+          <span class="section-tag"><span class="grid-coord-inline mono">COL 02 / ROW 03</span> Capabilities</span>
+          <h2 id="services-heading">Six disciplines. One accountable platform.</h2>
+          <p>From core infrastructure to boardroom strategy, TECHBISS teams operate as a single accountable delivery system — not a stack of disconnected vendors.</p>
+        </div>
+
+        <div class="services-grid reveal-init">
+          <article class="service-card">
+            <div class="icon-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19a4.5 4.5 0 0 0 0-9 6 6 0 0 0-11.6-1.5A4.5 4.5 0 0 0 6.5 19h11z"/></svg>
+            </div>
+            <h3>Cloud &amp; Infrastructure Modernization</h3>
+            <p class="desc">We re-platform legacy estates onto elastic, carbon-aware cloud infrastructure engineered for resilience at global scale.</p>
+            <ul class="service-bullets">
+              <li>Multi-cloud architecture &amp; FinOps</li>
+              <li>Zero-downtime migration playbooks</li>
+              <li>Carbon-aware workload scheduling</li>
+            </ul>
+          </article>
+
+          <article class="service-card">
+            <div class="icon-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg>
+            </div>
+            <h3>AI &amp; Intelligent Automation</h3>
+            <p class="desc">We design and deploy production-grade AI agents and automation pipelines that compound operational efficiency, not headcount.</p>
+            <ul class="service-bullets">
+              <li>Applied LLM &amp; agent engineering</li>
+              <li>Process mining &amp; RPA at scale</li>
+              <li>Human-in-the-loop governance</li>
+            </ul>
+          </article>
+
+          <article class="service-card">
+            <div class="icon-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/></svg>
+            </div>
+            <h3>Cybersecurity &amp; Risk Engineering</h3>
+            <p class="desc">Zero-trust architectures and continuous threat engineering protect the infrastructure that global markets depend on.</p>
+            <ul class="service-bullets">
+              <li>Zero-trust identity &amp; access</li>
+              <li>24/7 threat detection &amp; response</li>
+              <li>Regulatory &amp; compliance engineering</li>
+            </ul>
+          </article>
+
+          <article class="service-card">
+            <div class="icon-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V10M10 19V5M16 19v-7M20 19H4"/></svg>
+            </div>
+            <h3>Data, Analytics &amp; AI Platforms</h3>
+            <p class="desc">We unify fragmented data estates into governed, real-time platforms that make every model and dashboard trustworthy.</p>
+            <ul class="service-bullets">
+              <li>Real-time data mesh &amp; lakehouse</li>
+              <li>Governed ML/AI platform operations</li>
+              <li>Embedded analytics &amp; BI</li>
+            </ul>
+          </article>
+
+          <article class="service-card">
+            <div class="icon-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6L3 12l5 6M16 6l5 6-5 6M13 4l-2 16"/></svg>
+            </div>
+            <h3>Enterprise Software Engineering</h3>
+            <p class="desc">Mission-critical software built and modernized by teams who ship at the pace enterprise operations actually demand.</p>
+            <ul class="service-bullets">
+              <li>Cloud-native application engineering</li>
+              <li>Legacy system re-platforming</li>
+              <li>API &amp; integration fabric</li>
+            </ul>
+          </article>
+
+          <article class="service-card">
+            <div class="icon-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 12l4.5-2.5L14 14l-4.5 2.5L12 12z"/></svg>
+            </div>
+            <h3>Digital Transformation Strategy &amp; Consulting</h3>
+            <p class="desc">We align technology roadmaps to growth targets and sustainability commitments boards can actually stand behind.</p>
+            <ul class="service-bullets">
+              <li>Operating model redesign</li>
+              <li>Sustainable IT roadmapping</li>
+              <li>Change &amp; capability enablement</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SOLUTIONS ============ -->
+    <section id="solutions" class="alt-surface" aria-labelledby="solutions-heading">
+      <div class="container">
+        <div class="section-head reveal-init">
+          <span class="section-tag"><span class="grid-coord-inline mono">COL 04 / ROW 05</span> Industries</span>
+          <h2 id="solutions-heading">Built for the industries running the world.</h2>
+          <p>Every industry has a different definition of uptime, risk, and growth. Our solutions are engineered around each one.</p>
+        </div>
+
+        <div class="reveal-init">
+          <div class="tab-chips" role="tablist" aria-label="Industries" id="solutionTabs">
+            <button class="tab-chip" role="tab" id="tab-fin" aria-selected="true" aria-controls="panel-solution" data-industry="fin" type="button">Financial Services</button>
+            <button class="tab-chip" role="tab" id="tab-health" aria-selected="false" aria-controls="panel-solution" data-industry="health" type="button">Healthcare &amp; Life Sciences</button>
+            <button class="tab-chip" role="tab" id="tab-mfg" aria-selected="false" aria-controls="panel-solution" data-industry="mfg" type="button">Manufacturing &amp; Supply Chain</button>
+            <button class="tab-chip" role="tab" id="tab-public" aria-selected="false" aria-controls="panel-solution" data-industry="public" type="button">Public Sector &amp; Government</button>
+            <button class="tab-chip" role="tab" id="tab-retail" aria-selected="false" aria-controls="panel-solution" data-industry="retail" type="button">Retail &amp; Commerce</button>
+            <button class="tab-chip" role="tab" id="tab-energy" aria-selected="false" aria-controls="panel-solution" data-industry="energy" type="button">Energy &amp; Utilities</button>
+          </div>
+
+          <div class="solution-panel" id="panel-solution" role="tabpanel" aria-labelledby="tab-fin">
+            <div>
+              <h3 id="solution-title">Financial Services</h3>
+              <p class="desc" id="solution-desc">We modernize core banking, trading, and settlement infrastructure for institutions that cannot afford downtime — with real-time risk and compliance built in from day one.</p>
+            </div>
+            <div class="solution-stats" id="solution-stats">
+              <div class="sol-stat"><span class="num">40%</span><span class="lbl">Faster settlement cycles</span></div>
+              <div class="sol-stat"><span class="num">180+</span><span class="lbl">Institutions modernized</span></div>
+              <div class="sol-stat"><span class="num">$4.2T</span><span class="lbl">Client AUM on TECHBISS platforms</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ MARKETPLACE ============ -->
+    <section id="marketplace" aria-labelledby="marketplace-heading">
+      <div class="container">
+        <div class="section-head reveal-init">
+          <span class="section-tag"><span class="grid-coord-inline mono">COL 06 / ROW 04</span> Marketplace</span>
+          <h2 id="marketplace-heading">Deployable modules. Not just consulting hours.</h2>
+          <p>Browse packaged automation, AI agents, and industry kits engineered by TECHBISS and vetted partners — ready to deploy into your stack.</p>
+        </div>
+
+        <div class="reveal-init">
+          <div class="filter-row" role="group" aria-label="Filter marketplace by category" id="filterRow">
+            <button class="filter-chip" aria-pressed="true" data-filter="all" type="button">All</button>
+            <button class="filter-chip" aria-pressed="false" data-filter="Automation Modules" type="button">Automation Modules</button>
+            <button class="filter-chip" aria-pressed="false" data-filter="AI Agents &amp; Copilots" type="button">AI Agents &amp; Copilots</button>
+            <button class="filter-chip" aria-pressed="false" data-filter="Industry Solution Kits" type="button">Industry Solution Kits</button>
+            <button class="filter-chip" aria-pressed="false" data-filter="Security &amp; Compliance Packs" type="button">Security &amp; Compliance Packs</button>
+            <button class="filter-chip" aria-pressed="false" data-filter="Integration Connectors" type="button">Integration Connectors</button>
+            <button class="filter-chip" aria-pressed="false" data-filter="Analytics Dashboards" type="button">Analytics Dashboards</button>
+          </div>
+
+          <div class="product-grid" id="productGrid"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PROCESS ============ -->
+    <section id="process" class="alt-surface" aria-labelledby="process-heading">
+      <div class="container">
+        <div class="section-head reveal-init">
+          <span class="section-tag"><span class="grid-coord-inline mono">COL 03 / ROW 07</span> Methodology</span>
+          <h2 id="process-heading">A six-step path from discovery to global scale.</h2>
+          <p>The same disciplined delivery model, whether we're modernizing one business unit or fourteen countries at once.</p>
+        </div>
+
+        <div class="process-track reveal-init" id="processTrack">
+          <div class="connector" aria-hidden="true"><div class="connector-fill" id="connectorFill"></div></div>
+
+          <div class="process-step" data-step="1">
+            <div class="step-marker">01</div>
+            <h3>Discover</h3>
+            <p>Map systems, risk, and growth targets against current architecture.</p>
+          </div>
+          <div class="process-step" data-step="2">
+            <div class="step-marker">02</div>
+            <h3>Architect</h3>
+            <p>Design target-state platform, security model, and data fabric.</p>
+          </div>
+          <div class="process-step" data-step="3">
+            <div class="step-marker">03</div>
+            <h3>Build</h3>
+            <p>Engineer the platform in sprints with continuous stakeholder review.</p>
+          </div>
+          <div class="process-step" data-step="4">
+            <div class="step-marker">04</div>
+            <h3>Migrate</h3>
+            <p>Move workloads and data with zero-downtime cutover playbooks.</p>
+          </div>
+          <div class="process-step" data-step="5">
+            <div class="step-marker">05</div>
+            <h3>Launch</h3>
+            <p>Go live with monitored rollout and 24/7 command-center coverage.</p>
+          </div>
+          <div class="process-step" data-step="6">
+            <div class="step-marker">06</div>
+            <h3>Scale</h3>
+            <p>Expand the platform across markets, units, and future workloads.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CASE STUDIES ============ -->
+    <section id="case-studies" aria-labelledby="case-heading">
+      <div class="container">
+        <div class="section-head reveal-init">
+          <span class="section-tag"><span class="grid-coord-inline mono">COL 08 / ROW 02</span> Proof</span>
+          <h2 id="case-heading">Results measured in quarters, not decks.</h2>
+          <p>Drag to explore how TECHBISS platforms performed inside four of the world's most demanding operating environments.</p>
+        </div>
+
+        <div class="carousel-wrap reveal-init">
+          <div class="carousel-track" id="carouselTrack" tabindex="0" role="region" aria-label="Case studies, scrollable">
+            <article class="case-card">
+              <div class="case-metric">40%</div>
+              <h3>Tier-1 Global Bank — Faster Settlement Cycles</h3>
+              <div class="case-grid">
+                <div><h4>Challenge</h4><p>Legacy settlement infrastructure created multi-day delays and compliance exposure across 30 markets.</p></div>
+                <div><h4>Approach</h4><p>Re-architected core settlement onto a real-time, event-driven platform with embedded regulatory controls.</p></div>
+                <div><h4>Result</h4><p>Settlement cycles cut 40%, with zero critical incidents during an 11-month phased cutover.</p></div>
+                <div><h4>Scope</h4><p>180+ integrated systems, 6,200 users onboarded.</p></div>
+              </div>
+            </article>
+            <article class="case-card">
+              <div class="case-metric">27%</div>
+              <h3>Pan-Continental Logistics Network — Cost Reduction</h3>
+              <div class="case-grid">
+                <div><h4>Challenge</h4><p>Fragmented routing and warehouse systems drove excess fuel spend and idle fleet time.</p></div>
+                <div><h4>Approach</h4><p>Deployed an AI-driven routing and inventory platform with real-time carbon and cost telemetry.</p></div>
+                <div><h4>Result</h4><p>27% reduction in operating cost and a measurable drop in fleet emissions per shipment.</p></div>
+                <div><h4>Scope</h4><p>1,400 vehicles, 62 distribution hubs.</p></div>
+              </div>
+            </article>
+            <article class="case-card">
+              <div class="case-metric">14</div>
+              <h3>Multinational Telecom Group — Countries Migrated</h3>
+              <div class="case-grid">
+                <div><h4>Challenge</h4><p>Disparate national data centers blocked a unified customer and network experience.</p></div>
+                <div><h4>Approach</h4><p>Ran a phased multi-cloud migration with local data-residency compliance built into every region.</p></div>
+                <div><h4>Result</h4><p>Unified cloud backbone live across 14 countries, cutting infrastructure spend by a third.</p></div>
+                <div><h4>Scope</h4><p>38M subscribers migrated with no service interruption.</p></div>
+              </div>
+            </article>
+            <article class="case-card">
+              <div class="case-metric">1</div>
+              <h3>Regional Healthcare Network — Interoperable Data Platform</h3>
+              <div class="case-grid">
+                <div><h4>Challenge</h4><p>Patient data was siloed across 46 facilities on incompatible legacy record systems.</p></div>
+                <div><h4>Approach</h4><p>Built a governed, standards-based interoperability layer connecting every facility in real time.</p></div>
+                <div><h4>Result</h4><p>One unified patient record platform, improving care coordination across the entire network.</p></div>
+                <div><h4>Scope</h4><p>46 facilities, 2.1M patient records unified.</p></div>
+              </div>
+            </article>
+          </div>
+          <div class="carousel-dots" id="carouselDots"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PRICING ============ -->
+    <section id="pricing" class="alt-surface" aria-labelledby="pricing-heading">
+      <div class="container">
+        <div class="section-head reveal-init" style="margin-left:auto;margin-right:auto;text-align:center;">
+          <span class="section-tag" style="justify-content:center;"><span class="grid-coord-inline mono">COL 05 / ROW 09</span> Pricing</span>
+          <h2 id="pricing-heading">Platform pricing that scales with you.</h2>
+          <p style="margin-left:auto;margin-right:auto;">Every tier includes the core TECHBISS platform, security baseline, and support SLA.</p>
+        </div>
+
+        <div class="price-toggle-row reveal-init">
+          <span id="monthlyLabel" class="active">Monthly</span>
+          <button class="switch" id="billingSwitch" role="switch" aria-checked="false" aria-label="Toggle annual billing" type="button">
+            <span class="knob"></span>
+          </button>
+          <span id="annualLabel">Annual</span>
+          <span class="save-badge">Save ~18%</span>
+        </div>
+
+        <div class="pricing-grid reveal-init">
+          <div class="price-card">
+            <h3>Starter</h3>
+            <div class="price-amount"><span class="price-currency">$</span><span class="price-num" data-monthly="2400" data-annual="1968">2,400</span><span>/mo</span></div>
+            <p class="tagline">For single business units modernizing core workloads.</p>
+            <ul class="price-features">
+              <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L19 7"/></svg>Single-cloud deployment</li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L19 7"/></svg>Standard security baseline</li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L19 7"/></svg>Business-hours support</li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L19 7"/></svg>5 marketplace modules</li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L19 7"/></svg>Quarterly platform review</li>
+            </ul>
+            <a href="#contact" class="btn btn-ghost">Get Started</a>
+          </div>
+
+          <div class="price-card">
+            <h3>Growth</h3>
+            <div class="price-amount"><span class="price-currency">$</span><span class="price-num" data-monthly="7800" data-annual="6396">7,800</span><span>/mo</span></div>
+            <p class="tagline">For scaling enterprises running multi-region workloads.</p>
+            <ul class="price-features">
+              <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L19 7"/></svg>Multi-cloud deployment</li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L19 7"/></svg>Advanced threat monitoring</li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L19 7"/></svg>24/5 priority support</li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L19 7"/></svg>Unlimited marketplace modules</li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L19 7"/></svg>Dedicated solutions architect</li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L19 7"/></svg>Monthly platform review</li>
+            </ul>
+            <a href="#contact" class="btn btn-ghost">Get Started</a>
+          </div>
+
+          <div class="price-card is-recommended">
+            <span class="rec-badge">Most Popular</span>
+            <h3>Enterprise</h3>
+            <div class="price-amount"><span class="price-currency">$</span><span class="price-num" data-monthly="22000" data-annual="18040">22,000</span><span>/mo</span></div>
+            <p class="tagline">For global operations with mission-critical uptime needs.</p>
+            <ul class="price-features">
+              <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L19 7"/></svg>Global multi-region deployment</li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L19 7"/></svg>Zero-trust security suite</li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L19 7"/></svg>24/7/365 dedicated support</li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L19 7"/></svg>Custom marketplace bundles</li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L19 7"/></svg>Embedded delivery team</li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L19 7"/></svg>99.99% uptime SLA</li>
+            </ul>
+            <a href="#contact" class="btn btn-primary">Get Started</a>
+          </div>
+
+          <div class="price-card">
+            <h3>Global Scale</h3>
+            <div class="price-amount" style="font-size:26px;">Custom</div>
+            <p class="tagline">For $10B+ organizations operating across dozens of markets.</p>
+            <ul class="price-features">
+              <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L19 7"/></svg>Sovereign &amp; regional cloud options</li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L19 7"/></svg>Custom compliance engineering</li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L19 7"/></svg>On-site executive delivery office</li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L19 7"/></svg>Board-level governance reporting</li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L19 7"/></svg>Custom SLA negotiation</li>
+            </ul>
+            <a href="#contact" class="btn btn-ghost">Talk to Sales</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ FAQ ============ -->
+    <section id="faq" aria-labelledby="faq-heading">
+      <div class="container">
+        <div class="section-head reveal-init">
+          <span class="section-tag"><span class="grid-coord-inline mono">COL 02 / ROW 11</span> FAQ</span>
+          <h2 id="faq-heading">Common questions from transformation leads.</h2>
+        </div>
+
+        <div class="faq-list reveal-init" id="faqList">
+          <div class="faq-item" data-open="false">
+            <h3><button class="faq-q" aria-expanded="false" type="button">How long does a typical modernization engagement take?<span class="plus" aria-hidden="true"></span></button></h3>
+            <div class="faq-a"><div class="faq-a-inner">Most enterprise engagements run 6-18 months from Discover to Launch, depending on scope, with Scale continuing as an ongoing managed service. Smaller Growth-tier engagements can reach production in as little as 10 weeks.</div></div>
+          </div>
+          <div class="faq-item" data-open="false">
+            <h3><button class="faq-q" aria-expanded="false" type="button">Can we deploy marketplace modules without a full consulting engagement?<span class="plus" aria-hidden="true"></span></button></h3>
+            <div class="faq-a"><div class="faq-a-inner">Yes. Marketplace modules, AI agents, and connectors are self-serve and can be deployed directly into your existing environment, with optional implementation support from a TECHBISS solutions architect.</div></div>
+          </div>
+          <div class="faq-item" data-open="false">
+            <h3><button class="faq-q" aria-expanded="false" type="button">How does TECHBISS handle data residency and sovereignty requirements?<span class="plus" aria-hidden="true"></span></button></h3>
+            <div class="faq-a"><div class="faq-a-inner">Our Global Scale tier includes sovereign and regional cloud deployment options engineered to meet local data-residency law in every market we operate, with compliance controls embedded at the architecture level rather than bolted on afterward.</div></div>
+          </div>
+          <div class="faq-item" data-open="false">
+            <h3><button class="faq-q" aria-expanded="false" type="button">What does "carbon-aware infrastructure" actually mean in practice?<span class="plus" aria-hidden="true"></span></button></h3>
+            <div class="faq-a"><div class="faq-a-inner">We schedule elastic workloads against real-time regional grid carbon intensity and right-size compute continuously, which typically reduces both energy draw and cloud spend simultaneously — efficiency and sustainability are the same lever.</div></div>
+          </div>
+          <div class="faq-item" data-open="false">
+            <h3><button class="faq-q" aria-expanded="false" type="button">Do you offer a proof-of-concept before a full contract?<span class="plus" aria-hidden="true"></span></button></h3>
+            <div class="faq-a"><div class="faq-a-inner">Enterprise and Global Scale prospects can run a scoped, time-boxed proof-of-concept against a real workload before committing — most convert to a full engagement within one quarter.</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CONTACT ============ -->
+    <section id="contact" class="alt-surface" aria-labelledby="contact-heading">
+      <div class="container">
+        <div class="section-head reveal-init">
+          <span class="section-tag"><span class="grid-coord-inline mono">COL 07 / ROW 12</span> Contact</span>
+          <h2 id="contact-heading">Tell us what you're building.</h2>
+          <p>A solutions architect will respond within one business day.</p>
+        </div>
+
+        <div class="contact-grid reveal-init">
+          <div class="contact-info">
+            <div class="contact-info-item">
+              <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0zM2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20z"/></svg></span>
+              <div><h4>Global Headquarters</h4><p>One Meridian Plaza, Singapore &amp; Amsterdam — regional offices in 41 countries.</p></div>
+            </div>
+            <div class="contact-info-item">
+              <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4zM4 4l8 8 8-8"/></svg></span>
+              <div><h4>Sales &amp; Partnerships</h4><p>partnerships@techbiss.example — response within one business day.</p></div>
+            </div>
+            <div class="contact-info-item">
+              <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span>
+              <div><h4>Support SLA</h4><p>24/7/365 coverage for Enterprise and Global Scale customers.</p></div>
+            </div>
+          </div>
+
+          <form class="contact-form" id="contactForm" novalidate>
+            <span class="grid-coord mono" style="top:10px; left:12px;">COL 01 / ROW 01</span>
+            <div class="form-row">
+              <div class="field" id="field-name">
+                <label for="fld-name">Full name</label>
+                <input type="text" id="fld-name" name="name" autocomplete="name" required aria-required="true" />
+                <div class="field-error" role="alert">Please enter your name.</div>
+              </div>
+              <div class="field" id="field-email">
+                <label for="fld-email">Work email</label>
+                <input type="email" id="fld-email" name="email" autocomplete="email" required aria-required="true" />
+                <div class="field-error" role="alert">Please enter a valid email address.</div>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="field" id="field-company">
+                <label for="fld-company">Company</label>
+                <input type="text" id="fld-company" name="company" autocomplete="organization" required aria-required="true" />
+                <div class="field-error" role="alert">Please enter your company name.</div>
+              </div>
+              <div class="field" id="field-region">
+                <label for="fld-region">Region</label>
+                <select id="fld-region" name="region" required aria-required="true">
+                  <option value="">Select a region</option>
+                  <option value="namer">North America</option>
+                  <option value="emea">Europe, Middle East &amp; Africa</option>
+                  <option value="apac">Asia-Pacific</option>
+                  <option value="latam">Latin America</option>
+                </select>
+                <div class="field-error" role="alert">Please select a region.</div>
+              </div>
+            </div>
+            <div class="form-row full">
+              <div class="field" id="field-message">
+                <label for="fld-message">Tell us about your transformation goals</label>
+                <textarea id="fld-message" name="message" required aria-required="true"></textarea>
+                <div class="field-error" role="alert">Please enter a short message.</div>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%;">Submit Inquiry</button>
+            <div class="form-success" id="formSuccess" role="status">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L19 7"/></svg>
+              Thanks — your inquiry has been received. A solutions architect will reach out shortly.
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <a href="#main" class="wordmark">
+            <span class="mark" aria-hidden="true"></span>
+            TECHBISS
+          </a>
+          <p>Engineering the cloud, AI, and data infrastructure the next global economy runs on — built for growth that doesn't cost the planet.</p>
+        </div>
+        <div class="footer-col">
+          <h5>Company</h5>
+          <ul>
+            <li><a href="#main">About</a></li>
+            <li><a href="#main">Careers</a></li>
+            <li><a href="#main">Newsroom</a></li>
+            <li><a href="#main">Sustainability</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>Solutions</h5>
+          <ul>
+            <li><a href="#solutions">Financial Services</a></li>
+            <li><a href="#solutions">Healthcare &amp; Life Sciences</a></li>
+            <li><a href="#solutions">Manufacturing</a></li>
+            <li><a href="#solutions">Public Sector</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>Resources</h5>
+          <ul>
+            <li><a href="#main">Blog</a></li>
+            <li><a href="#case-studies">Case Studies</a></li>
+            <li><a href="#marketplace">Marketplace</a></li>
+            <li><a href="#main">Documentation</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>Legal</h5>
+          <ul>
+            <li><a href="#main">Privacy Policy</a></li>
+            <li><a href="#main">Terms of Service</a></li>
+            <li><a href="#main">Security</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 TECHBISS Global Holdings. All rights reserved. Registered in Singapore &amp; the Netherlands.</p>
+        <div class="social-row">
+          <a href="#main" aria-label="TECHBISS on LinkedIn"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 11v5M8 8v.01M12 16v-5M16 16v-3a2 2 0 0 0-4 0"/></svg></a>
+          <a href="#main" aria-label="TECHBISS on X"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4l16 16M20 4L4 20"/></svg></a>
+          <a href="#main" aria-label="TECHBISS on GitHub"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a>
+          <a href="#main" aria-label="TECHBISS on YouTube"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="3"/><path d="M10 9.5l5 2.5-5 2.5z"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ============ MODAL ============ -->
+  <div class="modal-scrim" id="modalScrim">
+    <div class="modal-box" id="modalBox" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button class="modal-close" id="modalClose" type="button" aria-label="Close dialog">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19"/></svg>
+      </button>
+      <span class="modal-cat" id="modalCat">Category</span>
+      <h3 id="modalTitle">Product Name</h3>
+      <p class="modal-vendor" id="modalVendor">Vendor</p>
+      <p class="desc" id="modalDesc">Description</p>
+      <div class="modal-price-row">
+        <span class="modal-price" id="modalPrice">$0</span>
+        <span class="product-rating" id="modalRating">★ 4.8</span>
+      </div>
+      <button class="btn btn-primary" id="modalPurchase" type="button" style="width:100%;">Purchase</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12l5 5L19 7"/></svg>
+    <span id="toastText">Purchase complete.</span>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var doc = document;
+  var root = doc.documentElement;
+  var page = doc.querySelector(".page");
+  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- THEME ---------- */
+  var THEME_KEY = "techbiss-theme";
+  function applyTheme(t) {
+    if (t === "dark" || t === "light") {
+      root.setAttribute("data-theme", t);
+    } else {
+      root.removeAttribute("data-theme");
+    }
+  }
+  function getStoredTheme() {
+    try { return localStorage.getItem(THEME_KEY); } catch (e) { return null; }
+  }
+  function storeTheme(t) {
+    try { localStorage.setItem(THEME_KEY, t); } catch (e) {}
+  }
+  applyTheme(getStoredTheme());
+
+  var themeToggle = doc.getElementById("themeToggle");
+  themeToggle.addEventListener("click", function () {
+    var current = root.getAttribute("data-theme");
+    var systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    var effectiveDark = current ? current === "dark" : systemDark;
+    var next = effectiveDark ? "light" : "dark";
+    applyTheme(next);
+    storeTheme(next);
+  });
+
+  /* ---------- INTRO LOADER ---------- */
+  var loader = doc.getElementById("introLoader");
+  if (!reduceMotion) {
+    loader.classList.add("is-active");
+    loader.setAttribute("aria-hidden", "false");
+    window.setTimeout(function () {
+      loader.classList.add("is-leaving");
+      window.setTimeout(function () {
+        loader.classList.remove("is-active", "is-leaving");
+        loader.setAttribute("aria-hidden", "true");
+      }, 520);
+    }, 900);
+  }
+
+  /* Enable JS-driven entrance animation (hero growth graphic) */
+  window.requestAnimationFrame(function () {
+    page.classList.add("js-animate");
+  });
+
+  /* ---------- MOBILE MENU ---------- */
+  var hamburger = doc.getElementById("hamburgerBtn");
+  var mobileMenu = doc.getElementById("mobileMenu");
+  var scrim = doc.getElementById("scrim");
+
+  function openMenu() {
+    mobileMenu.classList.add("is-open");
+    mobileMenu.setAttribute("aria-hidden", "false");
+    scrim.classList.add("is-open");
+    hamburger.setAttribute("aria-expanded", "true");
+  }
+  function closeMenu() {
+    mobileMenu.classList.remove("is-open");
+    mobileMenu.setAttribute("aria-hidden", "true");
+    scrim.classList.remove("is-open");
+    hamburger.setAttribute("aria-expanded", "false");
+  }
+  hamburger.addEventListener("click", function () {
+    if (mobileMenu.classList.contains("is-open")) { closeMenu(); } else { openMenu(); }
+  });
+  scrim.addEventListener("click", closeMenu);
+  mobileMenu.querySelectorAll("a").forEach(function (a) {
+    a.addEventListener("click", closeMenu);
+  });
+  doc.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && mobileMenu.classList.contains("is-open")) { closeMenu(); }
+  });
+
+  /* ---------- SCROLL REVEAL ---------- */
+  var revealTargets = doc.querySelectorAll(".reveal-init");
+  if ("IntersectionObserver" in window && !reduceMotion) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-revealed");
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: "0px 0px -60px 0px" });
+    revealTargets.forEach(function (el) { io.observe(el); });
+  } else {
+    revealTargets.forEach(function (el) { el.classList.add("is-revealed"); });
+  }
+
+  /* ---------- STAT COUNTERS ---------- */
+  function formatNumber(val, decimals) {
+    return val.toLocaleString("en-US", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+  }
+  function animateCount(el) {
+    var target = parseFloat(el.getAttribute("data-count-to"));
+    var decimals = parseInt(el.getAttribute("data-decimals") || "0", 10);
+    var prefix = el.getAttribute("data-prefix") || "";
+    var suffix = el.getAttribute("data-suffix") || "";
+    if (reduceMotion) {
+      el.textContent = prefix + formatNumber(target, decimals) + suffix;
+      return;
+    }
+    var duration = 1600;
+    var start = null;
+    function step(ts) {
+      if (start === null) { start = ts; }
+      var progress = Math.min((ts - start) / duration, 1);
+      var eased = 1 - Math.pow(1 - progress, 3);
+      var val = target * eased;
+      el.textContent = prefix + formatNumber(val, decimals) + suffix;
+      if (progress < 1) { window.requestAnimationFrame(step); }
+    }
+    window.requestAnimationFrame(step);
+  }
+  var statRow = doc.querySelector("[data-count-row]");
+  if (statRow) {
+    if ("IntersectionObserver" in window) {
+      var statIo = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            statRow.querySelectorAll("[data-count-to]").forEach(animateCount);
+            statIo.unobserve(statRow);
+          }
+        });
+      }, { threshold: 0.4 });
+      statIo.observe(statRow);
+    } else {
+      statRow.querySelectorAll("[data-count-to]").forEach(animateCount);
+    }
+  }
+
+  /* ---------- SOLUTIONS TABS ---------- */
+  var industryData = {
+    fin: {
+      title: "Financial Services",
+      desc: "We modernize core banking, trading, and settlement infrastructure for institutions that cannot afford downtime — with real-time risk and compliance built in from day one.",
+      stats: [["40%", "Faster settlement cycles"], ["180+", "Institutions modernized"], ["$4.2T", "Client AUM on TECHBISS platforms"]]
+    },
+    health: {
+      title: "Healthcare & Life Sciences",
+      desc: "We connect fragmented clinical and research systems into interoperable, standards-based platforms that improve care coordination without compromising patient privacy.",
+      stats: [["46", "Facilities unified per network"], ["2.1M+", "Patient records interoperable"], ["100%", "HIPAA/GDPR-aligned architecture"]]
+    },
+    mfg: {
+      title: "Manufacturing & Supply Chain",
+      desc: "Real-time visibility across plants, fleets, and suppliers — powered by AI-driven forecasting and carbon-aware logistics optimization.",
+      stats: [["27%", "Average logistics cost reduction"], ["62", "Distribution hubs connected"], ["1,400+", "Vehicles under optimized routing"]]
+    },
+    public: {
+      title: "Public Sector & Government",
+      desc: "Secure, sovereign digital infrastructure for citizen services, built to meet the highest compliance and resilience bar in government IT.",
+      stats: [["41", "Countries with regional operations"], ["99.99%", "Platform uptime SLA"], ["Zero-trust", "Security architecture standard"]]
+    },
+    retail: {
+      title: "Retail & Commerce",
+      desc: "Unified commerce platforms connecting inventory, payments, and personalization across every channel — engineered for peak-season scale.",
+      stats: [["3.2x", "Peak-load elasticity"], ["120+", "Countries in commerce footprint"], ["18%", "Average conversion lift"]]
+    },
+    energy: {
+      title: "Energy & Utilities",
+      desc: "Grid-aware infrastructure and predictive maintenance platforms that help utilities modernize while actively reducing operational carbon footprint.",
+      stats: [["1", "Unified grid telemetry platform"], ["31%", "Reduction in unplanned downtime"], ["Carbon-aware", "Workload scheduling built in"]]
+    }
+  };
+  var tabButtons = doc.querySelectorAll("#solutionTabs .tab-chip");
+  var solutionTitle = doc.getElementById("solution-title");
+  var solutionDesc = doc.getElementById("solution-desc");
+  var solutionStats = doc.getElementById("solution-stats");
+  function selectIndustry(key, btn) {
+    var data = industryData[key];
+    if (!data) { return; }
+    tabButtons.forEach(function (b) { b.setAttribute("aria-selected", "false"); });
+    btn.setAttribute("aria-selected", "true");
+    solutionTitle.textContent = data.title;
+    solutionDesc.textContent = data.desc;
+    solutionStats.innerHTML = "";
+    data.stats.forEach(function (pair) {
+      var row = doc.createElement("div");
+      row.className = "sol-stat";
+      row.innerHTML = '<span class="num">' + pair[0] + '</span><span class="lbl">' + pair[1] + "</span>";
+      solutionStats.appendChild(row);
+    });
+    doc.getElementById("panel-solution").setAttribute("aria-labelledby", btn.id);
+  }
+  tabButtons.forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      selectIndustry(btn.getAttribute("data-industry"), btn);
+    });
+  });
+
+  /* ---------- MARKETPLACE ---------- */
+  var products = [
+    { id: "p1", name: "FlowForge Automation Suite", vendor: "Meridian Ops", category: "Automation Modules", rating: 4.8, price: 12400, blurb: "Orchestrate cross-system workflows with a visual automation builder and 200+ prebuilt connectors." },
+    { id: "p2", name: "Nimbus Copilot", vendor: "Arboreal AI", category: "AI Agents & Copilots", rating: 4.9, price: 24000, blurb: "A deployable enterprise AI agent trained on your operating procedures, with human-in-the-loop guardrails." },
+    { id: "p3", name: "RetailEdge Kit", vendor: "Canopy Systems", category: "Industry Solution Kits", rating: 4.6, price: 18500, blurb: "A full commerce stack pre-configured for omnichannel retail — inventory, payments, and personalization." },
+    { id: "p4", name: "SentinelPack Compliance", vendor: "Ironleaf Security", category: "Security & Compliance Packs", rating: 4.7, price: 9800, blurb: "Automated compliance evidence collection mapped to SOC 2, ISO 27001, and GDPR controls." },
+    { id: "p5", name: "BridgeConnect Integrator", vendor: "Rootway Labs", category: "Integration Connectors", rating: 4.5, price: 1200, blurb: "Lightweight connector framework linking legacy ERPs to modern cloud-native services." },
+    { id: "p6", name: "ClearCanopy Analytics", vendor: "Greenfield Data Co.", category: "Analytics Dashboards", rating: 4.8, price: 48000, blurb: "Enterprise-grade, governed BI suite with real-time sustainability and operations dashboards." }
+  ];
+  var productGrid = doc.getElementById("productGrid");
+  function starString(rating) {
+    return "★ " + rating.toFixed(1);
+  }
+  function renderProducts(filter) {
+    productGrid.innerHTML = "";
+    products
+      .filter(function (p) { return filter === "all" || p.category === filter; })
+      .forEach(function (p) {
+        var card = doc.createElement("button");
+        card.type = "button";
+        card.className = "product-card";
+        card.setAttribute("data-id", p.id);
+        card.innerHTML =
+          '<span class="product-cat">' + p.category + '</span>' +
+          "<h3>" + p.name + "</h3>" +
+          '<p class="product-vendor">by ' + p.vendor + "</p>" +
+          '<p class="product-blurb">' + p.blurb + "</p>" +
+          '<div class="product-foot">' +
+            '<span class="product-rating">' + starString(p.rating) + '</span>' +
+            '<span class="product-price">$' + p.price.toLocaleString("en-US") + '</span>' +
+          "</div>";
+        card.addEventListener("click", function () { openModal(p); });
+        productGrid.appendChild(card);
+      });
+  }
+  var filterRow = doc.getElementById("filterRow");
+  filterRow.querySelectorAll(".filter-chip").forEach(function (chip) {
+    chip.addEventListener("click", function () {
+      filterRow.querySelectorAll(".filter-chip").forEach(function (c) { c.setAttribute("aria-pressed", "false"); });
+      chip.setAttribute("aria-pressed", "true");
+      renderProducts(chip.getAttribute("data-filter"));
+    });
+  });
+  renderProducts("all");
+
+  /* ---------- MODAL (focus trap) ---------- */
+  var modalScrim = doc.getElementById("modalScrim");
+  var modalBox = doc.getElementById("modalBox");
+  var modalClose = doc.getElementById("modalClose");
+  var modalPurchase = doc.getElementById("modalPurchase");
+  var lastFocused = null;
+  var currentProduct = null;
+
+  function openModal(product) {
+    currentProduct = product;
+    doc.getElementById("modalCat").textContent = product.category;
+    doc.getElementById("modalTitle").textContent = product.name;
+    doc.getElementById("modalVendor").textContent = "by " + product.vendor;
+    doc.getElementById("modalDesc").textContent = product.blurb;
+    doc.getElementById("modalPrice").textContent = "$" + product.price.toLocaleString("en-US");
+    doc.getElementById("modalRating").textContent = starString(product.rating);
+    lastFocused = doc.activeElement;
+    modalScrim.classList.add("is-open");
+    modalClose.focus();
+    doc.addEventListener("keydown", modalKeydown);
+  }
+  function closeModal() {
+    modalScrim.classList.remove("is-open");
+    doc.removeEventListener("keydown", modalKeydown);
+    if (lastFocused) { lastFocused.focus(); }
+  }
+  function getFocusable() {
+    return modalBox.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+  }
+  function modalKeydown(e) {
+    if (e.key === "Escape") { closeModal(); return; }
+    if (e.key === "Tab") {
+      var focusable = getFocusable();
+      if (!focusable.length) { return; }
+      var first = focusable[0];
+      var last = focusable[focusable.length - 1];
+      if (e.shiftKey && doc.activeElement === first) {
+        e.preventDefault(); last.focus();
+      } else if (!e.shiftKey && doc.activeElement === last) {
+        e.preventDefault(); first.focus();
+      }
+    }
+  }
+  modalClose.addEventListener("click", closeModal);
+  modalScrim.addEventListener("click", function (e) { if (e.target === modalScrim) { closeModal(); } });
+
+  var toast = doc.getElementById("toast");
+  var toastText = doc.getElementById("toastText");
+  var toastTimer = null;
+  function showToast(msg) {
+    toastText.textContent = msg;
+    toast.classList.add("is-visible");
+    if (toastTimer) { window.clearTimeout(toastTimer); }
+    toastTimer = window.setTimeout(function () { toast.classList.remove("is-visible"); }, 3200);
+  }
+  modalPurchase.addEventListener("click", function () {
+    if (currentProduct) {
+      showToast("Purchased " + currentProduct.name + " — confirmation sent to your inbox.");
+    }
+    closeModal();
+  });
+
+  /* ---------- PROCESS SCROLL PROGRESS ---------- */
+  var processTrack = doc.getElementById("processTrack");
+  var connectorFill = doc.getElementById("connectorFill");
+  var processSteps = processTrack.querySelectorAll(".process-step");
+  function updateProcessProgress() {
+    var rect = processTrack.getBoundingClientRect();
+    var vh = window.innerHeight || doc.documentElement.clientHeight;
+    var total = rect.height + vh * 0.6;
+    var traveled = vh * 0.8 - rect.top;
+    var pct = Math.max(0, Math.min(1, traveled / total));
+    connectorFill.style.width = (pct * 100) + "%";
+    var activeCount = Math.round(pct * processSteps.length);
+    processSteps.forEach(function (step, i) {
+      step.classList.toggle("is-active", i < activeCount);
+    });
+  }
+  var processTicking = false;
+  function onScrollProcess() {
+    if (!processTicking) {
+      window.requestAnimationFrame(function () { updateProcessProgress(); processTicking = false; });
+      processTicking = true;
+    }
+  }
+  window.addEventListener("scroll", onScrollProcess, { passive: true });
+  window.addEventListener("resize", onScrollProcess);
+  updateProcessProgress();
+
+  /* ---------- CASE STUDY DRAG CAROUSEL ---------- */
+  var track = doc.getElementById("carouselTrack");
+  var dotsWrap = doc.getElementById("carouselDots");
+  var cards = track.querySelectorAll(".case-card");
+  cards.forEach(function (_, i) {
+    var dot = doc.createElement("button");
+    dot.type = "button";
+    dot.setAttribute("aria-label", "Go to case study " + (i + 1));
+    if (i === 0) { dot.setAttribute("aria-current", "true"); }
+    dot.addEventListener("click", function () {
+      cards[i].scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", inline: "start", block: "nearest" });
+    });
+    dotsWrap.appendChild(dot);
+  });
+  var dots = dotsWrap.querySelectorAll("button");
+  function updateDots() {
+    var scrollLeft = track.scrollLeft;
+    var closest = 0;
+    var closestDist = Infinity;
+    cards.forEach(function (card, i) {
+      var dist = Math.abs(card.offsetLeft - scrollLeft);
+      if (dist < closestDist) { closestDist = dist; closest = i; }
+    });
+    dots.forEach(function (d, i) { d.setAttribute("aria-current", i === closest ? "true" : "false"); });
+  }
+  var trackTicking = false;
+  track.addEventListener("scroll", function () {
+    if (!trackTicking) {
+      window.requestAnimationFrame(function () { updateDots(); trackTicking = false; });
+      trackTicking = true;
+    }
+  }, { passive: true });
+
+  var isDown = false, startX = 0, scrollStart = 0, dragMoved = false;
+  function dragStart(x) {
+    isDown = true; dragMoved = false;
+    startX = x; scrollStart = track.scrollLeft;
+    track.classList.add("is-dragging");
+  }
+  function dragMove(x) {
+    if (!isDown) { return; }
+    var delta = x - startX;
+    if (Math.abs(delta) > 4) { dragMoved = true; }
+    track.scrollLeft = scrollStart - delta;
+  }
+  function dragEnd() {
+    isDown = false;
+    track.classList.remove("is-dragging");
+  }
+  track.addEventListener("mousedown", function (e) { dragStart(e.pageX); });
+  window.addEventListener("mousemove", function (e) { dragMove(e.pageX); });
+  window.addEventListener("mouseup", dragEnd);
+  track.addEventListener("touchstart", function (e) { dragStart(e.touches[0].pageX); }, { passive: true });
+  track.addEventListener("touchmove", function (e) { dragMove(e.touches[0].pageX); }, { passive: true });
+  track.addEventListener("touchend", dragEnd);
+  track.addEventListener("click", function (e) { if (dragMoved) { e.preventDefault(); e.stopPropagation(); } }, true);
+
+  /* ---------- PRICING TOGGLE ---------- */
+  var billingSwitch = doc.getElementById("billingSwitch");
+  var monthlyLabel = doc.getElementById("monthlyLabel");
+  var annualLabel = doc.getElementById("annualLabel");
+  var priceNums = doc.querySelectorAll(".price-num");
+  function setBilling(annual) {
+    billingSwitch.setAttribute("aria-checked", annual ? "true" : "false");
+    monthlyLabel.classList.toggle("active", !annual);
+    annualLabel.classList.toggle("active", annual);
+    priceNums.forEach(function (el) {
+      var target = parseInt(el.getAttribute(annual ? "data-annual" : "data-monthly"), 10);
+      var start = parseInt((el.textContent || "0").replace(/,/g, ""), 10) || 0;
+      if (reduceMotion) {
+        el.textContent = target.toLocaleString("en-US");
+        return;
+      }
+      var duration = 420;
+      var t0 = null;
+      function step(ts) {
+        if (t0 === null) { t0 = ts; }
+        var progress = Math.min((ts - t0) / duration, 1);
+        var val = Math.round(start + (target - start) * progress);
+        el.textContent = val.toLocaleString("en-US");
+        if (progress < 1) { window.requestAnimationFrame(step); }
+      }
+      window.requestAnimationFrame(step);
+    });
+  }
+  billingSwitch.addEventListener("click", function () {
+    setBilling(billingSwitch.getAttribute("aria-checked") !== "true");
+  });
+
+  /* ---------- FAQ ACCORDION ---------- */
+  var faqItems = doc.querySelectorAll(".faq-item");
+  faqItems.forEach(function (item) {
+    var btn = item.querySelector(".faq-q");
+    var answer = item.querySelector(".faq-a");
+    var inner = item.querySelector(".faq-a-inner");
+    btn.addEventListener("click", function () {
+      var isOpen = item.getAttribute("data-open") === "true";
+      faqItems.forEach(function (other) {
+        other.setAttribute("data-open", "false");
+        other.querySelector(".faq-q").setAttribute("aria-expanded", "false");
+        other.querySelector(".faq-a").style.maxHeight = "0px";
+      });
+      if (!isOpen) {
+        item.setAttribute("data-open", "true");
+        btn.setAttribute("aria-expanded", "true");
+        answer.style.maxHeight = inner.scrollHeight + "px";
+      }
+    });
+  });
+
+  /* ---------- CONTACT FORM VALIDATION ---------- */
+  var form = doc.getElementById("contactForm");
+  var formSuccess = doc.getElementById("formSuccess");
+  var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  function validateField(field) {
+    var input = field.querySelector("input, select, textarea");
+    var value = (input.value || "").trim();
+    var valid = true;
+    if (input.hasAttribute("required") && !value) { valid = false; }
+    if (valid && input.type === "email" && value && !emailPattern.test(value)) { valid = false; }
+    field.classList.toggle("has-error", !valid);
+    return valid;
+  }
+  form.querySelectorAll(".field").forEach(function (field) {
+    var input = field.querySelector("input, select, textarea");
+    input.addEventListener("blur", function () { validateField(field); });
+    input.addEventListener("input", function () {
+      if (field.classList.contains("has-error")) { validateField(field); }
+    });
+  });
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var fields = form.querySelectorAll(".field");
+    var allValid = true;
+    fields.forEach(function (field) {
+      if (!validateField(field)) { allValid = false; }
+    });
+    if (!allValid) {
+      var firstError = form.querySelector(".field.has-error input, .field.has-error select, .field.has-error textarea");
+      if (firstError) { firstError.focus(); }
+      formSuccess.classList.remove("is-visible");
+      return;
+    }
+    formSuccess.classList.add("is-visible");
+    form.reset();
+  });
+
+})();
+</script>

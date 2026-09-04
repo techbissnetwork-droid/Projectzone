@@ -24,6 +24,7 @@
   --shadow-color:rgba(13,71,196,0.9);
   --focus:#0d47c4;
   --success:#0a7a3d;
+  --label-accent:#0d47c4;
   --danger:#c4260d;
   --radius:2px;
 }
@@ -45,6 +46,7 @@
     --shadow-color:rgba(255,212,0,0.9);
     --focus:#ffd400;
     --success:#7dffb0;
+    --label-accent:#ffd400;
     --danger:#ffb199;
   }
 }
@@ -65,6 +67,7 @@
   --shadow-color:rgba(255,212,0,0.9);
   --focus:#ffd400;
   --success:#7dffb0;
+  --label-accent:#ffd400;
   --danger:#ffb199;
 }
 
@@ -147,7 +150,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
 .annot{
   display:inline-flex;align-items:center;gap:6px;
   font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.08em;
-  text-transform:uppercase;color:var(--accent-1);
+  text-transform:uppercase;color:var(--label-accent);
   background:rgba(0,0,0,0.02);
 }
 .annot::before{content:"◆";font-size:8px;}
@@ -261,8 +264,8 @@ section{padding:96px 0;position:relative;}
 .section-head{max-width:720px;margin:0 0 48px;}
 .eyebrow{
   font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.16em;text-transform:uppercase;
-  color:var(--accent-1);display:inline-block;margin-bottom:14px;
-  padding:4px 10px;border:1px solid var(--accent-1);border-radius:var(--radius);
+  color:var(--label-accent);display:inline-block;margin-bottom:14px;
+  padding:4px 10px;border:1px solid var(--label-accent);border-radius:var(--radius);
 }
 h2{font-size:clamp(28px,4vw,42px);}
 h3{font-size:20px;text-transform:none;}
