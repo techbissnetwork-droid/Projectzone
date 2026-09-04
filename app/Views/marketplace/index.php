@@ -153,9 +153,9 @@ $link = static function (array $overrides) use ($filters): string {
         <span class="eyebrow">Deployment</span>
         <h2 class="h2 mt-3">Every product installs the same way.</h2>
         <p class="lede mt-4">
-          The Advanced Installer ships with each licence. It detects your URL,
-          finds anything already installed, tests your database live, migrates
-          existing content and locks itself when it is done.
+          Whichever product you choose, putting it live is the same short,
+          guided job — and it is the same one our own engineers use. No terminal,
+          no developer, and nothing to unpick if you change your mind.
         </p>
         <div class="cluster mt-6">
           <a class="btn btn--primary" href="<?= e(url('/marketplace/installer')) ?>">How the installer works<?= icon('arrow-right') ?></a>
@@ -163,9 +163,9 @@ $link = static function (array $overrides) use ($filters): string {
       </div>
       <div class="cols-2" data-reveal="80">
         <?php foreach ([
-          ['zap', 'URL auto-detection'], ['search', 'Existing-site scan'],
-          ['database', 'Live database test'], ['refresh', 'Content migration'],
-          ['settings', 'Guided configuration'], ['lock', 'Self-locking install'],
+          ['zap', 'Live in about ten minutes'], ['settings', 'No terminal needed'],
+          ['server', 'Runs on ordinary hosting'], ['refresh', 'Your content moves with you'],
+          ['search', 'Old links keep working'], ['lock', 'Closes the door behind it'],
         ] as $item): ?>
           <div class="card" style="padding:var(--s-4);display:flex;gap:.7rem;align-items:center">
             <?= icon($item[0], ['size' => 18]) ?><span class="small"><?= e($item[1]) ?></span>

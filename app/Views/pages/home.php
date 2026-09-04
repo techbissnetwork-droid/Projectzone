@@ -133,10 +133,9 @@ $services = $site['services'];
         <span class="eyebrow">The Marketplace</span>
         <h2 class="h2 mt-3">Deploy-ready platforms, in your hands the same day.</h2>
         <p class="lede mt-4">
-          Production-grade websites, themes and templates built to the same standard
-          as our engagements. Preview live, buy a licence, then deploy with the
-          Advanced Installer — URL detection, existing-site detection, migration
-          and configuration in one guided flow.
+          Production-grade websites, themes and templates, built to the same
+          standard as our engagements. Preview one, buy the licence, and put it
+          live on your own server the same afternoon — without a developer.
         </p>
         <div class="cluster mt-6">
           <a class="btn btn--primary" href="<?= e(url('/marketplace')) ?>">Browse the catalogue<?= icon('arrow-right') ?></a>
@@ -145,10 +144,10 @@ $services = $site['services'];
 
         <div class="cols-2 mt-7" style="gap:var(--s-4)">
           <?php foreach ([
-            ['zap', 'Automatic URL detection', 'Sub-directories, proxies and HTTPS resolved for you.'],
-            ['search', 'Existing-site detection', 'Finds WordPress, Drupal or a prior install before touching anything.'],
-            ['refresh', 'Migration and import', 'Brings content across and rewrites old URLs to new ones.'],
-            ['shield', 'Clean, locked install', 'Schema, config and a lock file — nothing left exposed.'],
+            ['zap', 'Live the same day', 'Buy it in the morning and take real traffic by the afternoon.'],
+            ['settings', 'Nothing to configure', 'It works out where it lives and sets itself up. No terminal, no config files.'],
+            ['refresh', 'Bring your site with you', 'Moving off WordPress or anything else? Your content comes across and your search rankings hold.'],
+            ['shield', 'Safe by default', 'It checks what is already on the server before it builds, and closes the door behind itself when it is done.'],
           ] as $point): ?>
             <div class="stack" style="--flow:.4rem">
               <span class="feature__icon" style="width:34px;height:34px;margin-bottom:.35rem"><?= icon($point[0], ['size' => 16]) ?></span>

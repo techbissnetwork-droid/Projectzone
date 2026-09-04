@@ -56,11 +56,11 @@ $view->start('content');
           <div class="panel__body">
             <ol class="stack" style="--flow:1rem;counter-reset:s">
               <?php foreach ([
-                ['Download the package', 'Your licence gives access to the full source and the Advanced Installer package.'],
-                ['Upload to your server', 'Any host running PHP 8.1+ with PDO. Point the document root at the public directory.'],
-                ['Open /install in a browser', 'The installer detects your URL, scans for an existing site, and tests your database live.'],
-                ['Choose clean install or migrate', 'If it finds WordPress or another platform, it offers to import content and rewrite URLs.'],
-                ['Configure and finish', 'Name the site, create the owner account, and the installer locks itself when it is done.'],
+                ['Download your files', 'Your licence unlocks the complete site, ready to upload.'],
+                ['Upload it to your hosting', 'Ordinary shared hosting is enough. Your control panel or any FTP client will do.'],
+                ['Open the installer in your browser', 'It works out where it lives and checks the server is ready before touching anything.'],
+                ['Start fresh, or bring your old site', 'If it finds a site already there, it offers to move your content across and keep your old links working.'],
+                ['Name it and you are live', 'Set the site name, create your account, and it closes itself off when it is finished.'],
               ] as $i => $step): ?>
                 <li style="display:flex;gap:.85rem;align-items:flex-start">
                   <span class="wstep__num" style="margin-top:.15rem"><?= $i + 1 ?></span>

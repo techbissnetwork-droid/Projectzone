@@ -16,10 +16,10 @@ $icons = ['requirements' => 'gauge', 'environment' => 'globe', 'database' => 'da
           <span class="eyebrow" data-reveal>Included with every product</span>
           <h1 class="h1 hero__title" data-reveal="60">The Advanced Installer</h1>
           <p class="lede hero__lede" data-reveal="120">
-            Eight guided steps that take a fresh server — or one already running
-            WordPress — to a configured, locked, production installation. It
-            detects your URL, finds what is already there, tests your database
-            live, and migrates your content with the URLs rewritten.
+            Putting a site live is the part that usually goes wrong. This is the
+            tool our own engineers reach for — eight guided steps that take an
+            empty server, or one already running WordPress, to a site handling
+            real traffic. You will not need a terminal or a developer.
           </p>
           <div class="hero__actions" data-reveal="180">
             <a class="btn btn--primary btn--lg magnetic icon-shift" href="<?= e(url('/install')) ?>">Open the installer<?= icon('arrow-right') ?></a>
