@@ -213,7 +213,7 @@ button{ cursor:pointer; }
 .logo-mark svg{ width:100%; height:100%; overflow:visible; }
 .logo-mark g{ animation:logoBreathe 5s ease-in-out infinite; transform-box:fill-box; transform-origin:center; transition:transform .45s cubic-bezier(.34,1.56,.64,1); }
 .logo:hover .logo-mark g{ animation-play-state:paused; transform:rotate(-10deg) scale(1.08); }
-@keyframes logoBreathe{ 0%,100%{ transform:scale(1) rotate(0deg); } 50%{ transform:scale(1.08) rotate(-6deg); } }
+@keyframes logoBreathe{ 0%,100%{ transform:scale(1) rotate(0deg); } 25%{ transform:scale(1.06) rotate(-7deg); } 50%{ transform:scale(1) rotate(0deg); } 75%{ transform:scale(1.06) rotate(7deg); } }
 .logo b{ color:var(--ink); letter-spacing:-.01em; text-transform:uppercase; }
 
 .site-header .container{ max-width:1400px; }
@@ -364,6 +364,7 @@ button{ cursor:pointer; }
 .hero-grid{ display:grid; grid-template-columns:1.1fr .9fr; gap:48px; align-items:center; }
 @media (max-width:900px){ .hero-grid{ grid-template-columns:1fr; } }
 .hero h1{ font-size:clamp(2.4rem,5.4vw,4.1rem); }
+.hero-sub h1{ font-size:clamp(1.8rem,4.2vw,2.6rem); }
 .hero-stats{ display:flex; gap:clamp(20px,4vw,48px); margin-top:44px; flex-wrap:wrap; }
 @media (max-width:640px){ .hero-stats{ display:grid; grid-template-columns:1fr 1fr; gap:28px 20px; } }
 .hero-cta{ display:flex; gap:14px; margin:30px 0; flex-wrap:wrap; }

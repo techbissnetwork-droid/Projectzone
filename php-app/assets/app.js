@@ -1178,6 +1178,20 @@ function doRender(){
   else if(afterMap[r.key]){ afterMap[r.key](); }
   moveNavBlob(currentNavLink());
   syncDashboardNavLink();
+  var dockHome = $('.dock-item[data-path="/"], .dock-item[data-path="/dashboard"]');
+  if(dockHome){
+    if(AUTH_USER){
+      dockHome.querySelector('svg').outerHTML = ico('monitor');
+      dockHome.querySelector('span').textContent = 'Dashboard';
+      dockHome.setAttribute('href', BP+'/dashboard');
+      dockHome.dataset.path = '/dashboard';
+    } else {
+      dockHome.querySelector('svg').outerHTML = '<svg viewBox="0 0 24 24" fill="none"><path d="M4 11.5 12 4l8 7.5M6 10v9.5a1 1 0 0 0 1 1h3.5V15a1.5 1.5 0 0 1 1.5-1.5v0A1.5 1.5 0 0 1 13.5 15v5.5H17a1 1 0 0 0 1-1V10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      dockHome.querySelector('span').textContent = 'Home';
+      dockHome.setAttribute('href', BP+'/');
+      dockHome.dataset.path = '/';
+    }
+  }
   var loginBtn = $('#navLoginBtn');
   var dockLogin = $('.dock-item[data-path="/login"], .dock-item[data-path="/account"]');
   if(AUTH_USER){

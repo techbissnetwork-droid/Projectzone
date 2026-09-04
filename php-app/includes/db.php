@@ -265,16 +265,16 @@ function palette_attr(): string
 }
 
 /**
- * The logo has three possible states, controlled by Admin > Settings >
+ * The logo has four possible states, controlled by Admin > Settings >
  * Branding:
  *  - A custom uploaded image always wins: it's the whole logo, alone,
  *    no icon or text next to it.
  *  - Otherwise, "logo_style" picks between the built-in icon mark next
- *    to the site name text (default), or the site name text alone with
- *    no icon.
+ *    to the site name text (default), the icon alone with no text, or
+ *    the site name text alone with no icon.
  * logo_mark_html() returns the icon (image or built-in mark) or '' if
  * text-only mode applies; logo_wordmark_html() returns the site-name
- * text or '' once a custom image is set.
+ * text or '' once a custom image is set or icon-only mode applies.
  */
 function logo_mark_html(bool $gradient = true, string $prefix = ''): string
 {
@@ -291,7 +291,13 @@ function logo_mark_html(bool $gradient = true, string $prefix = ''): string
 
 function logo_wordmark_html(): string
 {
-    return get_setting('logo_path', '') !== '' ? '' : '<b>' . e(get_setting('site_name', 'TECHBISS')) . '</b>';
+    if (get_setting('logo_path', '') !== '') {
+        return '';
+    }
+    if (get_setting('logo_style', 'icon_text') === 'icon_only') {
+        return '';
+    }
+    return '<b>' . e(get_setting('site_name', 'TECHBISS')) . '</b>';
 }
 
 function flash(string $message, string $type = 'success'): void

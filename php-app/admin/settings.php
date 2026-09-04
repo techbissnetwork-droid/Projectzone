@@ -16,7 +16,7 @@ $TEXT_FIELDS = [
     'stat5_value', 'stat5_label',
 ];
 $THEME_OPTIONS = ['auto' => 'Automatic (matches visitor device)', 'light' => 'Light', 'dark' => 'Dark'];
-$LOGO_STYLE_OPTIONS = ['icon_text' => 'Icon + site name', 'text_only' => 'Site name only (no icon)'];
+$LOGO_STYLE_OPTIONS = ['icon_text' => 'Icon + site name', 'icon_only' => 'Icon only (no site name)', 'text_only' => 'Site name only (no icon)'];
 $PALETTE_OPTIONS = [
     '' => 'Bloom (coral & amber — default)',
     'fresh' => 'Fresh (teal & lime)',
