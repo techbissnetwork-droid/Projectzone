@@ -790,7 +790,25 @@
         if (label) label.textContent = 'Signing in…';
         submitBtn.insertAdjacentHTML('beforeend', '<span class="spinner" data-spinner></span>');
       }
+      // demo-only: typing a password of "wrongpass" simulates a rejected
+      // login, so the error state is reachable without wiring a real backend.
+      var simulateFailure = password && password.value === 'wrongpass';
+      var resetSubmit = function(){
+        if (!submitBtn) return;
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('is-loading');
+        var label = submitBtn.querySelector('[data-btn-label]');
+        if (label) label.textContent = 'Log In';
+        var spinner = submitBtn.querySelector('[data-spinner]');
+        if (spinner) spinner.remove();
+      };
       var finish = function(){
+        if (simulateFailure) {
+          resetSubmit();
+          if (formError) formError.hidden = false;
+          if (password) { validateField(password, function(){ return false; }); password.focus(); }
+          return;
+        }
         var successPanel = document.querySelector('[data-login-success]');
         if (successPanel) {
           form.hidden = true;

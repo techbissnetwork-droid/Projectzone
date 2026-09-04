@@ -772,6 +772,14 @@ p{color:var(--text);}
 .dash-shell{display:grid;grid-template-columns:220px 1fr;gap:2.2rem;align-items:start;}
 @media (max-width:880px){.dash-shell{grid-template-columns:1fr;}}
 .dash-content{min-width:0;}
+/* Grid items default to an automatic min-width of their content's min-content
+   size. .dash-sidebar's tab row uses flex-shrink:0 + white-space:nowrap so it
+   can scroll horizontally on narrow screens instead of squashing — but that
+   same nowrap content is what the browser would otherwise use to size this
+   grid item, growing the whole 1fr track (and the page) to fit six unshrunk
+   tabs. min-width:0 opts this grid item out of that automatic sizing, so the
+   tab row's own overflow-x:auto is what handles the excess width, not the grid. */
+.dash-sidebar{min-width:0;}
 
 .dash-sidebar{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:.9rem;position:sticky;top:6.5rem;}
 .dash-sidebar-head{padding:.6rem .7rem 1rem;}
@@ -785,7 +793,10 @@ p{color:var(--text);}
 @media (max-width:880px){
   .dash-sidebar{position:static;padding:.6rem;}
   .dash-tabs{flex-direction:row;overflow-x:auto;gap:.4rem;padding-bottom:.2rem;}
-  .dash-tab{flex-shrink:0;white-space:nowrap;}
+  /* Reset the desktop width:100% (a vertical list of full-width rows) — in
+     this row layout it would make each pill claim the full row width, so
+     six of them stacked horizontally would blow out to ~6x the container. */
+  .dash-tab{width:auto;flex-shrink:0;white-space:nowrap;}
   .dash-sidebar-head{display:none;}
 }
 
