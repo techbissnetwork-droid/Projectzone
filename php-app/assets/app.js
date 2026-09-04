@@ -658,15 +658,17 @@ Pages['/contact'] = function(){
     +'<div style="display:flex;flex-direction:column;gap:20px;">'
       +'<div class="card"><div class="card-head">'+blobIcon('mail','sm',true)+'<h3 style="font-size:1.05rem;">Email</h3></div><p style="font-size:.9rem;">'+(S.contactEmail||'hello@techbiss.com')+'</p></div>'
       +'<div class="card"><div class="card-head">'+blobIcon('phone','sm',true)+'<h3 style="font-size:1.05rem;">Phone</h3></div><p style="font-size:.9rem;">'+(S.contactPhone||'+1 (415) 555-0148')+'</p></div>'
+      +(S.whatsappNumber?'<div class="card"><div class="card-head">'+blobIcon('chat','sm',true)+'<h3 style="font-size:1.05rem;">WhatsApp</h3></div><p style="font-size:.9rem;margin-bottom:12px;">Message us any time — usually a same-day reply.</p><a href="https://wa.me/'+S.whatsappNumber.replace(/\D+/g,'')+'" target="_blank" rel="noopener" class="btn btn-primary btn-block">Chat on WhatsApp</a></div>':'')
       +'<div class="card"><div class="card-head">'+blobIcon('globe','sm',true)+'<h3 style="font-size:1.05rem;">Studios</h3></div><p style="font-size:.9rem;">San Francisco · Lisbon · Singapore</p></div>'
     +'</div>'
   +'</div></section>';
 };
 
 Pages['/login'] = function(){
+  var S = window.SITE_SETTINGS || {};
   return '<section class="hero"><div class="container hero-grid" style="align-items:stretch;">'
     +'<div class="card" style="max-width:440px;">'
-      +'<div class="tabbar" id="authTabs"><button class="active" data-t="signin">Sign in</button><button data-t="signup">Create account</button></div>'
+      +'<h3 style="margin-bottom:18px;">Sign in</h3>'
       +'<div id="authPanels">'
         +'<form id="signinForm" onsubmit="return false;">'
           +'<div class="field"><label for="liEmail">Email</label><input id="liEmail" type="email" required placeholder="you@company.com"></div>'
@@ -677,6 +679,7 @@ Pages['/login'] = function(){
         +'<p id="loginMsg" class="badge success" style="display:none;margin-top:16px;">'+ico('check')+' Welcome back — redirecting…</p>'
         +'<p id="loginError" class="badge danger" hidden style="margin-top:16px;"></p>'
       +'</div>'
+      +'<p style="font-size:.85rem;color:var(--ink-faint);margin-top:20px;">Client accounts are set up by our team once your project starts — <a href="'+BP+'/contact" style="color:var(--accent-1);font-weight:600;">get in touch</a> if you need access.</p>'
     +'</div>'
     +'<div class="hero-visual" style="aspect-ratio:auto;">'
       +'<div class="card" style="background:var(--grad);color:#fff2ea;border:none;text-align:center;padding:44px;">'
@@ -690,39 +693,52 @@ Pages['/login'] = function(){
 
 Pages['/dashboard'] = function(){
   return '<section class="hero hero-sub" style="padding-bottom:12px;"><div class="container">'
-    +'<span class="eyebrow">Client dashboard preview</span><h1 style="max-width:20ch;">Welcome back, '+((AUTH_USER&&AUTH_USER.name)||'there')+'.</h1>'
-    +'<p class="lede">A look at the dashboard you get once your site or app is live.</p>'
+    +'<span class="eyebrow">Client dashboard</span><h1 style="max-width:20ch;">Welcome back, '+((AUTH_USER&&AUTH_USER.name)||'there')+'.</h1>'
+    +'<p class="lede">Here\'s where things stand on your project.</p>'
   +'</div></section>'
-  +'<section class="section tone-a" style="padding-top:10px;"><div class="container">'
-    +'<div class="grid grid-4" style="margin-bottom:28px;">'
-      +statCardHTML('99.98%','Uptime this month','shield')
-      +statCardHTML('1,482','Website visits today','chart')
-      +statCardHTML('2','Open support tickets','chat')
-      +statCardHTML('Sep 18','Next check-in','calendar')
-    +'</div>'
-    +'<div class="hero-grid" style="align-items:flex-start;gap:26px;">'
-      +'<div style="display:flex;flex-direction:column;gap:22px;">'
-        +'<div class="card"><h3>Active projects</h3>'
-          +projectRow('Website redesign','On track','78','success')
-          +projectRow('Order-ahead app','In review','54','warning')
-          +projectRow('Local SEO push','On track','23','success')
-        +'</div>'
-        +'<div class="card"><h3>Recent activity</h3><ul style="display:flex;flex-direction:column;gap:14px;">'
-          +activityRow('check','Website update published','2 hours ago')
-          +activityRow('chat','New comment from Devon on the order-ahead app','Yesterday')
-          +activityRow('box','Marketplace order: Bramble Field Themes','2 days ago')
-          +'</ul></div>'
-      +'</div>'
-      +'<div style="display:flex;flex-direction:column;gap:22px;">'
-        +'<div class="card"><h3>Support tickets</h3>'
-          +ticketRow('#1042','Checkout error on mobile Safari','warning','Open')
-          +ticketRow('#1039','Add a holiday hours banner','success','In progress')
-        +'<a href="'+BP+'/contact" class="card-link" style="margin-top:12px;">Open a new ticket '+ico('arrow')+'</a></div>'
-        +'<div class="card" style="background:var(--grad);color:#fff2ea;border:none;"><div class="card-head">'+blobIcon('users','sm',false)+'<h3 style="color:#fff2ea;">Book a check-in call</h3></div><p style="color:rgba(255,242,234,.9);">A monthly look at your site\'s performance and what to do next.</p><a href="'+BP+'/contact" class="btn" style="background:#fff2ea;color:var(--accent-1);">Schedule now</a></div>'
-      +'</div>'
-    +'</div>'
+  +'<section class="section tone-a" style="padding-top:10px;"><div class="container" style="max-width:820px;">'
+    +'<div id="dashBody"><p style="color:var(--ink-faint);">Loading your project details…</p></div>'
   +'</div></section>';
 };
+function dashEmptyState(icon,title,body,cta){
+  return '<div class="card" style="text-align:center;padding:44px 24px;">'+blobIcon(icon,'lg')+'<h3 style="margin:14px 0 4px;">'+title+'</h3><p class="lede" style="margin-bottom:'+(cta?'18px':'0')+';">'+body+'</p>'+(cta||'')+'</div>';
+}
+function dashExpiryBadge(label,dateStr){
+  var days = Math.floor((new Date(dateStr) - new Date(new Date().toDateString())) / 86400000);
+  var tone = days < 0 ? 'danger' : (days <= 30 ? 'warning' : '');
+  return '<span class="badge '+tone+'">'+label+': '+(days<0?'overdue':days+'d')+'</span>';
+}
+function dashProjectCard(p){
+  var tone = {Planning:'',  'In progress':'warning', Live:'success', 'On hold':'danger'}[p.status] || '';
+  var expiries = [['Domain',p.domain_expires_at],['Hosting',p.hosting_expires_at],['SSL',p.ssl_expires_at],['Email',p.email_expires_at]]
+    .filter(function(e){ return e[1]; }).map(function(e){ return dashExpiryBadge(e[0],e[1]); }).join(' ');
+  return '<div class="card" style="margin-bottom:18px;">'
+    +'<div class="flex justify-between items-center" style="margin-bottom:10px;flex-wrap:wrap;gap:8px;">'
+      +'<h3 style="margin:0;">'+p.title+(p.domain?' <span style="color:var(--ink-faint);font-weight:400;font-size:.85rem;">— '+p.domain+'</span>':'')+'</h3>'
+      +'<span class="badge '+tone+'">'+p.status+'</span>'
+    +'</div>'
+    +'<div class="progress-track" style="margin-bottom:12px;"><div class="progress-fill" style="width:'+p.progress_pct+'%;"></div></div>'
+    +(expiries?'<div class="flex gap-8" style="flex-wrap:wrap;margin-bottom:'+(p.notes?'12px':'0')+';">'+expiries+'</div>':'')
+    +(p.notes?'<p style="font-size:.9rem;color:var(--ink-soft);margin:0;">'+p.notes+'</p>':'')
+  +'</div>';
+}
+function wireDashboard(){
+  var body = $('#dashBody');
+  fetch(BP+'/api/dashboard.php').then(function(r){ return r.json(); }).then(function(data){
+    if(!data.business){
+      body.innerHTML = dashEmptyState('users','Your project isn\'t linked yet','Once our team sets up your account, your project status will show up here.','<a href="'+BP+'/contact" class="btn btn-primary">Contact us</a>');
+      return;
+    }
+    if(!data.projects || !data.projects.length){
+      body.innerHTML = dashEmptyState('rocket','No projects yet','Your project will show up here once it kicks off.');
+      return;
+    }
+    body.innerHTML = data.projects.map(dashProjectCard).join('')
+      +'<div class="card" style="background:var(--grad);color:#fff2ea;border:none;"><div class="card-head">'+blobIcon('users','sm',false)+'<h3 style="color:#fff2ea;">Need something changed?</h3></div><p style="color:rgba(255,242,234,.9);">Reach out any time — we\'ll take it from there.</p><a href="'+BP+'/contact" class="btn" style="background:#fff2ea;color:var(--accent-1);">Contact us</a></div>';
+  }).catch(function(){
+    body.innerHTML = '<p class="badge danger">Could not load your project details — please try again.</p>';
+  });
+}
 Pages['/account'] = function(){
   var u = AUTH_USER || {};
   return '<section class="hero hero-sub" style="padding-bottom:12px;"><div class="container">'
@@ -742,20 +758,6 @@ Pages['/account'] = function(){
     +'</div>'
   +'</div></section>';
 };
-function statCardHTML(num,label,icon){
-  return '<div class="card tilt">'+blobIcon(icon,'sm',true)+'<div class="stat" style="margin-top:12px;">'+statBlock(num,label)+'</div></div>';
-}
-function projectRow(name,status,pct,tone){
-  return '<div style="margin:18px 0;"><div class="flex justify-between items-center" style="margin-bottom:8px;"><b style="font-family:var(--font-display);">'+name+'</b><span class="badge '+tone+'">'+status+'</span></div>'
-  +'<div class="progress-track"><div class="progress-fill" style="width:'+pct+'%;"></div></div></div>';
-}
-function activityRow(icon,text,when){
-  return '<li class="flex gap-12 items-center"><span class="blob-icon sm soft">'+ico(icon)+'</span><span style="flex:1;font-size:.9rem;">'+text+'<br><span style="color:var(--ink-faint);font-size:.78rem;">'+when+'</span></span></li>';
-}
-function ticketRow(id,title,tone,status){
-  return '<div class="flex justify-between items-center" style="padding:12px 0;border-bottom:1px solid var(--border-soft);"><div><span style="font-family:var(--font-display);font-weight:600;font-size:.85rem;color:var(--ink-faint);">'+id+'</span><p style="margin:2px 0 0;font-size:.9rem;">'+title+'</p></div><span class="badge '+tone+'">'+status+'</span></div>';
-}
-
 /* The real staff admin panel is a separate, session-protected PHP app at /admin/ — not part of this client-side SPA. */
 
 /* ===================================================================
@@ -888,31 +890,12 @@ function wireContact(){
   });
 }
 function wireLogin(){
-  var tabs = $('#authTabs'), panels = $('#authPanels');
-  var signup = '<form id="signupForm" onsubmit="return false;">'
-    +'<div class="field"><label for="suName">Full name</label><input id="suName" required></div>'
-    +'<div class="field"><label for="suEmail">Work email</label><input id="suEmail" type="email" required></div>'
-    +'<div class="field"><label for="suPass">Create a password</label><input id="suPass" type="password" minlength="8" required></div>'
-    +'<button class="btn btn-primary btn-block magnetic" type="submit">Create account</button>'
-    +'<p id="signupMsg" class="badge success" style="display:none;margin-top:16px;">'+ico('check')+' Account created — redirecting…</p>'
-    +'<p id="signupError" class="badge danger" hidden style="margin-top:16px;"></p>'
-  +'</form>';
-  var signin = panels.querySelector('#signinForm').outerHTML;
-  tabs.addEventListener('click', function(e){
-    var b=e.target.closest('button'); if(!b) return;
-    $all('button',tabs).forEach(function(x){x.classList.remove('active');}); b.classList.add('active');
-    if(b.dataset.t==='signup'){ panels.innerHTML = signup; bindForm('signupForm','signupMsg','signupError',BP+'/api/signup.php'); }
-    else { panels.innerHTML = signin + '<p id="loginMsg" class="badge success" style="display:none;margin-top:16px;">'+ico('check')+' Welcome back — redirecting…</p><p id="loginError" class="badge danger" hidden style="margin-top:16px;"></p>'; bindForm('signinForm','loginMsg','loginError',BP+'/api/login.php'); attachTilt(panels); }
-  });
   function bindForm(fid,mid,eid,endpoint){
     var f = $('#'+fid);
     f.addEventListener('submit', function(){
       var errEl = $('#'+eid); errEl.hidden = true;
       var btn = f.querySelector('button[type=submit]'); btn.disabled = true;
-      var isSignup = fid==='signupForm';
-      var payload = isSignup
-        ? { name: $('#suName').value, email: $('#suEmail').value, password: $('#suPass').value }
-        : { email: $('#liEmail').value, password: $('#liPass').value };
+      var payload = { email: $('#liEmail').value, password: $('#liPass').value };
       fetch(endpoint, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) })
         .then(function(r){ return r.json().then(function(data){ return {ok:r.ok, data:data}; }); })
         .then(function(res){
@@ -1104,7 +1087,7 @@ function doRender(){
   var afterMap = {
     '/': wireHome, '/work': wireWork, '/marketplace': wireMarketplace,
     '/resources': wireResources, '/pricing': wirePricing, '/contact': wireContact,
-    '/login': wireLogin, '/account': wireAccount
+    '/login': wireLogin, '/account': wireAccount, '/dashboard': wireDashboard
   };
   if(r.key==='/marketplace/detail'){ wireProductDetail(r.param); }
   else if(afterMap[r.key]){ afterMap[r.key](); }

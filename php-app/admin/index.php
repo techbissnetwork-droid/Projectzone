@@ -14,6 +14,33 @@ $openTickets = (int)$pdo->query("SELECT COUNT(*) c FROM tickets WHERE status != 
 
 $accounts = $pdo->query('SELECT * FROM businesses ORDER BY last_activity_at DESC LIMIT 8')->fetchAll();
 
+$EXPIRY_FIELDS = ['domain_expires_at' => 'Domain', 'hosting_expires_at' => 'Hosting', 'ssl_expires_at' => 'SSL', 'email_expires_at' => 'Email'];
+$renewalRows = $pdo->query(
+    'SELECT p.id, p.title, p.domain_expires_at, p.hosting_expires_at, p.ssl_expires_at, p.email_expires_at,
+            b.name AS business_name, b.contact_email, b.contact_phone
+     FROM projects p JOIN businesses b ON b.id = p.business_id'
+)->fetchAll();
+$renewals = [];
+foreach ($renewalRows as $row) {
+    $due = [];
+    foreach ($EXPIRY_FIELDS as $field => $label) {
+        if (!$row[$field]) {
+            continue;
+        }
+        $days = (int)floor((strtotime($row[$field]) - strtotime(date('Y-m-d'))) / 86400);
+        if ($days <= 30) {
+            $due[] = ['label' => $label, 'days' => $days];
+        }
+    }
+    if ($due) {
+        usort($due, fn($a, $b) => $a['days'] <=> $b['days']);
+        $row['due'] = $due;
+        $renewals[] = $row;
+    }
+}
+usort($renewals, fn($a, $b) => $a['due'][0]['days'] <=> $b['due'][0]['days']);
+$renewals = array_slice($renewals, 0, 8);
+
 $queue = $pdo->query(
     "SELECT t.id, t.title, t.priority, b.name AS business_name, s.initials AS assignee_initials, s.name AS assignee_name
      FROM tickets t
@@ -76,6 +103,29 @@ $priTone = ['High' => 'danger', 'Normal' => 'warning', 'Low' => 'success'];
       <?php if (!$accounts): ?><tr><td colspan="5" style="color:var(--ink-faint);">No businesses yet.</td></tr><?php endif; ?>
     </tbody></table></div>
   </div>
+
+  <?php if ($renewals): ?>
+  <div class="card" style="margin-bottom:22px;">
+    <div class="card-head" style="justify-content:space-between;"><div class="flex items-center gap-12"><?= blob_icon('calendar', 'sm', true) ?><h3>Renewals due soon</h3></div></div>
+    <?php foreach ($renewals as $r): ?>
+    <?php
+      $soonest = $r['due'][0];
+      $waDigits = preg_replace('/\D+/', '', (string)($r['contact_phone'] ?? ''));
+    ?>
+    <div class="flex justify-between items-center" style="padding:12px 0;border-bottom:1px solid var(--border-soft);flex-wrap:wrap;gap:10px;">
+      <div>
+        <b style="font-size:.9rem;"><?= e($r['business_name']) ?></b> <span style="color:var(--ink-faint);font-size:.85rem;">— <?= e($r['title']) ?></span><br>
+        <span class="badge <?= $soonest['days'] < 0 ? 'danger' : 'warning' ?>"><?= e($soonest['label']) ?> <?= $soonest['days'] < 0 ? 'overdue' : 'in ' . $soonest['days'] . 'd' ?></span>
+      </div>
+      <div class="flex gap-8">
+        <?php if ($r['contact_email']): ?><a class="icon-btn" href="mailto:<?= e($r['contact_email']) ?>" aria-label="Email"><?= ico('mail') ?></a><?php endif; ?>
+        <?php if ($waDigits): ?><a class="icon-btn" href="https://wa.me/<?= e($waDigits) ?>" target="_blank" rel="noopener" aria-label="WhatsApp"><?= ico('users') ?></a><?php endif; ?>
+        <?php if ($r['contact_phone']): ?><a class="icon-btn" href="tel:<?= e($r['contact_phone']) ?>" aria-label="Call"><?= ico('phone') ?></a><?php endif; ?>
+      </div>
+    </div>
+    <?php endforeach; ?>
+  </div>
+  <?php endif; ?>
 
   <div class="hero-grid" style="align-items:flex-start;gap:26px;">
     <div class="card">

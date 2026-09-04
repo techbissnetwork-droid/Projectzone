@@ -10,7 +10,7 @@ $pdo = db();
 
 $TEXT_FIELDS = [
     'hero_headline_main', 'hero_headline_accent', 'hero_subheadline', 'site_tagline',
-    'contact_email', 'contact_phone', 'seo_title', 'meta_description',
+    'contact_email', 'contact_phone', 'whatsapp_number', 'seo_title', 'meta_description',
     'stat1_value', 'stat1_label', 'stat2_value', 'stat2_label',
     'stat3_value', 'stat3_label', 'stat4_value', 'stat4_label',
     'stat5_value', 'stat5_label',
@@ -159,6 +159,7 @@ $socialPath = $current['social_image_path'] ?? 'assets/social-default.png';
         <div class="field"><label>Contact email</label><input type="email" name="contact_email" value="<?= e($current['contact_email'] ?? '') ?>"></div>
         <div class="field"><label>Contact phone</label><input name="contact_phone" value="<?= e($current['contact_phone'] ?? '') ?>"></div>
       </div>
+      <div class="field"><label>WhatsApp number <small style="font-weight:400;color:var(--ink-faint);">(with country code, e.g. 14155550148 — leave blank to hide the WhatsApp button)</small></label><input name="whatsapp_number" value="<?= e($current['whatsapp_number'] ?? '') ?>"></div>
     </div>
     </div>
 

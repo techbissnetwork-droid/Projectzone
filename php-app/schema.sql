@@ -55,6 +55,9 @@ CREATE TABLE `businesses` (
   `plan` VARCHAR(60) NOT NULL,
   `mrr_cents` INT UNSIGNED NOT NULL DEFAULT 0,
   `status` ENUM('Active','Trial','Past due') NOT NULL DEFAULT 'Active',
+  `contact_email` VARCHAR(190) NULL,
+  `contact_phone` VARCHAR(40) NULL,
+  `customer_id` INT UNSIGNED NULL,
   `last_activity_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -65,6 +68,28 @@ INSERT INTO `businesses` (`name`, `sector`, `plan`, `mrr_cents`, `status`, `last
 ('Nomad Coffee Roasters', 'Creator', 'App + Web', 22900, 'Trial', DATE_SUB(NOW(), INTERVAL 6 HOUR)),
 ('Kinship Pet Rescue', 'Nonprofit', 'Starter', 7900, 'Active', DATE_SUB(NOW(), INTERVAL 1 DAY)),
 ('Bloom & Bramble Florist', 'Retail', 'Growth', 14900, 'Past due', DATE_SUB(NOW(), INTERVAL 11 DAY));
+
+-- ---------------------------------------------------------------
+-- projects — real work tracked per business (replaces the placeholder
+-- demo content that used to be hardcoded on the customer dashboard).
+-- ---------------------------------------------------------------
+DROP TABLE IF EXISTS `projects`;
+CREATE TABLE `projects` (
+  `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `business_id` INT UNSIGNED NOT NULL,
+  `title` VARCHAR(150) NOT NULL,
+  `status` ENUM('Planning','In progress','Live','On hold') NOT NULL DEFAULT 'Planning',
+  `progress_pct` TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  `domain` VARCHAR(190) NULL,
+  `domain_expires_at` DATE NULL,
+  `hosting_expires_at` DATE NULL,
+  `ssl_expires_at` DATE NULL,
+  `email_expires_at` DATE NULL,
+  `notes` TEXT NULL,
+  `portfolio_visible` TINYINT(1) NOT NULL DEFAULT 0,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (`business_id`) REFERENCES `businesses`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ---------------------------------------------------------------
 -- tickets — cross-client support queue shown in the admin panel.
@@ -164,6 +189,7 @@ INSERT INTO `settings` (`id`, `value`) VALUES
 ('social_image_path', 'assets/social-default.png'),
 ('default_theme', 'auto'),
 ('color_palette', ''),
+('whatsapp_number', ''),
 ('stat1_value', '1,900+'),
 ('stat1_label', 'Businesses & apps launched'),
 ('stat2_value', '38'),
