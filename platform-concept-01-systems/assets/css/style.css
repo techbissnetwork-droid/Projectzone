@@ -904,7 +904,7 @@ section{padding-block:clamp(3.5rem,7vw,6.5rem);}
   .sidebar{position:static;height:auto;border-right:0;border-bottom:1px solid var(--border);padding:1rem 1.25rem;}
   .sidebar-head{display:none;}
   .sidebar-nav{flex-direction:row;overflow-x:auto;gap:.5rem;}
-  .sidebar-link{flex:none;white-space:nowrap;}
+  .sidebar-link{flex:none;width:auto;white-space:nowrap;}
   .dash-stats{grid-template-columns:repeat(2,1fr);}
   .websites-grid{grid-template-columns:1fr;}
 }
