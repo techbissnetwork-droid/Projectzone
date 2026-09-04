@@ -1,0 +1,213 @@
+<title>Bloom Logomark Studies</title>
+<meta name="description" content="Seven candidate marks for the TECHBISS Bloom concept, each shown in header context, across four color themes and both light and dark mode.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#faf8f4; --surface:#ffffff; --surface-2:#f3efe8;
+  --ink:#241c14; --ink-soft:#5c5044; --ink-faint:#8d8175;
+  --border:#e7e0d6; --border-soft:#efe9e0;
+  --r-lg:20px; --r-full:999px;
+  --shadow-sm:0 2px 10px -4px rgba(40,30,15,.10);
+  --shadow-md:0 14px 30px -12px rgba(40,30,15,.18);
+  --font-display:'Outfit',system-ui,sans-serif;
+  --font-body:'Inter',system-ui,sans-serif;
+
+  /* palette: bloom (default) */
+  --accent-1:#ff6a52; --accent-3:#ffb648;
+  --grad:linear-gradient(135deg,var(--accent-1),var(--accent-3));
+  --grad-soft:color-mix(in srgb, var(--accent-1) 15%, transparent);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#1a1712; --surface:#242019; --surface-2:#2d2820;
+    --ink:#f5efe6; --ink-soft:#c9beae; --ink-faint:#8f8574;
+    --border:#3a342a; --border-soft:#332e25;
+    --shadow-sm:0 2px 10px -4px rgba(0,0,0,.35);
+    --shadow-md:0 16px 34px -14px rgba(0,0,0,.5);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1a1712; --surface:#242019; --surface-2:#2d2820;
+  --ink:#f5efe6; --ink-soft:#c9beae; --ink-faint:#8f8574;
+  --border:#3a342a; --border-soft:#332e25;
+  --shadow-sm:0 2px 10px -4px rgba(0,0,0,.35);
+  --shadow-md:0 16px 34px -14px rgba(0,0,0,.5);
+}
+
+/* palettes — override only the two gradient stops, in every theme */
+:root[data-palette="fresh"]{ --accent-1:#0ea394; --accent-3:#8fd14f; }
+:root[data-palette="dusk"]{ --accent-1:#7c5cff; --accent-3:#4fc3f7; }
+:root[data-palette="ember"]{ --accent-1:#e0457a; --accent-3:#f6b93b; }
+
+*{ box-sizing:border-box; }
+body{ margin:0; background:var(--bg); color:var(--ink); font-family:var(--font-body); line-height:1.5; -webkit-font-smoothing:antialiased; }
+h1,h2{ font-family:var(--font-display); margin:0; text-wrap:balance; }
+p{ margin:0; }
+::selection{ background:var(--grad-soft); }
+
+.wrap{ max-width:1180px; margin:0 auto; padding:56px 28px 80px; }
+
+.page-head{ max-width:660px; margin-bottom:8px; }
+.eyebrow{ font-family:var(--font-display); font-weight:700; font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; color:var(--accent-1); margin-bottom:14px; transition:color .3s ease; }
+.page-head h1{ font-size:clamp(1.9rem,3.6vw,2.5rem); font-weight:700; letter-spacing:-.01em; }
+.page-head p.lede{ margin-top:14px; color:var(--ink-soft); font-size:1.02rem; max-width:56ch; }
+
+.controls{ display:flex; flex-wrap:wrap; align-items:center; gap:14px; margin:32px 0 40px; padding:16px 18px; background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--r-lg); box-shadow:var(--shadow-sm); }
+.control-label{ font-family:var(--font-display); font-weight:600; font-size:.72rem; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-faint); margin-right:2px; }
+.control-group{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.pal-btn{ display:inline-flex; align-items:center; gap:8px; padding:8px 14px; border-radius:var(--r-full); border:1.5px solid var(--border); background:var(--surface-2); color:var(--ink-soft); font-family:var(--font-display); font-weight:600; font-size:.85rem; cursor:pointer; transition:border-color .25s ease, color .25s ease, transform .2s ease; }
+.pal-btn:hover{ transform:translateY(-1px); }
+.pal-btn .swatch{ width:14px; height:14px; border-radius:50%; flex:none; }
+.pal-btn.active{ border-color:var(--accent-1); color:var(--ink); background:var(--grad-soft); }
+.vsep{ width:1px; align-self:stretch; background:var(--border); margin:0 4px; }
+.theme-btn{ display:inline-flex; align-items:center; gap:8px; padding:8px 16px; border-radius:var(--r-full); border:1.5px solid var(--border); background:var(--surface-2); color:var(--ink); font-family:var(--font-display); font-weight:600; font-size:.85rem; cursor:pointer; margin-left:auto; }
+.theme-btn:hover{ border-color:var(--accent-1); }
+
+.grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:22px; }
+
+.card{ background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--r-lg); padding:26px; box-shadow:var(--shadow-sm); display:flex; flex-direction:column; gap:20px; transition:box-shadow .3s ease, border-color .3s ease; }
+.card:hover{ box-shadow:var(--shadow-md); border-color:var(--border); }
+
+.card-head{ display:flex; align-items:flex-start; gap:14px; }
+.card-index{ font-family:var(--font-display); font-weight:800; font-size:.78rem; color:var(--accent-1); background:var(--grad-soft); width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex:none; transition:color .3s ease; }
+.card-head h2{ font-size:1.08rem; font-weight:700; }
+.card-head p{ margin-top:5px; color:var(--ink-faint); font-size:.86rem; line-height:1.45; }
+
+.mark-stage{ display:flex; align-items:center; justify-content:center; height:132px; background:var(--surface-2); border-radius:16px; }
+.mark-big{ width:76px; height:76px; overflow:visible; }
+
+.lockup{ display:flex; align-items:center; gap:10px; padding:14px 16px; background:var(--surface-2); border-radius:14px; }
+.lockup-mark{ width:26px; height:26px; flex:none; overflow:visible; }
+.lockup b{ font-family:var(--font-display); font-weight:700; font-size:1rem; color:var(--ink); letter-spacing:-.01em; }
+.lockup-badge{ display:inline-flex; align-items:center; padding:3px 9px; margin-left:1px; border-radius:var(--r-full); background:var(--grad-soft); color:var(--accent-1); font-family:var(--font-display); font-weight:700; font-size:.58rem; text-transform:uppercase; letter-spacing:.08em; transition:color .3s ease; }
+
+.page-foot{ margin-top:52px; padding-top:28px; border-top:1px solid var(--border-soft); color:var(--ink-faint); font-size:.92rem; }
+.page-foot b{ color:var(--ink); }
+
+@media (max-width:520px){ .wrap{ padding:40px 18px 60px; } .controls{ flex-direction:column; align-items:stretch; } .theme-btn{ margin-left:0; justify-content:center; } }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="markGrad" x1="3" y1="2" x2="21" y2="22" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" style="stop-color:var(--accent-1)"/>
+      <stop offset="100%" style="stop-color:var(--accent-3)"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<div class="wrap">
+
+  <div class="page-head">
+    <div class="eyebrow">Techbiss — Bloom concept</div>
+    <h1>Seven directions for the mark</h1>
+    <p class="lede">Same wordmark, seven different logomarks — shown at display size and as it actually sits in the nav. Switch the color theme or flip to dark mode to stress-test each one.</p>
+  </div>
+
+  <div class="controls">
+    <span class="control-label">Theme</span>
+    <div class="control-group" id="paletteGroup">
+      <button class="pal-btn active" data-palette="bloom"><span class="swatch" style="background:linear-gradient(135deg,#ff6a52,#ffb648)"></span>Bloom</button>
+      <button class="pal-btn" data-palette="fresh"><span class="swatch" style="background:linear-gradient(135deg,#0ea394,#8fd14f)"></span>Fresh</button>
+      <button class="pal-btn" data-palette="dusk"><span class="swatch" style="background:linear-gradient(135deg,#7c5cff,#4fc3f7)"></span>Dusk</button>
+      <button class="pal-btn" data-palette="ember"><span class="swatch" style="background:linear-gradient(135deg,#e0457a,#f6b93b)"></span>Ember</button>
+    </div>
+    <button class="theme-btn" id="themeToggle" aria-pressed="false">🌙 Dark mode</button>
+  </div>
+
+  <div class="grid">
+
+    <!-- A — T + Bud -->
+    <section class="card">
+      <div class="card-head"><span class="card-index">A</span><div><h2>T + Bud</h2><p>The company initial, crowned with a bloom bud — ties "Techbiss" and "Bloom" together directly.</p></div></div>
+      <div class="mark-stage"><svg class="mark-big" viewBox="0 0 24 24" fill="none"><g><circle cx="12" cy="5" r="3.1" fill="url(#markGrad)"/><rect x="4.6" y="7.3" width="14.8" height="3.6" rx="1.8" fill="url(#markGrad)"/><rect x="10.4" y="8" width="3.2" height="13" rx="1.6" fill="url(#markGrad)"/></g></svg></div>
+      <div class="lockup"><span class="lockup-mark"><svg viewBox="0 0 24 24" fill="none"><g><circle cx="12" cy="5" r="3.1" fill="url(#markGrad)"/><rect x="4.6" y="7.3" width="14.8" height="3.6" rx="1.8" fill="url(#markGrad)"/><rect x="10.4" y="8" width="3.2" height="13" rx="1.6" fill="url(#markGrad)"/></g></svg></span><b>techbiss</b><span class="lockup-badge">bloom</span></div>
+    </section>
+
+    <!-- B — Bloom B -->
+    <section class="card">
+      <div class="card-head"><span class="card-index">B</span><div><h2>Bloom B</h2><p>A lowercase "b" built from a stem and a bud bowl — reads as a letter first, a flower second.</p></div></div>
+      <div class="mark-stage"><svg class="mark-big" viewBox="0 0 24 24" fill="none"><g><rect x="6.4" y="3" width="3.2" height="18" rx="1.6" fill="url(#markGrad)"/><circle cx="14" cy="15.3" r="5.4" fill="url(#markGrad)"/></g></svg></div>
+      <div class="lockup"><span class="lockup-mark"><svg viewBox="0 0 24 24" fill="none"><g><rect x="6.4" y="3" width="3.2" height="18" rx="1.6" fill="url(#markGrad)"/><circle cx="14" cy="15.3" r="5.4" fill="url(#markGrad)"/></g></svg></span><b>techbiss</b><span class="lockup-badge">bloom</span></div>
+    </section>
+
+    <!-- C — Three-Petal Bloom -->
+    <section class="card">
+      <div class="card-head"><span class="card-index">C</span><div><h2>Three-Petal Bloom</h2><p>A pure flower mark, no letterform — leans fully on the wordmark to carry the name.</p></div></div>
+      <div class="mark-stage"><svg class="mark-big" viewBox="0 0 24 24" fill="none"><g><path d="M12,12 C9,10 8,6 12,3 C16,6 15,10 12,12 Z" fill="url(#markGrad)"/><path d="M12,12 C9,10 8,6 12,3 C16,6 15,10 12,12 Z" fill="url(#markGrad)" transform="rotate(120 12 12)"/><path d="M12,12 C9,10 8,6 12,3 C16,6 15,10 12,12 Z" fill="url(#markGrad)" transform="rotate(240 12 12)"/></g></svg></div>
+      <div class="lockup"><span class="lockup-mark"><svg viewBox="0 0 24 24" fill="none"><g><path d="M12,12 C9,10 8,6 12,3 C16,6 15,10 12,12 Z" fill="url(#markGrad)"/><path d="M12,12 C9,10 8,6 12,3 C16,6 15,10 12,12 Z" fill="url(#markGrad)" transform="rotate(120 12 12)"/><path d="M12,12 C9,10 8,6 12,3 C16,6 15,10 12,12 Z" fill="url(#markGrad)" transform="rotate(240 12 12)"/></g></svg></span><b>techbiss</b><span class="lockup-badge">bloom</span></div>
+    </section>
+
+    <!-- D — Radial Node Bloom -->
+    <section class="card">
+      <div class="card-head"><span class="card-index">D</span><div><h2>Radial Node Bloom</h2><p>A ring of six nodes around a core — reads as both a flower and a network, tying "tech" to "bloom".</p></div></div>
+      <div class="mark-stage"><svg class="mark-big" viewBox="0 0 24 24" fill="none"><g><circle cx="12" cy="12" r="3.4" fill="url(#markGrad)"/><circle cx="20.2" cy="12" r="1.7" fill="url(#markGrad)"/><circle cx="16.1" cy="4.9" r="1.7" fill="url(#markGrad)"/><circle cx="7.9" cy="4.9" r="1.7" fill="url(#markGrad)"/><circle cx="3.8" cy="12" r="1.7" fill="url(#markGrad)"/><circle cx="7.9" cy="19.1" r="1.7" fill="url(#markGrad)"/><circle cx="16.1" cy="19.1" r="1.7" fill="url(#markGrad)"/></g></svg></div>
+      <div class="lockup"><span class="lockup-mark"><svg viewBox="0 0 24 24" fill="none"><g><circle cx="12" cy="12" r="3.4" fill="url(#markGrad)"/><circle cx="20.2" cy="12" r="1.7" fill="url(#markGrad)"/><circle cx="16.1" cy="4.9" r="1.7" fill="url(#markGrad)"/><circle cx="7.9" cy="4.9" r="1.7" fill="url(#markGrad)"/><circle cx="3.8" cy="12" r="1.7" fill="url(#markGrad)"/><circle cx="7.9" cy="19.1" r="1.7" fill="url(#markGrad)"/><circle cx="16.1" cy="19.1" r="1.7" fill="url(#markGrad)"/></g></svg></span><b>techbiss</b><span class="lockup-badge">bloom</span></div>
+    </section>
+
+    <!-- E — Growth Sprout -->
+    <section class="card">
+      <div class="card-head"><span class="card-index">E</span><div><h2>Growth Sprout</h2><p>A stem with two leaves and a bud tip — reads as growth and transformation, not just decoration.</p></div></div>
+      <div class="mark-stage"><svg class="mark-big" viewBox="0 0 24 24" fill="none"><g><path d="M12,21 C12,15 10,12 12,6" stroke="url(#markGrad)" stroke-width="2.2" stroke-linecap="round"/><ellipse cx="8.3" cy="13.5" rx="3.1" ry="1.7" fill="url(#markGrad)" transform="rotate(-35 8.3 13.5)"/><ellipse cx="15.7" cy="10" rx="3.1" ry="1.7" fill="url(#markGrad)" transform="rotate(35 15.7 10)"/><circle cx="12" cy="5.2" r="1.9" fill="url(#markGrad)"/></g></svg></div>
+      <div class="lockup"><span class="lockup-mark"><svg viewBox="0 0 24 24" fill="none"><g><path d="M12,21 C12,15 10,12 12,6" stroke="url(#markGrad)" stroke-width="2.2" stroke-linecap="round"/><ellipse cx="8.3" cy="13.5" rx="3.1" ry="1.7" fill="url(#markGrad)" transform="rotate(-35 8.3 13.5)"/><ellipse cx="15.7" cy="10" rx="3.1" ry="1.7" fill="url(#markGrad)" transform="rotate(35 15.7 10)"/><circle cx="12" cy="5.2" r="1.9" fill="url(#markGrad)"/></g></svg></span><b>techbiss</b><span class="lockup-badge">bloom</span></div>
+    </section>
+
+    <!-- F — Crescent Leaf -->
+    <section class="card">
+      <div class="card-head"><span class="card-index">F</span><div><h2>Crescent Leaf</h2><p>One circle cut by another — a single confident leaf/petal shape, quiet and easy to scale down.</p></div></div>
+      <div class="mark-stage"><svg class="mark-big" viewBox="0 0 24 24" fill="none"><g><circle cx="10.6" cy="12" r="8.4" fill="url(#markGrad)"/><circle cx="16.4" cy="8.6" r="7.6" fill="var(--surface-2)"/></g></svg></div>
+      <div class="lockup"><span class="lockup-mark"><svg viewBox="0 0 24 24" fill="none"><g><circle cx="10.6" cy="12" r="8.4" fill="url(#markGrad)"/><circle cx="16.4" cy="8.6" r="7.6" fill="var(--surface-2)"/></g></svg></span><b>techbiss</b><span class="lockup-badge">bloom</span></div>
+    </section>
+
+    <!-- G — Faceted Bud -->
+    <section class="card">
+      <div class="card-head"><span class="card-index">G</span><div><h2>Faceted Bud</h2><p>A cut-gem silhouette instead of a soft blob — more premium-tech, less wellness-app.</p></div></div>
+      <div class="mark-stage"><svg class="mark-big" viewBox="0 0 24 24" fill="none"><g><polygon points="12,2.4 18.2,7 16.2,15.4 7.8,15.4 5.8,7" fill="url(#markGrad)"/><path d="M12,2.4 L12,15.4" stroke="var(--surface)" stroke-width=".7" opacity=".55"/></g></svg></div>
+      <div class="lockup"><span class="lockup-mark"><svg viewBox="0 0 24 24" fill="none"><g><polygon points="12,2.4 18.2,7 16.2,15.4 7.8,15.4 5.8,7" fill="url(#markGrad)"/><path d="M12,2.4 L12,15.4" stroke="var(--surface)" stroke-width=".7" opacity=".55"/></g></svg></span><b>techbiss</b><span class="lockup-badge">bloom</span></div>
+    </section>
+
+  </div>
+
+  <div class="page-foot">
+    Note on <b>Crescent Leaf</b> (F): it deliberately matches its cut-out circle to the surrounding surface color, so it will look slightly different placed on a solid-color card than it does here — worth a quick check wherever it's used on a non-default background.
+  </div>
+
+</div>
+
+<script>
+(function(){
+  var root = document.documentElement;
+
+  var paletteBtns = document.querySelectorAll('.pal-btn');
+  paletteBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      root.setAttribute('data-palette', btn.dataset.palette);
+      paletteBtns.forEach(function(b){ b.classList.toggle('active', b===btn); });
+      try{ localStorage.setItem('bloomStudiesPalette', btn.dataset.palette); }catch(e){}
+    });
+  });
+
+  var themeBtn = document.getElementById('themeToggle');
+  function setTheme(mode){
+    if(mode==='dark'){ root.setAttribute('data-theme','dark'); themeBtn.textContent='☀️ Light mode'; themeBtn.setAttribute('aria-pressed','true'); }
+    else{ root.setAttribute('data-theme','light'); themeBtn.textContent='🌙 Dark mode'; themeBtn.setAttribute('aria-pressed','false'); }
+    try{ localStorage.setItem('bloomStudiesTheme', mode); }catch(e){}
+  }
+  themeBtn.addEventListener('click', function(){
+    setTheme(root.getAttribute('data-theme')==='dark' ? 'light' : 'dark');
+  });
+
+  try{
+    var savedPalette = localStorage.getItem('bloomStudiesPalette');
+    if(savedPalette){
+      root.setAttribute('data-palette', savedPalette);
+      paletteBtns.forEach(function(b){ b.classList.toggle('active', b.dataset.palette===savedPalette); });
+    }
+    var savedTheme = localStorage.getItem('bloomStudiesTheme');
+    if(savedTheme) setTheme(savedTheme);
+  }catch(e){}
+})();
+</script>
