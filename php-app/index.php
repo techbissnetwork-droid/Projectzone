@@ -28,9 +28,10 @@ $socialImagePath = get_setting('social_image_path', 'assets/social-default.png')
 $baseUrl = defined('SITE_URL') ? rtrim(SITE_URL, '/') : '';
 $canonicalUrl = $baseUrl !== '' ? $baseUrl . '/' : '';
 $socialImageUrl = $baseUrl !== '' ? $baseUrl . '/' . ltrim($socialImagePath, '/') : $socialImagePath;
+$colorPalette = get_setting('color_palette', '');
 ?>
 <!doctype html>
-<html lang="en">
+<html lang="en"<?= $colorPalette !== '' ? ' data-palette="' . e($colorPalette) . '"' : '' ?>>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">

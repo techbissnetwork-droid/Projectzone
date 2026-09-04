@@ -78,6 +78,42 @@
   --shadow-lg: 0 32px 70px -18px hsl(var(--shadow-tint) / .65);
 }
 
+/* ============================= COLOR THEMES ============================= */
+/* Chosen site-wide by staff in Admin > Settings — not a public visitor
+   toggle. Each theme overrides only the two base hues; --accent-1/2/3,
+   --grad, --grad-soft and --grad-text all derive from them automatically
+   in every light/dark state. */
+:root[data-palette="fresh"]{ --hue-1:#0ea394; --hue-2:#8fd14f; }
+:root[data-palette="dusk"]{ --hue-1:#7c5cff; --hue-2:#4fc3f7; }
+:root[data-palette="ember"]{ --hue-1:#e0457a; --hue-2:#f6b93b; }
+:root[data-palette="sunrise"]{ --hue-1:#ff6a3d; --hue-2:#ff4f8b; }
+:root[data-palette="lagoon"]{ --hue-1:#0098c9; --hue-2:#2f6fed; }
+:root[data-palette="orchid"]{ --hue-1:#a83df0; --hue-2:#6a5cff; }
+:root[data-palette="citrus"]{ --hue-1:#7ec242; --hue-2:#17a672; }
+:root[data-palette="slate"]{ --hue-1:#7a63d1; --hue-2:#c9718a; }
+:root[data-palette="midnight"]{ --hue-1:#4a3aff; --hue-2:#e0389c; }
+:root[data-palette="noir"]{ --hue-1:#c9a45c; --hue-2:#efe6d0; }
+
+/* Noir is the one theme that also swaps the base surfaces — a true near-black,
+   not just gold accents on the standard warm-brown dark mode. Only kicks in
+   once dark mode is actually active. */
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"])[data-palette="noir"]{
+    --bg:#0e0d0b; --bg-alt:#141210; --bg-alt-2:#171512;
+    --surface:#161412; --surface-2:#1c1916;
+    --ink:#f3ede0; --ink-soft:#c7bdaa; --ink-faint:#8f8574;
+    --border:#2c2822; --border-soft:#242019;
+    --shadow-tint: 38 18% 3%;
+  }
+}
+:root[data-theme="dark"][data-palette="noir"]{
+  --bg:#0e0d0b; --bg-alt:#141210; --bg-alt-2:#171512;
+  --surface:#161412; --surface-2:#1c1916;
+  --ink:#f3ede0; --ink-soft:#c7bdaa; --ink-faint:#8f8574;
+  --border:#2c2822; --border-soft:#242019;
+  --shadow-tint: 38 18% 3%;
+}
+
 
 /* ============================= RESET ============================= */
 *,*::before,*::after{ box-sizing:border-box; }

@@ -162,14 +162,18 @@ so these all look right before you ever touch Settings.
 
 **Branding & appearance** — upload a custom logo (replaces the default
 "T" mark everywhere: public header/footer and the admin header) and a
-custom favicon, and choose the default light/dark theme for **new**
-visitors (Automatic/Light/Dark — anyone who has already toggled the
-theme themselves keeps their own choice; this only sets what a first-time
-visitor sees). Uploaded files are saved to `assets/uploads/` (created
-automatically — needs to be writable by the web server, same requirement
-as `install/` needing to write `config.php`) and are capped at 2MB;
-allowed types are PNG/JPG/WebP for the logo and social image, PNG only
-for the favicon.
+custom favicon; pick one of the 11 color themes explored during design
+(Bloom, Fresh, Dusk, Ember, Sunrise, Lagoon, Orchid, Citrus, Slate Bloom,
+Midnight Bloom, Noir) as the site's brand color — this applies to every
+visitor site-wide (it's a business-identity choice, not a per-visitor
+toggle, so there's no public picker for it); and choose the default
+light/dark theme for **new** visitors (Automatic/Light/Dark — anyone who
+has already toggled the theme themselves keeps their own choice; this
+only sets what a first-time visitor sees). Uploaded files are saved to
+`assets/uploads/` (created automatically — needs to be writable by the
+web server, same requirement as `install/` needing to write
+`config.php`) and are capped at 2MB; allowed types are PNG/JPG/WebP for
+the logo and social image, PNG only for the favicon.
 
 It does not (yet) cover every string on the site — full-page copy for
 Services/Solutions/Pricing/etc. is still in `assets/app.js`, since making
@@ -244,6 +248,7 @@ install/migrations/002_newsletter.php Adds newsletter_subscribers
 install/migrations/003_settings.php   Adds the settings table, seeded with the original hardcoded copy
 install/migrations/004_pricing_type.php  Adds products.pricing_type (monthly vs. one-time fixed price)
 install/migrations/005_branding_seo.php  Adds SEO/social/logo/favicon/default-theme settings
+install/migrations/006_color_palette.php Adds the site-wide brand color theme setting
 includes/db.php                       Database connection, session setup, auth/flash/settings/logo helpers, install-guard
 includes/migrate.php                  Tiny migration runner used by install/
 includes/icons.php                    Icon set used by the server-rendered admin panel

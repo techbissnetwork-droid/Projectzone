@@ -12,6 +12,19 @@ $TEXT_FIELDS = [
     'contact_email', 'contact_phone', 'seo_title', 'meta_description',
 ];
 $THEME_OPTIONS = ['auto' => 'Automatic (matches visitor device)', 'light' => 'Light', 'dark' => 'Dark'];
+$PALETTE_OPTIONS = [
+    '' => 'Bloom (coral & amber — default)',
+    'fresh' => 'Fresh (teal & lime)',
+    'dusk' => 'Dusk (violet & sky)',
+    'ember' => 'Ember (rose & gold)',
+    'sunrise' => 'Sunrise (orange & pink)',
+    'lagoon' => 'Lagoon (cyan & blue)',
+    'orchid' => 'Orchid (purple & indigo)',
+    'citrus' => 'Citrus (green & emerald)',
+    'slate' => 'Slate Bloom (indigo & mauve)',
+    'midnight' => 'Midnight Bloom (indigo & magenta)',
+    'noir' => 'Noir (gold on near-black — best in dark mode)',
+];
 
 function branding_upload(string $field, array $allowedExts, string $destBasename, string $settingKey): ?string
 {
@@ -61,6 +74,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         $theme = array_key_exists($_POST['default_theme'] ?? '', $THEME_OPTIONS) ? $_POST['default_theme'] : 'auto';
         $stmt->execute(['default_theme', $theme]);
+        $palette = array_key_exists($_POST['color_palette'] ?? '', $PALETTE_OPTIONS) ? $_POST['color_palette'] : '';
+        $stmt->execute(['color_palette', $palette]);
 
         if ($err = branding_upload('logo', ['png', 'jpg', 'jpeg', 'webp'], 'logo', 'logo_path')) {
             $errors[] = $err;
@@ -160,13 +175,23 @@ $socialPath = $current['social_image_path'] ?? 'assets/social-default.png';
           <p style="font-size:.78rem;color:var(--ink-faint);margin-top:6px;">PNG, ideally 512×512px (square).</p>
         </div>
       </div>
-      <div class="field"><label>Default theme for new visitors</label>
-        <select name="default_theme">
-          <?php foreach ($THEME_OPTIONS as $val => $label): ?>
-          <option value="<?= e($val) ?>" <?= ($current['default_theme'] ?? 'auto') === $val ? 'selected' : '' ?>><?= e($label) ?></option>
-          <?php endforeach; ?>
-        </select>
-        <p style="font-size:.78rem;color:var(--ink-faint);margin-top:6px;">Only applies to first-time visitors — anyone who has already toggled light/dark themselves keeps their own choice.</p>
+      <div class="grid grid-2" style="gap:16px;">
+        <div class="field"><label>Brand color theme</label>
+          <select name="color_palette">
+            <?php foreach ($PALETTE_OPTIONS as $val => $label): ?>
+            <option value="<?= e($val) ?>" <?= ($current['color_palette'] ?? '') === $val ? 'selected' : '' ?>><?= e($label) ?></option>
+            <?php endforeach; ?>
+          </select>
+          <p style="font-size:.78rem;color:var(--ink-faint);margin-top:6px;">Applies site-wide for everyone — one consistent brand look, not a per-visitor toggle.</p>
+        </div>
+        <div class="field"><label>Default theme for new visitors</label>
+          <select name="default_theme">
+            <?php foreach ($THEME_OPTIONS as $val => $label): ?>
+            <option value="<?= e($val) ?>" <?= ($current['default_theme'] ?? 'auto') === $val ? 'selected' : '' ?>><?= e($label) ?></option>
+            <?php endforeach; ?>
+          </select>
+          <p style="font-size:.78rem;color:var(--ink-faint);margin-top:6px;">Only applies to first-time visitors — anyone who has already toggled light/dark themselves keeps their own choice.</p>
+        </div>
       </div>
     </div>
 

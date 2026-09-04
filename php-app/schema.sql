@@ -158,6 +158,7 @@ INSERT INTO `settings` (`id`, `value`) VALUES
 ('logo_path', ''),
 ('favicon_path', 'assets/favicon.ico'),
 ('social_image_path', 'assets/social-default.png'),
-('default_theme', 'auto');
+('default_theme', 'auto'),
+('color_palette', '');
 
 SET FOREIGN_KEY_CHECKS = 1;
