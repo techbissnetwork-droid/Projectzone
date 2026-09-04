@@ -19,6 +19,7 @@ CREATE TABLE `staff` (
   `permissions` TEXT NULL,
   `is_owner` TINYINT(1) NOT NULL DEFAULT 0,
   `initials` VARCHAR(4) NOT NULL DEFAULT '',
+  `marketing_earnings_cents` INT UNSIGNED NOT NULL DEFAULT 0,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -31,6 +32,27 @@ INSERT INTO `staff` (`name`, `email`, `password_hash`, `role`, `permissions`, `i
 ('Devon Kwan', 'devon@techbiss.com', '$2y$12$KqXcJRwo2G4x/oavDaIVPuv754B8wk0ECXzkK4BWlcq0lzqQDrTha', 'Head of Engineering', NULL, 0, 'DK'),
 ('Rhea Solano', 'rhea@techbiss.com', '$2y$12$KqXcJRwo2G4x/oavDaIVPuv754B8wk0ECXzkK4BWlcq0lzqQDrTha', 'Head of Design', NULL, 0, 'RS'),
 ('Jonah Traeger', 'admin@techbiss.com', '$2y$12$KqXcJRwo2G4x/oavDaIVPuv754B8wk0ECXzkK4BWlcq0lzqQDrTha', 'VP Client Success', NULL, 0, 'JT');
+
+-- ---------------------------------------------------------------
+-- marketing_leads — offline businesses staff find in the field.
+-- Each submission earns the submitting staff member a small incentive
+-- (staff.marketing_earnings_cents), tallied regardless of review outcome.
+-- ---------------------------------------------------------------
+DROP TABLE IF EXISTS `marketing_leads`;
+CREATE TABLE `marketing_leads` (
+  `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `staff_id` INT UNSIGNED NOT NULL,
+  `business_name` VARCHAR(150) NOT NULL,
+  `phone` VARCHAR(40) NOT NULL,
+  `address` VARCHAR(255) NOT NULL,
+  `notes` TEXT NULL,
+  `status` ENUM('Pending','Approved','Rejected') NOT NULL DEFAULT 'Pending',
+  `reviewed_by_staff_id` INT UNSIGNED NULL,
+  `reviewed_at` TIMESTAMP NULL,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (`staff_id`) REFERENCES `staff`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`reviewed_by_staff_id`) REFERENCES `staff`(`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ---------------------------------------------------------------
 -- customers — real accounts created via the public sign-up form.

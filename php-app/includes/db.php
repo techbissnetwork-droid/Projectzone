@@ -199,10 +199,24 @@ function staff_permissions(array $staff): ?array
 
 function staff_can(array $staff, string $page): bool
 {
-    $key = pathinfo($page, PATHINFO_FILENAME);
-    if ($key === 'index') {
+    $perms = staff_permissions($staff);
+    if ($perms === null) {
         return true;
     }
+    if (isset(PAGE_PERMISSION_ALIASES[$page])) {
+        foreach (PAGE_PERMISSION_ALIASES[$page] as $key) {
+            if (in_array($key, $perms, true)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    $key = pathinfo($page, PATHINFO_FILENAME);
+    return $key === 'index' || in_array($key, $perms, true);
+}
+
+function staff_has_permission(array $staff, string $key): bool
+{
     $perms = staff_permissions($staff);
     return $perms === null || in_array($key, $perms, true);
 }

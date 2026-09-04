@@ -20,6 +20,7 @@ $ICONS = [
     'close' => '<path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
     'menu' => '<path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
     'settings' =>'<circle cx="12" cy="12" r="2.8" stroke="currentColor" stroke-width="1.7"/><path d="M19.4 13.5a1.7 1.7 0 0 0 .35 1.9l.05.05a2.1 2.1 0 1 1-3 3l-.05-.05a1.7 1.7 0 0 0-1.9-.35 1.7 1.7 0 0 0-1 1.55V20a2.1 2.1 0 1 1-4.2 0v-.08a1.7 1.7 0 0 0-1.1-1.55 1.7 1.7 0 0 0-1.9.35l-.05.05a2.1 2.1 0 1 1-3-3l.05-.05a1.7 1.7 0 0 0 .35-1.9 1.7 1.7 0 0 0-1.55-1H2a2.1 2.1 0 1 1 0-4.2h.08a1.7 1.7 0 0 0 1.55-1.1 1.7 1.7 0 0 0-.35-1.9l-.05-.05a2.1 2.1 0 1 1 3-3l.05.05a1.7 1.7 0 0 0 1.9.35H8.3a1.7 1.7 0 0 0 1-1.55V2a2.1 2.1 0 1 1 4.2 0v.08a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.9-.35l.05-.05a2.1 2.1 0 1 1 3 3l-.05.05a1.7 1.7 0 0 0-.35 1.9V8.3a1.7 1.7 0 0 0 1.55 1H22a2.1 2.1 0 1 1 0 4.2h-.08a1.7 1.7 0 0 0-1.55 1Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>',
+    'pin' => '<path d="M12 21s-7-6.5-7-12a7 7 0 1 1 14 0c0 5.5-7 12-7 12Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="9" r="2.4" stroke="currentColor" stroke-width="1.6"/>',
 ];
 
 function ico(string $name, string $cls = ''): string

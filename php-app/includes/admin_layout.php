@@ -3,6 +3,7 @@ const ADMIN_NAV = [
     ['path' => 'index.php', 'label' => 'Dashboard', 'icon' => 'grid'],
     ['path' => 'users.php', 'label' => 'Users', 'icon' => 'users'],
     ['path' => 'businesses.php', 'label' => 'Businesses', 'icon' => 'box'],
+    ['path' => 'marketing.php', 'label' => 'Marketing', 'icon' => 'pin'],
     ['path' => 'tickets.php', 'label' => 'Tickets', 'icon' => 'chat'],
     ['path' => 'products.php', 'label' => 'Products', 'icon' => 'star'],
     ['path' => 'content.php', 'label' => 'Content', 'icon' => 'edit'],
@@ -11,14 +12,25 @@ const ADMIN_NAV = [
 ];
 
 // Sections an admin can grant/withhold per staff member (Dashboard excluded — always available).
+// marketing_submit/marketing_review are independent — a staffer can be given
+// either one, both, or neither, unlike every other section here which maps
+// 1:1 to a page.
 const STAFF_SECTIONS = [
     'users' => 'Users',
     'businesses' => 'Businesses',
+    'marketing_submit' => 'Marketing: submit leads',
+    'marketing_review' => 'Marketing: approve/reject leads',
     'tickets' => 'Tickets',
     'products' => 'Products',
     'content' => 'Content',
     'staff' => 'Staff & permissions',
     'settings' => 'Settings',
+];
+
+// Pages unlocked by more than one of the granular keys above, instead of the
+// usual single filename-derived key (see staff_can()).
+const PAGE_PERMISSION_ALIASES = [
+    'marketing.php' => ['marketing_submit', 'marketing_review'],
 ];
 
 function admin_visible_nav(array $staff): array
