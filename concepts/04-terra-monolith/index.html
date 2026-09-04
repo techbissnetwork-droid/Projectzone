@@ -1,0 +1,2756 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Terra Monolith — TECHBISS</title>
+<meta name="description" content="TECHBISS builds the structural core of the world's largest enterprises — cloud foundations, applied AI, data fabric and zero-trust security, delivered as a single monolithic platform across 74 countries.">
+<meta name="theme-color" content="#0B0A09">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Inter:wght@300;400;500;600;700&display=swap">
+<style>
+/* ============================================================
+   TERRA MONOLITH — TECHBISS
+   Architectural / brutalist-luxury design system
+   ============================================================ */
+
+/* ---------- TOKENS : LIGHT (travertine) is the base layer ---------- */
+:root{
+  --ground:#E7E0D3;
+  --panel:#F1EBE0;
+  --panel-2:#DDD4C4;
+  --ink:#15110C;
+  --ink-soft:#4A423A;
+  --ink-mute:#6E645A;
+  --rule:rgba(21,17,12,.16);
+  --rule-strong:rgba(21,17,12,.42);
+  --rule-thick:rgba(21,17,12,.86);
+  --accent:#9A6534;
+  --accent-text:#8A5527;
+  --accent-soft:rgba(154,101,52,.14);
+  --accent-line:rgba(154,101,52,.45);
+  --metal-a:#C08552;
+  --metal-b:#8A5527;
+  --metal-c:#E3B784;
+  --good:#3F6B4A;
+  --warn:#8A6A1F;
+  --crit:#8E3B2E;
+  --shadow-press:0 0 0 1px rgba(21,17,12,.14), inset 0 2px 22px rgba(21,17,12,.10);
+  --shadow-rest:0 1px 0 rgba(255,255,255,.5);
+  --stone-op:.05;
+  --grain-op:.30;
+  --sweep-op:.16;
+  --gutter:clamp(18px,4.2vw,66px);
+  --maxw:1580px;
+  --rail:clamp(52px,7vw,104px);
+  --step:clamp(56px,7vw,120px);
+  --disp:'Archivo','Archivo Expanded','Helvetica Neue',Arial,sans-serif;
+  --body:'Inter','Helvetica Neue',Arial,system-ui,sans-serif;
+  color-scheme:light;
+}
+/* ---------- TOKENS : DARK (basalt) — system preference ---------- */
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0B0A09;
+    --panel:#141210;
+    --panel-2:#1E1A16;
+    --ink:#EFE8DC;
+    --ink-soft:#B6ABA0;
+    --ink-mute:#8B8078;
+    --rule:rgba(239,232,220,.14);
+    --rule-strong:rgba(239,232,220,.34);
+    --rule-thick:rgba(239,232,220,.78);
+    --accent:#C08552;
+    --accent-text:#D69A63;
+    --accent-soft:rgba(192,133,82,.13);
+    --accent-line:rgba(192,133,82,.42);
+    --metal-a:#E3B784;
+    --metal-b:#8A5527;
+    --metal-c:#F0D5B4;
+    --good:#7FB08C;
+    --warn:#D6AE5C;
+    --crit:#D97D68;
+    --shadow-press:0 0 0 1px rgba(239,232,220,.10), inset 0 2px 26px rgba(0,0,0,.55);
+    --shadow-rest:0 1px 0 rgba(255,255,255,.04);
+    --stone-op:.07;
+    --grain-op:.40;
+    --sweep-op:.22;
+    color-scheme:dark;
+  }
+}
+/* ---------- TOKENS : DARK — explicit choice ---------- */
+:root[data-theme="dark"]{
+  --ground:#0B0A09;
+  --panel:#141210;
+  --panel-2:#1E1A16;
+  --ink:#EFE8DC;
+  --ink-soft:#B6ABA0;
+  --ink-mute:#8B8078;
+  --rule:rgba(239,232,220,.14);
+  --rule-strong:rgba(239,232,220,.34);
+  --rule-thick:rgba(239,232,220,.78);
+  --accent:#C08552;
+  --accent-text:#D69A63;
+  --accent-soft:rgba(192,133,82,.13);
+  --accent-line:rgba(192,133,82,.42);
+  --metal-a:#E3B784;
+  --metal-b:#8A5527;
+  --metal-c:#F0D5B4;
+  --good:#7FB08C;
+  --warn:#D6AE5C;
+  --crit:#D97D68;
+  --shadow-press:0 0 0 1px rgba(239,232,220,.10), inset 0 2px 26px rgba(0,0,0,.55);
+  --shadow-rest:0 1px 0 rgba(255,255,255,.04);
+  --stone-op:.07;
+  --grain-op:.40;
+  --sweep-op:.22;
+  color-scheme:dark;
+}
+
+/* ---------- RESET / BASE ---------- */
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;
+  background:var(--ground);
+  color:var(--ink);
+  font-family:var(--body);
+  font-size:16px;
+  line-height:1.6;
+  font-weight:400;
+  overflow-x:hidden;
+  transition:background-color .7s cubic-bezier(.16,1,.3,1), color .7s cubic-bezier(.16,1,.3,1);
+}
+img{max-width:100%}
+h1,h2,h3,h4{margin:0;font-family:var(--disp);font-weight:800;line-height:.92;letter-spacing:-.022em;text-wrap:balance;font-stretch:84%}
+p{margin:0}
+a{color:inherit;text-decoration:none}
+button,input,select,textarea{font:inherit;color:inherit}
+ul,ol{margin:0;padding:0;list-style:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+::selection{background:var(--accent);color:var(--ground)}
+
+/* ---------- LAYOUT PRIMITIVES ---------- */
+.wrap{max-width:var(--maxw);margin:0 auto;padding-inline:var(--gutter)}
+.sec{padding-block:clamp(64px,9vw,150px);position:relative}
+.sec--tight{padding-block:clamp(44px,6vw,96px)}
+.rule{height:1px;background:var(--rule);border:0;margin:0}
+.rule--thick{height:3px;background:var(--rule-thick)}
+.rule--accent{height:3px;background:var(--accent)}
+
+/* structural rule that extends on reveal */
+.xrule{height:3px;background:var(--rule-thick);transform-origin:left center;transform:scaleX(1)}
+html.motion .xrule{transform:scaleX(0)}
+html.motion .xrule.in{transform:scaleX(1);transition:transform 1.5s cubic-bezier(.16,1,.3,1)}
+
+/* ---------- TYPE ---------- */
+.eyebrow{
+  font-family:var(--disp);font-size:.72rem;font-weight:700;letter-spacing:.24em;
+  text-transform:uppercase;color:var(--accent-text);font-stretch:100%;
+  display:flex;align-items:center;gap:.7em;
+}
+.eyebrow::before{content:"";width:clamp(18px,3vw,46px);height:2px;background:var(--accent);flex:none}
+.level-tag{
+  font-family:var(--disp);font-size:.68rem;font-weight:700;letter-spacing:.28em;text-transform:uppercase;
+  color:var(--ink-mute);font-stretch:100%;font-variant-numeric:tabular-nums;
+}
+.h-mega{font-size:clamp(2.9rem,12.4vw,10.5rem);font-weight:900;font-stretch:78%;letter-spacing:-.035em;line-height:.84}
+.h-1{font-size:clamp(2.3rem,7.4vw,6.2rem);font-weight:900;font-stretch:80%;line-height:.86}
+.h-2{font-size:clamp(1.85rem,4.6vw,3.9rem);font-weight:800;font-stretch:82%;line-height:.92}
+.h-3{font-size:clamp(1.25rem,2.2vw,1.85rem);font-weight:700;font-stretch:88%;line-height:1.02}
+.h-4{font-size:1.02rem;font-weight:700;font-stretch:92%;letter-spacing:-.005em;line-height:1.2}
+.lede{font-size:clamp(1.02rem,1.5vw,1.32rem);line-height:1.55;color:var(--ink-soft);max-width:62ch;font-weight:300}
+.body-s{font-size:.94rem;color:var(--ink-soft);line-height:1.62;max-width:64ch}
+.micro{font-size:.78rem;color:var(--ink-mute);letter-spacing:.02em}
+.num{font-variant-numeric:tabular-nums;font-family:var(--disp);font-stretch:78%}
+.metal{
+  background:linear-gradient(96deg,var(--metal-b) 0%,var(--metal-a) 22%,var(--metal-c) 40%,var(--metal-a) 58%,var(--metal-b) 78%,var(--metal-a) 100%);
+  background-size:220% 100%;
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  animation:metalDrift 22s linear infinite;
+}
+@keyframes metalDrift{0%{background-position:0% 0}100%{background-position:220% 0}}
+
+/* ---------- AMBIENT LAYERS ---------- */
+#ambient{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.9}
+.vignette{
+  position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:radial-gradient(120% 90% at 50% 0%,transparent 40%,rgba(0,0,0,.06) 100%);
+  mix-blend-mode:multiply;
+}
+:root[data-theme="dark"] .vignette{background:radial-gradient(130% 100% at 50% -10%,rgba(192,133,82,.05) 0%,transparent 46%),radial-gradient(120% 90% at 50% 100%,transparent 45%,rgba(0,0,0,.55) 100%);mix-blend-mode:normal}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .vignette{background:radial-gradient(130% 100% at 50% -10%,rgba(192,133,82,.05) 0%,transparent 46%),radial-gradient(120% 90% at 50% 100%,transparent 45%,rgba(0,0,0,.55) 100%);mix-blend-mode:normal}}
+.shell{position:relative;z-index:2}
+
+/* ---------- CUSTOM CURSOR ---------- */
+.cursor,.cursor-dot{position:fixed;top:0;left:0;z-index:9998;pointer-events:none;opacity:0;will-change:transform}
+.cursor{width:38px;height:38px;margin:-19px 0 0 -19px;border:1.5px solid var(--accent);transition:opacity .35s ease,width .5s cubic-bezier(.16,1,.3,1),height .5s cubic-bezier(.16,1,.3,1),margin .5s cubic-bezier(.16,1,.3,1),background-color .4s ease}
+.cursor.big{width:74px;height:74px;margin:-37px 0 0 -37px;background:var(--accent-soft)}
+.cursor-dot{width:4px;height:4px;margin:-2px 0 0 -2px;background:var(--accent)}
+html.cursor-on .cursor,html.cursor-on .cursor-dot{opacity:1}
+html.cursor-on,html.cursor-on a,html.cursor-on button{cursor:none}
+
+/* ---------- LOADER ---------- */
+#loader{position:fixed;inset:0;z-index:9999;background:var(--ground);display:grid;place-items:center;overflow:hidden}
+#loader .slab{position:absolute;inset:0;background:var(--panel);transform-origin:top center}
+#loader .ld-inner{position:relative;text-align:center;padding-inline:24px}
+#loader .ld-mark{font-family:var(--disp);font-weight:900;font-stretch:70%;letter-spacing:-.04em;font-size:clamp(2.6rem,13vw,9rem);line-height:.8;overflow:hidden}
+#loader .ld-mark span{display:inline-block;transform:translateY(102%)}
+#loader .ld-sub{margin-top:18px;display:flex;justify-content:center;gap:18px;flex-wrap:wrap;opacity:0}
+#loader .ld-bar{margin-top:26px;height:3px;background:var(--rule);position:relative;overflow:hidden}
+#loader .ld-bar i{position:absolute;inset:0;background:var(--accent);transform:scaleX(0);transform-origin:left}
+#loader.done{pointer-events:none}
+
+/* ---------- HEADER ---------- */
+.hdr{position:fixed;top:0;left:0;right:0;z-index:400;background:color-mix(in srgb,var(--ground) 86%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--rule);transition:transform .8s cubic-bezier(.16,1,.3,1),background-color .5s ease}
+.hdr.hide{transform:translateY(-101%)}
+.hdr-in{max-width:var(--maxw);margin:0 auto;padding:0 var(--gutter);height:clamp(60px,6.4vw,80px);display:flex;align-items:center;gap:clamp(14px,3vw,40px)}
+.brand{display:flex;align-items:center;gap:11px;flex:none}
+.brand-glyph{width:26px;height:26px;flex:none;position:relative}
+.brand-glyph i{position:absolute;background:var(--accent);display:block}
+.brand-glyph i:nth-child(1){left:0;top:0;width:26px;height:5px}
+.brand-glyph i:nth-child(2){left:3px;top:8px;width:20px;height:5px}
+.brand-glyph i:nth-child(3){left:6px;top:16px;width:14px;height:10px;background:var(--ink)}
+.brand-name{font-family:var(--disp);font-weight:900;font-stretch:74%;letter-spacing:.02em;font-size:1.14rem}
+.brand-name small{display:block;font-family:var(--body);font-weight:500;font-size:.55rem;letter-spacing:.3em;color:var(--ink-mute);margin-top:1px}
+.nav{display:flex;align-items:center;gap:2px;margin-left:auto;flex-wrap:nowrap}
+.nav a{
+  position:relative;padding:9px 11px;font-size:.79rem;font-weight:500;letter-spacing:.04em;color:var(--ink-soft);
+  transition:color .4s cubic-bezier(.16,1,.3,1);white-space:nowrap;
+}
+.nav a::after{content:"";position:absolute;left:11px;right:11px;bottom:2px;height:2px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .55s cubic-bezier(.16,1,.3,1)}
+.nav a:hover{color:var(--ink)}
+.nav a:hover::after{transform:scaleX(1)}
+.nav a[aria-current="page"]{color:var(--ink);font-weight:600}
+.nav a[aria-current="page"]::after{transform:scaleX(1)}
+.hdr-act{display:flex;align-items:center;gap:8px;flex:none;margin-left:8px}
+.icon-btn{
+  width:38px;height:38px;display:grid;place-items:center;background:transparent;border:1px solid var(--rule-strong);
+  cursor:pointer;transition:transform .45s cubic-bezier(.16,1,.3,1),box-shadow .45s ease,border-color .4s ease;
+}
+.icon-btn:hover{transform:scale(.95);box-shadow:var(--shadow-press);border-color:var(--accent)}
+.icon-btn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.6}
+.burger{display:none}
+.burger i{display:block;width:17px;height:2px;background:currentColor;transition:transform .5s cubic-bezier(.16,1,.3,1),opacity .3s ease}
+.burger i+i{margin-top:4px}
+html.drawer-open .burger i:nth-child(1){transform:translateY(6px) rotate(45deg)}
+html.drawer-open .burger i:nth-child(2){opacity:0}
+html.drawer-open .burger i:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+
+/* header progress rule */
+.hdr-prog{position:absolute;left:0;bottom:-1px;height:2px;background:var(--accent);width:0%;transition:width .12s linear}
+
+/* ---------- DRAWER ---------- */
+.drawer{position:fixed;inset:0;z-index:390;background:var(--panel);transform:translateY(-100%);visibility:hidden;transition:transform .9s cubic-bezier(.16,1,.3,1),visibility 0s linear .9s;display:flex;flex-direction:column;padding-top:clamp(60px,6.4vw,80px)}
+html.drawer-open .drawer{transform:translateY(0);visibility:visible;transition:transform .9s cubic-bezier(.16,1,.3,1),visibility 0s}
+.drawer-list{flex:1;overflow-y:auto;padding:14px var(--gutter) 30px;display:flex;flex-direction:column}
+.drawer-list a{
+  display:flex;align-items:baseline;gap:14px;padding:14px 0;border-bottom:1px solid var(--rule);
+  font-family:var(--disp);font-weight:800;font-stretch:80%;font-size:clamp(1.5rem,7vw,2.4rem);line-height:1;
+  opacity:0;transform:translateY(26px);
+}
+html.drawer-open .drawer-list a{opacity:1;transform:none;transition:opacity .7s cubic-bezier(.16,1,.3,1),transform .7s cubic-bezier(.16,1,.3,1);transition-delay:calc(var(--i)*38ms + .16s)}
+.drawer-list a span{font-family:var(--body);font-size:.6rem;letter-spacing:.24em;color:var(--accent-text);font-weight:600;flex:none;width:26px}
+.drawer-foot{padding:18px var(--gutter) 26px;border-top:3px solid var(--rule-thick);display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
+
+/* ---------- BUTTONS ---------- */
+.btn{
+  position:relative;display:inline-flex;align-items:center;gap:12px;padding:16px 26px;border:0;cursor:pointer;
+  font-family:var(--disp);font-weight:700;font-stretch:88%;font-size:.85rem;letter-spacing:.09em;text-transform:uppercase;
+  background:var(--ink);color:var(--ground);will-change:transform;
+  transition:transform .5s cubic-bezier(.16,1,.3,1),box-shadow .5s ease,background-color .4s ease,color .4s ease;
+}
+.btn::after{content:"";width:16px;height:2px;background:currentColor;transition:width .5s cubic-bezier(.16,1,.3,1)}
+.btn:hover{transform:scale(.975);box-shadow:inset 0 3px 26px rgba(0,0,0,.34)}
+.btn:hover::after{width:28px}
+.btn:active{transform:scale(.955)}
+.btn--accent{background:var(--accent);color:#120D08}
+.btn--ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 2px var(--rule-thick)}
+.btn--ghost:hover{box-shadow:inset 0 0 0 2px var(--accent),inset 0 3px 22px var(--accent-soft)}
+.btn--sm{padding:11px 18px;font-size:.74rem}
+.btn--block{width:100%;justify-content:center}
+.btn[disabled]{opacity:.45;pointer-events:none}
+.btn-row{display:flex;gap:14px;flex-wrap:wrap}
+
+/* text link with sliding rule */
+.tlink{display:inline-flex;align-items:center;gap:9px;font-family:var(--disp);font-weight:700;font-stretch:90%;font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent-text);padding-bottom:4px;border-bottom:2px solid var(--accent-line);transition:border-color .4s ease,gap .4s cubic-bezier(.16,1,.3,1)}
+.tlink:hover{border-color:var(--accent);gap:15px}
+
+/* ---------- SURFACES / CARDS ---------- */
+.slab{
+  position:relative;background:var(--panel);border:1px solid var(--rule);
+  transition:transform .6s cubic-bezier(.16,1,.3,1),box-shadow .6s ease,border-color .5s ease,background-color .5s ease;
+}
+.slab::before{
+  content:"";position:absolute;inset:0;pointer-events:none;opacity:var(--stone-op);
+  background:
+    repeating-linear-gradient(112deg,rgba(0,0,0,.5) 0 1px,transparent 1px 4px),
+    repeating-linear-gradient(68deg,rgba(255,255,255,.4) 0 1px,transparent 1px 7px);
+}
+.press{cursor:pointer}
+.press:hover{transform:scale(.988);box-shadow:var(--shadow-press);border-color:var(--accent-line)}
+.tilt{transform-style:preserve-3d;will-change:transform}
+
+/* ---------- REVEALS ---------- */
+html.motion [data-reveal]{opacity:0;transform:translateY(30px)}
+html.motion [data-reveal].in{opacity:1;transform:none;transition:opacity 1.05s cubic-bezier(.16,1,.3,1),transform 1.05s cubic-bezier(.16,1,.3,1);transition-delay:var(--d,0ms)}
+html.motion [data-reveal="mass"]{opacity:0;transform:translateY(46px) scale(.985)}
+html.motion [data-reveal="mass"].in{opacity:1;transform:none}
+
+/* ---------- HERO ---------- */
+.hero{position:relative;padding-top:clamp(104px,13vw,180px);padding-bottom:clamp(40px,6vw,80px);overflow:hidden}
+.hero-grid{position:absolute;inset:0;pointer-events:none;opacity:.55}
+.hero-grid i{position:absolute;top:0;bottom:0;width:1px;background:var(--rule)}
+.hero-head{position:relative}
+.hero-line{overflow:hidden;display:block}
+.hero-line>span{display:block;will-change:transform}
+.hero-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:clamp(18px,3vw,44px);margin-top:clamp(28px,4vw,52px);padding-top:22px;border-top:3px solid var(--rule-thick)}
+.hero-meta div span{display:block}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-top:clamp(26px,3.4vw,42px)}
+
+/* elevation column drawing */
+.elevation{width:100%;height:auto;display:block}
+.elevation .draw{stroke-dasharray:var(--len);stroke-dashoffset:var(--len)}
+.elevation .draw.in{stroke-dashoffset:0;transition:stroke-dashoffset 2.4s cubic-bezier(.16,1,.3,1)}
+
+/* ---------- SECTION HEAD ---------- */
+.shead{display:grid;grid-template-columns:var(--rail) 1fr;gap:clamp(14px,2.4vw,34px);align-items:start}
+.shead-body{display:flex;flex-direction:column;gap:16px}
+@media (max-width:700px){.shead{grid-template-columns:1fr;gap:12px}}
+
+/* ---------- PINNED STAGE (home + process) ---------- */
+.stage{position:relative}
+.stage-plates{position:relative;display:flex;flex-direction:column;gap:14px}
+.plate{position:relative;background:var(--panel);border:1px solid var(--rule);padding:clamp(26px,4vw,64px);display:grid;gap:clamp(18px,3vw,46px);grid-template-columns:1fr}
+.stage--pinned{height:100vh;display:flex;align-items:center;overflow:hidden}
+.stage--pinned .stage-plates{position:absolute;inset:0;display:block;gap:0}
+.stage--pinned .plate{position:absolute;inset:auto 0;top:50%;transform:translateY(-50%)}
+.plate-num{font-family:var(--disp);font-weight:900;font-stretch:66%;font-size:clamp(4rem,17vw,15rem);line-height:.7;color:transparent;-webkit-text-stroke:2px var(--rule-strong);letter-spacing:-.05em}
+@media (min-width:900px){.plate{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);align-items:center}}
+
+/* ---------- STAT BAND ---------- */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));border-top:3px solid var(--rule-thick);border-left:1px solid var(--rule)}
+.stat{padding:clamp(20px,3vw,38px) clamp(16px,2vw,28px);border-right:1px solid var(--rule);border-bottom:1px solid var(--rule);position:relative;overflow:hidden}
+.stat-v{font-family:var(--disp);font-weight:900;font-stretch:72%;font-size:clamp(2.4rem,5.6vw,4.6rem);line-height:.86;letter-spacing:-.03em;font-variant-numeric:tabular-nums;display:flex;align-items:baseline;gap:2px}
+.stat-l{margin-top:10px;font-size:.76rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-mute);font-weight:600}
+.stat-d{margin-top:6px;font-size:.82rem;color:var(--ink-soft);line-height:1.45}
+
+/* ---------- GRIDS ---------- */
+.grid{display:grid;gap:1px;background:var(--rule)}
+.grid-2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.grid-3{grid-template-columns:repeat(auto-fit,minmax(288px,1fr))}
+.cell{background:var(--ground);padding:clamp(22px,2.6vw,40px)}
+
+/* ---------- SERVICE ROWS ---------- */
+.srow{
+  position:relative;display:grid;grid-template-columns:var(--rail) 1fr auto;gap:clamp(12px,2.4vw,32px);
+  align-items:center;padding:clamp(22px,3.2vw,44px) 0;border-bottom:1px solid var(--rule);cursor:pointer;overflow:hidden;
+}
+.srow:first-of-type{border-top:3px solid var(--rule-thick)}
+.srow-fill{position:absolute;inset:0;background:var(--panel);transform:scaleY(0);transform-origin:bottom;transition:transform .8s cubic-bezier(.16,1,.3,1);z-index:0}
+.srow:hover .srow-fill,.srow.open .srow-fill{transform:scaleY(1)}
+.srow>*{position:relative;z-index:1}
+.srow-t{font-family:var(--disp);font-weight:800;font-stretch:80%;font-size:clamp(1.5rem,3.6vw,3rem);line-height:.96;letter-spacing:-.02em;transition:transform .8s cubic-bezier(.16,1,.3,1),color .5s ease}
+.srow:hover .srow-t{transform:translateX(clamp(6px,1.4vw,22px))}
+.srow-open{width:40px;height:40px;border:1px solid var(--rule-strong);display:grid;place-items:center;position:relative;flex:none;transition:background-color .5s ease,border-color .5s ease}
+.srow-open i{position:absolute;background:currentColor;transition:transform .6s cubic-bezier(.16,1,.3,1)}
+.srow-open i:nth-child(1){width:14px;height:2px}
+.srow-open i:nth-child(2){width:2px;height:14px}
+.srow.open .srow-open{background:var(--accent);border-color:var(--accent);color:#120D08}
+.srow.open .srow-open i:nth-child(2){transform:scaleY(0)}
+.srow-panel{display:grid;grid-template-rows:0fr;transition:grid-template-rows .85s cubic-bezier(.16,1,.3,1);border-bottom:1px solid var(--rule)}
+.srow-panel.open{grid-template-rows:1fr}
+.srow-panel-in{overflow:hidden}
+.srow-panel-pad{padding:0 0 clamp(24px,3vw,44px) calc(var(--rail) + clamp(12px,2.4vw,32px));display:grid;gap:clamp(18px,3vw,40px);grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+@media (max-width:700px){.srow{grid-template-columns:1fr auto;gap:10px}.srow .level-tag{grid-column:1/-1}.srow-panel-pad{padding-left:0}}
+
+/* ---------- MARKETPLACE ---------- */
+.chips{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.chip{
+  padding:9px 17px;border:1px solid var(--rule-strong);background:transparent;cursor:pointer;
+  font-family:var(--disp);font-weight:700;font-stretch:92%;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;
+  transition:transform .45s cubic-bezier(.16,1,.3,1),background-color .45s ease,color .45s ease,border-color .45s ease,box-shadow .45s ease;
+}
+.chip:hover{transform:scale(.96);box-shadow:var(--shadow-press)}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#120D08}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule)}
+.pcard{
+  background:var(--ground);padding:clamp(20px,2.4vw,32px);display:flex;flex-direction:column;gap:16px;min-height:330px;
+  cursor:pointer;position:relative;overflow:hidden;text-align:left;border:0;width:100%;
+  transition:transform .6s cubic-bezier(.16,1,.3,1),box-shadow .6s ease,background-color .5s ease;
+}
+.pcard:hover{background:var(--panel);box-shadow:var(--shadow-press)}
+.pcard-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.pcard-mark{width:58px;height:58px;flex:none;border:1px solid var(--rule-strong);position:relative;overflow:hidden;background:var(--panel-2)}
+.pcard-mark svg{position:absolute;inset:0;width:100%;height:100%}
+.pcard-cat{font-family:var(--disp);font-size:.64rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--accent-text)}
+.pcard-t{font-family:var(--disp);font-weight:800;font-stretch:82%;font-size:1.45rem;line-height:1;letter-spacing:-.015em}
+.pcard-d{font-size:.86rem;color:var(--ink-soft);line-height:1.5;flex:1}
+.pcard-foot{display:flex;justify-content:space-between;align-items:flex-end;padding-top:14px;border-top:1px solid var(--rule);gap:10px}
+.pcard-price{font-family:var(--disp);font-weight:800;font-stretch:78%;font-size:1.15rem;font-variant-numeric:tabular-nums}
+.pcard-price small{display:block;font-family:var(--body);font-weight:400;font-size:.66rem;color:var(--ink-mute);letter-spacing:.08em}
+.pcard.hiding{opacity:0;transform:scale(.94) translateY(12px);transition:opacity .4s ease,transform .4s ease}
+.pcard.gone{display:none}
+
+/* ---------- PRODUCT DETAIL FLOW ---------- */
+.flow-steps{display:flex;gap:1px;background:var(--rule);border:1px solid var(--rule);flex-wrap:wrap}
+.flow-step{flex:1 1 120px;background:var(--ground);padding:14px 16px;position:relative;transition:background-color .6s ease,color .6s ease}
+.flow-step.active{background:var(--accent);color:#120D08}
+.flow-step.done{background:var(--panel-2)}
+.flow-step b{display:block;font-family:var(--disp);font-weight:800;font-stretch:86%;font-size:.86rem;letter-spacing:.04em}
+.flow-body{border:1px solid var(--rule);border-top:0;padding:clamp(22px,3vw,44px);background:var(--panel);min-height:320px;position:relative}
+.flow-pane{display:none}
+.flow-pane.on{display:block}
+.opt{display:flex;align-items:center;gap:12px;padding:14px;border:1px solid var(--rule);cursor:pointer;transition:border-color .4s ease,background-color .4s ease,transform .4s cubic-bezier(.16,1,.3,1)}
+.opt:hover{transform:scale(.99);border-color:var(--accent-line)}
+.opt input{accent-color:var(--accent);width:16px;height:16px;flex:none}
+.opt.sel{border-color:var(--accent);background:var(--accent-soft)}
+
+/* ---------- PROGRESS + LOG ---------- */
+.prog{height:14px;background:var(--panel-2);border:1px solid var(--rule-strong);position:relative;overflow:hidden}
+.prog i{position:absolute;inset:0;transform-origin:left;transform:scaleX(0);background:linear-gradient(90deg,var(--metal-b),var(--metal-a) 60%,var(--metal-c));}
+.log{
+  background:#0A0908;color:#C9C0B4;border:1px solid var(--rule-strong);height:260px;overflow:hidden;padding:14px 16px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.76rem;line-height:1.62;
+}
+.log b{color:var(--metal-a);font-weight:600}
+.log .ok{color:#7FB08C}
+.log .wn{color:#D6AE5C}
+
+/* ---------- STEPPER ---------- */
+.stepper{display:flex;align-items:stretch;border-top:3px solid var(--rule-thick);border-bottom:1px solid var(--rule);overflow-x:auto}
+.stepper-i{flex:1 1 0;min-width:118px;padding:16px 14px;border-right:1px solid var(--rule);position:relative;color:var(--ink-mute);transition:color .6s ease}
+.stepper-i:last-child{border-right:0}
+.stepper-i .sn{font-family:var(--disp);font-weight:800;font-stretch:74%;font-size:.72rem;letter-spacing:.16em}
+.stepper-i .st{font-family:var(--disp);font-weight:800;font-stretch:86%;font-size:.98rem;margin-top:4px;line-height:1.05}
+.stepper-i::after{content:"";position:absolute;left:0;bottom:-1px;height:3px;width:0;background:var(--accent);transition:width .9s cubic-bezier(.16,1,.3,1)}
+.stepper-i.on{color:var(--ink)}
+.stepper-i.on::after,.stepper-i.done::after{width:100%}
+.stepper-i.done{color:var(--ink-soft)}
+
+/* ---------- PRICING ---------- */
+.toggle{display:inline-flex;align-items:center;gap:0;border:1px solid var(--rule-strong);position:relative;background:var(--panel)}
+.toggle button{padding:11px 22px;background:transparent;border:0;cursor:pointer;position:relative;z-index:1;font-family:var(--disp);font-weight:700;font-stretch:92%;font-size:.74rem;letter-spacing:.12em;text-transform:uppercase;transition:color .5s ease}
+.toggle button[aria-pressed="true"]{color:#120D08}
+.toggle .knob{position:absolute;top:0;bottom:0;left:0;width:50%;background:var(--accent);transition:transform .75s cubic-bezier(.16,1,.3,1)}
+.tier{background:var(--ground);padding:clamp(24px,2.8vw,40px);display:flex;flex-direction:column;gap:20px;position:relative}
+.tier--feature{background:var(--panel)}
+.tier-price{font-family:var(--disp);font-weight:900;font-stretch:72%;font-size:clamp(2.4rem,5vw,3.6rem);line-height:.9;font-variant-numeric:tabular-nums;letter-spacing:-.03em}
+.tier-price sup{font-size:.36em;vertical-align:top;top:.55em;position:relative;font-weight:700;margin-right:2px}
+.tier-price small{font-family:var(--body);font-size:.8rem;font-weight:400;color:var(--ink-mute);letter-spacing:0}
+.feat{display:flex;gap:11px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--rule);font-size:.87rem;color:var(--ink-soft)}
+.feat svg{width:14px;height:14px;flex:none;margin-top:4px;stroke:var(--accent);stroke-width:2.2;fill:none}
+.feat.off{opacity:.42}
+.feat.off svg{stroke:var(--ink-mute)}
+.ribbon{position:absolute;top:0;right:0;background:var(--accent);color:#120D08;font-family:var(--disp);font-weight:800;font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;padding:6px 12px}
+
+/* ---------- FORMS ---------- */
+.field{position:relative;display:flex;flex-direction:column;gap:7px;margin-bottom:20px}
+.field label{font-family:var(--disp);font-size:.68rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-mute)}
+.field input,.field textarea,.field select{
+  width:100%;padding:14px 15px;background:var(--panel);border:1px solid var(--rule-strong);border-radius:0;
+  transition:border-color .45s ease,background-color .45s ease,box-shadow .45s ease;font-size:.94rem;
+}
+.field textarea{min-height:130px;resize:vertical}
+.field input:focus,.field textarea:focus,.field select:focus{outline:0;border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent),inset 0 2px 18px var(--accent-soft)}
+.field .err{font-size:.76rem;color:var(--crit);opacity:0;transform:translateY(-4px);transition:opacity .35s ease,transform .35s ease;min-height:1.1em}
+.field.invalid .err{opacity:1;transform:none}
+.field.invalid input,.field.invalid textarea{border-color:var(--crit)}
+.field.shake{animation:shake .42s cubic-bezier(.36,.07,.19,.97)}
+@keyframes shake{10%,90%{transform:translateX(-2px)}30%,70%{transform:translateX(4px)}50%{transform:translateX(-5px)}}
+.field.ok input,.field.ok textarea{border-color:var(--good)}
+.form-note{display:flex;gap:10px;align-items:flex-start;padding:14px;border:1px solid var(--rule);background:var(--panel);font-size:.82rem;color:var(--ink-soft)}
+
+/* ---------- DASHBOARD ---------- */
+.tabs{display:flex;gap:1px;background:var(--rule);border:1px solid var(--rule);width:fit-content;max-width:100%;flex-wrap:wrap}
+.tabs button{background:var(--ground);border:0;padding:12px 22px;cursor:pointer;font-family:var(--disp);font-weight:700;font-stretch:90%;font-size:.76rem;letter-spacing:.12em;text-transform:uppercase;transition:background-color .5s ease,color .5s ease}
+.tabs button[aria-selected="true"]{background:var(--accent);color:#120D08}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule)}
+.kpi{background:var(--ground);padding:clamp(18px,2.2vw,28px)}
+.kpi-v{font-family:var(--disp);font-weight:900;font-stretch:74%;font-size:clamp(1.8rem,3.4vw,2.7rem);line-height:.95;font-variant-numeric:tabular-nums}
+.kpi-l{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-mute);margin-top:8px;font-weight:600}
+.delta{display:inline-flex;align-items:center;gap:5px;font-size:.74rem;font-weight:600;margin-top:8px}
+.delta.up{color:var(--good)}.delta.dn{color:var(--crit)}
+.panel{background:var(--panel);border:1px solid var(--rule);padding:clamp(18px,2.2vw,30px)}
+.chart-wrap{position:relative;width:100%;overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.85rem;min-width:620px}
+th{text-align:left;font-family:var(--disp);font-weight:700;font-stretch:92%;font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-mute);padding:12px 14px;border-bottom:2px solid var(--rule-strong);white-space:nowrap}
+td{padding:13px 14px;border-bottom:1px solid var(--rule);color:var(--ink-soft);font-variant-numeric:tabular-nums}
+tbody tr{transition:background-color .4s ease}
+tbody tr:hover{background:var(--panel-2)}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;font-size:.7rem;font-weight:600;letter-spacing:.06em;border:1px solid currentColor}
+.pill::before{content:"";width:6px;height:6px;background:currentColor;flex:none}
+.pill.ok{color:var(--good)}.pill.wn{color:var(--warn)}.pill.cr{color:var(--crit)}.pill.nu{color:var(--ink-mute)}
+.bars{display:flex;align-items:flex-end;gap:clamp(4px,1vw,12px);height:170px}
+.bar{flex:1;background:linear-gradient(180deg,var(--metal-a),var(--metal-b));transform-origin:bottom;transform:scaleY(0);transition:transform 1.3s cubic-bezier(.16,1,.3,1);position:relative;min-width:8px}
+.bar.in{transform:scaleY(1)}
+
+/* ---------- MISC ---------- */
+.kv{display:flex;justify-content:space-between;gap:16px;padding:11px 0;border-bottom:1px solid var(--rule);font-size:.86rem}
+.kv b{font-family:var(--disp);font-weight:700;font-stretch:88%;font-variant-numeric:tabular-nums}
+.tag{display:inline-block;padding:5px 11px;border:1px solid var(--rule-strong);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--ink-mute)}
+.quote{font-family:var(--disp);font-weight:700;font-stretch:86%;font-size:clamp(1.2rem,2.4vw,2rem);line-height:1.16;letter-spacing:-.015em}
+.toast{
+  position:fixed;left:50%;bottom:30px;transform:translate(-50%,140%);z-index:800;background:var(--ink);color:var(--ground);
+  padding:15px 24px;font-family:var(--disp);font-weight:700;font-stretch:90%;font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;
+  transition:transform .8s cubic-bezier(.16,1,.3,1);display:flex;gap:12px;align-items:center;max-width:calc(100vw - 32px);
+}
+.toast.on{transform:translate(-50%,0)}
+.skip{position:absolute;left:-9999px;top:0;background:var(--accent);color:#120D08;padding:12px 18px;z-index:9999}
+.skip:focus{left:12px;top:12px}
+
+/* ---------- FOOTER ---------- */
+.ftr{border-top:3px solid var(--rule-thick);background:var(--panel);margin-top:clamp(40px,6vw,110px)}
+.ftr-top{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:clamp(24px,3vw,50px);padding-block:clamp(38px,5vw,72px)}
+.ftr h4{margin-bottom:14px;font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-mute);font-stretch:100%;font-weight:700}
+.ftr li a{display:block;padding:6px 0;font-size:.88rem;color:var(--ink-soft);transition:color .4s ease,transform .5s cubic-bezier(.16,1,.3,1)}
+.ftr li a:hover{color:var(--accent-text);transform:translateX(6px)}
+.ftr-word{font-family:var(--disp);font-weight:900;font-stretch:62%;font-size:clamp(3.4rem,17vw,15rem);line-height:.74;letter-spacing:-.05em;color:transparent;-webkit-text-stroke:1.5px var(--rule-strong);padding-block:clamp(10px,2vw,26px);overflow:hidden}
+.ftr-bot{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;padding-block:20px;border-top:1px solid var(--rule);font-size:.76rem;color:var(--ink-mute)}
+
+/* ---------- VIEW TRANSITION ---------- */
+#view{min-height:70vh}
+.route-wipe{position:fixed;inset:0;z-index:380;background:var(--accent);transform:scaleY(0);transform-origin:bottom;pointer-events:none}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width:1080px){
+  .nav{display:none}
+  .burger{display:grid}
+}
+@media (max-width:520px){
+  .btn{padding:14px 20px;font-size:.78rem}
+  .stat{padding:18px 14px}
+  .log{height:210px;font-size:.68rem}
+}
+
+/* ---------- REDUCED MOTION ---------- */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.14s !important}
+  html.motion [data-reveal]{opacity:1 !important;transform:none !important}
+  .metal{animation:none;background-position:30% 0}
+  .stage--pinned{height:auto;display:block;overflow:visible}
+  .stage--pinned .stage-plates{position:relative;display:flex;flex-direction:column;gap:14px}
+  .stage--pinned .plate{position:relative;top:auto;transform:none}
+}
+</style>
+</head>
+<body>
+<script>
+/* Theme resolves before first paint: an explicit stamp wins, then a stored choice,
+   then this concept's dark-first brand default. */
+(function(){
+  try{
+    var r=document.documentElement;
+    if(!r.getAttribute('data-theme')){
+      var s=localStorage.getItem('tb-theme');
+      r.setAttribute('data-theme', s==='light'||s==='dark' ? s : 'dark');
+    }
+  }catch(e){ document.documentElement.setAttribute('data-theme','dark'); }
+})();
+</script>
+
+<a class="skip" href="#main">Skip to content</a>
+<canvas id="ambient" aria-hidden="true"></canvas>
+<div class="vignette" aria-hidden="true"></div>
+<div class="cursor" aria-hidden="true"></div>
+<div class="cursor-dot" aria-hidden="true"></div>
+<div class="route-wipe" aria-hidden="true"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<!-- ============== LOADER ============== -->
+<div id="loader" role="presentation">
+  <div class="slab" aria-hidden="true"></div>
+  <div class="ld-inner">
+    <div class="ld-mark"><span>T</span><span>E</span><span>C</span><span>H</span><span>B</span><span>I</span><span>S</span><span>S</span></div>
+    <div class="ld-sub">
+      <span class="level-tag">Terra Monolith</span>
+      <span class="level-tag">Est. 2009 · 74 Countries</span>
+    </div>
+    <div class="ld-bar"><i></i></div>
+  </div>
+</div>
+
+<!-- ============== HEADER ============== -->
+<header class="hdr" id="hdr">
+  <div class="hdr-in">
+    <a class="brand" href="#/home" aria-label="TECHBISS home">
+      <span class="brand-glyph" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="brand-name">TECHBISS<small>TERRA MONOLITH</small></span>
+    </a>
+    <nav class="nav" id="nav" aria-label="Primary"></nav>
+    <div class="hdr-act">
+      <button class="icon-btn" id="themeBtn" aria-label="Switch to light theme" data-cursor="big">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"></path></svg>
+      </button>
+      <button class="icon-btn burger" id="burger" aria-label="Open menu" aria-expanded="false" aria-controls="drawer">
+        <span aria-hidden="true"><i></i><i></i><i></i></span>
+      </button>
+      <a class="btn btn--accent btn--sm" id="hdrCta" href="#/contact" data-magnet data-cursor="big">Start a build</a>
+    </div>
+  </div>
+  <div class="hdr-prog" id="hdrProg" aria-hidden="true"></div>
+</header>
+
+<!-- ============== MOBILE DRAWER ============== -->
+<div class="drawer" id="drawer" aria-hidden="true">
+  <nav class="drawer-list" id="drawerList" aria-label="Mobile"></nav>
+  <div class="drawer-foot">
+    <span class="micro">Global HQ · Rotterdam · Singapore · Austin</span>
+    <span class="micro">+31 10 555 0192</span>
+  </div>
+</div>
+
+<main id="main">
+  <div id="view"></div>
+</main>
+
+<!-- ============== FOOTER ============== -->
+<footer class="ftr">
+  <div class="wrap">
+    <div class="ftr-top">
+      <div>
+        <h4>Structure</h4>
+        <ul>
+          <li><a href="#/services">Services</a></li>
+          <li><a href="#/solutions">Solutions</a></li>
+          <li><a href="#/marketplace">Marketplace</a></li>
+          <li><a href="#/process">Process</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Evidence</h4>
+        <ul>
+          <li><a href="#/work">Case studies</a></li>
+          <li><a href="#/resources">Resources</a></li>
+          <li><a href="#/pricing">Pricing</a></li>
+          <li><a href="#/about">About TECHBISS</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Console</h4>
+        <ul>
+          <li><a href="#/login">Sign in</a></li>
+          <li><a href="#/installer">Platform installer</a></li>
+          <li><a href="#/dashboard">Dashboard preview</a></li>
+          <li><a href="#/contact">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Offices</h4>
+        <ul class="micro" style="line-height:1.9">
+          <li>Rotterdam — Wilhelminakade 173</li>
+          <li>Singapore — 9 Straits View, Level 41</li>
+          <li>Austin — 500 W 2nd St, Tower B</li>
+          <li>São Paulo — Av. Faria Lima 3477</li>
+        </ul>
+      </div>
+    </div>
+    <div class="ftr-word" aria-hidden="true">TECHBISS</div>
+    <div class="ftr-bot">
+      <span>© 2026 TECHBISS Group N.V. — Built to bear load.</span>
+      <span>ISO 27001 · SOC 2 Type II · EU AI Act conformant</span>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+/* ============================================================
+   TERRA MONOLITH — runtime
+   ============================================================ */
+(function(){
+'use strict';
+
+var root = document.documentElement;
+var HAS_GSAP = typeof window.gsap !== 'undefined';
+var RM = window.matchMedia('(prefers-reduced-motion: reduce)');
+var reduced = RM.matches;
+var FINE = window.matchMedia('(pointer:fine)').matches && window.matchMedia('(hover:hover)').matches;
+if (HAS_GSAP && window.ScrollTrigger) gsap.registerPlugin(ScrollTrigger);
+if (!reduced) root.classList.add('motion');
+if (HAS_GSAP) root.classList.add('gsap');
+
+var EASE = 'cubic-bezier(.16,1,.3,1)';
+var GE = 'expo.out';
+
+function $(s,c){ return (c||document).querySelector(s); }
+function $$(s,c){ return Array.prototype.slice.call((c||document).querySelectorAll(s)); }
+function esc(s){ return String(s).replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];}); }
+
+/* ---------- toast ---------- */
+var toastEl = $('#toast'), toastT;
+function toast(msg){
+  toastEl.innerHTML = '<span aria-hidden="true">&#9632;</span>' + esc(msg);
+  toastEl.classList.add('on');
+  clearTimeout(toastT);
+  toastT = setTimeout(function(){ toastEl.classList.remove('on'); }, 3400);
+}
+
+/* ============================================================
+   THEME
+   ============================================================ */
+var themeBtn = $('#themeBtn');
+function setTheme(t, announce){
+  root.setAttribute('data-theme', t);
+  try{ localStorage.setItem('tb-theme', t); }catch(e){}
+  themeBtn.setAttribute('aria-label', t === 'dark' ? 'Switch to light theme' : 'Switch to dark theme');
+  var m = document.querySelector('meta[name="theme-color"]');
+  if (m) m.setAttribute('content', t === 'dark' ? '#0B0A09' : '#E7E0D3');
+  if (announce) toast(t === 'dark' ? 'Basalt — dark surface' : 'Travertine — light surface');
+}
+themeBtn.addEventListener('click', function(){
+  setTheme(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark', true);
+});
+setTheme(root.getAttribute('data-theme') || 'dark', false);
+
+/* ============================================================
+   AMBIENT CANVAS — procedural stone grain + slow light sweep
+   ============================================================ */
+(function ambient(){
+  var cv = $('#ambient'), ctx = cv.getContext('2d', {alpha:true});
+  var w=0,h=0,dpr=1,raf=null,t=0,paused=false;
+  var grain = document.createElement('canvas'), gx = grain.getContext('2d');
+  var GS = 190;
+
+  function buildGrain(){
+    grain.width = grain.height = GS;
+    var img = gx.createImageData(GS,GS), d = img.data;
+    for (var i=0;i<d.length;i+=4){
+      var v = Math.random();
+      var n = 128 + (v*88 - 44);
+      // warm bias so the noise reads as stone, not television static
+      d[i]   = n + 12;
+      d[i+1] = n + 2;
+      d[i+2] = n - 8;
+      d[i+3] = 26 + Math.random()*40;
+    }
+    gx.putImageData(img,0,0);
+  }
+  buildGrain();
+
+  function size(){
+    dpr = Math.min(window.devicePixelRatio||1, 1.6);
+    w = cv.clientWidth = window.innerWidth;
+    h = cv.clientHeight = window.innerHeight;
+    cv.width = Math.floor(w*dpr); cv.height = Math.floor(h*dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+
+  function draw(){
+    var dark = root.getAttribute('data-theme') === 'dark';
+    ctx.clearRect(0,0,w,h);
+
+    /* strata: broad horizontal bands of stone, drifting very slowly */
+    var bands = 7;
+    for (var i=0;i<bands;i++){
+      var p = i/bands;
+      var y = ((p + t*0.0022) % 1.15 - 0.075) * h;
+      var bh = h * (0.10 + 0.07*Math.sin(i*2.3));
+      var g = ctx.createLinearGradient(0,y,0,y+bh);
+      var a = dark ? 0.035 : 0.030;
+      g.addColorStop(0,'rgba(192,133,82,0)');
+      g.addColorStop(.5, dark ? 'rgba(192,133,82,'+a+')' : 'rgba(120,86,50,'+a+')');
+      g.addColorStop(1,'rgba(192,133,82,0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(0,y,w,bh);
+    }
+
+    /* a single slow raking light, as if from a clerestory */
+    var sx = (Math.sin(t*0.00035)*0.5+0.5) * w;
+    var lg = ctx.createRadialGradient(sx, h*0.12, 0, sx, h*0.12, Math.max(w,h)*0.85);
+    lg.addColorStop(0, dark ? 'rgba(227,183,132,0.055)' : 'rgba(255,251,242,0.55)');
+    lg.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = lg;
+    ctx.fillRect(0,0,w,h);
+
+    /* vertical structural piers, extremely faint */
+    ctx.save();
+    ctx.globalAlpha = dark ? 0.05 : 0.045;
+    ctx.fillStyle = dark ? '#EFE8DC' : '#15110C';
+    var cols = w < 700 ? 4 : 9;
+    for (var c=1;c<cols;c++){
+      var x = Math.round(w*(c/cols)) + Math.sin(t*0.0004 + c)*1.5;
+      ctx.fillRect(x,0,1,h);
+    }
+    ctx.restore();
+
+    /* stone grain tiles */
+    ctx.save();
+    ctx.globalAlpha = dark ? 0.30 : 0.22;
+    var ox = (t*0.05) % GS, oy = (t*0.03) % GS;
+    for (var gxp=-GS; gxp<w+GS; gxp+=GS){
+      for (var gyp=-GS; gyp<h+GS; gyp+=GS){
+        ctx.drawImage(grain, gxp+ox, gyp+oy);
+      }
+    }
+    ctx.restore();
+  }
+
+  var last = 0;
+  function loop(ts){
+    raf = requestAnimationFrame(loop);
+    if (paused) return;
+    if (ts - last < 44) return;   /* ~22fps is plenty for stone */
+    last = ts; t += 16;
+    draw();
+  }
+
+  size(); draw();
+  var rt;
+  window.addEventListener('resize', function(){ clearTimeout(rt); rt = setTimeout(function(){ size(); draw(); }, 180); });
+  document.addEventListener('visibilitychange', function(){ paused = document.hidden; });
+  if (!reduced) raf = requestAnimationFrame(loop);
+  window.addEventListener('tb:themechange', draw);
+})();
+new MutationObserver(function(){ window.dispatchEvent(new CustomEvent('tb:themechange')); })
+  .observe(root, {attributes:true, attributeFilter:['data-theme']});
+
+/* ============================================================
+   CUSTOM CURSOR (fine pointers only)
+   ============================================================ */
+if (FINE && !reduced){
+  var cur = $('.cursor'), dot = $('.cursor-dot');
+  var cx=window.innerWidth/2, cy=window.innerHeight/2, tx=cx, ty=cy, on=false;
+  document.addEventListener('mousemove', function(e){
+    tx = e.clientX; ty = e.clientY;
+    dot.style.transform = 'translate3d('+tx+'px,'+ty+'px,0)';
+    if (!on){ on = true; root.classList.add('cursor-on'); }
+  }, {passive:true});
+  document.addEventListener('mouseleave', function(){ root.classList.remove('cursor-on'); on=false; });
+  (function tick(){
+    cx += (tx-cx)*0.16; cy += (ty-cy)*0.16;
+    cur.style.transform = 'translate3d('+cx+'px,'+cy+'px,0)';
+    requestAnimationFrame(tick);
+  })();
+  document.addEventListener('mouseover', function(e){
+    var t = e.target.closest('a,button,[data-cursor],input,textarea,select,.press,.pcard,.srow');
+    cur.classList.toggle('big', !!t);
+  });
+  /* a coarse pointer appearing (hybrid laptops) retires the custom cursor */
+  window.addEventListener('touchstart', function(){ root.classList.remove('cursor-on'); }, {passive:true, once:true});
+}
+
+/* ============================================================
+   MAGNETIC BUTTONS
+   ============================================================ */
+function bindMagnets(scope){
+  if (!FINE || reduced) return;
+  $$('[data-magnet]', scope).forEach(function(el){
+    if (el.__mag) return; el.__mag = true;
+    var r = null;
+    el.addEventListener('mouseenter', function(){ r = el.getBoundingClientRect(); });
+    el.addEventListener('mousemove', function(e){
+      if (!r) r = el.getBoundingClientRect();
+      var dx = (e.clientX - (r.left + r.width/2)) * 0.28;
+      var dy = (e.clientY - (r.top + r.height/2)) * 0.34;
+      el.style.transform = 'translate3d('+dx+'px,'+dy+'px,0)';
+    });
+    el.addEventListener('mouseleave', function(){
+      r = null;
+      el.style.transition = 'transform .9s '+EASE;
+      el.style.transform = 'translate3d(0,0,0)';
+      setTimeout(function(){ el.style.transition=''; }, 900);
+    });
+  });
+}
+
+/* ============================================================
+   TILT / PRESS CARDS
+   ============================================================ */
+function bindTilt(scope){
+  if (!FINE || reduced) return;
+  $$('.tilt', scope).forEach(function(el){
+    if (el.__tilt) return; el.__tilt = true;
+    var r=null, raf=null, rx=0, ry=0;
+    function apply(){
+      el.style.transform = 'perspective(1100px) rotateX('+rx+'deg) rotateY('+ry+'deg) scale(.988)';
+      raf = null;
+    }
+    el.addEventListener('mousemove', function(e){
+      if (!r) r = el.getBoundingClientRect();
+      ry = ((e.clientX - (r.left + r.width/2)) / r.width) * 7;
+      rx = -((e.clientY - (r.top + r.height/2)) / r.height) * 6;
+      if (!raf) raf = requestAnimationFrame(apply);
+    });
+    el.addEventListener('mouseleave', function(){
+      r=null; rx=0; ry=0;
+      el.style.transform = '';
+    });
+  });
+}
+
+/* ============================================================
+   REVEALS — IntersectionObserver only
+   ============================================================ */
+var io = new IntersectionObserver(function(entries){
+  entries.forEach(function(en){
+    if (!en.isIntersecting) return;
+    en.target.classList.add('in');
+    io.unobserve(en.target);
+    if (en.target.dataset.count !== undefined) countUp(en.target);
+    if (en.target.dataset.bars !== undefined) runBars(en.target);
+    if (en.target.dataset.chart !== undefined) drawLineChart(en.target);
+  });
+}, {rootMargin:'0px 0px -8% 0px', threshold:0.12});
+
+function observeAll(scope){
+  $$('[data-reveal],[data-count],[data-bars],[data-chart],.xrule,.draw', scope).forEach(function(el){
+    io.observe(el);
+  });
+  /* stagger indices */
+  $$('[data-stagger]', scope).forEach(function(group){
+    var kids = $$('[data-reveal]', group);
+    kids.forEach(function(k,i){ k.style.setProperty('--d', Math.min(i,10)*72 + 'ms'); });
+  });
+}
+
+/* ---------- animated counters ---------- */
+function countUp(el){
+  if (el.__counted) return; el.__counted = true;
+  var target = parseFloat(el.dataset.count);
+  var dec = parseInt(el.dataset.dec || '0', 10);
+  var dur = reduced ? 200 : (parseInt(el.dataset.dur||'1900',10));
+  var start = performance.now();
+  var fmt = el.dataset.comma !== undefined;
+  function frame(now){
+    var p = Math.min(1, (now-start)/dur);
+    var e = 1 - Math.pow(1-p, 4);
+    var v = target * e;
+    var s = dec ? v.toFixed(dec) : Math.round(v).toString();
+    if (fmt) s = Number(s).toLocaleString('en-US', {minimumFractionDigits:dec, maximumFractionDigits:dec});
+    el.textContent = s;
+    if (p < 1) requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+function runBars(el){
+  $$('.bar', el).forEach(function(b,i){
+    setTimeout(function(){ b.classList.add('in'); }, reduced ? 0 : i*70);
+  });
+}
+
+/* ============================================================
+   SVG LINE CHART (hand-drawn path animation, no library)
+   ============================================================ */
+function drawLineChart(el){
+  if (el.__drawn) return; el.__drawn = true;
+  var series = JSON.parse(el.dataset.chart);
+  var labels = (el.dataset.labels||'').split(',');
+  var W = 720, H = 260, PL = 46, PR = 16, PT = 18, PB = 34;
+  var max = Math.max.apply(null, series) * 1.12;
+  var min = 0;
+  var iw = W - PL - PR, ih = H - PT - PB;
+  function X(i){ return PL + (i/(series.length-1)) * iw; }
+  function Y(v){ return PT + ih - ((v-min)/(max-min)) * ih; }
+
+  var line = series.map(function(v,i){ return (i?'L':'M') + X(i).toFixed(1) + ' ' + Y(v).toFixed(1); }).join(' ');
+  var area = line + ' L ' + X(series.length-1).toFixed(1) + ' ' + (PT+ih) + ' L ' + PL + ' ' + (PT+ih) + ' Z';
+
+  var ticks = 4, gridLines = '', axisLabels = '';
+  for (var g=0; g<=ticks; g++){
+    var val = min + (max-min)*(g/ticks);
+    var y = Y(val).toFixed(1);
+    gridLines += '<line x1="'+PL+'" y1="'+y+'" x2="'+(W-PR)+'" y2="'+y+'" stroke="var(--rule)" stroke-width="1"></line>';
+    axisLabels += '<text x="'+(PL-10)+'" y="'+(parseFloat(y)+4)+'" text-anchor="end" fill="var(--ink-mute)" font-size="11" font-family="Inter,sans-serif">'+Math.round(val)+'</text>';
+  }
+  var xLabels = '';
+  labels.forEach(function(l,i){
+    if (!l) return;
+    xLabels += '<text x="'+X(i).toFixed(1)+'" y="'+(H-10)+'" text-anchor="middle" fill="var(--ink-mute)" font-size="11" font-family="Inter,sans-serif">'+esc(l.trim())+'</text>';
+  });
+  var lastX = X(series.length-1).toFixed(1), lastY = Y(series[series.length-1]).toFixed(1);
+
+  el.innerHTML =
+    '<svg viewBox="0 0 '+W+' '+H+'" width="100%" style="display:block;min-width:560px" role="img" aria-label="Platform throughput, twelve months, rising from '+series[0]+' to '+series[series.length-1]+' million transactions">' +
+      '<defs><linearGradient id="tbFill" x1="0" y1="0" x2="0" y2="1">' +
+        '<stop offset="0%" stop-color="var(--accent)" stop-opacity="0.30"></stop>' +
+        '<stop offset="100%" stop-color="var(--accent)" stop-opacity="0"></stop>' +
+      '</linearGradient></defs>' +
+      gridLines + axisLabels + xLabels +
+      '<path d="'+area+'" fill="url(#tbFill)" opacity="0"></path>' +
+      '<path d="'+line+'" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"></path>' +
+      '<circle cx="'+lastX+'" cy="'+lastY+'" r="5" fill="var(--accent)"></circle>' +
+      '<circle cx="'+lastX+'" cy="'+lastY+'" r="10" fill="none" stroke="var(--accent)" stroke-width="1.5" opacity=".45"></circle>' +
+    '</svg>';
+
+  var path = el.querySelector('path[stroke]');
+  var fill = el.querySelector('path[fill^="url"]');
+  var dots = el.querySelectorAll('circle');
+  var len = path.getTotalLength();
+  path.style.strokeDasharray = len; path.style.strokeDashoffset = len;
+  dots.forEach(function(d){ d.style.opacity = 0; });
+  if (reduced){
+    path.style.strokeDashoffset = 0; fill.setAttribute('opacity','1');
+    dots.forEach(function(d){ d.style.opacity = 1; });
+    return;
+  }
+  path.style.transition = 'stroke-dashoffset 2.2s '+EASE;
+  fill.style.transition = 'opacity 1.4s ease .6s';
+  requestAnimationFrame(function(){
+    path.style.strokeDashoffset = 0;
+    fill.setAttribute('opacity','1');
+    setTimeout(function(){ dots.forEach(function(d){ d.style.transition='opacity .6s ease'; d.style.opacity = d.getAttribute('r')==='5'?1:.45; }); }, 1900);
+  });
+}
+
+/* ============================================================
+   ROUTER
+   ============================================================ */
+var ROUTES = [
+  {p:'home',        n:'Home'},
+  {p:'services',    n:'Services'},
+  {p:'solutions',   n:'Solutions'},
+  {p:'marketplace', n:'Marketplace'},
+  {p:'work',        n:'Work'},
+  {p:'process',     n:'Process'},
+  {p:'about',       n:'About'},
+  {p:'resources',   n:'Resources'},
+  {p:'pricing',     n:'Pricing'},
+  {p:'contact',     n:'Contact'},
+  {p:'login',       n:'Sign in'},
+  {p:'installer',   n:'Installer'},
+  {p:'dashboard',   n:'Dashboard'}
+];
+
+var navEl = $('#nav'), drawerList = $('#drawerList');
+navEl.innerHTML = ROUTES.slice(1,10).map(function(r){
+  return '<a href="#/'+r.p+'" data-route="'+r.p+'">'+r.n+'</a>';
+}).join('') + '<span style="width:1px;height:18px;background:var(--rule-strong);margin:0 6px" aria-hidden="true"></span>' +
+  ROUTES.slice(10).map(function(r){
+    return '<a href="#/'+r.p+'" data-route="'+r.p+'" style="font-size:.74rem;color:var(--ink-mute)">'+r.n+'</a>';
+  }).join('');
+
+drawerList.innerHTML = ROUTES.map(function(r,i){
+  return '<a href="#/'+r.p+'" data-route="'+r.p+'" style="--i:'+i+'"><span>'+String(i+1).padStart(2,'0')+'</span>'+r.n+'</a>';
+}).join('');
+
+/* ---------- drawer ---------- */
+var burger = $('#burger'), drawer = $('#drawer');
+function setDrawer(open){
+  root.classList.toggle('drawer-open', open);
+  burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+  burger.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+  drawer.setAttribute('aria-hidden', open ? 'false' : 'true');
+  document.body.style.overflow = open ? 'hidden' : '';
+}
+burger.addEventListener('click', function(){ setDrawer(!root.classList.contains('drawer-open')); });
+drawer.addEventListener('click', function(e){ if (e.target.closest('a')) setDrawer(false); });
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && root.classList.contains('drawer-open')) setDrawer(false); });
+
+/* ---------- header hide-on-scroll + progress ---------- */
+var hdr = $('#hdr'), prog = $('#hdrProg'), lastY = 0, ticking = false;
+function onScroll(){
+  if (ticking) return;
+  ticking = true;
+  requestAnimationFrame(function(){
+    var y = window.scrollY;
+    var max = document.documentElement.scrollHeight - window.innerHeight;
+    prog.style.width = (max > 0 ? (y/max)*100 : 0) + '%';
+    if (!root.classList.contains('drawer-open')){
+      hdr.classList.toggle('hide', y > lastY && y > 220);
+    }
+    lastY = y; ticking = false;
+  });
+}
+window.addEventListener('scroll', onScroll, {passive:true});
+
+/* ---------- route parsing ---------- */
+function parseHash(){
+  var h = location.hash.replace(/^#\/?/, '') || 'home';
+  var parts = h.split('/').filter(Boolean);
+  return { path: parts[0] || 'home', sub: parts[1] || null, id: parts[2] || null };
+}
+
+var viewEl = $('#view'), wipe = $('.route-wipe');
+var currentKey = null, firstRender = true;
+
+function killScrollTriggers(){
+  if (HAS_GSAP && window.ScrollTrigger) ScrollTrigger.getAll().forEach(function(st){ st.kill(); });
+}
+
+function render(){
+  var r = parseHash();
+  var key = r.path + (r.sub ? '/'+r.sub : '') + (r.id ? '/'+r.id : '');
+  if (key === currentKey) return;
+  currentKey = key;
+
+  var build = VIEWS[r.path] ? VIEWS[r.path] : VIEWS.notfound;
+  if (r.path === 'marketplace' && r.sub === 'product') build = VIEWS.product;
+
+  var paint = function(){
+    killScrollTriggers();
+    viewEl.innerHTML = build(r);
+    /* active nav state */
+    $$('[data-route]').forEach(function(a){
+      var on = a.dataset.route === r.path;
+      if (on) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current');
+    });
+    document.title = (VIEWTITLES[r.path] || 'Terra Monolith') + ' — TECHBISS';
+    window.scrollTo(0,0);
+    hdr.classList.remove('hide'); lastY = 0;
+    observeAll(viewEl);
+    bindMagnets(viewEl);
+    bindTilt(viewEl);
+    if (INIT[r.path]) INIT[r.path](r);
+    if (r.path === 'marketplace' && r.sub === 'product') INIT.product(r);
+    if (HAS_GSAP && window.ScrollTrigger) ScrollTrigger.refresh();
+    /* entrance */
+    if (!reduced && HAS_GSAP){
+      gsap.fromTo(viewEl, {opacity:0, y:26}, {opacity:1, y:0, duration:.85, ease:'power3.out', clearProps:'transform'});
+    } else if (!reduced){
+      viewEl.animate([{opacity:0, transform:'translateY(20px)'},{opacity:1, transform:'none'}], {duration:520, easing:'cubic-bezier(.16,1,.3,1)'});
+    }
+  };
+
+  if (firstRender || reduced || !HAS_GSAP){
+    firstRender = false;
+    paint();
+    return;
+  }
+  /* bronze shutter wipe: rises, swaps, falls — deliberate, not snappy */
+  var tl = gsap.timeline();
+  tl.set(wipe, {transformOrigin:'bottom center'})
+    .to(wipe, {scaleY:1, duration:.42, ease:'power3.inOut'})
+    .add(paint)
+    .set(wipe, {transformOrigin:'top center'})
+    .to(wipe, {scaleY:0, duration:.62, ease:'power3.inOut'}, '+=0.03');
+}
+
+window.addEventListener('hashchange', render);
+
+/* ============================================================
+   CONTENT
+   ============================================================ */
+var PRODUCTS = [
+  {id:'atlas-core', n:'ATLAS Core', cat:'Platform', price:48000, unit:'per node / year', seed:3,
+   tag:'The load-bearing runtime',
+   d:'The control plane every other TECHBISS module bolts into. Multi-region scheduling, deterministic rollbacks, and a policy engine that refuses a deploy before it can break a regulator.',
+   long:'ATLAS Core is the structural slab of the TECHBISS platform. It holds workload placement, secrets, entitlement and change control in one plane, so a bank in Frankfurt and a refinery in Jubail run the same deployment contract. Rollback is a first-class primitive: every release carries a reversible ledger entry, and a failed conformance check stops the pour before concrete sets.',
+   specs:[['Regions','38 active / 9 sovereign'],['Failover objective','RTO 40s · RPO 0'],['Change ledger','Immutable, 10-year'],['Conformance packs','ISO 27001, DORA, HIPAA']],
+   mods:[['Sovereign region pack','+ $9,200'],['Change-ledger archive (10 yr)','+ $4,400'],['24/7 structural on-call','+ $12,000']]},
+
+  {id:'quarry', n:'QUARRY Data Fabric', cat:'Data', price:31500, unit:'per 100TB / year', seed:7,
+   tag:'One seam through every source',
+   d:'Federated query and lineage across warehouses, lakes and forty years of mainframe extract, without a migration project standing between you and the answer.',
+   long:'QUARRY indexes what you already have rather than demanding you move it. Lineage is captured at read time, so an auditor can trace a board-level figure back through every join to the COBOL copybook it came from — in under nine seconds on a typical estate.',
+   specs:[['Connectors','214 certified'],['Median federated query','1.8s over 40TB'],['Lineage depth','Column-level, unlimited hops'],['Mainframe','VSAM, IMS, Db2 z/OS']],
+   mods:[['Mainframe extract bridge','+ $7,800'],['Column-level masking','+ $3,600'],['Lineage attestation API','+ $2,900']]},
+
+  {id:'obsidian', n:'OBSIDIAN Threat Mesh', cat:'Security', price:62000, unit:'per estate / year', seed:11,
+   tag:'Containment before escalation',
+   d:'Behavioural detection that isolates a compromised workload in under four seconds and files the regulatory notification draft while your team is still reading the page.',
+   long:'OBSIDIAN watches east-west traffic as a mesh, not a perimeter. Containment actions are pre-authorised by policy so response does not wait on a human being awake. Every action writes to the same change ledger ATLAS uses, which is what turns an incident into a defensible timeline.',
+   specs:[['Mean containment','3.6s'],['False-positive rate','0.4% at tuned baseline'],['Coverage','Kubernetes, VM, bare metal, edge'],['Notification drafts','GDPR, DORA, SEC 8-K']],
+   mods:[['Managed hunt team','+ $28,000'],['OT / SCADA sensor pack','+ $14,500'],['Tabletop exercise programme','+ $6,000']]},
+
+  {id:'foundry', n:'FOUNDRY Model Gateway', cat:'Applied AI', price:27400, unit:'per 10M calls / year', seed:5,
+   tag:'Every model, one doorway',
+   d:'A governed gateway in front of every model your organisation uses — routing, redaction, cost attribution and an evidence trail an EU AI Act auditor will accept.',
+   long:'FOUNDRY sits between your applications and whichever models they call. It redacts before egress, routes on cost and latency policy, and records a per-call evidence record: prompt class, model version, guardrail verdict, cost centre. Model swaps become a config change instead of a quarter of work.',
+   specs:[['Routing decision','P99 11ms'],['Redaction classes','62 built-in, extensible'],['Evidence retention','7 years, WORM'],['Providers','Any OpenAI-shaped or gRPC endpoint']],
+   mods:[['On-prem inference adapter','+ $11,300'],['Evaluation harness','+ $5,700'],['AI Act conformance pack','+ $8,900']]},
+
+  {id:'plumb', n:'PLUMB Observability', cat:'Operations', price:18900, unit:'per 1k hosts / year', seed:2,
+   tag:'Read the building, not the noise',
+   d:'Traces, metrics and logs correlated into a single structural view, with a cost governor that stops your telemetry bill outgrowing the system it watches.',
+   long:'PLUMB assumes you cannot afford to keep everything. It samples adaptively against service-level objectives, keeps full fidelity around anomalies, and gives every team a hard telemetry budget with a visible meter. Estates moving to PLUMB typically cut observability spend by 44% while raising incident detection.',
+   specs:[['Ingest','4.1M spans/sec sustained'],['Retention','Adaptive, 13 months hot'],['Cost governor','Per-team hard budget'],['SLO engine','Burn-rate alerting built in']],
+   mods:[['Synthetic journey fleet','+ $4,200'],['eBPF host profiler','+ $6,600'],['Executive service scorecard','+ $2,400']]},
+
+  {id:'ledgerstone', n:'LEDGERSTONE Finance Ops', cat:'Platform', price:44200, unit:'per entity / year', seed:13,
+   tag:'Close the books in daylight',
+   d:'Continuous close, intercompany reconciliation and audit evidence generated as transactions land — not reconstructed in a panic each quarter.',
+   long:'LEDGERSTONE reconciles as it ingests. Intercompany eliminations, FX revaluation and accrual policy run continuously, so period close becomes a review rather than a rebuild. Three of our clients now close in under two days across more than sixty legal entities.',
+   specs:[['Close cycle','1.8 days median, 63 entities'],['Reconciliation','Continuous, sub-ledger level'],['Standards','IFRS 17, US GAAP, local books'],['Evidence','Auto-assembled audit packs']],
+   mods:[['Statutory filing pack','+ $8,100'],['Transfer-pricing engine','+ $10,400'],['Treasury cash forecast','+ $5,900']]},
+
+  {id:'cipherwall', n:'CIPHERWALL Zero-Trust Edge', cat:'Security', price:39800, unit:'per 10k identities / year', seed:17,
+   tag:'The door is the perimeter',
+   d:'Identity-bound access for workforce, contractors and machines, with post-quantum key exchange already switched on by default.',
+   long:'CIPHERWALL replaces network trust with continuously evaluated identity. Access decisions consider device posture, behavioural baseline and data classification on every request, not once at login. Hybrid post-quantum key exchange ships enabled, because the harvest-now-decrypt-later problem is already in progress.',
+   specs:[['Key exchange','X25519 + ML-KEM-768 hybrid'],['Decision latency','P99 8ms'],['Machine identity','Workload attestation, 90s rotation'],['Contractor onboarding','Under 6 minutes']],
+   mods:[['Privileged session recording','+ $9,700'],['Hardware attestation fleet','+ $13,200'],['Break-glass governance','+ $3,300']]},
+
+  {id:'strata', n:'STRATA Feature Store', cat:'Data', price:22600, unit:'per 500 features / year', seed:23,
+   tag:'Training and serving, same stone',
+   d:'One definition of a feature, served identically to a training job and a live decision, with drift monitoring that names the upstream table that moved.',
+   long:'STRATA ends training-serving skew by making the feature definition the only artefact. Offline and online paths compile from the same source, and drift alerts point at the specific upstream column and the commit that changed it — not a vague distribution warning.',
+   specs:[['Online read','P99 4.2ms'],['Point-in-time correctness','Guaranteed'],['Drift detection','Per-feature, upstream-attributed'],['Backfill','Parallel, 12TB/hour']],
+   mods:[['Streaming ingestion','+ $6,800'],['Feature marketplace (internal)','+ $3,900'],['Governance approvals','+ $2,700']]},
+
+  {id:'kiln', n:'KILN ModelOps', cat:'Applied AI', price:35100, unit:'per 25 models / year', seed:19,
+   tag:'From notebook to load-bearing',
+   d:'Promotion pipelines, shadow deployment and automatic rollback for production models, so a retrained model never reaches customers unproven.',
+   long:'KILN treats a model like any other structural component. Candidates run in shadow against live traffic, promotion requires a signed evaluation record, and degradation triggers automatic reversion to the last known-good version. Nothing reaches customers on a hunch.',
+   specs:[['Shadow traffic','Up to 100% mirrored'],['Promotion gate','Signed eval + human sign-off'],['Auto-rollback','Triggered under 30s'],['Registry','Lineage to dataset commit']],
+   mods:[['GPU scheduling pool','+ $15,600'],['Bias & fairness suite','+ $7,200'],['Champion/challenger service','+ $4,800']]}
+];
+
+var CASES = [
+  {id:'nordbank', c:'Nordbank Group', s:'Banking · Oslo', t:'Core banking, moved without a single dark weekend',
+   d:'Nordbank ran 41 years of retail banking on a mainframe nobody was willing to touch. We built a parallel ATLAS estate, ran both cores against live traffic for eleven months, and cut over account by account — 6.2 million of them — with no customer-visible outage.',
+   m:[['71%','Lower cost per transaction'],['0','Minutes of customer downtime'],['11 mo','Parallel-run assurance period'],['6.2M','Accounts migrated']],
+   q:'They refused to give us a big-bang date. That refusal is why we still have a bank.', a:'Ingrid Solheim, Group COO'},
+  {id:'halden', c:'Halden Energy Network', s:'Utilities · Copenhagen', t:'2.4 million grid sensors, one honest number',
+   d:'Grid operators were making balancing decisions on data that was forty minutes old. QUARRY and PLUMB gave Halden a live structural view of the network, and the balancing desk got a figure it could act on inside four seconds.',
+   m:[['2.4M','Sensors under live telemetry'],['4.1s','End-to-end data latency'],['€38M','Annual balancing savings'],['99.997%','Telemetry completeness']],
+   q:'We stopped arguing about whose number was right and started running the grid.', a:'Lars Bendtsen, Head of System Operations'},
+  {id:'meridian', c:'Meridian Health Alliance', s:'Healthcare · Chicago', t:'Eleven hospitals, one record, zero exceptions',
+   d:'Meridian had eleven electronic record systems and a merger deadline. We federated first with QUARRY, consolidated second, and put CIPHERWALL in front of every clinician identity — so access followed the clinician, not the building.',
+   m:[['11','Hospitals unified'],['94%','Fewer record-retrieval delays'],['18 min','Saved per clinician shift'],['0','Reportable data incidents']],
+   q:'The clinicians noticed nothing on day one. That was the entire specification.', a:'Dr. Amara Osei, Chief Medical Information Officer'},
+  {id:'calvera', c:'Port of Calvera', s:'Logistics · Valencia', t:'A port that schedules itself',
+   d:'Berth allocation was a whiteboard and thirty years of instinct. KILN put a scheduling model into production behind shadow evaluation, and the port now allocates berths eight hours ahead with the harbourmaster overriding fewer than one call in twenty.',
+   m:[['31%','Reduction in vessel wait'],['8 hr','Forward scheduling horizon'],['4.6%','Human override rate'],['€21M','Annual throughput gain']],
+   q:'It earned the harbourmaster’s trust before it earned a single berth.', a:'Pau Ferrer, Port Operations Director'}
+];
+
+var SERVICES = [
+  {n:'Structural Assessment', d:'A twelve-week survey of your estate that ends in a load map: what bears weight, what is decorative, and what will fail under the next three years of demand.',
+   pts:['Application and data topology survey','Failure-mode and dependency analysis','Regulatory exposure register','Sequenced remediation plan with costs'],
+   stat:['12 weeks','Typical survey duration']},
+  {n:'Cloud & Platform Foundations', d:'Landing zones, network fabric and the control plane that turns a cloud account into infrastructure your auditors will sign off on.',
+   pts:['Multi-region landing zone build','Policy-as-code guardrails','FinOps allocation model','Platform team enablement'],
+   stat:['38','Regions delivered to date']},
+  {n:'Core Systems Modernisation', d:'Mainframes, ERP monoliths and forty-year-old batch estates, moved in parallel-run so the business never depends on a single cutover night.',
+   pts:['Parallel-run reconciliation harness','Strangler-pattern decomposition','COBOL and RPG interpretation','Cutover rehearsal programme'],
+   stat:['0','Customer-visible outages in 9 years']},
+  {n:'Data & Intelligence Platforms', d:'A single seam through your data estate — federated first, consolidated only where consolidation earns its keep.',
+   pts:['Federated query and lineage layer','Governance and classification model','Feature and metric definitions','Warehouse consolidation where justified'],
+   stat:['214','Certified source connectors']},
+  {n:'Applied AI Systems', d:'Models placed into production as load-bearing components: evaluated, governed, reversible, and accountable to a named human owner.',
+   pts:['Use-case triage and value modelling','Evaluation harness and guardrails','EU AI Act conformance evidence','Shadow deployment and promotion gates'],
+   stat:['1,180','Models under production governance']},
+  {n:'Cyber Resilience', d:'Zero-trust identity, containment automation and the incident evidence trail that decides whether a bad week becomes a bad decade.',
+   pts:['Zero-trust identity architecture','Automated containment playbooks','Post-quantum migration planning','Regulatory notification readiness'],
+   stat:['3.6s','Mean containment time']},
+  {n:'Experience Engineering', d:'The surfaces your customers and staff actually touch, built to the same structural standard as everything underneath them.',
+   pts:['Design system and component library','Accessibility to WCAG 2.2 AA','Performance budgets enforced in CI','Front-end platform team enablement'],
+   stat:['AA','Accessibility floor, never a stretch goal']},
+  {n:'Managed Operations', d:'We run what we build, on a shared incident ledger, with engineers who were in the room when it was designed.',
+   pts:['24/7 follow-the-sun operations','Shared SLO and error budget model','Quarterly structural review','Named engineering continuity'],
+   stat:['99.993%','Measured platform availability']}
+];
+
+var SOLUTIONS = [
+  {n:'Banking & Capital Markets', k:'Sector', d:'Core replacement without a cutover weekend, DORA evidence generated continuously, and a change ledger that answers a regulator in minutes.',
+   pts:['Parallel-run core migration','DORA & operational resilience evidence','Real-time payment rails','Model risk governance'], stat:'71% lower cost per transaction'},
+  {n:'Healthcare & Life Sciences', k:'Sector', d:'Federated patient records across merged estates, clinician-bound access, and clinical AI with evaluation evidence attached to every model.',
+   pts:['Record federation across systems','Identity that follows the clinician','Clinical model evaluation harness','HIPAA & MDR evidence packs'], stat:'18 minutes saved per clinician shift'},
+  {n:'Energy & Utilities', k:'Sector', d:'Grid-scale telemetry, OT/IT convergence done safely, and balancing decisions made on data measured in seconds rather than tens of minutes.',
+   pts:['OT/IT convergence architecture','Grid telemetry at 2M+ sensors','SCADA-aware threat detection','Demand forecasting in production'], stat:'€38M annual balancing savings'},
+  {n:'Industrial Manufacturing', k:'Sector', d:'Plant-floor data lifted into the same fabric as the enterprise, with predictive maintenance that survives contact with a maintenance schedule.',
+   pts:['Plant-to-enterprise data fabric','Predictive maintenance in production','Supply-chain resilience modelling','Quality inspection systems'], stat:'22% reduction in unplanned downtime'},
+  {n:'Public Infrastructure', k:'Sector', d:'Sovereign-region deployments, procurement-grade transparency, and citizen services that keep working during the week everybody uses them at once.',
+   pts:['Sovereign and air-gapped regions','Legacy citizen-service migration','Accessibility as a legal floor','Open procurement documentation'], stat:'9 sovereign regions in operation'},
+  {n:'Retail & Commerce', k:'Sector', d:'Inventory truth across channels, peak-season capacity proven by rehearsal rather than hope, and pricing models under real governance.',
+   pts:['Unified inventory and order fabric','Peak rehearsal programme','Pricing and demand models','Store and edge deployment'], stat:'11x peak load sustained without degradation'},
+  {n:'Merger Integration', k:'Use case', d:'Two estates, one deadline. Federate first so the business functions on day one, then consolidate on the evidence rather than the org chart.',
+   pts:['Day-one federation architecture','Duplicate system rationalisation','Identity and access consolidation','Synergy tracking against baseline'], stat:'11 hospitals unified in 14 months'},
+  {n:'Regulatory Response', k:'Use case', d:'When a supervisor sets a deadline, the answer is evidence, not intention. We build the machinery that produces it continuously.',
+   pts:['Control mapping to obligation','Continuous evidence generation','Remediation programme delivery','Supervisor-ready reporting'], stat:'Evidence packs assembled in under 20 minutes'},
+  {n:'Sovereign Cloud Exit', k:'Use case', d:'Concentration risk is now a board matter. We build portability into the platform so leaving a provider is an engineering task, not an existential one.',
+   pts:['Portability architecture review','Data gravity and egress modelling','Dual-region operational proof','Exit rehearsal and certification'], stat:'Exit rehearsals run twice annually'}
+];
+
+var PROCESS = [
+  {n:'Survey', d:'We measure the ground before we touch it. Six to twelve weeks of estate analysis producing a load map, a risk register and a costed sequence — delivered whether or not you continue with us.',
+   out:['Estate load map','Failure-mode register','Costed remediation sequence'], dur:'6–12 weeks'},
+  {n:'Foundation', d:'Landing zones, identity, network fabric and the change ledger go in first. Nothing is built on top until the foundation carries a rehearsal load.',
+   out:['Landing zones live','Policy-as-code guardrails','Change ledger operating'], dur:'8–16 weeks'},
+  {n:'Frame', d:'The structural members: core platform services, data fabric, security mesh. Each one proven against live traffic in shadow before it holds anything.',
+   out:['Core services in shadow','Data fabric federated','Containment automation armed'], dur:'12–28 weeks'},
+  {n:'Fit-out', d:'Applications, interfaces and workflows land inside the frame. Teams move in progressively, in an order set by risk rather than by enthusiasm.',
+   out:['Workload migration waves','Team enablement complete','Runbooks under version control'], dur:'16–52 weeks'},
+  {n:'Occupancy', d:'We run it with you, then increasingly beside you. Quarterly structural review checks that what we built still matches the load it now carries.',
+   out:['Joint operations model','Quarterly structural review','Named engineering continuity'], dur:'Ongoing'}
+];
+
+var RESOURCES = [
+  {k:'Field guide', n:'The Parallel-Run Handbook', d:'How to migrate a core banking system without ever scheduling a cutover weekend. Includes the reconciliation harness design we use on every engagement.', m:'48 pages · PDF', t:'Migration'},
+  {k:'Research', n:'Structural Debt Index 2026', d:'We surveyed 1,400 enterprise estates across 31 countries. The median organisation carries 6.8 years of deferred structural work — here is where it accumulates.', m:'Research report', t:'Strategy'},
+  {k:'Technical note', n:'Post-Quantum Migration Without a Big Bang', d:'A staged approach to hybrid key exchange in estates too large to rotate at once, with the sequencing we used across 10,000 machine identities.', m:'22 min read', t:'Security'},
+  {k:'Playbook', n:'Evidence, Not Intention: The DORA Playbook', d:'What supervisors actually ask for, what they accept, and how to produce it continuously instead of assembling it under deadline.', m:'Playbook · PDF', t:'Regulation'},
+  {k:'Field guide', n:'Putting a Model Into Production', d:'Shadow evaluation, promotion gates, automatic rollback, and the human sign-off that keeps a model accountable to a named owner.', m:'36 pages · PDF', t:'Applied AI'},
+  {k:'Benchmark', n:'Observability Cost Benchmark', d:'Telemetry spend across 220 estates, and the adaptive sampling model that cut the median bill by 44% without losing incident detection.', m:'Benchmark data', t:'Operations'},
+  {k:'Technical note', n:'Federate First, Consolidate Later', d:'Why the consolidation project you are planning should probably be a federation project, and how to tell when it genuinely should not be.', m:'14 min read', t:'Data'},
+  {k:'Case note', n:'Eleven Hospitals, Fourteen Months', d:'The Meridian Health integration in engineering detail: sequencing, identity model, and the three decisions that mattered most.', m:'Case note', t:'Healthcare'},
+  {k:'Reference', n:'The TECHBISS Structural Standard', d:'Our internal engineering standard, published in full. Every deliverable we produce is measured against it, and so can ours be by you.', m:'Living document', t:'Standards'}
+];
+
+var TIERS = [
+  {n:'Atrium', k:'Single business unit', m:14500, y:139200,
+   d:'One estate, one region, a foundation you can build on. For organisations proving the model before committing the group.',
+   f:[['ATLAS Core control plane',1],['Up to 3 platform modules',1],['2 regions, 1 sovereign optional',1],['Business-hours structural support',1],['Quarterly structural review',1],['Named delivery architect',0],['Managed operations',0],['Custom conformance packs',0]]},
+  {n:'Colonnade', k:'Multi-entity group', m:38900, y:373440, best:true,
+   d:'The standard shape of a TECHBISS engagement: several entities, real regulatory weight, and a platform team you are growing deliberately.',
+   f:[['ATLAS Core control plane',1],['Unlimited platform modules',1],['12 regions, 3 sovereign',1],['24/7 structural on-call',1],['Monthly structural review',1],['Named delivery architect',1],['Managed operations (co-run)',1],['Custom conformance packs',0]]},
+  {n:'Monolith', k:'Global enterprise', m:0, y:0,
+   d:'Group-wide, sovereign-capable, with our engineers embedded and continuity guaranteed by contract rather than by goodwill.',
+   f:[['ATLAS Core control plane',1],['Unlimited platform modules',1],['All 38 regions, 9 sovereign',1],['24/7 structural on-call',1],['Continuous structural review',1],['Named delivery architect',1],['Fully managed operations',1],['Custom conformance packs',1]]}
+];
+
+/* deterministic geometric product glyph — no image files */
+function glyph(seed){
+  var r = seed, out = '';
+  function rnd(){ r = (r*9301 + 49297) % 233280; return r/233280; }
+  for (var i=0;i<7;i++){
+    var w = 6 + Math.floor(rnd()*34);
+    var h = 3 + Math.floor(rnd()*7);
+    var x = Math.floor(rnd()*(46-w/2));
+    var y = 5 + i*7;
+    var accent = rnd() > .58;
+    out += '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" fill="'+(accent?'var(--accent)':'var(--rule-strong)')+'"></rect>';
+  }
+  return '<svg viewBox="0 0 58 58" aria-hidden="true">'+out+'</svg>';
+}
+
+/* ============================================================
+   SHARED VIEW FRAGMENTS
+   ============================================================ */
+function pageHead(o){
+  return '<section class="sec sec--tight"><div class="wrap">' +
+    '<div class="shead">' +
+      '<div class="level-tag">'+esc(o.level)+'</div>' +
+      '<div class="shead-body">' +
+        '<p class="eyebrow" data-reveal>'+esc(o.eyebrow)+'</p>' +
+        '<h1 class="h-1" data-reveal>'+o.title+'</h1>' +
+        (o.lede ? '<p class="lede" data-reveal style="--d:120ms">'+esc(o.lede)+'</p>' : '') +
+        (o.extra || '') +
+      '</div>' +
+    '</div>' +
+    '<div class="xrule" style="margin-top:clamp(30px,4vw,60px)"></div>' +
+  '</div></section>';
+}
+
+function statBand(items){
+  return '<div class="stats" data-stagger>' + items.map(function(s,i){
+    return '<div class="stat" data-reveal="mass">' +
+      '<div class="stat-v"><span data-count="'+s[0]+'"'+(s[3]?' data-dec="'+s[3]+'"':'')+(s[4]?' data-comma':'')+'>0</span><span>'+esc(s[1])+'</span></div>' +
+      '<div class="stat-l">'+esc(s[2])+'</div>' +
+      (s[5] ? '<div class="stat-d">'+esc(s[5])+'</div>' : '') +
+    '</div>';
+  }).join('') + '</div>';
+}
+
+function ctaBand(title, sub, primary, secondary){
+  return '<section class="sec"><div class="wrap">' +
+    '<div class="slab" style="padding:clamp(30px,5vw,80px);display:grid;gap:26px" data-reveal="mass">' +
+      '<p class="eyebrow">Next move</p>' +
+      '<h2 class="h-2">'+title+'</h2>' +
+      '<p class="lede">'+esc(sub)+'</p>' +
+      '<div class="btn-row">' +
+        '<a class="btn btn--accent" href="'+primary[1]+'" data-magnet>'+esc(primary[0])+'</a>' +
+        '<a class="btn btn--ghost" href="'+secondary[1]+'">'+esc(secondary[0])+'</a>' +
+      '</div>' +
+    '</div>' +
+  '</div></section>';
+}
+
+/* ============================================================
+   VIEWS
+   ============================================================ */
+var VIEWTITLES = {
+  home:'Terra Monolith', services:'Services', solutions:'Solutions', marketplace:'Marketplace',
+  work:'Case Studies', process:'Process', about:'About', resources:'Resources', pricing:'Pricing',
+  contact:'Contact', login:'Sign in', installer:'Platform Installer', dashboard:'Dashboard'
+};
+
+var VIEWS = {};
+
+/* ---------------- HOME ---------------- */
+VIEWS.home = function(){
+  var teaser = PRODUCTS.slice(0,3).map(function(p,i){
+    return '<a class="cell press" href="#/marketplace/product/'+p.id+'" data-reveal style="--d:'+(i*90)+'ms;display:flex;flex-direction:column;gap:14px;min-height:230px">' +
+      '<span class="pcard-cat">'+esc(p.cat)+'</span>' +
+      '<span class="h-3">'+esc(p.n)+'</span>' +
+      '<span class="body-s" style="flex:1">'+esc(p.tag)+'</span>' +
+      '<span class="tlink">Open module</span>' +
+    '</a>';
+  }).join('');
+
+  var svcTeaser = SERVICES.slice(0,4).map(function(s,i){
+    return '<div class="kv" data-reveal style="--d:'+(i*70)+'ms"><span>'+esc(s.n)+'</span><b>'+esc(s.stat[0])+'</b></div>';
+  }).join('');
+
+  return (
+  '<section class="hero" id="hero">' +
+    '<div class="hero-grid" aria-hidden="true"><i style="left:12%"></i><i style="left:34%"></i><i style="left:56%"></i><i style="left:78%"></i></div>' +
+    '<div class="wrap hero-head">' +
+      '<p class="level-tag" style="margin-bottom:clamp(18px,3vw,34px)">L00 — GROUND LEVEL / TECHBISS GROUP N.V. / EST. 2009</p>' +
+      '<h1 class="h-mega" style="margin-bottom:6px">' +
+        '<span class="hero-line"><span>WE BUILD</span></span>' +
+        '<span class="hero-line"><span>THE STRUCTURAL</span></span>' +
+        '<span class="hero-line"><span class="metal">CORE.</span></span>' +
+      '</h1>' +
+      '<div style="display:grid;gap:clamp(20px,3vw,44px);grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin-top:clamp(24px,4vw,48px);align-items:start">' +
+        '<p class="lede" data-reveal>TECHBISS is the digital transformation platform underneath 340 of the world’s largest enterprises. Not a consultancy that leaves. Not a tool that bolts on. The load-bearing structure your organisation runs on for the next twenty years.</p>' +
+        '<div>' +
+          '<svg class="elevation" viewBox="0 0 300 180" role="img" aria-label="Schematic elevation of a monolithic structure in eight levels">' +
+            '<g stroke="var(--accent)" stroke-width="2" fill="none">' +
+              '<path class="draw" style="--len:900" d="M20 170 L20 30 L150 8 L280 30 L280 170"></path>' +
+            '</g>' +
+            '<g stroke="var(--rule-strong)" stroke-width="1" fill="none">' +
+              '<path class="draw" style="--len:1800" d="M20 150 H280 M20 130 H280 M20 110 H280 M20 90 H280 M20 70 H280 M20 50 H280 M70 170 V38 M110 170 V32 M150 170 V26 M190 170 V32 M230 170 V38"></path>' +
+            '</g>' +
+            '<rect x="20" y="170" width="260" height="4" fill="var(--accent)"></rect>' +
+          '</svg>' +
+        '</div>' +
+      '</div>' +
+      '<div class="hero-cta">' +
+        '<a class="btn btn--accent" href="#/contact" data-magnet>Commission a survey</a>' +
+        '<a class="btn btn--ghost" href="#/work" data-magnet>See what we have built</a>' +
+      '</div>' +
+      '<div class="hero-meta">' +
+        '<div><span class="level-tag">Headquarters</span><span class="h-4" style="margin-top:6px">Rotterdam, NL</span></div>' +
+        '<div><span class="level-tag">Engineers</span><span class="h-4" style="margin-top:6px">11,400 across 74 countries</span></div>' +
+        '<div><span class="level-tag">Under management</span><span class="h-4" style="margin-top:6px">$1.4T of enterprise revenue</span></div>' +
+        '<div><span class="level-tag">Standard</span><span class="h-4" style="margin-top:6px">Built to bear load</span></div>' +
+      '</div>' +
+    '</div>' +
+  '</section>' +
+
+  /* ---- pinned storytelling: moving up through the structure ---- */
+  '<section class="sec" style="padding-top:clamp(40px,5vw,80px)"><div class="wrap">' +
+    '<div class="shead" style="margin-bottom:clamp(24px,4vw,50px)">' +
+      '<div class="level-tag">L01–L03</div>' +
+      '<div class="shead-body">' +
+        '<p class="eyebrow" data-reveal>Ascending the structure</p>' +
+        '<h2 class="h-2" data-reveal>Three levels. One continuous pour.</h2>' +
+      '</div>' +
+    '</div>' +
+  '</div>' +
+  '<div class="stage" id="homeStage"><div class="wrap"><div class="stage-plates" id="homePlates">' +
+    [['01','FOUNDATION','Landing zones, identity, network fabric and an immutable change ledger. We do not build on ground we have not tested. The foundation carries a rehearsal load before a single workload lands on it.','Estates founded','412'],
+     ['02','FRAME','Core services, data fabric and the security mesh. Every structural member runs in shadow against live traffic before it holds weight, because the first time a component bears load should never be in production.','Members in shadow','8,900'],
+     ['03','OCCUPANCY','Your teams move in, wave by wave, in an order set by risk. We run it with you, then beside you, and review the structure quarterly against the load it has actually taken on.','Estates operated','340']]
+    .map(function(p,i){
+      return '<div class="plate" data-plate="'+i+'">' +
+        '<div>' +
+          '<div class="plate-num" aria-hidden="true">'+p[0]+'</div>' +
+          '<h3 class="h-2" style="margin-top:clamp(6px,1vw,14px)">'+p[1]+'</h3>' +
+        '</div>' +
+        '<div style="display:flex;flex-direction:column;gap:22px">' +
+          '<p class="lede">'+p[2]+'</p>' +
+          '<div class="kv" style="border-top:1px solid var(--rule)"><span class="level-tag">'+p[3]+'</span><b style="font-size:1.5rem">'+p[4]+'</b></div>' +
+        '</div>' +
+      '</div>';
+    }).join('') +
+  '</div></div></div></section>' +
+
+  /* ---- stats ---- */
+  '<section class="sec sec--tight"><div class="wrap">' +
+    '<p class="eyebrow" style="margin-bottom:26px" data-reveal>Measured, not claimed</p>' +
+    statBand([
+      [74,'','Countries served',0,0,'Delivery presence with local legal entities in each.'],
+      [99.993,'%','Platform availability',3,0,'Rolling 24-month measurement across all managed estates.'],
+      [128400,'','Production deployments',0,1,'Executed through the ATLAS change ledger since 2019.'],
+      [340,'','Enterprise clients',0,0,'Organisations above $1B revenue currently under contract.']
+    ]) +
+  '</div></section>' +
+
+  /* ---- parallax quarry band ---- */
+  '<section class="sec" style="overflow:hidden"><div class="wrap">' +
+    '<div style="display:grid;gap:clamp(24px,4vw,64px);grid-template-columns:repeat(auto-fit,minmax(300px,1fr));align-items:center">' +
+      '<div style="display:flex;flex-direction:column;gap:22px">' +
+        '<p class="eyebrow" data-reveal>The difference</p>' +
+        '<h2 class="h-2" data-reveal>Most transformation is scaffolding. It comes down when the consultants leave.</h2>' +
+        '<p class="lede" data-reveal>We only build things designed to still be standing in twenty years. That means fewer frameworks, slower decisions, and a refusal to ship anything we would not be willing to operate ourselves — which we usually are.</p>' +
+        '<div>'+svcTeaser+'</div>' +
+        '<a class="tlink" href="#/services" style="align-self:flex-start">All eight services</a>' +
+      '</div>' +
+      '<div style="position:relative;min-height:340px" data-parallax-scene>' +
+        '<div class="slab" data-depth="0.10" style="position:absolute;inset:12% 22% 22% 4%"></div>' +
+        '<div class="slab" data-depth="0.22" style="position:absolute;inset:24% 6% 8% 26%;background:var(--panel-2)"></div>' +
+        '<div class="slab" data-depth="0.36" style="position:absolute;inset:4% 34% 46% 18%;border-color:var(--accent-line)"></div>' +
+        '<div data-depth="0.5" style="position:absolute;left:8%;right:8%;top:52%;height:3px;background:var(--accent)"></div>' +
+      '</div>' +
+    '</div>' +
+  '</div></section>' +
+
+  /* ---- marketplace teaser ---- */
+  '<section class="sec"><div class="wrap">' +
+    '<div class="shead" style="margin-bottom:30px">' +
+      '<div class="level-tag">L07 — MARKETPLACE</div>' +
+      '<div class="shead-body">' +
+        '<p class="eyebrow" data-reveal>Modules</p>' +
+        '<h2 class="h-2" data-reveal>Nine components. One structural standard.</h2>' +
+        '<p class="lede" data-reveal>Every module in the TECHBISS marketplace bolts into the same control plane, shares the same change ledger, and is operated to the same availability target. Buy one; it will still fit when you buy the fourth.</p>' +
+      '</div>' +
+    '</div>' +
+    '<div class="grid grid-3" data-stagger>'+teaser+'</div>' +
+    '<div style="margin-top:28px"><a class="tlink" href="#/marketplace">Enter the marketplace</a></div>' +
+  '</div></section>' +
+
+  ctaBand('Commission a structural survey.',
+    'Twelve weeks, a fixed fee, and a load map of your estate that is yours to keep whether or not you continue with us. Roughly a third of surveys end with our advice to do nothing yet.',
+    ['Start the conversation','#/contact'], ['Read the process','#/process'])
+  );
+};
+
+/* ---------------- SERVICES ---------------- */
+VIEWS.services = function(){
+  return pageHead({
+    level:'L02 — SERVICES', eyebrow:'What we do',
+    title:'Eight disciplines,<br>one structural standard.',
+    lede:'We do not sell staff by the hour. Each discipline below is a named outcome with a measurable standard attached to it, delivered by engineers who stay long enough to operate what they built.'
+  }) +
+  '<section class="sec sec--tight"><div class="wrap">' +
+    SERVICES.map(function(s,i){
+      return '<div class="srow-group">' +
+        '<div class="srow" data-srow="'+i+'" role="button" tabindex="0" aria-expanded="false" aria-controls="svc-p-'+i+'">' +
+          '<div class="srow-fill" aria-hidden="true"></div>' +
+          '<span class="level-tag">'+String(i+1).padStart(2,'0')+'</span>' +
+          '<span class="srow-t">'+esc(s.n)+'</span>' +
+          '<span class="srow-open" aria-hidden="true"><i></i><i></i></span>' +
+        '</div>' +
+        '<div class="srow-panel" id="svc-p-'+i+'"><div class="srow-panel-in"><div class="srow-panel-pad">' +
+          '<p class="body-s">'+esc(s.d)+'</p>' +
+          '<ul style="display:flex;flex-direction:column;gap:2px">' + s.pts.map(function(p){
+            return '<li class="kv"><span>'+esc(p)+'</span></li>'; }).join('') + '</ul>' +
+          '<div><div class="level-tag">'+esc(s.stat[1])+'</div><div class="h-2" style="margin-top:8px;color:var(--accent-text)">'+esc(s.stat[0])+'</div></div>' +
+        '</div></div></div>' +
+      '</div>';
+    }).join('') +
+  '</div></section>' +
+  ctaBand('Not sure which discipline you need?',
+    'That is what the survey is for. We measure first and recommend second, and we will tell you plainly when the answer is that you do not need us yet.',
+    ['Commission a survey','#/contact'], ['Compare pricing','#/pricing']);
+};
+
+/* ---------------- SOLUTIONS ---------------- */
+VIEWS.solutions = function(){
+  return pageHead({
+    level:'L03 — SOLUTIONS', eyebrow:'Where we do it',
+    title:'Six sectors.<br>Three hard situations.',
+    lede:'Services describe our disciplines. Solutions describe your situation — the sector you operate in, or the specific structural problem that put us in the room.'
+  }) +
+  '<section class="sec sec--tight"><div class="wrap">' +
+    '<div class="mgrid" data-stagger>' +
+      SOLUTIONS.map(function(s,i){
+        return '<article class="pcard tilt" data-reveal="mass" style="--d:'+(i%3*80)+'ms;cursor:default">' +
+          '<div class="pcard-top">' +
+            '<div><span class="pcard-cat">'+esc(s.k)+'</span><h3 class="pcard-t" style="margin-top:8px">'+esc(s.n)+'</h3></div>' +
+            '<span class="level-tag">'+String(i+1).padStart(2,'0')+'</span>' +
+          '</div>' +
+          '<p class="pcard-d">'+esc(s.d)+'</p>' +
+          '<ul style="display:flex;flex-direction:column;gap:1px">' + s.pts.map(function(p){
+            return '<li style="font-size:.8rem;color:var(--ink-mute);padding:5px 0;border-bottom:1px solid var(--rule)">'+esc(p)+'</li>'; }).join('') + '</ul>' +
+          '<div class="pcard-foot"><span style="font-family:var(--disp);font-weight:800;font-stretch:82%;font-size:.98rem;color:var(--accent-text);line-height:1.15">'+esc(s.stat)+'</span></div>' +
+        '</article>';
+      }).join('') +
+    '</div>' +
+  '</div></section>' +
+  ctaBand('Your situation is probably one of these three.',
+    'A regulator set a date. A merger created two of everything. Or a system that has run for thirty years has quietly become the thing nobody is allowed to touch.',
+    ['Tell us which','#/contact'], ['See the evidence','#/work']);
+};
+
+/* ---------------- MARKETPLACE ---------------- */
+VIEWS.marketplace = function(){
+  var cats = ['All'].concat(PRODUCTS.map(function(p){return p.cat;}).filter(function(v,i,a){return a.indexOf(v)===i;}));
+  return pageHead({
+    level:'L07 — MARKETPLACE', eyebrow:'Modules',
+    title:'Components you can<br>bolt into the frame.',
+    lede:'Nine modules, one control plane, one change ledger. Licensed annually, deployed through the installer, operated to the same 99.99% structural standard as everything else we build.',
+    extra:'<div class="chips" style="margin-top:26px" role="group" aria-label="Filter modules by category">' +
+      cats.map(function(c,i){ return '<button class="chip" data-cat="'+esc(c)+'" aria-pressed="'+(i===0?'true':'false')+'">'+esc(c)+'</button>'; }).join('') +
+      '<span class="micro" id="mpCount" aria-live="polite" style="margin-left:8px">9 modules</span>' +
+    '</div>'
+  }) +
+  '<section class="sec sec--tight"><div class="wrap">' +
+    '<div class="mgrid" id="mpGrid" data-stagger>' +
+      PRODUCTS.map(function(p,i){
+        return '<button class="pcard tilt" data-reveal="mass" data-pcat="'+esc(p.cat)+'" data-href="#/marketplace/product/'+p.id+'" style="--d:'+(i%3*80)+'ms">' +
+          '<div class="pcard-top">' +
+            '<div><span class="pcard-cat">'+esc(p.cat)+'</span><h3 class="pcard-t" style="margin-top:8px">'+esc(p.n)+'</h3></div>' +
+            '<span class="pcard-mark">'+glyph(p.seed)+'</span>' +
+          '</div>' +
+          '<p class="pcard-d">'+esc(p.d)+'</p>' +
+          '<div class="pcard-foot">' +
+            '<span class="pcard-price">$'+p.price.toLocaleString('en-US')+'<small>'+esc(p.unit)+'</small></span>' +
+            '<span class="tlink" style="border:0;padding:0">Open</span>' +
+          '</div>' +
+        '</button>';
+      }).join('') +
+    '</div>' +
+  '</div></section>' +
+  ctaBand('Every module ships with the installer.',
+    'Selection, detection, configuration, migration, install and verification run as one guided sequence. Watch it run end to end before you commit to anything.',
+    ['Run the installer','#/installer'], ['See pricing','#/pricing']);
+};
+
+/* ---------------- PRODUCT DETAIL ---------------- */
+VIEWS.product = function(r){
+  var p = PRODUCTS.filter(function(x){return x.id===r.id;})[0] || PRODUCTS[0];
+  var steps = ['Preview','Customize','Purchase','Deploy'];
+  return (
+  '<section class="sec sec--tight"><div class="wrap">' +
+    '<a class="tlink" href="#/marketplace" style="margin-bottom:26px">&#8592; All modules</a>' +
+    '<div style="display:grid;gap:clamp(24px,4vw,56px);grid-template-columns:repeat(auto-fit,minmax(300px,1fr));align-items:start;margin-top:24px">' +
+      '<div style="display:flex;flex-direction:column;gap:20px">' +
+        '<p class="eyebrow">'+esc(p.cat)+' module</p>' +
+        '<h1 class="h-1">'+esc(p.n)+'</h1>' +
+        '<p class="quote" style="color:var(--accent-text)">'+esc(p.tag)+'</p>' +
+        '<p class="lede">'+esc(p.long)+'</p>' +
+        '<div style="display:flex;gap:8px;flex-wrap:wrap"><span class="tag">Installer-ready</span><span class="tag">ATLAS-native</span><span class="tag">SOC 2 evidenced</span></div>' +
+      '</div>' +
+      '<div class="slab" style="padding:clamp(22px,3vw,36px);display:flex;flex-direction:column;gap:6px">' +
+        '<div class="level-tag" style="margin-bottom:12px">Specification</div>' +
+        p.specs.map(function(s){ return '<div class="kv"><span>'+esc(s[0])+'</span><b>'+esc(s[1])+'</b></div>'; }).join('') +
+        '<div class="kv" style="border:0;padding-top:18px"><span class="level-tag">List price</span><b style="font-size:1.5rem">$'+p.price.toLocaleString('en-US')+'</b></div>' +
+        '<div class="micro" style="text-align:right;margin-top:-8px">'+esc(p.unit)+'</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="xrule" style="margin-top:clamp(30px,4vw,56px)"></div>' +
+  '</div></section>' +
+
+  '<section class="sec sec--tight" id="flowSec" data-product="'+esc(p.id)+'"><div class="wrap">' +
+    '<p class="eyebrow" style="margin-bottom:20px">Acquisition sequence</p>' +
+    '<div class="flow-steps" id="flowSteps" role="list">' +
+      steps.map(function(s,i){
+        return '<div class="flow-step'+(i===0?' active':'')+'" role="listitem" data-fstep="'+i+'">' +
+          '<span class="level-tag">'+String(i+1).padStart(2,'0')+'</span><b>'+s+'</b></div>';
+      }).join('') +
+    '</div>' +
+    '<div class="flow-body" id="flowBody">' +
+
+      '<div class="flow-pane on" data-pane="0">' +
+        '<h2 class="h-3">Preview the module in a sandbox estate</h2>' +
+        '<p class="body-s" style="margin-top:12px">A read-only instance of '+esc(p.n)+' running against synthetic traffic shaped like a mid-size European bank. Nothing here touches your systems.</p>' +
+        '<div style="display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);margin-top:22px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))">' +
+          [['Sandbox region','eu-central-1'],['Synthetic load','12,400 req/s'],['Instance age','4 days'],['Reset in','19 hours']].map(function(k){
+            return '<div style="background:var(--ground);padding:16px"><div class="level-tag">'+k[0]+'</div><div class="h-4" style="margin-top:6px">'+k[1]+'</div></div>';
+          }).join('') +
+        '</div>' +
+        '<div class="btn-row" style="margin-top:26px"><button class="btn btn--accent" data-fnext data-magnet>Configure this module</button></div>' +
+      '</div>' +
+
+      '<div class="flow-pane" data-pane="1">' +
+        '<h2 class="h-3">Add the pieces your estate needs</h2>' +
+        '<p class="body-s" style="margin-top:12px">Base licence covers the module and the control-plane integration. Everything below is optional and priced per year.</p>' +
+        '<div style="display:flex;flex-direction:column;gap:10px;margin-top:22px" id="modList">' +
+          p.mods.map(function(m,i){
+            return '<label class="opt" data-mod="'+i+'" data-add="'+parseInt(m[1].replace(/[^0-9]/g,''),10)+'">' +
+              '<input type="checkbox">' +
+              '<span style="flex:1"><b class="h-4">'+esc(m[0])+'</b></span>' +
+              '<span class="num" style="font-weight:700">'+esc(m[1])+'</span>' +
+            '</label>';
+          }).join('') +
+        '</div>' +
+        '<div class="kv" style="margin-top:24px;border-top:3px solid var(--rule-thick);border-bottom:0;padding-top:18px">' +
+          '<span class="level-tag">Annual total</span><b class="num" id="flowTotal" style="font-size:1.8rem">$'+p.price.toLocaleString('en-US')+'</b></div>' +
+        '<div class="btn-row" style="margin-top:22px">' +
+          '<button class="btn btn--accent" data-fnext data-magnet>Proceed to purchase</button>' +
+          '<button class="btn btn--ghost" data-fprev>Back</button>' +
+        '</div>' +
+      '</div>' +
+
+      '<div class="flow-pane" data-pane="2">' +
+        '<h2 class="h-3">Confirm the commitment</h2>' +
+        '<p class="body-s" style="margin-top:12px">This is a demonstration. No payment method is collected and nothing is charged.</p>' +
+        '<div style="display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));margin-top:24px">' +
+          '<div><div class="level-tag">Billing entity</div><div class="h-4" style="margin-top:6px">Nordbank Group N.V.</div></div>' +
+          '<div><div class="level-tag">Term</div><div class="h-4" style="margin-top:6px">36 months, annual invoice</div></div>' +
+          '<div><div class="level-tag">Deploy target</div><div class="h-4" style="margin-top:6px">ATLAS estate · eu-central</div></div>' +
+          '<div><div class="level-tag">Total per year</div><div class="h-4" style="margin-top:6px;color:var(--accent-text)" id="flowTotal2">$'+p.price.toLocaleString('en-US')+'</div></div>' +
+        '</div>' +
+        '<div class="form-note" style="margin-top:24px"><span aria-hidden="true">&#9632;</span><span>Purchases route through your existing TECHBISS master agreement. Structural review of the deployment plan is included at no cost.</span></div>' +
+        '<div class="btn-row" style="margin-top:22px">' +
+          '<button class="btn btn--accent" data-fnext data-magnet>Authorise &amp; deploy</button>' +
+          '<button class="btn btn--ghost" data-fprev>Back</button>' +
+        '</div>' +
+      '</div>' +
+
+      '<div class="flow-pane" data-pane="3">' +
+        '<h2 class="h-3" id="deployTitle">Deploying '+esc(p.n)+'</h2>' +
+        '<p class="body-s" style="margin-top:12px">The module is being poured into your ATLAS estate. Rollback stays available for 30 days.</p>' +
+        '<div class="prog" style="margin-top:22px"><i id="depBar"></i></div>' +
+        '<div class="micro" style="margin-top:8px;display:flex;justify-content:space-between"><span id="depPhase">Requesting capacity</span><span class="num" id="depPct">0%</span></div>' +
+        '<div class="log" id="depLog" style="margin-top:18px;height:190px" role="log" aria-live="off"></div>' +
+        '<div id="depDone" style="display:none;margin-top:24px">' +
+          '<div class="slab" style="padding:24px;border-color:var(--accent);display:flex;flex-direction:column;gap:14px">' +
+            '<div class="eyebrow">Deployment complete</div>' +
+            '<div class="h-3">'+esc(p.n)+' is live in eu-central-1</div>' +
+            '<p class="body-s">Change ledger entry ATL-2026-0914-77C recorded. Structural review scheduled for 14 days from now.</p>' +
+            '<div class="btn-row"><a class="btn btn--accent" href="#/dashboard" data-magnet>Open dashboard</a><a class="btn btn--ghost" href="#/marketplace">Back to marketplace</a></div>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+
+    '</div>' +
+  '</div></section>' +
+
+  '<section class="sec sec--tight"><div class="wrap">' +
+    '<p class="eyebrow" style="margin-bottom:24px">Bolts into</p>' +
+    '<div class="grid grid-3" data-stagger>' +
+      PRODUCTS.filter(function(x){return x.id!==p.id;}).slice(0,3).map(function(o,i){
+        return '<a class="cell press" href="#/marketplace/product/'+o.id+'" data-reveal style="--d:'+(i*80)+'ms;display:flex;flex-direction:column;gap:12px">' +
+          '<span class="pcard-cat">'+esc(o.cat)+'</span><span class="h-3">'+esc(o.n)+'</span>' +
+          '<span class="body-s">'+esc(o.tag)+'</span></a>';
+      }).join('') +
+    '</div>' +
+  '</div></section>'
+  );
+};
+
+/* ---------------- WORK ---------------- */
+VIEWS.work = function(){
+  return pageHead({
+    level:'L04 — EVIDENCE', eyebrow:'Case studies',
+    title:'Four buildings<br>still standing.',
+    lede:'Every figure below was measured against a baseline agreed before we started, and verified by the client’s own finance or operations function. We publish the ones that worked and we will discuss the ones that did not.'
+  }) +
+  CASES.map(function(c,i){
+    return '<section class="sec sec--tight"><div class="wrap">' +
+      '<article class="slab" style="padding:clamp(24px,3.4vw,56px);display:grid;gap:clamp(22px,3vw,44px);grid-template-columns:repeat(auto-fit,minmax(290px,1fr))" data-reveal="mass">' +
+        '<div style="display:flex;flex-direction:column;gap:18px">' +
+          '<div style="display:flex;justify-content:space-between;gap:12px;align-items:baseline">' +
+            '<span class="eyebrow">'+esc(c.c)+'</span><span class="level-tag">'+String(i+1).padStart(2,'0')+' / 04</span></div>' +
+          '<h2 class="h-2">'+esc(c.t)+'</h2>' +
+          '<span class="tag" style="align-self:flex-start">'+esc(c.s)+'</span>' +
+          '<p class="body-s">'+esc(c.d)+'</p>' +
+          '<blockquote style="border-left:3px solid var(--accent);padding-left:18px;margin:6px 0 0">' +
+            '<p class="quote">&ldquo;'+esc(c.q)+'&rdquo;</p>' +
+            '<footer class="micro" style="margin-top:10px">'+esc(c.a)+'</footer>' +
+          '</blockquote>' +
+        '</div>' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--rule);align-self:start;border:1px solid var(--rule)">' +
+          c.m.map(function(m){
+            return '<div style="background:var(--panel);padding:clamp(18px,2.4vw,30px)">' +
+              '<div class="h-2" style="color:var(--accent-text);font-size:clamp(1.7rem,3.4vw,2.6rem)">'+esc(m[0])+'</div>' +
+              '<div class="stat-l">'+esc(m[1])+'</div></div>';
+          }).join('') +
+        '</div>' +
+      '</article>' +
+    '</div></section>';
+  }).join('') +
+  ctaBand('We will introduce you to any of them.',
+    'Reference calls are arranged directly with the operational owner, not a marketing contact. Ask them what went wrong — they will tell you, and so will we.',
+    ['Request a reference','#/contact'], ['Read the process','#/process']);
+};
+
+/* ---------------- PROCESS ---------------- */
+VIEWS.process = function(){
+  return pageHead({
+    level:'L05 — METHOD', eyebrow:'How we engage',
+    title:'Five phases.<br>No cutover weekends.',
+    lede:'Our method is borrowed from construction rather than software: survey the ground, pour a foundation, raise a frame, fit out, then occupy. Each phase has an exit condition, and we do not proceed past one that has not been met.'
+  }) +
+  '<div class="stage" id="procStage"><div class="wrap"><div class="stage-plates" id="procPlates">' +
+    PROCESS.map(function(p,i){
+      return '<div class="plate" data-plate="'+i+'">' +
+        '<div>' +
+          '<div class="plate-num" aria-hidden="true">'+String(i+1).padStart(2,'0')+'</div>' +
+          '<h2 class="h-2" style="margin-top:clamp(6px,1vw,14px)">'+esc(p.n)+'</h2>' +
+          '<div class="tag" style="margin-top:14px">'+esc(p.dur)+'</div>' +
+        '</div>' +
+        '<div style="display:flex;flex-direction:column;gap:20px">' +
+          '<p class="lede">'+esc(p.d)+'</p>' +
+          '<div><div class="level-tag" style="margin-bottom:8px">Exit conditions</div>' +
+            p.out.map(function(o){ return '<div class="kv"><span>'+esc(o)+'</span><b style="color:var(--accent-text)">Required</b></div>'; }).join('') +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('') +
+  '</div></div></div>' +
+  '<section class="sec"><div class="wrap">' +
+    '<div class="xrule" style="margin-bottom:clamp(28px,4vw,50px)"></div>' +
+    '<div style="display:grid;gap:clamp(22px,3vw,50px);grid-template-columns:repeat(auto-fit,minmax(260px,1fr))" data-stagger>' +
+      [['We measure before we quote','A survey costs a fixed fee and produces a document you keep. Roughly one in three ends with us recommending you wait.'],
+       ['We run in parallel, always','No cutover weekend has ever been necessary on an estate we have touched. Parallel-run costs more up front and less in total.'],
+       ['We stay through occupancy','The engineers who designed your platform are on the incident bridge for it. Continuity is contractual, not aspirational.']].map(function(x,i){
+        return '<div data-reveal style="--d:'+(i*90)+'ms;display:flex;flex-direction:column;gap:12px">' +
+          '<div style="height:3px;background:var(--accent);width:44px"></div>' +
+          '<h3 class="h-3">'+esc(x[0])+'</h3><p class="body-s">'+esc(x[1])+'</p></div>';
+      }).join('') +
+    '</div>' +
+  '</div></section>' +
+  ctaBand('Phase one is twelve weeks and a fixed fee.',
+    'You end it with a load map of your estate, a costed sequence, and no obligation to use us for any of it.',
+    ['Commission the survey','#/contact'], ['See what it produced','#/work']);
+};
+
+/* ---------------- ABOUT ---------------- */
+VIEWS.about = function(){
+  return pageHead({
+    level:'L06 — THE FIRM', eyebrow:'About TECHBISS',
+    title:'Founded by people<br>who had to fix it after.',
+    lede:'TECHBISS was started in Rotterdam in 2009 by four engineers who had spent the previous decade being called in after other people’s transformations failed. The firm exists because they got tired of arriving late.'
+  }) +
+  '<section class="sec sec--tight"><div class="wrap">' +
+    '<div style="display:grid;gap:clamp(24px,4vw,60px);grid-template-columns:repeat(auto-fit,minmax(300px,1fr))">' +
+      '<div style="display:flex;flex-direction:column;gap:20px">' +
+        '<h2 class="h-2" data-reveal>Seventeen years, one standard.</h2>' +
+        '<p class="body-s" data-reveal>We have never taken outside investment, which is why we can turn down work. About a quarter of the engagements we are offered are declined — usually because the client wants a date before they want a survey, and we have learned what that leads to.</p>' +
+        '<p class="body-s" data-reveal>We publish our engineering standard in full, including the parts that make us look slow. Our clients hold us to it, and so do their regulators.</p>' +
+        '<p class="body-s" data-reveal>The firm is employee-owned. Every engineer above their fourth year holds equity, which is a large part of why the person who designed your platform is still reachable six years later.</p>' +
+      '</div>' +
+      '<div class="slab" style="padding:clamp(22px,3vw,40px);display:flex;flex-direction:column;gap:4px" data-reveal="mass">' +
+        '<div class="level-tag" style="margin-bottom:14px">The firm in figures</div>' +
+        [['Founded','2009, Rotterdam'],['Ownership','Employee-owned, 68% held by staff'],['Engineers','11,400'],['Countries','74 with local entities'],['Median tenure','7.4 years'],['Engagements declined','24% of those offered'],['Client revenue under management','$1.4 trillion'],['Standard','Published in full']].map(function(k){
+          return '<div class="kv"><span>'+esc(k[0])+'</span><b>'+esc(k[1])+'</b></div>'; }).join('') +
+      '</div>' +
+    '</div>' +
+  '</div></section>' +
+  '<section class="sec sec--tight"><div class="wrap">' +
+    '<p class="eyebrow" style="margin-bottom:26px" data-reveal>Values, stated as constraints</p>' +
+    '<div class="grid grid-2" data-stagger>' +
+      [['Measure before you build','Every engagement opens with a survey. We will not quote a transformation from a slide deck, and we will not accept a date set before the measurement.'],
+       ['Never a single cutover','If a plan depends on one night going perfectly, the plan is wrong. Parallel-run is more expensive, and it is not negotiable.'],
+       ['Operate what you design','The team that builds a platform carries its pager. This constrains how clever we allow ourselves to be, deliberately.'],
+       ['Publish the standard','Our engineering standard, including its failures and revisions, is public. A standard nobody can check is a marketing document.'],
+       ['Refuse the work you should refuse','A quarter of what we are offered, we decline. Saying no to a bad engagement is the cheapest quality control available.'],
+       ['Build for twenty years','Every decision is tested against a simple question: will someone thank us for this in 2046, or will they be trying to remove it?']].map(function(v,i){
+        return '<div class="cell" data-reveal style="--d:'+(i%2*90)+'ms;display:flex;flex-direction:column;gap:12px">' +
+          '<span class="level-tag">'+String(i+1).padStart(2,'0')+'</span>' +
+          '<h3 class="h-3">'+esc(v[0])+'</h3><p class="body-s">'+esc(v[1])+'</p></div>';
+      }).join('') +
+    '</div>' +
+  '</div></section>' +
+  '<section class="sec sec--tight"><div class="wrap">' +
+    '<p class="eyebrow" style="margin-bottom:26px" data-reveal>Global presence</p>' +
+    statBand([[74,'','Countries with local entities'],[31,'','Delivery centres'],[11400,'','Engineers',0,1],[9,'','Sovereign regions operated']]) +
+    '<div class="grid grid-3" style="margin-top:1px" data-stagger>' +
+      [['Rotterdam','Global HQ · 2,100 staff','Wilhelminakade 173'],['Singapore','APAC HQ · 1,840 staff','9 Straits View, Level 41'],['Austin','Americas HQ · 1,610 staff','500 W 2nd St, Tower B'],
+       ['São Paulo','LATAM · 740 staff','Av. Faria Lima 3477'],['Nairobi','EMEA South · 520 staff','Westlands, Muthithi Road'],['Kraków','Engineering · 1,290 staff','Rondo Mogilskie 1']].map(function(o,i){
+        return '<div class="cell" data-reveal style="--d:'+(i%3*80)+'ms"><h3 class="h-3">'+esc(o[0])+'</h3>' +
+          '<div class="micro" style="margin-top:8px">'+esc(o[1])+'</div>' +
+          '<div class="micro" style="margin-top:4px;color:var(--ink-soft)">'+esc(o[2])+'</div></div>';
+      }).join('') +
+    '</div>' +
+  '</div></section>' +
+  ctaBand('We are usually booked two quarters out.',
+    'Surveys can normally start sooner. If your situation has a regulatory deadline attached, say so — we hold capacity for those.',
+    ['Contact the firm','#/contact'], ['Read the standard','#/resources']);
+};
+
+/* ---------------- RESOURCES ---------------- */
+VIEWS.resources = function(){
+  return pageHead({
+    level:'L08 — LIBRARY', eyebrow:'Resources',
+    title:'What we have<br>learned, published.',
+    lede:'Field guides, benchmarks and technical notes from live engagements. No registration wall — if it is useful, take it.'
+  }) +
+  '<section class="sec sec--tight"><div class="wrap">' +
+    '<div class="grid grid-3" data-stagger>' +
+      RESOURCES.map(function(r,i){
+        return '<article class="cell press tilt" data-reveal="mass" style="--d:'+(i%3*80)+'ms;display:flex;flex-direction:column;gap:14px;min-height:270px">' +
+          '<div style="display:flex;justify-content:space-between;gap:10px;align-items:baseline">' +
+            '<span class="pcard-cat">'+esc(r.k)+'</span><span class="level-tag">'+esc(r.t)+'</span></div>' +
+          '<h3 class="h-3">'+esc(r.n)+'</h3>' +
+          '<p class="body-s" style="flex:1">'+esc(r.d)+'</p>' +
+          '<div class="pcard-foot"><span class="micro">'+esc(r.m)+'</span><span class="tlink" style="border:0;padding:0">Read</span></div>' +
+        '</article>';
+      }).join('') +
+    '</div>' +
+  '</div></section>' +
+  ctaBand('The structural standard, in full.',
+    'Our complete internal engineering standard is a living document, revised roughly monthly, with every revision and its reasoning kept in the open.',
+    ['Open the standard','#/resources'], ['Talk to an engineer','#/contact']);
+};
+
+/* ---------------- PRICING ---------------- */
+VIEWS.pricing = function(){
+  return pageHead({
+    level:'L09 — COMMERCIAL', eyebrow:'Pricing',
+    title:'Three shapes<br>of engagement.',
+    lede:'Platform licensing is published. Delivery work is quoted from the survey, because quoting transformation work without measuring it first is how the industry got its reputation.',
+    extra:'<div style="margin-top:26px;display:flex;gap:16px;align-items:center;flex-wrap:wrap">' +
+      '<div class="toggle" role="group" aria-label="Billing period"><span class="knob" aria-hidden="true"></span>' +
+        '<button id="pMonthly" aria-pressed="true">Monthly</button><button id="pAnnual" aria-pressed="false">Annual</button></div>' +
+      '<span class="micro" id="pSave">Annual billing saves 20%</span></div>'
+  }) +
+  '<section class="sec sec--tight"><div class="wrap">' +
+    '<div class="grid grid-3" data-stagger>' +
+      TIERS.map(function(t,i){
+        return '<div class="tier'+(t.best?' tier--feature':'')+'" data-reveal="mass" style="--d:'+(i*90)+'ms">' +
+          (t.best ? '<span class="ribbon">Most estates</span>' : '') +
+          '<div><span class="level-tag">'+esc(t.k)+'</span><h2 class="h-2" style="margin-top:8px;font-size:clamp(1.7rem,3vw,2.5rem)">'+esc(t.n)+'</h2></div>' +
+          '<div class="tier-price" data-tier="'+i+'">' +
+            (t.m ? '<sup>$</sup><span class="tier-num">'+t.m.toLocaleString('en-US')+'</span><small> /mo</small>' : '<span style="font-size:.5em">On application</span>') +
+          '</div>' +
+          '<p class="body-s">'+esc(t.d)+'</p>' +
+          '<div style="flex:1">' + t.f.map(function(f){
+            return '<div class="feat'+(f[1]?'':' off')+'">' +
+              '<svg viewBox="0 0 24 24" aria-hidden="true">'+(f[1]?'<path d="M4 12l6 6L20 6"></path>':'<path d="M6 6l12 12M18 6L6 18"></path>')+'</svg>' +
+              '<span>'+esc(f[0])+'</span></div>';
+          }).join('') + '</div>' +
+          '<a class="btn '+(t.best?'btn--accent':'btn--ghost')+' btn--block" href="#/contact" data-magnet>'+(t.m?'Request this tier':'Speak to the firm')+'</a>' +
+        '</div>';
+      }).join('') +
+    '</div>' +
+    '<div class="form-note" style="margin-top:26px"><span aria-hidden="true">&#9632;</span><span>Delivery engagements are quoted separately from a completed structural survey. A survey is a fixed fee of $84,000 and is credited in full against any engagement that follows within twelve months.</span></div>' +
+  '</div></section>' +
+  '<section class="sec sec--tight"><div class="wrap">' +
+    '<p class="eyebrow" style="margin-bottom:24px" data-reveal>Common questions</p>' +
+    '<div style="display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule)" data-stagger>' +
+      [['Why is the top tier priced on application?','Because group-wide engagements differ by an order of magnitude in scope and sovereignty requirements. We would rather quote from your survey than publish a number that is wrong for everyone.'],
+       ['Is the survey fee really credited back?','In full, against any engagement starting within twelve months. Roughly a third of surveys do not lead to one, and we consider that a feature.'],
+       ['Can we buy modules without the platform?','Yes, from the marketplace. They will run standalone, though the change ledger and structural review only apply inside an ATLAS estate.'],
+       ['What happens if we want to leave?','Exit rehearsal is part of every engagement above Atrium, run twice yearly. Portability is a design constraint, not a concession.']].map(function(q,i){
+        return '<div style="background:var(--ground);padding:clamp(20px,2.4vw,32px)" data-reveal style="--d:'+(i*70)+'ms">' +
+          '<h3 class="h-4" style="font-size:1.1rem">'+esc(q[0])+'</h3>' +
+          '<p class="body-s" style="margin-top:10px">'+esc(q[1])+'</p></div>';
+      }).join('') +
+    '</div>' +
+  '</div></section>';
+};
+
+/* ---------------- CONTACT ---------------- */
+VIEWS.contact = function(){
+  return pageHead({
+    level:'L10 — CONTACT', eyebrow:'Start here',
+    title:'Tell us what<br>is bearing load.',
+    lede:'A senior engineer reads every enquiry — not a qualification team. Expect a reply within one working day, and expect it to contain questions rather than a brochure.'
+  }) +
+  '<section class="sec sec--tight"><div class="wrap">' +
+    '<div style="display:grid;gap:clamp(26px,4vw,64px);grid-template-columns:repeat(auto-fit,minmax(300px,1fr));align-items:start">' +
+      '<form id="contactForm" novalidate data-reveal>' +
+        '<div class="field"><label for="cName">Your name</label><input id="cName" name="name" type="text" autocomplete="name" placeholder="Ingrid Solheim"><span class="err" data-err></span></div>' +
+        '<div class="field"><label for="cEmail">Work email</label><input id="cEmail" name="email" type="email" autocomplete="email" placeholder="i.solheim@nordbank.no"><span class="err" data-err></span></div>' +
+        '<div class="field"><label for="cOrg">Organisation</label><input id="cOrg" name="org" type="text" autocomplete="organization" placeholder="Nordbank Group"><span class="err" data-err></span></div>' +
+        '<div class="field"><label for="cType">What is the situation?</label>' +
+          '<select id="cType" name="type">' +
+            '<option value="">Select one</option>' +
+            '<option>A regulator has set a deadline</option>' +
+            '<option>A merger created two of everything</option>' +
+            '<option>A core system nobody will touch</option>' +
+            '<option>A platform that will not scale</option>' +
+            '<option>Something else entirely</option>' +
+          '</select><span class="err" data-err></span></div>' +
+        '<div class="field"><label for="cMsg">What is bearing load?</label><textarea id="cMsg" name="msg" placeholder="Describe the system, the constraint, and the date if there is one."></textarea><span class="err" data-err></span></div>' +
+        '<button class="btn btn--accent btn--block" type="submit" data-magnet>Send to an engineer</button>' +
+        '<div id="contactDone" style="display:none;margin-top:20px" class="slab">' +
+          '<div style="padding:22px;display:flex;flex-direction:column;gap:10px">' +
+            '<div class="eyebrow">Received</div>' +
+            '<p class="body-s">Enquiry logged as <b class="num">TB-2026-4471</b>. A structural engineer will reply within one working day. This is a demonstration form — nothing was transmitted.</p>' +
+          '</div></div>' +
+      '</form>' +
+      '<div style="display:flex;flex-direction:column;gap:22px" data-reveal style="--d:120ms">' +
+        '<div class="slab" style="padding:clamp(22px,3vw,34px);display:flex;flex-direction:column;gap:4px">' +
+          '<div class="level-tag" style="margin-bottom:12px">Direct lines</div>' +
+          [['Rotterdam (HQ)','+31 10 555 0192'],['Singapore','+65 6555 0144'],['Austin','+1 512 555 0177'],['Regulatory deadlines','deadline@techbiss.example']].map(function(k){
+            return '<div class="kv"><span>'+esc(k[0])+'</span><b>'+esc(k[1])+'</b></div>'; }).join('') +
+        '</div>' +
+        '<div class="slab" style="padding:clamp(22px,3vw,34px);display:flex;flex-direction:column;gap:14px">' +
+          '<div class="eyebrow">What happens next</div>' +
+          ['A senior engineer reads it, usually the same day.','You get questions back, not a capability deck.','If it is a fit, we scope a survey. If not, we say so.'].map(function(s,i){
+            return '<div style="display:flex;gap:14px;align-items:flex-start"><span class="level-tag" style="flex:none;padding-top:3px">'+String(i+1).padStart(2,'0')+'</span><span class="body-s">'+esc(s)+'</span></div>'; }).join('') +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+  '</div></section>';
+};
+
+/* ---------------- LOGIN ---------------- */
+VIEWS.login = function(){
+  return '<section class="sec" style="padding-top:clamp(96px,12vw,170px)"><div class="wrap">' +
+    '<div style="display:grid;gap:clamp(26px,4vw,70px);grid-template-columns:repeat(auto-fit,minmax(300px,1fr));align-items:center">' +
+      '<div style="display:flex;flex-direction:column;gap:22px">' +
+        '<p class="level-tag">L11 — CONSOLE ACCESS</p>' +
+        '<h1 class="h-1">Enter the<br>structure.</h1>' +
+        '<p class="lede">The TECHBISS console holds your estate: change ledger, structural reviews, module licences and the incident bridge. Access is bound to your identity, not to a network.</p>' +
+        '<div style="display:flex;gap:8px;flex-wrap:wrap"><span class="tag">Hardware key required</span><span class="tag">ML-KEM-768 hybrid</span><span class="tag">Session recording on</span></div>' +
+      '</div>' +
+      '<div class="slab" style="padding:clamp(24px,3.4vw,44px)" data-reveal="mass">' +
+        '<form id="loginForm" novalidate>' +
+          '<div class="eyebrow" style="margin-bottom:22px">Sign in</div>' +
+          '<div class="field"><label for="lEmail">Work email</label><input id="lEmail" type="email" autocomplete="username" placeholder="you@yourgroup.com"><span class="err" data-err></span></div>' +
+          '<div class="field"><label for="lPass">Passphrase</label><input id="lPass" type="password" autocomplete="current-password" placeholder="At least 10 characters"><span class="err" data-err></span></div>' +
+          '<label class="opt" style="margin-bottom:18px"><input type="checkbox" id="lRemember"><span class="body-s" style="margin:0">Keep this device enrolled for 30 days</span></label>' +
+          '<button class="btn btn--accent btn--block" type="submit" id="loginBtn" data-magnet>Authenticate</button>' +
+          '<div class="micro" style="margin-top:16px;text-align:center">Demonstration only — no credentials are transmitted or stored.</div>' +
+        '</form>' +
+        '<div id="loginDone" style="display:none;text-align:center;padding:20px 0">' +
+          '<div class="eyebrow" style="justify-content:center">Authenticated</div>' +
+          '<div class="h-2" style="margin:14px 0 10px">Welcome back</div>' +
+          '<p class="body-s" style="margin:0 auto 20px">Hardware key verified. Routing you to the console.</p>' +
+          '<div class="prog"><i id="loginBar"></i></div>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+  '</div></section>';
+};
+
+/* ---------------- INSTALLER ---------------- */
+var INSTALL_STEPS = ['Select','Detect','Configure','Import','Install','Verify','Launch'];
+VIEWS.installer = function(){
+  return pageHead({
+    level:'L12 — INSTALLER', eyebrow:'Platform installer',
+    title:'Seven steps<br>from nothing to live.',
+    lede:'The same guided sequence our engineers run on a real estate, driven here against a simulated environment. Nothing leaves your browser and nothing is installed on your machine.'
+  }) +
+  '<section class="sec sec--tight"><div class="wrap">' +
+    '<div class="stepper" id="stepper" role="list">' +
+      INSTALL_STEPS.map(function(s,i){
+        return '<div class="stepper-i'+(i===0?' on':'')+'" role="listitem" data-step="'+i+'">' +
+          '<div class="sn">'+String(i+1).padStart(2,'0')+'</div><div class="st">'+s+'</div></div>';
+      }).join('') +
+    '</div>' +
+
+    '<div class="flow-body" style="border-top:0" id="instBody">' +
+
+      '<div class="flow-pane on" data-ipane="0">' +
+        '<h2 class="h-3">Select the modules to install</h2>' +
+        '<p class="body-s" style="margin-top:12px">ATLAS Core is mandatory — it is the control plane everything else registers with.</p>' +
+        '<div style="display:flex;flex-direction:column;gap:10px;margin-top:22px" id="instSelect">' +
+          PRODUCTS.slice(0,5).map(function(p,i){
+            return '<label class="opt'+(i===0?' sel':'')+'"><input type="checkbox" '+(i===0?'checked disabled':'')+' data-inst="'+esc(p.n)+'">' +
+              '<span style="flex:1"><b class="h-4">'+esc(p.n)+'</b><span class="micro" style="display:block;margin-top:2px">'+esc(p.tag)+'</span></span>' +
+              '<span class="tag">'+esc(p.cat)+'</span></label>';
+          }).join('') +
+        '</div>' +
+        '<div class="btn-row" style="margin-top:26px"><button class="btn btn--accent" data-inext data-magnet>Detect environment</button></div>' +
+      '</div>' +
+
+      '<div class="flow-pane" data-ipane="1">' +
+        '<h2 class="h-3">Detecting the target environment</h2>' +
+        '<p class="body-s" style="margin-top:12px">Probing regions, identity providers, existing workloads and anything already holding load.</p>' +
+        '<div class="prog" style="margin-top:22px"><i data-ibar></i></div>' +
+        '<div class="micro" style="margin-top:8px;display:flex;justify-content:space-between"><span data-iphase>Starting probe</span><span class="num" data-ipct>0%</span></div>' +
+        '<div class="log" data-ilog style="margin-top:18px" role="log"></div>' +
+        '<div class="btn-row" style="margin-top:22px"><button class="btn btn--accent" data-inext disabled data-magnet>Configure</button></div>' +
+      '</div>' +
+
+      '<div class="flow-pane" data-ipane="2">' +
+        '<h2 class="h-3">Configure the estate</h2>' +
+        '<p class="body-s" style="margin-top:12px">Detected defaults are pre-filled. Anything you change here is written to the change ledger before install begins.</p>' +
+        '<div style="display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));margin-top:24px">' +
+          '<div class="field" style="margin:0"><label for="iRegion">Primary region</label><select id="iRegion"><option>eu-central-1 (Frankfurt)</option><option>eu-west-2 (Rotterdam)</option><option>ap-southeast-1 (Singapore)</option><option>us-south-2 (Austin)</option></select></div>' +
+          '<div class="field" style="margin:0"><label for="iFail">Failover region</label><select id="iFail"><option>eu-west-2 (Rotterdam)</option><option>eu-north-1 (Stockholm)</option><option>None — single region</option></select></div>' +
+          '<div class="field" style="margin:0"><label for="iIdp">Identity provider</label><select id="iIdp"><option>Detected: Entra ID (tenant nordbank.no)</option><option>Okta</option><option>Ping Federate</option><option>TECHBISS native</option></select></div>' +
+          '<div class="field" style="margin:0"><label for="iLedger">Change ledger retention</label><select id="iLedger"><option>10 years (regulated default)</option><option>7 years</option><option>3 years</option></select></div>' +
+        '</div>' +
+        '<div class="form-note" style="margin-top:20px"><span aria-hidden="true">&#9632;</span><span>Detected 41 existing workloads in eu-central-1. Import in the next step will bring them under the ledger without redeploying them.</span></div>' +
+        '<div class="btn-row" style="margin-top:24px"><button class="btn btn--accent" data-inext data-magnet>Import existing estate</button><button class="btn btn--ghost" data-iprev>Back</button></div>' +
+      '</div>' +
+
+      '<div class="flow-pane" data-ipane="3">' +
+        '<h2 class="h-3">Importing and migrating</h2>' +
+        '<p class="body-s" style="margin-top:12px">Existing workloads are registered, dependencies mapped, and secrets rotated into the new vault. Originals remain untouched and reversible.</p>' +
+        '<div class="prog" style="margin-top:22px"><i data-ibar></i></div>' +
+        '<div class="micro" style="margin-top:8px;display:flex;justify-content:space-between"><span data-iphase>Enumerating workloads</span><span class="num" data-ipct>0%</span></div>' +
+        '<div class="log" data-ilog style="margin-top:18px" role="log"></div>' +
+        '<div class="btn-row" style="margin-top:22px"><button class="btn btn--accent" data-inext disabled data-magnet>Begin install</button></div>' +
+      '</div>' +
+
+      '<div class="flow-pane" data-ipane="4">' +
+        '<h2 class="h-3">Installing</h2>' +
+        '<p class="body-s" style="margin-top:12px">Pouring the control plane, then each selected module in dependency order.</p>' +
+        '<div class="prog" style="margin-top:22px"><i data-ibar></i></div>' +
+        '<div class="micro" style="margin-top:8px;display:flex;justify-content:space-between"><span data-iphase>Allocating capacity</span><span class="num" data-ipct>0%</span></div>' +
+        '<div class="log" data-ilog style="margin-top:18px;height:300px" role="log"></div>' +
+        '<div class="btn-row" style="margin-top:22px"><button class="btn btn--accent" data-inext disabled data-magnet>Verify</button></div>' +
+      '</div>' +
+
+      '<div class="flow-pane" data-ipane="5">' +
+        '<h2 class="h-3">Verifying the structure</h2>' +
+        '<p class="body-s" style="margin-top:12px">Rehearsal load applied. Every check below must pass before the estate is released for use.</p>' +
+        '<div class="prog" style="margin-top:22px"><i data-ibar></i></div>' +
+        '<div class="micro" style="margin-top:8px;display:flex;justify-content:space-between"><span data-iphase>Applying rehearsal load</span><span class="num" data-ipct>0%</span></div>' +
+        '<div style="display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);margin-top:20px" id="verifyList">' +
+          ['Control plane reachable in both regions','Failover drill completed in 38s','Change ledger writing and sealed','Identity federation resolving','All modules registered and healthy','Rollback path proven'].map(function(v,i){
+            return '<div style="background:var(--ground);padding:13px 16px;display:flex;justify-content:space-between;gap:12px;align-items:center" data-vrow="'+i+'">' +
+              '<span class="body-s" style="margin:0">'+esc(v)+'</span><span class="pill nu" data-vpill>Pending</span></div>';
+          }).join('') +
+        '</div>' +
+        '<div class="btn-row" style="margin-top:22px"><button class="btn btn--accent" data-inext disabled data-magnet>Launch estate</button></div>' +
+      '</div>' +
+
+      '<div class="flow-pane" data-ipane="6">' +
+        '<div style="text-align:center;padding:clamp(16px,3vw,40px) 0">' +
+          '<div class="eyebrow" style="justify-content:center">Estate live</div>' +
+          '<h2 class="h-1" style="margin:18px 0">STANDING.</h2>' +
+          '<p class="lede" style="margin:0 auto 26px;text-align:left;max-width:56ch">Your ATLAS estate is operating in eu-central-1 with failover to eu-west-2. Five modules registered, 41 workloads imported, rollback proven. First structural review is scheduled in 14 days.</p>' +
+          '<div class="stats" style="text-align:left;margin-bottom:26px">' +
+            '<div class="stat"><div class="stat-v"><span data-count="41">0</span></div><div class="stat-l">Workloads imported</div></div>' +
+            '<div class="stat"><div class="stat-v"><span data-count="5">0</span></div><div class="stat-l">Modules installed</div></div>' +
+            '<div class="stat"><div class="stat-v"><span data-count="38">0</span><span>s</span></div><div class="stat-l">Failover drill</div></div>' +
+            '<div class="stat"><div class="stat-v"><span data-count="0">0</span></div><div class="stat-l">Failed checks</div></div>' +
+          '</div>' +
+          '<div class="btn-row" style="justify-content:center"><a class="btn btn--accent" href="#/dashboard" data-magnet>Open the console</a><button class="btn btn--ghost" id="instReset">Run it again</button></div>' +
+        '</div>' +
+      '</div>' +
+
+    '</div>' +
+  '</div></section>';
+};
+
+/* ---------------- DASHBOARD ---------------- */
+var ROLES = {
+  admin:{
+    label:'Administrator',
+    kpis:[['Estates under management',412,'',0,'up','+6 this quarter'],['Platform availability',99.993,'%',3,'up','+0.004 vs target'],['Open structural findings',23,'',0,'dn','-11 vs last month'],['Change ledger entries',128400,'',0,'up','+2,140 this week']],
+    chart:[41,44,48,52,51,58,63,69,72,78,84,91],
+    bars:[62,74,58,81,69,88,76,93,71,84,90,97],
+    table:[['ATL-2026-0914-77C','Nordbank Group','Module deploy · OBSIDIAN','eu-central-1','Sealed','ok'],
+           ['ATL-2026-0914-71A','Halden Energy','Region failover drill','eu-north-1','Sealed','ok'],
+           ['ATL-2026-0913-64F','Meridian Health','Identity policy change','us-south-2','Review','wn'],
+           ['ATL-2026-0913-59B','Port of Calvera','Model promotion · KILN','eu-west-2','Sealed','ok'],
+           ['ATL-2026-0912-51D','Nordbank Group','Schema migration · wave 7','eu-central-1','Rolled back','cr'],
+           ['ATL-2026-0912-44E','Kraków Engineering','Guardrail policy update','eu-central-1','Sealed','ok']],
+    cols:['Ledger entry','Estate','Change','Region','State','']
+  },
+  client:{
+    label:'Client',
+    kpis:[['Cost per transaction',0.041,'',3,'dn','-71% since 2024'],['Estate availability',99.991,'%',3,'up','Above 99.99 SLO'],['Modules licensed',6,'',0,'up','+1 this quarter'],['Open incidents',2,'',0,'dn','Both below P2']],
+    chart:[22,26,31,29,35,41,47,52,58,61,67,74],
+    bars:[48,55,51,63,60,72,68,79,74,85,81,92],
+    table:[['Core banking ledger','ATLAS Core','eu-central-1','99.998%','Healthy','ok'],
+           ['Payment rails','ATLAS Core','eu-central-1','99.994%','Healthy','ok'],
+           ['Customer data fabric','QUARRY','eu-central-1','99.987%','Degraded','wn'],
+           ['Fraud decisioning','KILN + FOUNDRY','eu-west-2','99.999%','Healthy','ok'],
+           ['Branch identity','CIPHERWALL','Global edge','100%','Healthy','ok'],
+           ['Regulatory reporting','LEDGERSTONE','eu-central-1','99.996%','Healthy','ok']],
+    cols:['Service','Module','Region','30-day availability','State','']
+  },
+  staff:{
+    label:'Staff',
+    kpis:[['Assigned engagements',7,'',0,'up','2 in survey phase'],['Pager weeks this year',4,'',0,'dn','Below the 6-week cap'],['Structural reviews due',3,'',0,'wn','Next: Halden, Friday'],['Utilisation',78,'%',0,'up','Target band 72–82%']],
+    chart:[12,18,15,24,29,27,34,38,36,44,49,53],
+    bars:[70,66,74,81,77,85,79,88,83,91,87,94],
+    table:[['Nordbank Group','Fit-out · wave 8','Lead architect','Fri 12 Sep','On track','ok'],
+           ['Halden Energy','Occupancy review','Reviewer','Fri 12 Sep','Due','wn'],
+           ['Meridian Health','Frame · identity mesh','Engineer','Mon 22 Sep','On track','ok'],
+           ['Port of Calvera','Survey','Surveyor','Wed 01 Oct','Not started','nu'],
+           ['Confidential — Sector: Retail','Survey','Surveyor','Thu 09 Oct','Not started','nu'],
+           ['Kraków platform team','Enablement','Coach','Ongoing','On track','ok']],
+    cols:['Engagement','Phase','Your role','Next milestone','State','']
+  }
+};
+
+VIEWS.dashboard = function(){
+  return pageHead({
+    level:'L13 — CONSOLE', eyebrow:'Console preview',
+    title:'The view from<br>inside the structure.',
+    lede:'A live-shaped preview of the TECHBISS console. Three roles see three different buildings — switch between them below. All figures are demonstration data.',
+    extra:'<div class="tabs" style="margin-top:26px" role="tablist" aria-label="Console role">' +
+      Object.keys(ROLES).map(function(k,i){
+        return '<button role="tab" id="tab-'+k+'" aria-selected="'+(i===0?'true':'false')+'" aria-controls="rolepanel" data-role="'+k+'">'+ROLES[k].label+'</button>';
+      }).join('') + '</div>'
+  }) +
+  '<section class="sec sec--tight"><div class="wrap">' +
+    '<div id="rolepanel" role="tabpanel" aria-labelledby="tab-admin"></div>' +
+  '</div></section>';
+};
+
+function roleMarkup(key){
+  var R = ROLES[key];
+  return '<div class="kpis" data-stagger>' +
+    R.kpis.map(function(k,i){
+      return '<div class="kpi" data-reveal style="--d:'+(i*70)+'ms">' +
+        '<div class="kpi-v"><span data-count="'+k[1]+'"'+(k[3]?' data-dec="'+k[3]+'"':'')+(k[1]>=1000?' data-comma':'')+'>0</span>'+esc(k[2])+'</div>' +
+        '<div class="kpi-l">'+esc(k[0])+'</div>' +
+        '<div class="delta '+(k[4]==='up'?'up':(k[4]==='dn'?'dn':''))+'" style="'+(k[4]==='wn'?'color:var(--warn)':'')+'">' +
+          '<span aria-hidden="true">'+(k[4]==='up'?'&#9650;':(k[4]==='dn'?'&#9660;':'&#9632;'))+'</span>'+esc(k[5])+'</div>' +
+      '</div>';
+    }).join('') + '</div>' +
+
+  '<div style="display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);border-top:0;grid-template-columns:repeat(auto-fit,minmax(320px,1fr))">' +
+    '<div style="background:var(--ground);padding:clamp(18px,2.2vw,30px)">' +
+      '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:18px">' +
+        '<h3 class="h-3">'+(key==='admin'?'Deployments per month':(key==='client'?'Transaction volume (millions)':'Delivery velocity index'))+'</h3>' +
+        '<span class="tag">12 months</span></div>' +
+      '<div class="chart-wrap" data-chart="['+R.chart.join(',')+']" data-labels="Oct,Nov,Dec,Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep"></div>' +
+    '</div>' +
+    '<div style="background:var(--ground);padding:clamp(18px,2.2vw,30px)">' +
+      '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:18px">' +
+        '<h3 class="h-3">'+(key==='admin'?'Ledger entries by week':(key==='client'?'Peak load headroom':'Review throughput'))+'</h3>' +
+        '<span class="tag">Rolling 12</span></div>' +
+      '<div class="bars" data-bars>' + R.bars.map(function(b){
+        return '<div class="bar" style="height:'+b+'%"></div>'; }).join('') + '</div>' +
+      '<div class="micro" style="margin-top:12px;display:flex;justify-content:space-between"><span>Week 1</span><span>Week 12</span></div>' +
+    '</div>' +
+  '</div>' +
+
+  '<div class="panel" style="border-top:0;padding:0">' +
+    '<div style="padding:clamp(18px,2.2vw,26px);display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap">' +
+      '<h3 class="h-3">'+(key==='admin'?'Recent change ledger':(key==='client'?'Services under management':'Your engagements'))+'</h3>' +
+      '<span class="micro">Updated 4 minutes ago</span></div>' +
+    '<div style="overflow-x:auto"><table><thead><tr>' +
+      R.cols.map(function(c){ return '<th>'+esc(c)+'</th>'; }).join('') +
+    '</tr></thead><tbody>' +
+      R.table.map(function(row){
+        var pill = row[row.length-1], cells = row.slice(0,-1);
+        return '<tr>' + cells.map(function(c,i){
+          if (i === cells.length-1) return '<td><span class="pill '+pill+'">'+esc(c)+'</span></td>';
+          return '<td'+(i===0?' style="color:var(--ink);font-weight:500"':'')+'>'+esc(c)+'</td>';
+        }).join('') + '</tr>';
+      }).join('') +
+    '</tbody></table></div>' +
+  '</div>';
+}
+
+/* ---------------- NOT FOUND ---------------- */
+VIEWS.notfound = function(){
+  return '<section class="sec" style="padding-top:clamp(110px,14vw,190px)"><div class="wrap">' +
+    '<p class="level-tag">ERROR 404 — NO SUCH LEVEL</p>' +
+    '<h1 class="h-mega" style="margin:18px 0">404</h1>' +
+    '<p class="lede">That level does not exist in this structure. The lift only stops where something has been built.</p>' +
+    '<div class="btn-row" style="margin-top:30px"><a class="btn btn--accent" href="#/home" data-magnet>Return to ground level</a></div>' +
+  '</div></section>';
+};
+
+/* ============================================================
+   PER-VIEW INITIALISERS
+   ============================================================ */
+var INIT = {};
+var timers = [];
+function later(fn, ms){ var t = setTimeout(fn, ms); timers.push(t); return t; }
+function clearTimers(){ timers.forEach(clearTimeout); timers = []; }
+window.addEventListener('hashchange', clearTimers);
+
+/* ---- parallax layers (transform only, rAF-gated) ---- */
+function bindParallax(scope){
+  if (reduced) return;
+  var scenes = $$('[data-parallax-scene]', scope);
+  if (!scenes.length) return;
+  var layers = [];
+  scenes.forEach(function(s){ $$('[data-depth]', s).forEach(function(l){ layers.push(l); }); });
+  var ticking = false;
+  function upd(){
+    ticking = false;
+    var vh = window.innerHeight;
+    layers.forEach(function(l){
+      var r = l.parentElement.getBoundingClientRect();
+      var p = (r.top + r.height/2 - vh/2) / vh;
+      l.style.transform = 'translate3d(0,' + (p * parseFloat(l.dataset.depth) * -110).toFixed(1) + 'px,0)';
+    });
+  }
+  function onS(){ if (!ticking){ ticking = true; requestAnimationFrame(upd); } }
+  window.addEventListener('scroll', onS, {passive:true});
+  upd();
+}
+
+/* ---- pinned stage: move through levels of the structure ---- */
+function bindStage(id){
+  var stage = document.getElementById(id);
+  if (!stage) return;
+  var plates = $$('.plate', stage);
+  if (!HAS_GSAP || reduced || window.innerWidth < 860){
+    plates.forEach(function(p){ p.style.opacity = 1; });
+    return;
+  }
+  stage.classList.add('stage--pinned');
+  gsap.set(plates, {yPercent:0});
+  plates.forEach(function(p,i){
+    gsap.set(p, {opacity: i===0?1:0, yPercent: i===0?0:14, scale: i===0?1:.96});
+  });
+  var tl = gsap.timeline({
+    scrollTrigger:{
+      trigger: stage,
+      start: 'top top',
+      end: '+=' + (plates.length * 90) + '%',
+      pin: true,
+      scrub: 1.1,
+      anticipatePin: 1,
+      invalidateOnRefresh: true
+    }
+  });
+  plates.forEach(function(p,i){
+    if (i === 0) return;
+    tl.to(plates[i-1], {opacity:0, yPercent:-12, scale:.965, duration:1, ease:'power2.inOut'}, i-1)
+      .to(p, {opacity:1, yPercent:0, scale:1, duration:1, ease:'power2.inOut'}, i-1);
+  });
+  /* the structural rule below the stage extends as you ascend */
+  gsap.utils.toArray($$('.xrule', stage.parentElement)).forEach(function(el){ el.classList.add('in'); });
+}
+
+/* ---------------- HOME ---------------- */
+INIT.home = function(){
+  /* hero lines rise like slabs being set */
+  var lines = $$('.hero-line > span');
+  if (HAS_GSAP && !reduced){
+    gsap.set(lines, {yPercent:106});
+    gsap.to(lines, {yPercent:0, duration:1.5, ease:'expo.out', stagger:0.10, delay:0.12});
+    gsap.fromTo('.hero-grid i', {scaleY:0, transformOrigin:'top center'}, {scaleY:1, duration:2.2, ease:'expo.out', stagger:0.09, delay:0.2});
+    /* the hero mass shifts as the camera moves past it */
+    ScrollTrigger.create({
+      trigger:'#hero', start:'top top', end:'bottom top', scrub:true,
+      onUpdate:function(self){
+        gsap.set('.hero-head', {y: self.progress * 90, opacity: 1 - self.progress*0.55});
+      }
+    });
+  } else {
+    lines.forEach(function(l){ l.style.transform = 'none'; });
+  }
+  bindStage('homeStage');
+  bindParallax(viewEl);
+};
+
+/* ---------------- SERVICES ---------------- */
+INIT.services = function(){
+  $$('.srow').forEach(function(row){
+    function toggle(){
+      var i = row.dataset.srow;
+      var panel = document.getElementById('svc-p-'+i);
+      var open = panel.classList.toggle('open');
+      row.classList.toggle('open', open);
+      row.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+    row.addEventListener('click', toggle);
+    row.addEventListener('keydown', function(e){
+      if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); toggle(); }
+    });
+  });
+  /* open the first so the page is never a wall of closed doors */
+  var first = $('.srow');
+  if (first) first.click();
+};
+
+/* ---------------- SOLUTIONS ---------------- */
+INIT.solutions = function(){ bindParallax(viewEl); };
+
+/* ---------------- MARKETPLACE ---------------- */
+INIT.marketplace = function(){
+  var grid = $('#mpGrid'), count = $('#mpCount');
+  $$('.pcard', grid).forEach(function(c){
+    c.addEventListener('click', function(){ location.hash = c.dataset.href; });
+  });
+  $$('.chip').forEach(function(chip){
+    chip.addEventListener('click', function(){
+      $$('.chip').forEach(function(c){ c.setAttribute('aria-pressed', c === chip ? 'true' : 'false'); });
+      var cat = chip.dataset.cat;
+      var shown = 0;
+      $$('.pcard', grid).forEach(function(card, i){
+        var match = (cat === 'All' || card.dataset.pcat === cat);
+        if (match) shown++;
+        if (match){
+          card.classList.remove('gone');
+          requestAnimationFrame(function(){
+            card.classList.remove('hiding');
+            if (!reduced) card.animate(
+              [{opacity:0, transform:'translateY(16px) scale(.97)'},{opacity:1, transform:'none'}],
+              {duration:640, delay:Math.min(i,8)*45, easing:'cubic-bezier(.16,1,.3,1)', fill:'backwards'});
+          });
+        } else {
+          card.classList.add('hiding');
+          later(function(){ if (card.classList.contains('hiding')) card.classList.add('gone'); }, 400);
+        }
+      });
+      count.textContent = shown + (shown === 1 ? ' module' : ' modules');
+    });
+  });
+};
+
+/* ---------------- PRODUCT DETAIL ---------------- */
+INIT.product = function(r){
+  var p = PRODUCTS.filter(function(x){return x.id===r.id;})[0] || PRODUCTS[0];
+  var step = 0, base = p.price;
+  var panes = $$('.flow-pane', $('#flowBody'));
+  var stepEls = $$('.flow-step');
+
+  function go(n){
+    if (n < 0 || n >= panes.length) return;
+    step = n;
+    panes.forEach(function(pane,i){ pane.classList.toggle('on', i === n); });
+    stepEls.forEach(function(s,i){
+      s.classList.toggle('active', i === n);
+      s.classList.toggle('done', i < n);
+    });
+    if (!reduced && panes[n].animate){
+      panes[n].animate([{opacity:0, transform:'translateY(18px)'},{opacity:1, transform:'none'}],
+        {duration:620, easing:'cubic-bezier(.16,1,.3,1)'});
+    }
+    if (n === 3) runDeploy();
+    $('#flowBody').scrollIntoView({behavior: reduced ? 'auto' : 'smooth', block:'start'});
+  }
+  $$('[data-fnext]').forEach(function(b){ b.addEventListener('click', function(){ go(step+1); }); });
+  $$('[data-fprev]').forEach(function(b){ b.addEventListener('click', function(){ go(step-1); }); });
+
+  /* customize total */
+  function total(){
+    var t = base;
+    $$('#modList .opt').forEach(function(o){
+      var cb = o.querySelector('input');
+      o.classList.toggle('sel', cb.checked);
+      if (cb.checked) t += parseInt(o.dataset.add, 10);
+    });
+    var s = '$' + t.toLocaleString('en-US');
+    $('#flowTotal').textContent = s;
+    $('#flowTotal2').textContent = s;
+  }
+  $$('#modList input').forEach(function(cb){ cb.addEventListener('change', total); });
+
+  /* deploy simulation */
+  var deployed = false;
+  function runDeploy(){
+    if (deployed) return; deployed = true;
+    var bar = $('#depBar'), pct = $('#depPct'), phase = $('#depPhase'), log = $('#depLog'), done = $('#depDone');
+    var lines = [
+      ['Requesting capacity','atlas: reserving 6 nodes in eu-central-1'],
+      ['Requesting capacity','atlas: capacity granted, lease 2026-09-14T09:41Z'],
+      ['Sealing ledger entry','ledger: entry ATL-2026-0914-77C opened'],
+      ['Pouring module',''+p.n.toLowerCase().split(' ')[0]+': image verified, signature ok'],
+      ['Pouring module',''+p.n.toLowerCase().split(' ')[0]+': 6/6 replicas scheduled'],
+      ['Wiring control plane','atlas: module registered, policy attached'],
+      ['Wiring control plane','cipherwall: workload identity issued, rotation 90s'],
+      ['Rehearsal load','harness: 12,400 req/s applied for 90s'],
+      ['Rehearsal load','harness: p99 41ms, error rate 0.00%'],
+      ['Proving rollback','ledger: reverse plan validated, retained 30d'],
+      ['Sealing ledger entry','ledger: entry ATL-2026-0914-77C sealed'],
+      ['Complete','estate: '+p.n+' live in eu-central-1']
+    ];
+    simulate({bar:bar, pct:pct, phase:phase, log:log, lines:lines, dur:7200, onDone:function(){
+      done.style.display = 'block';
+      if (!reduced && done.animate) done.animate([{opacity:0,transform:'translateY(18px)'},{opacity:1,transform:'none'}],{duration:700,easing:'cubic-bezier(.16,1,.3,1)'});
+      toast(p.n + ' deployed');
+    }});
+  }
+};
+
+/* ---- shared simulated progress + log engine ---- */
+function simulate(o){
+  var i = 0, start = performance.now(), dur = reduced ? 900 : o.dur;
+  var written = -1;
+  o.bar.style.transition = 'none';
+  o.bar.style.transform = 'scaleX(0)';
+  o.log.innerHTML = '';
+  function stamp(){
+    var d = new Date(Date.UTC(2026,8,14,9,41,0) + (performance.now()-start)*3.4);
+    return d.toISOString().substr(11,12);
+  }
+  function frame(now){
+    var p = Math.min(1, (now-start)/dur);
+    var e = p < 1 ? 1 - Math.pow(1-p, 2.4) : 1;
+    /* believable stalls: progress hesitates where real installers hesitate */
+    var hitch = 1 - 0.045*Math.sin(p*Math.PI*7);
+    var shown = Math.min(1, e*hitch);
+    o.bar.style.transform = 'scaleX(' + shown.toFixed(4) + ')';
+    o.pct.textContent = Math.round(shown*100) + '%';
+    var idx = Math.min(o.lines.length-1, Math.floor(p * o.lines.length));
+    while (written < idx){
+      written++;
+      var L = o.lines[written];
+      o.phase.textContent = L[0];
+      var cls = /ok|complete|sealed|passed|live/i.test(L[1]) ? 'ok' : (/warn|retry|degraded/i.test(L[1]) ? 'wn' : '');
+      var row = document.createElement('div');
+      row.innerHTML = '<b>' + stamp() + '</b> <span class="' + cls + '">' + esc(L[1]) + '</span>';
+      o.log.appendChild(row);
+      o.log.scrollTop = o.log.scrollHeight;
+    }
+    if (p < 1) requestAnimationFrame(frame);
+    else {
+      o.phase.textContent = 'Complete';
+      o.pct.textContent = '100%';
+      if (o.onDone) o.onDone();
+    }
+  }
+  requestAnimationFrame(frame);
+}
+
+/* ---------------- INSTALLER ---------------- */
+INIT.installer = function(){
+  var step = 0;
+  var panes = $$('[data-ipane]');
+  var stepEls = $$('.stepper-i');
+  var ran = {};
+
+  $$('#instSelect .opt').forEach(function(o){
+    var cb = o.querySelector('input');
+    cb.addEventListener('change', function(){ o.classList.toggle('sel', cb.checked); });
+  });
+
+  function go(n){
+    if (n < 0 || n >= panes.length) return;
+    step = n;
+    panes.forEach(function(p,i){ p.classList.toggle('on', i === n); });
+    stepEls.forEach(function(s,i){
+      s.classList.toggle('on', i === n);
+      s.classList.toggle('done', i < n);
+    });
+    if (!reduced && panes[n].animate){
+      panes[n].animate([{opacity:0, transform:'translateY(20px)'},{opacity:1, transform:'none'}],
+        {duration:680, easing:'cubic-bezier(.16,1,.3,1)'});
+    }
+    if (n === 6) $$('[data-count]', panes[6]).forEach(function(c){ c.__counted = false; countUp(c); });
+    if (RUNNERS[n] && !ran[n]){ ran[n] = true; RUNNERS[n](panes[n]); }
+    $('#stepper').scrollIntoView({behavior: reduced ? 'auto' : 'smooth', block:'start'});
+  }
+
+  function runner(lines, dur){
+    return function(pane){
+      var next = pane.querySelector('[data-inext]');
+      simulate({
+        bar: pane.querySelector('[data-ibar]'),
+        pct: pane.querySelector('[data-ipct]'),
+        phase: pane.querySelector('[data-iphase]'),
+        log: pane.querySelector('[data-ilog]'),
+        lines: lines, dur: dur,
+        onDone: function(){
+          if (next){ next.disabled = false; }
+          if (step === 5) markVerified();
+        }
+      });
+    };
+  }
+
+  function markVerified(){
+    $$('#verifyList [data-vrow]').forEach(function(row,i){
+      later(function(){
+        var pill = row.querySelector('[data-vpill]');
+        pill.className = 'pill ok'; pill.textContent = 'Passed';
+      }, reduced ? 0 : 180 + i*260);
+    });
+  }
+
+  var RUNNERS = {
+    1: runner([
+      ['Starting probe','probe: scanning subscription 4 of 4'],
+      ['Reading regions','probe: eu-central-1 reachable, 41 workloads'],
+      ['Reading regions','probe: eu-west-2 reachable, 0 workloads'],
+      ['Identity','probe: Entra ID tenant nordbank.no detected'],
+      ['Identity','probe: 10,412 identities, 1,180 machine'],
+      ['Existing load','probe: 6 databases, 2 message buses, 1 mainframe gateway'],
+      ['Existing load','warn: mainframe gateway on unsupported TLS 1.1'],
+      ['Compatibility','probe: 41/41 workloads importable'],
+      ['Complete','probe: environment detection complete']
+    ], 5200),
+    3: runner([
+      ['Enumerating workloads','import: 41 workloads enumerated'],
+      ['Mapping dependencies','import: 128 edges resolved, 0 cycles'],
+      ['Rotating secrets','vault: 214 secrets rotated into estate vault'],
+      ['Rotating secrets','vault: legacy secrets retained read-only for 30d'],
+      ['Migrating data','migrate: 8.4TB staged, checksum verified'],
+      ['Migrating data','migrate: reconciliation harness running in parallel'],
+      ['Migrating data','migrate: 41/41 workloads reconciled, delta 0 rows'],
+      ['Complete','import: estate imported, originals untouched']
+    ], 6400),
+    4: runner([
+      ['Allocating capacity','atlas: 18 nodes reserved across 2 regions'],
+      ['Installing control plane','atlas: control plane 3/3 replicas healthy'],
+      ['Installing control plane','ledger: change ledger initialised, 10y retention'],
+      ['Installing modules','quarry: 214 connectors registered'],
+      ['Installing modules','obsidian: sensors deployed to 41 workloads'],
+      ['Installing modules','foundry: model gateway listening, 0 routes'],
+      ['Installing modules','plumb: telemetry pipeline at 4.1M spans/sec'],
+      ['Wiring identity','cipherwall: federation to Entra ID established'],
+      ['Wiring identity','cipherwall: hybrid ML-KEM-768 key exchange active'],
+      ['Sealing','ledger: install entry ATL-2026-0914-01A sealed'],
+      ['Complete','atlas: 5 modules installed and registered']
+    ], 8600),
+    5: runner([
+      ['Applying rehearsal load','harness: 24,800 req/s applied'],
+      ['Applying rehearsal load','harness: p99 47ms, error rate 0.00%'],
+      ['Failover drill','atlas: severing eu-central-1 control plane'],
+      ['Failover drill','atlas: eu-west-2 assumed control in 38s'],
+      ['Failover drill','atlas: primary restored, no data loss (RPO 0)'],
+      ['Ledger integrity','ledger: 1,412 entries verified, chain sealed'],
+      ['Rollback proof','atlas: reverse plan executed in sandbox, ok'],
+      ['Complete','verify: 6/6 structural checks passed']
+    ], 6800)
+  };
+
+  $$('[data-inext]').forEach(function(b){ b.addEventListener('click', function(){ go(step+1); }); });
+  $$('[data-iprev]').forEach(function(b){ b.addEventListener('click', function(){ go(step-1); }); });
+  $$('.stepper-i').forEach(function(s){
+    s.addEventListener('click', function(){
+      var n = parseInt(s.dataset.step, 10);
+      if (n < step) go(n);
+    });
+  });
+  var reset = $('#instReset');
+  if (reset) reset.addEventListener('click', function(){
+    ran = {};
+    $$('[data-inext]').forEach(function(b,i){ if (i>0) b.disabled = true; });
+    $$('#verifyList [data-vpill]').forEach(function(p){ p.className='pill nu'; p.textContent='Pending'; });
+    go(0);
+  });
+};
+
+/* ---------------- LOGIN ---------------- */
+INIT.login = function(){
+  var form = $('#loginForm');
+  var email = $('#lEmail'), pass = $('#lPass');
+  liveValidate(email, function(v){ return /^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(v) ? '' : 'Enter a valid work email address.'; });
+  liveValidate(pass, function(v){ return v.length >= 10 ? '' : 'Passphrase must be at least 10 characters.'; });
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var ok = validateField(email) & validateField(pass);
+    if (!ok) return;
+    $('#loginForm').style.display = 'none';
+    var done = $('#loginDone');
+    done.style.display = 'block';
+    if (!reduced && done.animate) done.animate([{opacity:0,transform:'scale(.97)'},{opacity:1,transform:'none'}],{duration:700,easing:'cubic-bezier(.16,1,.3,1)'});
+    var bar = $('#loginBar');
+    bar.style.transition = 'transform 1.6s cubic-bezier(.16,1,.3,1)';
+    requestAnimationFrame(function(){ bar.style.transform = 'scaleX(1)'; });
+    toast('Authenticated — opening console');
+    later(function(){ location.hash = '#/dashboard'; }, reduced ? 400 : 1900);
+  });
+};
+
+/* ---------------- CONTACT ---------------- */
+INIT.contact = function(){
+  var form = $('#contactForm');
+  var name = $('#cName'), email = $('#cEmail'), org = $('#cOrg'), type = $('#cType'), msg = $('#cMsg');
+  liveValidate(name, function(v){ return v.trim().length >= 2 ? '' : 'Please tell us your name.'; });
+  liveValidate(email, function(v){ return /^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(v) ? '' : 'Enter a valid work email address.'; });
+  liveValidate(org, function(v){ return v.trim().length >= 2 ? '' : 'Which organisation is this for?'; });
+  liveValidate(type, function(v){ return v ? '' : 'Pick the closest situation.'; });
+  liveValidate(msg, function(v){ return v.trim().length >= 20 ? '' : 'A little more detail helps — at least 20 characters.'; });
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var fields = [name,email,org,type,msg];
+    var ok = true;
+    fields.forEach(function(f){ if (!validateField(f)) ok = false; });
+    if (!ok){
+      var bad = form.querySelector('.field.invalid');
+      if (bad){ bad.classList.add('shake'); later(function(){ bad.classList.remove('shake'); }, 480); bad.querySelector('input,textarea,select').focus(); }
+      return;
+    }
+    fields.forEach(function(f){ f.closest('.field').style.display = 'none'; });
+    form.querySelector('button[type="submit"]').style.display = 'none';
+    var done = $('#contactDone');
+    done.style.display = 'block';
+    if (!reduced && done.animate) done.animate([{opacity:0,transform:'translateY(20px)'},{opacity:1,transform:'none'}],{duration:760,easing:'cubic-bezier(.16,1,.3,1)'});
+    toast('Enquiry received — TB-2026-4471');
+  });
+};
+
+function liveValidate(el, rule){
+  el.__rule = rule;
+  var evt = el.tagName === 'SELECT' ? 'change' : 'input';
+  el.addEventListener('blur', function(){ validateField(el); });
+  el.addEventListener(evt, function(){
+    var f = el.closest('.field');
+    if (f.classList.contains('invalid') || f.classList.contains('ok')) validateField(el);
+  });
+}
+function validateField(el){
+  var f = el.closest('.field'), err = f.querySelector('[data-err]');
+  var m = el.__rule ? el.__rule(el.value) : '';
+  f.classList.toggle('invalid', !!m);
+  f.classList.toggle('ok', !m && el.value.length > 0);
+  if (err) err.textContent = m;
+  return !m;
+}
+
+/* ---------------- PRICING ---------------- */
+INIT.pricing = function(){
+  var monthly = $('#pMonthly'), annual = $('#pAnnual'), knob = $('.toggle .knob'), save = $('#pSave');
+  var isAnnual = false;
+  function setMode(a){
+    isAnnual = a;
+    monthly.setAttribute('aria-pressed', a ? 'false' : 'true');
+    annual.setAttribute('aria-pressed', a ? 'true' : 'false');
+    knob.style.transform = a ? 'translateX(100%)' : 'translateX(0)';
+    save.textContent = a ? 'Billed once yearly — 20% below monthly' : 'Annual billing saves 20%';
+    $$('.tier-price').forEach(function(el){
+      var t = TIERS[parseInt(el.dataset.tier,10)];
+      if (!t.m) return;
+      var span = el.querySelector('.tier-num'), unit = el.querySelector('small');
+      var from = parseInt(span.textContent.replace(/[^0-9]/g,''),10);
+      var to = a ? t.y : t.m;
+      unit.textContent = a ? ' /yr' : ' /mo';
+      var st = performance.now(), dur = reduced ? 150 : 850;
+      (function frame(now){
+        var p = Math.min(1,(now-st)/dur), e = 1-Math.pow(1-p,3);
+        span.textContent = Math.round(from + (to-from)*e).toLocaleString('en-US');
+        if (p<1) requestAnimationFrame(frame);
+      })(performance.now());
+    });
+  }
+  monthly.addEventListener('click', function(){ setMode(false); });
+  annual.addEventListener('click', function(){ setMode(true); });
+};
+
+/* ---------------- DASHBOARD ---------------- */
+INIT.dashboard = function(){
+  var panel = $('#rolepanel');
+  function load(key){
+    panel.innerHTML = roleMarkup(key);
+    panel.setAttribute('aria-labelledby','tab-'+key);
+    observeAll(panel);
+    /* KPI tiles and charts above the fold: run them now rather than wait for scroll */
+    $$('[data-count],[data-bars],[data-chart]', panel).forEach(function(el){
+      var r = el.getBoundingClientRect();
+      if (r.top < window.innerHeight){
+        el.classList.add('in');
+        if (el.dataset.count !== undefined) countUp(el);
+        if (el.dataset.bars !== undefined) runBars(el);
+        if (el.dataset.chart !== undefined) drawLineChart(el);
+      }
+    });
+    if (!reduced && panel.animate) panel.animate([{opacity:0,transform:'translateY(18px)'},{opacity:1,transform:'none'}],{duration:620,easing:'cubic-bezier(.16,1,.3,1)'});
+  }
+  $$('[data-role]').forEach(function(b){
+    b.addEventListener('click', function(){
+      $$('[data-role]').forEach(function(x){ x.setAttribute('aria-selected', x===b ? 'true':'false'); });
+      load(b.dataset.role);
+    });
+  });
+  load('admin');
+};
+
+/* ---------------- WORK / RESOURCES / ABOUT ---------------- */
+INIT.work = function(){ bindParallax(viewEl); };
+INIT.process = function(){ bindStage('procStage'); };
+
+
+/* ---------- boot ---------- */
+function boot(){
+  render();
+  bindMagnets(document);
+  observeAll(document);
+}
+
+/* ============================================================
+   CINEMATIC INTRO — once per session
+   ============================================================ */
+(function intro(){
+  var ld = $('#loader');
+  var seen = false;
+  try{ seen = sessionStorage.getItem('tb-intro') === '1'; }catch(e){}
+
+  if (seen || reduced){
+    ld.style.display = 'none';
+    ld.setAttribute('aria-hidden','true');
+    document.body.style.overflow = '';
+    if (reduced){ try{ sessionStorage.setItem('tb-intro','1'); }catch(e){} }
+    boot();
+    return;
+  }
+  try{ sessionStorage.setItem('tb-intro','1'); }catch(e){}
+  document.body.style.overflow = 'hidden';
+  boot();
+
+  var letters = $$('#loader .ld-mark span');
+  var finish = function(){
+    ld.classList.add('done');
+    ld.style.display = 'none';
+    document.body.style.overflow = '';
+    if (HAS_GSAP && window.ScrollTrigger) ScrollTrigger.refresh();
+  };
+
+  if (!HAS_GSAP){
+    letters.forEach(function(s,i){
+      s.style.transition = 'transform .9s '+EASE; s.style.transitionDelay = (i*55)+'ms';
+      requestAnimationFrame(function(){ s.style.transform = 'none'; });
+    });
+    setTimeout(function(){
+      ld.style.transition = 'opacity .7s ease'; ld.style.opacity = 0;
+      setTimeout(finish, 700);
+    }, 1500);
+    return;
+  }
+
+  var tl = gsap.timeline({onComplete: finish});
+  tl.to(letters, {y:'0%', duration:1.05, ease:'expo.out', stagger:0.048})
+    .to('#loader .ld-sub', {opacity:1, duration:.7, ease:'power2.out'}, '-=0.5')
+    .to('#loader .ld-bar i', {scaleX:1, duration:1.15, ease:'power2.inOut'}, '-=0.55')
+    .to(letters, {y:'-104%', duration:.75, ease:'power3.in', stagger:0.026}, '+=0.12')
+    .to(['#loader .ld-sub','#loader .ld-bar'], {opacity:0, duration:.35, ease:'power2.in'}, '-=0.6')
+    .to('#loader .slab', {scaleY:0, transformOrigin:'top center', duration:.95, ease:'expo.inOut'}, '-=0.25')
+    .to('#loader', {opacity:0, duration:.5, ease:'power2.out'}, '-=0.45');
+})();
+
+})();
+</script>
+</body>
+</html>
