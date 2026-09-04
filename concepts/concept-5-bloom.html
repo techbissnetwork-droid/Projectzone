@@ -691,11 +691,11 @@ main{ display:block; }
       </div>
       <div>
         <h4>Platform</h4>
-        <a href="#/services">Services</a><a href="#/solutions">Solutions</a><a href="#/marketplace">Marketplace</a><a href="#/installer">Installer</a>
+        <a href="#/services">Services</a><a href="#/solutions">Solutions</a><a href="#/marketplace">Marketplace</a>
       </div>
       <div>
         <h4>Get started</h4>
-        <a href="#/pricing">Pricing</a><a href="#/contact">Contact</a><a href="#/login">Log in</a><a href="#/dashboard">Dashboard preview</a>
+        <a href="#/pricing">Pricing</a><a href="#/contact">Contact</a><a href="#/login">Log in</a>
       </div>
     </div>
     <div class="footer-bottom">
@@ -963,8 +963,8 @@ ROUTES.forEach(function(r){
   a.innerHTML = r.label + ico('arrow');
   mobileNav.appendChild(a);
 });
-['/login','/installer','/dashboard'].forEach(function(p,i){
-  var labels=['Log in','Installer','Dashboard preview'];
+['/login'].forEach(function(p,i){
+  var labels=['Log in'];
   var a = document.createElement('a');
   a.href='#'+p; a.dataset.path=p; a.innerHTML=labels[i]+ico('arrow');
   mobileNav.appendChild(a);
