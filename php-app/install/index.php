@@ -116,8 +116,13 @@ if ($pdo && !$lockExists && $action === 'create_admin') {
 }
 
 // ---- Step: apply any pending migrations to an already-installed site ----
+// Once the site is locked (already fully installed), this requires an
+// authenticated staff session — otherwise any anonymous visitor could
+// trigger schema migrations at will.
 if ($pdo && $action === 'run_migrations') {
-    if (!csrf_check((string)($_POST['csrf'] ?? ''))) {
+    if ($lockExists && !current_staff()) {
+        $formError = 'Please sign in to /admin/ first, then come back here to run pending updates.';
+    } elseif (!csrf_check((string)($_POST['csrf'] ?? ''))) {
         $formError = 'Your session expired — please try again.';
     } else {
         try {
@@ -146,6 +151,8 @@ if ($configExists && $pdo) {
     $needsAdminAccount = in_array('001_initial', array_map(fn($f) => basename($f, '.php'), $pending), true) && !$lockExists;
     if ($needsAdminAccount) {
         $view = 'admin_account';
+    } elseif (!empty($pending) && $lockExists && !current_staff()) {
+        $view = 'pending_locked';
     } elseif (!empty($pending)) {
         $view = 'pending_migrations';
     } else {
@@ -243,6 +250,14 @@ body{ min-height:100vh; padding:40px 20px; }
         <div class="field"><label>Password</label><input type="password" name="admin_password" minlength="8" required></div>
         <button class="btn btn-primary btn-block" type="submit">Create account &amp; install</button>
       </form>
+    </div>
+
+  <?php elseif ($view === 'pending_locked'): ?>
+    <div class="card">
+      <h3 style="margin-bottom:6px;">Update available</h3>
+      <p style="font-size:.9rem;color:var(--ink-faint);margin-bottom:0;">There's a pending update for this site. Sign in to the admin panel first, then reload this page to run it.</p>
+      <?php if ($formError): ?><p class="badge danger" style="margin-top:16px;"><?= e($formError) ?></p><?php endif; ?>
+      <a href="../admin/login.php" class="btn btn-primary btn-block" style="margin-top:16px;">Staff sign in</a>
     </div>
 
   <?php elseif ($view === 'pending_migrations'): ?>

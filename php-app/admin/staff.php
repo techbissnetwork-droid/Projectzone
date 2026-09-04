@@ -26,6 +26,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $ownerCheck->execute([$id]);
             $editingOwner = (bool)$ownerCheck->fetchColumn();
         }
+        if ($editingOwner && (int)$staff['id'] !== $id) {
+            flash('Only the owner can edit their own account.', 'error');
+            header('Location: staff.php');
+            exit;
+        }
         if ($editingOwner) {
             $permissions = null;
         } elseif (isset($_POST['full_access'])) {
@@ -177,7 +182,9 @@ $token = csrf_token();
         </td>
         <td><?= (int)$s['open_count'] ?></td>
         <td class="admin-actions-cell">
+          <?php if (empty($s['is_owner']) || (int)$s['id'] === (int)$staff['id']): ?>
           <a class="icon-btn" href="staff.php?edit=<?= (int)$s['id'] ?>" aria-label="Edit"><?= ico('edit') ?></a>
+          <?php endif; ?>
           <?php if (empty($s['is_owner'])): ?>
           <form method="post" onsubmit="return confirm('Remove <?= e(addslashes($s['name'])) ?>? Their open tickets will become unassigned.');">
             <input type="hidden" name="action" value="delete">

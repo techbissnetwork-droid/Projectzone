@@ -12,6 +12,14 @@ function $(sel,ctx){ return (ctx||document).querySelector(sel); }
 function $all(sel,ctx){ return Array.prototype.slice.call((ctx||document).querySelectorAll(sel)); }
 function el(html){ var d=document.createElement('div'); d.innerHTML=html.trim(); return d.firstElementChild; }
 function fmtMoney(n){ return '$' + n.toLocaleString('en-US'); }
+var ESC_MAP = {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'};
+/* Every field that ultimately comes from an admin-editable source (Content,
+   Settings, a business's projects, etc.) must go through this before being
+   concatenated into an innerHTML string — none of it is safe to trust,
+   since a staff member with only a narrow section permission (e.g.
+   "content" or "businesses") could otherwise plant script that runs for
+   every site visitor or customer. */
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(c){ return ESC_MAP[c]; }); }
 
 /* ===================================================================
    1. ICONS — small shared line-icon set
@@ -326,16 +334,16 @@ function wave(variant, fill, flip){
   return '<svg class="wave'+(flip?' wave-top':'')+'" viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="'+paths[variant]+'" fill="'+fill+'"/></svg>';
 }
 function serviceCard(s){
-  return '<div class="card tilt"><div class="card-head">'+blobIcon(s.icon,'sm')+'<h3>'+s.name+'</h3></div><p>'+s.blurb+'</p><ul style="margin:0 0 18px;display:flex;flex-direction:column;gap:8px;">'+
-    s.bullets.map(function(b){ return '<li style="display:flex;gap:8px;align-items:flex-start;color:var(--ink-soft);font-size:.9rem;">'+ico('check','').replace('width:22px','width:16px')+'<span>'+b+'</span></li>'; }).join('')+
+  return '<div class="card tilt"><div class="card-head">'+blobIcon(s.icon,'sm')+'<h3>'+esc(s.name)+'</h3></div><p>'+esc(s.blurb)+'</p><ul style="margin:0 0 18px;display:flex;flex-direction:column;gap:8px;">'+
+    s.bullets.map(function(b){ return '<li style="display:flex;gap:8px;align-items:flex-start;color:var(--ink-soft);font-size:.9rem;">'+ico('check','').replace('width:22px','width:16px')+'<span>'+esc(b)+'</span></li>'; }).join('')+
     '</ul><a href="'+BP+'/contact" class="card-link">Talk to us '+ico('arrow')+'</a></div>';
 }
 function solutionCard(s){
-  return '<div class="card tilt"><div class="card-head">'+blobIcon(s.icon,'sm')+'<h3>'+s.name+'</h3></div><ul style="display:flex;flex-direction:column;gap:8px;">'+
-    s.out.map(function(o){ return '<li style="display:flex;gap:8px;align-items:flex-start;color:var(--ink-soft);font-size:.9rem;">'+ico('check')+'<span>'+o+'</span></li>'; }).join('')+
+  return '<div class="card tilt"><div class="card-head">'+blobIcon(s.icon,'sm')+'<h3>'+esc(s.name)+'</h3></div><ul style="display:flex;flex-direction:column;gap:8px;">'+
+    s.out.map(function(o){ return '<li style="display:flex;gap:8px;align-items:flex-start;color:var(--ink-soft);font-size:.9rem;">'+ico('check')+'<span>'+esc(o)+'</span></li>'; }).join('')+
     '</ul></div>';
 }
-function statBlock(num,label){ return '<div class="stat"><div class="num grad-text">'+num+'</div><div class="label">'+label+'</div></div>'; }
+function statBlock(num,label){ return '<div class="stat"><div class="num grad-text">'+esc(num)+'</div><div class="label">'+esc(label)+'</div></div>'; }
 
 /* ===================================================================
    10. PAGE RENDERERS
@@ -347,8 +355,8 @@ Pages['/'] = function(){
   return ''
   +'<section class="hero"><div class="container hero-grid">'
     +'<div><span class="eyebrow">Websites & apps, fully handled</span>'
-    +'<h1>'+(S.heroHeadlineMain||'We help offline businesses')+' <span class="grad-text">'+(S.heroHeadlineAccent||'thrive online.')+'</span></h1>'
-    +'<p class="lede">'+(S.heroSubheadline||'TECHBISS builds your website or app, then sets up your domain, hosting, email and app store listing — so you launch with everything working and ready to be found.')+'</p>'
+    +'<h1>'+esc(S.heroHeadlineMain||'We help offline businesses')+' <span class="grad-text">'+esc(S.heroHeadlineAccent||'thrive online.')+'</span></h1>'
+    +'<p class="lede">'+esc(S.heroSubheadline||'TECHBISS builds your website or app, then sets up your domain, hosting, email and app store listing — so you launch with everything working and ready to be found.')+'</p>'
     +'<div class="hero-cta"><a href="'+BP+'/services" class="btn btn-primary magnetic">See what we build '+ico('arrow')+'</a><a href="'+BP+'/contact" class="btn btn-ghost magnetic">Book a free call</a></div>'
     +'<div class="hero-stats">'+statBlock(S.stat1Value||'1,900+',S.stat1Label||'Businesses & apps launched')+statBlock(S.stat2Value||'38',S.stat2Label||'Countries served')+statBlock(S.stat3Value||'4.9/5',S.stat3Label||'Customer rating')+statBlock(S.stat4Value||'72 hrs',S.stat4Label||'To your first draft')+'</div>'
     +'</div>'
@@ -388,9 +396,9 @@ Pages['/'] = function(){
   +'<section class="section tone-a"><div class="container">'
     +'<div class="section-head center"><span class="eyebrow">Recent work</span><h2>Real businesses, now online</h2></div>'
     +'<div class="grid grid-3">'+CASESTUDIES.slice(0,3).map(function(c){
-      return '<div class="card tilt"><div class="card-head">'+blobIcon(c.icon,'sm')+'<h3>'+c.client+'</h3></div><p>'+c.body+'</p>'
+      return '<div class="card tilt"><div class="card-head">'+blobIcon(c.icon,'sm')+'<h3>'+esc(c.client)+'</h3></div><p>'+esc(c.body)+'</p>'
       +'<div class="stat" style="margin-bottom:14px;">'+statBlock(c.stat,c.statLabel)+'</div>'
-      +'<div class="flex items-center justify-between"><a href="'+BP+'/work" class="card-link">Read the story '+ico('arrow')+'</a><span class="badge">'+c.sector+'</span></div></div>';
+      +'<div class="flex items-center justify-between"><a href="'+BP+'/work" class="card-link">Read the story '+ico('arrow')+'</a><span class="badge">'+esc(c.sector)+'</span></div></div>';
     }).join('')+'</div>'
   +'</div></section>'
 
@@ -416,8 +424,8 @@ Pages['/services'] = function(){
     +'<div class="grid grid-2">'+SERVICES.map(function(s,i){
       return '<div class="card tilt" style="display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:flex-start;">'
         +blobIcon(s.icon,'lg')
-        +'<div><h3 style="font-size:1.35rem;">'+s.name+'</h3><p>'+s.blurb+'</p>'
-        +'<ul style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">'+s.bullets.map(function(b){return '<li style="display:flex;gap:8px;font-size:.9rem;color:var(--ink-soft);">'+ico('check')+'<span>'+b+'</span></li>';}).join('')+'</ul>'
+        +'<div><h3 style="font-size:1.35rem;">'+esc(s.name)+'</h3><p>'+esc(s.blurb)+'</p>'
+        +'<ul style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">'+s.bullets.map(function(b){return '<li style="display:flex;gap:8px;font-size:.9rem;color:var(--ink-soft);">'+ico('check')+'<span>'+esc(b)+'</span></li>';}).join('')+'</ul>'
         +'<a href="'+BP+'/contact" class="card-link">Start a conversation '+ico('arrow')+'</a></div></div>';
     }).join('')+'</div>'
   +'</div></section>'
@@ -472,9 +480,9 @@ Pages['/marketplace/detail'] = function(id){
     +'<a href="'+BP+'/marketplace" class="card-link" style="margin-bottom:18px;">'+ico('arrow').replace('12h14','14h-14').replace('M13 6l6 6-6 6','M11 6l-6 6 6 6')+' Back to marketplace</a>'
     +'<div class="hero-grid" style="align-items:flex-start;">'
       +'<div>'
-        +'<span class="badge grad">'+p.cat+'</span>'
-        +'<h1 style="margin-top:14px;">'+p.name+'</h1>'
-        +'<p class="lede">'+p.tagline+'</p>'
+        +'<span class="badge grad">'+esc(p.cat)+'</span>'
+        +'<h1 style="margin-top:14px;">'+esc(p.name)+'</h1>'
+        +'<p class="lede">'+esc(p.tagline)+'</p>'
         +'<div class="flex items-center gap-12" style="margin:18px 0 28px;"><span class="stat"><span class="num" style="font-size:1.4rem;">'+fmtMoney(p.price)+'</span></span><span class="badge">★ '+p.rating+' rating</span></div>'
       +'</div>'
       +'<div class="hero-visual" style="aspect-ratio:4/3;"><svg viewBox="0 0 200 150" style="width:100%;height:100%;"><path fill="url(#pdGrad)" d="M40,-40C56,-30,68,-10,66,10C64,30,48,46,28,54C8,62,-16,62,-34,50C-52,38,-64,14,-62,-8C-60,-30,-44,-50,-24,-58C-4,-66,20,-50,40,-40Z" transform="translate(100 76)"/><defs><linearGradient id="pdGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" style="stop-color:var(--accent-1)"/><stop offset="100%" style="stop-color:var(--accent-2)"/></linearGradient></defs></svg><div style="position:absolute;color:#fff;">'+ico(p.icon).replace('width:22px;height:22px','width:56px;height:56px')+'</div></div>'
@@ -483,7 +491,7 @@ Pages['/marketplace/detail'] = function(id){
     +'<div class="tabbar" id="pdTabs" role="tablist">'
       +['Preview','Customize','Purchase','Deploy'].map(function(t,i){return '<button role="tab" class="'+(i===0?'active':'')+'" data-tab="'+t.toLowerCase()+'">'+(i+1)+'. '+t+'</button>';}).join('')
     +'</div>'
-    +'<div id="pdPanels" data-pid="'+p.id+'"></div>'
+    +'<div id="pdPanels" data-pid="'+esc(p.id)+'"></div>'
   +'</div></section>';
 };
 
@@ -494,11 +502,11 @@ Pages['/work'] = function(){
   +'</div></section>'
   +'<section class="section tone-a"><div class="container">'
     +'<div class="grid grid-2" id="caseGrid">'+CASESTUDIES.map(function(c,i){
-      return '<div class="card tilt case-card" data-i="'+i+'"><div class="flex items-center gap-16" style="margin-bottom:14px;">'+blobIcon(c.icon,'sm')+'<div><span class="badge">'+c.sector+'</span><h3 style="margin:6px 0 0;">'+c.client+'</h3></div></div>'
-      +'<p style="font-style:italic;">"'+c.quote+'"</p>'
+      return '<div class="card tilt case-card" data-i="'+i+'"><div class="flex items-center gap-16" style="margin-bottom:14px;">'+blobIcon(c.icon,'sm')+'<div><span class="badge">'+esc(c.sector)+'</span><h3 style="margin:6px 0 0;">'+esc(c.client)+'</h3></div></div>'
+      +'<p style="font-style:italic;">"'+esc(c.quote)+'"</p>'
       +'<div class="stat" style="margin:14px 0;">'+statBlock(c.stat,c.statLabel)+'</div>'
       +'<button class="card-link case-toggle" data-i="'+i+'" style="background:none;border:none;padding:0;">Read the full story '+ico('arrow')+'</button>'
-      +'<div class="accordion-panel case-panel" data-i="'+i+'"><div class="inner"><p>'+c.body+'</p></div></div>'
+      +'<div class="accordion-panel case-panel" data-i="'+i+'"><div class="inner"><p>'+esc(c.body)+'</p></div></div>'
       +'</div>';
     }).join('')+'</div>'
   +'</div></section>';
@@ -553,12 +561,12 @@ Pages['/about'] = function(){
   +wave('a','var(--bg-alt)')
   +'<section class="section tone-b"><div class="container">'
     +'<div class="section-head center"><span class="eyebrow">What we hold onto</span><h2>Values that show up in the work</h2></div>'
-    +'<div class="grid grid-4">'+values.map(function(v){return '<div class="card tilt"><div class="card-head">'+blobIcon(v.icon,'sm',true)+'<h3 style="font-size:1.05rem;">'+v.t+'</h3></div><p style="font-size:.88rem;">'+v.d+'</p></div>';}).join('')+'</div>'
+    +'<div class="grid grid-4">'+values.map(function(v){return '<div class="card tilt"><div class="card-head">'+blobIcon(v.icon,'sm',true)+'<h3 style="font-size:1.05rem;">'+esc(v.t)+'</h3></div><p style="font-size:.88rem;">'+esc(v.d)+'</p></div>';}).join('')+'</div>'
   +'</div></section>'
   +wave('b','var(--bg)',true)
   +'<section class="section tone-a"><div class="container">'
     +'<div class="section-head center"><span class="eyebrow">Leadership</span><h2>The people steering the studio</h2></div>'
-    +'<div class="grid grid-4">'+team.map(function(t){return '<div class="card tilt text-center"><div class="avatar-blob" style="margin:0 auto 14px;">'+t.i+'</div><h3 style="font-size:1.05rem;">'+t.n+'</h3><p style="font-size:.85rem;">'+t.r+'</p></div>';}).join('')+'</div>'
+    +'<div class="grid grid-4">'+team.map(function(t){return '<div class="card tilt text-center"><div class="avatar-blob" style="margin:0 auto 14px;">'+esc(t.i)+'</div><h3 style="font-size:1.05rem;">'+esc(t.n)+'</h3><p style="font-size:.85rem;">'+esc(t.r)+'</p></div>';}).join('')+'</div>'
   +'</div></section>'
   +'<section class="section tone-a" style="padding-top:0;"><div class="container text-center">'
     +'<div class="quote-blob"><p>"We\'re always looking for people who\'d rather ship a small business\'s first website than polish a slide deck."</p><cite>— Careers at TECHBISS</cite></div>'
@@ -612,10 +620,10 @@ Pages['/pricing'] = function(){
     +'<div class="grid grid-3" id="priceGrid">'+tiers.map(function(t,i){
       return '<div class="card tilt" style="'+(t.rec?'border-color:var(--accent-1);box-shadow:var(--shadow-lg);position:relative;':'')+'">'
         +(t.rec?'<span class="badge grad" style="position:absolute;top:-14px;left:32px;">Most popular</span>':'')
-        +'<h3>'+t.n+'</h3><p style="font-size:.9rem;">'+t.d+'</p>'
-        +'<div style="margin:14px 0 20px;"><span class="price-amt" data-m="'+t.m+'" data-y="'+t.y+'" style="font-family:var(--font-display);font-weight:800;font-size:2.2rem;">'+(t.m?fmtMoney(t.m):'Custom')+'</span>'+(t.m?'<span style="color:var(--ink-faint);"> /mo</span>':'')+'</div>'
-        +'<ul style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px;">'+t.f.map(function(f){return '<li style="display:flex;gap:8px;font-size:.9rem;">'+ico('check')+'<span>'+f+'</span></li>';}).join('')+'</ul>'
-        +'<a href="'+BP+'/contact" class="btn '+(t.rec?'btn-primary':'btn-ghost')+' btn-block">'+t.cta+'</a>'
+        +'<h3>'+esc(t.n)+'</h3><p style="font-size:.9rem;">'+esc(t.d)+'</p>'
+        +'<div style="margin:14px 0 20px;"><span class="price-amt" data-m="'+esc(t.m)+'" data-y="'+esc(t.y)+'" style="font-family:var(--font-display);font-weight:800;font-size:2.2rem;">'+(t.m?fmtMoney(t.m):'Custom')+'</span>'+(t.m?'<span style="color:var(--ink-faint);"> /mo</span>':'')+'</div>'
+        +'<ul style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px;">'+t.f.map(function(f){return '<li style="display:flex;gap:8px;font-size:.9rem;">'+ico('check')+'<span>'+esc(f)+'</span></li>';}).join('')+'</ul>'
+        +'<a href="'+BP+'/contact" class="btn '+(t.rec?'btn-primary':'btn-ghost')+' btn-block">'+esc(t.cta)+'</a>'
       +'</div>';
     }).join('')+'</div>'
   +'</div></section>'
@@ -629,7 +637,7 @@ Pages['/pricing'] = function(){
       ['Can I start with a marketplace theme instead of a custom build?','Yes — Growth and Custom Build plans include a marketplace credit toward any ready-made theme, which we\'ll brand and launch for you.'],
       ['Do you offer nonprofit or small business discounts?','Yes, reach out through Contact and we\'ll tailor a plan for community and mission-driven organizations.']
     ]).map(function(f,i){
-      return '<div class="accordion-item'+(i===0?' open':'')+'"><button aria-expanded="'+(i===0)+'">'+f[0]+ico('arrow').replace('M13 6l6 6-6 6','m6 9 6 6 6-6').replace('M5 12h14','')+'</button><div class="accordion-panel"><div class="inner">'+f[1]+'</div></div></div>';
+      return '<div class="accordion-item'+(i===0?' open':'')+'"><button aria-expanded="'+(i===0)+'">'+esc(f[0])+ico('arrow').replace('M13 6l6 6-6 6','m6 9 6 6 6-6').replace('M5 12h14','')+'</button><div class="accordion-panel"><div class="inner">'+esc(f[1])+'</div></div></div>';
     }).join('')+'</div>'
   +'</div></section>';
 };
@@ -656,9 +664,9 @@ Pages['/contact'] = function(){
       +'<div id="contactSuccess" hidden style="text-align:center;padding:20px 0;">'+blobIcon('check','lg')+'<h3>Message sent</h3><p>Thanks — a real human will reply within two business days.</p></div>'
     +'</div>'
     +'<div style="display:flex;flex-direction:column;gap:20px;">'
-      +'<div class="card"><div class="card-head">'+blobIcon('mail','sm',true)+'<h3 style="font-size:1.05rem;">Email</h3></div><p style="font-size:.9rem;">'+(S.contactEmail||'hello@techbiss.com')+'</p></div>'
-      +'<div class="card"><div class="card-head">'+blobIcon('phone','sm',true)+'<h3 style="font-size:1.05rem;">Phone</h3></div><p style="font-size:.9rem;">'+(S.contactPhone||'+1 (415) 555-0148')+'</p></div>'
-      +(S.whatsappNumber?'<div class="card"><div class="card-head">'+blobIcon('chat','sm',true)+'<h3 style="font-size:1.05rem;">WhatsApp</h3></div><p style="font-size:.9rem;margin-bottom:12px;">Message us any time — usually a same-day reply.</p><a href="https://wa.me/'+S.whatsappNumber.replace(/\D+/g,'')+'" target="_blank" rel="noopener" class="btn btn-primary btn-block">Chat on WhatsApp</a></div>':'')
+      +'<div class="card"><div class="card-head">'+blobIcon('mail','sm',true)+'<h3 style="font-size:1.05rem;">Email</h3></div><p style="font-size:.9rem;">'+esc(S.contactEmail||'hello@techbiss.com')+'</p></div>'
+      +'<div class="card"><div class="card-head">'+blobIcon('phone','sm',true)+'<h3 style="font-size:1.05rem;">Phone</h3></div><p style="font-size:.9rem;">'+esc(S.contactPhone||'+1 (415) 555-0148')+'</p></div>'
+      +(S.whatsappNumber?'<div class="card"><div class="card-head">'+blobIcon('chat','sm',true)+'<h3 style="font-size:1.05rem;">WhatsApp</h3></div><p style="font-size:.9rem;margin-bottom:12px;">Message us any time — usually a same-day reply.</p><a href="https://wa.me/'+esc(S.whatsappNumber.replace(/\D+/g,''))+'" target="_blank" rel="noopener" class="btn btn-primary btn-block">Chat on WhatsApp</a></div>':'')
       +'<div class="card"><div class="card-head">'+blobIcon('globe','sm',true)+'<h3 style="font-size:1.05rem;">Studios</h3></div><p style="font-size:.9rem;">San Francisco · Lisbon · Singapore</p></div>'
     +'</div>'
   +'</div></section>';
@@ -693,7 +701,7 @@ Pages['/login'] = function(){
 
 Pages['/dashboard'] = function(){
   return '<section class="hero hero-sub" style="padding-bottom:12px;"><div class="container">'
-    +'<span class="eyebrow">Client dashboard</span><h1 style="max-width:20ch;">Welcome back, '+((AUTH_USER&&AUTH_USER.name)||'there')+'.</h1>'
+    +'<span class="eyebrow">Client dashboard</span><h1 style="max-width:20ch;">Welcome back, '+esc((AUTH_USER&&AUTH_USER.name)||'there')+'.</h1>'
     +'<p class="lede">Here\'s where things stand on your project.</p>'
   +'</div></section>'
   +'<section class="section tone-a" style="padding-top:10px;"><div class="container" style="max-width:820px;">'
@@ -706,7 +714,7 @@ function dashEmptyState(icon,title,body,cta){
 function dashExpiryBadge(label,dateStr){
   var days = Math.floor((new Date(dateStr) - new Date(new Date().toDateString())) / 86400000);
   var tone = days < 0 ? 'danger' : (days <= 30 ? 'warning' : '');
-  return '<span class="badge '+tone+'">'+label+': '+(days<0?'overdue':days+'d')+'</span>';
+  return '<span class="badge '+tone+'">'+esc(label)+': '+(days<0?'overdue':days+'d')+'</span>';
 }
 function dashProjectCard(p){
   var tone = {Planning:'',  'In progress':'warning', Live:'success', 'On hold':'danger'}[p.status] || '';
@@ -714,12 +722,12 @@ function dashProjectCard(p){
     .filter(function(e){ return e[1]; }).map(function(e){ return dashExpiryBadge(e[0],e[1]); }).join(' ');
   return '<div class="card" style="margin-bottom:18px;">'
     +'<div class="flex justify-between items-center" style="margin-bottom:10px;flex-wrap:wrap;gap:8px;">'
-      +'<h3 style="margin:0;">'+p.title+(p.domain?' <span style="color:var(--ink-faint);font-weight:400;font-size:.85rem;">— '+p.domain+'</span>':'')+'</h3>'
-      +'<span class="badge '+tone+'">'+p.status+'</span>'
+      +'<h3 style="margin:0;">'+esc(p.title)+(p.domain?' <span style="color:var(--ink-faint);font-weight:400;font-size:.85rem;">— '+esc(p.domain)+'</span>':'')+'</h3>'
+      +'<span class="badge '+tone+'">'+esc(p.status)+'</span>'
     +'</div>'
-    +'<div class="progress-track" style="margin-bottom:12px;"><div class="progress-fill" style="width:'+p.progress_pct+'%;"></div></div>'
+    +'<div class="progress-track" style="margin-bottom:12px;"><div class="progress-fill" style="width:'+(parseInt(p.progress_pct,10)||0)+'%;"></div></div>'
     +(expiries?'<div class="flex gap-8" style="flex-wrap:wrap;margin-bottom:'+(p.notes?'12px':'0')+';">'+expiries+'</div>':'')
-    +(p.notes?'<p style="font-size:.9rem;color:var(--ink-soft);margin:0;">'+p.notes+'</p>':'')
+    +(p.notes?'<p style="font-size:.9rem;color:var(--ink-soft);margin:0;">'+esc(p.notes)+'</p>':'')
   +'</div>';
 }
 function dashRequestFormHTML(){
@@ -785,9 +793,9 @@ Pages['/account'] = function(){
   +'</div></section>'
   +'<section class="section tone-a" style="padding-top:10px;"><div class="container" style="max-width:640px;">'
     +'<div class="card" style="text-align:center;padding:32px 24px;">'
-      +'<div class="avatar-blob" style="margin:0 auto 16px;">'+((u.name||'U').charAt(0).toUpperCase())+'</div>'
-      +'<h3 style="margin-bottom:2px;">'+(u.name||'Your account')+'</h3>'
-      +'<p style="color:var(--ink-faint);">'+(u.email||'')+'</p>'
+      +'<div class="avatar-blob" style="margin:0 auto 16px;">'+esc((u.name||'U').charAt(0).toUpperCase())+'</div>'
+      +'<h3 style="margin-bottom:2px;">'+esc(u.name||'Your account')+'</h3>'
+      +'<p style="color:var(--ink-faint);">'+esc(u.email||'')+'</p>'
     +'</div>'
     +'<div class="card" style="margin-top:16px;">'
       +'<a href="'+BP+'/dashboard" class="card-link" style="margin-bottom:14px;">'+ico('chart')+' View dashboard</a>'
@@ -824,17 +832,17 @@ function wireMarketplace(){
     grid.innerHTML = items.map(function(p){
       return '<div class="flip-card"><div class="flip-inner">'
         +'<div class="flip-face flip-front">'
-          +'<div class="card-head" style="margin-bottom:12px;">'+blobIcon(p.icon,'sm')+'<h3 style="font-size:1.05rem;">'+p.name+'</h3></div>'
-          +'<p style="font-size:.85rem;">'+p.tagline+'</p>'
+          +'<div class="card-head" style="margin-bottom:12px;">'+blobIcon(p.icon,'sm')+'<h3 style="font-size:1.05rem;">'+esc(p.name)+'</h3></div>'
+          +'<p style="font-size:.85rem;">'+esc(p.tagline)+'</p>'
           +'<div class="pf-preview">'+ico(p.icon)+'</div>'
-          +'<div class="pf-tags" style="justify-content:space-between;align-items:center;"><div style="display:flex;gap:6px;flex-wrap:wrap;"><span class="badge">'+p.cat+'</span>'+(p.rating>=4.9?'<span class="badge grad">Popular</span>':'')+'</div><span class="pf-rating">'+ico('star')+' '+p.rating+'</span></div>'
+          +'<div class="pf-tags" style="justify-content:space-between;align-items:center;"><div style="display:flex;gap:6px;flex-wrap:wrap;"><span class="badge">'+esc(p.cat)+'</span>'+(p.rating>=4.9?'<span class="badge grad">Popular</span>':'')+'</div><span class="pf-rating">'+ico('star')+' '+esc(p.rating)+'</span></div>'
           +'<div class="pf-foot"><span class="pf-price">'+fmtMoney(p.price)+(p.pricing_type==='fixed'?'':'<span> /mo</span>')+'</span><span class="pf-hint">Flip to preview '+ico('refresh')+'</span></div>'
         +'</div>'
         +'<div class="flip-face flip-back">'
-          +'<div><h3 style="color:#fff2ea;font-size:1.05rem;">'+p.name+'</h3>'
-          +'<p style="font-size:.85rem;">'+p.desc+'</p>'
-          +'<div class="fb-specs">'+p.specs.slice(0,3).map(function(s){return '<div class="flex items-center gap-8">'+ico('check')+'<span>'+s+'</span></div>';}).join('')+'</div></div>'
-          +'<a href="'+BP+'/marketplace/detail/'+p.id+'" class="btn" style="background:#fff2ea;color:var(--accent-1);">View details '+ico('arrow')+'</a>'
+          +'<div><h3 style="color:#fff2ea;font-size:1.05rem;">'+esc(p.name)+'</h3>'
+          +'<p style="font-size:.85rem;">'+esc(p.desc)+'</p>'
+          +'<div class="fb-specs">'+p.specs.slice(0,3).map(function(s){return '<div class="flex items-center gap-8">'+ico('check')+'<span>'+esc(s)+'</span></div>';}).join('')+'</div></div>'
+          +'<a href="'+BP+'/marketplace/detail/'+esc(p.id)+'" class="btn" style="background:#fff2ea;color:var(--accent-1);">View details '+ico('arrow')+'</a>'
         +'</div>'
       +'</div>'
       +'<button class="flip-peek" aria-label="Toggle preview">'+ico('refresh')+'</button>'
@@ -967,8 +975,8 @@ function wireProductDetail(id){
     {k:'sla', n:'24/7 priority support', price:219}
   ];
   function renderPreview(){
-    return '<div class="grid grid-2"><div><h3>Overview</h3><p>'+p.desc+'</p>'
-      +'<h3 style="margin-top:22px;">What\'s included</h3><ul style="display:flex;flex-direction:column;gap:8px;">'+p.specs.map(function(s){return '<li style="display:flex;gap:8px;font-size:.9rem;">'+ico('check')+'<span>'+s+'</span></li>';}).join('')+'</ul></div>'
+    return '<div class="grid grid-2"><div><h3>Overview</h3><p>'+esc(p.desc)+'</p>'
+      +'<h3 style="margin-top:22px;">What\'s included</h3><ul style="display:flex;flex-direction:column;gap:8px;">'+p.specs.map(function(s){return '<li style="display:flex;gap:8px;font-size:.9rem;">'+ico('check')+'<span>'+esc(s)+'</span></li>';}).join('')+'</ul></div>'
       +'<div class="hero-visual" style="aspect-ratio:1/1;"><svg viewBox="0 0 200 200" style="width:80%;height:80%;"><path fill="url(#pvGrad)" d="M46,-52C58,-42,64,-24,64,-6C64,12,58,28,46,40C34,52,16,60,-3,63C-22,66,-44,64,-56,52C-68,40,-70,18,-67,-3C-64,-24,-56,-46,-40,-58C-24,-70,-2,-72,17,-68C36,-64,34,-62,46,-52Z" transform="translate(100 100)"/><defs><linearGradient id="pvGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" style="stop-color:var(--accent-1)"/><stop offset="100%" style="stop-color:var(--accent-2)"/></linearGradient></defs></svg></div>'
       +'</div><button class="btn btn-primary magnetic" style="margin-top:24px;" data-goto="customize">Customize this product '+ico('arrow')+'</button>';
   }
@@ -991,7 +999,7 @@ function wireProductDetail(id){
         }).join('')
       +'</div></div>'
       +'<div class="card" style="background:var(--grad-soft);position:sticky;top:110px;">'
-        +'<h3>Your summary</h3><p style="font-size:.85rem;">'+p.name+' — '+TIERS.filter(function(t){return t.k===state.tier;})[0].n+' plan</p>'
+        +'<h3>Your summary</h3><p style="font-size:.85rem;">'+esc(p.name)+' — '+TIERS.filter(function(t){return t.k===state.tier;})[0].n+' plan</p>'
         +'<div style="font-family:var(--font-display);font-weight:800;font-size:2rem;margin:14px 0;" id="pdTotal">'+fmtMoney(total())+(p.pricing_type==='fixed'?'':'<span style="font-size:.9rem;color:var(--ink-faint);font-weight:600;"> /mo</span>')+'</div>'
         +'<button class="btn btn-primary btn-block magnetic" data-goto="purchase">Continue to purchase '+ico('arrow')+'</button>'
       +'</div></div>';
@@ -1005,7 +1013,7 @@ function wireProductDetail(id){
     return '<div class="hero-grid" style="align-items:flex-start;">'
       +'<div><h3>Review your order</h3>'
       +'<div class="table-wrap"><table><tbody>'
-        +'<tr><td>'+p.name+' — '+tier.n+'</td><td>'+fmtMoney(tier.price)+'</td></tr>'
+        +'<tr><td>'+esc(p.name)+' — '+tier.n+'</td><td>'+fmtMoney(tier.price)+'</td></tr>'
         +ADDONS.filter(function(a){return state.addons[a.k];}).map(function(a){return '<tr><td>'+a.n+'</td><td>'+fmtMoney(a.price)+'</td></tr>';}).join('')
         +'<tr><td><b>Total due today</b></td><td><b>'+fmtMoney(total())+'</b></td></tr>'
       +'</tbody></table></div>'
@@ -1020,7 +1028,7 @@ function wireProductDetail(id){
     var rows=['Provisioning environment','Configuring services','Running migrations','Finalizing & health checks'];
     return '<div class="text-center" style="max-width:520px;margin:0 auto;">'
       +'<div class="blob-icon lg" id="deployBlob" style="margin:0 auto 18px;">'+ico('rocket')+'</div>'
-      +'<h3 id="deployTitle">'+(deployed?'You\'re live.':'Deploying '+p.name+'…')+'</h3>'
+      +'<h3 id="deployTitle">'+(deployed?'You\'re live.':'Deploying '+esc(p.name)+'…')+'</h3>'
       +'<div class="progress-track" style="margin:18px 0;"><div class="progress-fill" id="deployFill" style="width:'+(deployed?100:0)+'%;"></div></div>'
       +'<div class="deploy-log" id="deployLog">'+rows.map(function(r,i){return '<div class="row'+(deployed?' on':'')+'" data-i="'+i+'"><span class="dot">'+(deployed?ico('check').replace('width:22px;height:22px','width:11px;height:11px'):'')+'</span><span>'+r+'</span></div>';}).join('')+'</div>'
       +(deployed?'<a href="'+BP+'/dashboard" class="btn btn-primary magnetic">Launch workspace '+ico('arrow')+'</a>':'<button class="btn btn-ghost" id="startDeploy">Start deployment</button>')
