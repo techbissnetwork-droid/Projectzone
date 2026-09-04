@@ -299,7 +299,7 @@ html.motion [data-reveal="mass"]{opacity:0;transform:translateY(46px) scale(.985
 html.motion [data-reveal="mass"].in{opacity:1;transform:none}
 
 /* ---------- HERO ---------- */
-.hero{position:relative;padding-top:clamp(104px,13vw,180px);padding-bottom:clamp(40px,6vw,80px);overflow:hidden}
+.hero{position:relative;padding-top:clamp(38px,6vw,92px);padding-bottom:clamp(40px,6vw,80px);overflow:hidden}
 .hero-grid{position:absolute;inset:0;pointer-events:none;opacity:.55}
 .hero-grid i{position:absolute;top:0;bottom:0;width:1px;background:var(--rule)}
 .hero-head{position:relative}
@@ -511,7 +511,8 @@ tbody tr:hover{background:var(--panel-2)}
 .ftr-bot{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;padding-block:20px;border-top:1px solid var(--rule);font-size:.76rem;color:var(--ink-mute)}
 
 /* ---------- VIEW TRANSITION ---------- */
-#view{min-height:70vh}
+/* clears the fixed header on every route */
+#view{min-height:70vh;padding-top:clamp(60px,6.4vw,80px)}
 .route-wipe{position:fixed;inset:0;z-index:380;background:var(--accent);transform:scaleY(0);transform-origin:bottom;pointer-events:none}
 
 /* ---------- RESPONSIVE ---------- */
@@ -1950,7 +1951,7 @@ VIEWS.contact = function(){
 
 /* ---------------- LOGIN ---------------- */
 VIEWS.login = function(){
-  return '<section class="sec" style="padding-top:clamp(96px,12vw,170px)"><div class="wrap">' +
+  return '<section class="sec"><div class="wrap">' +
     '<div style="display:grid;gap:clamp(26px,4vw,70px);grid-template-columns:repeat(auto-fit,minmax(300px,1fr));align-items:center">' +
       '<div style="display:flex;flex-direction:column;gap:22px">' +
         '<p class="level-tag">L11 — CONSOLE ACCESS</p>' +
@@ -2189,7 +2190,7 @@ function roleMarkup(key){
 
 /* ---------------- NOT FOUND ---------------- */
 VIEWS.notfound = function(){
-  return '<section class="sec" style="padding-top:clamp(110px,14vw,190px)"><div class="wrap">' +
+  return '<section class="sec"><div class="wrap">' +
     '<p class="level-tag">ERROR 404 — NO SUCH LEVEL</p>' +
     '<h1 class="h-mega" style="margin:18px 0">404</h1>' +
     '<p class="lede">That level does not exist in this structure. The lift only stops where something has been built.</p>' +
@@ -2724,12 +2725,16 @@ function boot(){
   boot();
 
   var letters = $$('#loader .ld-mark span');
+  var finished = false;
   var finish = function(){
+    if (finished) return; finished = true;
     ld.classList.add('done');
     ld.style.display = 'none';
     document.body.style.overflow = '';
     if (HAS_GSAP && window.ScrollTrigger) ScrollTrigger.refresh();
   };
+  /* the page is never held hostage by the intro */
+  setTimeout(finish, 7000);
 
   if (!HAS_GSAP){
     letters.forEach(function(s,i){
