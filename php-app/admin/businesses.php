@@ -173,15 +173,14 @@ $token = csrf_token();
       </div>
       <div class="field">
         <label>Owner</label>
-        <select name="owner_id">
-          <option value="">No owner yet</option>
+        <select name="owner_id" id="ownerSelect">
+          <option value="">No owner yet — create a new user below</option>
           <?php foreach ($users as $u): ?>
           <option value="<?= (int)$u['id'] ?>" <?= $currentOwnerId == $u['id'] ? 'selected' : '' ?>><?= e($u['name']) ?> — <?= e($u['email']) ?></option>
           <?php endforeach; ?>
         </select>
-        <p style="font-size:.78rem;color:var(--ink-faint);margin-top:6px;">Pick an existing user above, or fill in the fields below to create a new one — a new user takes priority over the selection.</p>
       </div>
-      <div class="grid grid-3" style="gap:16px;">
+      <div class="grid grid-3" style="gap:16px;" id="newUserFields">
         <div class="field"><label>New user — name</label><input name="new_user_name" placeholder="Only if creating a new user"></div>
         <div class="field"><label>New user — email</label><input type="email" name="new_user_email"></div>
         <div class="field"><label>New user — password</label><input type="password" name="new_user_password" minlength="8" placeholder="Min 8 characters"></div>
@@ -192,6 +191,15 @@ $token = csrf_token();
       </div>
     </form>
   </div>
+  <script>
+  (function(){
+    var sel = document.getElementById('ownerSelect');
+    var wrap = document.getElementById('newUserFields');
+    function sync(){ wrap.style.display = sel.value ? 'none' : ''; }
+    sel.addEventListener('change', sync);
+    sync();
+  })();
+  </script>
 
   <div class="card">
     <div class="table-wrap"><table><thead><tr><th>Business</th><th>Sector</th><th>Plan</th><th>Owner</th><th>Projects</th><th>Status</th><th>Last activity</th><th></th></tr></thead><tbody>
