@@ -645,13 +645,25 @@ main{ display:block; }
 #tab-general:checked ~ .tab-labels label[for="tab-general"],
 #tab-stats:checked ~ .tab-labels label[for="tab-stats"],
 #tab-seo:checked ~ .tab-labels label[for="tab-seo"],
-#tab-branding:checked ~ .tab-labels label[for="tab-branding"]{
+#tab-branding:checked ~ .tab-labels label[for="tab-branding"],
+#tab-c-services:checked ~ .tab-labels label[for="tab-c-services"],
+#tab-c-industries:checked ~ .tab-labels label[for="tab-c-industries"],
+#tab-c-cases:checked ~ .tab-labels label[for="tab-c-cases"],
+#tab-c-pricing:checked ~ .tab-labels label[for="tab-c-pricing"],
+#tab-c-team:checked ~ .tab-labels label[for="tab-c-team"]{
   background:var(--grad-soft); color:var(--accent-1); border-color:transparent;
 }
 #tab-general:checked ~ #panel-general,
 #tab-stats:checked ~ #panel-stats,
 #tab-seo:checked ~ #panel-seo,
-#tab-branding:checked ~ #panel-branding{ display:block; }
+#tab-branding:checked ~ #panel-branding,
+#tab-c-services:checked ~ #panel-c-services,
+#tab-c-industries:checked ~ #panel-c-industries,
+#tab-c-cases:checked ~ #panel-c-cases,
+#tab-c-pricing:checked ~ #panel-c-pricing,
+#tab-c-team:checked ~ #panel-c-team{ display:block; }
+.content-item{ background:var(--surface-2); }
+.content-item summary::-webkit-details-marker{ display:none; }
 
 /* ============================= UTILS ============================= */
 .mt-0{ margin-top:0; } .mb-0{ margin-bottom:0; }

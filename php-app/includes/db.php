@@ -193,6 +193,21 @@ function get_setting(string $key, string $default = ''): string
     return $all[$key] ?? $default;
 }
 
+/**
+ * Reads a repeatable content section (Services, Case Studies, Team, etc.)
+ * stored as a JSON blob under $key. Falls back to $default (the section's
+ * built-in content) if the setting is missing or fails to decode.
+ */
+function content_section(string $key, array $default): array
+{
+    $raw = get_setting($key, '');
+    if ($raw === '') {
+        return $default;
+    }
+    $decoded = json_decode($raw, true);
+    return is_array($decoded) && $decoded !== [] ? $decoded : $default;
+}
+
 function palette_attr(): string
 {
     $p = get_setting('color_palette', '');

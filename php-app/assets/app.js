@@ -288,7 +288,7 @@ function confettiBurst(x,y){
 /* ===================================================================
    8. SHARED CONTENT DATA
 =================================================================== */
-var SERVICES = [
+var SERVICES = window.SERVICES_DATA || [
   {icon:'monitor', name:'Website Design & Development', blurb:'A site built around your business, not squeezed into a generic template.', bullets:['Custom design & copy','Fast, mobile-friendly pages','Built to grow as you do']},
   {icon:'code', name:'App Development', blurb:'iOS and Android apps built from your idea, not a boilerplate.', bullets:['iOS & Android, one build','Real designs before we code','Built to pass App Store review']},
   {icon:'globe', name:'Domain, Hosting & Email', blurb:'The unglamorous stuff, set up right the first time and never left to lapse.', bullets:['Domain registration & DNS','Fast hosting with SSL included','Business email on your domain']},
@@ -296,14 +296,14 @@ var SERVICES = [
   {icon:'chart', name:'SEO & Search Ranking', blurb:'So being online actually means being found.', bullets:['On-page & technical SEO','Google Maps & local search','Plain-language ranking reports']},
   {icon:'cart', name:'Ready-Made Themes & Templates', blurb:'Buy a theme, brand it as your own, and launch in days.', bullets:['Fully brandable, no lock-in','Your logo, colors & content','Same support as a custom build']}
 ];
-var SOLUTIONS = [
+var SOLUTIONS = window.SOLUTIONS_DATA || [
   {icon:'cart', name:'Shops & Local Retail', out:['An online store that matches your storefront','Orders and inventory in one place','Local SEO so nearby customers find you']},
   {icon:'heart', name:'Restaurants & Cafés', out:['Menu, hours & online ordering','Table booking built in','Your Google & Maps listing done right']},
   {icon:'gear', name:'Home & Local Services', out:['Booking & quote requests online','Service-area SEO that actually ranks','Reviews and contact, front and center']},
   {icon:'spark', name:'Creators & Personal Brands', out:['A site or app that looks like you','Portfolio, shop or booking in one place','App store publishing handled']},
   {icon:'flag', name:'Nonprofits & Community Groups', out:['Donation & event pages','Volunteer sign-ups made simple','Discounted plans available']}
 ];
-var CASESTUDIES = [
+var CASESTUDIES = window.CASESTUDIES_DATA || [
   {sector:'Bakery', icon:'cart', client:'Maple & Co. Bakery', stat:'+64%', statLabel:'online orders in month one', quote:'We went from a Facebook page to a real website with ordering in under two weeks.', body:'Maple & Co. was taking orders through Facebook comments and DMs. We built them a website with online ordering, connected a custom domain and business email, and got them ranking for "bakery near me" in their own neighborhood.'},
   {sector:'Fitness', icon:'heart', client:'Solstice Yoga Studio', stat:'3x', statLabel:'more class bookings', quote:'Our booking calendar used to be a shared spreadsheet. Now people book from their phone.', body:'Solstice had no website at all — just word of mouth. We built them a site with class booking, set up hosting and email, and helped them show up in local search.'},
   {sector:'Home services', icon:'gear', client:'Corner Hardware & Repair', stat:'+120', statLabel:'quote requests per month', quote:'People find us on Google now instead of just driving past.', body:'Corner Hardware had a storefront but no online presence at all. We built a simple, fast site with a quote-request form and got them ranking on Google Maps for their service area.'},
@@ -530,13 +530,13 @@ Pages['/process'] = function(){
 
 Pages['/about'] = function(){
   var S = window.SITE_SETTINGS || {};
-  var values = [
+  var values = window.VALUES_DATA || [
     {icon:'heart', t:'Plain language, always', d:'No jargon you need a developer to translate. If we can\'t explain it simply, we haven\'t understood it yet.'},
     {icon:'shield', t:'Nothing rented that should be owned', d:'Your domain, your site, your app — registered and built in your name, not locked to us.'},
     {icon:'users', t:'A real person replies', d:'Support that\'s an actual person who knows your project, not a ticket number.'},
     {icon:'spark', t:'Built to be found, not just to exist', d:'A website nobody can find isn\'t really online. SEO is part of the build, not an upsell.'}
   ];
-  var team = [
+  var team = window.TEAM_DATA || [
     {i:'MA', n:'Mara Aldous', r:'Founder & CEO'},
     {i:'DK', n:'Devon Kwan', r:'Head of Engineering'},
     {i:'RS', n:'Rhea Solano', r:'Head of Design'},
@@ -598,7 +598,7 @@ Pages['/resources'] = function(){
 };
 
 Pages['/pricing'] = function(){
-  var tiers=[
+  var tiers = window.PRICING_DATA || [
     {n:'Starter', m:39, y:31, d:'Hosting, domain renewal and a small monthly update — for once your site is live.', f:['Hosting, SSL & domain included','1 small update per month','Email support','Uptime monitoring'], cta:'Start with Starter'},
     {n:'Growth', m:99, y:79, d:'For businesses adding bookings, an online store, or an app.', f:['Everything in Starter','Priority support','Marketplace theme credit','Monthly SEO check-in','App store update handling'], cta:'Start with Growth', rec:true},
     {n:'Custom Build', m:null, y:null, d:'A website or app built from scratch around your business.', f:['Custom design & development','Dedicated project lead','Domain, hosting, SSL & email included','App Store & Play Store publishing','Free ranking check-up'], cta:'Get a free quote'}
@@ -621,13 +621,13 @@ Pages['/pricing'] = function(){
   +wave('a','var(--bg-alt)')
   +'<section class="section tone-b"><div class="container">'
     +'<div class="section-head center"><span class="eyebrow">Questions</span><h2>Pricing FAQ</h2></div>'
-    +'<div id="priceFaq">'+[
+    +'<div id="priceFaq">'+(window.PRICING_FAQ_DATA || [
       ['Do you build the website too, or is this just hosting?','These plans cover hosting, care and updates after launch. New builds — a website, an app, or both — are quoted upfront based on what you need.'],
       ['Can I switch plans later?','Yes — upgrade or downgrade at the start of any billing cycle, and we\'ll prorate the difference.'],
       ['What if I already have a website?','We can take over hosting and support for an existing site, or rebuild it if it needs modern love — either way, nothing changes for your visitors during the switch.'],
       ['Can I start with a marketplace theme instead of a custom build?','Yes — Growth and Custom Build plans include a marketplace credit toward any ready-made theme, which we\'ll brand and launch for you.'],
       ['Do you offer nonprofit or small business discounts?','Yes, reach out through Contact and we\'ll tailor a plan for community and mission-driven organizations.']
-    ].map(function(f,i){
+    ]).map(function(f,i){
       return '<div class="accordion-item'+(i===0?' open':'')+'"><button aria-expanded="'+(i===0)+'">'+f[0]+ico('arrow').replace('M13 6l6 6-6 6','m6 9 6 6 6-6').replace('M5 12h14','')+'</button><div class="accordion-panel"><div class="inner">'+f[1]+'</div></div></div>';
     }).join('')+'</div>'
   +'</div></section>';

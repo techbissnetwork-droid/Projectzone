@@ -4,6 +4,7 @@ const ADMIN_NAV = [
     ['path' => 'businesses.php', 'label' => 'Businesses', 'icon' => 'box'],
     ['path' => 'tickets.php', 'label' => 'Tickets', 'icon' => 'chat'],
     ['path' => 'products.php', 'label' => 'Products', 'icon' => 'star'],
+    ['path' => 'content.php', 'label' => 'Content', 'icon' => 'edit'],
     ['path' => 'staff.php', 'label' => 'Staff', 'icon' => 'users'],
     ['path' => 'settings.php', 'label' => 'Settings', 'icon' => 'settings'],
 ];
@@ -13,6 +14,7 @@ const STAFF_SECTIONS = [
     'businesses' => 'Businesses',
     'tickets' => 'Tickets',
     'products' => 'Products',
+    'content' => 'Content',
     'staff' => 'Staff & permissions',
     'settings' => 'Settings',
 ];

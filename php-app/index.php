@@ -29,6 +29,17 @@ $siteSettings = [
     'stat5Value' => get_setting('stat5_value', '9'),
     'stat5Label' => get_setting('stat5_label', 'Years in business'),
 ];
+$defaultContent = require __DIR__ . '/includes/default_content.php';
+$contentSections = [
+    'services' => content_section('services_json', $defaultContent['services']),
+    'solutions' => content_section('solutions_json', $defaultContent['solutions']),
+    'caseStudies' => content_section('case_studies_json', $defaultContent['case_studies']),
+    'pricing' => content_section('pricing_json', $defaultContent['pricing']),
+    'pricingFaq' => content_section('pricing_faq_json', $defaultContent['pricing_faq']),
+    'team' => content_section('team_json', $defaultContent['team']),
+    'values' => content_section('values_json', $defaultContent['values']),
+];
+
 $siteTagline = get_setting('site_tagline', 'We help offline businesses get online — building the website or app, then handling the domain, hosting, email and everything after launch.');
 
 $seoTitle = get_setting('seo_title', 'TECHBISS — Helping offline businesses go online');
@@ -185,6 +196,13 @@ $socialImageUrl = $baseUrl !== '' ? $baseUrl . '/' . ltrim($socialImagePath, '/'
 <script>
   var PRODUCTS_DATA = <?= json_encode($products, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>;
   var SITE_SETTINGS = <?= json_encode($siteSettings, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>;
+  var SERVICES_DATA = <?= json_encode($contentSections['services'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>;
+  var SOLUTIONS_DATA = <?= json_encode($contentSections['solutions'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>;
+  var CASESTUDIES_DATA = <?= json_encode($contentSections['caseStudies'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>;
+  var PRICING_DATA = <?= json_encode($contentSections['pricing'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>;
+  var PRICING_FAQ_DATA = <?= json_encode($contentSections['pricingFaq'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>;
+  var TEAM_DATA = <?= json_encode($contentSections['team'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>;
+  var VALUES_DATA = <?= json_encode($contentSections['values'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>;
 </script>
 <script src="assets/app.js?v=<?= @filemtime(__DIR__ . '/assets/app.js') ?: '1' ?>"></script>
 </body>
