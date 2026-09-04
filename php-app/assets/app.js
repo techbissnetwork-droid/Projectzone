@@ -346,10 +346,10 @@ Pages['/'] = function(){
   return ''
   +'<section class="hero"><div class="container hero-grid">'
     +'<div><span class="eyebrow">Websites & apps, fully handled</span>'
-    +'<h1>'+(S.heroHeadlineMain||'Your business, finally')+' <span class="grad-text">'+(S.heroHeadlineAccent||'open online.')+'</span></h1>'
-    +'<p class="lede">'+(S.heroSubheadline||'TECHBISS builds your website or app from the ground up, then handles the domain, hosting, SSL, business email and app store publishing — so you launch with everything already working, and people can actually find you.')+'</p>'
+    +'<h1>'+(S.heroHeadlineMain||'We help offline businesses')+' <span class="grad-text">'+(S.heroHeadlineAccent||'thrive online.')+'</span></h1>'
+    +'<p class="lede">'+(S.heroSubheadline||'TECHBISS builds your website or app, then sets up your domain, hosting, email and app store listing — so you launch with everything working and ready to be found.')+'</p>'
     +'<div class="hero-cta"><a href="#/services" class="btn btn-primary magnetic">See what we build '+ico('arrow')+'</a><a href="#/contact" class="btn btn-ghost magnetic">Book a free call</a></div>'
-    +'<div class="hero-stats">'+statBlock('1,900+','Businesses & apps launched')+statBlock('38','Countries served')+statBlock('4.9/5','Customer rating')+statBlock('72 hrs','To your first draft')+'</div>'
+    +'<div class="hero-stats">'+statBlock(S.stat1Value||'1,900+',S.stat1Label||'Businesses & apps launched')+statBlock(S.stat2Value||'38',S.stat2Label||'Countries served')+statBlock(S.stat3Value||'4.9/5',S.stat3Label||'Customer rating')+statBlock(S.stat4Value||'72 hrs',S.stat4Label||'To your first draft')+'</div>'
     +'</div>'
     +'<div class="hero-visual"><svg class="hero-blob-main" viewBox="0 0 200 200"><path fill="url(#heroGrad)" d="M52,-64C67,-54,78,-38,81,-20C84,-2,79,17,68,33C57,49,40,62,20,69C0,76,-24,77,-42,66C-60,55,-72,32,-75,8C-78,-16,-72,-42,-56,-58C-40,-74,-14,-80,7,-83C28,-86,37,-74,52,-64Z" transform="translate(100 100)"/><defs><linearGradient id="heroGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" style="stop-color:var(--accent-1)"/><stop offset="55%" style="stop-color:var(--accent-3)"/><stop offset="100%" style="stop-color:var(--accent-2)"/></linearGradient></defs></svg>'
       +'<div class="float-chip chip-1">'+ico('rocket')+'<span>Live in days, not months</span></div>'
@@ -408,8 +408,8 @@ Pages['/'] = function(){
 
 Pages['/services'] = function(){
   return '<section class="hero hero-sub" style="padding-bottom:20px;"><div class="container">'
-    +'<span class="eyebrow">Services</span><h1 style="max-width:16ch;">Everything it takes to go from offline to online.</h1>'
-    +'<p class="lede">Website or app, domain, hosting, email, publishing, SEO — pick what you need, or hand us the whole thing.</p>'
+    +'<span class="eyebrow">Services</span><h1 style="max-width:16ch;">Everything you need to take your business online.</h1>'
+    +'<p class="lede">From a new website or app to your domain, hosting, email and search visibility — choose only what you need, or let us handle it all.</p>'
   +'</div></section>'
   +'<section class="section tone-a"><div class="container">'
     +'<div class="grid grid-2">'+SERVICES.map(function(s,i){
@@ -434,8 +434,8 @@ Pages['/services'] = function(){
 
 Pages['/solutions'] = function(){
   return '<section class="hero hero-sub" style="padding-bottom:20px;"><div class="container">'
-    +'<span class="eyebrow">Who we help</span><h1 style="max-width:18ch;">Built for people bringing a business online — not enterprise IT.</h1>'
-    +'<p class="lede">Different business, different needs. The care we put into the work doesn\'t change.</p>'
+    +'<span class="eyebrow">Who we help</span><h1 style="max-width:18ch;">Built for real businesses, not enterprise IT teams.</h1>'
+    +'<p class="lede">Every business is different, but the care we put into your project never changes.</p>'
   +'</div></section>'
   +'<section class="section tone-a"><div class="container">'
     +'<div class="grid grid-3">'+SOLUTIONS.map(solutionCard).join('')+'</div>'
@@ -454,8 +454,8 @@ Pages['/solutions'] = function(){
 Pages['/marketplace'] = function(){
   var cats = ['All','Templates','Bundles','AI Agents','Dashboards','Themes'];
   return '<section class="hero hero-sub" style="padding-bottom:10px;"><div class="container">'
-    +'<span class="eyebrow">Marketplace</span><h1 style="max-width:16ch;">Ready-made themes you can brand as your own.</h1>'
-    +'<p class="lede">Flip a card to preview it. Buy a theme, drop in your logo and colors, and launch — every listing is built and maintained by the TECHBISS studio.</p>'
+    +'<span class="eyebrow">Marketplace</span><h1 style="max-width:16ch;">Ready-made themes, branded just for you.</h1>'
+    +'<p class="lede">Preview any theme, then let us apply your logo and colors and launch it as your own — every listing is built and maintained by the TECHBISS studio.</p>'
   +'</div></section>'
   +'<section class="section tone-a" style="padding-top:10px;"><div class="container">'
     +'<div class="search-field">'+ico('search')+'<input type="search" id="mktSearch" placeholder="Search the marketplace" aria-label="Search marketplace"></div>'
@@ -512,7 +512,7 @@ Pages['/process'] = function(){
     {t:'Grow', icon:'chart', d:'SEO, small updates and support keep new customers finding and using it after launch.', out:['Monthly SEO check-in','Small updates included','Support when you need it']}
   ];
   return '<section class="hero hero-sub" style="padding-bottom:20px;"><div class="container">'
-    +'<span class="eyebrow">Process</span><h1 style="max-width:16ch;">Five stages. No surprises in between.</h1>'
+    +'<span class="eyebrow">Process</span><h1 style="max-width:16ch;">A clear, five-stage process — with no surprises along the way.</h1>'
     +'<p class="lede">Every project — big or small — moves through the same five stages, so you always know what\'s next.</p>'
   +'</div></section>'
   +'<section class="section tone-a"><div class="container">'
@@ -529,6 +529,7 @@ Pages['/process'] = function(){
 };
 
 Pages['/about'] = function(){
+  var S = window.SITE_SETTINGS || {};
   var values = [
     {icon:'heart', t:'Plain language, always', d:'No jargon you need a developer to translate. If we can\'t explain it simply, we haven\'t understood it yet.'},
     {icon:'shield', t:'Nothing rented that should be owned', d:'Your domain, your site, your app — registered and built in your name, not locked to us.'},
@@ -542,11 +543,11 @@ Pages['/about'] = function(){
     {i:'JT', n:'Jonah Traeger', r:'VP Client Success'}
   ];
   return '<section class="hero hero-sub" style="padding-bottom:20px;"><div class="container">'
-    +'<span class="eyebrow">About</span><h1 style="max-width:16ch;">Started because getting online shouldn\'t be this hard.</h1>'
+    +'<span class="eyebrow">About</span><h1 style="max-width:16ch;">We started TECHBISS because getting online shouldn\'t be this hard.</h1>'
     +'<p class="lede">TECHBISS began by building one shop owner a website over a weekend. Nine years later, the same conviction runs the platform: we build every project like it\'s the most important one — because to the person running the business, it is.</p>'
   +'</div></section>'
   +'<section class="section tone-a"><div class="container">'
-    +'<div class="grid grid-4">'+[['9','Years in business'],['1,900+','Businesses & apps launched'],['38','Countries served'],['4.9/5','Customer rating']].map(function(s){return '<div class="card tilt text-center">'+statBlock(s[0],s[1])+'</div>';}).join('')+'</div>'
+    +'<div class="grid grid-4">'+[[S.stat5Value||'9',S.stat5Label||'Years in business'],[S.stat1Value||'1,900+',S.stat1Label||'Businesses & apps launched'],[S.stat2Value||'38',S.stat2Label||'Countries served'],[S.stat3Value||'4.9/5',S.stat3Label||'Customer rating']].map(function(s){return '<div class="card tilt text-center">'+statBlock(s[0],s[1])+'</div>';}).join('')+'</div>'
   +'</div></section>'
   +wave('a','var(--bg-alt)')
   +'<section class="section tone-b"><div class="container">'
@@ -576,8 +577,8 @@ Pages['/resources'] = function(){
     {t:'App Store Launch Kit — v4.0 release notes', k:'Changelog', icon:'box', min:'4 min read'}
   ];
   return '<section class="hero hero-sub" style="padding-bottom:10px;"><div class="container">'
-    +'<span class="eyebrow">Resources</span><h1 style="max-width:16ch;">Field notes for getting online.</h1>'
-    +'<p class="lede">Guides, recordings and release notes from the team actually building this.</p>'
+    +'<span class="eyebrow">Resources</span><h1 style="max-width:16ch;">Guides and resources to help you get online.</h1>'
+    +'<p class="lede">Practical guides, recorded sessions and product updates from the team building this.</p>'
   +'</div></section>'
   +'<section class="section tone-a" style="padding-top:10px;"><div class="container">'
     +'<div class="chip-row" id="resChips">'+types.map(function(t,i){return '<button class="chip'+(i===0?' active':'')+'" data-cat="'+t+'">'+t+'</button>';}).join('')+'</div>'
@@ -603,7 +604,7 @@ Pages['/pricing'] = function(){
     {n:'Custom Build', m:null, y:null, d:'A website or app built from scratch around your business.', f:['Custom design & development','Dedicated project lead','Domain, hosting, SSL & email included','App Store & Play Store publishing','Free ranking check-up'], cta:'Get a free quote'}
   ];
   return '<section class="hero hero-sub" style="padding-bottom:20px;"><div class="container text-center">'
-    +'<span class="eyebrow">Pricing</span><h1 style="max-width:20ch;margin-inline:auto;">Straightforward care plans. Custom builds, quoted upfront.</h1>'
+    +'<span class="eyebrow">Pricing</span><h1 style="max-width:20ch;margin-inline:auto;">Simple care plans, and custom builds quoted upfront.</h1>'
     +'<div class="toggle-pill" id="priceToggle" style="margin-top:20px;"><button class="active" data-p="m">Monthly</button><button data-p="y">Annual — save 20%</button></div>'
   +'</div></section>'
   +'<section class="section tone-a" style="padding-top:0;"><div class="container">'
@@ -635,7 +636,7 @@ Pages['/pricing'] = function(){
 Pages['/contact'] = function(){
   var S = window.SITE_SETTINGS || {};
   return '<section class="hero hero-sub" style="padding-bottom:20px;"><div class="container">'
-    +'<span class="eyebrow">Contact</span><h1 style="max-width:18ch;">Tell us about your business. We\'ll tell you what it takes to get online.</h1>'
+    +'<span class="eyebrow">Contact</span><h1 style="max-width:18ch;">Tell us about your business, and we\'ll explain exactly what it takes to get you online.</h1>'
     +'<p class="lede">Most first calls happen within two business days.</p>'
   +'</div></section>'
   +'<section class="section tone-a" style="padding-top:0;"><div class="container hero-grid" style="align-items:flex-start;">'

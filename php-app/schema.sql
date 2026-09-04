@@ -151,18 +151,28 @@ CREATE TABLE `settings` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO `settings` (`id`, `value`) VALUES
-('hero_headline_main', 'Your business, finally'),
-('hero_headline_accent', 'open online.'),
-('hero_subheadline', 'TECHBISS builds your website or app from the ground up, then handles the domain, hosting, SSL, business email and app store publishing — so you launch with everything already working, and people can actually find you.'),
-('site_tagline', 'We help offline businesses get online — website or app, domain, hosting, email and everything after launch.'),
+('hero_headline_main', 'We help offline businesses'),
+('hero_headline_accent', 'thrive online.'),
+('hero_subheadline', 'TECHBISS builds your website or app, then sets up your domain, hosting, email and app store listing — so you launch with everything working and ready to be found.'),
+('site_tagline', 'We help offline businesses get online — building the website or app, then handling the domain, hosting, email and everything after launch.'),
 ('contact_email', 'hello@techbiss.com'),
 ('contact_phone', '+1 (415) 555-0148'),
-('seo_title', 'TECHBISS — Get your business online'),
-('meta_description', 'TECHBISS helps offline businesses get online: websites, apps, domains, hosting, email and everything after launch.'),
+('seo_title', 'TECHBISS — Helping offline businesses go online'),
+('meta_description', 'TECHBISS helps offline businesses get online with a new website or app, then takes care of the domain, hosting, email and everything after launch.'),
 ('logo_path', ''),
 ('favicon_path', 'assets/favicon.ico'),
 ('social_image_path', 'assets/social-default.png'),
 ('default_theme', 'auto'),
-('color_palette', '');
+('color_palette', ''),
+('stat1_value', '1,900+'),
+('stat1_label', 'Businesses & apps launched'),
+('stat2_value', '38'),
+('stat2_label', 'Countries served'),
+('stat3_value', '4.9/5'),
+('stat3_label', 'Customer rating'),
+('stat4_value', '72 hrs'),
+('stat4_label', 'To your first draft'),
+('stat5_value', '9'),
+('stat5_label', 'Years in business');
 
 SET FOREIGN_KEY_CHECKS = 1;

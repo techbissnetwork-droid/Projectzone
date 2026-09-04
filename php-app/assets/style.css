@@ -643,11 +643,13 @@ main{ display:block; }
 .tab-labels label svg{ width:15px; height:15px; }
 .tab-panel{ display:none; }
 #tab-general:checked ~ .tab-labels label[for="tab-general"],
+#tab-stats:checked ~ .tab-labels label[for="tab-stats"],
 #tab-seo:checked ~ .tab-labels label[for="tab-seo"],
 #tab-branding:checked ~ .tab-labels label[for="tab-branding"]{
   background:var(--grad-soft); color:var(--accent-1); border-color:transparent;
 }
 #tab-general:checked ~ #panel-general,
+#tab-stats:checked ~ #panel-stats,
 #tab-seo:checked ~ #panel-seo,
 #tab-branding:checked ~ #panel-branding{ display:block; }
 

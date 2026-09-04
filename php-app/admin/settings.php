@@ -11,6 +11,9 @@ $pdo = db();
 $TEXT_FIELDS = [
     'hero_headline_main', 'hero_headline_accent', 'hero_subheadline', 'site_tagline',
     'contact_email', 'contact_phone', 'seo_title', 'meta_description',
+    'stat1_value', 'stat1_label', 'stat2_value', 'stat2_label',
+    'stat3_value', 'stat3_label', 'stat4_value', 'stat4_label',
+    'stat5_value', 'stat5_label',
 ];
 $THEME_OPTIONS = ['auto' => 'Automatic (matches visitor device)', 'light' => 'Light', 'dark' => 'Dark'];
 $PALETTE_OPTIONS = [
@@ -130,11 +133,13 @@ $socialPath = $current['social_image_path'] ?? 'assets/social-default.png';
 
     <div class="settings-tabs">
       <input type="radio" name="stab" id="tab-general" class="tab-radio" checked>
+      <input type="radio" name="stab" id="tab-stats" class="tab-radio">
       <input type="radio" name="stab" id="tab-seo" class="tab-radio">
       <input type="radio" name="stab" id="tab-branding" class="tab-radio">
 
       <div class="tab-labels">
         <label for="tab-general"><?= ico('edit') ?> General</label>
+        <label for="tab-stats"><?= ico('chart') ?> Stats</label>
         <label for="tab-seo"><?= ico('star') ?> SEO &amp; Social</label>
         <label for="tab-branding"><?= ico('grid') ?> Branding</label>
       </div>
@@ -153,6 +158,32 @@ $socialPath = $current['social_image_path'] ?? 'assets/social-default.png';
       <div class="grid grid-2" style="gap:16px;">
         <div class="field"><label>Contact email</label><input type="email" name="contact_email" value="<?= e($current['contact_email'] ?? '') ?>"></div>
         <div class="field"><label>Contact phone</label><input name="contact_phone" value="<?= e($current['contact_phone'] ?? '') ?>"></div>
+      </div>
+    </div>
+    </div>
+
+    <div class="tab-panel" id="panel-stats">
+    <div class="card admin-form-card">
+      <p class="lede" style="margin-bottom:16px;">The numbers shown on the homepage and About page — edit these instead of the site's code.</p>
+      <div class="grid grid-2" style="gap:16px;">
+        <div class="field"><label>Stat 1 — value</label><input name="stat1_value" value="<?= e($current['stat1_value'] ?? '') ?>"></div>
+        <div class="field"><label>Stat 1 — label</label><input name="stat1_label" value="<?= e($current['stat1_label'] ?? '') ?>"></div>
+      </div>
+      <div class="grid grid-2" style="gap:16px;">
+        <div class="field"><label>Stat 2 — value</label><input name="stat2_value" value="<?= e($current['stat2_value'] ?? '') ?>"></div>
+        <div class="field"><label>Stat 2 — label</label><input name="stat2_label" value="<?= e($current['stat2_label'] ?? '') ?>"></div>
+      </div>
+      <div class="grid grid-2" style="gap:16px;">
+        <div class="field"><label>Stat 3 — value</label><input name="stat3_value" value="<?= e($current['stat3_value'] ?? '') ?>"></div>
+        <div class="field"><label>Stat 3 — label</label><input name="stat3_label" value="<?= e($current['stat3_label'] ?? '') ?>"></div>
+      </div>
+      <div class="grid grid-2" style="gap:16px;">
+        <div class="field"><label>Stat 4 — value <small style="font-weight:400;color:var(--ink-faint);">(homepage only)</small></label><input name="stat4_value" value="<?= e($current['stat4_value'] ?? '') ?>"></div>
+        <div class="field"><label>Stat 4 — label</label><input name="stat4_label" value="<?= e($current['stat4_label'] ?? '') ?>"></div>
+      </div>
+      <div class="grid grid-2" style="gap:16px;">
+        <div class="field"><label>Stat 5 — value <small style="font-weight:400;color:var(--ink-faint);">(About page only)</small></label><input name="stat5_value" value="<?= e($current['stat5_value'] ?? '') ?>"></div>
+        <div class="field"><label>Stat 5 — label</label><input name="stat5_label" value="<?= e($current['stat5_label'] ?? '') ?>"></div>
       </div>
     </div>
     </div>
