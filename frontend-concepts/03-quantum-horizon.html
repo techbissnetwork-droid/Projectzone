@@ -338,6 +338,197 @@ h3{font-size:clamp(1.2rem,1.8vw,1.5rem);line-height:1.25}
 </div>
 
 <main id="main-content">
+<section data-route="home" aria-labelledby="home-h1">
+
+  <section style="position:relative;padding:64px 0 80px;overflow:hidden">
+    <div class="orbit-decor" aria-hidden="true">
+      <div class="glow" style="width:640px;height:640px;background:var(--accent-2);top:-220px;right:-160px"></div>
+      <div class="glow" style="width:520px;height:520px;background:var(--accent);bottom:-260px;left:-140px;opacity:.22"></div>
+    </div>
+    <div class="container" style="position:relative;display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center">
+      <div>
+        <span class="eyebrow">Global Digital Transformation Platform</span>
+        <h1 id="home-h1" style="margin-top:18px">Engineering the Next Global Economy</h1>
+        <p class="lede measure" style="margin-top:20px">TECHBISS designs, builds and runs the cloud, AI and security infrastructure behind 482 of the world's most consequential enterprises — across 120+ countries and every regulated industry.</p>
+        <div style="display:flex;gap:14px;margin-top:32px;flex-wrap:wrap">
+          <a href="#contact" class="btn btn-primary">Start a Project</a>
+          <a href="#work" class="btn btn-outline">View Case Studies</a>
+        </div>
+        <dl style="display:flex;gap:36px;margin-top:56px;flex-wrap:wrap">
+          <div><dt class="mono" style="font-size:.68rem;letter-spacing:.08em;color:var(--ink-muted);text-transform:uppercase">Countries</dt><dd style="margin:4px 0 0;font-family:var(--font-display);font-size:1.7rem" data-counter data-target="120" data-suffix="+">0</dd></div>
+          <div><dt class="mono" style="font-size:.68rem;letter-spacing:.08em;color:var(--ink-muted);text-transform:uppercase">AUM Modernized</dt><dd style="margin:4px 0 0;font-family:var(--font-display);font-size:1.7rem"><span data-counter data-target="4.2" data-decimals="1" data-prefix="$">0</span>T</dd></div>
+          <div><dt class="mono" style="font-size:.68rem;letter-spacing:.08em;color:var(--ink-muted);text-transform:uppercase">Platform Uptime</dt><dd style="margin:4px 0 0;font-family:var(--font-display);font-size:1.7rem"><span data-counter data-target="99.99" data-decimals="2">0</span>%</dd></div>
+          <div><dt class="mono" style="font-size:.68rem;letter-spacing:.08em;color:var(--ink-muted);text-transform:uppercase">Engineers</dt><dd style="margin:4px 0 0;font-family:var(--font-display);font-size:1.7rem" data-counter data-target="3400" data-suffix="+">0</dd></div>
+        </dl>
+      </div>
+      <div style="position:relative;aspect-ratio:1/1;border-radius:var(--radius-lg);border:1px solid var(--line);background:radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--accent-2) 10%, var(--surface)), var(--surface) 70%);overflow:hidden">
+        <canvas id="orbital-canvas" role="img" aria-label="Animated diagram of a global orbital network of connected nodes"></canvas>
+        <div class="mono" style="position:absolute;left:16px;bottom:14px;font-size:.68rem;letter-spacing:.06em;color:var(--accent);background:color-mix(in srgb, var(--bg) 55%, transparent);padding:6px 10px;border-radius:6px">NETWORK · 482 NODES ACTIVE</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0" data-reveal>
+    <div class="container">
+      <p class="mono" style="text-align:center;font-size:.7rem;letter-spacing:.1em;color:var(--ink-muted);text-transform:uppercase;margin-bottom:24px">Trusted by category leaders across every regulated industry</p>
+      <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:40px;opacity:.7">
+        <span class="mono" style="font-size:1.05rem;font-weight:700">MERIDIAN CAPITAL</span>
+        <span class="mono" style="font-size:1.05rem;font-weight:700">NOVATEL GROUP</span>
+        <span class="mono" style="font-size:1.05rem;font-weight:700">CONTINENTAL FREIGHT</span>
+        <span class="mono" style="font-size:1.05rem;font-weight:700">BEACON HEALTH</span>
+        <span class="mono" style="font-size:1.05rem;font-weight:700">ARCLIGHT ENERGY</span>
+        <span class="mono" style="font-size:1.05rem;font-weight:700">VANTAGE RETAIL</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="background:var(--surface);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+    <div class="container">
+      <div class="section-head reveal-pending" data-reveal>
+        <span class="eyebrow">What We Do</span>
+        <h2>Six disciplines, one integrated platform</h2>
+        <p style="color:var(--ink-muted)">From infrastructure to intelligence — engineering capability that compounds across every engagement.</p>
+      </div>
+      <div id="home-services-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px"></div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="home-work-h2">
+    <div class="container">
+      <div class="section-head reveal-pending" data-reveal>
+        <span class="eyebrow">Selected Outcomes</span>
+        <h2 id="home-work-h2">Proof, at planetary scale</h2>
+      </div>
+      <div class="carousel" role="region" aria-roledescription="carousel" aria-label="Case study highlights">
+        <div class="carousel-track" id="home-carousel-track" tabindex="0"></div>
+        <div style="display:flex;gap:10px;margin-top:20px;justify-content:flex-end">
+          <button class="btn-icon btn-outline" id="carousel-prev" type="button" aria-label="Previous case study"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true" style="width:16px;height:16px"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button class="btn-icon btn-outline" id="carousel-next" type="button" aria-label="Next case study"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true" style="width:16px;height:16px"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="background:var(--surface);border-top:1px solid var(--line)">
+    <div class="container">
+      <div class="section-head reveal-pending" data-reveal>
+        <span class="eyebrow">How We Work</span>
+        <h2>A six-phase mission, every engagement</h2>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:16px" id="home-process-teaser"></div>
+      <div style="margin-top:32px;text-align:center">
+        <a href="#process" class="btn btn-outline">See the full methodology</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="home-cta-h2">
+    <div class="container" style="position:relative;border-radius:var(--radius-lg);border:1px solid var(--line);background:var(--surface);padding:64px 48px;text-align:center;overflow:hidden">
+      <div class="orbit-decor" aria-hidden="true"><div class="glow" style="width:500px;height:500px;background:var(--accent);top:-200px;left:50%;transform:translateX(-50%);opacity:.18"></div></div>
+      <h2 id="home-cta-h2" style="position:relative">Ready to engineer what's next?</h2>
+      <p class="lede" style="position:relative;max-width:52ch;margin:16px auto 0">Tell us where you're headed. A senior architect responds within one business day.</p>
+      <div style="position:relative;display:flex;gap:14px;justify-content:center;margin-top:28px;flex-wrap:wrap">
+        <a href="#contact" class="btn btn-primary">Talk to an Architect</a>
+        <a href="#marketplace" class="btn btn-outline">Browse the Marketplace</a>
+      </div>
+    </div>
+  </section>
+
+</section>
+<section data-route="services" aria-labelledby="services-h1">
+  <section class="section" style="padding-bottom:0">
+    <div class="container section-head">
+      <span class="eyebrow">Services</span>
+      <h1 id="services-h1">Six disciplines. One accountable partner.</h1>
+      <p class="lede">Every engagement draws on the same integrated bench — so cloud, AI, security and data decisions are made together, not in sequence.</p>
+    </div>
+  </section>
+  <section class="section" style="padding-top:40px">
+    <div class="container" style="display:grid;grid-template-columns:repeat(2,1fr);gap:24px" id="services-full-grid"></div>
+  </section>
+</section>
+<section data-route="solutions" aria-labelledby="solutions-h1">
+  <section class="section" style="padding-bottom:0">
+    <div class="container section-head">
+      <span class="eyebrow">Industry Solutions</span>
+      <h1 id="solutions-h1">Built for the physics of your industry</h1>
+      <p class="lede">Regulatory regime, latency tolerance, legacy footprint — every sector has different constraints. Our reference architectures start from yours.</p>
+    </div>
+  </section>
+  <section class="section" style="padding-top:40px">
+    <div class="container" style="display:grid;grid-template-columns:280px 1fr;gap:32px;align-items:start">
+      <div role="tablist" aria-label="Industry solutions" id="solutions-tablist" style="display:flex;flex-direction:column;gap:6px"></div>
+      <div id="solutions-panel" style="background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);padding:36px"></div>
+    </div>
+  </section>
+</section>
+<section data-route="marketplace" aria-labelledby="marketplace-h1">
+  <section class="section" style="padding-bottom:0">
+    <div class="container section-head" style="max-width:760px">
+      <span class="eyebrow">Marketplace</span>
+      <h1 id="marketplace-h1">Deployable modules, agents and kits</h1>
+      <p class="lede">Pre-built, vetted and ready to integrate into your TECHBISS environment — from automation modules to full industry solution kits.</p>
+    </div>
+  </section>
+  <section class="section" style="padding-top:24px">
+    <div class="container">
+      <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:28px">
+        <div id="marketplace-chips" style="display:flex;gap:8px;flex-wrap:wrap" role="group" aria-label="Filter by category"></div>
+        <div style="position:relative;min-width:240px">
+          <label for="marketplace-search" class="visually-hidden">Search marketplace products</label>
+          <input type="search" id="marketplace-search" placeholder="Search products, vendors…" style="width:100%;padding:11px 14px 11px 38px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink)">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" style="width:16px;height:16px;position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--ink-muted)"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.6"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </div>
+      </div>
+      <p id="marketplace-count" class="mono" style="font-size:.76rem;color:var(--ink-muted);margin-bottom:16px" aria-live="polite"></p>
+      <div id="marketplace-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:22px"></div>
+    </div>
+  </section>
+</section>
+
+<section data-route="product" aria-labelledby="product-h1">
+  <section class="section">
+    <div class="container">
+      <a href="#marketplace" class="mono" style="font-size:.78rem;color:var(--accent);display:inline-flex;align-items:center;gap:6px;margin-bottom:24px"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true" style="width:14px;height:14px"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Back to Marketplace</a>
+      <div id="product-detail" style="display:grid;grid-template-columns:1.2fr .8fr;gap:48px;align-items:start"></div>
+    </div>
+  </section>
+</section>
+
+<section data-route="work" aria-labelledby="work-h1">
+  <section class="section" style="padding-bottom:0">
+    <div class="container section-head">
+      <span class="eyebrow">Client Work</span>
+      <h1 id="work-h1">Outcomes measured in points, not adjectives</h1>
+      <p class="lede">A sample of engagements across financial services, logistics, telecommunications and healthcare.</p>
+    </div>
+  </section>
+  <section class="section" style="padding-top:32px">
+    <div class="container">
+      <div id="work-chips" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:32px" role="group" aria-label="Filter case studies by industry"></div>
+      <div id="work-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:24px"></div>
+    </div>
+  </section>
+</section>
+
+<section data-route="process" aria-labelledby="process-h1">
+  <section class="section" style="padding-bottom:0">
+    <div class="container section-head">
+      <span class="eyebrow">Methodology</span>
+      <h1 id="process-h1">Six mission phases, one predictable path</h1>
+      <p class="lede">Every engagement — regardless of scope — moves through the same disciplined sequence.</p>
+    </div>
+  </section>
+  <section class="section" style="padding-top:24px">
+    <div class="container" style="display:grid;grid-template-columns:60px 1fr;gap:8px" id="process-timeline">
+      <div style="position:relative;display:flex;justify-content:center">
+        <div style="position:absolute;top:0;bottom:0;width:2px;background:var(--line)"></div>
+        <div id="process-progress-fill" style="position:absolute;top:0;width:2px;background:linear-gradient(var(--accent),var(--accent-2));height:0%;transition:height .3s ease"></div>
+      </div>
+      <div id="process-steps" style="display:flex;flex-direction:column;gap:64px;padding-bottom:32px"></div>
+    </div>
+  </section>
+</section>
 <!--ROUTE_INSERT_POINT-->
 </main>
 
