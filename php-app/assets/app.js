@@ -722,6 +722,41 @@ function dashProjectCard(p){
     +(p.notes?'<p style="font-size:.9rem;color:var(--ink-soft);margin:0;">'+p.notes+'</p>':'')
   +'</div>';
 }
+function dashRequestFormHTML(){
+  return '<div class="card" style="margin-top:18px;">'
+    +'<div class="card-head">'+blobIcon('plus','sm',true)+'<h3>Request a new project</h3></div>'
+    +'<p class="lede" style="margin-bottom:14px;">Need a new site, app, or something added to what you already have? Tell us here and we\'ll follow up.</p>'
+    +'<form id="reqProjectForm" onsubmit="return false;">'
+      +'<div class="field"><label for="reqTitle">What do you need?</label><input id="reqTitle" required placeholder="e.g. A new online store"></div>'
+      +'<div class="field"><label for="reqDesc">Any details?</label><textarea id="reqDesc" placeholder="Optional — anything that helps us scope it."></textarea></div>'
+      +'<button class="btn btn-primary" type="submit">Send request</button>'
+      +'<p id="reqMsg" class="badge success" style="display:none;margin-top:12px;">'+ico('check')+' Request sent — we\'ll be in touch.</p>'
+      +'<p id="reqError" class="badge danger" hidden style="margin-top:12px;"></p>'
+    +'</form>'
+  +'</div>';
+}
+function wireRequestForm(){
+  var f = $('#reqProjectForm');
+  if(!f) return;
+  f.addEventListener('submit', function(){
+    var errEl = $('#reqError'), msgEl = $('#reqMsg');
+    errEl.hidden = true;
+    var btn = f.querySelector('button[type=submit]'); btn.disabled = true;
+    fetch(BP+'/api/project-request.php', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ title: $('#reqTitle').value, description: $('#reqDesc').value }) })
+      .then(function(r){ return r.json().then(function(data){ return {ok:r.ok, data:data}; }); })
+      .then(function(res){
+        btn.disabled = false;
+        if(!res.ok){ errEl.textContent = res.data.error || 'Something went wrong — please try again.'; errEl.hidden = false; return; }
+        f.reset();
+        msgEl.style.display = 'inline-flex';
+        setTimeout(function(){ msgEl.style.display='none'; }, 4000);
+      })
+      .catch(function(){
+        btn.disabled = false;
+        errEl.textContent = 'Could not reach the server — please try again.'; errEl.hidden = false;
+      });
+  });
+}
 function wireDashboard(){
   var body = $('#dashBody');
   fetch(BP+'/api/dashboard.php').then(function(r){ return r.json(); }).then(function(data){
@@ -730,11 +765,14 @@ function wireDashboard(){
       return;
     }
     if(!data.projects || !data.projects.length){
-      body.innerHTML = dashEmptyState('rocket','No projects yet','Your project will show up here once it kicks off.');
+      body.innerHTML = dashEmptyState('rocket','No projects yet','Your project will show up here once it kicks off.') + dashRequestFormHTML();
+      wireRequestForm();
       return;
     }
     body.innerHTML = data.projects.map(dashProjectCard).join('')
-      +'<div class="card" style="background:var(--grad);color:#fff2ea;border:none;"><div class="card-head">'+blobIcon('users','sm',false)+'<h3 style="color:#fff2ea;">Need something changed?</h3></div><p style="color:rgba(255,242,234,.9);">Reach out any time — we\'ll take it from there.</p><a href="'+BP+'/contact" class="btn" style="background:#fff2ea;color:var(--accent-1);">Contact us</a></div>';
+      +'<div class="card" style="background:var(--grad);color:#fff2ea;border:none;"><div class="card-head">'+blobIcon('users','sm',false)+'<h3 style="color:#fff2ea;">Need something changed?</h3></div><p style="color:rgba(255,242,234,.9);">Reach out any time — we\'ll take it from there.</p><a href="'+BP+'/contact" class="btn" style="background:#fff2ea;color:var(--accent-1);">Contact us</a></div>'
+      +dashRequestFormHTML();
+    wireRequestForm();
   }).catch(function(){
     body.innerHTML = '<p class="badge danger">Could not load your project details — please try again.</p>';
   });
@@ -1072,6 +1110,26 @@ function navigate(path){
 }
 var wipe = $('#routeWipe');
 var AUTH_USER = null;
+function syncDashboardNavLink(){
+  var inDesktop = navLinksEl.querySelector('a[data-path="/dashboard"]');
+  var inMobile = mobileNav.querySelector('a[data-path="/dashboard"]');
+  if(AUTH_USER){
+    if(!inDesktop){
+      var a = document.createElement('a');
+      a.href = BP+'/dashboard'; a.className='nav-link'; a.textContent='Dashboard'; a.dataset.path='/dashboard';
+      navLinksEl.insertBefore(a, navLinksEl.firstChild.nextSibling);
+    }
+    if(!inMobile){
+      var m = document.createElement('a');
+      m.href = BP+'/dashboard'; m.dataset.path='/dashboard';
+      m.innerHTML = 'Dashboard'+ico('arrow');
+      mobileNav.insertBefore(m, mobileNav.firstChild.nextSibling);
+    }
+  } else {
+    if(inDesktop) inDesktop.remove();
+    if(inMobile) inMobile.remove();
+  }
+}
 function refreshAuth(){
   return fetch(BP+'/api/me.php').then(function(r){ return r.ok ? r.json() : null; })
     .then(function(data){ AUTH_USER = (data && data.user) || null; return AUTH_USER; })
@@ -1092,6 +1150,7 @@ function doRender(){
   if(r.key==='/marketplace/detail'){ wireProductDetail(r.param); }
   else if(afterMap[r.key]){ afterMap[r.key](); }
   moveNavBlob(currentNavLink());
+  syncDashboardNavLink();
   var loginBtn = $('#navLoginBtn');
   var dockLogin = $('.dock-item[data-path="/login"], .dock-item[data-path="/account"]');
   if(AUTH_USER){

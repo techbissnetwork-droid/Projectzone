@@ -57,8 +57,6 @@ $staffList = $pdo->query(
      FROM staff s ORDER BY s.id"
 )->fetchAll();
 
-$sellers = $pdo->query('SELECT name, rating FROM products ORDER BY rating DESC, sort_order ASC LIMIT 5')->fetchAll();
-
 $statusTone = ['Active' => 'success', 'Trial' => 'warning', 'Past due' => 'danger'];
 $priTone = ['High' => 'danger', 'Normal' => 'warning', 'Low' => 'success'];
 ?>
@@ -152,15 +150,6 @@ $priTone = ['High' => 'danger', 'Normal' => 'warning', 'Low' => 'success'];
           <div class="avatar-blob" style="width:38px;height:38px;font-size:.75rem;"><?= e($s['initials']) ?></div>
           <div style="flex:1;"><b style="font-size:.9rem;"><?= e($s['name']) ?></b><p style="margin:0;font-size:.78rem;color:var(--ink-faint);"><?= e($s['role']) ?></p></div>
           <span style="font-size:.78rem;color:var(--ink-faint);"><?= (int)$s['open_count'] ?> open</span>
-        </div>
-        <?php endforeach; ?>
-      </div>
-      <div class="card">
-        <div class="card-head" style="justify-content:space-between;"><h3>Top marketplace sellers</h3><a href="products.php" class="card-link">Manage <?= ico('arrow') ?></a></div>
-        <?php foreach ($sellers as $p): ?>
-        <div class="flex justify-between items-center" style="padding:10px 0;border-bottom:1px solid var(--border-soft);">
-          <span style="font-size:.9rem;"><?= e($p['name']) ?></span>
-          <span class="badge"><?= ico('star') ?> <?= number_format((float)$p['rating'], 1) ?></span>
         </div>
         <?php endforeach; ?>
       </div>

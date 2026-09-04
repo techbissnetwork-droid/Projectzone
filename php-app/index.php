@@ -41,10 +41,10 @@ $contentSections = [
     'values' => content_section('values_json', $defaultContent['values']),
 ];
 
-$siteTagline = get_setting('site_tagline', 'We help offline businesses get online — building the website or app, then handling the domain, hosting, email and everything after launch.');
+$siteTagline = get_setting('site_tagline', 'TECHBISS builds the complete digital presence of your business — websites, apps, hosting, security, email, e-commerce, automation and payments.');
 
 $seoTitle = get_setting('seo_title', 'TECHBISS — Helping offline businesses go online');
-$metaDescription = get_setting('meta_description', 'TECHBISS helps offline businesses get online with a new website or app, then takes care of the domain, hosting, email and everything after launch.');
+$metaDescription = get_setting('meta_description', 'TECHBISS builds the complete digital presence of your business — websites, apps, hosting, security, email, e-commerce, automation and payments.');
 $faviconPath = get_setting('favicon_path', 'assets/favicon.ico');
 $socialImagePath = get_setting('social_image_path', 'assets/social-default.png');
 $baseUrl = defined('SITE_URL') ? rtrim(SITE_URL, '/') : '';
