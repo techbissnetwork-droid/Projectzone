@@ -1,0 +1,3275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TECHBISS — Obsidian Aerospace</title>
+<meta name="description" content="TECHBISS is the global digital transformation platform for regulated, high-consequence enterprises — core systems, data fabric, sovereign security and autonomous operations, flown on instruments across 74 countries.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<style>
+/* ============================================================
+   TECHBISS · OBSIDIAN AEROSPACE
+   Instrument-panel design system. Dark is the default world;
+   light is a warm graphite panel, not an inversion.
+   ============================================================ */
+
+:root{
+  /* --- surfaces (dark / default) --- */
+  --void:#08090B;
+  --deep:#0A0C0F;
+  --panel:#101318;
+  --panel-2:#151920;
+  --raise:#1A1F27;
+  --rule:#1E232B;
+  --rule-2:#2A313B;
+
+  /* --- ink --- */
+  --ink:#E8EBF0;
+  --ink-2:#A6ADBA;
+  --dim:#7D8492;
+  --faint:#565D6A;
+  --ghost:#333944;
+
+  /* --- accent: cockpit amber, one hue, used sparingly --- */
+  --amber:#FF8A3D;
+  --amber-ink:#FF8A3D;
+  --amber-soft:rgba(255,138,61,.14);
+  --amber-line:rgba(255,138,61,.34);
+  --amber-glow:rgba(255,138,61,.20);
+  --on-amber:#0A0C0F;
+
+  /* --- semantic telemetry (never decorative) --- */
+  --ok:#4FD1A5;
+  --warn:#FFC14D;
+  --crit:#FF5C47;
+
+  /* --- grid / atmosphere --- */
+  --grid-line:rgba(255,255,255,.045);
+  --scrim:rgba(8,9,11,.86);
+  --shade:rgba(0,0,0,.5);
+
+  /* --- type --- */
+  --display:"Space Grotesk","Helvetica Neue",Arial,sans-serif;
+  --body:"Manrope","Segoe UI",system-ui,-apple-system,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+
+  --t1:clamp(2.6rem,7.2vw,6.1rem);
+  --t2:clamp(2rem,4.4vw,3.5rem);
+  --t3:clamp(1.4rem,2.4vw,2.05rem);
+  --t4:1.12rem;
+  --tb:1rem;
+  --ts:.875rem;
+  --tm:.7rem;
+
+  /* --- rhythm --- */
+  --gut:clamp(18px,3.4vw,40px);
+  --max:1440px;
+  --hdr:66px;
+
+  --ease:cubic-bezier(.22,.61,.16,1);
+  --ease-x:cubic-bezier(.16,1,.3,1);
+  --dur:.5s;
+
+  color-scheme:dark;
+}
+
+/* Explicit light choice wins over a dark OS */
+:root[data-theme="light"],
+html:root[data-theme="light"]{
+  --void:#E9E7E1;
+  --deep:#E3E0D9;
+  --panel:#F7F6F3;
+  --panel-2:#F1EFEA;
+  --raise:#FFFFFF;
+  --rule:#D3CFC6;
+  --rule-2:#BEB9AE;
+
+  --ink:#15171B;
+  --ink-2:#3D424B;
+  --dim:#61666F;
+  --faint:#878C95;
+  --ghost:#B9BCC2;
+
+  --amber:#FF8A3D;
+  --amber-ink:#B8500C;
+  --amber-soft:rgba(184,80,12,.10);
+  --amber-line:rgba(184,80,12,.32);
+  --amber-glow:rgba(184,80,12,.16);
+  --on-amber:#FFF7F0;
+
+  --ok:#1C7F5F;
+  --warn:#8A6100;
+  --crit:#B4291A;
+
+  --grid-line:rgba(21,23,27,.055);
+  --scrim:rgba(233,231,225,.88);
+  --shade:rgba(90,84,74,.16);
+  color-scheme:light;
+}
+
+/* System-light, no explicit stamp */
+@media (prefers-color-scheme:light){
+  :root:not([data-theme="dark"]){
+    --void:#E9E7E1;
+    --deep:#E3E0D9;
+    --panel:#F7F6F3;
+    --panel-2:#F1EFEA;
+    --raise:#FFFFFF;
+    --rule:#D3CFC6;
+    --rule-2:#BEB9AE;
+    --ink:#15171B;
+    --ink-2:#3D424B;
+    --dim:#61666F;
+    --faint:#878C95;
+    --ghost:#B9BCC2;
+    --amber:#FF8A3D;
+    --amber-ink:#B8500C;
+    --amber-soft:rgba(184,80,12,.10);
+    --amber-line:rgba(184,80,12,.32);
+    --amber-glow:rgba(184,80,12,.16);
+    --on-amber:#FFF7F0;
+    --ok:#1C7F5F;
+    --warn:#8A6100;
+    --crit:#B4291A;
+    --grid-line:rgba(21,23,27,.055);
+    --scrim:rgba(233,231,225,.88);
+    --shade:rgba(90,84,74,.16);
+    color-scheme:light;
+  }
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;
+  background:var(--void);
+  color:var(--ink);
+  font-family:var(--body);
+  font-size:var(--tb);
+  line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+  transition:background-color .55s var(--ease),color .55s var(--ease);
+}
+img{max-width:100%}
+::selection{background:var(--amber);color:var(--on-amber)}
+
+h1,h2,h3,h4{font-family:var(--display);font-weight:600;letter-spacing:-.028em;line-height:1.04;margin:0;text-wrap:balance}
+p{margin:0}
+a{color:inherit;text-decoration:none}
+button,input,select,textarea{font:inherit;color:inherit}
+
+:focus-visible{outline:2px solid var(--amber-ink);outline-offset:3px}
+
+/* ---------- mono micro-labels: coordinates, designators ---------- */
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.lbl{
+  font-family:var(--mono);font-size:var(--tm);font-weight:500;
+  letter-spacing:.19em;text-transform:uppercase;color:var(--dim);
+  display:inline-flex;align-items:center;gap:.55em;
+}
+.lbl--amber{color:var(--amber-ink)}
+.lbl::before{
+  content:"";width:5px;height:5px;flex:none;
+  background:var(--amber);
+  clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);
+}
+.lbl.nomark::before{display:none}
+
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+
+/* ---------- structural shell ---------- */
+.wrap{width:100%;max-width:var(--max);margin-inline:auto;padding-inline:var(--gut)}
+.sec{position:relative;padding-block:clamp(64px,9vw,132px)}
+.sec--tight{padding-block:clamp(44px,6vw,76px)}
+.rule{height:1px;background:var(--rule);border:0;margin:0}
+
+/* Panels are defined by hairlines + corner ticks, never rounded cards */
+.panel{
+  position:relative;background:var(--panel);
+  border:1px solid var(--rule);
+  transition:border-color .4s var(--ease),background-color .4s var(--ease),transform .5s var(--ease);
+}
+.tick::before,.tick::after,
+.tick>.tk1,.tick>.tk2{
+  content:"";position:absolute;width:9px;height:9px;pointer-events:none;
+  border-color:var(--amber-line);border-style:solid;border-width:0;
+  transition:border-color .4s var(--ease);
+}
+.tick::before{top:-1px;left:-1px;border-top-width:1px;border-left-width:1px}
+.tick::after{top:-1px;right:-1px;border-top-width:1px;border-right-width:1px}
+.tick>.tk1{bottom:-1px;left:-1px;border-bottom-width:1px;border-left-width:1px}
+.tick>.tk2{bottom:-1px;right:-1px;border-bottom-width:1px;border-right-width:1px}
+
+/* ---------- ambient canvas ---------- */
+#amb{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.9}
+.veil{
+  position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:
+    radial-gradient(120% 78% at 50% -8%,transparent 38%,var(--void) 100%),
+    linear-gradient(transparent 0%,transparent 72%,var(--void) 100%);
+}
+
+/* ---------- header / nav ---------- */
+.hdr{
+  position:fixed;top:0;left:0;right:0;z-index:60;height:var(--hdr);
+  display:flex;align-items:center;
+  background:var(--scrim);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--rule);
+  transition:border-color .4s var(--ease),background-color .4s var(--ease),transform .45s var(--ease);
+}
+.hdr__in{display:flex;align-items:center;gap:clamp(14px,2.4vw,34px);width:100%;max-width:var(--max);margin-inline:auto;padding-inline:var(--gut)}
+.brand{display:flex;align-items:center;gap:10px;flex:none}
+.brand__mk{width:22px;height:22px;flex:none;color:var(--amber-ink)}
+.brand__tx{font-family:var(--display);font-weight:600;letter-spacing:.13em;font-size:.94rem}
+.brand__tx small{font-family:var(--mono);font-size:.56rem;letter-spacing:.24em;color:var(--dim);display:block;margin-top:-2px}
+
+.nav{display:flex;align-items:center;gap:2px;margin-left:auto}
+.nav a{
+  position:relative;font-family:var(--mono);font-size:.685rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--dim);padding:9px 10px;
+  transition:color .28s var(--ease);
+}
+.nav a::after{
+  content:"";position:absolute;left:10px;right:10px;bottom:2px;height:1px;
+  background:var(--amber);transform:scaleX(0);transform-origin:left;
+  transition:transform .38s var(--ease);
+}
+.nav a:hover{color:var(--ink)}
+.nav a:hover::after{transform:scaleX(1)}
+.nav a[aria-current="page"]{color:var(--amber-ink)}
+.nav a[aria-current="page"]::after{transform:scaleX(1)}
+
+.hdr__ctl{display:flex;align-items:center;gap:8px;flex:none}
+.iconbtn{
+  width:34px;height:34px;display:grid;place-items:center;flex:none;
+  background:transparent;border:1px solid var(--rule);color:var(--ink-2);
+  cursor:pointer;transition:border-color .3s var(--ease),color .3s var(--ease),background-color .3s var(--ease);
+}
+.iconbtn:hover{border-color:var(--amber-line);color:var(--amber-ink)}
+.iconbtn svg{width:15px;height:15px}
+.thm .sun{display:none}
+:root[data-theme="light"] .thm .sun{display:block}
+:root[data-theme="light"] .thm .moon{display:none}
+@media (prefers-color-scheme:light){
+  :root:not([data-theme="dark"]) .thm .sun{display:block}
+  :root:not([data-theme="dark"]) .thm .moon{display:none}
+}
+.burger{display:none}
+.burger span{display:block;width:15px;height:1px;background:currentColor;transition:transform .4s var(--ease),opacity .3s var(--ease)}
+.burger span+span{margin-top:4px}
+body.menu-open .burger span:nth-child(1){transform:translateY(5px) rotate(45deg)}
+body.menu-open .burger span:nth-child(2){opacity:0}
+body.menu-open .burger span:nth-child(3){transform:translateY(-5px) rotate(-45deg)}
+
+/* ---------- mobile drawer ---------- */
+.drawer{
+  position:fixed;inset:var(--hdr) 0 0 0;z-index:55;background:var(--deep);
+  border-top:1px solid var(--rule);
+  transform:translateY(-101%);transition:transform .55s var(--ease);
+  overflow-y:auto;padding:22px var(--gut) 48px;
+}
+body.menu-open .drawer{transform:translateY(0)}
+.drawer a{
+  display:flex;align-items:baseline;gap:14px;padding:13px 0;
+  border-bottom:1px solid var(--rule);
+  font-family:var(--display);font-size:1.42rem;font-weight:500;letter-spacing:-.02em;
+  opacity:0;transform:translateY(12px);
+}
+body.menu-open .drawer a{opacity:1;transform:none;transition:opacity .4s var(--ease) var(--d,0s),transform .5s var(--ease) var(--d,0s)}
+.drawer a span{font-family:var(--mono);font-size:.62rem;letter-spacing:.18em;color:var(--faint)}
+.drawer a[aria-current="page"]{color:var(--amber-ink)}
+
+/* ---------- crosshair cursor (desktop pointers only) ---------- */
+.cur,.cur-dot{position:fixed;top:0;left:0;z-index:200;pointer-events:none;opacity:0;will-change:transform}
+.cur{width:38px;height:38px;margin:-19px 0 0 -19px;transition:opacity .3s linear}
+.cur i{position:absolute;background:var(--amber);opacity:.85}
+.cur i:nth-child(1){left:50%;top:0;width:1px;height:9px;transform:translateX(-50%)}
+.cur i:nth-child(2){left:50%;bottom:0;width:1px;height:9px;transform:translateX(-50%)}
+.cur i:nth-child(3){top:50%;left:0;height:1px;width:9px;transform:translateY(-50%)}
+.cur i:nth-child(4){top:50%;right:0;height:1px;width:9px;transform:translateY(-50%)}
+.cur b{position:absolute;inset:11px;border:1px solid var(--amber-line);border-radius:50%}
+.cur-dot{width:3px;height:3px;margin:-1.5px 0 0 -1.5px;background:var(--amber)}
+body.cur-on{cursor:none}
+body.cur-on a,body.cur-on button,body.cur-on input,body.cur-on select,body.cur-on textarea,body.cur-on [role="button"]{cursor:none}
+body.cur-on .cur,body.cur-on .cur-dot{opacity:1}
+.cur.is-lock i{opacity:1}
+.cur.is-lock b{border-color:var(--amber)}
+
+/* ---------- intro / boot sequence ---------- */
+.boot{
+  position:fixed;inset:0;z-index:300;background:var(--void);
+  display:grid;place-items:center;
+}
+.boot__in{width:min(430px,84vw);text-align:left}
+.boot__id{font-family:var(--display);font-size:1.5rem;font-weight:600;letter-spacing:.3em;margin-bottom:20px}
+.boot__id em{font-style:normal;color:var(--amber-ink)}
+.boot__bar{height:1px;background:var(--rule);position:relative;overflow:hidden;margin-bottom:14px}
+.boot__bar i{position:absolute;inset:0;background:var(--amber);transform:scaleX(0);transform-origin:left}
+.boot__log{font-family:var(--mono);font-size:.66rem;letter-spacing:.08em;color:var(--dim);min-height:80px}
+.boot__log div{opacity:0}
+.boot__log b{color:var(--ok);font-weight:400}
+.boot__skip{
+  position:absolute;bottom:26px;right:26px;background:none;border:0;
+  font-family:var(--mono);font-size:.64rem;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--faint);cursor:pointer;
+}
+.boot__skip:hover{color:var(--amber-ink)}
+.boot__ring{position:absolute;width:min(66vmin,540px);height:min(66vmin,540px);border:1px solid var(--rule);border-radius:50%;pointer-events:none}
+.boot__ring::after{content:"";position:absolute;inset:14%;border:1px solid var(--rule);border-radius:50%}
+
+/* ---------- buttons ---------- */
+.btn{
+  position:relative;isolation:isolate;display:inline-flex;align-items:center;gap:11px;
+  padding:13px 22px;background:transparent;border:1px solid var(--rule-2);
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink);cursor:pointer;overflow:hidden;
+  transition:color .35s var(--ease),border-color .35s var(--ease);
+  will-change:transform;
+}
+.btn::before{
+  content:"";position:absolute;inset:0;background:var(--amber);
+  transform:translateY(101%);transition:transform .45s var(--ease-x);z-index:-1;
+}
+.btn>*{position:relative;z-index:1}
+.btn:hover{color:var(--on-amber);border-color:var(--amber)}
+.btn:hover::before{transform:translateY(0)}
+.btn--solid{background:var(--amber);border-color:var(--amber);color:var(--on-amber)}
+.btn--solid::before{background:var(--ink)}
+.btn--solid:hover{color:var(--void);border-color:var(--ink)}
+:root[data-theme="light"] .btn--solid:hover{color:var(--panel)}
+.btn--ghost{border-color:var(--rule)}
+.btn--sm{padding:9px 15px;font-size:.64rem}
+.btn[disabled]{opacity:.4;pointer-events:none}
+.btn__ar{width:11px;height:11px;flex:none}
+
+/* ---------- coordinate rail (persistent, desktop) ---------- */
+.rail{
+  position:fixed;left:0;top:var(--hdr);bottom:0;width:74px;z-index:40;
+  border-right:1px solid var(--rule);
+  display:none;flex-direction:column;justify-content:space-between;
+  padding:20px 0 18px;pointer-events:none;background:linear-gradient(90deg,var(--void),transparent);
+}
+.rail__t{writing-mode:vertical-rl;font-family:var(--mono);font-size:.6rem;letter-spacing:.32em;
+  text-transform:uppercase;color:var(--faint);margin-inline:auto}
+.rail__c{font-family:var(--mono);font-size:.58rem;letter-spacing:.1em;color:var(--dim);
+  text-align:center;line-height:1.9}
+.rail__c b{display:block;color:var(--amber-ink);font-weight:500}
+.rail__bar{width:1px;flex:1;margin:16px auto;background:var(--rule);position:relative}
+.rail__bar i{position:absolute;left:-2px;width:5px;height:5px;background:var(--amber);top:0;
+  clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
+
+/* ---------- page transitions ---------- */
+#view{position:relative;z-index:2;padding-top:var(--hdr);min-height:100vh}
+.pg{opacity:1}
+.pg.is-out{opacity:0;transform:translateY(-10px);transition:opacity .26s linear,transform .26s var(--ease)}
+.pg.is-in{animation:pgin .5s var(--ease) both}
+@keyframes pgin{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+
+/* ---------- reveal ---------- */
+.rv{opacity:0;transform:translateY(18px)}
+.rv.on{opacity:1;transform:none;transition:opacity .6s var(--ease) var(--d,0s),transform .7s var(--ease-x) var(--d,0s)}
+html.no-js .rv,html.reduced .rv{opacity:1;transform:none}
+
+/* ---------- page head block ---------- */
+.phd{display:grid;gap:20px;padding-block:clamp(46px,7vw,92px) clamp(26px,4vw,46px)}
+.phd__meta{display:flex;flex-wrap:wrap;gap:10px 26px;align-items:center}
+.phd h1{font-size:var(--t2)}
+.phd__lead{max-width:62ch;color:var(--ink-2);font-size:clamp(1rem,1.5vw,1.15rem)}
+.phd__co{font-family:var(--mono);font-size:.62rem;letter-spacing:.16em;color:var(--faint)}
+
+/* ---------- HOME hero ---------- */
+.hero{position:relative;padding-block:clamp(56px,8vw,104px) clamp(40px,6vw,72px)}
+.hero__grid{display:grid;gap:clamp(28px,4vw,54px)}
+.hero h1{font-size:var(--t1);letter-spacing:-.042em}
+.hero h1 .ln{display:block;overflow:hidden}
+.hero h1 .ln i{display:block;font-style:normal}
+.hero h1 em{font-style:normal;color:var(--amber-ink)}
+.hero__sub{max-width:56ch;color:var(--ink-2);font-size:clamp(1.02rem,1.7vw,1.22rem)}
+.hero__cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px}
+.hero__hud{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));
+  border-top:1px solid var(--rule);margin-top:clamp(30px,5vw,54px);
+}
+.hud{padding:20px 18px 18px;border-right:1px solid var(--rule);position:relative}
+.hud:last-child{border-right:0}
+.hud__v{font-family:var(--display);font-size:clamp(1.75rem,3.4vw,2.6rem);font-weight:600;
+  letter-spacing:-.04em;font-variant-numeric:tabular-nums;line-height:1}
+.hud__v sup{font-size:.42em;vertical-align:super;color:var(--amber-ink);margin-left:2px}
+.hud__k{font-family:var(--mono);font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--dim);margin-top:9px}
+.hud__d{font-size:.79rem;color:var(--faint);margin-top:3px;line-height:1.5}
+
+/* instrument dial in hero */
+.dial{position:relative;aspect-ratio:1;width:100%;max-width:400px;margin-inline:auto}
+.dial svg{width:100%;height:100%;overflow:visible}
+.dial__rd{position:absolute;font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;color:var(--dim)}
+.dial__rd b{color:var(--amber-ink);font-weight:500}
+
+/* ---------- flight path (pinned scroll story) ---------- */
+.flight{position:relative;height:420vh}
+.flight__vp{position:sticky;top:0;height:100vh;overflow:hidden;display:flex;align-items:center}
+.flight__track{display:flex;will-change:transform}
+.leg{flex:none;width:100vw;padding-inline:var(--gut);display:grid;align-content:center;gap:18px}
+.leg__in{width:100%;max-width:var(--max);margin-inline:auto;display:grid;gap:18px;max-width:min(var(--max),980px)}
+.leg__n{font-family:var(--mono);font-size:.66rem;letter-spacing:.24em;color:var(--amber-ink)}
+.leg h2{font-size:var(--t2)}
+.leg p{max-width:56ch;color:var(--ink-2)}
+.leg__d{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);margin-top:14px}
+.leg__d div{background:var(--void);padding:14px 15px}
+.leg__d b{display:block;font-family:var(--mono);font-size:1.16rem;color:var(--ink);font-weight:500}
+.leg__d span{font-family:var(--mono);font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+.flight__hud{position:absolute;left:var(--gut);right:var(--gut);bottom:26px;display:flex;
+  justify-content:space-between;align-items:flex-end;gap:16px;pointer-events:none}
+.flight__prog{flex:1;max-width:420px;height:1px;background:var(--rule);position:relative}
+.flight__prog i{position:absolute;inset:0;background:var(--amber);transform:scaleX(0);transform-origin:left}
+.flight__rd{font-family:var(--mono);font-size:.6rem;letter-spacing:.14em;color:var(--dim);white-space:nowrap}
+.flight__rd b{color:var(--amber-ink);font-weight:500}
+.horizon{position:absolute;left:-20%;right:-20%;top:50%;height:1px;background:var(--amber-line);opacity:.35;pointer-events:none}
+.horizon::before,.horizon::after{content:"";position:absolute;top:-4px;width:1px;height:9px;background:var(--amber-line)}
+.horizon::before{left:32%}.horizon::after{right:32%}
+
+/* ---------- generic card grid ---------- */
+.grid{display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule)}
+.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(268px,1fr))}
+.cell{background:var(--panel);padding:clamp(20px,2.4vw,30px);position:relative;overflow:hidden;
+  transition:background-color .4s var(--ease)}
+.cell:hover{background:var(--panel-2)}
+
+/* services: signature sweep reveal */
+.svc{display:grid;gap:14px;align-content:start;min-height:214px}
+.svc__id{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);
+  font-size:.62rem;letter-spacing:.16em;color:var(--faint)}
+.svc h3{font-size:var(--t4);letter-spacing:-.02em}
+.svc p{font-size:.9rem;color:var(--dim);line-height:1.6}
+.svc__more{
+  display:grid;grid-template-rows:0fr;transition:grid-template-rows .5s var(--ease-x);
+}
+.svc:hover .svc__more,.svc:focus-within .svc__more{grid-template-rows:1fr}
+.svc__more>div{overflow:hidden}
+.svc__more ul{margin:0;padding:12px 0 0;list-style:none;display:grid;gap:6px}
+.svc__more li{font-family:var(--mono);font-size:.68rem;letter-spacing:.05em;color:var(--ink-2);
+  display:flex;gap:9px;align-items:baseline}
+.svc__more li::before{content:"→";color:var(--amber-ink)}
+.svc__sweep{position:absolute;left:0;right:0;top:0;height:1px;background:var(--amber);
+  transform:scaleX(0);transform-origin:left;transition:transform .55s var(--ease-x)}
+.cell:hover .svc__sweep{transform:scaleX(1)}
+
+/* solutions */
+.sol{display:grid;gap:16px;align-content:start}
+.sol__h{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
+.sol h3{font-size:1.28rem}
+.sol__ic{width:38px;height:38px;flex:none;color:var(--amber-ink)}
+.sol p{font-size:.9rem;color:var(--dim)}
+.sol__m{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+.chipx{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;padding:4px 8px;
+  border:1px solid var(--rule-2);color:var(--dim);text-transform:uppercase}
+.sol__st{display:flex;gap:18px;border-top:1px solid var(--rule);padding-top:14px;margin-top:4px}
+.sol__st div b{display:block;font-family:var(--mono);font-size:1.05rem;color:var(--amber-ink);font-weight:500}
+.sol__st div span{font-family:var(--mono);font-size:.58rem;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+
+/* ---------- filter chips ---------- */
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-block:22px}
+.chip{
+  font-family:var(--mono);font-size:.65rem;letter-spacing:.14em;text-transform:uppercase;
+  padding:8px 14px;border:1px solid var(--rule);background:transparent;color:var(--dim);cursor:pointer;
+  transition:color .3s var(--ease),border-color .3s var(--ease),background-color .3s var(--ease);
+}
+.chip:hover{color:var(--ink);border-color:var(--rule-2)}
+.chip[aria-pressed="true"]{color:var(--on-amber);background:var(--amber);border-color:var(--amber)}
+.chip b{font-weight:400;opacity:.6;margin-left:6px}
+
+/* ---------- marketplace product cards ---------- */
+.mk{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,282px),1fr));gap:16px}
+.pc{
+  position:relative;background:var(--panel);border:1px solid var(--rule);
+  padding:20px;display:grid;gap:14px;align-content:start;text-align:left;cursor:pointer;
+  transform-style:preserve-3d;will-change:transform;
+  transition:border-color .4s var(--ease),background-color .4s var(--ease),box-shadow .4s var(--ease);
+}
+.pc:hover{border-color:var(--amber-line);box-shadow:0 22px 50px -30px var(--shade)}
+.pc__vis{position:relative;aspect-ratio:16/10;background:var(--deep);border:1px solid var(--rule);overflow:hidden}
+.pc__vis canvas{width:100%;height:100%;display:block}
+.pc__cat{position:absolute;top:8px;left:8px;font-family:var(--mono);font-size:.55rem;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--amber-ink);
+  background:var(--scrim);padding:3px 7px;border:1px solid var(--rule)}
+.pc h3{font-size:1.06rem;letter-spacing:.01em}
+.pc__tag{font-family:var(--mono);font-size:.62rem;letter-spacing:.1em;color:var(--faint);margin-top:-8px}
+.pc p{font-size:.845rem;color:var(--dim);line-height:1.58}
+.pc__ft{display:flex;justify-content:space-between;align-items:center;
+  border-top:1px solid var(--rule);padding-top:12px;margin-top:2px}
+.pc__pr{font-family:var(--mono);font-size:.8rem;color:var(--ink)}
+.pc__pr span{color:var(--faint);font-size:.62rem}
+.pc__go{font-family:var(--mono);font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--amber-ink)}
+.pc.filtered-out{display:none}
+
+/* ---------- product detail ---------- */
+.pd{display:grid;gap:clamp(24px,3vw,40px)}
+.pd__hero{display:grid;gap:clamp(20px,3vw,34px)}
+.pd__stage{position:relative;aspect-ratio:16/9;background:var(--deep);border:1px solid var(--rule)}
+.pd__stage canvas{width:100%;height:100%;display:block}
+.pd__spec{display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule)}
+.pd__spec div{background:var(--panel);padding:12px 15px;display:flex;justify-content:space-between;gap:14px}
+.pd__spec dt{font-family:var(--mono);font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+.pd__spec dd{margin:0;font-family:var(--mono);font-size:.78rem;color:var(--ink);text-align:right}
+
+.flow__steps{display:flex;flex-wrap:wrap;gap:1px;background:var(--rule);border:1px solid var(--rule)}
+.flow__steps button{
+  flex:1 1 120px;background:var(--panel);border:0;padding:13px 12px;text-align:left;cursor:pointer;
+  font-family:var(--mono);font-size:.63rem;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);
+  transition:color .3s var(--ease),background-color .3s var(--ease);
+}
+.flow__steps button[aria-selected="true"]{color:var(--amber-ink);background:var(--panel-2)}
+.flow__steps button.done{color:var(--ok)}
+.flow__steps button b{display:block;font-size:.55rem;opacity:.6;font-weight:400;margin-bottom:3px}
+.flow__body{border:1px solid var(--rule);border-top:0;background:var(--panel);padding:clamp(20px,3vw,30px);min-height:250px}
+.flow__pane{display:grid;gap:18px}
+.opt{display:grid;gap:9px}
+.opt__row{display:flex;flex-wrap:wrap;gap:8px}
+.tgl{
+  font-family:var(--mono);font-size:.65rem;letter-spacing:.1em;padding:8px 13px;cursor:pointer;
+  border:1px solid var(--rule);background:transparent;color:var(--dim);
+  transition:all .3s var(--ease);
+}
+.tgl[aria-pressed="true"]{border-color:var(--amber);color:var(--amber-ink);background:var(--amber-soft)}
+.slider{width:100%;accent-color:var(--amber)}
+.total{display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid var(--rule);padding-top:16px}
+.total b{font-family:var(--display);font-size:1.9rem;font-weight:600;font-variant-numeric:tabular-nums}
+
+/* ---------- progress + logs (installer + deploy) ---------- */
+.prog{height:2px;background:var(--rule);position:relative;overflow:hidden}
+.prog i{position:absolute;inset:0;background:var(--amber);transform:scaleX(0);transform-origin:left}
+.prog--tall{height:4px}
+.logbox{
+  background:var(--deep);border:1px solid var(--rule);padding:14px 16px;
+  font-family:var(--mono);font-size:.68rem;line-height:1.85;color:var(--dim);
+  height:190px;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;
+}
+.logbox div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.logbox .ok{color:var(--ok)}
+.logbox .wn{color:var(--warn)}
+.logbox .am{color:var(--amber-ink)}
+.logbox time{color:var(--ghost);margin-right:9px}
+
+/* ---------- work / case studies ---------- */
+.cs{display:grid;gap:0;border:1px solid var(--rule);background:var(--panel);
+  transition:background-color .4s var(--ease),border-color .4s var(--ease)}
+.cs+.cs{border-top:0}
+.cs__top{display:grid;gap:18px;padding:clamp(22px,3vw,34px);align-items:start}
+.cs__eyebrow{display:flex;flex-wrap:wrap;gap:8px 20px;align-items:center}
+.cs h3{font-size:var(--t3)}
+.cs p{color:var(--ink-2);max-width:62ch;font-size:.95rem}
+.cs__res{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:1px;
+  background:var(--rule);border-top:1px solid var(--rule)}
+.cs__res div{background:var(--panel-2);padding:18px 20px}
+.cs__res b{display:block;font-family:var(--display);font-size:clamp(1.4rem,2.5vw,1.95rem);
+  font-weight:600;letter-spacing:-.035em;font-variant-numeric:tabular-nums;line-height:1;color:var(--amber-ink)}
+.cs__res span{font-family:var(--mono);font-size:.6rem;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--faint);display:block;margin-top:8px;line-height:1.5}
+.cs__vis{position:relative;min-height:180px;border-left:1px solid var(--rule);background:var(--deep);overflow:hidden}
+.cs__vis canvas{width:100%;height:100%;display:block}
+
+/* ---------- process ---------- */
+.proc{display:grid;gap:0;position:relative}
+.phase{
+  display:grid;gap:16px;padding-block:clamp(28px,4vw,50px);
+  border-top:1px solid var(--rule);position:relative;
+}
+.phase__n{font-family:var(--mono);font-size:.66rem;letter-spacing:.22em;color:var(--amber-ink)}
+.phase h3{font-size:var(--t3)}
+.phase p{color:var(--ink-2);max-width:58ch}
+.phase__grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:18px;margin-top:6px}
+.phase__grid h4{font-family:var(--mono);font-size:.63rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--faint);font-weight:500;margin-bottom:7px}
+.phase__grid ul{margin:0;padding:0;list-style:none;display:grid;gap:5px}
+.phase__grid li{font-size:.85rem;color:var(--dim)}
+.phase__bar{position:absolute;left:0;top:0;height:1px;width:0;background:var(--amber)}
+.proc__gauge{position:sticky;top:calc(var(--hdr) + 14px);z-index:5;background:var(--scrim);
+  backdrop-filter:blur(8px);border:1px solid var(--rule);padding:12px 16px;
+  display:flex;align-items:center;gap:16px;margin-bottom:8px}
+.proc__gauge .prog{flex:1}
+.proc__gauge span{font-family:var(--mono);font-size:.62rem;letter-spacing:.14em;color:var(--dim);white-space:nowrap}
+
+/* ---------- about ---------- */
+.plx{position:relative;overflow:hidden;border:1px solid var(--rule);background:var(--deep);
+  min-height:clamp(300px,46vw,470px);display:grid;place-items:center}
+.plx__l{position:absolute;inset:-8%;will-change:transform}
+.plx__l canvas{width:100%;height:100%;display:block}
+.plx__c{position:relative;text-align:center;padding:var(--gut);max-width:640px}
+.plx__c h2{font-size:var(--t2)}
+.plx__c p{color:var(--ink-2);margin-top:14px}
+.vals{display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule)}
+.val{background:var(--panel);padding:clamp(20px,2.6vw,30px);display:grid;gap:10px;align-content:start}
+.val h3{font-size:1.1rem}
+.val p{font-size:.88rem;color:var(--dim)}
+.val__n{font-family:var(--mono);font-size:.6rem;letter-spacing:.2em;color:var(--amber-ink)}
+.pres{display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);
+  grid-template-columns:repeat(auto-fit,minmax(158px,1fr))}
+.pres div{background:var(--panel);padding:16px 18px}
+.pres b{display:block;font-family:var(--display);font-size:1.02rem;font-weight:600}
+.pres span{font-family:var(--mono);font-size:.58rem;letter-spacing:.13em;color:var(--faint);display:block;margin-top:5px}
+.pres em{font-style:normal;color:var(--ok);font-family:var(--mono);font-size:.58rem}
+
+/* ---------- resources ---------- */
+.res{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:16px}
+.rescard{
+  background:var(--panel);border:1px solid var(--rule);padding:22px;display:grid;gap:12px;
+  align-content:start;cursor:pointer;transform-style:preserve-3d;will-change:transform;
+  transition:border-color .4s var(--ease),background-color .4s var(--ease),box-shadow .4s var(--ease);
+}
+.rescard:hover{border-color:var(--amber-line);box-shadow:0 20px 44px -30px var(--shade)}
+.rescard__k{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.6rem;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
+.rescard__k b{color:var(--amber-ink);font-weight:500}
+.rescard h3{font-size:1.08rem;line-height:1.28}
+.rescard p{font-size:.855rem;color:var(--dim)}
+.rescard__f{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);
+  font-size:.62rem;color:var(--faint);border-top:1px solid var(--rule);padding-top:11px}
+.rescard__f em{font-style:normal;color:var(--amber-ink);opacity:0;transform:translateX(-6px);
+  transition:opacity .35s var(--ease),transform .35s var(--ease)}
+.rescard:hover .rescard__f em{opacity:1;transform:none}
+
+/* ---------- pricing ---------- */
+.billing{display:inline-flex;align-items:center;gap:0;border:1px solid var(--rule);background:var(--panel)}
+.billing button{background:transparent;border:0;padding:10px 18px;cursor:pointer;
+  font-family:var(--mono);font-size:.65rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);
+  transition:color .3s var(--ease)}
+.billing button[aria-pressed="true"]{color:var(--on-amber)}
+.billing{position:relative}
+.billing i{position:absolute;top:1px;bottom:1px;left:1px;background:var(--amber);z-index:0;
+  transition:transform .45s var(--ease-x),width .45s var(--ease-x)}
+.billing button{position:relative;z-index:1}
+.billing em{font-style:normal;color:var(--ok);font-size:.58rem;margin-left:7px}
+.billing button[aria-pressed="true"] em{color:var(--on-amber)}
+
+.tiers{display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,272px),1fr))}
+.tier{background:var(--panel);padding:clamp(22px,2.6vw,30px);display:grid;gap:16px;align-content:start;position:relative}
+.tier--pick{background:var(--panel-2)}
+.tier--pick::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:var(--amber)}
+.tier__badge{position:absolute;top:14px;right:16px;font-family:var(--mono);font-size:.55rem;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--amber-ink)}
+.tier h3{font-size:1.24rem}
+.tier__d{font-size:.85rem;color:var(--dim);min-height:44px}
+.tier__p{display:flex;align-items:baseline;gap:6px;border-block:1px solid var(--rule);padding-block:16px}
+.tier__p b{font-family:var(--display);font-size:clamp(1.9rem,3.4vw,2.5rem);font-weight:600;
+  letter-spacing:-.04em;font-variant-numeric:tabular-nums;line-height:1}
+.tier__p span{font-family:var(--mono);font-size:.62rem;color:var(--faint);letter-spacing:.1em}
+.tier ul{margin:0;padding:0;list-style:none;display:grid;gap:9px}
+.tier li{font-size:.85rem;color:var(--ink-2);display:flex;gap:10px;align-items:baseline;line-height:1.5}
+.tier li::before{content:"";width:5px;height:5px;flex:none;background:var(--amber);
+  clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);transform:translateY(-1px)}
+.tier li.off{color:var(--ghost)}
+.tier li.off::before{background:var(--ghost)}
+
+.cmp{width:100%;border-collapse:collapse;font-size:.85rem;min-width:620px}
+.cmp th,.cmp td{padding:12px 14px;text-align:left;border-bottom:1px solid var(--rule)}
+.cmp thead th{font-family:var(--mono);font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--faint);font-weight:500;border-bottom-color:var(--rule-2)}
+.cmp td:not(:first-child),.cmp th:not(:first-child){text-align:center;font-family:var(--mono);font-size:.78rem}
+.cmp tbody th{font-weight:500;color:var(--ink-2);font-size:.85rem;font-family:var(--body)}
+.cmp .y{color:var(--ok)}
+.cmp .n{color:var(--ghost)}
+.scrollx{overflow-x:auto;border:1px solid var(--rule);background:var(--panel)}
+
+/* ---------- forms ---------- */
+.form{display:grid;gap:18px}
+.field{display:grid;gap:7px;position:relative}
+.field label{font-family:var(--mono);font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+.field input,.field textarea,.field select{
+  width:100%;background:var(--deep);border:1px solid var(--rule);padding:12px 14px;
+  font-family:var(--mono);font-size:.85rem;color:var(--ink);
+  transition:border-color .3s var(--ease),background-color .3s var(--ease);
+}
+.field textarea{resize:vertical;min-height:120px;font-family:var(--body);font-size:.92rem;line-height:1.6}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--amber);outline:none;background:var(--panel)}
+.field input::placeholder,.field textarea::placeholder{color:var(--ghost)}
+.field .err{
+  font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;color:var(--crit);
+  max-height:0;opacity:0;overflow:hidden;transition:max-height .35s var(--ease),opacity .3s var(--ease);
+}
+.field.bad input,.field.bad textarea{border-color:var(--crit)}
+.field.bad .err{max-height:34px;opacity:1}
+.field.bad{animation:nudge .34s var(--ease)}
+.field.good input{border-color:var(--ok)}
+@keyframes nudge{0%,100%{transform:translateX(0)}22%{transform:translateX(-4px)}62%{transform:translateX(3px)}}
+.f2{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.formwrap{display:grid;gap:clamp(26px,4vw,50px)}
+.authpanel{background:var(--panel);border:1px solid var(--rule);padding:clamp(24px,3.4vw,40px);
+  max-width:440px;width:100%;position:relative}
+.authpanel h2{font-size:var(--t3);margin-bottom:6px}
+.sent{
+  border:1px solid var(--ok);background:var(--panel);padding:22px;display:grid;gap:8px;
+  font-family:var(--mono);font-size:.78rem;color:var(--ok);
+}
+.sent b{font-family:var(--display);font-size:1.2rem;color:var(--ink);letter-spacing:-.02em}
+.sent span{color:var(--dim);font-size:.72rem}
+
+/* ---------- installer ---------- */
+.stepper{display:flex;overflow-x:auto;gap:1px;background:var(--rule);border:1px solid var(--rule)}
+.stepper div{
+  flex:1 0 116px;background:var(--panel);padding:13px 14px;position:relative;
+  font-family:var(--mono);font-size:.63rem;letter-spacing:.13em;text-transform:uppercase;color:var(--faint);
+  transition:color .35s var(--ease),background-color .35s var(--ease);
+}
+.stepper div b{display:block;font-size:.55rem;opacity:.55;font-weight:400;margin-bottom:4px}
+.stepper div.now{color:var(--amber-ink);background:var(--panel-2)}
+.stepper div.now::after{content:"";position:absolute;left:0;bottom:0;height:2px;width:100%;
+  background:var(--amber);transform-origin:left;animation:swipe .6s var(--ease-x) both}
+@keyframes swipe{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.stepper div.was{color:var(--ok)}
+.installer{display:grid;gap:20px}
+.inst__body{border:1px solid var(--rule);background:var(--panel);padding:clamp(20px,3vw,30px);display:grid;gap:20px;min-height:330px}
+.inst__pane{display:grid;gap:16px}
+.detect{display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule)}
+.detect div{background:var(--deep);padding:11px 15px;display:flex;justify-content:space-between;gap:12px;
+  font-family:var(--mono);font-size:.72rem}
+.detect span:last-child{color:var(--faint)}
+.detect .ok{color:var(--ok)}
+.detect .wn{color:var(--warn)}
+.pick{display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);
+  grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+.pick button{background:var(--deep);border:0;padding:18px;text-align:left;cursor:pointer;display:grid;gap:6px;
+  transition:background-color .3s var(--ease)}
+.pick button:hover{background:var(--panel-2)}
+.pick button[aria-pressed="true"]{background:var(--panel-2);box-shadow:inset 2px 0 0 var(--amber)}
+.pick b{font-family:var(--display);font-size:1rem;font-weight:600}
+.pick span{font-family:var(--mono);font-size:.62rem;color:var(--dim);line-height:1.55}
+.inst__nav{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.inst__pct{font-family:var(--mono);font-size:.68rem;color:var(--dim);display:flex;justify-content:space-between}
+.inst__pct b{color:var(--amber-ink);font-weight:500}
+.launch{display:grid;gap:16px;place-items:center;text-align:center;padding:26px 0}
+.launch__ring{width:96px;height:96px;position:relative}
+.launch h3{font-size:var(--t3)}
+
+/* ---------- dashboard ---------- */
+.tabs{display:inline-flex;border:1px solid var(--rule);background:var(--panel);position:relative}
+.tabs button{background:transparent;border:0;padding:10px 18px;cursor:pointer;position:relative;z-index:1;
+  font-family:var(--mono);font-size:.65rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);
+  transition:color .3s var(--ease)}
+.tabs button[aria-selected="true"]{color:var(--on-amber)}
+.tabs i{position:absolute;top:1px;bottom:1px;left:1px;background:var(--amber);z-index:0;
+  transition:transform .45s var(--ease-x),width .45s var(--ease-x)}
+.kpis{display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,186px),1fr))}
+.kpi{background:var(--panel);padding:18px 20px;display:grid;gap:7px}
+.kpi__k{font-family:var(--mono);font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
+.kpi__v{font-family:var(--display);font-size:clamp(1.5rem,2.6vw,2rem);font-weight:600;
+  letter-spacing:-.038em;font-variant-numeric:tabular-nums;line-height:1}
+.kpi__t{font-family:var(--mono);font-size:.63rem;display:flex;align-items:center;gap:6px}
+.kpi__t.up{color:var(--ok)}.kpi__t.dn{color:var(--crit)}.kpi__t.fl{color:var(--dim)}
+.kpi__spark{height:26px;margin-top:2px}
+.kpi__spark svg{width:100%;height:100%;overflow:visible}
+
+.dashgrid{display:grid;gap:16px;grid-template-columns:1fr}
+.card{background:var(--panel);border:1px solid var(--rule)}
+.card__h{display:flex;justify-content:space-between;align-items:center;gap:14px;
+  padding:14px 18px;border-bottom:1px solid var(--rule)}
+.card__h h3{font-size:.98rem}
+.card__b{padding:18px}
+.chart{width:100%;height:230px;display:block;overflow:visible}
+.chart .gl{stroke:var(--rule);stroke-width:1}
+.chart .ax{fill:var(--faint);font-family:var(--mono);font-size:9px;letter-spacing:.08em}
+.chart .ln{fill:none;stroke:var(--amber);stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round}
+.chart .ln2{fill:none;stroke:var(--dim);stroke-width:1.2;stroke-dasharray:3 3}
+.chart .ar{fill:var(--amber-glow)}
+.chart .pt{fill:var(--amber)}
+.dtable{width:100%;border-collapse:collapse;font-size:.83rem;min-width:560px}
+.dtable th,.dtable td{padding:11px 16px;text-align:left;border-bottom:1px solid var(--rule);white-space:nowrap}
+.dtable thead th{font-family:var(--mono);font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--faint);font-weight:500}
+.dtable tbody tr{transition:background-color .25s var(--ease)}
+.dtable tbody tr:hover{background:var(--panel-2)}
+.dtable td.n{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.pill{font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;
+  padding:3px 9px;border:1px solid currentColor;display:inline-block}
+.pill--ok{color:var(--ok)}.pill--wn{color:var(--warn)}.pill--cr{color:var(--crit)}.pill--nu{color:var(--dim)}
+.bars{display:grid;gap:11px}
+.bar{display:grid;grid-template-columns:98px 1fr 54px;gap:12px;align-items:center;
+  font-family:var(--mono);font-size:.68rem;color:var(--dim)}
+.bar__t{height:6px;background:var(--deep);position:relative;overflow:hidden}
+.bar__t i{position:absolute;inset:0;background:var(--amber);transform:scaleX(0);transform-origin:left;
+  transition:transform 1.1s var(--ease-x)}
+.bar__t i.alt{background:var(--dim)}
+.bar b{text-align:right;color:var(--ink);font-weight:500}
+
+/* ---------- CTA + footer ---------- */
+.cta{border:1px solid var(--rule);background:var(--panel);padding:clamp(30px,5vw,66px);
+  display:grid;gap:20px;position:relative;overflow:hidden}
+.cta h2{font-size:var(--t2)}
+.cta p{max-width:52ch;color:var(--ink-2)}
+.ftr{border-top:1px solid var(--rule);margin-top:clamp(50px,7vw,100px);padding-block:44px 34px;
+  position:relative;z-index:2;background:var(--void)}
+.ftr__grid{display:grid;gap:30px;grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+.ftr h4{font-family:var(--mono);font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--faint);font-weight:500;margin-bottom:12px}
+.ftr ul{margin:0;padding:0;list-style:none;display:grid;gap:8px}
+.ftr li a{font-size:.85rem;color:var(--dim);transition:color .3s var(--ease)}
+.ftr li a:hover{color:var(--amber-ink)}
+.ftr__b{display:flex;flex-wrap:wrap;gap:12px 26px;justify-content:space-between;align-items:center;
+  border-top:1px solid var(--rule);margin-top:34px;padding-top:20px;
+  font-family:var(--mono);font-size:.62rem;letter-spacing:.1em;color:var(--faint)}
+.ftr__b .live{display:inline-flex;align-items:center;gap:7px;color:var(--ok)}
+.ftr__b .live i{width:5px;height:5px;background:var(--ok);border-radius:50%;animation:pulse 2.4s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+
+/* ---------- responsive ---------- */
+@media (min-width:700px){
+  .hero__grid{grid-template-columns:1.15fr .85fr;align-items:center}
+  .cs__top{grid-template-columns:1fr;}
+  .phd{grid-template-columns:1fr}
+}
+@media (min-width:1024px){
+  .rail{display:flex}
+  body{padding-left:74px}
+  .hdr{left:74px}
+  .leg{width:calc(100vw - 74px)}
+  .hdr__in{padding-left:calc(var(--gut))}
+  .flight__vp{margin-left:0}
+  .cs{grid-template-columns:1.55fr .95fr}
+  .cs__top{grid-column:1;grid-row:1}
+  .cs__res{grid-column:1;grid-row:2;border-top:1px solid var(--rule)}
+  .cs__vis{grid-column:2;grid-row:1 / span 2}
+  .dashgrid{grid-template-columns:1.6fr 1fr}
+  .pd__hero{grid-template-columns:1.4fr 1fr}
+  .plx{min-height:470px}
+}
+@media (max-width:900px){
+  .nav{display:none}
+  .burger{display:grid;place-items:center}
+}
+@media (max-width:1023px){
+  .leg{width:100vw}
+}
+@media (max-width:480px){
+  :root{--hdr:60px}
+  .brand__tx{font-size:.86rem}
+  .hud{border-right:0;border-bottom:1px solid var(--rule)}
+  .hero__hud{grid-template-columns:1fr 1fr}
+  .hud:nth-child(odd){border-right:1px solid var(--rule)}
+}
+
+/* ---------- reduced motion ---------- */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.01ms!important;animation-iteration-count:1!important;
+    transition-duration:.12s!important;scroll-behavior:auto!important;
+  }
+  .rv{opacity:1!important;transform:none!important}
+  .flight{height:auto}
+  .flight__vp{position:static;height:auto;display:block}
+  .flight__track{display:grid;transform:none!important}
+  .leg{width:100%;padding-block:40px;border-top:1px solid var(--rule)}
+  .horizon,#amb{display:none}
+}
+</style>
+</head>
+<body>
+
+<canvas id="amb" aria-hidden="true"></canvas>
+<div class="veil" aria-hidden="true"></div>
+
+<div class="cur" id="cur" aria-hidden="true"><i></i><i></i><i></i><i></i><b></b></div>
+<div class="cur-dot" id="curdot" aria-hidden="true"></div>
+
+<div class="boot" id="boot" role="status" aria-label="System initialising">
+  <div class="boot__ring" aria-hidden="true"></div>
+  <div class="boot__in">
+    <div class="boot__id">TECH<em>BISS</em></div>
+    <div class="boot__bar"><i id="bootbar"></i></div>
+    <div class="boot__log" id="bootlog"></div>
+  </div>
+  <button class="boot__skip" id="bootskip" type="button">Skip sequence</button>
+</div>
+
+<aside class="rail" aria-hidden="true">
+  <div class="rail__t">TECHBISS · Global Operations</div>
+  <div class="rail__bar"><i id="railmark"></i></div>
+  <div class="rail__c" id="railco"><b>SEC 00</b>LAT 47.3769<br>LON 08.5417</div>
+</aside>
+
+<header class="hdr" id="hdr">
+  <div class="hdr__in">
+    <a class="brand" href="#/home" aria-label="TECHBISS home">
+      <svg class="brand__mk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true">
+        <path d="M12 1.6 22.4 12 12 22.4 1.6 12Z"/><path d="M12 6.6 17.4 12 12 17.4 6.6 12Z"/>
+        <path d="M12 1.6v20.8M1.6 12h20.8" stroke-width=".6"/>
+      </svg>
+      <span class="brand__tx">TECHBISS<small>OBSIDIAN CTRL</small></span>
+    </a>
+    <nav class="nav" id="nav" aria-label="Primary"></nav>
+    <div class="hdr__ctl">
+      <button class="iconbtn thm" id="themebtn" type="button" aria-label="Switch colour theme">
+        <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.8 6.8 0 0 0 10.5 10.5Z"/></svg>
+        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.6M12 19.4V22M2 12h2.6M19.4 12H22M4.9 4.9l1.9 1.9M17.2 17.2l1.9 1.9M19.1 4.9l-1.9 1.9M6.8 17.2l-1.9 1.9"/></svg>
+      </button>
+      <button class="iconbtn burger" id="burger" type="button" aria-label="Open navigation menu" aria-expanded="false" aria-controls="drawer">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<nav class="drawer" id="drawer" aria-label="Mobile"></nav>
+
+<main id="view" tabindex="-1"></main>
+
+<footer class="ftr">
+  <div class="wrap">
+    <div class="ftr__grid">
+      <div>
+        <h4>Platform</h4>
+        <ul>
+          <li><a href="#/services">Services</a></li>
+          <li><a href="#/solutions">Solutions</a></li>
+          <li><a href="#/marketplace">Marketplace</a></li>
+          <li><a href="#/installer">Installer</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Evidence</h4>
+        <ul>
+          <li><a href="#/work">Case files</a></li>
+          <li><a href="#/process">Methodology</a></li>
+          <li><a href="#/resources">Research</a></li>
+          <li><a href="#/dashboard">Control preview</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#/about">About TECHBISS</a></li>
+          <li><a href="#/pricing">Pricing</a></li>
+          <li><a href="#/contact">Contact</a></li>
+          <li><a href="#/login">Console login</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Operations centres</h4>
+        <ul>
+          <li><a href="#/about">Zurich · HQ</a></li>
+          <li><a href="#/about">Singapore · APAC</a></li>
+          <li><a href="#/about">Austin · AMER</a></li>
+          <li><a href="#/about">Nairobi · EMEA-S</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="ftr__b">
+      <span>© 2026 TECHBISS AG · Bahnhofstrasse 42, 8001 Zurich</span>
+      <span class="live"><i></i>ALL REGIONS NOMINAL · 99.997% 90-DAY</span>
+      <span>ISO 27001 · SOC 2 TYPE II · EU CRA READY</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ==========================================================
+   TECHBISS · Obsidian Aerospace — single-file SPA
+   Vanilla JS + GSAP/ScrollTrigger. No backend, no build.
+   ========================================================== */
+(function(){
+"use strict";
+
+var D=document, W=window;
+var $=function(s,r){return (r||D).querySelector(s)};
+var $$=function(s,r){return Array.prototype.slice.call((r||D).querySelectorAll(s))};
+var RM=W.matchMedia&&W.matchMedia("(prefers-reduced-motion: reduce)").matches;
+var FINE=W.matchMedia&&W.matchMedia("(hover: hover) and (pointer: fine)").matches;
+var HAS_GSAP=!!(W.gsap&&W.ScrollTrigger);
+if(HAS_GSAP){gsap.registerPlugin(ScrollTrigger);}
+D.documentElement.classList.remove("no-js");
+if(RM)D.documentElement.classList.add("reduced");
+
+var esc=function(s){return String(s).replace(/[&<>"']/g,function(c){
+  return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});};
+
+/* ---------------- routes ---------------- */
+var ROUTES=[
+  {p:"home",       t:"Home",        n:"Home"},
+  {p:"services",   t:"Services",    n:"Services"},
+  {p:"solutions",  t:"Solutions",   n:"Solutions"},
+  {p:"marketplace",t:"Marketplace", n:"Market"},
+  {p:"work",       t:"Case Files",  n:"Work"},
+  {p:"process",    t:"Method",      n:"Process"},
+  {p:"about",      t:"About",       n:"About"},
+  {p:"resources",  t:"Research",    n:"Research"},
+  {p:"pricing",    t:"Pricing",     n:"Pricing"},
+  {p:"contact",    t:"Contact",     n:"Contact"},
+  {p:"login",      t:"Console",     n:"Login"},
+  {p:"installer",  t:"Installer",   n:"Installer"},
+  {p:"dashboard",  t:"Control",     n:"Dashboard"}
+];
+
+/* ---------------- data ---------------- */
+var SERVICES=[
+  {id:"SVC-01",n:"Core Systems Replatforming",
+   d:"We lift regulated cores — banking ledgers, claims engines, dispatch and billing — off end-of-life stacks without pausing the business. Dual-run, reconcile, cut over.",
+   b:["Strangler-fig decomposition","Zero-downtime dual-run","Ledger-level reconciliation","Regulator evidence pack"]},
+  {id:"SVC-02",n:"Sovereign Cloud & Edge",
+   d:"Workload placement engineered against data-residency law, latency budgets and carbon envelopes — across 3 hyperscalers, 6 sovereign regions and on-metal edge.",
+   b:["Residency-aware scheduling","Sub-12ms edge tiers","Multi-cloud exit paths","FinOps unit economics"]},
+  {id:"SVC-03",n:"Data & Decision Engineering",
+   d:"One governed lakehouse, one semantic layer, one number that survives an audit. Then the models that act on it — with a human in the loop where it matters.",
+   b:["Contract-first data products","Lineage to source-of-truth","Model risk documentation","Drift and fairness monitors"]},
+  {id:"SVC-04",n:"Security & Assurance",
+   d:"Zero-trust identity fabric, continuous control evidence and adversary simulation, mapped to the frameworks your auditors actually cite.",
+   b:["Identity-first segmentation","Continuous control evidence","Purple-team programmes","CRA / DORA / NIS2 readiness"]},
+  {id:"SVC-05",n:"Experience Engineering",
+   d:"Interfaces for people under pressure — traders, clinicians, dispatchers, field crews. Designed for the worst ten seconds of their day, not the demo.",
+   b:["Task-time instrumentation","Design systems at scale","Accessibility to EN 301 549","Offline-capable field apps"]},
+  {id:"SVC-06",n:"Autonomous Operations",
+   d:"An operations layer that detects, diagnoses and remediates before your customers write in. SLOs with teeth and error budgets that change roadmaps.",
+   b:["SLO and error-budget policy","Automated remediation runbooks","Anomaly detection at 1s","Post-incident causal review"]},
+  {id:"SVC-07",n:"Integration Fabric",
+   d:"The connective tissue: event streams, API products and partner gateways that make 40 years of acquisitions behave like one company.",
+   b:["Event-driven backbone","API productisation","Partner onboarding in days","Legacy protocol bridging"]},
+  {id:"SVC-08",n:"Transformation Command",
+   d:"Programme leadership that carries delivery risk with you — sequencing, funding models, vendor consolidation and the uncomfortable board conversation.",
+   b:["Portfolio sequencing","Benefits realisation tracking","Vendor rationalisation","Executive war-gaming"]}
+];
+
+var SOLUTIONS=[
+  {n:"Financial Services",k:"Banking · Markets · Insurance",
+   d:"Core migration under continuous supervision, real-time payment rails, and model governance that satisfies both the regulator and the trading desk.",
+   tags:["DORA","ISO 20022","T+1"],st:[["41%","Core run cost"],["9ms","Payment decision"]]},
+  {n:"Healthcare & Life Sciences",k:"Providers · Payers · Pharma",
+   d:"Clinical data interoperability, trial-grade evidence pipelines and bedside interfaces validated with the clinicians who use them at 3am.",
+   tags:["HL7 FHIR","GxP","HIPAA"],st:[["22min","Clinician hours/shift saved"],["100%","Audit trail coverage"]]},
+  {n:"Energy & Utilities",k:"Grid · Renewables · Oil & Gas",
+   d:"Grid telemetry at edge, forecasting for volatile supply, and OT/IT convergence that does not widen the attack surface.",
+   tags:["IEC 62443","OT/IT","SCADA"],st:[["1.4s","Grid event to action"],["6.8%","Curtailment avoided"]]},
+  {n:"Public Sector & Defence",k:"National · Regional · Civic",
+   d:"Sovereign-hosted citizen platforms, accessible by law and by design, procured and delivered inside political cycles rather than across them.",
+   tags:["Sovereign","EN 301 549","Air-gap"],st:[["11wk","Service to public beta"],["94","Citizen sat. score"]]},
+  {n:"Manufacturing & Supply",k:"Industrial · Logistics · Ports",
+   d:"Digital twins tied to real sensors, plant-floor scheduling that respects physics, and supply visibility beyond tier-one.",
+   tags:["Digital twin","MES","Tier-N"],st:[["18%","OEE improvement"],["3.1x","Supply visibility depth"]]},
+  {n:"Telecommunications",k:"Carriers · Towers · Satellite",
+   d:"OSS/BSS consolidation, network slicing monetisation and churn models that act inside the retention window, not after it.",
+   tags:["5G SA","OSS/BSS","NTN"],st:[["27%","Churn reduction"],["48h","Slice to revenue"]]}
+];
+
+var PRODUCTS=[
+  {id:"orbital-core",n:"ORBITAL Core",c:"Platform",tag:"Composable enterprise core",
+   d:"Ledger-grade transactional core with a policy engine, event log and pluggable domain modules. Runs the business your monolith used to.",
+   price:48000,unit:"per environment / yr",
+   specs:[["Designator","TB-ORB-9"],["Throughput","84,000 tx/sec"],["Consistency","Strict serialisable"],["Residency","17 sovereign regions"],["Recovery","RPO 0 · RTO 42s"],["Certification","SOC 2 II · ISO 27001"]],
+   mods:["Ledger","Policy Engine","Workflow","Partner Gateway","Reporting"]},
+  {id:"signal-mesh",n:"SIGNAL Mesh",c:"Data",tag:"Event backbone",
+   d:"Exactly-once event fabric with schema contracts, replay and lineage. The nervous system between systems that were never designed to speak.",
+   price:26400,unit:"per cluster / yr",
+   specs:[["Designator","TB-SIG-4"],["Ingest","2.6M events/sec"],["Delivery","Exactly-once"],["Retention","Tiered to 7 yrs"],["Replay","Point-in-time"],["Protocols","Kafka · AMQP · MQTT"]],
+   mods:["Schema Registry","Replay","Lineage","Bridge Adapters","DLQ Console"]},
+  {id:"vector-id",n:"VECTOR ID",c:"Security",tag:"Identity & access fabric",
+   d:"Workforce, customer and machine identity in one control plane, with continuous authorisation instead of a login and a prayer.",
+   price:19800,unit:"per 10k identities / yr",
+   specs:[["Designator","TB-VEC-7"],["Auth latency","11ms p99"],["Standards","OIDC · SAML · SPIFFE"],["Assurance","AAL3 capable"],["Sessions","Continuous re-eval"],["Attestation","Hardware-backed"]],
+   mods:["Workforce SSO","CIAM","Machine Identity","Step-up Policy","Session Analytics"]},
+  {id:"atlas-lakehouse",n:"ATLAS Lakehouse",c:"Data",tag:"Governed analytical estate",
+   d:"Storage, catalogue, semantic layer and contract enforcement in one plane, so a metric means the same thing in the boardroom and the warehouse.",
+   price:34500,unit:"per 100TB / yr",
+   specs:[["Designator","TB-ATL-2"],["Format","Open table · ACID"],["Query p95","1.8s at 100TB"],["Catalogue","Automated lineage"],["Contracts","Enforced at write"],["Masking","Attribute-based"]],
+   mods:["Catalogue","Semantic Layer","Contracts","Quality Monitors","Cost Guard"]},
+  {id:"sentinel-grid",n:"SENTINEL Grid",c:"Security",tag:"Detection & response",
+   d:"Behavioural detection across cloud, endpoint and OT with automated containment paths that a human approves in one keystroke.",
+   price:41200,unit:"per estate / yr",
+   specs:[["Designator","TB-SEN-5"],["Detection","1.2s median"],["Coverage","MITRE 94% technique"],["Containment","Automated · gated"],["OT support","IEC 62443 zones"],["Retention","400 days hot"]],
+   mods:["Cloud Detection","Endpoint","OT Zones","Auto-Containment","Threat Intel"]},
+  {id:"helm-console",n:"HELM Console",c:"Operations",tag:"Operations control plane",
+   d:"One console for SLOs, deployments, incidents and error budgets, wired to the systems that can actually change the outcome.",
+   price:22600,unit:"per 50 services / yr",
+   specs:[["Designator","TB-HLM-3"],["Signal lag","900ms"],["Deploy control","Progressive · auto-rollback"],["SLO engine","Multi-window burn"],["Runbooks","Executable"],["Integrations","112 native"]],
+   mods:["SLO Engine","Deploy Control","Incident Bridge","Runbooks","Budget Policy"]},
+  {id:"prism-studio",n:"PRISM Studio",c:"Experience",tag:"Design system & content",
+   d:"A governed component library, content model and preview pipeline so 200 teams ship one brand without a committee in the middle.",
+   price:15400,unit:"per 100 editors / yr",
+   specs:[["Designator","TB-PRS-6"],["Components","340 governed"],["A11y","EN 301 549 gated"],["Preview","Branch-level"],["Locales","64 shipped"],["Token sync","Bi-directional"]],
+   mods:["Component Registry","Content Model","Token Pipeline","A11y Gate","Preview Envs"]},
+  {id:"quanta-ledger",n:"QUANTA Ledger",c:"Platform",tag:"Reconciliation engine",
+   d:"Multi-entity, multi-currency reconciliation with immutable evidence — closes the books in hours and explains every break in plain language.",
+   price:37900,unit:"per entity group / yr",
+   specs:[["Designator","TB-QNT-1"],["Match rate","99.4% automated"],["Close time","4.2 hours"],["Currencies","180"],["Evidence","Immutable · signed"],["Standards","IFRS · US GAAP"]],
+   mods:["Matching Engine","Break Analysis","Entity Graph","Close Workflow","Evidence Vault"]},
+  {id:"beacon-insight",n:"BEACON Insight",c:"Data",tag:"Decision intelligence",
+   d:"Forecasts, scenarios and alerts delivered where the decision happens — not in a dashboard nobody opens on a Tuesday.",
+   price:18700,unit:"per 250 seats / yr",
+   specs:[["Designator","TB-BCN-8"],["Forecast MAPE","4.1%"],["Refresh","Near real-time"],["Scenarios","Unlimited branches"],["Delivery","In-workflow"],["Explainability","Per-driver"]],
+   mods:["Forecasting","Scenario Studio","Alerting","Driver Explain","Embed SDK"]}
+];
+
+var CASES=[
+  {cl:"Nordvent Bank",sec:"Financial Services · Oslo",yr:"2024–2026",
+   t:"A 38-year core banking ledger retired without a single closed branch day",
+   d:"Nordvent ran a COBOL core with 41 downstream dependencies and a regulator watching the migration in near real time. We dual-ran the old and new ledgers for 214 days, reconciling 61 million accounts nightly, then cut over on a Tuesday morning with no customer notice issued.",
+   r:[["214","Days dual-run, zero breaks"],["41%","Core run cost removed"],["0","Customer-visible outages"],["9.2M","Accounts migrated"]],
+   viz:"ledger"},
+  {cl:"Meridian Health Network",sec:"Healthcare · Toronto",yr:"2025–2026",
+   t:"22 minutes returned to every clinician, every shift, across 31 hospitals",
+   d:"Charting sprawled across six systems. We built a single clinical workspace on a FHIR data product layer, instrumented real task-time in wards rather than in usability labs, and shipped to the hardest department first — emergency, on a winter weekend.",
+   r:[["22min","Returned per clinician shift"],["31","Hospitals live in 14 months"],["68%","Fewer charting errors"],["94","Clinician satisfaction"]],
+   viz:"pulse"},
+  {cl:"Kaltrix Energy",sec:"Energy · Rotterdam",yr:"2024–2025",
+   t:"Grid events answered in 1.4 seconds across 14,000 edge nodes",
+   d:"Kaltrix could see instability but could not act inside the window that mattered. We placed inference at 14,000 substation nodes with a residency-aware control plane above it, and kept OT segmentation intact throughout — the security review found no new exposed surface.",
+   r:[["1.4s","Event to automated action"],["6.8%","Curtailment avoided"],["14,000","Edge nodes under control"],["0","New OT exposures"]],
+   viz:"grid"},
+  {cl:"Aurelia Retail Group",sec:"Retail · Singapore",yr:"2025–2026",
+   t:"Nine acquired brands consolidated onto one commerce core in 11 months",
+   d:"Nine ERPs, four loyalty schemes and a peak trading window that could not move. We sequenced by revenue risk rather than by org chart, migrating the smallest brand first to prove the pattern and the largest last, three weeks after peak.",
+   r:[["11mo","Nine brands consolidated"],["3.4x","Release frequency"],["S$62M","Annualised run-rate saving"],["1","Commerce core"]],
+   viz:"flow"}
+];
+
+var PHASES=[
+  {n:"PH-01",t:"Reconnaissance",lead:"Two weeks. No slides until we have evidence.",
+   d:"We instrument what already exists before proposing what should replace it — traffic, cost, incident history, the spreadsheets people actually run the business on.",
+   a:["System and dependency survey","Cost and incident forensics","Shadow-process discovery"],
+   o:["Evidence base","Risk register","Constraint map"]},
+  {n:"PH-02",t:"Trajectory",lead:"The sequence is the strategy.",
+   d:"A migration order chosen by risk and value, not by org chart. We publish the flight plan with named decision gates and the conditions under which we would turn back.",
+   a:["Sequencing by risk-value","Funding and benefits model","Abort criteria per gate"],
+   o:["Flight plan","Benefits model","Gate definitions"]},
+  {n:"PH-03",t:"Architecture",lead:"Decisions with expiry dates.",
+   d:"Every significant choice is recorded with its assumptions and the date we will re-examine it, so the architecture ages honestly instead of ossifying.",
+   a:["Reference architecture","Decision records with review dates","Reference implementation"],
+   o:["Architecture set","ADR library","Working skeleton"]},
+  {n:"PH-04",t:"Build & Dual-Run",lead:"Old and new alive together.",
+   d:"New systems run beside the incumbent under real load, reconciling continuously. Nothing is retired on a promise — only on a matched result.",
+   a:["Parallel operation","Continuous reconciliation","Progressive traffic shift"],
+   o:["Verified parity","Reconciliation evidence","Cutover rehearsal"]},
+  {n:"PH-05",t:"Cutover",lead:"A Tuesday, deliberately.",
+   d:"We cut over when the team is rested and the rollback path is warm — never on a Friday, never over a holiday, always with the previous system still breathing.",
+   a:["Rehearsed cutover","Warm rollback","Hypercare command"],
+   o:["Live service","Rollback proof","Hypercare log"]},
+  {n:"PH-06",t:"Sustainment",lead:"We hand over the controls, not a manual.",
+   d:"Your teams take the SLOs, the runbooks and the error budget policy. We stay on the frequency for two quarters, then step back to advisory.",
+   a:["Capability transfer","SLO and budget policy","Advisory tail"],
+   o:["Owning team","Operational policy","Independence date"]}
+];
+
+var RESOURCES=[
+  {k:"Field Report",n:"RPT-114",t:"What 214 days of dual-run actually costs",
+   d:"A full accounting of parallel operation on a regulated core — infrastructure, reconciliation labour, and the two categories of cost nobody budgets for.",
+   m:"18 min read",dt:"Feb 2026"},
+  {k:"Technical Brief",n:"TB-207",t:"Residency-aware workload placement",
+   d:"A scheduler model that treats data-residency law, latency budget and carbon intensity as one constraint set rather than three arguments.",
+   m:"12 min read",dt:"Jan 2026"},
+  {k:"Playbook",n:"PB-031",t:"Cutover on a Tuesday: a rehearsal protocol",
+   d:"The nine rehearsals we run before any production cutover, what each one is designed to break, and the abort criteria for every gate.",
+   m:"Download · 42pp",dt:"Jan 2026"},
+  {k:"Research",n:"RS-088",t:"Error budgets that change roadmaps",
+   d:"Evidence from 61 client programmes on what makes an SLO policy bite — and why most error budget schemes quietly become decoration inside two quarters.",
+   m:"22 min read",dt:"Dec 2025"},
+  {k:"Field Report",n:"RPT-109",t:"Instrumenting clinician task-time in live wards",
+   d:"How we measured real task time in emergency departments without adding a single second to it, and what the data changed about our interface.",
+   m:"15 min read",dt:"Dec 2025"},
+  {k:"Technical Brief",n:"TB-198",t:"Exactly-once, honestly explained",
+   d:"What exactly-once delivery guarantees, what it does not, and the four failure modes that survive every vendor's marketing claim.",
+   m:"14 min read",dt:"Nov 2025"},
+  {k:"Playbook",n:"PB-028",t:"Vendor consolidation without a hostage crisis",
+   d:"A negotiation and exit-path sequence for reducing a 40-vendor estate to nine, including the contract clauses that decide whether it is possible.",
+   m:"Download · 36pp",dt:"Nov 2025"},
+  {k:"Research",n:"RS-081",t:"The cost of a metric that means two things",
+   d:"We traced 340 executive metrics across 12 enterprises to their sources. A third disagreed with themselves. This is what that cost.",
+   m:"19 min read",dt:"Oct 2025"}
+];
+
+var TIERS=[
+  {n:"Ascent",d:"A single business unit modernising one system with a defined end state.",
+   m:14500,y:12300,pick:false,
+   f:[["Up to 3 workloads",1],["HELM Console · 25 services",1],["Business-hours command",1],["Quarterly architecture review",1],["99.9% platform SLO",1],["Dedicated flight director",0],["Sovereign region placement",0],["Dual-run migration cover",0]]},
+  {n:"Orbit",d:"Multi-domain transformation with production dependencies and a regulator in the room.",
+   m:39800,y:33800,pick:true,badge:"Most deployed",
+   f:[["Up to 20 workloads",1],["HELM Console · 250 services",1],["24/7 command with 15-min response",1],["Monthly architecture review",1],["99.99% platform SLO",1],["Dedicated flight director",1],["Sovereign region placement",1],["Dual-run migration cover",0]]},
+  {n:"Vanguard",d:"Enterprise-wide programmes carrying delivery risk across regions and entities.",
+   m:0,y:0,pick:false,custom:"Engaged",
+   f:[["Unlimited workloads",1],["HELM Console · unlimited",1],["24/7 command with 5-min response",1],["Embedded architecture team",1],["99.997% platform SLO",1],["Dedicated flight director",1],["Sovereign region placement",1],["Dual-run migration cover",1]]}
+];
+
+var CMP=[
+  ["Governed workloads","3","20","Unlimited"],
+  ["Command response","Business hours","15 min · 24/7","5 min · 24/7"],
+  ["Platform SLO","99.9%","99.99%","99.997%"],
+  ["Sovereign placement","n","y","y"],
+  ["Dual-run migration cover","n","n","y"],
+  ["Error-budget policy design","n","y","y"],
+  ["Regulator evidence pack","n","y","y"],
+  ["Named flight director","n","y","y"],
+  ["Adversary simulation","n","2 / yr","Continuous"],
+  ["Capability transfer programme","n","y","y"]
+];
+
+var DASH={
+ admin:{
+  label:"Administrator",
+  kpis:[
+   {k:"Platform uptime · 90d",v:99.997,dec:3,suf:"%",t:"up",tv:"+0.004 vs prior",sp:[62,64,63,68,70,69,74,76,75,79,82,86]},
+   {k:"Active deployments",v:12480,dec:0,suf:"",t:"up",tv:"+412 this week",sp:[30,36,34,41,45,48,52,58,61,66,72,78]},
+   {k:"Open critical alerts",v:3,dec:0,suf:"",t:"dn",tv:"-9 vs yesterday",sp:[80,74,66,58,60,44,38,30,26,22,18,12]},
+   {k:"Error budget remaining",v:71.4,dec:1,suf:"%",t:"fl",tv:"On policy",sp:[92,88,86,84,80,78,77,75,74,73,72,71]}
+  ],
+  chart:{t:"Request volume vs error budget burn",a:"Requests · billions/day",
+   s1:[3.1,3.4,3.2,3.9,4.4,4.1,4.8,5.2,5.0,5.7,6.1,6.6,6.2,7.0,7.4],
+   s2:[2.6,2.7,2.9,3.0,3.4,3.6,3.5,3.9,4.2,4.4,4.3,4.8,5.1,5.0,5.4],
+   x:["W1","","W3","","W5","","W7","","W9","","W11","","W13","","W15"]},
+  bars:[["eu-central",92],["us-east",78],["ap-southeast",64],["sa-east",41],["af-south",28],["me-central",19]],
+  tableTitle:"Regional control status",
+  cols:["Region","Estate","Services","p99","Budget","Status"],
+  rows:[
+   ["eu-central-1","Zurich",412,"84ms","71%","ok:Nominal"],
+   ["us-east-4","Austin",386,"96ms","64%","ok:Nominal"],
+   ["ap-southeast-2","Singapore",298,"112ms","38%","wn:Watch"],
+   ["sa-east-1","São Paulo",147,"128ms","82%","ok:Nominal"],
+   ["af-south-1","Nairobi",96,"141ms","19%","cr:Burn rate"],
+   ["me-central-1","Doha",71,"104ms","88%","ok:Nominal"]
+  ]
+ },
+ client:{
+  label:"Client",
+  kpis:[
+   {k:"Programme completion",v:68.2,dec:1,suf:"%",t:"up",tv:"+4.1 this month",sp:[20,26,30,35,38,44,48,52,57,61,65,68]},
+   {k:"Benefits realised",v:24.6,dec:1,pre:"€",suf:"M",t:"up",tv:"+€2.8M in Q1",sp:[8,10,11,13,15,16,18,19,21,22,23,25]},
+   {k:"Workloads migrated",v:184,dec:0,suf:" / 271",t:"up",tv:"+19 this sprint",sp:[40,48,55,62,70,78,88,102,118,140,162,184]},
+   {k:"Open risks",v:7,dec:0,suf:"",t:"dn",tv:"-3 since review",sp:[18,17,16,14,15,13,12,11,10,9,8,7]}
+  ],
+  chart:{t:"Migration trajectory vs plan",a:"Workloads cut over",
+   s1:[6,14,22,31,44,58,70,85,98,112,128,146,161,173,184],
+   s2:[8,17,26,36,47,59,72,86,100,115,130,146,162,178,194],
+   x:["Jan","","Mar","","May","","Jul","","Sep","","Nov","","Jan","","Mar"]},
+  bars:[["Core ledger",96],["Payments",81],["Reporting",67],["Partner APIs",52],["Branch systems",34],["Archive",12]],
+  tableTitle:"Workstream status",
+  cols:["Workstream","Owner","Sprint","Progress","Gate","Status"],
+  rows:[
+   ["Ledger dual-run","H. Adeyemi","S-42","96%","PH-04","ok:On track"],
+   ["Payments ISO 20022","M. Kraus","S-42","81%","PH-04","ok:On track"],
+   ["Regulatory reporting","L. Fontaine","S-41","67%","PH-03","wn:At risk"],
+   ["Partner API estate","D. Okonjo","S-42","52%","PH-03","ok:On track"],
+   ["Branch terminal refresh","S. Varga","S-40","34%","PH-02","wn:At risk"],
+   ["Archive decommission","T. Nakamura","S-39","12%","PH-02","nu:Queued"]
+  ]
+ },
+ staff:{
+  label:"Staff",
+  kpis:[
+   {k:"Assigned tickets",v:14,dec:0,suf:"",t:"fl",tv:"2 escalated",sp:[9,11,10,13,12,14,13,15,14,16,15,14]},
+   {k:"Median resolution",v:3.8,dec:1,suf:"h",t:"dn",tv:"-1.2h vs 30d",sp:[70,66,62,58,56,50,48,44,42,40,38,36]},
+   {k:"Deploys shipped · 7d",v:37,dec:0,suf:"",t:"up",tv:"+8 vs prior week",sp:[14,18,17,22,24,21,27,29,31,30,34,37]},
+   {k:"Change failure rate",v:1.9,dec:1,suf:"%",t:"dn",tv:"Below 5% target",sp:[52,48,44,40,38,34,30,28,25,23,21,19]}
+  ],
+  chart:{t:"Deploy throughput vs change failures",a:"Deploys per day",
+   s1:[4,6,5,8,7,9,11,10,13,12,15,14,17,16,19],
+   s2:[1,1,2,1,2,1,1,2,1,1,2,1,1,1,1],
+   x:["D1","","D3","","D5","","D7","","D9","","D11","","D13","","D15"]},
+  bars:[["Incident",84],["Change",71],["Request",58],["Problem",33],["Access",26],["Advisory",15]],
+  tableTitle:"Active queue",
+  cols:["Ref","Subject","Client","Priority","Age","Status"],
+  rows:[
+   ["INC-8841","Payment gateway p99 breach","Nordvent Bank","P1","0.7h","cr:Escalated"],
+   ["CHG-2210","ORBITAL Core 9.4 rollout","Aurelia Retail","P2","4.2h","ok:In flight"],
+   ["INC-8836","Replay lag on SIGNAL Mesh","Kaltrix Energy","P2","6.1h","wn:Diagnosing"],
+   ["REQ-5514","New sovereign region · me-central","Meridian Health","P3","1.2d","ok:Approved"],
+   ["PRB-0912","Recurring auth timeout, ap-se-2","Aurelia Retail","P3","2.8d","wn:Root cause"],
+   ["ACC-3301","Console access · 14 clinicians","Meridian Health","P4","3.4d","nu:Queued"]
+  ]
+ }
+};
+
+/* ---------------- shared view fragments ---------------- */
+function pageHead(seq,kicker,title,lead,coord){
+  return '<div class="wrap"><div class="phd">'+
+    '<div class="phd__meta"><span class="lbl lbl--amber">'+esc(seq)+'</span>'+
+    '<span class="lbl nomark">'+esc(kicker)+'</span></div>'+
+    '<h1 class="rv">'+title+'</h1>'+
+    '<p class="phd__lead rv" style="--d:.08s">'+esc(lead)+'</p>'+
+    '<div class="phd__co rv" style="--d:.14s">'+esc(coord)+'</div>'+
+  '</div></div>';
+}
+function ctaBlock(){
+  return '<div class="wrap"><section class="sec sec--tight"><div class="cta tick rv">'+
+    '<i class="tk1"></i><i class="tk2"></i>'+
+    '<span class="lbl lbl--amber">Open a channel</span>'+
+    '<h2>Bring us the system nobody wants to touch.</h2>'+
+    '<p>We take on the migrations that carry real consequence — the regulated cores, the clinical estates, the grid controllers. Send the constraints, not a brief.</p>'+
+    '<div class="hero__cta"><a class="btn btn--solid" href="#/contact" data-mag>Request a survey'+arrow()+'</a>'+
+    '<a class="btn" href="#/work" data-mag>Read the case files</a></div></div></section></div>';
+}
+function arrow(){
+  return '<svg class="btn__ar" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M1 6h10M7 2l4 4-4 4"/></svg>';
+}
+
+/* ---------------- HOME ---------------- */
+function vHome(){
+  var stats=[
+    {v:74,d:0,s:"",k:"Countries served",n:"Sovereign and commercial regions under contract"},
+    {v:99.997,d:3,s:"%",k:"Platform uptime",n:"Rolling 90-day, all regions, measured externally"},
+    {v:12480,d:0,s:"",k:"Live deployments",n:"Production workloads under TECHBISS control"},
+    {v:340,d:0,s:"",k:"Enterprise clients",n:"Regulated and critical-infrastructure operators"}
+  ];
+  var hud=stats.map(function(s){
+    return '<div class="hud"><div class="hud__v"><span class="num" data-count="'+s.v+'" data-dec="'+s.d+'">0</span>'+
+      (s.s?'<sup>'+s.s+'</sup>':'')+'</div>'+
+      '<div class="hud__k">'+esc(s.k)+'</div><div class="hud__d">'+esc(s.n)+'</div></div>';
+  }).join("");
+
+  var legs=[
+    {n:"LEG 01 · ORIGIN",h:"Every transformation starts on the ground, in the evidence.",
+     p:"We begin by instrumenting what you already run — the traffic, the incident history, the spreadsheets holding the business together between the official systems. No proposal leaves our hands until it is grounded in your own telemetry.",
+     d:[["14","Days to evidence base"],["100%","Estate instrumented"],["0","Slides before data"]]},
+    {n:"LEG 02 · CLIMB",h:"The sequence is the strategy. We publish the flight plan.",
+     p:"Migration order is chosen by risk and value, never by org chart. Each gate carries named abort criteria, so the programme has a way back at every altitude — and everyone knows in advance what would trigger it.",
+     d:[["6","Decision gates"],["Risk-first","Sequencing model"],["Published","Abort criteria"]]},
+    {n:"LEG 03 · CRUISE",h:"Old and new fly together until the numbers match.",
+     p:"Nothing is retired on a promise. New systems run beside the incumbent under real production load, reconciling continuously, until parity is a measured fact rather than a project milestone.",
+     d:[["214","Days longest dual-run"],["61M","Records reconciled nightly"],["0","Unexplained breaks"]]},
+    {n:"LEG 04 · APPROACH",h:"We hand over the controls, then step off the flight deck.",
+     p:"Your teams take the SLOs, the runbooks and the error-budget policy. We stay on the frequency for two quarters of hypercare, then move to advisory — with an independence date written into the contract from day one.",
+     d:[["2","Quarters hypercare"],["Contracted","Independence date"],["340","Teams handed over"]]}
+  ];
+  var legHtml=legs.map(function(l){
+    return '<article class="leg"><div class="leg__in">'+
+      '<div class="leg__n">'+esc(l.n)+'</div><h2>'+esc(l.h)+'</h2><p>'+esc(l.p)+'</p>'+
+      '<div class="leg__d">'+l.d.map(function(x){return '<div><b>'+esc(x[0])+'</b><span>'+esc(x[1])+'</span></div>';}).join("")+'</div>'+
+    '</div></article>';
+  }).join("");
+
+  var svcPrev=SERVICES.slice(0,4).map(function(s,i){
+    return '<a class="cell svc rv" style="--d:'+(i*.06)+'s" href="#/services">'+
+      '<span class="svc__sweep"></span>'+
+      '<div class="svc__id"><span>'+esc(s.id)+'</span><span>→</span></div>'+
+      '<h3>'+esc(s.n)+'</h3><p>'+esc(s.d)+'</p></a>';
+  }).join("");
+
+  var mkPrev=PRODUCTS.slice(0,3).map(function(p,i){
+    return productCard(p,i);
+  }).join("");
+
+  return '<div class="pg">'+
+  '<section class="hero"><div class="wrap"><div class="hero__grid">'+
+    '<div class="hero__col">'+
+      '<span class="lbl lbl--amber" style="margin-bottom:22px">TECHBISS · Global digital transformation</span>'+
+      '<h1 id="heroh">'+
+        '<span class="ln"><i>Flown on</i></span>'+
+        '<span class="ln"><i><em>instruments.</em></i></span>'+
+        '<span class="ln"><i>Not on instinct.</i></span>'+
+      '</h1>'+
+      '<p class="hero__sub" style="margin-top:22px">TECHBISS rebuilds the systems that cannot fail — regulated cores, clinical estates, grid controllers, national platforms — for 340 enterprises across 74 countries. Evidence first, dual-run always, handover contracted.</p>'+
+      '<div class="hero__cta">'+
+        '<a class="btn btn--solid" href="#/contact" data-mag>Request a survey'+arrow()+'</a>'+
+        '<a class="btn" href="#/marketplace" data-mag>Enter marketplace</a>'+
+      '</div>'+
+    '</div>'+
+    '<div class="hero__col"><div class="dial" id="dial">'+
+      '<canvas id="dialc"></canvas>'+
+      '<div class="dial__rd" style="top:4%;left:0">ALT <b id="rdA">36,000</b> FT</div>'+
+      '<div class="dial__rd" style="bottom:4%;right:0;text-align:right">HDG <b id="rdH">074</b>°</div>'+
+      '<div class="dial__rd" style="bottom:4%;left:0">SYS <b style="color:var(--ok)">NOMINAL</b></div>'+
+    '</div></div>'+
+  '</div>'+
+  '<div class="hero__hud" id="herohud">'+hud+'</div>'+
+  '</div></section>'+
+
+  '<section class="flight" id="flight" aria-label="Engagement flight path">'+
+    '<div class="flight__vp">'+
+      '<div class="horizon" id="horizon" aria-hidden="true"></div>'+
+      '<div class="flight__track" id="ftrack">'+legHtml+'</div>'+
+      '<div class="flight__hud">'+
+        '<div class="flight__rd">TRAJECTORY <b id="fpct">00</b>% · <span id="fleg">LEG 01</span></div>'+
+        '<div class="flight__prog"><i id="fbar"></i></div>'+
+        '<div class="flight__rd">GS <b id="fgs">482</b> KT</div>'+
+      '</div>'+
+    '</div>'+
+  '</section>'+
+
+  '<div class="wrap"><section class="sec">'+
+    '<div class="phd__meta" style="margin-bottom:26px"><span class="lbl lbl--amber">SEC.02 · Capability</span>'+
+    '<span class="lbl nomark">Eight disciplines, one command structure</span></div>'+
+    '<div class="grid g2">'+svcPrev+'</div>'+
+    '<div style="margin-top:22px"><a class="btn btn--ghost" href="#/services" data-mag>All eight services'+arrow()+'</a></div>'+
+  '</section>'+
+
+  '<section class="sec sec--tight">'+
+    '<div class="phd__meta" style="margin-bottom:26px"><span class="lbl lbl--amber">SEC.03 · Marketplace</span>'+
+    '<span class="lbl nomark">Deployable platform products</span></div>'+
+    '<div class="mk" id="mkprev">'+mkPrev+'</div>'+
+    '<div style="margin-top:22px"><a class="btn btn--ghost" href="#/marketplace" data-mag>Browse all nine products'+arrow()+'</a></div>'+
+  '</section></div>'+
+  ctaBlock()+
+  '</div>';
+}
+
+/* ---------------- SERVICES ---------------- */
+function vServices(){
+  var cells=SERVICES.map(function(s,i){
+    return '<article class="cell svc rv" tabindex="0" style="--d:'+((i%3)*.06)+'s">'+
+      '<span class="svc__sweep"></span>'+
+      '<div class="svc__id"><span>'+esc(s.id)+'</span><span>ACTIVE</span></div>'+
+      '<h3>'+esc(s.n)+'</h3><p>'+esc(s.d)+'</p>'+
+      '<div class="svc__more"><div><ul>'+s.b.map(function(b){return '<li>'+esc(b)+'</li>';}).join("")+'</ul></div></div>'+
+    '</article>';
+  }).join("");
+  return '<div class="pg">'+
+    pageHead("SEC.01 · Services","Capability register",
+      "Eight disciplines. One command structure.",
+      "Each service is a standing capability with its own designator, its own evidence requirements and its own exit criteria. We deploy them in combination, under a single flight director, against a published sequence.",
+      "REGISTER TB-SVC · REV 2026.02 · 8 ENTRIES · HOVER OR FOCUS A CARD FOR SCOPE")+
+    '<div class="wrap"><section class="sec sec--tight"><div class="grid g3">'+cells+'</div></section></div>'+
+    ctaBlock()+'</div>';
+}
+
+/* ---------------- SOLUTIONS ---------------- */
+function vSolutions(){
+  var cells=SOLUTIONS.map(function(s,i){
+    return '<article class="cell sol rv" data-tilt style="--d:'+((i%3)*.06)+'s">'+
+      '<div class="sol__h"><div><h3>'+esc(s.n)+'</h3>'+
+      '<div class="lbl nomark" style="margin-top:8px">'+esc(s.k)+'</div></div>'+
+      sectorIcon(i)+'</div>'+
+      '<p>'+esc(s.d)+'</p>'+
+      '<div class="sol__m">'+s.tags.map(function(t){return '<span class="chipx">'+esc(t)+'</span>';}).join("")+'</div>'+
+      '<div class="sol__st">'+s.st.map(function(x){return '<div><b>'+esc(x[0])+'</b><span>'+esc(x[1])+'</span></div>';}).join("")+'</div>'+
+    '</article>';
+  }).join("");
+  return '<div class="pg">'+
+    pageHead("SEC.01 · Solutions","Sector deployments",
+      "Where the consequence of failure is not commercial.",
+      "Services are what we do. Solutions are what they become inside a sector with its own regulator, its own physics and its own definition of an acceptable Tuesday. Six sector patterns, each with a reference architecture already in production.",
+      "SECTOR PATTERNS · 6 ACTIVE · REFERENCE ARCHITECTURES AVAILABLE UNDER NDA")+
+    '<div class="wrap"><section class="sec sec--tight"><div class="grid g3">'+cells+'</div></section></div>'+
+    ctaBlock()+'</div>';
+}
+function sectorIcon(i){
+  var p=[
+   '<path d="M4 30V14l14-9 14 9v16" /><path d="M12 30V20h12v10"/><path d="M2 30h32"/>',
+   '<path d="M18 6v24M6 18h24" stroke-width="2"/><circle cx="18" cy="18" r="14"/>',
+   '<path d="M20 3 9 20h9l-3 13 12-18h-9Z"/>',
+   '<path d="M4 32V12l14-8 14 8v20"/><path d="M4 32h28M14 32V22h8v10"/>',
+   '<rect x="4" y="14" width="12" height="12"/><rect x="20" y="8" width="12" height="18"/><path d="M2 30h32"/>',
+   '<path d="M18 26a8 8 0 0 1 0-16"/><path d="M18 30a12 12 0 0 1 0-24"/><circle cx="18" cy="18" r="2.4"/><path d="M18 18h14"/>'
+  ][i%6];
+  return '<svg class="sol__ic" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true">'+p+'</svg>';
+}
+
+/* ---------------- MARKETPLACE ---------------- */
+function productCard(p,i){
+  return '<article class="pc rv" data-tilt data-pid="'+p.id+'" tabindex="0" role="link" style="--d:'+((i%3)*.06)+'s" aria-label="'+esc(p.n)+' — open product detail">'+
+    '<div class="pc__vis"><canvas class="pviz" data-viz="'+p.id+'"></canvas><span class="pc__cat">'+esc(p.c)+'</span></div>'+
+    '<h3>'+esc(p.n)+'</h3><div class="pc__tag">'+esc(p.tag)+'</div>'+
+    '<p>'+esc(p.d)+'</p>'+
+    '<div class="pc__ft"><span class="pc__pr">$'+p.price.toLocaleString("en-US")+' <span>'+esc(p.unit)+'</span></span>'+
+    '<span class="pc__go">Open →</span></div></article>';
+}
+function vMarket(){
+  var cats=["All"].concat(PRODUCTS.map(function(p){return p.c;}).filter(function(v,i,a){return a.indexOf(v)===i;}));
+  var chips=cats.map(function(c,i){
+    var n=c==="All"?PRODUCTS.length:PRODUCTS.filter(function(p){return p.c===c;}).length;
+    return '<button class="chip" type="button" data-cat="'+esc(c)+'" aria-pressed="'+(i===0)+'">'+esc(c)+'<b>'+n+'</b></button>';
+  }).join("");
+  return '<div class="pg">'+
+    pageHead("SEC.01 · Marketplace","Deployable products",
+      "Nine products. Each one already running something that matters.",
+      "Every product in the TECHBISS marketplace is extracted from a delivered programme, hardened, and given a designator. Preview it, configure it against your estate, and deploy into a sovereign region — the flow below is a live simulation of the real console.",
+      "CATALOGUE TB-MKT · 9 PRODUCTS · FILTER TO NARROW · SELECT TO OPEN DETAIL")+
+    '<div class="wrap"><section class="sec sec--tight">'+
+      '<div class="chips" id="chips" role="group" aria-label="Filter products by category">'+chips+'</div>'+
+      '<div class="mk" id="mkgrid">'+PRODUCTS.map(productCard).join("")+'</div>'+
+    '</section></div>'+ctaBlock()+'</div>';
+}
+
+/* ---------------- PRODUCT DETAIL ---------------- */
+function vProduct(id){
+  var p=null,i;
+  for(i=0;i<PRODUCTS.length;i++){if(PRODUCTS[i].id===id)p=PRODUCTS[i];}
+  if(!p){
+    return '<div class="pg">'+pageHead("ERR.404","Catalogue","Product not found.",
+      "That designator is not in the current catalogue revision. Return to the marketplace and select an active product.",
+      "CATALOGUE TB-MKT · REV 2026.02")+
+      '<div class="wrap"><a class="btn" href="#/marketplace" data-mag>Back to marketplace</a></div></div>';
+  }
+  var steps=[["01","Preview"],["02","Customize"],["03","Purchase"],["04","Deploy"]];
+  return '<div class="pg" data-pid="'+p.id+'">'+
+  '<div class="wrap"><div class="phd">'+
+    '<div class="phd__meta"><span class="lbl lbl--amber">'+esc(p.specs[0][1])+'</span>'+
+    '<span class="lbl nomark">'+esc(p.c)+' · '+esc(p.tag)+'</span>'+
+    '<a class="lbl nomark" href="#/marketplace" style="color:var(--amber-ink)">← Catalogue</a></div>'+
+    '<h1 class="rv">'+esc(p.n)+'</h1>'+
+    '<p class="phd__lead rv" style="--d:.08s">'+esc(p.d)+'</p>'+
+  '</div></div>'+
+
+  '<div class="wrap"><section class="sec sec--tight"><div class="pd">'+
+    '<div class="pd__hero">'+
+      '<div class="pd__stage tick"><i class="tk1"></i><i class="tk2"></i><canvas id="pdstage"></canvas></div>'+
+      '<dl class="pd__spec">'+p.specs.map(function(s){
+        return '<div><dt>'+esc(s[0])+'</dt><dd>'+esc(s[1])+'</dd></div>';}).join("")+'</dl>'+
+    '</div>'+
+
+    '<div class="flow">'+
+      '<div class="flow__steps" id="flowsteps" role="tablist" aria-label="Deployment flow">'+
+        steps.map(function(s,i){
+          return '<button role="tab" type="button" data-step="'+i+'" aria-selected="'+(i===0)+'">'+
+            '<b>STEP '+s[0]+'</b>'+esc(s[1])+'</button>';}).join("")+
+      '</div>'+
+      '<div class="flow__body" id="flowbody"></div>'+
+    '</div>'+
+  '</div></section></div>'+ctaBlock()+'</div>';
+}
+
+function flowPane(p,step,cfg){
+  if(step===0){
+    return '<div class="flow__pane">'+
+      '<span class="lbl lbl--amber">Preview · read-only sandbox</span>'+
+      '<h3 style="font-size:var(--t3)">What '+esc(p.n)+' does on day one</h3>'+
+      '<p style="color:var(--ink-2);max-width:60ch">A sandbox instance is provisioned against synthetic data drawn from a comparable estate. Nothing here touches your systems — it exists to let your architects break it before your procurement team commits.</p>'+
+      '<div class="detect">'+p.mods.map(function(m,i){
+        return '<div><span>MODULE · '+esc(m)+'</span><span class="ok">AVAILABLE</span></div>';}).join("")+'</div>'+
+      '<div class="inst__nav"><span class="lbl nomark">Sandbox expires 14 days after provisioning</span>'+
+      '<button class="btn btn--solid" type="button" data-go="1" data-mag>Configure for my estate'+arrow()+'</button></div>'+
+    '</div>';
+  }
+  if(step===1){
+    return '<div class="flow__pane">'+
+      '<span class="lbl lbl--amber">Customize · scope the deployment</span>'+
+      '<div class="opt"><span class="lbl nomark">Sovereign region</span>'+
+        '<div class="opt__row" id="rgnrow">'+
+        ["eu-central-1","us-east-4","ap-southeast-2","me-central-1"].map(function(r){
+          return '<button class="tgl" type="button" data-region="'+r+'" aria-pressed="'+(cfg.region===r)+'">'+r+'</button>';}).join("")+
+        '</div></div>'+
+      '<div class="opt"><label class="lbl nomark" for="seats">Environments · <b class="mono" id="seatv">'+cfg.env+'</b></label>'+
+        '<input class="slider" type="range" id="seats" min="1" max="12" value="'+cfg.env+'" aria-label="Number of environments"></div>'+
+      '<div class="opt"><span class="lbl nomark">Modules</span><div class="opt__row" id="modrow">'+
+        p.mods.map(function(m){
+          return '<button class="tgl" type="button" data-mod="'+esc(m)+'" aria-pressed="'+(cfg.mods.indexOf(m)>-1)+'">'+esc(m)+'</button>';}).join("")+
+        '</div></div>'+
+      '<div class="total"><span class="lbl nomark">Annual subscription · indicative</span>'+
+        '<b class="num" id="pricev">$0</b></div>'+
+      '<div class="inst__nav"><button class="btn btn--ghost" type="button" data-go="0" data-mag>Back to preview</button>'+
+        '<button class="btn btn--solid" type="button" data-go="2" data-mag>Review order'+arrow()+'</button></div>'+
+    '</div>';
+  }
+  if(step===2){
+    return '<div class="flow__pane">'+
+      '<span class="lbl lbl--amber">Purchase · order authorisation</span>'+
+      '<h3 style="font-size:var(--t3)">Order summary</h3>'+
+      '<dl class="pd__spec">'+
+        '<div><dt>Product</dt><dd>'+esc(p.n)+' · '+esc(p.specs[0][1])+'</dd></div>'+
+        '<div><dt>Region</dt><dd>'+esc(cfg.region)+'</dd></div>'+
+        '<div><dt>Environments</dt><dd>'+cfg.env+'</dd></div>'+
+        '<div><dt>Modules</dt><dd>'+(cfg.mods.length?esc(cfg.mods.join(" · ")):"Core only")+'</dd></div>'+
+        '<div><dt>Term</dt><dd>12 months · auto-renew</dd></div>'+
+        '<div><dt>Annual total</dt><dd id="ordtot">$0</dd></div>'+
+      '</dl>'+
+      '<p style="color:var(--dim);font-size:.85rem;max-width:58ch">This is a demonstration console. No payment instrument is collected and no charge is raised — authorising below runs a simulated provisioning sequence.</p>'+
+      '<div class="inst__nav"><button class="btn btn--ghost" type="button" data-go="1" data-mag>Adjust configuration</button>'+
+        '<button class="btn btn--solid" type="button" id="authbtn" data-mag>Authorise deployment'+arrow()+'</button></div>'+
+    '</div>';
+  }
+  return '<div class="flow__pane">'+
+    '<span class="lbl lbl--amber">Deploy · provisioning</span>'+
+    '<h3 style="font-size:var(--t3)" id="dephead">Provisioning '+esc(p.n)+' into '+esc(cfg.region)+'</h3>'+
+    '<div class="inst__pct"><span>PROGRESS</span><b><span id="deppct">0</span>%</b></div>'+
+    '<div class="prog prog--tall"><i id="depbar"></i></div>'+
+    '<div class="logbox" id="deplog" role="log" aria-live="polite"></div>'+
+    '<div id="depdone"></div>'+
+  '</div>';
+}
+
+/* ---------------- WORK ---------------- */
+function vWork(){
+  var cs=CASES.map(function(c,i){
+    return '<article class="cs rv" style="--d:'+(i*.05)+'s">'+
+      '<div class="cs__top">'+
+        '<div class="cs__eyebrow"><span class="lbl lbl--amber">CASE '+String(i+1).padStart(2,"0")+'</span>'+
+        '<span class="lbl nomark">'+esc(c.sec)+'</span><span class="lbl nomark">'+esc(c.yr)+'</span></div>'+
+        '<h3>'+esc(c.t)+'</h3><p>'+esc(c.d)+'</p>'+
+        '<div class="lbl nomark" style="color:var(--ink)">'+esc(c.cl)+'</div>'+
+      '</div>'+
+      '<div class="cs__res">'+c.r.map(function(r){
+        return '<div><b>'+esc(r[0])+'</b><span>'+esc(r[1])+'</span></div>';}).join("")+'</div>'+
+      '<div class="cs__vis"><canvas class="csviz" data-viz="'+c.viz+'"></canvas></div>'+
+    '</article>';
+  }).join("");
+  return '<div class="pg">'+
+    pageHead("SEC.01 · Case files","Delivered programmes",
+      "Four systems that could not be allowed to fail. None of them did.",
+      "We publish outcomes with the numbers our clients agreed to release, including the ones that took longer than planned. Every figure below is drawn from a signed benefits statement, not a case-study rewrite.",
+      "CASE FILES · 4 RELEASED OF 61 DELIVERED · REMAINDER UNDER NDA")+
+    '<div class="wrap"><section class="sec sec--tight">'+cs+'</section></div>'+ctaBlock()+'</div>';
+}
+
+/* ---------------- PROCESS ---------------- */
+function vProcess(){
+  var ph=PHASES.map(function(p,i){
+    return '<article class="phase rv" data-phase="'+i+'" style="--d:'+(i*.04)+'s">'+
+      '<span class="phase__bar"></span>'+
+      '<div class="phase__n">'+esc(p.n)+' · '+esc(p.lead)+'</div>'+
+      '<h3>'+esc(p.t)+'</h3><p>'+esc(p.d)+'</p>'+
+      '<div class="phase__grid">'+
+        '<div><h4>Activities</h4><ul>'+p.a.map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul></div>'+
+        '<div><h4>Artefacts released</h4><ul>'+p.o.map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul></div>'+
+      '</div>'+
+    '</article>';
+  }).join("");
+  return '<div class="pg">'+
+    pageHead("SEC.01 · Method","Engagement methodology",
+      "Six phases. Every one of them has a way back.",
+      "This is a genuine sequence — each phase depends on the artefacts released by the one before it, and each gate carries published abort criteria. That is why the phases are numbered: the order is the method, not the layout.",
+      "METHOD TB-MTH · REV 2026.01 · 6 PHASES · GATED PROGRESSION")+
+    '<div class="wrap"><section class="sec sec--tight">'+
+      '<div class="proc__gauge"><span>FLIGHT PLAN</span><div class="prog"><i id="procbar"></i></div>'+
+      '<span>PHASE <b class="mono" id="procph" style="color:var(--amber-ink)">01</b> / 06</span></div>'+
+      '<div class="proc" id="proc">'+ph+'</div>'+
+    '</section></div>'+ctaBlock()+'</div>';
+}
+
+/* ---------------- ABOUT ---------------- */
+function vAbout(){
+  var vals=[
+    {n:"V-01",t:"Evidence outranks opinion",d:"The most senior person in the room does not win the argument. The instrumentation does. We build the measurement before we build the case."},
+    {n:"V-02",t:"Never retire on a promise",d:"A system comes out of service when a reconciled result says it can, and not one day earlier — regardless of what the programme plan asserts."},
+    {n:"V-03",t:"Publish the abort criteria",d:"Every gate names the conditions under which we would turn back. A programme that cannot describe its own failure mode is not being managed."},
+    {n:"V-04",t:"Hand over the controls",d:"Our contracts carry an independence date. If your teams still need us after it, we have built the wrong thing."},
+    {n:"V-05",t:"Design for the worst ten seconds",d:"Interfaces are built for the trader mid-fault, the clinician at 3am, the dispatcher during a storm — not for the demonstration."},
+    {n:"V-06",t:"Carry the risk with you",d:"Our commercial model puts a meaningful share of fee behind delivery outcomes. If the migration slips, so does our margin."}
+  ];
+  var pres=[
+    ["Zurich","Headquarters · EMEA command","ok"],["Singapore","APAC command","ok"],
+    ["Austin","AMER command","ok"],["Nairobi","EMEA-South command","ok"],
+    ["São Paulo","LATAM operations","ok"],["Doha","Middle East operations","ok"],
+    ["Toronto","Healthcare practice","ok"],["Rotterdam","Energy & OT practice","ok"]
+  ];
+  return '<div class="pg">'+
+    pageHead("SEC.01 · About","TECHBISS AG",
+      "We were founded by people who had already broken a production core.",
+      "TECHBISS was started in Zurich in 2014 by four engineers who had between them run one catastrophic migration and two that worked. The difference between those outcomes became the methodology, and the methodology became the company.",
+      "FOUNDED 2014 · ZURICH · 2,840 STAFF · 8 OPERATIONS CENTRES · 74 COUNTRIES")+
+
+    '<div class="wrap"><section class="sec sec--tight">'+
+      '<div class="plx" id="plx">'+
+        '<div class="plx__l" data-plx="0.10"><canvas id="plx1"></canvas></div>'+
+        '<div class="plx__l" data-plx="0.24"><canvas id="plx2"></canvas></div>'+
+        '<div class="plx__c">'+
+          '<span class="lbl lbl--amber" style="justify-content:center">Mission</span>'+
+          '<h2 style="margin-top:16px">To make critical systems changeable again — without asking the public to absorb the risk.</h2>'+
+          '<p>Hospitals, grids, payment rails and national services run on software that is a generation old and increasingly unmaintainable. Replacing it is not a technology problem; it is a risk-transfer problem. We exist to take the technical share of that risk onto our own balance sheet.</p>'+
+        '</div>'+
+      '</div>'+
+    '</section>'+
+
+    '<section class="sec sec--tight">'+
+      '<div class="phd__meta" style="margin-bottom:24px"><span class="lbl lbl--amber">SEC.02 · Operating principles</span>'+
+      '<span class="lbl nomark">Six rules, enforced in contract</span></div>'+
+      '<div class="vals grid g3">'+vals.map(function(v,i){
+        return '<div class="val rv" style="--d:'+((i%3)*.06)+'s"><span class="val__n">'+esc(v.n)+'</span>'+
+        '<h3>'+esc(v.t)+'</h3><p>'+esc(v.d)+'</p></div>';}).join("")+'</div>'+
+    '</section>'+
+
+    '<section class="sec sec--tight">'+
+      '<div class="phd__meta" style="margin-bottom:24px"><span class="lbl lbl--amber">SEC.03 · Global presence</span>'+
+      '<span class="lbl nomark">Eight operations centres, follow-the-sun command</span></div>'+
+      '<div class="pres rv">'+pres.map(function(p){
+        return '<div><b>'+esc(p[0])+'</b><span>'+esc(p[1])+'</span><em>● ON WATCH</em></div>';}).join("")+'</div>'+
+    '</section></div>'+ctaBlock()+'</div>';
+}
+
+/* ---------------- RESOURCES ---------------- */
+function vResources(){
+  var cards=RESOURCES.map(function(r,i){
+    return '<article class="rescard rv" data-tilt tabindex="0" style="--d:'+((i%3)*.06)+'s">'+
+      '<div class="rescard__k"><b>'+esc(r.k)+'</b><span>'+esc(r.n)+'</span></div>'+
+      '<h3>'+esc(r.t)+'</h3><p>'+esc(r.d)+'</p>'+
+      '<div class="rescard__f"><span>'+esc(r.dt)+' · '+esc(r.m)+'</span><em>Open →</em></div>'+
+    '</article>';
+  }).join("");
+  return '<div class="pg">'+
+    pageHead("SEC.01 · Research","Field reports & playbooks",
+      "What we learned, published while it is still inconvenient.",
+      "We release the operational detail most firms keep — real dual-run costs, the rehearsal protocols, the metrics that disagreed with themselves. Written by the engineers who ran the programmes, not by a content team afterwards.",
+      "LIBRARY TB-RES · 8 OF 214 PUBLIC ITEMS SHOWN · UPDATED FEB 2026")+
+    '<div class="wrap"><section class="sec sec--tight"><div class="res">'+cards+'</div></section></div>'+
+    ctaBlock()+'</div>';
+}
+
+/* ---------------- PRICING ---------------- */
+function vPricing(){
+  var tiers=TIERS.map(function(t,i){
+    var price=t.custom?'<b>'+esc(t.custom)+'</b><span>· scoped per programme</span>'
+      :'<b><span class="num" data-price-m="'+t.m+'" data-price-y="'+t.y+'">$'+t.m.toLocaleString("en-US")+'</span></b><span class="pu">/ month</span>';
+    return '<article class="tier rv '+(t.pick?"tier--pick":"")+'" style="--d:'+(i*.07)+'s">'+
+      (t.badge?'<span class="tier__badge">'+esc(t.badge)+'</span>':'')+
+      '<h3>'+esc(t.n)+'</h3><p class="tier__d">'+esc(t.d)+'</p>'+
+      '<div class="tier__p">'+price+'</div>'+
+      '<ul>'+t.f.map(function(f){return '<li class="'+(f[1]?"":"off")+'">'+esc(f[0])+'</li>';}).join("")+'</ul>'+
+      '<a class="btn '+(t.pick?"btn--solid":"")+'" href="#/contact" data-mag>'+(t.custom?"Scope a programme":"Start with "+esc(t.n))+arrow()+'</a>'+
+    '</article>';
+  }).join("");
+  var rows=CMP.map(function(r){
+    return '<tr><th scope="row">'+esc(r[0])+'</th>'+r.slice(1).map(function(c){
+      if(c==="y")return '<td class="y">●</td>';
+      if(c==="n")return '<td class="n">—</td>';
+      return '<td>'+esc(c)+'</td>';}).join("")+'</tr>';
+  }).join("");
+  return '<div class="pg">'+
+    pageHead("SEC.01 · Pricing","Commercial model",
+      "Priced on consequence, not on seats.",
+      "Platform subscription covers the control plane, the command rota and the SLO commitment. Programme delivery is contracted separately with a share of fee held against outcomes. Annual billing removes 15%.",
+      "SCHEDULE TB-PRC · REV 2026.02 · USD · EXCLUSIVE OF LOCAL TAX")+
+    '<div class="wrap"><section class="sec sec--tight">'+
+      '<div class="billing" id="billing" role="group" aria-label="Billing period">'+
+        '<i id="billpill"></i>'+
+        '<button type="button" data-bill="m" aria-pressed="true">Monthly</button>'+
+        '<button type="button" data-bill="y" aria-pressed="false">Annual<em>−15%</em></button>'+
+      '</div>'+
+      '<div class="tiers" style="margin-top:22px">'+tiers+'</div>'+
+    '</section>'+
+    '<section class="sec sec--tight">'+
+      '<div class="phd__meta" style="margin-bottom:22px"><span class="lbl lbl--amber">SEC.02 · Comparison</span>'+
+      '<span class="lbl nomark">Line-by-line entitlement</span></div>'+
+      '<div class="scrollx rv"><table class="cmp"><thead><tr><th>Entitlement</th><th>Ascent</th><th>Orbit</th><th>Vanguard</th></tr></thead>'+
+      '<tbody>'+rows+'</tbody></table></div>'+
+    '</section></div>'+ctaBlock()+'</div>';
+}
+
+/* ---------------- CONTACT ---------------- */
+function vContact(){
+  return '<div class="pg">'+
+    pageHead("SEC.01 · Contact","Open a channel",
+      "Send us the constraints. We will send back a survey plan.",
+      "Every enquiry is read by a flight director, not a sales queue. Tell us what system is causing the problem, what regulator is watching, and what date is immovable — that is enough for us to respond with something useful.",
+      "ZURICH 47.3769°N 8.5417°E · RESPONSE WITHIN ONE BUSINESS DAY")+
+    '<div class="wrap"><section class="sec sec--tight"><div class="formwrap" style="grid-template-columns:minmax(0,1fr)">'+
+      '<form class="form" id="cform" novalidate>'+
+        '<div class="f2">'+
+          field("cname","Full name","text","Ingrid Halvorsen")+
+          field("corg","Organisation","text","Nordvent Bank")+
+        '</div>'+
+        '<div class="f2">'+
+          field("cmail","Work email","email","i.halvorsen@nordvent.no")+
+          field("crole","Role","text","Chief Technology Officer")+
+        '</div>'+
+        '<div class="field"><label for="cint">Interest</label>'+
+          '<select id="cint"><option>Core systems replatforming</option><option>Sovereign cloud &amp; edge</option>'+
+          '<option>Data &amp; decision engineering</option><option>Security &amp; assurance</option>'+
+          '<option>Marketplace product deployment</option><option>Something else entirely</option></select></div>'+
+        '<div class="field"><label for="cmsg">The constraints</label>'+
+          '<textarea id="cmsg" placeholder="Which system, which regulator, which date cannot move."></textarea>'+
+          '<span class="err" id="cmsg-e">Tell us at least 30 characters — we need something to work with.</span></div>'+
+        '<div class="inst__nav"><span class="lbl nomark">No newsletter. No sequence. One reply from a person.</span>'+
+        '<button class="btn btn--solid" type="submit" data-mag>Transmit'+arrow()+'</button></div>'+
+      '</form>'+
+      '<div id="cdone"></div>'+
+    '</div></section></div></div>';
+}
+function field(id,label,type,ph){
+  return '<div class="field"><label for="'+id+'">'+esc(label)+'</label>'+
+    '<input id="'+id+'" type="'+type+'" placeholder="'+esc(ph)+'" autocomplete="off">'+
+    '<span class="err" id="'+id+'-e"></span></div>';
+}
+
+/* ---------------- LOGIN ---------------- */
+function vLogin(){
+  return '<div class="pg">'+
+    pageHead("SEC.01 · Console","Authenticated access",
+      "TECHBISS Obsidian Control.",
+      "Operator access to the command plane. Sessions are continuously re-evaluated by VECTOR ID — a valid credential is the beginning of authorisation, not the end of it.",
+      "DEMONSTRATION CONSOLE · NO CREDENTIALS ARE TRANSMITTED OR STORED")+
+    '<div class="wrap"><section class="sec sec--tight" style="display:grid;justify-items:center">'+
+      '<div class="authpanel tick"><i class="tk1"></i><i class="tk2"></i>'+
+        '<div id="loginbox">'+
+        '<span class="lbl lbl--amber">Identify</span>'+
+        '<h2 style="margin-top:12px">Sign in to control</h2>'+
+        '<p style="color:var(--dim);font-size:.86rem;margin-bottom:22px">Any well-formed address and a password of eight characters or more will pass — this console is a demonstration.</p>'+
+        '<form class="form" id="lform" novalidate>'+
+          field("lmail","Operator email","email","operator@techbiss.com")+
+          field("lpass","Passphrase","password","••••••••••••")+
+          '<button class="btn btn--solid" type="submit" style="justify-content:center" data-mag>Authenticate'+arrow()+'</button>'+
+        '</form>'+
+        '<div class="lbl nomark" style="margin-top:18px;font-size:.6rem">Hardware key required for production estates</div>'+
+        '</div>'+
+      '</div>'+
+    '</section></div></div>';
+}
+
+/* ---------------- INSTALLER ---------------- */
+var INST_STEPS=[
+  ["01","Select"],["02","Detect"],["03","Configure"],["04","Import"],["05","Install"],["06","Verify"],["07","Launch"]
+];
+function vInstaller(){
+  return '<div class="pg">'+
+    pageHead("SEC.01 · Installer","Deployment wizard",
+      "Seven steps from empty region to live service.",
+      "The TECHBISS installer provisions a control plane, detects your existing estate, migrates configuration and verifies the result before it will hand you the keys. This is a faithful simulation of the real sequence — the timings are real, the systems are not.",
+      "INSTALLER TB-INS 9.4 · SIMULATION MODE · NO SYSTEMS ARE CONTACTED")+
+    '<div class="wrap"><section class="sec sec--tight"><div class="installer">'+
+      '<div class="stepper" id="stepper">'+INST_STEPS.map(function(s,i){
+        return '<div class="'+(i===0?"now":"")+'" data-i="'+i+'"><b>STEP '+s[0]+'</b>'+esc(s[1])+'</div>';}).join("")+'</div>'+
+      '<div class="inst__body" id="instbody"></div>'+
+    '</div></section></div></div>';
+}
+
+/* ---------------- DASHBOARD ---------------- */
+function vDashboard(){
+  return '<div class="pg">'+
+    pageHead("SEC.01 · Control","Obsidian Control preview",
+      "One console. Three vantage points on the same estate.",
+      "Administrators see the platform, clients see their programme, staff see their queue — drawn from a single telemetry stream so the numbers cannot disagree with each other. The data below is representative, not live.",
+      "PREVIEW BUILD · REPRESENTATIVE DATA · REFRESHED 04 SEP 2026 06:12 UTC")+
+    '<div class="wrap"><section class="sec sec--tight" style="display:grid;gap:18px">'+
+      '<div class="tabs" id="dtabs" role="tablist" aria-label="Dashboard role">'+
+        '<i id="dpill"></i>'+
+        '<button role="tab" type="button" data-role="admin" aria-selected="true">Administrator</button>'+
+        '<button role="tab" type="button" data-role="client" aria-selected="false">Client</button>'+
+        '<button role="tab" type="button" data-role="staff" aria-selected="false">Staff</button>'+
+      '</div>'+
+      '<div id="dpanel"></div>'+
+    '</section></div>'+ctaBlock()+'</div>';
+}
+
+/* ==========================================================
+   ENGINE
+   ========================================================== */
+var view=$("#view"), navEl=$("#nav"), drawerEl=$("#drawer");
+var teardown=[];           /* per-route cleanup */
+var rafs=[];               /* per-route rAF ids */
+function onTeardown(fn){teardown.push(fn);}
+function addRaf(id){rafs.push(id);}
+function clearRoute(){
+  teardown.forEach(function(f){try{f();}catch(e){}});
+  teardown=[];
+  rafs.forEach(function(id){cancelAnimationFrame(id);});
+  rafs=[];
+  if(HAS_GSAP){ScrollTrigger.getAll().forEach(function(t){t.kill();});}
+}
+
+/* ---------------- nav ---------------- */
+function buildNav(){
+  navEl.innerHTML=ROUTES.map(function(r){
+    return '<a href="#/'+r.p+'" data-r="'+r.p+'">'+esc(r.n)+'</a>';
+  }).join("");
+  drawerEl.innerHTML=ROUTES.map(function(r,i){
+    return '<a href="#/'+r.p+'" data-r="'+r.p+'" style="--d:'+(0.05+i*0.035)+'s">'+
+      '<span>'+String(i+1).padStart(2,"0")+'</span>'+esc(r.t)+'</a>';
+  }).join("");
+}
+function markNav(p){
+  $$("[data-r]").forEach(function(a){
+    if(a.getAttribute("data-r")===p)a.setAttribute("aria-current","page");
+    else a.removeAttribute("aria-current");
+  });
+}
+
+/* ---------------- theme ---------------- */
+var THEME_KEY="tb_theme";
+function applyTheme(t){
+  if(t)D.documentElement.setAttribute("data-theme",t);
+  else D.documentElement.removeAttribute("data-theme");
+}
+function currentTheme(){
+  var s=D.documentElement.getAttribute("data-theme");
+  if(s)return s;
+  return (W.matchMedia&&W.matchMedia("(prefers-color-scheme: light)").matches)?"light":"dark";
+}
+try{var saved=localStorage.getItem(THEME_KEY); if(saved)applyTheme(saved);}catch(e){}
+$("#themebtn").addEventListener("click",function(){
+  var next=currentTheme()==="dark"?"light":"dark";
+  applyTheme(next);
+  try{localStorage.setItem(THEME_KEY,next);}catch(e){}
+  readTokens();
+});
+
+/* token cache for canvas drawing (re-read on theme change) */
+var TOK={};
+function readTokens(){
+  var cs=getComputedStyle(D.documentElement);
+  TOK.amber=cs.getPropertyValue("--amber").trim()||"#FF8A3D";
+  TOK.rule=cs.getPropertyValue("--rule").trim()||"#1E232B";
+  TOK.dim=cs.getPropertyValue("--dim").trim()||"#7D8492";
+  TOK.ink=cs.getPropertyValue("--ink").trim()||"#E8EBF0";
+  TOK.deep=cs.getPropertyValue("--deep").trim()||"#0A0C0F";
+  TOK.grid=cs.getPropertyValue("--grid-line").trim();
+  TOK.ok=cs.getPropertyValue("--ok").trim()||"#4FD1A5";
+}
+readTokens();
+
+/* ---------------- mobile drawer ---------------- */
+var burger=$("#burger");
+function closeMenu(){
+  D.body.classList.remove("menu-open");
+  burger.setAttribute("aria-expanded","false");
+  burger.setAttribute("aria-label","Open navigation menu");
+}
+burger.addEventListener("click",function(){
+  var open=!D.body.classList.contains("menu-open");
+  D.body.classList.toggle("menu-open",open);
+  burger.setAttribute("aria-expanded",String(open));
+  burger.setAttribute("aria-label",open?"Close navigation menu":"Open navigation menu");
+});
+drawerEl.addEventListener("click",function(e){if(e.target.closest("a"))closeMenu();});
+D.addEventListener("keydown",function(e){if(e.key==="Escape")closeMenu();});
+
+/* ---------------- crosshair cursor ---------------- */
+if(FINE&&!RM){
+  var cur=$("#cur"), dot=$("#curdot");
+  var cx=innerWidth/2, cy=innerHeight/2, tx=cx, ty=cy, dx=cx, dy=cy, lock=null;
+  D.body.classList.add("cur-on");
+  D.addEventListener("mousemove",function(e){tx=e.clientX;ty=e.clientY;},{passive:true});
+  D.addEventListener("mouseover",function(e){
+    var t=e.target.closest("a,button,[role=link],[tabindex='0'],input,select,textarea");
+    lock=t||null;
+    cur.classList.toggle("is-lock",!!t);
+  },{passive:true});
+  (function loop(){
+    var ax=tx, ay=ty;
+    if(lock&&lock.isConnected){
+      var r=lock.getBoundingClientRect();
+      if(r.width<340&&r.height<200){
+        ax=tx+(r.left+r.width/2-tx)*0.34;
+        ay=ty+(r.top+r.height/2-ty)*0.34;
+      }
+    }
+    cx+=(ax-cx)*0.19; cy+=(ay-cy)*0.19;
+    dx+=(tx-dx)*0.55; dy+=(ty-dy)*0.55;
+    cur.style.transform="translate3d("+cx+"px,"+cy+"px,0)";
+    dot.style.transform="translate3d("+dx+"px,"+dy+"px,0)";
+    requestAnimationFrame(loop);
+  })();
+}
+
+/* ---------------- magnetic buttons ---------------- */
+function initMagnetic(root){
+  if(!FINE||RM)return;
+  $$("[data-mag]",root).forEach(function(el){
+    var raf=0,mx=0,my=0,px=0,py=0,on=false;
+    function tick(){
+      px+=(mx-px)*0.18; py+=(my-py)*0.18;
+      el.style.transform="translate3d("+px.toFixed(2)+"px,"+py.toFixed(2)+"px,0)";
+      if(on||Math.abs(px-mx)>0.2||Math.abs(py-my)>0.2)raf=requestAnimationFrame(tick);
+      else el.style.transform="";
+    }
+    function move(e){
+      var r=el.getBoundingClientRect();
+      mx=(e.clientX-(r.left+r.width/2))*0.28;
+      my=(e.clientY-(r.top+r.height/2))*0.34;
+      if(!raf){on=true;raf=requestAnimationFrame(tick);}
+    }
+    function leave(){on=false;mx=0;my=0;if(!raf)raf=requestAnimationFrame(tick);setTimeout(function(){raf=0;},400);}
+    el.addEventListener("mousemove",move);
+    el.addEventListener("mouseleave",leave);
+    onTeardown(function(){el.removeEventListener("mousemove",move);el.removeEventListener("mouseleave",leave);});
+  });
+}
+
+/* ---------------- card tilt ---------------- */
+function initTilt(root){
+  if(!FINE||RM)return;
+  $$("[data-tilt]",root).forEach(function(el){
+    function move(e){
+      var r=el.getBoundingClientRect();
+      var px=(e.clientX-r.left)/r.width-0.5;
+      var py=(e.clientY-r.top)/r.height-0.5;
+      el.style.transform="perspective(900px) rotateX("+(-py*5).toFixed(2)+"deg) rotateY("+(px*6).toFixed(2)+"deg) translateZ(6px)";
+    }
+    function enter(){el.style.transition="transform .08s linear";}
+    function leave(){el.style.transition="";el.style.transform="";}
+    el.addEventListener("mouseenter",enter);
+    el.addEventListener("mousemove",move);
+    el.addEventListener("mouseleave",leave);
+    onTeardown(function(){el.removeEventListener("mouseenter",enter);el.removeEventListener("mousemove",move);el.removeEventListener("mouseleave",leave);leave();});
+  });
+}
+
+/* ---------------- reveals ---------------- */
+function initReveal(root){
+  var items=$$(".rv",root);
+  if(RM||!("IntersectionObserver" in W)){items.forEach(function(e){e.classList.add("on");});return;}
+  var io=new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if(en.isIntersecting){en.target.classList.add("on");io.unobserve(en.target);}
+    });
+  },{rootMargin:"0px 0px -8% 0px",threshold:0.08});
+  items.forEach(function(e){io.observe(e);});
+  /* failsafe: nothing stays hidden */
+  var fs=setTimeout(function(){items.forEach(function(e){e.classList.add("on");});},2200);
+  onTeardown(function(){io.disconnect();clearTimeout(fs);});
+}
+
+/* ---------------- counters ---------------- */
+function easeOutExpo(t){return t===1?1:1-Math.pow(2,-10*t);}
+function countUp(el,to,dec,dur){
+  dur=dur||(RM?280:1500);
+  var from=0,t0=null;
+  function fmt(v){
+    return v.toLocaleString("en-US",{minimumFractionDigits:dec,maximumFractionDigits:dec});
+  }
+  function step(ts){
+    if(!t0)t0=ts;
+    var p=Math.min((ts-t0)/dur,1);
+    el.textContent=fmt(from+(to-from)*easeOutExpo(p));
+    if(p<1)addRaf(requestAnimationFrame(step));
+  }
+  addRaf(requestAnimationFrame(step));
+}
+function initCounters(root){
+  var els=$$("[data-count]",root);
+  if(!els.length)return;
+  if(!("IntersectionObserver" in W)){
+    els.forEach(function(e){countUp(e,parseFloat(e.dataset.count),parseInt(e.dataset.dec||0,10));});
+    return;
+  }
+  var io=new IntersectionObserver(function(en){
+    en.forEach(function(x){
+      if(x.isIntersecting){
+        countUp(x.target,parseFloat(x.target.dataset.count),parseInt(x.target.dataset.dec||0,10));
+        io.unobserve(x.target);
+      }
+    });
+  },{threshold:0.4});
+  els.forEach(function(e){io.observe(e);});
+  onTeardown(function(){io.disconnect();});
+}
+
+/* ---------------- canvas helper ---------------- */
+function fit(cv){
+  var r=cv.getBoundingClientRect();
+  var dpr=Math.min(W.devicePixelRatio||1,2);
+  cv.width=Math.max(1,Math.round(r.width*dpr));
+  cv.height=Math.max(1,Math.round(r.height*dpr));
+  var ctx=cv.getContext("2d");
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  return {ctx:ctx,w:r.width,h:r.height};
+}
+
+/* ---------------- ambient background ---------------- */
+(function ambient(){
+  var cv=$("#amb"), ctx=cv.getContext("2d");
+  var w=0,h=0,dpr=1,t=0,paused=false,raf=0;
+  var motes=[];
+  function resize(){
+    dpr=Math.min(W.devicePixelRatio||1,2);
+    w=innerWidth;h=innerHeight;
+    cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    motes=[];
+    var n=Math.min(38,Math.round(w*h/42000));
+    for(var i=0;i<n;i++)motes.push({
+      x:Math.random()*w,y:Math.random()*h,
+      v:0.06+Math.random()*0.22,r:Math.random()*1.1+0.3,a:0.08+Math.random()*0.2
+    });
+  }
+  function grid(){
+    var step=w<600?58:92;
+    ctx.lineWidth=1;
+    ctx.strokeStyle=TOK.grid||"rgba(255,255,255,.045)";
+    var off=(t*0.16)%step;
+    ctx.beginPath();
+    for(var x=-step+off;x<w+step;x+=step){ctx.moveTo(Math.round(x)+.5,0);ctx.lineTo(Math.round(x)+.5,h);}
+    for(var y=-step+off;y<h+step;y+=step){ctx.moveTo(0,Math.round(y)+.5);ctx.lineTo(w,Math.round(y)+.5);}
+    ctx.stroke();
+  }
+  function sweep(){
+    var cxp=w*0.86, cyp=h*0.14, R=Math.max(w,h)*0.95;
+    var a=(t*0.0052)%(Math.PI*2);
+    ctx.save();
+    ctx.globalCompositeOperation="lighter";
+    for(var i=0;i<16;i++){
+      var aa=a-i*0.026;
+      ctx.strokeStyle="rgba(255,138,61,"+(0.030*(1-i/16))+")";
+      ctx.lineWidth=1.4;
+      ctx.beginPath();ctx.moveTo(cxp,cyp);
+      ctx.lineTo(cxp+Math.cos(aa)*R,cyp+Math.sin(aa)*R);ctx.stroke();
+    }
+    ctx.restore();
+    ctx.strokeStyle="rgba(255,138,61,.055)";ctx.lineWidth=1;
+    for(var k=1;k<=3;k++){
+      ctx.beginPath();ctx.arc(cxp,cyp,R*k/3.4,0,Math.PI*2);ctx.stroke();
+    }
+  }
+  function draw(){
+    ctx.clearRect(0,0,w,h);
+    grid();
+    sweep();
+    ctx.fillStyle=TOK.amber||"#FF8A3D";
+    for(var i=0;i<motes.length;i++){
+      var m=motes[i];
+      m.y-=m.v; if(m.y<-4){m.y=h+4;m.x=Math.random()*w;}
+      ctx.globalAlpha=m.a;
+      ctx.fillRect(m.x,m.y,m.r,m.r);
+    }
+    ctx.globalAlpha=1;
+  }
+  function loop(){
+    if(paused)return;
+    t++;
+    if(t%2===0)draw();          /* ~30fps: cheap */
+    raf=requestAnimationFrame(loop);
+  }
+  resize();
+  if(RM){draw();}
+  else{loop();}
+  var rt;
+  W.addEventListener("resize",function(){clearTimeout(rt);rt=setTimeout(function(){resize();if(RM)draw();},180);});
+  D.addEventListener("visibilitychange",function(){
+    if(D.hidden){paused=true;cancelAnimationFrame(raf);}
+    else if(!RM){paused=false;raf=requestAnimationFrame(loop);}
+  });
+})();
+
+/* ---------------- coordinate rail telemetry ---------------- */
+(function rail(){
+  var mark=$("#railmark"), co=$("#railco");
+  if(!mark)return;
+  var bases=[[47.3769,8.5417],[1.3521,103.8198],[30.2672,-97.7431],[-1.2921,36.8219]];
+  var idx=0;
+  function tick(){
+    var doc=D.documentElement;
+    var max=doc.scrollHeight-innerHeight;
+    var p=max>0?Math.min(scrollY/max,1):0;
+    mark.style.top=(p*100)+"%";
+    var b=bases[idx];
+    co.innerHTML="<b>SEC "+String(Math.round(p*99)).padStart(2,"0")+"</b>LAT "+b[0].toFixed(4)+"<br>LON "+b[1].toFixed(4);
+  }
+  W.addEventListener("scroll",function(){
+    if(!rail.q){rail.q=true;requestAnimationFrame(function(){tick();rail.q=false;});}
+  },{passive:true});
+  setInterval(function(){idx=(idx+1)%bases.length;tick();},5200);
+  tick();
+})();
+
+/* ---------------- header hide on scroll down ---------------- */
+(function hdrScroll(){
+  var hdr=$("#hdr"), last=0;
+  W.addEventListener("scroll",function(){
+    var y=scrollY;
+    if(D.body.classList.contains("menu-open"))return;
+    hdr.style.transform=(y>240&&y>last)?"translateY(-100%)":"translateY(0)";
+    last=y;
+  },{passive:true});
+})();
+
+/* ---------------- intro / boot sequence ---------------- */
+function runBoot(done){
+  var boot=$("#boot"), bar=$("#bootbar"), log=$("#bootlog"), skip=$("#bootskip");
+  var lines=[
+    "INIT · obsidian control plane",
+    "LINK · 8 operations centres <b>ACQUIRED</b>",
+    "SYNC · 74 regions · 12,480 deployments",
+    "AUTH · session established <b>NOMINAL</b>"
+  ];
+  var seen=false;
+  try{seen=sessionStorage.getItem("tb_boot_v1")==="1";}catch(e){}
+  function finish(){
+    try{sessionStorage.setItem("tb_boot_v1","1");}catch(e){}
+    boot.style.transition="opacity .45s linear";
+    boot.style.opacity="0";
+    setTimeout(function(){boot.remove();},480);
+    done();
+  }
+  if(seen){boot.remove();done();return;}
+  if(RM){
+    log.innerHTML="<div style='opacity:1'>SYSTEM READY</div>";
+    bar.style.transform="scaleX(1)";
+    setTimeout(finish,420);
+    skip.addEventListener("click",finish);
+    return;
+  }
+  log.innerHTML=lines.map(function(l){return "<div><time>"+Math.floor(Math.random()*90+10)+"ms</time>"+l+"</div>";}).join("");
+  var divs=$$("div",log);
+  var t0=performance.now(), DUR=2100, ended=false;
+  function step(ts){
+    var p=Math.min((ts-t0)/DUR,1);
+    bar.style.transform="scaleX("+easeOutExpo(p)+")";
+    divs.forEach(function(d,i){
+      d.style.opacity=(p>(i+0.6)/(divs.length+1))?"1":"0";
+      d.style.transition="opacity .3s linear";
+    });
+    if(p<1&&!ended)requestAnimationFrame(step);
+    else if(!ended){ended=true;setTimeout(finish,220);}
+  }
+  requestAnimationFrame(step);
+  skip.addEventListener("click",function(){ended=true;finish();});
+}
+
+/* ==========================================================
+   PROCEDURAL INSTRUMENT GRAPHICS (canvas — no images)
+   ========================================================== */
+function rng(seed){var s=seed>>>0;return function(){s=(s*1664525+1013904223)>>>0;return s/4294967296;};}
+function hashStr(s){var h=2166136261;for(var i=0;i<s.length;i++){h^=s.charCodeAt(i);h=(h*16777619)>>>0;}return h;}
+
+function drawSchema(cv,cat,seed,scan){
+  var f=fit(cv), c=f.ctx, w=f.w, h=f.h, R=rng(seed);
+  c.clearRect(0,0,w,h);
+  c.fillStyle=TOK.deep;c.fillRect(0,0,w,h);
+  /* fine measure grid */
+  c.strokeStyle=TOK.rule;c.lineWidth=1;c.globalAlpha=.85;
+  var s=Math.max(14,w/16);
+  c.beginPath();
+  for(var x=s;x<w;x+=s){c.moveTo(Math.round(x)+.5,0);c.lineTo(Math.round(x)+.5,h);}
+  for(var y=s;y<h;y+=s){c.moveTo(0,Math.round(y)+.5);c.lineTo(w,Math.round(y)+.5);}
+  c.stroke();c.globalAlpha=1;
+
+  c.strokeStyle=TOK.amber;c.fillStyle=TOK.amber;c.lineWidth=1.2;
+  var cxp=w/2, cyp=h/2, i, a, r;
+
+  if(cat==="Platform"){
+    for(i=1;i<=3;i++){
+      c.globalAlpha=.28+i*.14;
+      c.beginPath();
+      var rr=Math.min(w,h)*(0.14*i);
+      for(a=0;a<=6;a++){
+        var ang=a/6*Math.PI*2-Math.PI/2;
+        var px=cxp+Math.cos(ang)*rr, py=cyp+Math.sin(ang)*rr*0.72;
+        a?c.lineTo(px,py):c.moveTo(px,py);
+      }
+      c.closePath();c.stroke();
+    }
+    c.globalAlpha=1;
+    for(i=0;i<6;i++){
+      a=i/6*Math.PI*2-Math.PI/2;
+      r=Math.min(w,h)*0.42;
+      c.beginPath();c.moveTo(cxp,cyp);c.lineTo(cxp+Math.cos(a)*r,cyp+Math.sin(a)*r*0.72);
+      c.globalAlpha=.22;c.stroke();c.globalAlpha=1;
+      c.fillRect(cxp+Math.cos(a)*r-2,cyp+Math.sin(a)*r*0.72-2,4,4);
+    }
+    c.fillRect(cxp-3,cyp-3,6,6);
+  }
+  else if(cat==="Data"){
+    for(i=0;i<7;i++){
+      var yy=h*(0.16+i*0.115);
+      c.globalAlpha=i%2?.28:.6;
+      c.beginPath();c.moveTo(0,yy);
+      for(var xx=0;xx<=w;xx+=8){
+        c.lineTo(xx,yy+Math.sin((xx/w*3.4)+i*0.9+seed%7)*h*0.045);
+      }
+      c.stroke();
+      c.globalAlpha=1;
+      var dx=w*(0.14+R()*0.72);
+      c.fillRect(dx,yy-2,4,4);
+    }
+  }
+  else if(cat==="Security"){
+    c.globalAlpha=.7;
+    c.beginPath();
+    c.moveTo(cxp,h*0.14);c.lineTo(w*0.78,h*0.3);c.lineTo(w*0.78,h*0.62);
+    c.lineTo(cxp,h*0.9);c.lineTo(w*0.22,h*0.62);c.lineTo(w*0.22,h*0.3);c.closePath();c.stroke();
+    c.globalAlpha=.32;
+    c.beginPath();
+    c.moveTo(cxp,h*0.26);c.lineTo(w*0.67,h*0.37);c.lineTo(w*0.67,h*0.6);
+    c.lineTo(cxp,h*0.78);c.lineTo(w*0.33,h*0.6);c.lineTo(w*0.33,h*0.37);c.closePath();c.stroke();
+    c.globalAlpha=1;
+    for(i=0;i<9;i++){
+      var nx=w*(0.24+R()*0.52), ny=h*(0.24+R()*0.52);
+      c.fillRect(nx,ny,3,3);
+      c.globalAlpha=.2;c.beginPath();c.moveTo(cxp,cyp);c.lineTo(nx,ny);c.stroke();c.globalAlpha=1;
+    }
+  }
+  else if(cat==="Operations"){
+    var base=h*0.72;
+    for(i=0;i<18;i++){
+      var bh=h*(0.08+R()*0.5);
+      c.globalAlpha=i%3===0?.9:.34;
+      c.fillRect(w*0.06+i*(w*0.052),base-bh,Math.max(2,w*0.026),bh);
+    }
+    c.globalAlpha=.55;c.strokeStyle=TOK.dim;
+    c.beginPath();c.setLineDash([3,3]);
+    c.moveTo(0,h*0.34);c.lineTo(w,h*0.34);c.stroke();c.setLineDash([]);
+    c.globalAlpha=1;c.strokeStyle=TOK.amber;
+    c.beginPath();c.moveTo(0,base+.5);c.lineTo(w,base+.5);c.stroke();
+  }
+  else{ /* Experience */
+    var cols=5,rows=3,pw=w*0.82/cols,phh=h*0.66/rows;
+    for(i=0;i<cols*rows;i++){
+      var ccx=w*0.09+(i%cols)*pw, ccy=h*0.17+Math.floor(i/cols)*phh;
+      c.globalAlpha=R()>0.68?.85:.24;
+      c.strokeRect(Math.round(ccx)+.5,Math.round(ccy)+.5,Math.round(pw*0.82),Math.round(phh*0.72));
+      if(R()>0.72){c.fillRect(ccx+4,ccy+4,Math.round(pw*0.34),3);}
+    }
+    c.globalAlpha=1;
+  }
+
+  /* crosshair corner ticks */
+  c.strokeStyle=TOK.amber;c.globalAlpha=.6;c.lineWidth=1;
+  [[6,6,1,1],[w-6,6,-1,1],[6,h-6,1,-1],[w-6,h-6,-1,-1]].forEach(function(p){
+    c.beginPath();c.moveTo(p[0],p[1]+7*p[3]);c.lineTo(p[0],p[1]);c.lineTo(p[0]+7*p[2],p[1]);c.stroke();
+  });
+  c.globalAlpha=1;
+  return f;
+}
+
+function initProductCanvases(root){
+  $$(".pviz",root).forEach(function(cv){
+    var id=cv.dataset.viz, p=null;
+    for(var i=0;i<PRODUCTS.length;i++)if(PRODUCTS[i].id===id)p=PRODUCTS[i];
+    if(!p)return;
+    var draw=function(){drawSchema(cv,p.c,hashStr(id));};
+    if("IntersectionObserver" in W){
+      var io=new IntersectionObserver(function(en){
+        en.forEach(function(x){if(x.isIntersecting){draw();io.unobserve(x.target);}});
+      },{rootMargin:"120px"});
+      io.observe(cv);
+      onTeardown(function(){io.disconnect();});
+    }else draw();
+  });
+}
+
+function drawCaseViz(cv,kind,seed){
+  var f=fit(cv), c=f.ctx, w=f.w, h=f.h, R=rng(seed), i;
+  c.clearRect(0,0,w,h);
+  c.fillStyle=TOK.deep;c.fillRect(0,0,w,h);
+  c.strokeStyle=TOK.rule;c.lineWidth=1;
+  c.beginPath();
+  for(var y=h*0.2;y<h;y+=h*0.2){c.moveTo(0,Math.round(y)+.5);c.lineTo(w,Math.round(y)+.5);}
+  c.stroke();
+  c.strokeStyle=TOK.amber;c.fillStyle=TOK.amber;c.lineWidth=1.4;
+  if(kind==="ledger"){
+    for(i=0;i<22;i++){
+      var bh=h*(0.1+R()*0.62), bx=w*0.05+i*(w*0.042);
+      c.globalAlpha=i>15?.85:.3;
+      c.fillRect(bx,h*0.86-bh,Math.max(2,w*0.02),bh);
+    }
+    c.globalAlpha=1;
+  }else if(kind==="pulse"){
+    c.beginPath();
+    for(var x=0;x<=w;x+=3){
+      var t=x/w*7, v=Math.sin(t)*0.12;
+      var m=(x/w*4)%1;
+      if(m>0.44&&m<0.56)v=(m<0.5?-(m-0.44)*9:(0.56-m)*9);
+      c.lineTo(x,h*0.5+v*h*0.9);
+    }
+    c.stroke();
+  }else if(kind==="grid"){
+    var pts=[];
+    for(i=0;i<16;i++)pts.push([w*(0.08+R()*0.84),h*(0.12+R()*0.76)]);
+    c.globalAlpha=.24;
+    for(i=0;i<pts.length;i++)for(var j=i+1;j<pts.length;j++){
+      var d=Math.hypot(pts[i][0]-pts[j][0],pts[i][1]-pts[j][1]);
+      if(d<w*0.26){c.beginPath();c.moveTo(pts[i][0],pts[i][1]);c.lineTo(pts[j][0],pts[j][1]);c.stroke();}
+    }
+    c.globalAlpha=1;
+    pts.forEach(function(p){c.fillRect(p[0]-2,p[1]-2,4,4);});
+  }else{
+    for(i=0;i<9;i++){
+      c.globalAlpha=.3+ (i===4?.6:0);
+      c.beginPath();
+      c.moveTo(0,h*(0.08+i*0.105));
+      c.bezierCurveTo(w*0.4,h*(0.08+i*0.105),w*0.6,h*0.5,w,h*0.5);
+      c.stroke();
+    }
+    c.globalAlpha=1;c.fillRect(w-6,h*0.5-3,6,6);
+  }
+  c.strokeStyle=TOK.amber;c.globalAlpha=.55;
+  [[6,6,1,1],[w-6,6,-1,1],[6,h-6,1,-1],[w-6,h-6,-1,-1]].forEach(function(p){
+    c.beginPath();c.moveTo(p[0],p[1]+7*p[3]);c.lineTo(p[0],p[1]);c.lineTo(p[0]+7*p[2],p[1]);c.stroke();
+  });
+  c.globalAlpha=1;
+}
+
+/* ---------------- hero attitude dial ---------------- */
+function initDial(){
+  var cv=$("#dialc"); if(!cv)return;
+  var f=fit(cv), c=f.ctx, w=f.w, h=f.h;
+  var t=0, raf=0, paused=false;
+  var rdA=$("#rdA"), rdH=$("#rdH");
+  function draw(){
+    c.clearRect(0,0,w,h);
+    var cxp=w/2, cyp=h/2, R=Math.min(w,h)*0.44;
+    var roll=Math.sin(t*0.006)*0.13, pitch=Math.sin(t*0.0042)*R*0.11;
+    /* outer instrument ring */
+    c.strokeStyle=TOK.rule;c.lineWidth=1;
+    c.beginPath();c.arc(cxp,cyp,R,0,Math.PI*2);c.stroke();
+    c.beginPath();c.arc(cxp,cyp,R*0.78,0,Math.PI*2);c.stroke();
+    /* bearing ticks */
+    for(var i=0;i<72;i++){
+      var a=i/72*Math.PI*2;
+      var long=i%6===0;
+      c.strokeStyle=long?TOK.dim:TOK.rule;
+      c.beginPath();
+      c.moveTo(cxp+Math.cos(a)*R,cyp+Math.sin(a)*R);
+      c.lineTo(cxp+Math.cos(a)*(R-(long?11:5)),cyp+Math.sin(a)*(R-(long?11:5)));
+      c.stroke();
+    }
+    /* horizon inside inner circle */
+    c.save();
+    c.beginPath();c.arc(cxp,cyp,R*0.76,0,Math.PI*2);c.clip();
+    c.translate(cxp,cyp+pitch);c.rotate(roll);
+    c.strokeStyle=TOK.amber;c.lineWidth=1.5;
+    c.beginPath();c.moveTo(-R,0);c.lineTo(R,0);c.stroke();
+    c.strokeStyle=TOK.rule;c.lineWidth=1;
+    for(var k=-4;k<=4;k++){
+      if(!k)continue;
+      var yy=k*R*0.15, ww=(k%2?R*0.14:R*0.26);
+      c.beginPath();c.moveTo(-ww,yy);c.lineTo(ww,yy);c.stroke();
+    }
+    c.restore();
+    /* fixed aircraft reference */
+    c.strokeStyle=TOK.ink;c.lineWidth=1.6;
+    c.beginPath();
+    c.moveTo(cxp-R*0.3,cyp);c.lineTo(cxp-R*0.09,cyp);
+    c.moveTo(cxp+R*0.09,cyp);c.lineTo(cxp+R*0.3,cyp);
+    c.moveTo(cxp,cyp-R*0.07);c.lineTo(cxp,cyp+R*0.07);
+    c.stroke();
+    /* sweep needle */
+    var sa=(t*0.011)%(Math.PI*2);
+    c.strokeStyle=TOK.amber;c.globalAlpha=.5;c.lineWidth=1;
+    c.beginPath();c.moveTo(cxp,cyp);c.lineTo(cxp+Math.cos(sa)*R*0.95,cyp+Math.sin(sa)*R*0.95);c.stroke();
+    c.globalAlpha=1;
+    c.fillStyle=TOK.amber;
+    c.beginPath();c.arc(cxp+Math.cos(sa)*R*0.95,cyp+Math.sin(sa)*R*0.95,2.4,0,Math.PI*2);c.fill();
+  }
+  function loop(){
+    if(paused)return;
+    t++;
+    if(t%2===0)draw();
+    if(t%40===0){
+      if(rdA)rdA.textContent=(36000+Math.round(Math.sin(t*0.004)*420)).toLocaleString("en-US");
+      if(rdH)rdH.textContent=String(74+Math.round(Math.sin(t*0.003)*7)).padStart(3,"0");
+    }
+    raf=requestAnimationFrame(loop);
+  }
+  draw();
+  if(!RM)raf=requestAnimationFrame(loop);
+  function vis(){if(D.hidden){paused=true;cancelAnimationFrame(raf);}else if(!RM){paused=false;raf=requestAnimationFrame(loop);}}
+  D.addEventListener("visibilitychange",vis);
+  var ro=("ResizeObserver" in W)?new ResizeObserver(function(){f=fit(cv);c=f.ctx;w=f.w;h=f.h;draw();}):null;
+  if(ro)ro.observe(cv);
+  onTeardown(function(){paused=true;cancelAnimationFrame(raf);D.removeEventListener("visibilitychange",vis);if(ro)ro.disconnect();});
+}
+
+/* ---------------- HOME init ---------------- */
+function initHome(){
+  initDial();
+  initProductCanvases(view);
+
+  /* hero headline reveal */
+  if(HAS_GSAP&&!RM){
+    gsap.fromTo("#heroh .ln i",{yPercent:112},{yPercent:0,duration:1.05,ease:"expo.out",stagger:0.075});
+    gsap.fromTo(".hero__sub,.hero__cta,.hero .lbl",{opacity:0,y:14},{opacity:1,y:0,duration:.8,ease:"power3.out",stagger:.06,delay:.24});
+    gsap.fromTo("#dial",{opacity:0,scale:.92},{opacity:1,scale:1,duration:1.2,ease:"expo.out",delay:.15});
+  }
+
+  /* flight path: pinned horizontal trajectory */
+  var track=$("#ftrack"), flight=$("#flight");
+  if(track&&HAS_GSAP&&!RM){
+    var legs=$$(".leg",track);
+    var bar=$("#fbar"), pct=$("#fpct"), legRd=$("#fleg"), gs=$("#fgs"), hz=$("#horizon");
+    var dist=function(){return Math.max(0,track.scrollWidth-track.parentNode.clientWidth);};
+    gsap.to(track,{
+      x:function(){return -dist();},
+      ease:"none",
+      scrollTrigger:{
+        trigger:flight,start:"top top",end:function(){return "+="+(dist()+innerHeight*0.6);},
+        pin:".flight__vp",scrub:.6,invalidateOnRefresh:true,
+        onUpdate:function(self){
+          var p=self.progress;
+          if(bar)bar.style.transform="scaleX("+p+")";
+          if(pct)pct.textContent=String(Math.round(p*100)).padStart(2,"0");
+          var li=Math.min(legs.length,Math.floor(p*legs.length)+1);
+          if(legRd)legRd.textContent="LEG "+String(li).padStart(2,"0");
+          if(gs)gs.textContent=String(468+Math.round(Math.sin(p*9)*26));
+          if(hz)hz.style.transform="translateY("+(-p*30+15)+"px) rotate("+(Math.sin(p*6)*1.1)+"deg)";
+        }
+      }
+    });
+    ScrollTrigger.refresh();
+  }else if(track){
+    $$(".leg__in>*",track).forEach(function(e){e.style.opacity=1;});
+  }
+
+  /* preview product cards route through */
+  wireProductCards(view);
+}
+
+/* ---------------- MARKETPLACE init ---------------- */
+function wireProductCards(root){
+  $$("[data-pid]",root).forEach(function(card){
+    if(!card.classList.contains("pc"))return;
+    function go(){location.hash="#/marketplace/product/"+card.dataset.pid;}
+    card.addEventListener("click",go);
+    card.addEventListener("keydown",function(e){
+      if(e.key==="Enter"||e.key===" "){e.preventDefault();go();}
+    });
+  });
+}
+function initMarket(){
+  initProductCanvases(view);
+  wireProductCards(view);
+  var chips=$("#chips"), grid=$("#mkgrid");
+  if(!chips)return;
+  chips.addEventListener("click",function(e){
+    var b=e.target.closest(".chip"); if(!b)return;
+    $$(".chip",chips).forEach(function(c){c.setAttribute("aria-pressed",String(c===b));});
+    var cat=b.dataset.cat;
+    var cards=$$(".pc",grid);
+    var show=cards.filter(function(c){
+      var p=null;for(var i=0;i<PRODUCTS.length;i++)if(PRODUCTS[i].id===c.dataset.pid)p=PRODUCTS[i];
+      return cat==="All"||(p&&p.c===cat);
+    });
+    if(HAS_GSAP&&!RM){
+      gsap.to(cards,{opacity:0,y:10,duration:.18,ease:"power2.in",onComplete:function(){
+        cards.forEach(function(c){c.classList.toggle("filtered-out",show.indexOf(c)<0);});
+        gsap.fromTo(show,{opacity:0,y:16},{opacity:1,y:0,duration:.45,ease:"power3.out",stagger:.04});
+      }});
+    }else{
+      cards.forEach(function(c){c.classList.toggle("filtered-out",show.indexOf(c)<0);});
+      cards.forEach(function(c){c.style.opacity=1;});
+    }
+  });
+}
+
+/* ---------------- fake log engine ---------------- */
+function logLine(box,txt,cls){
+  var d=D.createElement("div");
+  var ms=Date.now()%100000;
+  d.innerHTML='<time>'+String(Math.floor(ms/1000)%1000).padStart(3,"0")+"."+String(ms%1000).padStart(3,"0")+'</time>'+
+    (cls?'<span class="'+cls+'">'+txt+'</span>':txt);
+  box.appendChild(d);
+  while(box.children.length>9)box.removeChild(box.firstChild);
+}
+function runSequence(opts){
+  /* opts: {bar, pctEl, box, lines:[[atPercent,text,cls]], dur, onDone} */
+  var t0=null, done=false, raf=0, next=0;
+  var dur=opts.dur||(RM?900:5200);
+  function step(ts){
+    if(!t0)t0=ts;
+    var p=Math.min((ts-t0)/dur,1);
+    var e=1-Math.pow(1-p,2.1);
+    if(opts.bar)opts.bar.style.transform="scaleX("+e+")";
+    if(opts.pctEl)opts.pctEl.textContent=Math.round(e*100);
+    while(next<opts.lines.length&&e*100>=opts.lines[next][0]){
+      if(opts.box)logLine(opts.box,opts.lines[next][1],opts.lines[next][2]);
+      next++;
+    }
+    if(p<1){raf=requestAnimationFrame(step);addRaf(raf);}
+    else if(!done){done=true;if(opts.onDone)opts.onDone();}
+  }
+  raf=requestAnimationFrame(step);addRaf(raf);
+  onTeardown(function(){cancelAnimationFrame(raf);});
+}
+
+/* ---------------- PRODUCT DETAIL init ---------------- */
+function initProduct(id){
+  var p=null;for(var i=0;i<PRODUCTS.length;i++)if(PRODUCTS[i].id===id)p=PRODUCTS[i];
+  if(!p)return;
+  /* stage schematic with scanline */
+  var stage=$("#pdstage");
+  if(stage){
+    var sraf=0,st=0,paused=false;
+    function redraw(){
+      var f=drawSchema(stage,p.c,hashStr(p.id));
+      if(!RM){
+        var c=f.ctx,yy=(st*1.4)%f.h;
+        c.globalAlpha=.20;c.strokeStyle=TOK.amber;c.lineWidth=1;
+        c.beginPath();c.moveTo(0,yy);c.lineTo(f.w,yy);c.stroke();c.globalAlpha=1;
+      }
+    }
+    function sloop(){if(paused)return;st++;if(st%3===0)redraw();sraf=requestAnimationFrame(sloop);addRaf(sraf);}
+    redraw();
+    if(!RM)sloop();
+    var vis=function(){if(D.hidden){paused=true;cancelAnimationFrame(sraf);}else if(!RM){paused=false;sloop();}};
+    D.addEventListener("visibilitychange",vis);
+    onTeardown(function(){paused=true;cancelAnimationFrame(sraf);D.removeEventListener("visibilitychange",vis);});
+  }
+
+  var cfg={region:"eu-central-1",env:3,mods:p.mods.slice(0,3)};
+  var step=0, maxReached=0;
+  var body=$("#flowbody"), tabs=$$("#flowsteps button");
+
+  function price(){
+    return Math.round(p.price*(1+(cfg.env-1)*0.14)*(1+cfg.mods.length*0.055));
+  }
+  function fmt(n){return "$"+n.toLocaleString("en-US");}
+
+  function paint(){
+    tabs.forEach(function(b,i){
+      b.setAttribute("aria-selected",String(i===step));
+      b.classList.toggle("done",i<maxReached&&i!==step);
+    });
+    body.innerHTML=flowPane(p,step,cfg);
+    if(HAS_GSAP&&!RM)gsap.fromTo(body.children,{opacity:0,y:14},{opacity:1,y:0,duration:.42,ease:"power3.out"});
+    initMagnetic(body);
+    if(step===1){
+      var pv=$("#pricev"); if(pv)pv.textContent=fmt(price());
+      $("#rgnrow").addEventListener("click",function(e){
+        var b=e.target.closest("[data-region]");if(!b)return;
+        cfg.region=b.dataset.region;
+        $$("[data-region]").forEach(function(x){x.setAttribute("aria-pressed",String(x===b));});
+        bump();
+      });
+      $("#modrow").addEventListener("click",function(e){
+        var b=e.target.closest("[data-mod]");if(!b)return;
+        var m=b.dataset.mod, k=cfg.mods.indexOf(m);
+        if(k>-1)cfg.mods.splice(k,1);else cfg.mods.push(m);
+        b.setAttribute("aria-pressed",String(k<0));
+        bump();
+      });
+      var sl=$("#seats");
+      sl.addEventListener("input",function(){cfg.env=parseInt(sl.value,10);$("#seatv").textContent=cfg.env;bump();});
+    }
+    if(step===2){$("#ordtot").textContent=fmt(price());}
+    if(step===3)runDeploy();
+    body.querySelectorAll("[data-go]").forEach(function(b){
+      b.addEventListener("click",function(){goto(parseInt(b.dataset.go,10));});
+    });
+    var auth=$("#authbtn");
+    if(auth)auth.addEventListener("click",function(){
+      auth.disabled=true;auth.querySelector("svg")&&auth.removeChild(auth.querySelector("svg"));
+      auth.childNodes[0].nodeValue="Authorising…";
+      setTimeout(function(){goto(3);},RM?200:900);
+    });
+  }
+  function bump(){
+    var pv=$("#pricev");if(!pv)return;
+    var to=price();
+    if(RM||!HAS_GSAP){pv.textContent=fmt(to);return;}
+    var o={v:parseFloat(pv.textContent.replace(/[^0-9.]/g,""))||0};
+    gsap.to(o,{v:to,duration:.5,ease:"power2.out",onUpdate:function(){pv.textContent=fmt(Math.round(o.v));}});
+  }
+  function goto(s){
+    step=s; maxReached=Math.max(maxReached,s); paint();
+    body.scrollIntoView({block:"nearest",behavior:RM?"auto":"smooth"});
+  }
+  function runDeploy(){
+    var lines=[
+      [3,"claiming region "+cfg.region,"am"],
+      [11,"provisioning control plane · 3 zones"],
+      [22,"attaching identity fabric (VECTOR ID)"],
+      [34,"deploying "+p.n+" "+p.specs[0][1]],
+      [46,"loading modules: "+(cfg.mods.join(", ")||"core")],
+      [58,"seeding "+cfg.env+" environments"],
+      [69,"residency assertion · verified","ok"],
+      [79,"warming caches · 2 of 3 regions"],
+      [88,"running smoke suite · 412 checks"],
+      [96,"all checks passed","ok"]
+    ];
+    runSequence({bar:$("#depbar"),pctEl:$("#deppct"),box:$("#deplog"),lines:lines,dur:RM?900:5600,
+      onDone:function(){
+        logLine($("#deplog"),"service live · "+p.n,"ok");
+        $("#depdone").innerHTML='<div class="sent" role="status"><b>'+esc(p.n)+' is live in '+esc(cfg.region)+'</b>'+
+          'Endpoint: '+esc(p.id)+'.'+esc(cfg.region)+'.techbiss.net · '+cfg.env+' environments · '+fmt(price())+' / yr'+
+          '<span>Simulation complete. No systems were contacted and no charge was raised.</span></div>';
+        if(HAS_GSAP&&!RM)gsap.fromTo("#depdone .sent",{opacity:0,y:14},{opacity:1,y:0,duration:.5,ease:"power3.out"});
+      }});
+  }
+  tabs.forEach(function(b,i){
+    b.addEventListener("click",function(){if(i<=maxReached||i<=step)goto(i);});
+  });
+  paint();
+}
+
+/* ---------------- WORK init ---------------- */
+function initWork(){
+  $$(".csviz",view).forEach(function(cv,i){
+    var draw=function(){drawCaseViz(cv,cv.dataset.viz,hashStr(cv.dataset.viz)+i);};
+    if("IntersectionObserver" in W){
+      var io=new IntersectionObserver(function(en){en.forEach(function(x){
+        if(x.isIntersecting){draw();io.unobserve(x.target);}});},{rootMargin:"140px"});
+      io.observe(cv);onTeardown(function(){io.disconnect();});
+    }else draw();
+  });
+  if(HAS_GSAP&&!RM){
+    $$(".cs",view).forEach(function(el){
+      gsap.fromTo($$(".cs__res div",el),{opacity:0,y:18},{opacity:1,y:0,duration:.55,ease:"power3.out",stagger:.06,
+        scrollTrigger:{trigger:el,start:"top 78%"}});
+    });
+  }
+}
+
+/* ---------------- PROCESS init ---------------- */
+function initProcess(){
+  var bar=$("#procbar"), ph=$("#procph"), phases=$$(".phase",view);
+  if(!phases.length)return;
+  if(HAS_GSAP&&!RM){
+    phases.forEach(function(el,i){
+      gsap.fromTo(el.querySelector(".phase__bar"),{width:"0%"},{width:"100%",duration:1,ease:"expo.out",
+        scrollTrigger:{trigger:el,start:"top 82%"}});
+      gsap.fromTo($$("h3,p,.phase__n,.phase__grid>div",el),{opacity:0,y:20},{opacity:1,y:0,duration:.6,
+        ease:"power3.out",stagger:.05,scrollTrigger:{trigger:el,start:"top 80%"}});
+      ScrollTrigger.create({trigger:el,start:"top 60%",end:"bottom 60%",
+        onToggle:function(s){if(s.isActive&&ph)ph.textContent=String(i+1).padStart(2,"0");}});
+    });
+    ScrollTrigger.create({
+      trigger:"#proc",start:"top 70%",end:"bottom bottom",scrub:.4,
+      onUpdate:function(s){if(bar)bar.style.transform="scaleX("+s.progress+")";}
+    });
+  }else if(bar)bar.style.transform="scaleX(1)";
+}
+
+/* ---------------- ABOUT init ---------------- */
+function initAbout(){
+  var c1=$("#plx1"), c2=$("#plx2");
+  if(c1){
+    var f=fit(c1),c=f.ctx,w=f.w,h=f.h,i,a;
+    c.clearRect(0,0,w,h);
+    c.strokeStyle=TOK.rule;c.lineWidth=1;
+    var cxp=w/2,cyp=h/2,R=Math.min(w,h)*0.4;
+    for(i=-4;i<=4;i++){
+      c.beginPath();
+      c.ellipse(cxp,cyp,R*Math.cos(i*0.22),R,0,0,Math.PI*2);c.stroke();
+    }
+    for(i=-3;i<=3;i++){
+      var rr=R*Math.cos(i*0.28);
+      c.beginPath();c.ellipse(cxp,cyp+i*R*0.24,rr,rr*0.16,0,0,Math.PI*2);c.stroke();
+    }
+  }
+  if(c2){
+    var f2=fit(c2),c2x=f2.ctx,w2=f2.w,h2=f2.h;
+    c2x.clearRect(0,0,w2,h2);
+    c2x.strokeStyle=TOK.amber;c2x.fillStyle=TOK.amber;c2x.lineWidth=1;
+    var R2=Math.min(w2,h2)*0.44, cx2=w2/2, cy2=h2/2;
+    c2x.globalAlpha=.3;
+    [0.55,0.78,1].forEach(function(k,i){
+      c2x.beginPath();c2x.ellipse(cx2,cy2,R2*k,R2*k*0.32,i*0.5,0,Math.PI*2);c2x.stroke();
+    });
+    c2x.globalAlpha=1;
+    var sites=[[.28,.36],[.72,.3],[.6,.62],[.38,.68],[.82,.55],[.2,.55],[.5,.24],[.66,.78]];
+    sites.forEach(function(s){
+      var x=w2*s[0],y=h2*s[1];
+      c2x.fillRect(x-2,y-2,4,4);
+      c2x.globalAlpha=.35;
+      c2x.beginPath();c2x.arc(x,y,7,0,Math.PI*2);c2x.stroke();
+      c2x.globalAlpha=1;
+    });
+  }
+  if(HAS_GSAP&&!RM){
+    $$("[data-plx]",view).forEach(function(el){
+      gsap.to(el,{yPercent:-parseFloat(el.dataset.plx)*100,ease:"none",
+        scrollTrigger:{trigger:"#plx",start:"top bottom",end:"bottom top",scrub:.5}});
+    });
+  }
+}
+
+/* ---------------- PRICING init ---------------- */
+function initPricing(){
+  var bill=$("#billing"); if(!bill)return;
+  var pill=$("#billpill"), btns=$$("button",bill);
+  function movePill(){
+    var b=btns.filter(function(x){return x.getAttribute("aria-pressed")==="true";})[0]||btns[0];
+    pill.style.width=b.offsetWidth+"px";
+    pill.style.transform="translateX("+(b.offsetLeft-1)+"px)";
+  }
+  function setBill(mode){
+    btns.forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.bill===mode));});
+    movePill();
+    $$("[data-price-m]",view).forEach(function(el){
+      var to=parseInt(mode==="y"?el.dataset.priceY:el.dataset.priceM,10);
+      var from=parseInt(el.textContent.replace(/[^0-9]/g,""),10)||to;
+      if(RM||!HAS_GSAP){el.textContent="$"+to.toLocaleString("en-US");}
+      else{
+        var o={v:from};
+        gsap.to(o,{v:to,duration:.65,ease:"power3.out",onUpdate:function(){
+          el.textContent="$"+Math.round(o.v).toLocaleString("en-US");}});
+      }
+    });
+    $$(".tier__p .pu",view).forEach(function(s){s.textContent=mode==="y"?"/ month, billed annually":"/ month";});
+  }
+  bill.addEventListener("click",function(e){
+    var b=e.target.closest("[data-bill]");if(!b)return;setBill(b.dataset.bill);
+  });
+  requestAnimationFrame(movePill);
+  W.addEventListener("resize",movePill);
+  onTeardown(function(){W.removeEventListener("resize",movePill);});
+}
+
+/* ---------------- FORMS ---------------- */
+function validate(field,fn,msg){
+  var input=$("input,textarea",field)||field.querySelector("input");
+  var err=field.querySelector(".err");
+  var ok=fn(input.value.trim());
+  field.classList.toggle("bad",!ok);
+  field.classList.toggle("good",ok&&input.value.trim().length>0);
+  if(err&&msg&&!ok)err.textContent=msg;
+  return ok;
+}
+function initContact(){
+  var f=$("#cform"); if(!f)return;
+  var rules=[
+    ["cname",function(v){return v.length>1;},"Enter the name we should reply to."],
+    ["corg",function(v){return v.length>1;},"Which organisation is this for?"],
+    ["cmail",function(v){return /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(v);},"That does not look like a work address."],
+    ["crole",function(v){return v.length>1;},"Your role helps us route this correctly."],
+    ["cmsg",function(v){return v.length>=30;},"Tell us at least 30 characters — we need something to work with."]
+  ];
+  rules.forEach(function(r){
+    var input=$("#"+r[0]); if(!input)return;
+    var fieldEl=input.closest(".field");
+    input.addEventListener("blur",function(){validate(fieldEl,r[1],r[2]);});
+    input.addEventListener("input",function(){if(fieldEl.classList.contains("bad"))validate(fieldEl,r[1],r[2]);});
+  });
+  f.addEventListener("submit",function(e){
+    e.preventDefault();
+    var ok=true;
+    rules.forEach(function(r){
+      var input=$("#"+r[0]);if(!input)return;
+      if(!validate(input.closest(".field"),r[1],r[2]))ok=false;
+    });
+    if(!ok){
+      var bad=$(".field.bad",f);
+      if(bad)bad.querySelector("input,textarea").focus();
+      return;
+    }
+    var name=$("#cname").value.trim().split(" ")[0];
+    f.style.transition="opacity .3s linear,transform .35s ease";
+    f.style.opacity="0";f.style.transform="translateY(-10px)";
+    setTimeout(function(){
+      f.hidden=true;
+      $("#cdone").innerHTML='<div class="sent" role="status"><b>Transmission received, '+esc(name)+'.</b>'+
+        'Reference TB-'+String(Math.floor(Math.random()*9000+1000))+' · routed to the EMEA flight director on watch in Zurich.'+
+        '<span>You will hear from a person within one business day. Nothing was actually sent — this is a demonstration form.</span></div>';
+      if(HAS_GSAP&&!RM)gsap.fromTo("#cdone .sent",{opacity:0,y:16},{opacity:1,y:0,duration:.55,ease:"power3.out"});
+    },300);
+  });
+}
+function initLogin(){
+  var f=$("#lform"); if(!f)return;
+  var rules=[
+    ["lmail",function(v){return /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(v);},"Enter a valid operator address."],
+    ["lpass",function(v){return v.length>=8;},"Passphrase must be at least eight characters."]
+  ];
+  rules.forEach(function(r){
+    var input=$("#"+r[0]);
+    var fieldEl=input.closest(".field");
+    input.addEventListener("blur",function(){validate(fieldEl,r[1],r[2]);});
+    input.addEventListener("input",function(){if(fieldEl.classList.contains("bad"))validate(fieldEl,r[1],r[2]);});
+  });
+  f.addEventListener("submit",function(e){
+    e.preventDefault();
+    var ok=true;
+    rules.forEach(function(r){
+      if(!validate($("#"+r[0]).closest(".field"),r[1],r[2]))ok=false;});
+    if(!ok)return;
+    var btn=$("button[type=submit]",f);
+    btn.disabled=true;btn.childNodes[0].nodeValue="Verifying credential…";
+    setTimeout(function(){
+      btn.childNodes[0].nodeValue="Evaluating session risk…";
+      setTimeout(function(){
+        $("#loginbox").innerHTML='<div class="sent" role="status"><b>Session established</b>'+
+          'Operator '+esc($("#lmail").value.trim())+' · assurance AAL2 · continuous re-evaluation active'+
+          '<span>Demonstration only — no credential was transmitted or stored.</span></div>'+
+          '<a class="btn btn--solid" href="#/dashboard" style="justify-content:center;margin-top:18px" data-mag>Enter Obsidian Control'+arrow()+'</a>';
+        initMagnetic($("#loginbox"));
+        if(HAS_GSAP&&!RM)gsap.fromTo("#loginbox>*",{opacity:0,y:16},{opacity:1,y:0,duration:.5,ease:"power3.out",stagger:.07});
+      },RM?150:700);
+    },RM?150:800);
+  });
+}
+
+/* ---------------- INSTALLER init ---------------- */
+function initInstaller(){
+  var body=$("#instbody"), steps=$$("#stepper div");
+  if(!body)return;
+  var s=0, maxS=0;
+  var st={edition:"orbit",region:"eu-central-1",source:"legacy-core",migrate:true};
+  var EDITIONS=[
+    ["ascent","Ascent control plane","Single business unit · 3 workloads · business-hours command"],
+    ["orbit","Orbit control plane","Multi-domain · 20 workloads · 24/7 command, 15-minute response"],
+    ["vanguard","Vanguard control plane","Enterprise-wide · unlimited workloads · 5-minute response"]
+  ];
+  function mark(){
+    steps.forEach(function(d,i){
+      d.classList.toggle("now",i===s);
+      d.classList.toggle("was",i<s);
+    });
+  }
+  function nav(back,fwd,label){
+    return '<div class="inst__nav">'+
+      (back!==null?'<button class="btn btn--ghost" type="button" data-back="'+back+'" data-mag>Back</button>':'<span></span>')+
+      (fwd!==null?'<button class="btn btn--solid" type="button" data-next="'+fwd+'" data-mag>'+esc(label)+arrow()+'</button>':'')+
+    '</div>';
+  }
+  function pane(){
+    if(s===0)return '<div class="inst__pane">'+
+      '<span class="lbl lbl--amber">Step 01 · Select</span>'+
+      '<h3 style="font-size:var(--t3)">Choose the control plane to install</h3>'+
+      '<p style="color:var(--dim);max-width:60ch">The control plane determines command rota, SLO commitment and how many workloads the installer will place under management.</p>'+
+      '<div class="pick" id="pickrow">'+EDITIONS.map(function(e){
+        return '<button type="button" data-ed="'+e[0]+'" aria-pressed="'+(st.edition===e[0])+'">'+
+        '<b>'+esc(e[1])+'</b><span>'+esc(e[2])+'</span></button>';}).join("")+'</div>'+
+      nav(null,1,"Detect estate")+'</div>';
+
+    if(s===1)return '<div class="inst__pane">'+
+      '<span class="lbl lbl--amber">Step 02 · Detect</span>'+
+      '<h3 style="font-size:var(--t3)">Surveying the target estate</h3>'+
+      '<div class="inst__pct"><span>SCAN</span><b><span id="ipct">0</span>%</b></div>'+
+      '<div class="prog prog--tall"><i id="ibar"></i></div>'+
+      '<div class="detect" id="detect"></div>'+
+      '<div class="logbox" id="ilog" role="log" aria-live="polite"></div>'+
+      '<div id="inav"></div></div>';
+
+    if(s===2)return '<div class="inst__pane">'+
+      '<span class="lbl lbl--amber">Step 03 · Configure</span>'+
+      '<h3 style="font-size:var(--t3)">Placement and policy</h3>'+
+      '<div class="opt"><span class="lbl nomark">Primary sovereign region</span><div class="opt__row" id="irgn">'+
+        ["eu-central-1","us-east-4","ap-southeast-2","af-south-1"].map(function(r){
+          return '<button class="tgl" type="button" data-r="'+r+'" aria-pressed="'+(st.region===r)+'">'+r+'</button>';}).join("")+
+      '</div></div>'+
+      '<div class="opt"><span class="lbl nomark">Import source</span><div class="opt__row" id="isrc">'+
+        ["legacy-core","erp-cluster","file-archive","greenfield"].map(function(r){
+          return '<button class="tgl" type="button" data-s="'+r+'" aria-pressed="'+(st.source===r)+'">'+r+'</button>';}).join("")+
+      '</div></div>'+
+      '<div class="detect"><div><span>ENCRYPTION AT REST</span><span class="ok">ENFORCED · AES-256</span></div>'+
+      '<div><span>RESIDENCY ASSERTION</span><span class="ok">REQUIRED</span></div>'+
+      '<div><span>ROLLBACK WINDOW</span><span>72 HOURS</span></div></div>'+
+      nav(1,3,"Begin import")+'</div>';
+
+    if(s===3)return '<div class="inst__pane">'+
+      '<span class="lbl lbl--amber">Step 04 · Import &amp; migrate</span>'+
+      '<h3 style="font-size:var(--t3)">Migrating from '+esc(st.source)+'</h3>'+
+      '<div class="inst__pct"><span>RECORDS TRANSFERRED</span><b><span id="ipct">0</span>%</b></div>'+
+      '<div class="prog prog--tall"><i id="ibar"></i></div>'+
+      '<div class="logbox" id="ilog" role="log" aria-live="polite"></div>'+
+      '<div id="inav"></div></div>';
+
+    if(s===4)return '<div class="inst__pane">'+
+      '<span class="lbl lbl--amber">Step 05 · Install</span>'+
+      '<h3 style="font-size:var(--t3)">Writing the control plane into '+esc(st.region)+'</h3>'+
+      '<div class="inst__pct"><span>INSTALL</span><b><span id="ipct">0</span>%</b></div>'+
+      '<div class="prog prog--tall"><i id="ibar"></i></div>'+
+      '<div class="logbox" id="ilog" role="log" aria-live="polite"></div>'+
+      '<div id="inav"></div></div>';
+
+    if(s===5)return '<div class="inst__pane">'+
+      '<span class="lbl lbl--amber">Step 06 · Verify</span>'+
+      '<h3 style="font-size:var(--t3)">Independent verification before handover</h3>'+
+      '<div class="inst__pct"><span>CHECKS</span><b><span id="ipct">0</span>%</b></div>'+
+      '<div class="prog prog--tall"><i id="ibar"></i></div>'+
+      '<div class="detect" id="verify"></div>'+
+      '<div id="inav"></div></div>';
+
+    return '<div class="inst__pane"><div class="launch">'+
+      '<div class="launch__ring"><svg viewBox="0 0 96 96" fill="none" aria-hidden="true">'+
+      '<circle cx="48" cy="48" r="44" stroke="var(--rule)"/>'+
+      '<circle id="lring" cx="48" cy="48" r="44" stroke="var(--amber)" stroke-width="2" stroke-linecap="round" '+
+      'stroke-dasharray="277" stroke-dashoffset="277" transform="rotate(-90 48 48)"/>'+
+      '<path d="M34 48l9 9 19-19" stroke="var(--ok)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" id="ltick" '+
+      'stroke-dasharray="42" stroke-dashoffset="42"/></svg></div>'+
+      '<span class="lbl lbl--amber" style="justify-content:center">Step 07 · Launch</span>'+
+      '<h3>Control plane live in '+esc(st.region)+'</h3>'+
+      '<p style="color:var(--ink-2);max-width:52ch">'+esc(st.edition.charAt(0).toUpperCase()+st.edition.slice(1))+
+      ' control plane installed, estate imported and verified. Command rota is on watch and the 72-hour rollback window is open.</p>'+
+      '<div class="detect" style="width:100%;max-width:460px;text-align:left">'+
+      '<div><span>CONSOLE</span><span class="ok">'+esc(st.region)+'.control.techbiss.net</span></div>'+
+      '<div><span>WORKLOADS UNDER MANAGEMENT</span><span class="ok">184</span></div>'+
+      '<div><span>ROLLBACK WINDOW</span><span>OPEN · 71:58 REMAINING</span></div></div>'+
+      '<div class="hero__cta" style="justify-content:center">'+
+      '<a class="btn btn--solid" href="#/dashboard" data-mag>Open Obsidian Control'+arrow()+'</a>'+
+      '<button class="btn btn--ghost" type="button" data-restart data-mag>Run installer again</button></div>'+
+    '</div></div>';
+  }
+
+  function afterPaint(){
+    initMagnetic(body);
+    body.querySelectorAll("[data-next]").forEach(function(b){
+      b.addEventListener("click",function(){go(parseInt(b.dataset.next,10));});});
+    body.querySelectorAll("[data-back]").forEach(function(b){
+      b.addEventListener("click",function(){go(parseInt(b.dataset.back,10));});});
+    var rs=body.querySelector("[data-restart]");
+    if(rs)rs.addEventListener("click",function(){go(0);});
+
+    if(s===0){
+      $("#pickrow").addEventListener("click",function(e){
+        var b=e.target.closest("[data-ed]");if(!b)return;
+        st.edition=b.dataset.ed;
+        $$("[data-ed]").forEach(function(x){x.setAttribute("aria-pressed",String(x===b));});
+      });
+    }
+    if(s===2){
+      $("#irgn").addEventListener("click",function(e){
+        var b=e.target.closest("[data-r]");if(!b)return;st.region=b.dataset.r;
+        $$("[data-r]",$("#irgn")).forEach(function(x){x.setAttribute("aria-pressed",String(x===b));});});
+      $("#isrc").addEventListener("click",function(e){
+        var b=e.target.closest("[data-s]");if(!b)return;st.source=b.dataset.s;
+        $$("[data-s]",$("#isrc")).forEach(function(x){x.setAttribute("aria-pressed",String(x===b));});});
+    }
+    if(s===1)runDetect();
+    if(s===3)runImport();
+    if(s===4)runInstall();
+    if(s===5)runVerify();
+    if(s===6&&HAS_GSAP&&!RM){
+      gsap.to("#lring",{strokeDashoffset:0,duration:1.1,ease:"expo.out"});
+      gsap.to("#ltick",{strokeDashoffset:0,duration:.5,ease:"power2.out",delay:.85});
+    }else if(s===6){
+      var lr=$("#lring"),lt=$("#ltick");
+      if(lr)lr.setAttribute("stroke-dashoffset","0");
+      if(lt)lt.setAttribute("stroke-dashoffset","0");
+    }
+  }
+  function finishNav(label,to){
+    var el=$("#inav");
+    if(!el)return;
+    el.innerHTML=nav(s>0?s-1:null,to,label);
+    initMagnetic(el);
+    el.querySelectorAll("[data-next]").forEach(function(b){b.addEventListener("click",function(){go(to);});});
+    el.querySelectorAll("[data-back]").forEach(function(b){b.addEventListener("click",function(){go(parseInt(b.dataset.back,10));});});
+    if(HAS_GSAP&&!RM)gsap.fromTo(el,{opacity:0,y:10},{opacity:1,y:0,duration:.4,ease:"power3.out"});
+  }
+  function runDetect(){
+    var found=[
+      ["LEGACY CORE · COBOL/CICS","41 dependencies","wn"],
+      ["ERP CLUSTER · 9 INSTANCES","migratable","ok"],
+      ["IDENTITY DIRECTORY","LDAP · 61,400 principals","ok"],
+      ["MESSAGE BROKER","AMQP 0-9-1 · bridgeable","ok"],
+      ["DATA WAREHOUSE","104 TB · open table","ok"],
+      ["UNSUPPORTED RUNTIME","2 nodes · manual step","wn"]
+    ];
+    var box=$("#detect"), n=0;
+    runSequence({bar:$("#ibar"),pctEl:$("#ipct"),box:$("#ilog"),dur:RM?800:4200,
+      lines:[[4,"opening survey channel · read-only","am"],[18,"enumerating hosts · 1,284 responded"],
+        [36,"fingerprinting runtimes"],[54,"mapping dependency graph"],[72,"classifying data stores"],
+        [88,"survey complete · 6 systems classified","ok"]],
+      onDone:function(){finishNav("Configure placement",2);}});
+    var iv=setInterval(function(){
+      if(n>=found.length){clearInterval(iv);return;}
+      var f=found[n++];
+      var d=D.createElement("div");
+      d.innerHTML='<span>'+f[0]+'</span><span class="'+f[2]+'">'+f[1]+'</span>';
+      box.appendChild(d);
+      if(HAS_GSAP&&!RM)gsap.fromTo(d,{opacity:0,x:-10},{opacity:1,x:0,duration:.35,ease:"power2.out"});
+    },RM?90:620);
+    onTeardown(function(){clearInterval(iv);});
+  }
+  function runImport(){
+    runSequence({bar:$("#ibar"),pctEl:$("#ipct"),box:$("#ilog"),dur:RM?800:5000,
+      lines:[[3,"opening migration channel to "+st.source,"am"],[12,"schema translation · 412 tables"],
+        [26,"transferring reference data · 1.2M rows"],[41,"transferring transactional history · 61M rows"],
+        [58,"rebuilding indexes"],[71,"reconciling balances · pass 1 of 2"],
+        [84,"reconciling balances · pass 2 of 2"],[94,"0 unexplained breaks","ok"]],
+      onDone:function(){finishNav("Install control plane",4);}});
+  }
+  function runInstall(){
+    runSequence({bar:$("#ibar"),pctEl:$("#ipct"),box:$("#ilog"),dur:RM?800:5200,
+      lines:[[4,"claiming "+st.region,"am"],[14,"writing control plane · 3 availability zones"],
+        [28,"installing "+st.edition+" entitlements"],[42,"attaching identity fabric"],
+        [56,"registering 184 workloads"],[70,"applying SLO and error-budget policy"],
+        [83,"arming automated rollback · 72h window"],[95,"control plane installed","ok"]],
+      onDone:function(){finishNav("Verify installation",5);}});
+  }
+  function runVerify(){
+    var checks=[
+      ["RESIDENCY ASSERTION","VERIFIED","ok"],["ENCRYPTION AT REST","AES-256 · ENFORCED","ok"],
+      ["IDENTITY CONTINUITY","61,400 / 61,400","ok"],["LEDGER RECONCILIATION","0 BREAKS","ok"],
+      ["SLO TELEMETRY","STREAMING","ok"],["ROLLBACK REHEARSAL","PASSED IN 41s","ok"],
+      ["MANUAL STEP OUTSTANDING","2 UNSUPPORTED NODES","wn"]
+    ];
+    var box=$("#verify"), n=0;
+    runSequence({bar:$("#ibar"),pctEl:$("#ipct"),dur:RM?800:4400,lines:[],
+      onDone:function(){finishNav("Launch control",6);}});
+    var iv=setInterval(function(){
+      if(n>=checks.length){clearInterval(iv);return;}
+      var f=checks[n++];
+      var d=D.createElement("div");
+      d.innerHTML='<span>'+f[0]+'</span><span class="'+f[2]+'">'+f[1]+'</span>';
+      box.appendChild(d);
+      if(HAS_GSAP&&!RM)gsap.fromTo(d,{opacity:0,x:-10},{opacity:1,x:0,duration:.35,ease:"power2.out"});
+    },RM?80:560);
+    onTeardown(function(){clearInterval(iv);});
+  }
+  function go(to){
+    s=to;maxS=Math.max(maxS,to);mark();
+    body.innerHTML=pane();
+    if(HAS_GSAP&&!RM)gsap.fromTo(body.children,{opacity:0,y:14},{opacity:1,y:0,duration:.45,ease:"power3.out"});
+    afterPaint();
+  }
+  go(0);
+}
+
+/* ---------------- DASHBOARD init ---------------- */
+function spark(data){
+  var w=100,h=26,mn=Math.min.apply(null,data),mx=Math.max.apply(null,data),rg=(mx-mn)||1;
+  var pts=data.map(function(v,i){
+    return (i/(data.length-1)*w).toFixed(1)+","+(h-((v-mn)/rg)*(h-3)-1.5).toFixed(1);}).join(" ");
+  var last=pts.split(" ").pop().split(",");
+  return '<svg viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none" aria-hidden="true">'+
+    '<polyline points="'+pts+'" fill="none" stroke="var(--amber)" stroke-width="1.4" vector-effect="non-scaling-stroke"/>'+
+    '<circle cx="'+last[0]+'" cy="'+last[1]+'" r="1.8" fill="var(--amber)"/></svg>';
+}
+function chartSvg(ch){
+  var W=560,H=230,PL=44,PR=12,PT=14,PB=28;
+  var all=ch.s1.concat(ch.s2), mx=Math.max.apply(null,all)*1.12, mn=0;
+  var iw=W-PL-PR, ih=H-PT-PB;
+  function X(i){return PL+i/(ch.s1.length-1)*iw;}
+  function Y(v){return PT+ih-((v-mn)/(mx-mn))*ih;}
+  var ticks=4,g="",lab="";
+  for(var t=0;t<=ticks;t++){
+    var v=mn+(mx-mn)*t/ticks, y=Y(v);
+    g+='<line class="gl" x1="'+PL+'" y1="'+y.toFixed(1)+'" x2="'+(W-PR)+'" y2="'+y.toFixed(1)+'"/>';
+    lab+='<text class="ax" x="'+(PL-8)+'" y="'+(y+3).toFixed(1)+'" text-anchor="end">'+
+      (mx>=100?Math.round(v):v.toFixed(1))+'</text>';
+  }
+  var p1=ch.s1.map(function(v,i){return (i?"L":"M")+X(i).toFixed(1)+" "+Y(v).toFixed(1);}).join(" ");
+  var p2=ch.s2.map(function(v,i){return (i?"L":"M")+X(i).toFixed(1)+" "+Y(v).toFixed(1);}).join(" ");
+  var area=p1+" L"+X(ch.s1.length-1).toFixed(1)+" "+Y(0).toFixed(1)+" L"+X(0).toFixed(1)+" "+Y(0).toFixed(1)+" Z";
+  var xl="";
+  ch.x.forEach(function(t,i){
+    if(!t)return;
+    xl+='<text class="ax" x="'+X(i).toFixed(1)+'" y="'+(H-9)+'" text-anchor="middle">'+esc(t)+'</text>';
+  });
+  var lastX=X(ch.s1.length-1).toFixed(1), lastY=Y(ch.s1[ch.s1.length-1]).toFixed(1);
+  return '<svg class="chart" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+esc(ch.t)+'">'+
+    g+lab+xl+
+    '<path class="ar" d="'+area+'" opacity="0"/>'+
+    '<path class="ln2" d="'+p2+'"/>'+
+    '<path class="ln" id="chline" d="'+p1+'"/>'+
+    '<circle class="pt" cx="'+lastX+'" cy="'+lastY+'" r="3"/>'+
+    '<text class="ax" x="'+PL+'" y="'+(PT-2)+'">'+esc(ch.a)+'</text>'+
+  '</svg>';
+}
+function initDashboard(){
+  var tabs=$("#dtabs"), panel=$("#dpanel"), pill=$("#dpill");
+  if(!tabs)return;
+  var btns=$$("button",tabs);
+  function movePill(){
+    var b=btns.filter(function(x){return x.getAttribute("aria-selected")==="true";})[0]||btns[0];
+    pill.style.width=b.offsetWidth+"px";
+    pill.style.transform="translateX("+(b.offsetLeft-1)+"px)";
+  }
+  function render(role){
+    var d=DASH[role];
+    var kpis=d.kpis.map(function(k){
+      return '<div class="kpi"><div class="kpi__k">'+esc(k.k)+'</div>'+
+        '<div class="kpi__v">'+(k.pre||"")+'<span class="num" data-count="'+k.v+'" data-dec="'+k.dec+'">0</span>'+esc(k.suf||"")+'</div>'+
+        '<div class="kpi__t '+k.t+'">'+(k.t==="up"?"▲":k.t==="dn"?"▼":"—")+" "+esc(k.tv)+'</div>'+
+        '<div class="kpi__spark">'+spark(k.sp)+'</div></div>';
+    }).join("");
+    var bars=d.bars.map(function(b){
+      return '<div class="bar"><span>'+esc(b[0])+'</span><span class="bar__t"><i data-w="'+b[1]+'"></i></span><b>'+b[1]+'%</b></div>';
+    }).join("");
+    var rows=d.rows.map(function(r){
+      var stt=r[r.length-1].split(":");
+      return '<tr>'+r.slice(0,-1).map(function(c,i){
+        return '<td'+(typeof c==="number"||/^[\d.,$%]+$/.test(String(c))?' class="n"':'')+'>'+esc(c)+'</td>';
+      }).join("")+'<td><span class="pill pill--'+stt[0]+'">'+esc(stt[1])+'</span></td></tr>';
+    }).join("");
+    panel.innerHTML=
+      '<div style="display:grid;gap:16px">'+
+      '<div class="kpis">'+kpis+'</div>'+
+      '<div class="dashgrid">'+
+        '<div class="card"><div class="card__h"><h3>'+esc(d.chart.t)+'</h3>'+
+          '<span class="lbl nomark">'+esc(d.label)+' view</span></div>'+
+          '<div class="card__b">'+chartSvg(d.chart)+'</div></div>'+
+        '<div class="card"><div class="card__h"><h3>Capacity by region</h3><span class="lbl nomark">% committed</span></div>'+
+          '<div class="card__b"><div class="bars">'+bars+'</div></div></div>'+
+      '</div>'+
+      '<div class="card"><div class="card__h"><h3>'+esc(d.tableTitle)+'</h3>'+
+        '<span class="lbl nomark">Live · 30s refresh</span></div>'+
+        '<div class="scrollx" style="border:0"><table class="dtable"><thead><tr>'+
+        d.cols.map(function(c){return '<th>'+esc(c)+'</th>';}).join("")+
+        '</tr></thead><tbody>'+rows+'</tbody></table></div></div>'+
+      '</div>';
+    /* animate */
+    $$("[data-count]",panel).forEach(function(e){
+      countUp(e,parseFloat(e.dataset.count),parseInt(e.dataset.dec||0,10),RM?250:1300);});
+    requestAnimationFrame(function(){
+      $$(".bar__t i",panel).forEach(function(b,i){
+        setTimeout(function(){b.style.transform="scaleX("+(parseInt(b.dataset.w,10)/100)+")";},RM?0:90+i*70);
+      });
+    });
+    var line=$("#chline",panel), area=$(".ar",panel);
+    if(line&&!RM){
+      var L=line.getTotalLength();
+      line.style.strokeDasharray=L;line.style.strokeDashoffset=L;
+      if(HAS_GSAP){
+        gsap.to(line,{strokeDashoffset:0,duration:1.5,ease:"power2.out"});
+        gsap.to(area,{opacity:1,duration:.9,delay:.5});
+        gsap.fromTo(".chart .pt",{scale:0,transformOrigin:"center"},{scale:1,duration:.4,delay:1.35,ease:"back.out(2)"});
+      }else{
+        line.style.transition="stroke-dashoffset 1.4s ease-out";
+        requestAnimationFrame(function(){line.style.strokeDashoffset=0;});
+        area.setAttribute("opacity","1");
+      }
+    }else if(line){line.style.strokeDashoffset=0;if(area)area.setAttribute("opacity","1");}
+    if(HAS_GSAP&&!RM)gsap.fromTo(panel.querySelectorAll(".kpi,.card"),{opacity:0,y:16},
+      {opacity:1,y:0,duration:.5,ease:"power3.out",stagger:.05});
+  }
+  tabs.addEventListener("click",function(e){
+    var b=e.target.closest("[data-role]");if(!b)return;
+    btns.forEach(function(x){x.setAttribute("aria-selected",String(x===b));});
+    movePill();render(b.dataset.role);
+  });
+  render("admin");
+  requestAnimationFrame(movePill);
+  W.addEventListener("resize",movePill);
+  onTeardown(function(){W.removeEventListener("resize",movePill);});
+}
+
+/* ==========================================================
+   ROUTER
+   ========================================================== */
+var VIEWS={
+  home:{f:vHome,init:initHome,t:"TECHBISS — Digital transformation, flown on instruments"},
+  services:{f:vServices,init:null,t:"Services — TECHBISS"},
+  solutions:{f:vSolutions,init:null,t:"Solutions — TECHBISS"},
+  marketplace:{f:vMarket,init:initMarket,t:"Marketplace — TECHBISS"},
+  work:{f:vWork,init:initWork,t:"Case files — TECHBISS"},
+  process:{f:vProcess,init:initProcess,t:"Method — TECHBISS"},
+  about:{f:vAbout,init:initAbout,t:"About — TECHBISS"},
+  resources:{f:vResources,init:null,t:"Research — TECHBISS"},
+  pricing:{f:vPricing,init:initPricing,t:"Pricing — TECHBISS"},
+  contact:{f:vContact,init:initContact,t:"Contact — TECHBISS"},
+  login:{f:vLogin,init:initLogin,t:"Console access — TECHBISS"},
+  installer:{f:vInstaller,init:initInstaller,t:"Installer — TECHBISS"},
+  dashboard:{f:vDashboard,init:initDashboard,t:"Obsidian Control — TECHBISS"}
+};
+
+function parseHash(){
+  var h=(location.hash||"#/home").replace(/^#\/?/,"");
+  var parts=h.split("/").filter(Boolean);
+  if(!parts.length)parts=["home"];
+  return parts;
+}
+var firstPaint=true;
+function render(){
+  var parts=parseHash();
+  var base=parts[0];
+  var isProduct=(base==="marketplace"&&parts[1]==="product");
+  if(!VIEWS[base]&&!isProduct){base="home";}
+  var html, initFn, title;
+  if(isProduct){
+    var pid=parts[2]||"";
+    html=vProduct(pid);
+    initFn=function(){initProduct(pid);};
+    var pn="Product";
+    for(var i=0;i<PRODUCTS.length;i++)if(PRODUCTS[i].id===pid)pn=PRODUCTS[i].n;
+    title=pn+" — TECHBISS Marketplace";
+  }else{
+    var v=VIEWS[base];
+    html=v.f();initFn=v.init;title=v.t;
+  }
+  var old=view.firstElementChild;
+  function paint(){
+    clearRoute();
+    view.innerHTML=html;
+    D.title=title;
+    markNav(base);
+    var pg=view.firstElementChild;
+    if(pg&&!RM)pg.classList.add("is-in");
+    initReveal(view);
+    initCounters(view);
+    initMagnetic(view);
+    initTilt(view);
+    if(initFn)initFn();
+    if(HAS_GSAP)ScrollTrigger.refresh();
+    if(!firstPaint){
+      W.scrollTo(0,0);
+      view.focus({preventScroll:true});
+    }
+    firstPaint=false;
+  }
+  if(old&&!RM){
+    old.classList.add("is-out");
+    setTimeout(paint,190);
+  }else paint();
+}
+
+W.addEventListener("hashchange",function(){closeMenu();render();});
+
+/* ---------------- start ---------------- */
+buildNav();
+if(!location.hash)location.replace("#/home");
+runBoot(function(){
+  render();
+});
+})();
+</script>
+</body>
+</html>
