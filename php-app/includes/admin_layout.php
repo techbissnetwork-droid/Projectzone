@@ -32,11 +32,30 @@ function admin_header(array $staff, string $active): string
 
 function admin_bottomnav(string $active): string
 {
+    $primary = array_slice(ADMIN_NAV, 0, 3);
+    $overflow = array_slice(ADMIN_NAV, 3);
+    $activeInOverflow = false;
+
     $items = '';
-    foreach (ADMIN_NAV as $item) {
+    foreach ($primary as $item) {
         $cls = $item['path'] === $active ? 'dock-item active' : 'dock-item';
         $items .= '<a href="' . e($item['path']) . '" class="' . $cls . '">' . ico($item['icon']) . '<span>' . e($item['label']) . '</span></a>';
     }
+
+    $panel = '';
+    foreach ($overflow as $item) {
+        $isActive = $item['path'] === $active;
+        if ($isActive) {
+            $activeInOverflow = true;
+        }
+        $cls = $isActive ? 'dock-menu-link active' : 'dock-menu-link';
+        $panel .= '<a href="' . e($item['path']) . '" class="' . $cls . '">' . ico($item['icon']) . '<span>' . e($item['label']) . '</span></a>';
+    }
+
+    $summaryCls = $activeInOverflow ? 'dock-item active' : 'dock-item';
+    $items .= '<details class="dock-menu"><summary class="' . $summaryCls . '">' . ico('menu') . '<span>Menu</span></summary>'
+        . '<div class="dock-menu-panel">' . $panel . '</div></details>';
+
     return '<nav class="bottom-dock admin-bottomnav" aria-label="Admin quick access">' . $items . '</nav>';
 }
 
