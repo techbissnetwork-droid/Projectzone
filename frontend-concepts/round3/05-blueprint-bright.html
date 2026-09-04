@@ -21,7 +21,7 @@
   --line:rgba(13,71,196,0.16);
   --line-strong:rgba(13,71,196,0.34);
   --grid-line:rgba(13,71,196,0.08);
-  --shadow:0 2px 0 rgba(13,71,196,0.9);
+  --shadow-color:rgba(13,71,196,0.9);
   --focus:#0d47c4;
   --success:#0a7a3d;
   --danger:#c4260d;
@@ -42,7 +42,7 @@
     --line:rgba(255,255,255,0.28);
     --line-strong:rgba(255,255,255,0.55);
     --grid-line:rgba(255,255,255,0.12);
-    --shadow:0 2px 0 rgba(255,212,0,0.9);
+    --shadow-color:rgba(255,212,0,0.9);
     --focus:#ffd400;
     --success:#7dffb0;
     --danger:#ffb199;
@@ -62,7 +62,7 @@
   --line:rgba(255,255,255,0.28);
   --line-strong:rgba(255,255,255,0.55);
   --grid-line:rgba(255,255,255,0.12);
-  --shadow:0 2px 0 rgba(255,212,0,0.9);
+  --shadow-color:rgba(255,212,0,0.9);
   --focus:#ffd400;
   --success:#7dffb0;
   --danger:#ffb199;
@@ -150,7 +150,6 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
   text-transform:uppercase;color:var(--accent-1);
   background:rgba(0,0,0,0.02);
 }
-:root[data-theme="dark"] .annot,@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .annot{color:var(--accent-1);}}
 .annot::before{content:"◆";font-size:8px;}
 .coord{font-family:"Space Mono",monospace;font-size:11px;color:var(--ink-muted);letter-spacing:.04em;}
 
@@ -165,10 +164,9 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
 .btn:active{transform:translateY(2px);}
 .btn-primary{
   background:var(--accent-1);color:var(--accent-1-ink);
-  box-shadow:var(--shadow);
+  box-shadow:0 2px 0 var(--shadow-color);
 }
-.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 0 rgba(13,71,196,.9);}
-:root[data-theme="dark"] .btn-primary:hover,@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn-primary:hover{box-shadow:0 6px 0 rgba(255,212,0,.9);}}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 0 var(--shadow-color);}
 .btn-ghost{
   background:transparent;color:var(--ink-heading);border-color:var(--ink-heading);
 }
@@ -356,7 +354,10 @@ h3{font-size:20px;text-transform:none;}
 }
 .chip:hover{border-color:var(--accent-1);}
 .chip[aria-pressed="true"]{background:var(--ink-heading);border-color:var(--ink-heading);color:#fff;}
-:root[data-theme="dark"] .chip[aria-pressed="true"],@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .chip[aria-pressed="true"]{background:var(--accent-1);border-color:var(--accent-1);color:var(--accent-1-ink);}}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]) .chip[aria-pressed="true"]{background:var(--accent-1);border-color:var(--accent-1);color:var(--accent-1-ink);}
+}
+:root[data-theme="dark"] .chip[aria-pressed="true"]{background:var(--accent-1);border-color:var(--accent-1);color:var(--accent-1-ink);}
 .product-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
 .product-card{
   background:var(--surface);border:1px dashed var(--line-strong);border-radius:var(--radius);

@@ -280,7 +280,7 @@ section{position:relative;padding-block:clamp(64px,10vw,120px);}
 .case-slide .metric-label{margin-top:10px;font-size:.85rem;text-transform:uppercase;letter-spacing:.04em;font-weight:700;color:var(--ink-muted);}
 .case-slide .case-org{font-size:.8rem;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-muted);font-weight:700;margin-top:22px;}
 .case-block{margin-top:14px;}
-.case-block h4{font-family:var(--font-display);font-weight:400;text-transform:uppercase;font-size:.95rem;letter-spacing:.03em;color:var(--accent);}
+.case-block h3{font-family:var(--font-display);font-weight:400;text-transform:uppercase;font-size:.95rem;letter-spacing:.03em;color:var(--accent);}
 .case-block p{margin-top:6px;font-size:.9rem;line-height:1.55;color:var(--ink-muted);}
 .carousel-controls{display:flex;justify-content:space-between;align-items:center;margin-top:24px;}
 .carousel-arrows{display:flex;gap:10px;}
@@ -366,7 +366,7 @@ form#contactForm{display:flex;flex-direction:column;gap:18px;}
 .footer-grid{display:grid;grid-template-columns:1.4fr repeat(4,1fr);gap:32px;}
 .footer-brand .wordmark{color:var(--bg);}
 .footer-brand p{margin-top:16px;font-size:.9rem;line-height:1.6;color:#b6b6b2;max-width:34ch;}
-.footer-col h4{font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);font-weight:700;}
+.footer-col h2{font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);font-weight:700;}
 .footer-col ul{margin-top:16px;display:flex;flex-direction:column;gap:10px;}
 .footer-col a{font-size:.9rem;color:#d6d6d2;transition:color var(--dur-s) var(--ease);}
 .footer-col a:hover{color:var(--bg);}
@@ -705,7 +705,7 @@ form#contactForm{display:flex;flex-direction:column;gap:18px;}
         <p>Engineering the cloud, AI, security and data infrastructure behind the next global economy.</p>
       </div>
       <div class="footer-col">
-        <h4>Company</h4>
+        <h2>Company</h2>
         <ul>
           <li><a href="#services">Services</a></li>
           <li><a href="#solutions">Solutions</a></li>
@@ -714,7 +714,7 @@ form#contactForm{display:flex;flex-direction:column;gap:18px;}
         </ul>
       </div>
       <div class="footer-col">
-        <h4>Platform</h4>
+        <h2>Platform</h2>
         <ul>
           <li><a href="#marketplace">Marketplace</a></li>
           <li><a href="#pricing">Pricing</a></li>
@@ -723,7 +723,7 @@ form#contactForm{display:flex;flex-direction:column;gap:18px;}
         </ul>
       </div>
       <div class="footer-col">
-        <h4>Resources</h4>
+        <h2>Resources</h2>
         <ul>
           <li><a href="#">Research Library</a></li>
           <li><a href="#">Security Trust Center</a></li>
@@ -732,7 +732,7 @@ form#contactForm{display:flex;flex-direction:column;gap:18px;}
         </ul>
       </div>
       <div class="footer-col">
-        <h4>Contact</h4>
+        <h2>Contact</h2>
         <ul>
           <li><a href="#contact">Sales</a></li>
           <li><a href="#contact">Support</a></li>
@@ -1145,9 +1145,9 @@ function renderCarousel(){
         '<div class="case-org">'+c.org+'</div>'+
       '</div>'+
       '<div>'+
-        '<div class="case-block"><h4>Challenge</h4><p>'+c.challenge+'</p></div>'+
-        '<div class="case-block"><h4>Approach</h4><p>'+c.approach+'</p></div>'+
-        '<div class="case-block"><h4>Result</h4><p>'+c.result+'</p></div>'+
+        '<div class="case-block"><h3>Challenge</h3><p>'+c.challenge+'</p></div>'+
+        '<div class="case-block"><h3>Approach</h3><p>'+c.approach+'</p></div>'+
+        '<div class="case-block"><h3>Result</h3><p>'+c.result+'</p></div>'+
       '</div>'+
     '</div>';
   }).join('');
