@@ -254,6 +254,24 @@ button{ cursor:pointer; }
 .sheet-backdrop{ position:fixed; inset:0; z-index:590; background:rgba(30,20,10,.35); opacity:0; pointer-events:none; transition:opacity .35s ease; }
 .sheet-backdrop.open{ opacity:1; pointer-events:auto; }
 
+.bottom-nav-fab{
+  position:fixed; z-index:520; left:50%; bottom:calc(20px + env(safe-area-inset-bottom,0px));
+  transform:translateX(-50%);
+  display:flex; align-items:center; gap:9px;
+  padding:15px 26px; border-radius:var(--r-full);
+  background:var(--grad); color:#fff2ea; border:none;
+  font-family:var(--font-display); font-weight:600; font-size:.92rem; white-space:nowrap;
+  box-shadow:var(--shadow-lg);
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1), box-shadow .3s ease, opacity .3s ease;
+}
+.bottom-nav-fab svg{ width:18px; height:18px; flex:none; }
+.bottom-nav-fab:hover{ transform:translateX(-50%) translateY(-3px); box-shadow:var(--shadow-lg), 0 0 0 6px var(--grad-soft); }
+.bottom-nav-fab.is-hidden{ opacity:0; pointer-events:none; transform:translateX(-50%) translateY(16px); }
+@media (max-width:480px){
+  .bottom-nav-fab{ padding:15px; }
+  .bottom-nav-fab span{ display:none; }
+}
+
 /* ============================= BLOB BACKGROUND LAYER ============================= */
 .blob-field{ position:fixed; inset:0; z-index:-1; overflow:hidden; pointer-events:none; }
 .blob-field svg{ position:absolute; filter:blur(.5px); }
@@ -500,6 +518,11 @@ main{ display:block; }
   <div class="grabber"></div>
   <nav id="mobileNav" aria-label="Mobile"></nav>
 </div>
+
+<button class="bottom-nav-fab" id="bottomNavFab" aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobileSheet">
+  <svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+  <span>Menu</span>
+</button>
 
 <main id="main">
   <div id="view"></div>
@@ -758,13 +781,16 @@ ROUTES.forEach(function(r){
   a.href='#'+p; a.dataset.path=p; a.innerHTML=labels[i]+ico('arrow');
   mobileNav.appendChild(a);
 });
-var burger=$('#navBurger'), sheet=$('#mobileSheet'), backdrop=$('#sheetBackdrop');
+var burger=$('#navBurger'), sheet=$('#mobileSheet'), backdrop=$('#sheetBackdrop'), bottomFab=$('#bottomNavFab');
 function openSheet(o){
   sheet.classList.toggle('open',o); backdrop.classList.toggle('open',o);
   burger.setAttribute('aria-expanded', String(o));
+  bottomFab.setAttribute('aria-expanded', String(o));
+  bottomFab.classList.toggle('is-hidden', o);
   document.body.style.overflow = o ? 'hidden':'';
 }
 burger.addEventListener('click', function(){ openSheet(!sheet.classList.contains('open')); });
+bottomFab.addEventListener('click', function(){ openSheet(!sheet.classList.contains('open')); });
 backdrop.addEventListener('click', function(){ openSheet(false); });
 mobileNav.addEventListener('click', function(){ openSheet(false); });
 
