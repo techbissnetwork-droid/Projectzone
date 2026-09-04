@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ember &amp; Table — TECHBISS Marketplace</title>
+<meta name="description" content="Ember & Table is a warm, appetite-first restaurant website template — digital menu, online ordering, reservations, domain-ready and SSL-secured.">
+<script>(function(){try{var t=localStorage.getItem('techbiss-theme');if(!t||t==='system'){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();</script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><rect width=%2232%22 height=%2232%22 rx=%229%22 fill=%22%23221f1a%22/><rect x=%229%22 y=%229%22 width=%2214%22 height=%223.4%22 rx=%221.7%22 fill=%22%23a8622f%22/><rect x=%2214.3%22 y=%229%22 width=%223.4%22 height=%2214%22 rx=%221.7%22 fill=%22%23a8622f%22/></svg>">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<script>(function(){document.documentElement.classList.add('js-anim');window.addEventListener('error',function(){document.querySelectorAll('[data-reveal]').forEach(function(el){el.classList.add('reveal-in');});});setTimeout(function(){document.querySelectorAll('[data-reveal]:not(.reveal-in)').forEach(function(el){el.classList.add('reveal-in');});},2500);})();</script>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header" data-header>
+  <div class="header-shell">
+    <div class="header-inner">
+      <div class="header-row">
+        <a href="index.html" class="logo"><span class="logo-mark">T</span>TECHBISS</a>
+        <nav class="main-nav" aria-label="Primary">
+          <ul>
+            <li><a href="index.html" class="nav-link">Home</a></li>
+            <li><a href="marketplace.html" class="nav-link">Marketplace</a></li>
+            <li><a href="installer.html" class="nav-link">Installer</a></li>
+            <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+          </ul>
+        </nav>
+        <div class="header-actions">
+          <div class="theme-toggle" data-theme-toggle role="radiogroup" aria-label="Theme">
+            <button type="button" role="radio" data-value="light" aria-checked="false" aria-label="Light theme"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="4" stroke="currentColor" stroke-width="1.6"/><path d="M10 1.5v2M10 16.5v2M18.5 10h-2M3.5 10h-2M15.6 4.4l-1.4 1.4M5.8 14.2l-1.4 1.4M15.6 15.6l-1.4-1.4M5.8 5.8L4.4 4.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+            <button type="button" role="radio" data-value="dark" aria-checked="false" aria-label="Dark theme"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M17 11.5A7 7 0 1 1 8.5 3a5.5 5.5 0 0 0 8.5 8.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></button>
+            <button type="button" role="radio" data-value="system" aria-checked="false" aria-label="Match system theme"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="2" y="4" width="16" height="10.5" rx="1.5" stroke="currentColor" stroke-width="1.6"/><path d="M7 17.5h6M10 14.5v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+          </div>
+          <a href="login.html" class="nav-link header-login">Log In</a>
+          <a href="installer.html" class="btn btn-primary btn-sm header-cta magnetic">Start Your Journey</a>
+          <button class="nav-toggle" aria-label="Open menu" aria-expanded="false" data-nav-toggle>
+            <span></span><span></span><span></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-nav" data-mobile-nav>
+  <ul class="mobile-nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="marketplace.html">Marketplace</a></li>
+    <li><a href="installer.html">Installer</a></li>
+    <li><a href="dashboard.html">Dashboard</a></li>
+  </ul>
+  <div class="mobile-nav-foot">
+    <a href="installer.html" class="btn btn-primary">Start Your Journey →</a>
+    <a href="login.html" class="btn btn-outline">Log In</a>
+  </div>
+</div>
+
+<main id="main">
+
+  <section class="page-hero" style="padding-top:clamp(7rem,11vw,8.5rem);padding-bottom:clamp(1.5rem,3vw,2.2rem);">
+    <div class="container">
+      <nav class="breadcrumb" aria-label="Breadcrumb" data-reveal>
+        <a href="index.html">Home</a><span class="sep">/</span><a href="marketplace.html">Marketplace</a><span class="sep">/</span><span aria-current="page" id="pd-breadcrumb-name">Ember &amp; Table</span>
+      </nav>
+    </div>
+  </section>
+
+  <section class="section-tight" style="padding-top:0;">
+    <div class="container">
+      <div class="product-hero">
+
+        <div data-reveal>
+          <span class="industry-tag" id="pd-industry" style="margin-bottom:.9rem;display:inline-block;">Restaurant</span>
+          <h1 id="pd-name" style="font-size:clamp(2rem,1.6vw+1.5rem,2.9rem);margin-bottom:.6rem;">Ember &amp; Table</h1>
+          <p class="lede" id="pd-tagline" style="max-width:52ch;margin-bottom:1.8rem;">Warm, appetite-first design for restaurants that take orders seriously.</p>
+
+          <div class="gallery-tabs" id="pd-gallery-tabs" role="tablist" aria-label="Product screens">
+            <button type="button" role="tab" aria-selected="true" data-gallery-index="0">Home</button>
+            <button type="button" role="tab" aria-selected="false" data-gallery-index="1">Menu</button>
+            <button type="button" role="tab" aria-selected="false" data-gallery-index="2">Ordering</button>
+            <button type="button" role="tab" aria-selected="false" data-gallery-index="3">Mobile</button>
+          </div>
+          <div id="pd-gallery-frame">
+            <div class="product-preview is-lg pat-hero" data-pv="1" aria-hidden="true">
+              <div class="pv-chrome"><span></span><span></span><span></span><i></i></div>
+              <div class="pv-body">
+                <div class="pv-hero-block"></div>
+                <div class="pv-line w60"></div>
+                <div class="pv-line w40"></div>
+                <div class="pv-btn"></div>
+              </div>
+            </div>
+          </div>
+          <p class="gallery-caption" id="pd-gallery-caption">Home — a preview of the Ember &amp; Table home screen.</p>
+          <noscript><p class="text-dim" style="font-size:.85rem;">Enable JavaScript to switch between preview screens.</p></noscript>
+
+          <h2 style="font-size:1.4rem;margin-top:2.6rem;margin-bottom:1rem;">Full feature list</h2>
+          <ul class="dot-list" id="pd-features" style="columns:2;column-gap:2rem;">
+            <li>Visual menu builder with categories, photos &amp; dietary tags</li>
+            <li>Online ordering with delivery, pickup &amp; dine-in modes</li>
+            <li>Real-time table reservation calendar</li>
+            <li>Daily specials &amp; seasonal menu scheduling</li>
+            <li>Order notifications by SMS and email</li>
+            <li>Built-in tipping &amp; split-bill checkout</li>
+            <li>Multi-location support for small chains</li>
+          </ul>
+
+          <h2 style="font-size:1.4rem;margin-top:2.4rem;margin-bottom:1rem;">Tech included</h2>
+          <div class="tech-grid" id="pd-tech">
+            <div class="tech-item"><span class="check-mark" aria-hidden="true"></span><span>Domain-ready</span></div>
+            <div class="tech-item"><span class="check-mark" aria-hidden="true"></span><span>Free SSL certificate</span></div>
+            <div class="tech-item"><span class="check-mark" aria-hidden="true"></span><span>Premium hosting included (first year)</span></div>
+            <div class="tech-item"><span class="check-mark" aria-hidden="true"></span><span>Mobile-optimized on every screen</span></div>
+            <div class="tech-item"><span class="check-mark" aria-hidden="true"></span><span>Online payment integration</span></div>
+            <div class="tech-item"><span class="check-mark" aria-hidden="true"></span><span>Booking &amp; reservation module</span></div>
+          </div>
+
+          <h2 style="font-size:1.4rem;margin-top:2.4rem;margin-bottom:1rem;">About this template</h2>
+          <p class="prose" id="pd-description">Ember &amp; Table was designed around one idea: hungry visitors decide fast. The layout leads with your food, gets a table booked or an order placed in a few taps, and carries the same warmth from a first-time visitor's phone to your host stand's tablet.</p>
+        </div>
+
+        <aside data-reveal data-reveal-delay="100">
+          <div class="buy-panel">
+            <span class="buy-badge">One-Time Purchase</span>
+            <div class="buy-price" id="pd-price">$249<span> one-time</span></div>
+            <p class="text-dim" style="font-size:.84rem;">Includes premium hosting, SSL and mobile optimization for the first year.</p>
+
+            <div class="buy-steps">
+              <div class="buy-step is-active" data-buy-step="purchase">
+                <span class="buy-step-num"><span class="n">1</span></span>
+                <span class="buy-step-body"><strong>Purchase</strong><span>Secure this template for your business</span></span>
+                <button type="button" class="btn btn-primary btn-sm" data-buy-action="purchase">Purchase</button>
+              </div>
+              <div class="buy-step" data-buy-step="configure">
+                <span class="buy-step-num"><span class="n">2</span></span>
+                <span class="buy-step-body"><strong>Configure</strong><span>Set your domain, name &amp; environment</span></span>
+                <button type="button" class="btn btn-outline btn-sm" data-buy-action="configure" disabled>Configure</button>
+              </div>
+              <div class="buy-step" data-buy-step="deploy">
+                <span class="buy-step-num"><span class="n">3</span></span>
+                <span class="buy-step-body"><strong>Deploy</strong><span>Go live with the Advanced Installer</span></span>
+                <button type="button" class="btn btn-outline btn-sm" data-buy-action="deploy" disabled>Deploy</button>
+              </div>
+            </div>
+
+            <div class="buy-continue" id="pd-buy-continue" hidden>
+              <p class="text-dim" style="font-size:.84rem;margin-bottom:.9rem;">Deployed — head to the Advanced Installer to finish going live.</p>
+              <a href="installer.html" class="btn btn-primary btn-block" id="pd-continue-link">Continue to Advanced Installer <svg class="arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 12L12 4M12 4H5M12 4V11" stroke="currentColor" stroke-width="2"/></svg></a>
+            </div>
+
+            <p class="buy-note">This is a frontend preview — Purchase, Configure and Deploy simulate the real flow so you can see exactly how it works before anything touches payments.</p>
+          </div>
+        </aside>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="container">
+      <div class="section-head" data-reveal>
+        <div>
+          <span class="eyebrow"><span class="eyebrow-swatch" aria-hidden="true"></span>You Might Also Like</span>
+          <h2>Related templates</h2>
+        </div>
+        <a href="marketplace.html" class="btn-link">Browse all templates</a>
+      </div>
+      <div class="related-row" id="pd-related" data-reveal data-reveal-delay="80">
+        <noscript><p class="text-dim">Enable JavaScript to see related templates, or <a href="marketplace.html" class="btn-link">browse the full marketplace</a>.</p></noscript>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- PREVIEW MODAL (for related-product cards) -->
+<div class="modal-overlay" id="preview-modal" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="preview-modal-title">
+    <div class="modal-head">
+      <h3 id="preview-modal-title">Preview</h3>
+      <button type="button" class="modal-close" data-modal-close aria-label="Close preview"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div id="preview-modal-frame"></div>
+      <p id="preview-modal-tagline" class="text-dim" style="margin-top:1.1rem;font-size:.92rem;"></p>
+      <div class="btn-row" style="margin-top:1.3rem;">
+        <a id="preview-modal-link" href="marketplace-product.html" class="btn btn-primary btn-sm">View Full Details</a>
+        <button type="button" class="btn btn-outline btn-sm" data-modal-close>Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="index.html" class="logo"><span class="logo-mark">T</span>TECHBISS</a>
+        <p>We don't just build websites. We build the entire digital presence of your business.</p>
+        <div class="footer-social">
+          <a href="#" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.4"/><path d="M8 10v6M8 7.5v.01M12 16v-3.5c0-1.5 1-2.5 2.5-2.5S17 11 17 12.5V16" stroke="currentColor" stroke-width="1.4"/></svg></a>
+          <a href="#" aria-label="X"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 4l16 16M20 4L4 20" stroke="currentColor" stroke-width="1.4"/></svg></a>
+          <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="1.4"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.4"/></svg></a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Services</h4>
+        <ul>
+          <li><a href="index.html#services">Website Design &amp; Development</a></li>
+          <li><a href="index.html#services">E-commerce Development</a></li>
+          <li><a href="index.html#services">Mobile App Development</a></li>
+          <li><a href="index.html#services">Business Digitization</a></li>
+          <li><a href="index.html#services">Domain &amp; Hosting</a></li>
+          <li><a href="index.html#services">SSL &amp; Security</a></li>
+          <li><a href="index.html#services">All Services →</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Solutions</h4>
+        <ul>
+          <li><a href="marketplace.html?industry=Restaurant">Restaurants &amp; Cafés</a></li>
+          <li><a href="marketplace.html?industry=Retail">Retail &amp; E-commerce</a></li>
+          <li><a href="marketplace.html?industry=Hotel">Hotels &amp; Travel</a></li>
+          <li><a href="marketplace.html?industry=School">Schools &amp; Education</a></li>
+          <li><a href="marketplace.html?industry=Clinic">Clinics &amp; Healthcare</a></li>
+          <li><a href="marketplace.html">All Industries →</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Marketplace</h4>
+        <ul>
+          <li><a href="marketplace.html">Browse All Templates</a></li>
+          <li><a href="marketplace-product.html?id=ember-table">Ember &amp; Table</a></li>
+          <li><a href="marketplace-product.html?id=threadline">Threadline</a></li>
+          <li><a href="installer.html">Advanced Installer</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom-cols">
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="index.html#process">Our Process</a></li>
+          <li><a href="index.html#trust">Why TECHBISS</a></li>
+          <li><a href="index.html#ecosystem">The Ecosystem</a></li>
+          <li><a href="dashboard.html">Client Dashboard</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Resources</h4>
+        <ul>
+          <li><a href="dashboard.html">Client Dashboard</a></li>
+          <li><a href="installer.html">Advanced Installer</a></li>
+          <li><a href="marketplace.html">Marketplace</a></li>
+          <li><a href="login.html">Log In</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Support</h4>
+        <ul>
+          <li><a href="dashboard.html#support">Help Center</a></li>
+          <li><a href="mailto:hello@techbiss.com">Talk to Us</a></li>
+          <li><a href="index.html#trust">System Status</a></li>
+          <li><a href="installer.html">Installer Guide</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="mailto:hello@techbiss.com">hello@techbiss.com</a></li>
+          <li><a href="tel:+14155550148">+1 (415) 555-0148</a></li>
+          <li><a href="mailto:hello@techbiss.com">Talk to TECHBISS →</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-legal">
+      <p>© 2026 TECHBISS. All rights reserved.</p>
+      <div class="footer-legal-links">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1/dist/lenis.min.js"></script>
+<script src="assets/js/main.js"></script>
+<script src="assets/js/products.js"></script>
+<script>
+/* ---------------- Product detail — populate from ?id=, gallery tabs, buy flow, related ---------------- */
+(function(){
+  "use strict";
+  if (!window.TB || !window.TB.products) return;
+  var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var params = new URLSearchParams(location.search);
+  var product = window.TB.getById(params.get('id')) || window.TB.getById('ember-table') || window.TB.products[0];
+
+  document.title = product.name + ' — TECHBISS Marketplace';
+  document.getElementById('pd-breadcrumb-name').textContent = product.name;
+  document.getElementById('pd-industry').textContent = product.industry;
+  document.getElementById('pd-name').textContent = product.name;
+  document.getElementById('pd-tagline').textContent = product.tagline;
+  document.getElementById('pd-description').textContent = product.description;
+  document.getElementById('pd-price').innerHTML = '$' + product.price + '<span> one-time</span>';
+
+  document.getElementById('pd-features').innerHTML = product.fullFeatures.map(function(f){ return '<li>' + f + '</li>'; }).join('');
+  document.getElementById('pd-tech').innerHTML = product.techIncluded.map(function(t){
+    return '<div class="tech-item"><span class="check-mark" aria-hidden="true"></span><span>' + t + '</span></div>';
+  }).join('');
+
+  /* Gallery tabs */
+  var tabsEl = document.getElementById('pd-gallery-tabs');
+  var frameEl = document.getElementById('pd-gallery-frame');
+  var captionEl = document.getElementById('pd-gallery-caption');
+  tabsEl.innerHTML = product.gallery.map(function(g, i){
+    return '<button type="button" role="tab" aria-selected="' + (i === 0 ? 'true' : 'false') + '" data-gallery-index="' + i + '">' + g.label + '</button>';
+  }).join('');
+  function showGallery(i){
+    var entry = product.gallery[i];
+    frameEl.innerHTML = window.TB.galleryFrameHTML(product, entry);
+    captionEl.textContent = entry.label + ' — a preview of the ' + product.name + ' ' + entry.label.toLowerCase() + ' screen.';
+    Array.prototype.forEach.call(tabsEl.querySelectorAll('button'), function(b, bi){ b.setAttribute('aria-selected', bi === i ? 'true' : 'false'); });
+  }
+  tabsEl.addEventListener('click', function(e){
+    var btn = e.target.closest('[data-gallery-index]');
+    if (!btn) return;
+    showGallery(parseInt(btn.getAttribute('data-gallery-index'), 10));
+  });
+  showGallery(0);
+
+  /* Related products */
+  var related = window.TB.relatedProducts(product, 4);
+  document.getElementById('pd-related').innerHTML = related.map(window.TB.cardHTML).join('');
+
+  /* Purchase → Configure → Deploy state machine */
+  var buySteps = ['purchase', 'configure', 'deploy'];
+  var buyState = { purchase: 'idle', configure: 'locked', deploy: 'locked' };
+  var buyLabels = { purchase: 'Purchase', configure: 'Configure', deploy: 'Deploy' };
+  var loadingLabels = { purchase: 'Purchasing…', configure: 'Configuring…', deploy: 'Deploying…' };
+  var doneLabels = { purchase: 'Purchased', configure: 'Configured', deploy: 'Deployed' };
+
+  function renderBuyStep(step){
+    var el = document.querySelector('[data-buy-step="' + step + '"]');
+    var btn = el.querySelector('[data-buy-action]');
+    var state = buyState[step];
+    el.classList.toggle('is-active', state === 'idle' || state === 'loading');
+    el.classList.toggle('is-done', state === 'done');
+    btn.disabled = (state === 'locked' || state === 'loading' || state === 'done');
+    if (state === 'loading') {
+      btn.innerHTML = '<span class="spinner" aria-hidden="true"></span> ' + loadingLabels[step];
+    } else if (state === 'done') {
+      btn.textContent = doneLabels[step] + ' ✓';
+    } else {
+      btn.textContent = buyLabels[step];
+    }
+  }
+
+  function runBuyStep(step){
+    if (buyState[step] !== 'idle') return;
+    buyState[step] = 'loading';
+    renderBuyStep(step);
+    setTimeout(function(){
+      buyState[step] = 'done';
+      renderBuyStep(step);
+      var idx = buySteps.indexOf(step);
+      if (idx < buySteps.length - 1) {
+        var next = buySteps[idx + 1];
+        buyState[next] = 'idle';
+        renderBuyStep(next);
+      } else {
+        var cont = document.getElementById('pd-buy-continue');
+        var link = document.getElementById('pd-continue-link');
+        if (link) link.href = 'installer.html?product=' + product.id;
+        if (cont) { cont.hidden = false; cont.classList.add('confirm-in'); }
+      }
+    }, reduced ? 0 : 900);
+  }
+
+  buySteps.forEach(function(step){
+    var btn = document.querySelector('[data-buy-action="' + step + '"]');
+    if (btn) btn.addEventListener('click', function(){ runBuyStep(step); });
+  });
+  buySteps.forEach(renderBuyStep);
+
+  /* Preview modal (related row) */
+  var previewOverlay = document.getElementById('preview-modal');
+  var previewFrame = document.getElementById('preview-modal-frame');
+  var previewTitle = document.getElementById('preview-modal-title');
+  var previewTagline = document.getElementById('preview-modal-tagline');
+  var previewLink = document.getElementById('preview-modal-link');
+  document.getElementById('pd-related').addEventListener('click', function(e){
+    var btn = e.target.closest('[data-preview-btn]');
+    if (!btn) return;
+    var p = window.TB.getById(btn.getAttribute('data-id'));
+    if (!p) return;
+    previewTitle.textContent = p.name;
+    previewFrame.innerHTML = window.TB.previewHTML(p, 'lg');
+    previewTagline.textContent = p.tagline;
+    previewLink.href = 'marketplace-product.html?id=' + p.id;
+    window.techbissModal.open(previewOverlay, btn);
+  });
+})();
+</script>
+</body>
+</html>

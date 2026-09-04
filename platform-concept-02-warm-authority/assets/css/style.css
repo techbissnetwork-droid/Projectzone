@@ -295,6 +295,19 @@ p{color:var(--text);}
 .card p{color:var(--text-dim);font-size:.93rem;line-height:1.62;}
 .badge{display:inline-flex;align-items:center;gap:.5rem;font-size:.78rem;font-weight:600;color:var(--text-dim);border:1px solid var(--border-strong);padding:.4em .9em;border-radius:var(--radius-pill);background:var(--surface);}
 
+/* Lightweight dot-marker list — a plain <li>Text</li> gets its marker from
+   CSS alone, so long static checklists (service details, chapter lists,
+   tech-included notes) never need a hand-authored SVG per row. */
+.dot-list li{position:relative;padding-left:1.35rem;font-size:.86rem;color:var(--text-dim);line-height:1.55;}
+.dot-list li+li{margin-top:.55rem;}
+.dot-list li::before{content:"";position:absolute;left:0;top:.55em;width:.4rem;height:.4rem;border-radius:50%;background:var(--accent);}
+
+/* CSS-drawn checkmark badge — a <span class="check-mark"></span>, no SVG
+   needed, reused anywhere a short "included" list wants a check instead of
+   a plain dot (tech-included grids, buy-panel notes, trust legend). */
+.check-mark{width:1.15rem;height:1.15rem;border-radius:50%;background:var(--accent-soft);position:relative;flex-shrink:0;}
+.check-mark::before{content:"";position:absolute;left:50%;top:44%;width:.3rem;height:.56rem;border-right:2px solid var(--accent);border-bottom:2px solid var(--accent);transform:translate(-50%,-58%) rotate(45deg);}
+
 /* ==========================================================================
    HERO + ecosystem diagram
    ========================================================================== */
@@ -758,6 +771,7 @@ p{color:var(--text);}
 
 .dash-shell{display:grid;grid-template-columns:220px 1fr;gap:2.2rem;align-items:start;}
 @media (max-width:880px){.dash-shell{grid-template-columns:1fr;}}
+.dash-content{min-width:0;}
 
 .dash-sidebar{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:.9rem;position:sticky;top:6.5rem;}
 .dash-sidebar-head{padding:.6rem .7rem 1rem;}
@@ -814,7 +828,7 @@ p{color:var(--text);}
 @media (max-width:760px){.site-grid{grid-template-columns:1fr;}}
 .site-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;margin-bottom:1rem;}
 .site-card-top strong{display:block;font-size:1.02rem;}
-.site-card-top a{font-size:.82rem;color:var(--text-faint);transition:color var(--dur-fast);}
+.site-card-top a,.site-card-top .domain{font-size:.82rem;color:var(--text-faint);transition:color var(--dur-fast);}
 .site-card-top a:hover{color:var(--accent);}
 .sparkline{width:100%;height:52px;display:block;}
 .sparkline path.spark-fill{fill:var(--accent-soft);stroke:none;}

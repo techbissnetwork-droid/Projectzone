@@ -126,9 +126,10 @@
     return '';
   }
 
-  function previewMarkup(p){
+  function previewMarkup(p, layoutOverride){
+    var layout = layoutOverride || p.layout;
     return '' +
-      '<div class="product-preview" data-layout="' + p.layout + '" style="--tile:' + TINTS[p.tint] + '">' +
+      '<div class="product-preview" data-layout="' + layout + '" style="--tile:' + TINTS[p.tint] + '">' +
         '<div class="pp-chrome"><span class="pp-dot"></span><span class="pp-dot"></span><span class="pp-dot"></span><span class="pp-url">' + p.domain + '</span></div>' +
         '<div class="pp-body">' +
           '<div class="pp-tile">' + p.mark + '</div>' +

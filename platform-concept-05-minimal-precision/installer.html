@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>(function(){try{var t=localStorage.getItem('techbiss-theme');if(!t||t==='system'){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>
+<title>Advanced Installer — TECHBISS</title>
+<meta name="description" content="Select, configure and deploy your TECHBISS project — a real, guided installer from selection through launch.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='5' fill='%230c0c0d'/%3E%3Crect x='8' y='9' width='16' height='2.4' fill='%23f4f4f3'/%3E%3Crect x='14.8' y='9' width='2.4' height='14' fill='%23f4f4f3'/%3E%3Crect x='21.5' y='19.5' width='4' height='4' fill='%233355e0'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<script>(function(){document.documentElement.classList.add('js-anim');window.addEventListener('error',function(){document.querySelectorAll('[data-reveal]').forEach(function(el){el.classList.add('reveal-in');});});setTimeout(function(){document.querySelectorAll('[data-reveal]:not(.reveal-in)').forEach(function(el){el.classList.add('reveal-in');});},2500);})();</script>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header" data-header>
+  <div class="header-inner">
+    <div class="header-shell">
+      <a href="index.html" class="logo">TECHBISS</a>
+      <div class="header-actions-simple">
+        <div class="theme-toggle" role="group" aria-label="Theme">
+          <button type="button" data-theme-btn="dark" aria-pressed="false" aria-label="Dark theme" title="Dark theme">D</button>
+          <button type="button" data-theme-btn="light" aria-pressed="false" aria-label="Light theme" title="Light theme">L</button>
+          <button type="button" data-theme-btn="system" aria-pressed="false" aria-label="Match system theme" title="System theme">S</button>
+        </div>
+        <a href="dashboard.html" class="header-simple-link">Save &amp; Exit</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <div class="installer-shell">
+    <div class="container" style="padding-inline:0;">
+
+      <div class="step-progress">
+        <div class="step-progress-label">
+          <span class="step-progress-count" data-step-count>Step 1 / 7</span>
+          <span class="step-progress-name" data-step-name>Select</span>
+        </div>
+        <div class="step-progress-rule"><div class="step-progress-fill" data-step-fill style="width:14%;"></div></div>
+      </div>
+
+      <!-- STEP 1: SELECT -->
+      <section class="step-panel" data-step="select">
+        <h2>What are we setting up?</h2>
+        <p class="step-intro">Choose how this project starts. You can change environment and details in the next steps.</p>
+        <p class="context-note" data-select-context hidden></p>
+        <div class="radio-list">
+          <div class="radio-item">
+            <label>
+              <input type="radio" name="install-select" value="new" checked>
+              <span class="radio-dot" aria-hidden="true"></span>
+              <span class="radio-copy"><span class="name">New Website</span><span class="desc">Start fresh with a custom-built website or application.</span></span>
+            </label>
+          </div>
+          <div class="radio-item">
+            <label>
+              <input type="radio" name="install-select" value="migrate">
+              <span class="radio-dot" aria-hidden="true"></span>
+              <span class="radio-copy"><span class="name">Migrate Existing Website</span><span class="desc">Move an existing site to TECHBISS infrastructure.</span></span>
+            </label>
+          </div>
+          <div class="radio-item">
+            <label>
+              <input type="radio" name="install-select" value="marketplace">
+              <span class="radio-dot" aria-hidden="true"></span>
+              <span class="radio-copy"><span class="name">Deploy a Marketplace Product</span><span class="desc">Launch a ready-made theme from the TECHBISS Marketplace.</span></span>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <!-- STEP 2: DETECT -->
+      <section class="step-panel" data-step="detect" hidden>
+        <h2>Detecting your environment</h2>
+        <p class="step-intro">A quick scan before we configure anything.</p>
+        <div class="status-lines" data-detect-lines></div>
+      </section>
+
+      <!-- STEP 3: CONFIGURE -->
+      <section class="step-panel" data-step="configure" hidden>
+        <h2>Configure your project</h2>
+        <p class="step-intro">These details set up your environment and can be changed later from your dashboard.</p>
+
+        <div class="field" data-domain-field>
+          <label class="field-label" for="domain-input">Domain</label>
+          <input type="text" id="domain-input" class="field-input" placeholder="yourbusiness.com" data-domain-input autocomplete="off">
+          <span class="field-msg"></span>
+        </div>
+
+        <div class="field" data-sitename-field>
+          <label class="field-label" for="sitename-input">Site Name</label>
+          <input type="text" id="sitename-input" class="field-input" placeholder="Your Business Name" data-sitename-input autocomplete="off">
+          <span class="field-msg"></span>
+        </div>
+
+        <div class="field">
+          <span class="field-label">Environment</span>
+          <div class="segmented">
+            <button type="button" class="is-active" data-env-btn="Staging">Staging</button>
+            <button type="button" data-env-btn="Production">Production</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- STEP 4: IMPORT / MIGRATE -->
+      <section class="step-panel" data-step="import" hidden>
+        <h2>Import &amp; migrate</h2>
+        <p class="step-intro">Moving everything into place.</p>
+        <div class="bar-list" data-import-bars></div>
+      </section>
+
+      <!-- STEP 5: INSTALL -->
+      <section class="step-panel" data-step="install" hidden>
+        <h2>Installing</h2>
+        <p class="step-intro">Setting up your environment, step by step.</p>
+        <div class="check-list" data-install-list></div>
+      </section>
+
+      <!-- STEP 6: VERIFY -->
+      <section class="step-panel" data-step="verify" hidden>
+        <h2>Verifying</h2>
+        <p class="step-intro">Automated checks before we go live.</p>
+        <div class="check-list" data-verify-list></div>
+      </section>
+
+      <!-- STEP 7: LAUNCH -->
+      <section class="step-panel" data-step="launch" hidden>
+        <div class="launch-mark" aria-hidden="true"></div>
+        <h2>Your site is live.</h2>
+        <p class="step-intro"><span data-launch-domain>your-site.techbiss.site</span> is provisioned, verified and ready for real visitors.</p>
+        <div class="launch-summary" data-launch-summary></div>
+        <div class="launch-actions">
+          <a href="dashboard.html#websites" class="btn btn-primary">View Your Site<span class="arrow">→</span></a>
+          <a href="installer.html" class="text-link-quiet">Start Another Project</a>
+        </div>
+        <div class="next-steps">
+          <h4>Next steps</h4>
+          <ul class="plain-list">
+            <li><a href="index.html#service-business-email" class="text-link-quiet">Add your business email</a></li>
+            <li><a href="index.html#service-online-payment-integration" class="text-link-quiet">Connect a payment provider</a></li>
+            <li><a href="dashboard.html" class="text-link-quiet">Invite your team to the dashboard</a></li>
+          </ul>
+        </div>
+      </section>
+
+      <div class="step-nav" data-step-nav>
+        <button type="button" class="step-nav-back" data-step-back hidden>← Back</button>
+        <button type="button" class="btn btn-primary" data-step-next>Next<span class="arrow">→</span></button>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer-minimal">
+  <div class="container footer-bottom">
+    <div class="footer-bottom-left">
+      <p class="footer-copy">© 2026 TECHBISS. All rights reserved.</p>
+      <div class="footer-legal-links">
+        <button type="button" data-legal-trigger="privacy">Privacy</button>
+        <button type="button" data-legal-trigger="terms">Terms</button>
+      </div>
+    </div>
+    <a href="index.html" class="text-link-quiet">Back to TECHBISS</a>
+  </div>
+</footer>
+
+<div class="legal-modal" data-legal-modal aria-hidden="true">
+  <div class="legal-modal-backdrop" data-legal-close></div>
+  <div class="legal-modal-panel" role="dialog" aria-modal="true" aria-label="Legal">
+    <button class="legal-modal-close" data-legal-close aria-label="Close">
+      <svg width="16" height="16" viewBox="0 0 16 16"><path d="M2 2l12 12M14 2L2 14" stroke="currentColor" stroke-width="1.4"/></svg>
+    </button>
+    <div data-legal-panel="privacy">
+      <h3>Privacy Policy</h3>
+      <p>TECHBISS collects only the information needed to design, build and support your project — account details, project requirements, and basic usage data for the services you use. We never sell client data, and information is shared with third parties only where a service you've asked for requires it (payment processing, hosting, or a similar integration).</p>
+      <p>You can request a copy of your data, ask us to correct it, or ask us to delete it at any time by contacting <a href="mailto:privacy@techbiss.com" class="text-link-quiet">privacy@techbiss.com</a>.</p>
+    </div>
+    <div data-legal-panel="terms" hidden>
+      <h3>Terms of Service</h3>
+      <p>Using TECHBISS services — the marketplace, the installer, or a custom-built project — means agreeing to use them lawfully and to keep any account credentials secure. Marketplace products are licensed for use on a single live domain per purchase unless otherwise agreed in writing.</p>
+      <p>Custom projects are governed by the statement of work agreed for that engagement. Questions about a specific agreement should go to <a href="mailto:hello@techbiss.com" class="text-link-quiet">hello@techbiss.com</a>.</p>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1/dist/lenis.min.js"></script>
+<script src="assets/js/main.js"></script>
+<script src="assets/js/products-data.js"></script>
+<script src="assets/js/installer.js"></script>
+</body>
+</html>

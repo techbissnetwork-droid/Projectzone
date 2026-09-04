@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log In — TECHBISS</title>
+<meta name="description" content="Sign in to your TECHBISS client, staff or admin workspace.">
+<script>(function(){try{var t=localStorage.getItem('techbiss-theme');if(!t||t==='system'){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();</script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><rect width=%2232%22 height=%2232%22 rx=%229%22 fill=%22%23221f1a%22/><rect x=%229%22 y=%229%22 width=%2214%22 height=%223.4%22 rx=%221.7%22 fill=%22%23a8622f%22/><rect x=%2214.3%22 y=%229%22 width=%223.4%22 height=%2214%22 rx=%221.7%22 fill=%22%23a8622f%22/></svg>">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<script>(function(){document.documentElement.classList.add('js-anim');window.addEventListener('error',function(){document.querySelectorAll('[data-reveal]').forEach(function(el){el.classList.add('reveal-in');});});setTimeout(function(){document.querySelectorAll('[data-reveal]:not(.reveal-in)').forEach(function(el){el.classList.add('reveal-in');});},2500);})();</script>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header" data-header>
+  <div class="header-shell">
+    <div class="header-inner">
+      <div class="header-row">
+        <a href="index.html" class="logo"><span class="logo-mark">T</span>TECHBISS</a>
+        <div class="theme-toggle" data-theme-toggle role="radiogroup" aria-label="Theme">
+          <button type="button" role="radio" data-value="light" aria-checked="false" aria-label="Light theme"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="4" stroke="currentColor" stroke-width="1.6"/><path d="M10 1.5v2M10 16.5v2M18.5 10h-2M3.5 10h-2M15.6 4.4l-1.4 1.4M5.8 14.2l-1.4 1.4M15.6 15.6l-1.4-1.4M5.8 5.8L4.4 4.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+          <button type="button" role="radio" data-value="dark" aria-checked="false" aria-label="Dark theme"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M17 11.5A7 7 0 1 1 8.5 3a5.5 5.5 0 0 0 8.5 8.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></button>
+          <button type="button" role="radio" data-value="system" aria-checked="false" aria-label="Match system theme"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="2" y="4" width="16" height="10.5" rx="1.5" stroke="currentColor" stroke-width="1.6"/><path d="M7 17.5h6M10 14.5v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <div class="auth-shell">
+
+    <aside class="auth-aside">
+      <a href="index.html" class="logo"><span class="logo-mark">T</span>TECHBISS</a>
+      <div>
+        <p class="auth-quote">"We stopped thinking of our website as a project with an end date. Now it's just part of how the business runs."</p>
+        <p class="auth-quote-attrib">— Owner, Anand Family Grocers</p>
+      </div>
+      <ul class="auth-trust">
+        <li><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l3.5 3.5L16 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>SSL-secured, monitored infrastructure</span></li>
+        <li><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l3.5 3.5L16 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Backups running automatically, every day</span></li>
+        <li><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l3.5 3.5L16 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>A real support team behind every account</span></li>
+      </ul>
+    </aside>
+
+    <div class="auth-main">
+      <div class="auth-card-wrap" data-reveal>
+        <a class="auth-top-link" href="index.html"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.6"/></svg> Back to techbiss.com</a>
+
+        <div class="role-tabs">
+          <div class="segmented" role="tablist" aria-label="Sign in as">
+            <button type="button" role="tab" data-role="client" aria-selected="true">Client</button>
+            <button type="button" role="tab" data-role="staff" aria-selected="false">Staff</button>
+            <button type="button" role="tab" data-role="admin" aria-selected="false">Admin</button>
+          </div>
+        </div>
+
+        <h1 id="auth-heading">Welcome back.</h1>
+        <p class="lede" id="auth-body">Sign in to manage your projects, websites and billing.</p>
+
+        <form id="login-form" novalidate>
+          <div class="field" id="field-email">
+            <label for="login-email">Email address</label>
+            <div class="field-input-wrap">
+              <input type="email" id="login-email" autocomplete="email" placeholder="you@yourbusiness.com">
+              <svg class="field-check" viewBox="0 0 20 20" fill="none" aria-hidden="true" hidden><path d="M4 10.5l3.5 3.5L16 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <p class="field-error" hidden><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.6"/><path d="M10 6.5v4.5M10 13.5v.01" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span>Enter a valid email address.</span></p>
+          </div>
+          <div class="field" id="field-password">
+            <label for="login-password">Password</label>
+            <div class="field-input-wrap">
+              <input type="password" id="login-password" autocomplete="current-password" placeholder="••••••••">
+              <svg class="field-check" viewBox="0 0 20 20" fill="none" aria-hidden="true" hidden><path d="M4 10.5l3.5 3.5L16 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <p class="field-error" hidden><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.6"/><path d="M10 6.5v4.5M10 13.5v.01" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span>Password must be at least 6 characters.</span></p>
+          </div>
+
+          <div class="auth-forgot">
+            <button type="button" id="forgot-btn" aria-expanded="false" aria-controls="reset-note">Forgot password?</button>
+          </div>
+          <p class="auth-reset-note" id="reset-note" hidden>Password reset isn't wired up in this preview — in the full product, we'd email you a secure reset link right away.</p>
+
+          <button type="submit" class="btn btn-primary btn-block magnetic" id="login-submit">Sign In</button>
+        </form>
+
+        <p class="auth-foot">Don't have an account yet? <a href="installer.html">Start your project</a> and we'll set one up.</p>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer class="footer-minimal">
+  <div class="container footer-legal">
+    <p>© 2026 TECHBISS. All rights reserved.</p>
+    <div class="footer-legal-links">
+      <a href="index.html">Back to techbiss.com</a>
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1/dist/lenis.min.js"></script>
+<script src="assets/js/main.js"></script>
+<script>
+/* ---------------- Login — role tabs, validation, submit micro-interaction ---------------- */
+(function(){
+  "use strict";
+  var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var ROLE_COPY = {
+    client: { heading: 'Welcome back.', body: 'Sign in to manage your projects, websites and billing.' },
+    staff: { heading: 'Staff sign in.', body: 'Sign in to access client projects and support queues.' },
+    admin: { heading: 'Admin sign in.', body: 'Sign in for full platform and account administration.' }
+  };
+  var currentRole = 'client';
+  var roleTabs = Array.prototype.slice.call(document.querySelectorAll('[data-role]'));
+  var headingEl = document.getElementById('auth-heading');
+  var bodyEl = document.getElementById('auth-body');
+
+  function selectRole(role){
+    currentRole = role;
+    roleTabs.forEach(function(t){ t.setAttribute('aria-selected', t.getAttribute('data-role') === role ? 'true' : 'false'); });
+    var copy = ROLE_COPY[role];
+    if (headingEl) headingEl.textContent = copy.heading;
+    if (bodyEl) bodyEl.textContent = copy.body;
+  }
+  roleTabs.forEach(function(t){ t.addEventListener('click', function(){ selectRole(t.getAttribute('data-role')); }); });
+
+  var emailInput = document.getElementById('login-email');
+  var passwordInput = document.getElementById('login-password');
+  var emailField = document.getElementById('field-email');
+  var passwordField = document.getElementById('field-password');
+  var form = document.getElementById('login-form');
+  var submitBtn = document.getElementById('login-submit');
+
+  function isValidEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+  function isValidPassword(v){ return v.length >= 6; }
+
+  function validate(input, fieldWrap, testFn, invalidMsg){
+    var errorBlock = fieldWrap.querySelector('.field-error');
+    var errorSpan = errorBlock.querySelector('span');
+    var checkIcon = fieldWrap.querySelector('.field-check');
+    var value = input.value.trim();
+    var ok = value !== '' && testFn(value);
+    fieldWrap.classList.toggle('has-error', !ok);
+    fieldWrap.classList.toggle('has-success', ok);
+    errorBlock.hidden = ok;
+    if (checkIcon) checkIcon.hidden = !ok;
+    errorSpan.textContent = value === '' ? 'This field is required.' : invalidMsg;
+    return ok;
+  }
+
+  emailInput.addEventListener('blur', function(){ validate(emailInput, emailField, isValidEmail, 'Enter a valid email address.'); });
+  passwordInput.addEventListener('blur', function(){ validate(passwordInput, passwordField, isValidPassword, 'Password must be at least 6 characters.'); });
+  emailInput.addEventListener('input', function(){ if (emailField.classList.contains('has-error')) validate(emailInput, emailField, isValidEmail, 'Enter a valid email address.'); });
+  passwordInput.addEventListener('input', function(){ if (passwordField.classList.contains('has-error')) validate(passwordInput, passwordField, isValidPassword, 'Password must be at least 6 characters.'); });
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var emailOk = validate(emailInput, emailField, isValidEmail, 'Enter a valid email address.');
+    var passOk = validate(passwordInput, passwordField, isValidPassword, 'Password must be at least 6 characters.');
+    if (!emailOk) { emailInput.focus(); return; }
+    if (!passOk) { passwordInput.focus(); return; }
+
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner" aria-hidden="true"></span> Signing in…';
+    setTimeout(function(){
+      window.location.href = 'dashboard.html?role=' + currentRole;
+    }, reduced ? 80 : 1000);
+  });
+
+  var forgotBtn = document.getElementById('forgot-btn');
+  var resetNote = document.getElementById('reset-note');
+  if (forgotBtn && resetNote) {
+    forgotBtn.addEventListener('click', function(){
+      var open = resetNote.hidden;
+      resetNote.hidden = !open;
+      forgotBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  }
+})();
+</script>
+</body>
+</html>

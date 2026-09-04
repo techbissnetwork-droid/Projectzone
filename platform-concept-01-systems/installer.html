@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Advanced Installer — TECHBISS</title>
+<meta name="description" content="The TECHBISS Advanced Installer — select, detect, configure, migrate, install, verify and launch, all from one guided flow.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230a0b0d'/%3E%3Cpath d='M8 8h16v3.2H8zM14.4 11.2h3.2V24h-3.2z' fill='%2322c5a3'/%3E%3C/svg%3E">
+<script>(function(){try{var t=localStorage.getItem('techbiss-theme');if(!t||t==='system'){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<script>(function(){document.documentElement.classList.add('js-anim');window.addEventListener('error',function(){document.querySelectorAll('[data-reveal]').forEach(function(el){el.classList.add('reveal-in');});});setTimeout(function(){document.querySelectorAll('[data-reveal]:not(.reveal-in)').forEach(function(el){el.classList.add('reveal-in');});},2500);})();</script>
+
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header" data-header>
+  <div class="header-inner">
+    <div class="header-shell">
+      <a href="index.html" class="logo">
+        <span class="logo-mark" aria-hidden="true">T</span>
+        <span class="logo-text">TECHBISS</span>
+        <span class="logo-tag">PLATFORM</span>
+      </a>
+      <nav class="main-nav" aria-label="Primary">
+        <ul>
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="marketplace.html" class="nav-link">Marketplace</a></li>
+          <li><a href="installer.html" class="nav-link">Installer</a></li>
+          <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <div class="theme-toggle" role="group" aria-label="Theme">
+          <button type="button" class="theme-btn" data-theme-choice="dark" aria-pressed="false" aria-label="Dark theme"><svg viewBox="0 0 24 24" fill="none"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></button>
+          <button type="button" class="theme-btn" data-theme-choice="light" aria-pressed="false" aria-label="Light theme"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.6"/><path d="M12 2.5v2.4M12 19.1v2.4M4.6 4.6l1.7 1.7M17.7 17.7l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.6 19.4l1.7-1.7M17.7 6.3l1.7-1.7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+          <button type="button" class="theme-btn" data-theme-choice="system" aria-pressed="false" aria-label="Match system theme"><svg viewBox="0 0 24 24" fill="none"><rect x="2.5" y="4.5" width="19" height="12.5" rx="1.6" stroke="currentColor" stroke-width="1.6"/><path d="M8.5 20.5h7M12 17v3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+        </div>
+        <a href="login.html" class="nav-link nav-link-ghost">Log In</a>
+        <a href="installer.html" class="btn btn-primary">Start Your Project</a>
+        <button class="nav-toggle" aria-label="Open menu" aria-expanded="false" data-nav-toggle><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </div>
+</header>
+<div class="mobile-nav" data-mobile-nav>
+  <ul class="mobile-nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="marketplace.html">Marketplace</a></li>
+    <li><a href="installer.html">Installer</a></li>
+    <li><a href="dashboard.html">Dashboard</a></li>
+    <li><a href="login.html">Log In</a></li>
+  </ul>
+  <div class="mobile-nav-foot">
+    <a href="installer.html" class="btn btn-primary">Start Your Project</a>
+    <a href="login.html" class="btn btn-outline">Log In</a>
+  </div>
+</div>
+
+<main id="main">
+
+<section class="installer-hero">
+  <div class="container">
+    <span class="eyebrow" data-reveal>The Advanced Installer</span>
+    <h1 data-reveal data-reveal-delay="60">From nothing to live, one verified step at a time.</h1>
+    <p data-reveal data-reveal-delay="100">Select what you're building, and the installer handles detection, configuration, migration, installation and verification — before anything goes live.</p>
+  </div>
+</section>
+
+<section class="installer-body hairline">
+  <div class="container">
+
+    <div class="stepper-rail" data-reveal>
+      <div class="stepper-track"><div class="stepper-fill" data-stepper-fill></div></div>
+      <ol class="stepper-markers">
+        <li class="stepper-marker is-active" data-step-marker="0"><span class="sm-dot mono">01</span><span class="sm-label">Select</span></li>
+        <li class="stepper-marker is-locked" data-step-marker="1"><span class="sm-dot mono">02</span><span class="sm-label">Detect</span></li>
+        <li class="stepper-marker is-locked" data-step-marker="2"><span class="sm-dot mono">03</span><span class="sm-label">Configure</span></li>
+        <li class="stepper-marker is-locked" data-step-marker="3"><span class="sm-dot mono">04</span><span class="sm-label">Import</span></li>
+        <li class="stepper-marker is-locked" data-step-marker="4"><span class="sm-dot mono">05</span><span class="sm-label">Install</span></li>
+        <li class="stepper-marker is-locked" data-step-marker="5"><span class="sm-dot mono">06</span><span class="sm-label">Verify</span></li>
+        <li class="stepper-marker is-locked" data-step-marker="6"><span class="sm-dot mono">07</span><span class="sm-label">Launch</span></li>
+      </ol>
+    </div>
+
+    <div class="panel installer-panel" data-installer data-flow="new" data-reveal data-reveal-delay="80">
+      <div class="panel-body">
+
+        <!-- STEP 1 — SELECT -->
+        <div class="step-pane" data-step-pane="0">
+          <div class="step-head">
+            <span class="ph-label mono">STEP 01 / SELECT</span>
+            <h2>What are we building?</h2>
+            <p>Choose a starting point — this shapes the rest of the install.</p>
+          </div>
+          <div class="radio-card-group">
+            <label class="radio-card is-checked">
+              <input type="radio" name="flow" value="new" checked>
+              <span class="radio-dot"></span>
+              <span class="rc-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="3" width="16" height="18" rx="1.6" stroke="currentColor" stroke-width="1.5"/><path d="M12 9v6M9 12h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span>
+              <span class="rc-text"><span class="rc-title">New Website</span><span class="rc-desc">Start from a blank environment or a marketplace template.</span></span>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="flow" value="migrate">
+              <span class="radio-dot"></span>
+              <span class="rc-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7h13M17 7l-3-3M17 7l-3 3M20 17H7M7 17l3-3M7 17l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span class="rc-text"><span class="rc-title">Migrate Existing Website</span><span class="rc-desc">Move an existing site onto the TECHBISS platform.</span></span>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="flow" value="marketplace">
+              <span class="radio-dot"></span>
+              <span class="rc-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M6 8h12l-1 12H7L6 8Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 8V6a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.5"/></svg></span>
+              <span class="rc-text"><span class="rc-title">Deploy a Marketplace Product</span><span class="rc-desc">Launch a ready-made theme from the marketplace.</span></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- STEP 2 — DETECT -->
+        <div class="step-pane" data-step-pane="1" hidden>
+          <div class="step-head">
+            <span class="ph-label mono">STEP 02 / DETECT</span>
+            <h2 data-flow-for="new">Checking your environment</h2>
+            <h2 data-flow-for="migrate">Scanning your existing website</h2>
+            <h2 data-flow-for="marketplace">Validating the product package</h2>
+            <p data-flow-for="new">We check domain, DNS and hosting readiness before anything is installed.</p>
+            <p data-flow-for="migrate">We scan your current site so nothing is missed during migration.</p>
+            <p data-flow-for="marketplace">We confirm the product package is compatible with your hosting plan.</p>
+          </div>
+          <div class="scan-panel">
+            <button type="button" class="btn btn-primary" data-action="start-scan">Start Scan</button>
+            <div class="scan-progress"><div class="scan-progress-bar" data-scan-bar></div></div>
+            <ul class="scan-log mono" data-flow-for="new" data-scan-log>
+              <li data-log-line>Checking domain availability…</li>
+              <li data-log-line>DNS provider detected: Cloudflare</li>
+              <li data-log-line>Recommended template: Business Starter</li>
+              <li data-log-line class="is-ok">Environment ready</li>
+            </ul>
+            <ul class="scan-log mono" data-flow-for="migrate" data-scan-log>
+              <li data-log-line>Detecting existing CMS…</li>
+              <li data-log-line>Found: WordPress 6.x</li>
+              <li data-log-line>SSL certificate: valid</li>
+              <li data-log-line class="is-ok">12 pages found</li>
+            </ul>
+            <ul class="scan-log mono" data-flow-for="marketplace" data-scan-log>
+              <li data-log-line>Validating product package…</li>
+              <li data-log-line>Product: Ember &amp; Table v2.1</li>
+              <li data-log-line>Dependencies resolved</li>
+              <li data-log-line class="is-ok">Compatible with current hosting plan</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- STEP 3 — CONFIGURE -->
+        <div class="step-pane" data-step-pane="2" hidden>
+          <div class="step-head">
+            <span class="ph-label mono">STEP 03 / CONFIGURE</span>
+            <h2>Configure your environment</h2>
+            <p>These details set up the site record — you can change them later from the dashboard.</p>
+          </div>
+          <form class="install-form" data-install-form novalidate>
+            <div class="field" data-field="domain">
+              <label for="instDomain">Domain <span class="opt">Required</span></label>
+              <div class="field-input-wrap">
+                <input class="input" id="instDomain" type="text" placeholder="yourbusiness.com" autocomplete="off">
+                <svg class="field-status-icon icon-success" viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <svg class="field-status-icon icon-error" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 7.5v6M12 16.5v.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+              </div>
+              <p class="field-msg" data-field-msg data-default-msg="Used for your live site and SSL certificate.">Used for your live site and SSL certificate.</p>
+            </div>
+            <div class="field" data-field="siteName">
+              <label for="instSiteName">Site name <span class="opt">Required</span></label>
+              <input class="input" id="instSiteName" type="text" placeholder="Your Business Name">
+              <p class="field-msg" data-field-msg data-default-msg="Shown in your dashboard and admin panel.">Shown in your dashboard and admin panel.</p>
+            </div>
+            <div class="field-row">
+              <div class="field" data-field="env">
+                <label for="instEnv">Environment</label>
+                <select class="select" id="instEnv">
+                  <option value="staging">Staging</option>
+                  <option value="production">Production</option>
+                </select>
+              </div>
+              <div class="field" data-field="dbName">
+                <label for="instDbName">Database name <span class="opt">Auto</span></label>
+                <input class="input" id="instDbName" type="text" placeholder="auto-generated" readonly>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- STEP 4 — IMPORT / MIGRATE -->
+        <div class="step-pane" data-step-pane="3" hidden>
+          <div class="step-head">
+            <span class="ph-label mono">STEP 04 / IMPORT</span>
+            <h2 data-flow-for="new">Provisioning starter content</h2>
+            <h2 data-flow-for="migrate">Migrating your existing site</h2>
+            <h2 data-flow-for="marketplace">Deploying product content</h2>
+            <p data-flow-for="new">We set up starter files, database and media so there's something live to build on.</p>
+            <p data-flow-for="migrate">Files, database and media are transferred from your existing site.</p>
+            <p data-flow-for="marketplace">Product files, demo database and media assets are deployed to your environment.</p>
+          </div>
+          <button type="button" class="btn btn-primary" data-action="start-import" data-flow-for="new">Start Provisioning</button>
+          <button type="button" class="btn btn-primary" data-action="start-import" data-flow-for="migrate">Start Migration</button>
+          <button type="button" class="btn btn-primary" data-action="start-import" data-flow-for="marketplace">Start Deployment</button>
+          <div class="import-bars">
+            <div class="import-bar-row">
+              <span class="ib-label mono">FILES</span>
+              <div class="ib-track"><div class="ib-fill" data-import-bar="files"></div></div>
+              <span class="ib-pct mono" data-import-pct="files">0%</span>
+            </div>
+            <div class="import-bar-row">
+              <span class="ib-label mono">DATABASE</span>
+              <div class="ib-track"><div class="ib-fill" data-import-bar="database"></div></div>
+              <span class="ib-pct mono" data-import-pct="database">0%</span>
+            </div>
+            <div class="import-bar-row">
+              <span class="ib-label mono">MEDIA</span>
+              <div class="ib-track"><div class="ib-fill" data-import-bar="media"></div></div>
+              <span class="ib-pct mono" data-import-pct="media">0%</span>
+            </div>
+          </div>
+          <p class="step-summary mono" data-import-summary hidden>✓ 142 files · 8 tables · 36 media assets transferred</p>
+        </div>
+
+        <!-- STEP 5 — INSTALL -->
+        <div class="step-pane" data-step-pane="4" hidden>
+          <div class="step-head">
+            <span class="ph-label mono">STEP 05 / INSTALL</span>
+            <h2>Installing your platform</h2>
+            <p>Each stage runs in order — this usually takes under a minute.</p>
+          </div>
+          <button type="button" class="btn btn-primary" data-action="start-install">Begin Installation</button>
+          <ul class="deploy-checklist checklist-lg" data-install-checklist>
+            <li data-install-step="provisioning"><span class="dc-icon"></span> Provisioning<span class="ic-status mono">PENDING</span></li>
+            <li data-install-step="installing"><span class="dc-icon"></span> Installing<span class="ic-status mono">PENDING</span></li>
+            <li data-install-step="configuring"><span class="dc-icon"></span> Configuring<span class="ic-status mono">PENDING</span></li>
+            <li data-install-step="optimizing"><span class="dc-icon"></span> Optimizing<span class="ic-status mono">PENDING</span></li>
+          </ul>
+          <p class="step-summary mono" data-install-summary hidden>✓ Installation complete</p>
+        </div>
+
+        <!-- STEP 6 — VERIFY -->
+        <div class="step-pane" data-step-pane="5" hidden>
+          <div class="step-head">
+            <span class="ph-label mono">STEP 06 / VERIFY</span>
+            <h2>Running final checks</h2>
+            <p>We verify the deployment end to end before it's safe to launch.</p>
+          </div>
+          <button type="button" class="btn btn-primary" data-action="start-verify">Run Checks</button>
+          <ul class="deploy-checklist checklist-lg" data-verify-checklist>
+            <li data-verify-step="ssl"><span class="dc-icon"></span> SSL certificate valid<span class="ic-status mono">PENDING</span></li>
+            <li data-verify-step="dns"><span class="dc-icon"></span> DNS propagated<span class="ic-status mono">PENDING</span></li>
+            <li data-verify-step="responding"><span class="dc-icon"></span> Site responding (200 OK)<span class="ic-status mono">PENDING</span></li>
+            <li data-verify-step="backups"><span class="dc-icon"></span> Backups configured<span class="ic-status mono">PENDING</span></li>
+          </ul>
+          <p class="step-summary mono" data-verify-summary hidden>✓ All checks passed</p>
+        </div>
+
+        <!-- STEP 7 — LAUNCH -->
+        <div class="step-pane" data-step-pane="6" hidden>
+          <div class="launch-confirm">
+            <span class="launch-badge"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <h2><span data-launch-sitename>Your site</span> is live.</h2>
+            <p>Deployed, verified, and ready for traffic.</p>
+            <a href="dashboard.html" class="btn btn-primary btn-lg">View Your Site</a>
+            <div class="launch-next">
+              <h3 class="mono">NEXT STEPS</h3>
+              <ul>
+                <li><a href="dashboard.html">Open your Client Dashboard →</a></li>
+                <li><a href="marketplace.html">Browse the Marketplace for add-ons →</a></li>
+                <li><a href="dashboard.html#support">Talk to Technical Support →</a></li>
+              </ul>
+            </div>
+            <button type="button" class="btn-link" data-action="restart">Start Another Project</button>
+          </div>
+        </div>
+
+      </div>
+      <div class="stepper-nav">
+        <button type="button" class="btn btn-outline" data-step-back hidden>← Back</button>
+        <button type="button" class="btn btn-primary" data-step-next>Next →</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+</main>
+
+<footer class="footer-min">
+  <div class="container">
+    <p class="footer-copy">© 2026 TECHBISS. All rights reserved.</p>
+    <nav class="footer-min-links" aria-label="Footer">
+      <a href="index.html">Home</a>
+      <a href="marketplace.html">Marketplace</a>
+      <a href="installer.html">Installer</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="login.html">Log In</a>
+      <a href="#" class="footer-legal-link">Privacy</a>
+      <a href="#" class="footer-legal-link">Terms</a>
+    </nav>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1/dist/lenis.min.js"></script>
+<script src="assets/js/main.js"></script>
+<script src="assets/js/installer.js"></script>
+</body>
+</html>

@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Advanced Installer — TECHBISS</title>
+<meta name="description" content="The TECHBISS Advanced Installer: select, detect, configure, migrate, install, verify and launch your site — one guided flow from start to live.">
+<script>(function(){try{var t=localStorage.getItem('techbiss-theme');if(!t||t==='system'){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();</script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><rect width=%2232%22 height=%2232%22 rx=%229%22 fill=%22%23221f1a%22/><rect x=%229%22 y=%229%22 width=%2214%22 height=%223.4%22 rx=%221.7%22 fill=%22%23a8622f%22/><rect x=%2214.3%22 y=%229%22 width=%223.4%22 height=%2214%22 rx=%221.7%22 fill=%22%23a8622f%22/></svg>">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<script>(function(){document.documentElement.classList.add('js-anim');window.addEventListener('error',function(){document.querySelectorAll('[data-reveal]').forEach(function(el){el.classList.add('reveal-in');});});setTimeout(function(){document.querySelectorAll('[data-reveal]:not(.reveal-in)').forEach(function(el){el.classList.add('reveal-in');});},2500);})();</script>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header" data-header>
+  <div class="header-shell">
+    <div class="header-inner">
+      <div class="header-row">
+        <a href="index.html" class="logo"><span class="logo-mark">T</span>TECHBISS</a>
+        <nav class="main-nav" aria-label="Primary">
+          <ul>
+            <li><a href="index.html" class="nav-link">Home</a></li>
+            <li><a href="marketplace.html" class="nav-link">Marketplace</a></li>
+            <li><a href="installer.html" class="nav-link">Installer</a></li>
+            <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+          </ul>
+        </nav>
+        <div class="header-actions">
+          <div class="theme-toggle" data-theme-toggle role="radiogroup" aria-label="Theme">
+            <button type="button" role="radio" data-value="light" aria-checked="false" aria-label="Light theme"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="4" stroke="currentColor" stroke-width="1.6"/><path d="M10 1.5v2M10 16.5v2M18.5 10h-2M3.5 10h-2M15.6 4.4l-1.4 1.4M5.8 14.2l-1.4 1.4M15.6 15.6l-1.4-1.4M5.8 5.8L4.4 4.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+            <button type="button" role="radio" data-value="dark" aria-checked="false" aria-label="Dark theme"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M17 11.5A7 7 0 1 1 8.5 3a5.5 5.5 0 0 0 8.5 8.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></button>
+            <button type="button" role="radio" data-value="system" aria-checked="false" aria-label="Match system theme"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="2" y="4" width="16" height="10.5" rx="1.5" stroke="currentColor" stroke-width="1.6"/><path d="M7 17.5h6M10 14.5v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+          </div>
+          <a href="login.html" class="nav-link header-login">Log In</a>
+          <a href="installer.html" class="btn btn-primary btn-sm header-cta magnetic">Start Your Journey</a>
+          <button class="nav-toggle" aria-label="Open menu" aria-expanded="false" data-nav-toggle>
+            <span></span><span></span><span></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-nav" data-mobile-nav>
+  <ul class="mobile-nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="marketplace.html">Marketplace</a></li>
+    <li><a href="installer.html">Installer</a></li>
+    <li><a href="dashboard.html">Dashboard</a></li>
+  </ul>
+  <div class="mobile-nav-foot">
+    <a href="installer.html" class="btn btn-primary">Start Your Journey →</a>
+    <a href="login.html" class="btn btn-outline">Log In</a>
+  </div>
+</div>
+
+<main id="main">
+
+  <section class="page-hero" style="padding-top:clamp(7rem,11vw,8.5rem);padding-bottom:clamp(1.5rem,3vw,2rem);">
+    <div class="container">
+      <nav class="breadcrumb" aria-label="Breadcrumb" data-reveal>
+        <a href="index.html">Home</a><span class="sep">/</span><span aria-current="page">Advanced Installer</span>
+      </nav>
+      <span class="eyebrow" data-reveal data-reveal-delay="40"><span class="eyebrow-swatch" aria-hidden="true"></span>The Advanced Installer</span>
+      <h1 data-reveal data-reveal-delay="80" style="max-width:20ch;font-size:clamp(2rem,1.6vw+1.5rem,2.9rem);">Let's get your site live.</h1>
+      <p class="lede" data-reveal data-reveal-delay="120">One guided flow — from telling us what you're starting with, to watching it go live. Nothing here is hidden from you; you'll see exactly what we see, at every step.</p>
+    </div>
+  </section>
+
+  <section class="section-tight" style="padding-top:0;">
+    <div class="container">
+      <div class="installer-shell" data-reveal>
+
+        <div class="installer-rail-wrap">
+          <div class="installer-rail" data-installer-rail style="--fill:0;">
+            <div class="installer-line" aria-hidden="true"></div>
+            <div class="installer-fill" aria-hidden="true" data-installer-fill></div>
+
+            <button type="button" class="installer-node is-active" data-installer-node="1" disabled>
+              <span class="installer-dot"><span class="num">1</span><svg class="check" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l3.5 3.5L16 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span class="installer-label">Select</span>
+            </button>
+            <button type="button" class="installer-node" data-installer-node="2" disabled>
+              <span class="installer-dot"><span class="num">2</span><svg class="check" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l3.5 3.5L16 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span class="installer-label">Detect</span>
+            </button>
+            <button type="button" class="installer-node" data-installer-node="3" disabled>
+              <span class="installer-dot"><span class="num">3</span><svg class="check" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l3.5 3.5L16 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span class="installer-label">Configure</span>
+            </button>
+            <button type="button" class="installer-node" data-installer-node="4" disabled>
+              <span class="installer-dot"><span class="num">4</span><svg class="check" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l3.5 3.5L16 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span class="installer-label">Import</span>
+            </button>
+            <button type="button" class="installer-node" data-installer-node="5" disabled>
+              <span class="installer-dot"><span class="num">5</span><svg class="check" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l3.5 3.5L16 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span class="installer-label">Install</span>
+            </button>
+            <button type="button" class="installer-node" data-installer-node="6" disabled>
+              <span class="installer-dot"><span class="num">6</span><svg class="check" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l3.5 3.5L16 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span class="installer-label">Verify</span>
+            </button>
+            <button type="button" class="installer-node" data-installer-node="7" disabled>
+              <span class="installer-dot"><span class="num">7</span><svg class="check" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l3.5 3.5L16 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span class="installer-label">Launch</span>
+            </button>
+          </div>
+          <p class="installer-status" data-installer-status>Step 1 of 7 — Select</p>
+        </div>
+
+        <!-- STEP 1: SELECT -->
+        <div class="install-step" data-install-step="1">
+          <div class="install-step-head">
+            <h2>What are we setting up today?</h2>
+            <p>Choose the path that matches where you're starting from — we'll tailor the next few steps to match.</p>
+          </div>
+
+          <div class="option-cards" role="radiogroup" aria-label="Setup type">
+            <label class="option-card is-checked">
+              <input type="radio" name="flow" value="new" checked>
+              <span class="check" aria-hidden="true"><svg viewBox="0 0 20 20" fill="none"><path d="M4 10.5l3.5 3.5L16 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span class="icon" aria-hidden="true"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.2" width="16" height="13.6" rx="2.2"/><path d="M3 8.4h16"/><path d="M8 13h6"/></svg></span>
+              <h3>New Website</h3>
+              <p>Starting fresh with a brand-new site, built from the ground up.</p>
+            </label>
+            <label class="option-card">
+              <input type="radio" name="flow" value="migrate">
+              <span class="check" aria-hidden="true"><svg viewBox="0 0 20 20" fill="none"><path d="M4 10.5l3.5 3.5L16 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span class="icon" aria-hidden="true"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11h11M10 6l4 5-4 5"/><path d="M19 5v12"/></svg></span>
+              <h3>Migrate Existing Website</h3>
+              <p>Bringing an existing site over to TECHBISS, without losing anything.</p>
+            </label>
+            <label class="option-card">
+              <input type="radio" name="flow" value="marketplace">
+              <span class="check" aria-hidden="true"><svg viewBox="0 0 20 20" fill="none"><path d="M4 10.5l3.5 3.5L16 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span class="icon" aria-hidden="true"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="16" height="13" rx="2"/><path d="M3 9.3h16"/><circle cx="6.3" cy="7.15" r=".5" fill="currentColor" stroke="none"/></svg></span>
+              <h3>Deploy a Marketplace Product</h3>
+              <p>Launching a ready-made template from the TECHBISS Marketplace.</p>
+            </label>
+          </div>
+          <p class="badge" id="select-product-note" hidden style="margin-top:1.4rem;"></p>
+
+          <div class="install-actions">
+            <button type="button" class="btn btn-primary magnetic" data-install-next>Next <svg class="arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 12L12 4M12 4H5M12 4V11" stroke="currentColor" stroke-width="2"/></svg></button>
+          </div>
+        </div>
+
+        <!-- STEP 2: DETECT -->
+        <div class="install-step" data-install-step="2" hidden>
+          <div class="install-step-head">
+            <h2 id="detect-heading">We found your site — here's what we see.</h2>
+            <p id="detect-body">We scanned the domain you're migrating from and here's a summary before we bring it over.</p>
+          </div>
+
+          <div class="detect-lines" id="detect-lines"></div>
+          <div class="detect-summary" id="detect-summary">
+            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l3.5 3.5L16 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>Looks good — you're ready to continue.</span>
+          </div>
+
+          <div class="install-actions">
+            <button type="button" class="btn btn-outline" data-install-back>Back</button>
+            <button type="button" class="btn btn-primary magnetic" data-install-next disabled>Next <svg class="arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 12L12 4M12 4H5M12 4V11" stroke="currentColor" stroke-width="2"/></svg></button>
+          </div>
+        </div>
+
+        <!-- STEP 3: CONFIGURE -->
+        <div class="install-step" data-install-step="3" hidden>
+          <div class="install-step-head">
+            <h2>Configure your site</h2>
+            <p>A few details so we set everything up under the right name, in the right place.</p>
+          </div>
+
+          <div class="config-form">
+            <div class="field" id="field-domain">
+              <label for="cfg-domain">Domain</label>
+              <div class="field-input-wrap">
+                <input type="text" id="cfg-domain" placeholder="yourbusiness.com" autocomplete="off">
+                <svg class="field-check" viewBox="0 0 20 20" fill="none" aria-hidden="true" hidden><path d="M4 10.5l3.5 3.5L16 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <p class="field-error" hidden><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.6"/><path d="M10 6.5v4.5M10 13.5v.01" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span>Enter a valid domain, like yourbusiness.com</span></p>
+            </div>
+            <div class="field" id="field-sitename">
+              <label for="cfg-sitename">Site name</label>
+              <div class="field-input-wrap">
+                <input type="text" id="cfg-sitename" placeholder="e.g. Anand Family Grocers" autocomplete="off">
+                <svg class="field-check" viewBox="0 0 20 20" fill="none" aria-hidden="true" hidden><path d="M4 10.5l3.5 3.5L16 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <p class="field-error" hidden><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.6"/><path d="M10 6.5v4.5M10 13.5v.01" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span>Give this project a name.</span></p>
+            </div>
+            <div class="field">
+              <label id="cfg-env-label">Environment</label>
+              <div class="segmented" role="group" aria-labelledby="cfg-env-label">
+                <button type="button" data-env="staging" aria-pressed="true">Staging</button>
+                <button type="button" data-env="production" aria-pressed="false">Production</button>
+              </div>
+              <p class="field-hint">Staging is a private preview link — switch to Production when you're ready to go live.</p>
+            </div>
+          </div>
+
+          <div class="install-actions">
+            <button type="button" class="btn btn-outline" data-install-back>Back</button>
+            <button type="button" class="btn btn-primary magnetic" id="cfg-next-btn">Next <svg class="arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 12L12 4M12 4H5M12 4V11" stroke="currentColor" stroke-width="2"/></svg></button>
+          </div>
+        </div>
+
+        <!-- STEP 4: IMPORT / MIGRATE -->
+        <div class="install-step" data-install-step="4" hidden>
+          <div class="install-step-head">
+            <h2 id="import-heading">Importing your content.</h2>
+            <p id="import-body">We're bringing your files, database and media over — nothing is deleted from the original until you confirm the switch.</p>
+          </div>
+
+          <div class="progress-bars" id="progress-bars">
+            <div class="progress-row">
+              <div class="progress-row-head"><span data-progress-label>Files</span><span data-progress-pct>0%</span></div>
+              <div class="progress-track"><div class="progress-fill" data-progress-fill></div></div>
+            </div>
+            <div class="progress-row">
+              <div class="progress-row-head"><span data-progress-label>Database</span><span data-progress-pct>0%</span></div>
+              <div class="progress-track"><div class="progress-fill" data-progress-fill></div></div>
+            </div>
+            <div class="progress-row">
+              <div class="progress-row-head"><span data-progress-label>Media</span><span data-progress-pct>0%</span></div>
+              <div class="progress-track"><div class="progress-fill" data-progress-fill></div></div>
+            </div>
+          </div>
+
+          <div class="install-actions">
+            <button type="button" class="btn btn-outline" data-install-back>Back</button>
+            <button type="button" class="btn btn-primary magnetic" data-install-next disabled>Next <svg class="arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 12L12 4M12 4H5M12 4V11" stroke="currentColor" stroke-width="2"/></svg></button>
+          </div>
+        </div>
+
+        <!-- STEP 5: INSTALL -->
+        <div class="install-step" data-install-step="5" hidden>
+          <div class="install-step-head">
+            <h2>Installing your site.</h2>
+            <p>This runs in order — each step waits for the one before it to finish cleanly.</p>
+          </div>
+
+          <div class="check-list" id="install-checklist">
+            <div class="check-list-item" data-check="0">
+              <span class="status-icon"><span class="spinner" aria-hidden="true"></span><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l3.5 3.5L16 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span class="check-list-item-body"><strong>Provisioning</strong><span>Allocating server resources for your site</span></span>
+            </div>
+            <div class="check-list-item" data-check="1">
+              <span class="status-icon"><span class="spinner" aria-hidden="true"></span><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l3.5 3.5L16 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span class="check-list-item-body"><strong>Installing</strong><span>Setting up the core platform files</span></span>
+            </div>
+            <div class="check-list-item" data-check="2">
+              <span class="status-icon"><span class="spinner" aria-hidden="true"></span><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l3.5 3.5L16 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span class="check-list-item-body"><strong>Configuring</strong><span>Applying your domain, name and environment settings</span></span>
+            </div>
+            <div class="check-list-item" data-check="3">
+              <span class="status-icon"><span class="spinner" aria-hidden="true"></span><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l3.5 3.5L16 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span class="check-list-item-body"><strong>Optimizing</strong><span>Tuning performance and caching for launch</span></span>
+            </div>
+          </div>
+
+          <div class="install-actions">
+            <button type="button" class="btn btn-outline" data-install-back>Back</button>
+            <button type="button" class="btn btn-primary magnetic" data-install-next disabled>Next <svg class="arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 12L12 4M12 4H5M12 4V11" stroke="currentColor" stroke-width="2"/></svg></button>
+          </div>
+        </div>
+
+        <!-- STEP 6: VERIFY -->
+        <div class="install-step" data-install-step="6" hidden>
+          <div class="install-step-head">
+            <h2>Verifying everything works.</h2>
+            <p>The same checks we'd run ourselves, before we'd ever call a site "done."</p>
+          </div>
+
+          <div class="check-list" id="verify-checklist">
+            <div class="check-list-item" data-check="0">
+              <span class="status-icon"><span class="spinner" aria-hidden="true"></span><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l3.5 3.5L16 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span class="check-list-item-body"><strong>SSL certificate</strong><span>Checking certificate validity</span></span>
+            </div>
+            <div class="check-list-item" data-check="1">
+              <span class="status-icon"><span class="spinner" aria-hidden="true"></span><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l3.5 3.5L16 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span class="check-list-item-body"><strong>DNS propagation</strong><span>Confirming your domain resolves correctly</span></span>
+            </div>
+            <div class="check-list-item" data-check="2">
+              <span class="status-icon"><span class="spinner" aria-hidden="true"></span><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l3.5 3.5L16 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span class="check-list-item-body"><strong>Site responding</strong><span>Requesting your homepage and checking the response</span></span>
+            </div>
+            <div class="check-list-item" data-check="3">
+              <span class="status-icon"><span class="spinner" aria-hidden="true"></span><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l3.5 3.5L16 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span class="check-list-item-body"><strong>Backups configured</strong><span>Scheduling automatic daily backups</span></span>
+            </div>
+          </div>
+
+          <div class="install-actions">
+            <button type="button" class="btn btn-outline" data-install-back>Back</button>
+            <button type="button" class="btn btn-primary magnetic" data-install-next disabled>Launch <svg class="arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 12L12 4M12 4H5M12 4V11" stroke="currentColor" stroke-width="2"/></svg></button>
+          </div>
+        </div>
+
+        <!-- STEP 7: LAUNCH -->
+        <div class="install-step launch-panel" data-install-step="7" hidden>
+          <div class="launch-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12.5 10 17.5 19.5 6.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <h2 id="launch-heading">You're live.</h2>
+          <p id="launch-body" class="text-dim">Your new site is up and running.</p>
+
+          <div class="launch-summary">
+            <div class="launch-summary-row"><span>Site name</span><span id="launch-sitename">—</span></div>
+            <div class="launch-summary-row"><span>Domain</span><span id="launch-domain">—</span></div>
+            <div class="launch-summary-row"><span>Environment</span><span id="launch-env">—</span></div>
+            <div class="launch-summary-row"><span>Plan</span><span id="launch-plan">—</span></div>
+          </div>
+
+          <div class="btn-row" style="justify-content:center;">
+            <button type="button" class="btn btn-primary magnetic" id="view-site-btn">View Your Site</button>
+            <a href="dashboard.html" class="btn btn-outline">Go to Dashboard</a>
+          </div>
+
+          <div class="launch-next">
+            <a href="dashboard.html">
+              <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="16" height="14" rx="2"/><path d="M3 8.5h16M8 8.5V18"/></svg>
+              <span><strong>Explore your Dashboard</strong><span>See projects, domains, billing and support in one place.</span></span>
+            </a>
+            <a href="marketplace.html">
+              <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h2.3L7 15.3a2 2 0 0 0 2 1.7h7a2 2 0 0 0 2-1.6l1.3-6.9H6"/><circle cx="9.3" cy="19.2" r="1.1" fill="currentColor" stroke="none"/><circle cx="15.7" cy="19.2" r="1.1" fill="currentColor" stroke="none"/></svg>
+              <span><strong>Browse more templates</strong><span>Add another site to your account from the Marketplace.</span></span>
+            </a>
+            <a href="mailto:hello@techbiss.com">
+              <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5.5" width="16" height="11.5" rx="2"/><path d="M3.4 6.4 11 12.5l7.6-6.1"/></svg>
+              <span><strong>Talk to our team</strong><span>Questions about what's next? We're here.</span></span>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- SITE PREVIEW MODAL -->
+<div class="modal-overlay" id="site-preview-modal" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="site-preview-title">
+    <div class="modal-head">
+      <h3 id="site-preview-title">Your site</h3>
+      <button type="button" class="modal-close" data-modal-close aria-label="Close preview"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div id="launch-preview-frame"></div>
+      <p class="text-dim" style="margin-top:1.1rem;font-size:.85rem;">A live look at your homepage — real screenshots replace this preview once your domain finishes propagating.</p>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="index.html" class="logo"><span class="logo-mark">T</span>TECHBISS</a>
+        <p>We don't just build websites. We build the entire digital presence of your business.</p>
+        <div class="footer-social">
+          <a href="#" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.4"/><path d="M8 10v6M8 7.5v.01M12 16v-3.5c0-1.5 1-2.5 2.5-2.5S17 11 17 12.5V16" stroke="currentColor" stroke-width="1.4"/></svg></a>
+          <a href="#" aria-label="X"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 4l16 16M20 4L4 20" stroke="currentColor" stroke-width="1.4"/></svg></a>
+          <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="1.4"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.4"/></svg></a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Services</h4>
+        <ul>
+          <li><a href="index.html#services">Website Design &amp; Development</a></li>
+          <li><a href="index.html#services">E-commerce Development</a></li>
+          <li><a href="index.html#services">Mobile App Development</a></li>
+          <li><a href="index.html#services">Business Digitization</a></li>
+          <li><a href="index.html#services">Domain &amp; Hosting</a></li>
+          <li><a href="index.html#services">SSL &amp; Security</a></li>
+          <li><a href="index.html#services">All Services →</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Solutions</h4>
+        <ul>
+          <li><a href="marketplace.html?industry=Restaurant">Restaurants &amp; Cafés</a></li>
+          <li><a href="marketplace.html?industry=Retail">Retail &amp; E-commerce</a></li>
+          <li><a href="marketplace.html?industry=Hotel">Hotels &amp; Travel</a></li>
+          <li><a href="marketplace.html?industry=School">Schools &amp; Education</a></li>
+          <li><a href="marketplace.html?industry=Clinic">Clinics &amp; Healthcare</a></li>
+          <li><a href="marketplace.html">All Industries →</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Marketplace</h4>
+        <ul>
+          <li><a href="marketplace.html">Browse All Templates</a></li>
+          <li><a href="marketplace-product.html?id=ember-table">Ember &amp; Table</a></li>
+          <li><a href="marketplace-product.html?id=threadline">Threadline</a></li>
+          <li><a href="installer.html">Advanced Installer</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom-cols">
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="index.html#process">Our Process</a></li>
+          <li><a href="index.html#trust">Why TECHBISS</a></li>
+          <li><a href="index.html#ecosystem">The Ecosystem</a></li>
+          <li><a href="dashboard.html">Client Dashboard</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Resources</h4>
+        <ul>
+          <li><a href="dashboard.html">Client Dashboard</a></li>
+          <li><a href="installer.html">Advanced Installer</a></li>
+          <li><a href="marketplace.html">Marketplace</a></li>
+          <li><a href="login.html">Log In</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Support</h4>
+        <ul>
+          <li><a href="dashboard.html#support">Help Center</a></li>
+          <li><a href="mailto:hello@techbiss.com">Talk to Us</a></li>
+          <li><a href="index.html#trust">System Status</a></li>
+          <li><a href="installer.html">Installer Guide</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="mailto:hello@techbiss.com">hello@techbiss.com</a></li>
+          <li><a href="tel:+14155550148">+1 (415) 555-0148</a></li>
+          <li><a href="mailto:hello@techbiss.com">Talk to TECHBISS →</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-legal">
+      <p>© 2026 TECHBISS. All rights reserved.</p>
+      <div class="footer-legal-links">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1/dist/lenis.min.js"></script>
+<script src="assets/js/main.js"></script>
+<script src="assets/js/products.js"></script>
+<script>
+/* ---------------- Advanced Installer — 7-step wizard state machine ---------------- */
+(function(){
+  "use strict";
+  var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var params = new URLSearchParams(location.search);
+  var presetId = params.get('product');
+  var product = (presetId && window.TB) ? window.TB.getById(presetId) : null;
+
+  var STEP_LABELS = ['Select', 'Detect', 'Configure', 'Import', 'Install', 'Verify', 'Launch'];
+  var TOTAL = STEP_LABELS.length;
+  var current = 1;
+  var maxVisited = 1;
+  var flow = 'new';
+  var envValue = 'staging';
+
+  var railWrap = document.querySelector('[data-installer-rail]');
+  var statusEl = document.querySelector('[data-installer-status]');
+  var nodes = Array.prototype.slice.call(document.querySelectorAll('[data-installer-node]'));
+  var panels = Array.prototype.slice.call(document.querySelectorAll('[data-install-step]'));
+
+  function renderRail(){
+    nodes.forEach(function(node){
+      var n = parseInt(node.getAttribute('data-installer-node'), 10);
+      node.classList.toggle('is-active', n === current);
+      node.classList.toggle('is-done', n < current);
+      node.disabled = n > maxVisited;
+    });
+    railWrap.style.setProperty('--fill', String((current - 1) / (TOTAL - 1)));
+    statusEl.textContent = 'Step ' + current + ' of ' + TOTAL + ' — ' + STEP_LABELS[current - 1];
+  }
+
+  function onStepShown(n){
+    if (n === 2) runDetect();
+    if (n === 4) runImport();
+    if (n === 5) runChecklist('install-checklist', 5, 'Complete');
+    if (n === 6) runChecklist('verify-checklist', 6, 'Passed');
+    if (n === 7) runLaunch();
+  }
+
+  function showStep(n){
+    current = n;
+    if (n > maxVisited) maxVisited = n;
+    panels.forEach(function(p){ p.hidden = (parseInt(p.getAttribute('data-install-step'), 10) !== n); });
+    renderRail();
+    var panel = panels[n - 1];
+    var heading = panel && panel.querySelector('h2');
+    if (heading) {
+      heading.setAttribute('tabindex', '-1');
+      heading.focus({ preventScroll: true });
+    }
+    if (panel) {
+      var top = panel.getBoundingClientRect().top + window.scrollY - 100;
+      window.scrollTo({ top: top, behavior: reduced ? 'auto' : 'smooth' });
+    }
+    onStepShown(n);
+  }
+
+  nodes.forEach(function(node){
+    node.addEventListener('click', function(){
+      var n = parseInt(node.getAttribute('data-installer-node'), 10);
+      if (n <= maxVisited && n !== current) showStep(n);
+    });
+  });
+  document.querySelectorAll('[data-install-next]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      if (btn.disabled) return;
+      if (current < TOTAL) showStep(current + 1);
+    });
+  });
+  document.querySelectorAll('[data-install-back]').forEach(function(btn){
+    btn.addEventListener('click', function(){ if (current > 1) showStep(current - 1); });
+  });
+
+  /* ---- Step 1: Select ---- */
+  document.querySelectorAll('input[name="flow"]').forEach(function(r){
+    r.addEventListener('change', function(){
+      if (!r.checked) return;
+      flow = r.value;
+      document.querySelectorAll('.option-card').forEach(function(card){
+        card.classList.toggle('is-checked', card.contains(r));
+      });
+    });
+  });
+  var productNote = document.getElementById('select-product-note');
+  if (product) {
+    var marketplaceRadio = document.querySelector('input[name="flow"][value="marketplace"]');
+    if (marketplaceRadio) {
+      document.querySelectorAll('.option-card').forEach(function(card){ card.classList.remove('is-checked'); });
+      marketplaceRadio.checked = true;
+      flow = 'marketplace';
+      marketplaceRadio.closest('.option-card').classList.add('is-checked');
+    }
+    if (productNote) {
+      productNote.hidden = false;
+      productNote.textContent = 'Continuing with: ' + product.name + ' (' + product.industry + ')';
+    }
+  }
+
+  /* ---- Step 2: Detect ---- */
+  function detectLinesFor(currentFlow){
+    if (currentFlow === 'migrate') {
+      return ['Looking at your current site…', 'Found: WordPress, 12 pages', 'SSL certificate: valid', 'Estimated migration size: 340MB'];
+    }
+    var lines = ['Provisioning a clean workspace…', 'Selecting the nearest data center…', 'Environment ready'];
+    if (currentFlow === 'marketplace' && product) lines.push('Product selected: ' + product.name);
+    return lines;
+  }
+  function runDetect(){
+    var container = document.getElementById('detect-lines');
+    var summary = document.getElementById('detect-summary');
+    var heading = document.getElementById('detect-heading');
+    var body = document.getElementById('detect-body');
+    var nextBtn = document.querySelector('[data-install-step="2"] [data-install-next]');
+
+    if (flow === 'migrate') {
+      heading.textContent = "We found your site — here's what we see.";
+      body.textContent = 'We scanned the domain you\'re migrating from and here\'s a summary before we bring it over.';
+    } else if (flow === 'marketplace' && product) {
+      heading.textContent = 'Preparing your environment.';
+      body.textContent = "We're setting up a clean environment for " + product.name + " before we configure it.";
+    } else {
+      heading.textContent = 'Preparing your environment.';
+      body.textContent = "We're setting up a clean, ready-to-configure environment for your new site.";
+    }
+
+    var lines = detectLinesFor(flow);
+    container.innerHTML = lines.map(function(text, i){
+      return '<div class="detect-line" data-line="' + i + '"><span class="dot"><span class="spinner" aria-hidden="true"></span><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l3.5 3.5L16 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><strong>' + text + '</strong></div>';
+    }).join('');
+    summary.classList.remove('is-in');
+    nextBtn.disabled = true;
+
+    var lineEls = Array.prototype.slice.call(container.querySelectorAll('.detect-line'));
+    if (reduced) {
+      lineEls.forEach(function(el){ el.classList.add('is-in', 'is-done'); });
+      summary.classList.add('is-in');
+      nextBtn.disabled = false;
+      return;
+    }
+    lineEls.forEach(function(el, i){
+      setTimeout(function(){
+        el.classList.add('is-in');
+        setTimeout(function(){ el.classList.add('is-done'); }, 480);
+      }, i * 620);
+    });
+    setTimeout(function(){
+      summary.classList.add('is-in');
+      nextBtn.disabled = false;
+    }, lineEls.length * 620 + 500);
+  }
+
+  /* ---- Step 3: Configure ---- */
+  document.querySelectorAll('[data-env]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      envValue = btn.getAttribute('data-env');
+      document.querySelectorAll('[data-env]').forEach(function(b){ b.setAttribute('aria-pressed', b === btn ? 'true' : 'false'); });
+    });
+  });
+
+  var domainInput = document.getElementById('cfg-domain');
+  var nameInput = document.getElementById('cfg-sitename');
+  var domainField = document.getElementById('field-domain');
+  var nameField = document.getElementById('field-sitename');
+
+  function isValidDomain(v){ return /^[a-z0-9-]+(\.[a-z0-9-]+)+$/i.test(v); }
+  function isValidName(v){ return v.length > 1; }
+
+  function validateField(input, fieldWrap, testFn){
+    var errorBlock = fieldWrap.querySelector('.field-error');
+    var checkIcon = fieldWrap.querySelector('.field-check');
+    var ok = testFn(input.value.trim());
+    fieldWrap.classList.toggle('has-error', !ok);
+    fieldWrap.classList.toggle('has-success', ok);
+    errorBlock.hidden = ok;
+    checkIcon.hidden = !ok;
+    return ok;
+  }
+
+  domainInput.addEventListener('blur', function(){ if (domainInput.value.trim()) validateField(domainInput, domainField, isValidDomain); });
+  nameInput.addEventListener('blur', function(){ if (nameInput.value.trim()) validateField(nameInput, nameField, isValidName); });
+  domainInput.addEventListener('input', function(){ if (domainField.classList.contains('has-error')) validateField(domainInput, domainField, isValidDomain); });
+  nameInput.addEventListener('input', function(){ if (nameField.classList.contains('has-error')) validateField(nameInput, nameField, isValidName); });
+
+  document.getElementById('cfg-next-btn').addEventListener('click', function(){
+    var domainOk = validateField(domainInput, domainField, isValidDomain);
+    var nameOk = validateField(nameInput, nameField, isValidName);
+    if (!domainOk) { domainInput.focus(); return; }
+    if (!nameOk) { nameInput.focus(); return; }
+    showStep(current + 1);
+  });
+
+  /* ---- Step 4: Import / Migrate ---- */
+  var IMPORT_LABELS = {
+    migrate: ['Files', 'Database', 'Media'],
+    new: ['Website Framework', 'Domain Connection', 'Starter Content'],
+    marketplace: ['Website Framework', 'Domain Connection', 'Starter Content']
+  };
+  function runImport(){
+    var heading = document.getElementById('import-heading');
+    var body = document.getElementById('import-body');
+    var labels = IMPORT_LABELS[flow] || IMPORT_LABELS.new;
+    if (flow === 'migrate') {
+      heading.textContent = 'Importing your content.';
+      body.textContent = "We're bringing your files, database and media over — nothing is deleted from the original until you confirm the switch.";
+    } else {
+      heading.textContent = 'Setting up your foundation.';
+      body.textContent = "We're laying down the framework your site runs on, before we install and configure it.";
+    }
+    var rows = Array.prototype.slice.call(document.querySelectorAll('#progress-bars .progress-row'));
+    var nextBtn = document.querySelector('[data-install-step="4"] [data-install-next]');
+    nextBtn.disabled = true;
+    var doneCount = 0;
+    rows.forEach(function(row, i){
+      row.querySelector('[data-progress-label]').textContent = labels[i];
+      var fill = row.querySelector('[data-progress-fill]');
+      var pct = row.querySelector('[data-progress-pct]');
+      fill.style.width = '0%';
+      pct.textContent = '0%';
+      if (reduced) {
+        fill.style.width = '100%';
+        pct.textContent = '100%';
+        doneCount++;
+        if (doneCount === rows.length) nextBtn.disabled = false;
+        return;
+      }
+      var duration = 1300 + i * 260;
+      var delay = i * 320;
+      setTimeout(function(){
+        var start = null;
+        function tick(ts){
+          if (!start) start = ts;
+          var p = Math.min(1, (ts - start) / duration);
+          var val = Math.round(p * 100);
+          fill.style.width = val + '%';
+          pct.textContent = val + '%';
+          if (p < 1) requestAnimationFrame(tick);
+          else {
+            doneCount++;
+            if (doneCount === rows.length) nextBtn.disabled = false;
+          }
+        }
+        requestAnimationFrame(tick);
+      }, delay);
+    });
+  }
+
+  /* ---- Steps 5 & 6: sequential checklists ---- */
+  function runChecklist(containerId, stepNum, doneText){
+    var items = Array.prototype.slice.call(document.querySelectorAll('#' + containerId + ' .check-list-item'));
+    var nextBtn = document.querySelector('[data-install-step="' + stepNum + '"] [data-install-next]');
+    nextBtn.disabled = true;
+    items.forEach(function(it){ it.classList.remove('is-active', 'is-done'); });
+
+    if (reduced) {
+      items.forEach(function(it){
+        it.classList.add('is-done');
+        var span = it.querySelector('.check-list-item-body span');
+        if (span) span.textContent = doneText;
+      });
+      nextBtn.disabled = false;
+      return;
+    }
+    function step(i){
+      if (i >= items.length) { nextBtn.disabled = false; return; }
+      items[i].classList.add('is-active');
+      setTimeout(function(){
+        items[i].classList.remove('is-active');
+        items[i].classList.add('is-done');
+        var span = items[i].querySelector('.check-list-item-body span');
+        if (span) span.textContent = doneText;
+        step(i + 1);
+      }, 720);
+    }
+    step(0);
+  }
+
+  /* ---- Step 7: Launch ---- */
+  function runLaunch(){
+    var domain = domainInput.value.trim() || 'yourbusiness.com';
+    var siteName = nameInput.value.trim() || 'Your New Site';
+    var envLabel = envValue === 'production' ? 'Production' : 'Staging';
+    var planLabel = (flow === 'marketplace' && product) ? product.name : (flow === 'migrate' ? 'Migrated Site' : 'New Website');
+
+    document.getElementById('launch-heading').textContent = "You're live.";
+    document.getElementById('launch-body').textContent = siteName + ' is up and running on ' + domain + '.';
+    document.getElementById('launch-sitename').textContent = siteName;
+    document.getElementById('launch-domain').textContent = domain;
+    document.getElementById('launch-env').textContent = envLabel;
+    document.getElementById('launch-plan').textContent = planLabel;
+
+    var previewFrame = document.getElementById('launch-preview-frame');
+    if (previewFrame && window.TB) {
+      var previewProduct = product || { pattern: 'hero', paletteIndex: 1 };
+      previewFrame.innerHTML = window.TB.previewHTML(previewProduct, 'lg');
+    }
+  }
+
+  var viewSiteBtn = document.getElementById('view-site-btn');
+  var siteModal = document.getElementById('site-preview-modal');
+  if (viewSiteBtn && siteModal) {
+    viewSiteBtn.addEventListener('click', function(){ window.techbissModal.open(siteModal, viewSiteBtn); });
+  }
+
+  showStep(1);
+})();
+</script>
+</body>
+</html>

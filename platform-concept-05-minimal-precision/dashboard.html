@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>(function(){try{var t=localStorage.getItem('techbiss-theme');if(!t||t==='system'){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>
+<title>Client Dashboard — TECHBISS</title>
+<meta name="description" content="Projects, websites, domains, hosting, billing and support — everything for your TECHBISS platform, in one place.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='5' fill='%230c0c0d'/%3E%3Crect x='8' y='9' width='16' height='2.4' fill='%23f4f4f3'/%3E%3Crect x='14.8' y='9' width='2.4' height='14' fill='%23f4f4f3'/%3E%3Crect x='21.5' y='19.5' width='4' height='4' fill='%233355e0'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<script>(function(){document.documentElement.classList.add('js-anim');window.addEventListener('error',function(){document.querySelectorAll('[data-reveal]').forEach(function(el){el.classList.add('reveal-in');});});setTimeout(function(){document.querySelectorAll('[data-reveal]:not(.reveal-in)').forEach(function(el){el.classList.add('reveal-in');});},2500);})();</script>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header" data-header>
+  <div class="header-inner">
+    <div class="header-shell">
+      <a href="index.html" class="logo">TECHBISS</a>
+      <div class="header-actions-simple">
+        <div class="theme-toggle" role="group" aria-label="Theme">
+          <button type="button" data-theme-btn="dark" aria-pressed="false" aria-label="Dark theme" title="Dark theme">D</button>
+          <button type="button" data-theme-btn="light" aria-pressed="false" aria-label="Light theme" title="Light theme">L</button>
+          <button type="button" data-theme-btn="system" aria-pressed="false" aria-label="Match system theme" title="System theme">S</button>
+        </div>
+        <a href="index.html" class="header-simple-link">Log Out</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <div class="app-shell">
+    <aside class="app-sidebar">
+      <div class="app-client">
+        <div class="name">Solstice Hospitality</div>
+        <div class="plan">Growth Plan</div>
+      </div>
+      <nav class="app-nav" aria-label="Dashboard">
+        <button type="button" data-panel-btn="overview">Overview</button>
+        <button type="button" data-panel-btn="projects">Projects</button>
+        <button type="button" data-panel-btn="websites">Websites &amp; Apps</button>
+        <button type="button" data-panel-btn="hosting">Domains &amp; Hosting</button>
+        <button type="button" data-panel-btn="billing">Billing &amp; Invoices</button>
+        <button type="button" data-panel-btn="support">Support</button>
+      </nav>
+    </aside>
+
+    <div class="app-main">
+
+      <!-- OVERVIEW -->
+      <section class="app-panel" data-panel="overview">
+        <div class="app-panel-head">
+          <div>
+            <h1>Overview</h1>
+            <p>Welcome back, Solstice Hospitality Group.</p>
+          </div>
+          <a href="installer.html" class="btn btn-primary btn-sm">New Project<span class="arrow">→</span></a>
+        </div>
+
+        <div class="stat-grid">
+          <div class="stat"><div class="stat-value">3</div><div class="stat-label">Active Projects</div></div>
+          <div class="stat"><div class="stat-value">5</div><div class="stat-label">Live Websites</div></div>
+          <div class="stat is-accent"><div class="stat-value">99.98%</div><div class="stat-label">Monthly Uptime</div></div>
+          <div class="stat"><div class="stat-value">2</div><div class="stat-label">Open Support Tickets</div></div>
+        </div>
+
+        <ul class="activity-list">
+          <li><span>SSL certificate renewed on solsticehospitality.com</span><time>2 days ago</time></li>
+          <li><span>Backup completed across all environments</span><time>6 hours ago</time></li>
+          <li><span>Invoice INV-1042 paid — Premium Hosting renewal</span><time>5 days ago</time></li>
+          <li><span>Booking Engine Integration moved to Review</span><time>1 week ago</time></li>
+        </ul>
+      </section>
+
+      <!-- PROJECTS -->
+      <section class="app-panel" data-panel="projects" hidden>
+        <div class="app-panel-head">
+          <div><h1>Projects</h1><p>Everything currently in build or review.</p></div>
+        </div>
+        <ul class="project-list">
+          <li class="project-row">
+            <div><div class="row-title">Main Website Redesign</div><div class="row-meta">Website Design &amp; Development — started Jun 2, 2026</div></div>
+            <span class="status-tag is-live"><span class="dot"></span>Live</span>
+          </li>
+          <li class="project-row">
+            <div><div class="row-title">Online Ordering App (iOS/Android)</div><div class="row-meta">Mobile App Development — started Jul 14, 2026</div></div>
+            <span class="status-tag is-progress"><span class="dot"></span>In Progress</span>
+          </li>
+          <li class="project-row">
+            <div><div class="row-title">Booking Engine Integration</div><div class="row-meta">Booking Systems — started Jul 28, 2026</div></div>
+            <span class="status-tag is-review"><span class="dot"></span>Review</span>
+          </li>
+          <li class="project-row">
+            <div><div class="row-title">CRM &amp; Loyalty System</div><div class="row-meta">CRM / Business Systems — started Aug 11, 2026</div></div>
+            <span class="status-tag is-progress"><span class="dot"></span>In Progress</span>
+          </li>
+        </ul>
+      </section>
+
+      <!-- WEBSITES & APPS -->
+      <section class="app-panel" data-panel="websites" hidden>
+        <div class="app-panel-head">
+          <div><h1>Websites &amp; Apps</h1><p>Live properties and their recent traffic.</p></div>
+        </div>
+        <ul class="web-list">
+          <li class="web-row">
+            <div><div class="row-title">solsticehospitality.com</div><div class="row-meta">Main Website</div></div>
+            <span class="sparkline" data-sparkline="40,44,42,50,55,52,60,64,61,68,72,70"></span>
+            <span class="status-tag is-live"><span class="dot"></span>Live</span>
+          </li>
+          <li class="web-row">
+            <div><div class="row-title">order.solsticehospitality.com</div><div class="row-meta">Online Ordering</div></div>
+            <span class="sparkline" data-sparkline="12,18,16,24,30,28,35,40,38,44,50,55"></span>
+            <span class="status-tag is-live"><span class="dot"></span>Live</span>
+          </li>
+          <li class="web-row">
+            <div><div class="row-title">book.solsticehospitality.com</div><div class="row-meta">Booking Portal</div></div>
+            <span class="sparkline" data-sparkline="20,22,19,25,23,27,24,29,31,28,33,30"></span>
+            <span class="status-tag is-live"><span class="dot"></span>Live</span>
+          </li>
+          <li class="web-row">
+            <div><div class="row-title">app-staging.solsticehospitality.com</div><div class="row-meta">Mobile App Companion</div></div>
+            <span class="sparkline" data-sparkline="4,5,4,6,5,7,6,8,7,9,8,10"></span>
+            <span class="status-tag is-progress"><span class="dot"></span>Staging</span>
+          </li>
+          <li class="web-row">
+            <div><div class="row-title">careers.solsticehospitality.com</div><div class="row-meta">Careers Microsite</div></div>
+            <span class="sparkline" data-sparkline="8,9,7,10,9,12,10,13,11,14,12,15"></span>
+            <span class="status-tag is-live"><span class="dot"></span>Live</span>
+          </li>
+        </ul>
+      </section>
+
+      <!-- DOMAINS & HOSTING -->
+      <section class="app-panel" data-panel="hosting" hidden>
+        <div class="app-panel-head">
+          <div><h1>Domains &amp; Hosting</h1><p>Plans, renewal dates and SSL status.</p></div>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Domain</th><th>Plan</th><th>Expiry</th><th>SSL Status</th></tr></thead>
+            <tbody>
+              <tr><td>solsticehospitality.com</td><td>Premium Hosting</td><td>Mar 14, 2027</td><td>Valid</td></tr>
+              <tr><td>order.solsticehospitality.com</td><td>VPS / Cloud</td><td>Mar 14, 2027</td><td>Valid</td></tr>
+              <tr><td>book.solsticehospitality.com</td><td>Premium Hosting</td><td>Jun 2, 2027</td><td>Valid</td></tr>
+              <tr><td>app-staging.solsticehospitality.com</td><td>VPS / Cloud (Staging)</td><td>Jan 9, 2027</td><td>Valid</td></tr>
+              <tr><td>solsticehospitality.co</td><td>Domain Only</td><td><b>Oct 2, 2026 — expiring soon</b></td><td>Not applicable</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- BILLING -->
+      <section class="app-panel" data-panel="billing" hidden>
+        <div class="app-panel-head">
+          <div><h1>Billing &amp; Invoices</h1><p>Recent charges across your account.</p></div>
+        </div>
+        <ul class="invoice-list">
+          <li><div class="invoice-row"><span class="id">INV-1044</span><span class="desc">Booking System Integration</span><span class="date">Sep 1, 2026</span><span class="amount">$650.00</span><span class="invoice-status status-tag is-progress"><span class="dot"></span>Due</span></div></li>
+          <li><div class="invoice-row"><span class="id">INV-1042</span><span class="desc">Premium Hosting — Annual Renewal</span><span class="date">Aug 14, 2026</span><span class="amount">$588.00</span><span class="invoice-status status-tag is-live"><span class="dot"></span>Paid</span></div></li>
+          <li><div class="invoice-row"><span class="id">INV-1038</span><span class="desc">VPS / Cloud Infrastructure</span><span class="date">Jun 2, 2026</span><span class="amount">$840.00</span><span class="invoice-status status-tag is-live"><span class="dot"></span>Paid</span></div></li>
+          <li><div class="invoice-row"><span class="id">INV-1031</span><span class="desc">Custom Web Application — Milestone 2</span><span class="date">Apr 18, 2026</span><span class="amount">$3,200.00</span><span class="invoice-status status-tag is-live"><span class="dot"></span>Paid</span></div></li>
+        </ul>
+      </section>
+
+      <!-- SUPPORT -->
+      <section class="app-panel" data-panel="support" hidden>
+        <div class="app-panel-head">
+          <div><h1>Support</h1><p>Open and recent tickets.</p></div>
+        </div>
+        <ul class="ticket-list">
+          <li class="ticket-row">
+            <div class="ticket-body">
+              <div class="row-title">#4033 — Add new menu items to booking portal</div>
+              <p>Requesting three new seasonal menu items be added to the online ordering flow ahead of the autumn menu launch.</p>
+              <div class="row-meta">Opened Sep 2, 2026</div>
+            </div>
+            <span class="status-tag is-progress"><span class="dot"></span>Open</span>
+          </li>
+          <li class="ticket-row">
+            <div class="ticket-body">
+              <div class="row-title">#4021 — SSL renewal confirmation for order subdomain</div>
+              <p>Confirming the SSL certificate on order.solsticehospitality.com renewed correctly after the DNS change.</p>
+              <div class="row-meta">Opened Aug 28, 2026</div>
+            </div>
+            <span class="status-tag is-live"><span class="dot"></span>Resolved</span>
+          </li>
+        </ul>
+      </section>
+
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer-minimal">
+  <div class="container footer-bottom">
+    <div class="footer-bottom-left">
+      <p class="footer-copy">© 2026 TECHBISS. All rights reserved.</p>
+      <div class="footer-legal-links">
+        <button type="button" data-legal-trigger="privacy">Privacy</button>
+        <button type="button" data-legal-trigger="terms">Terms</button>
+      </div>
+    </div>
+    <a href="index.html" class="text-link-quiet">Back to TECHBISS</a>
+  </div>
+</footer>
+
+<div class="legal-modal" data-legal-modal aria-hidden="true">
+  <div class="legal-modal-backdrop" data-legal-close></div>
+  <div class="legal-modal-panel" role="dialog" aria-modal="true" aria-label="Legal">
+    <button class="legal-modal-close" data-legal-close aria-label="Close">
+      <svg width="16" height="16" viewBox="0 0 16 16"><path d="M2 2l12 12M14 2L2 14" stroke="currentColor" stroke-width="1.4"/></svg>
+    </button>
+    <div data-legal-panel="privacy">
+      <h3>Privacy Policy</h3>
+      <p>TECHBISS collects only the information needed to design, build and support your project — account details, project requirements, and basic usage data for the services you use. We never sell client data, and information is shared with third parties only where a service you've asked for requires it (payment processing, hosting, or a similar integration).</p>
+      <p>You can request a copy of your data, ask us to correct it, or ask us to delete it at any time by contacting <a href="mailto:privacy@techbiss.com" class="text-link-quiet">privacy@techbiss.com</a>.</p>
+    </div>
+    <div data-legal-panel="terms" hidden>
+      <h3>Terms of Service</h3>
+      <p>Using TECHBISS services — the marketplace, the installer, or a custom-built project — means agreeing to use them lawfully and to keep any account credentials secure. Marketplace products are licensed for use on a single live domain per purchase unless otherwise agreed in writing.</p>
+      <p>Custom projects are governed by the statement of work agreed for that engagement. Questions about a specific agreement should go to <a href="mailto:hello@techbiss.com" class="text-link-quiet">hello@techbiss.com</a>.</p>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1/dist/lenis.min.js"></script>
+<script src="assets/js/main.js"></script>
+<script src="assets/js/dashboard.js"></script>
+</body>
+</html>

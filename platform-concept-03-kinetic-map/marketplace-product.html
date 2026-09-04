@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ember &amp; Table — TECHBISS Marketplace</title>
+<meta name="description" content="Ember & Table is a complete restaurant system — digital menu, online ordering, table reservations, payments and email, connected from day one.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%234b5eda'/%3E%3Cpath d='M9 21L16 11L23 21' stroke='%23ffffff' stroke-opacity='.55' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Ccircle cx='16' cy='11' r='2.4' fill='%23ffffff'/%3E%3Ccircle cx='9' cy='21' r='2.4' fill='%23ffffff'/%3E%3Ccircle cx='23' cy='21' r='2.6' fill='%233ddc84'/%3E%3C/svg%3E">
+<script>(function(){try{var t=localStorage.getItem('techbiss-theme');if(!t||t==='system'){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<script>(function(){document.documentElement.classList.add('js-anim');window.addEventListener('error',function(){document.querySelectorAll('[data-reveal]').forEach(function(el){el.classList.add('reveal-in');});});setTimeout(function(){document.querySelectorAll('[data-reveal]:not(.reveal-in)').forEach(function(el){el.classList.add('reveal-in');});},2500);})();</script>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header" data-header>
+  <div class="header-inner">
+    <div class="header-shell">
+      <a href="index.html" class="logo">
+        <span class="logo-mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x=".5" y=".5" width="31" height="31" rx="9" fill="var(--accent)"/><path d="M9 21L16 11L23 21" stroke="#fff" stroke-opacity=".55" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="16" cy="11" r="2.4" fill="#fff"/><circle cx="9" cy="21" r="2.4" fill="#fff"/><circle cx="23" cy="21" r="2.6" fill="#3ddc84"/></svg></span>
+        <span class="logo-word">TECHBISS</span>
+      </a>
+      <nav class="main-nav" aria-label="Primary">
+        <ul>
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="marketplace.html" class="nav-link" aria-current="page">Marketplace</a></li>
+          <li><a href="installer.html" class="nav-link">Installer</a></li>
+          <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <div class="theme-toggle" role="group" aria-label="Theme">
+          <button type="button" data-theme-option="light" aria-pressed="false" aria-label="Light theme"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="3.2" stroke="currentColor" stroke-width="1.5"/><path d="M10 2v2M10 16v2M4.2 4.2l1.4 1.4M14.4 14.4l1.4 1.4M2 10h2M16 10h2M4.2 15.8l1.4-1.4M14.4 5.6l1.4-1.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+          <button type="button" data-theme-option="dark" aria-pressed="false" aria-label="Dark theme"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M17 11.3A7 7 0 118.7 3a5.6 5.6 0 108.3 8.3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></button>
+          <button type="button" data-theme-option="system" aria-pressed="false" aria-label="Match system theme"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="2.5" y="4" width="15" height="10" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M7 17.5h6M10 14v3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+        </div>
+        <a href="login.html" class="nav-link nav-link-ghost">Log In</a>
+        <a href="installer.html" class="btn btn-primary btn-sm">Get Started</a>
+        <button class="nav-toggle" aria-label="Open menu" aria-expanded="false" data-nav-toggle>
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-nav" data-mobile-nav>
+  <ul class="mobile-nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="marketplace.html" aria-current="page">Marketplace</a></li>
+    <li><a href="installer.html">Installer</a></li>
+    <li><a href="dashboard.html">Dashboard</a></li>
+    <li><a href="login.html">Log In</a></li>
+  </ul>
+  <div class="mobile-nav-foot">
+    <a href="installer.html" class="btn btn-primary">Start Your Digital Journey →</a>
+    <div class="mobile-nav-note"><span class="status-dot is-live pulse"></span> All systems operational</div>
+  </div>
+</div>
+
+<main id="main">
+
+  <section class="product-detail-hero">
+    <div class="container">
+      <nav class="breadcrumb" aria-label="Breadcrumb" data-reveal>
+        <a href="marketplace.html">Marketplace</a><span aria-hidden="true">/</span>
+        <a href="marketplace.html?industry=Restaurant">Restaurant</a><span aria-hidden="true">/</span>
+        <span aria-current="page">Ember &amp; Table</span>
+      </nav>
+
+      <div class="product-detail-grid">
+        <div class="product-gallery" data-reveal>
+          <div class="gallery-frame" data-gallery-frame data-active-view="home" aria-hidden="true">
+            <span class="preview-bar"><span></span><span></span><span></span><span class="preview-url">emberandtable.techbiss.app</span></span>
+            <span class="preview-body">
+              <span class="pv a"></span><span class="pv b"></span><span class="pv c"></span><span class="pv d"></span><span class="pv e"></span><span class="pv f"></span>
+            </span>
+          </div>
+          <div class="gallery-thumbs" role="tablist" aria-label="Preview views">
+            <button type="button" data-gallery-thumb="home" aria-selected="true" role="tab">Homepage</button>
+            <button type="button" data-gallery-thumb="menu" aria-selected="false" role="tab">Menu</button>
+            <button type="button" data-gallery-thumb="checkout" aria-selected="false" role="tab">Checkout</button>
+            <button type="button" data-gallery-thumb="mobile" aria-selected="false" role="tab">Mobile</button>
+          </div>
+        </div>
+
+        <div class="product-summary" data-reveal data-reveal-delay="80">
+          <span class="chip chip-accent">Restaurant</span>
+          <h1>Ember &amp; Table</h1>
+          <p class="lede">A complete restaurant system — not just a menu page. Diners browse, order and pay from their phone; the kitchen sees it the moment it lands.</p>
+
+          <div class="pricing-panel panel panel-pad" data-buy-flow>
+            <div class="price-row">
+              <span class="price-amount">$249</span>
+              <span class="price-note">one-time · includes 1 year hosting &amp; SSL</span>
+            </div>
+            <ul class="price-includes">
+              <li><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Full source, no lock-in</li>
+              <li><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Free updates for 12 months</li>
+              <li><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Deploy to your own domain</li>
+            </ul>
+            <div class="buy-steps">
+              <button type="button" class="btn btn-primary btn-block" data-buy-purchase>Purchase — $249</button>
+              <button type="button" class="btn btn-outline btn-block" data-buy-configure disabled>Configure</button>
+              <button type="button" class="btn btn-outline btn-block" data-buy-deploy disabled><span data-btn-label>Deploy</span></button>
+            </div>
+            <div class="buy-status-row">
+              <span class="status-pill is-idle" data-buy-status>Not purchased yet</span>
+            </div>
+            <div class="deploy-result" data-deploy-result hidden>
+              <span class="status-dot is-live pulse"></span> Deployed — <a href="dashboard.html">view it in your dashboard →</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-tight">
+    <div class="container">
+      <div class="detail-columns">
+        <div class="detail-main" data-reveal>
+          <div class="detail-tabs" data-tabs>
+            <div class="tab-bar" role="tablist">
+              <button type="button" data-tab-btn="overview" aria-selected="true" role="tab">Overview</button>
+              <button type="button" data-tab-btn="features" aria-selected="false" role="tab">Features</button>
+              <button type="button" data-tab-btn="tech" aria-selected="false" role="tab">What's Included</button>
+            </div>
+
+            <div data-tab-panel="overview" class="tab-panel">
+              <p>Ember &amp; Table replaces a phone line and a stack of paper tickets with one connected ordering system. Guests scan a code or visit the site, browse a live menu, place an order and pay — all before the food leaves the kitchen. Table reservations run through the same system, so front-of-house always knows what's coming.</p>
+              <p>Every part of the product is wired together from the start: menu changes update everywhere at once, orders sync straight to payments, and confirmation emails send themselves. It's built on the same TECHBISS platform as a custom build, just pre-configured for a restaurant.</p>
+            </div>
+            <div data-tab-panel="features" class="tab-panel" hidden>
+              <ul class="detail-feature-list">
+                <li>Live digital menu with categories, photos and dietary tags</li>
+                <li>Online ordering with pickup and delivery modes</li>
+                <li>Table reservation calendar with party-size limits</li>
+                <li>Integrated card and wallet payments at checkout</li>
+                <li>Automatic order-confirmation and receipt emails</li>
+                <li>Kitchen-facing order queue, updated in real time</li>
+                <li>Mobile-first design tuned for one-handed ordering</li>
+                <li>Built-in SEO for "restaurants near me" style search</li>
+              </ul>
+            </div>
+            <div data-tab-panel="tech" class="tab-panel" hidden>
+              <div class="tech-grid">
+                <div class="tech-item"><span class="tech-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="14" rx="2"/><path d="M3.5 9h17"/></svg></span>Website</div>
+                <div class="tech-item"><span class="tech-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/><path d="M6.5 14h4"/></svg></span>Payments</div>
+                <div class="tech-item"><span class="tech-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="16" rx="2"/><path d="M3.5 9.5h17M8 3v3M16 3v3"/></svg></span>Booking</div>
+                <div class="tech-item"><span class="tech-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.2" y="5.5" width="17.6" height="13" rx="2"/><path d="M3.6 7l8.4 6 8.4-6"/></svg></span>Business Email</div>
+                <div class="tech-item"><span class="tech-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.2l6.8 2.6v5.4c0 4.4-2.9 7.4-6.8 8.6-3.9-1.2-6.8-4.2-6.8-8.6V5.8L12 3.2z"/><path d="M9.2 12l2 2 3.6-4"/></svg></span>SSL &amp; Security</div>
+                <div class="tech-item"><span class="tech-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4.5" width="16" height="5.5" rx="1.4"/><rect x="4" y="14" width="16" height="5.5" rx="1.4"/><circle cx="7.3" cy="7.25" r=".6" fill="currentColor" stroke="none"/><circle cx="7.3" cy="16.75" r=".6" fill="currentColor" stroke="none"/></svg></span>Premium Hosting</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <aside class="detail-aside" data-reveal data-reveal-delay="60">
+          <div class="panel panel-pad">
+            <h3>What's connected</h3>
+            <p class="text-dim" style="font-size:.85rem;margin-top:.4rem;">Every system in this product talks to the others — nothing is bolted on separately.</p>
+            <div class="mesh-graph" aria-hidden="true">
+              <svg class="node-graph-svg" viewBox="0 0 300 220" preserveAspectRatio="xMidYMid meet">
+                <line class="connector-line is-accent" pathLength="100" x1="50%" y1="13.6%" x2="83.3%" y2="63.6%"/>
+                <line class="connector-line is-accent" pathLength="100" x1="50%" y1="13.6%" x2="50%" y2="86.4%"/>
+                <line class="connector-line is-accent" pathLength="100" x1="50%" y1="13.6%" x2="16.7%" y2="63.6%"/>
+                <line class="connector-line is-accent" pathLength="100" x1="83.3%" y1="63.6%" x2="50%" y2="86.4%"/>
+                <line class="connector-line is-accent" pathLength="100" x1="83.3%" y1="63.6%" x2="16.7%" y2="63.6%"/>
+                <line class="connector-line is-accent" pathLength="100" x1="50%" y1="86.4%" x2="16.7%" y2="63.6%"/>
+              </svg>
+              <div class="node-mini is-accent" style="left:50%;top:13.6%"><span class="node-mark node-mark-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="14" rx="2"/><path d="M3.5 9h17"/></svg></span><span class="node-mini-label">Website</span></div>
+              <div class="node-mini is-accent" style="left:83.3%;top:63.6%"><span class="node-mark node-mark-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/><path d="M6.5 14h4"/></svg></span><span class="node-mini-label">Payments</span></div>
+              <div class="node-mini is-accent" style="left:50%;top:86.4%"><span class="node-mark node-mark-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="16" rx="2"/><path d="M3.5 9.5h17M8 3v3M16 3v3"/></svg></span><span class="node-mini-label">Booking</span></div>
+              <div class="node-mini is-accent" style="left:16.7%;top:63.6%"><span class="node-mark node-mark-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.2" y="5.5" width="17.6" height="13" rx="2"/><path d="M3.6 7l8.4 6 8.4-6"/></svg></span><span class="node-mini-label">Email</span></div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <section class="band section-tight">
+    <div class="container">
+      <div class="section-head" data-reveal>
+        <span class="eyebrow"><span class="dot"></span> You Might Also Like</span>
+        <h2>Related products</h2>
+      </div>
+      <div class="related-grid" data-stagger>
+        <a class="related-card" href="marketplace.html?industry=Freelancer" data-reveal>
+          <span class="preview-window" data-preview="portfolio" aria-hidden="true"><span class="preview-bar"><span></span><span></span><span></span></span><span class="preview-body"><span class="pv a"></span><span class="pv b"></span><span class="pv c"></span><span class="pv d"></span><span class="pv e"></span></span></span>
+          <div class="related-body"><span class="chip chip-accent">Freelancer</span><h3>Solo Works</h3><span class="product-price">$129</span></div>
+        </a>
+        <a class="related-card" href="marketplace.html?industry=Travel" data-reveal data-reveal-delay="70">
+          <span class="preview-window" data-preview="itinerary" aria-hidden="true"><span class="preview-bar"><span></span><span></span><span></span></span><span class="preview-body"><span class="pv a"></span><span class="pv b"></span><span class="pv c"></span><span class="pv d"></span><span class="pv e"></span></span></span>
+          <div class="related-body"><span class="chip chip-accent">Travel</span><h3>Wanderlane</h3><span class="product-price">$289</span></div>
+        </a>
+        <a class="related-card" href="marketplace.html?industry=Retail" data-reveal data-reveal-delay="140">
+          <span class="preview-window" data-preview="catalog" aria-hidden="true"><span class="preview-bar"><span></span><span></span><span></span></span><span class="preview-body"><span class="pv a"></span><span class="pv b"></span><span class="pv c"></span><span class="pv d"></span><span class="pv e"></span></span></span>
+          <div class="related-body"><span class="chip chip-accent">Retail</span><h3>Thread &amp; Co.</h3><span class="product-price">$229</span></div>
+        </a>
+        <a class="related-card" href="marketplace.html?industry=Clinic" data-reveal data-reveal-delay="210">
+          <span class="preview-window" data-preview="form" aria-hidden="true"><span class="preview-bar"><span></span><span></span><span></span></span><span class="preview-body"><span class="pv a"></span><span class="pv b"></span><span class="pv c"></span><span class="pv d"></span><span class="pv e"></span></span></span>
+          <div class="related-body"><span class="chip chip-accent">Clinic</span><h3>Clearview Clinic</h3><span class="product-price">$259</span></div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="index.html" class="logo">
+          <span class="logo-mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x=".5" y=".5" width="31" height="31" rx="9" fill="var(--accent)"/><path d="M9 21L16 11L23 21" stroke="#fff" stroke-opacity=".55" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="16" cy="11" r="2.4" fill="#fff"/><circle cx="9" cy="21" r="2.4" fill="#fff"/><circle cx="23" cy="21" r="2.6" fill="#3ddc84"/></svg></span>
+          <span>TECHBISS</span>
+        </a>
+        <p>The platform behind your business's entire digital presence — website, apps, hosting, payments and growth, built and run as one connected system.</p>
+        <div class="footer-social">
+          <a href="https://www.linkedin.com/company/techbiss" target="_blank" rel="noopener" aria-label="TECHBISS on LinkedIn"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="4" stroke="currentColor" stroke-width="1.4"/><path d="M8 10v6M8 7.6v.01M12 16v-3.6c0-1.4 1-2.4 2.4-2.4S16.8 11 16.8 12.4V16" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></a>
+          <a href="https://x.com/techbiss" target="_blank" rel="noopener" aria-label="TECHBISS on X"><svg viewBox="0 0 24 24" fill="none"><path d="M5 5l14 14M19 5L5 19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></a>
+          <a href="https://github.com/techbiss" target="_blank" rel="noopener" aria-label="TECHBISS on GitHub"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2a10 10 0 00-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.46-1.16-1.11-1.47-1.11-1.47-.9-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.52 2.34 1.08 2.91.83.09-.65.35-1.08.63-1.33-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02a9.53 9.53 0 015 0c1.91-1.3 2.75-1.02 2.75-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10 10 0 0012 2z" fill="currentColor"/></svg></a>
+          <a href="https://instagram.com/techbiss" target="_blank" rel="noopener" aria-label="TECHBISS on Instagram"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="1.4"/><circle cx="12" cy="12" r="3.6" stroke="currentColor" stroke-width="1.4"/><circle cx="17.2" cy="6.8" r="1" fill="currentColor"/></svg></a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Services</h4>
+        <ul>
+          <li><a href="index.html#services">Website Design &amp; Development</a></li>
+          <li><a href="index.html#services">E-commerce Development</a></li>
+          <li><a href="index.html#services">Mobile App Development</a></li>
+          <li><a href="index.html#services">Business Digitization</a></li>
+          <li><a href="index.html#services">All services →</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Solutions</h4>
+        <ul>
+          <li><a href="marketplace.html?industry=Restaurant">Restaurants</a></li>
+          <li><a href="marketplace.html?industry=Retail">Retail</a></li>
+          <li><a href="marketplace.html?industry=Hotel">Hotels &amp; Travel</a></li>
+          <li><a href="marketplace.html?industry=Clinic">Clinics &amp; Healthcare</a></li>
+          <li><a href="marketplace.html?industry=Real Estate">Real Estate</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Marketplace</h4>
+        <ul>
+          <li><a href="marketplace.html">Browse all products</a></li>
+          <li><a href="marketplace.html?sort=newest">Newest releases</a></li>
+          <li><a href="marketplace-product.html">Ember &amp; Table — Restaurant</a></li>
+          <li><a href="installer.html">Deploy a product</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="index.html#trust">Why TECHBISS</a></li>
+          <li><a href="index.html#process">Our process</a></li>
+          <li><a href="index.html#transformations">Client transformations</a></li>
+          <li><a href="dashboard.html">Client dashboard</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Support</h4>
+        <ul>
+          <li><a href="installer.html">Installer guide</a></li>
+          <li><a href="dashboard.html#support">Support tickets</a></li>
+          <li><a href="dashboard.html#billing">Billing &amp; invoices</a></li>
+          <li><a href="login.html">Staff / Admin login</a></li>
+          <li><a href="mailto:hello@techbiss.com">hello@techbiss.com</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom" id="legal">
+      <p>© 2026 TECHBISS. All rights reserved.</p>
+      <div class="footer-legal">
+        <a href="mailto:legal@techbiss.com">Privacy Policy</a>
+        <a href="mailto:legal@techbiss.com">Terms of Service</a>
+        <a href="mailto:legal@techbiss.com">Cookie Policy</a>
+      </div>
+      <div class="footer-status"><span class="status-dot is-live pulse"></span> All systems operational</div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1/dist/lenis.min.js"></script>
+<script src="assets/js/main.js"></script>
+</body>
+</html>

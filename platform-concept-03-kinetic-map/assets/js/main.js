@@ -348,10 +348,9 @@
      MARKETPLACE PRODUCT PAGE — gallery tabs + purchase/configure/deploy
      ============================================================ */
   (function initProductPage(){
-    var gallery = document.querySelector('[data-gallery]');
-    if (gallery) {
-      var frame = gallery.querySelector('[data-gallery-frame]');
-      var thumbs = gallery.querySelectorAll('[data-gallery-thumb]');
+    var frame = document.querySelector('[data-gallery-frame]');
+    if (frame) {
+      var thumbs = document.querySelectorAll('[data-gallery-thumb]');
       thumbs.forEach(function(thumb){
         thumb.addEventListener('click', function(){
           thumbs.forEach(function(t){ t.setAttribute('aria-selected', 'false'); });
@@ -415,6 +414,21 @@
       });
     }
   })();
+
+  /* ============================================================
+     GENERIC SEGMENTED CONTROL — [data-segmented] > [data-segmented-option]
+     ============================================================ */
+  document.querySelectorAll('[data-segmented]').forEach(function(group){
+    var opts = group.querySelectorAll('[data-segmented-option]');
+    opts.forEach(function(opt){
+      opt.addEventListener('click', function(){
+        opts.forEach(function(o){ o.setAttribute('aria-selected', 'false'); });
+        opt.setAttribute('aria-selected', 'true');
+        var hidden = group.parentElement && group.parentElement.querySelector('input[type="hidden"]');
+        if (hidden) hidden.value = opt.getAttribute('data-segmented-option');
+      });
+    });
+  });
 
   /* ============================================================
      INSTALLER — Select → Detect → Configure → Import → Install →

@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Installer — TECHBISS</title>
+<meta name="description" content="The TECHBISS Advanced Installer — select, detect, configure, migrate, install, verify and launch a new site, migration or marketplace product.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%234b5eda'/%3E%3Cpath d='M9 21L16 11L23 21' stroke='%23ffffff' stroke-opacity='.55' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Ccircle cx='16' cy='11' r='2.4' fill='%23ffffff'/%3E%3Ccircle cx='9' cy='21' r='2.4' fill='%23ffffff'/%3E%3Ccircle cx='23' cy='21' r='2.6' fill='%233ddc84'/%3E%3C/svg%3E">
+<script>(function(){try{var t=localStorage.getItem('techbiss-theme');if(!t||t==='system'){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<script>(function(){document.documentElement.classList.add('js-anim');window.addEventListener('error',function(){document.querySelectorAll('[data-reveal]').forEach(function(el){el.classList.add('reveal-in');});});setTimeout(function(){document.querySelectorAll('[data-reveal]:not(.reveal-in)').forEach(function(el){el.classList.add('reveal-in');});},2500);})();</script>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header" data-header>
+  <div class="header-inner">
+    <div class="header-shell">
+      <a href="index.html" class="logo">
+        <span class="logo-mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x=".5" y=".5" width="31" height="31" rx="9" fill="var(--accent)"/><path d="M9 21L16 11L23 21" stroke="#fff" stroke-opacity=".55" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="16" cy="11" r="2.4" fill="#fff"/><circle cx="9" cy="21" r="2.4" fill="#fff"/><circle cx="23" cy="21" r="2.6" fill="#3ddc84"/></svg></span>
+        <span class="logo-word">TECHBISS</span>
+      </a>
+      <nav class="main-nav" aria-label="Primary">
+        <ul>
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="marketplace.html" class="nav-link">Marketplace</a></li>
+          <li><a href="installer.html" class="nav-link" aria-current="page">Installer</a></li>
+          <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <div class="theme-toggle" role="group" aria-label="Theme">
+          <button type="button" data-theme-option="light" aria-pressed="false" aria-label="Light theme"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="3.2" stroke="currentColor" stroke-width="1.5"/><path d="M10 2v2M10 16v2M4.2 4.2l1.4 1.4M14.4 14.4l1.4 1.4M2 10h2M16 10h2M4.2 15.8l1.4-1.4M14.4 5.6l1.4-1.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+          <button type="button" data-theme-option="dark" aria-pressed="false" aria-label="Dark theme"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M17 11.3A7 7 0 118.7 3a5.6 5.6 0 108.3 8.3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></button>
+          <button type="button" data-theme-option="system" aria-pressed="false" aria-label="Match system theme"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="2.5" y="4" width="15" height="10" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M7 17.5h6M10 14v3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+        </div>
+        <a href="login.html" class="nav-link nav-link-ghost">Log In</a>
+        <a href="installer.html" class="btn btn-primary btn-sm">Get Started</a>
+        <button class="nav-toggle" aria-label="Open menu" aria-expanded="false" data-nav-toggle>
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-nav" data-mobile-nav>
+  <ul class="mobile-nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="marketplace.html">Marketplace</a></li>
+    <li><a href="installer.html" aria-current="page">Installer</a></li>
+    <li><a href="dashboard.html">Dashboard</a></li>
+    <li><a href="login.html">Log In</a></li>
+  </ul>
+  <div class="mobile-nav-foot">
+    <a href="installer.html" class="btn btn-primary">Start Your Digital Journey →</a>
+    <div class="mobile-nav-note"><span class="status-dot is-live pulse"></span> All systems operational</div>
+  </div>
+</div>
+
+<main id="main">
+
+  <section class="installer-shell">
+    <div class="container">
+      <span class="eyebrow" data-reveal><span class="dot"></span> Advanced Installer</span>
+      <h1 data-reveal data-reveal-delay="60" style="max-width:26ch;">Get your system online in seven steps</h1>
+      <p class="lede" data-reveal data-reveal-delay="120" style="margin-bottom:2.5rem;">The same installer TECHBISS uses internally — select what you're building, and it detects, configures and verifies the rest.</p>
+
+      <div class="installer-panel-wrap" data-installer data-reveal data-reveal-delay="180">
+        <div class="stepper-wrap">
+          <div class="stepper" role="tablist" aria-label="Installation steps">
+            <button type="button" class="stepper-node" data-rail-node aria-selected="true">
+              <span class="stepper-dot"><span>1</span><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span class="stepper-connector" aria-hidden="true"></span>
+              <span class="stepper-label">Select</span>
+            </button>
+            <button type="button" class="stepper-node" data-rail-node aria-selected="false">
+              <span class="stepper-dot"><span>2</span><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span class="stepper-connector" aria-hidden="true"></span>
+              <span class="stepper-label">Detect</span>
+            </button>
+            <button type="button" class="stepper-node" data-rail-node aria-selected="false">
+              <span class="stepper-dot"><span>3</span><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span class="stepper-connector" aria-hidden="true"></span>
+              <span class="stepper-label">Configure</span>
+            </button>
+            <button type="button" class="stepper-node" data-rail-node aria-selected="false">
+              <span class="stepper-dot"><span>4</span><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span class="stepper-connector" aria-hidden="true"></span>
+              <span class="stepper-label">Import</span>
+            </button>
+            <button type="button" class="stepper-node" data-rail-node aria-selected="false">
+              <span class="stepper-dot"><span>5</span><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span class="stepper-connector" aria-hidden="true"></span>
+              <span class="stepper-label">Install</span>
+            </button>
+            <button type="button" class="stepper-node" data-rail-node aria-selected="false">
+              <span class="stepper-dot"><span>6</span><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span class="stepper-connector" aria-hidden="true"></span>
+              <span class="stepper-label">Verify</span>
+            </button>
+            <button type="button" class="stepper-node" data-rail-node aria-selected="false">
+              <span class="stepper-dot"><span>7</span><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span class="stepper-label">Launch</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- STEP 1 — SELECT -->
+        <div class="step-panel installer-panel" data-step-panel="select">
+          <h2>What are you setting up?</h2>
+          <p class="field-hint">Pick one to continue — later steps adjust based on this.</p>
+          <div class="radio-card-group">
+            <label class="radio-card">
+              <input type="radio" name="install-mode" value="new">
+              <span class="radio-card-face">
+                <span class="radio-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></span>
+                <span><span class="radio-card-title">New Website</span><span class="radio-card-desc">Start fresh from a TECHBISS starter template.</span></span>
+                <span class="radio-card-mark" aria-hidden="true"></span>
+              </span>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="install-mode" value="migrate">
+              <span class="radio-card-face">
+                <span class="radio-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 0113.9-5.4M20 12a8 8 0 01-13.9 5.4"/><path d="M17.5 3.5v3.5H14M6.5 20.5V17H10"/></svg></span>
+                <span><span class="radio-card-title">Migrate Existing Website</span><span class="radio-card-desc">Bring your current site's content, media and database over.</span></span>
+                <span class="radio-card-mark" aria-hidden="true"></span>
+              </span>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="install-mode" value="marketplace">
+              <span class="radio-card-face">
+                <span class="radio-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.2" fill="currentColor" stroke="none"/><circle cx="17" cy="20" r="1.2" fill="currentColor" stroke="none"/><path d="M3 4h2l2.2 11.2a2 2 0 002 1.8h7.6a2 2 0 002-1.7L20 8H6"/></svg></span>
+                <span><span class="radio-card-title">Deploy a Marketplace Product</span><span class="radio-card-desc">Launch a product you've purchased, like Ember &amp; Table.</span></span>
+                <span class="radio-card-mark" aria-hidden="true"></span>
+              </span>
+            </label>
+          </div>
+          <p class="mode-summary" data-mode-summary hidden></p>
+        </div>
+
+        <!-- STEP 2 — DETECT -->
+        <div class="step-panel installer-panel" data-step-panel="detect" hidden>
+          <h2>Scanning your environment</h2>
+          <p class="field-hint">This runs automatically — no input needed.</p>
+          <div class="scan-console">
+            <div class="scan-console-head">
+              <span class="mono text-dim" style="font-size:.8rem;">techbiss-detect --target=environment</span>
+              <span class="status-pill is-accent" data-detect-status>Scanning…</span>
+            </div>
+            <ul class="scan-log" data-scan-log></ul>
+          </div>
+        </div>
+
+        <!-- STEP 3 — CONFIGURE -->
+        <div class="step-panel installer-panel" data-step-panel="configure" hidden>
+          <h2>Configure your site</h2>
+          <p class="field-hint">You can change all of this later from your dashboard.</p>
+          <div class="field">
+            <label for="install-sitename">Site name</label>
+            <input type="text" class="input" id="install-sitename" name="install-sitename" placeholder="e.g. Ember &amp; Table">
+            <span class="field-error"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/><path d="M8 5v4M8 11h.01" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg> Site name is required</span>
+          </div>
+          <div class="field">
+            <label for="install-domain">Domain</label>
+            <div class="input-group">
+              <span class="input-prefix">https://</span>
+              <input type="text" class="input" id="install-domain" name="install-domain" placeholder="yourbusiness.com">
+            </div>
+            <span class="field-hint">Use a domain you already own, or register one from your dashboard after launch.</span>
+            <span class="field-error"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/><path d="M8 5v4M8 11h.01" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg> Enter a valid domain, like yourbusiness.com</span>
+          </div>
+          <div class="field">
+            <label id="install-env-label">Environment</label>
+            <div class="segmented" data-segmented role="group" aria-labelledby="install-env-label">
+              <button type="button" data-segmented-option="staging" aria-selected="true">Staging</button>
+              <button type="button" data-segmented-option="production" aria-selected="false">Production</button>
+            </div>
+            <input type="hidden" name="install-environment" value="staging">
+            <span class="field-hint">Staging is a private preview link — switch to Production when you're ready to go live.</span>
+          </div>
+        </div>
+
+        <!-- STEP 4 — IMPORT / MIGRATE -->
+        <div class="step-panel installer-panel" data-step-panel="import" hidden>
+          <h2>Import &amp; migrate</h2>
+          <p class="field-hint">Content is copied, never moved — your original stays untouched.</p>
+          <div data-import-bars>
+            <div class="import-bar" data-import-bar>
+              <div class="import-bar-head"><span>Files</span><span data-import-pct>0%</span></div>
+              <div class="progress-track"><div class="progress-fill"></div></div>
+            </div>
+            <div class="import-bar" data-import-bar>
+              <div class="import-bar-head"><span>Database</span><span data-import-pct>0%</span></div>
+              <div class="progress-track"><div class="progress-fill"></div></div>
+            </div>
+            <div class="import-bar" data-import-bar>
+              <div class="import-bar-head"><span>Media</span><span data-import-pct>0%</span></div>
+              <div class="progress-track"><div class="progress-fill"></div></div>
+            </div>
+          </div>
+          <p class="field-hint" data-import-skip hidden></p>
+        </div>
+
+        <!-- STEP 5 — INSTALL -->
+        <div class="step-panel installer-panel" data-step-panel="install" hidden>
+          <h2>Installing your system</h2>
+          <p class="field-hint">This usually takes under a minute.</p>
+          <div class="checklist" data-install-checklist>
+            <div class="checklist-item"><span class="checklist-icon"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="checklist-label">Provisioning environment</span></div>
+            <div class="checklist-item"><span class="checklist-icon"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="checklist-label">Installing core system</span></div>
+            <div class="checklist-item"><span class="checklist-icon"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="checklist-label">Configuring integrations</span></div>
+            <div class="checklist-item"><span class="checklist-icon"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="checklist-label">Optimizing performance</span></div>
+          </div>
+        </div>
+
+        <!-- STEP 6 — VERIFY -->
+        <div class="step-panel installer-panel" data-step-panel="verify" hidden>
+          <h2>Verifying everything works</h2>
+          <p class="field-hint">Automated checks run before we let you launch.</p>
+          <div class="checklist" data-verify-checklist>
+            <div class="checklist-item"><span class="checklist-icon"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="checklist-label">SSL certificate valid</span></div>
+            <div class="checklist-item"><span class="checklist-icon"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="checklist-label">DNS propagated</span></div>
+            <div class="checklist-item"><span class="checklist-icon"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="checklist-label">Site responding (200 OK)</span></div>
+            <div class="checklist-item"><span class="checklist-icon"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="checklist-label">Backups configured</span></div>
+          </div>
+        </div>
+
+        <!-- STEP 7 — LAUNCH -->
+        <div class="step-panel installer-panel launch-panel" data-step-panel="launch" hidden>
+          <span class="launch-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg></span>
+          <h2>You're live</h2>
+          <p class="field-hint">Every check passed — your system is provisioned, verified and connected.</p>
+          <div class="launch-domain-row"><span class="status-dot is-live pulse"></span> <span data-launch-domain>yourbusiness.techbiss.app</span></div>
+          <ul class="next-steps">
+            <li><span class="status-dot is-live pulse"></span> Invite your team from the dashboard</li>
+            <li><span class="status-dot is-live pulse"></span> Connect a custom domain when you're ready</li>
+            <li><span class="status-dot is-live pulse"></span> Watch traffic and orders roll in, live</li>
+          </ul>
+          <div class="btn-row">
+            <a href="marketplace-product.html" class="btn btn-primary">View Your Site →</a>
+            <a href="dashboard.html" class="btn btn-outline">Go to Dashboard</a>
+          </div>
+        </div>
+
+        <div class="installer-nav">
+          <button type="button" class="btn btn-outline" data-installer-back hidden>← Back</button>
+          <button type="button" class="btn btn-primary" data-installer-next disabled>Continue →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="index.html" class="logo">
+          <span class="logo-mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x=".5" y=".5" width="31" height="31" rx="9" fill="var(--accent)"/><path d="M9 21L16 11L23 21" stroke="#fff" stroke-opacity=".55" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="16" cy="11" r="2.4" fill="#fff"/><circle cx="9" cy="21" r="2.4" fill="#fff"/><circle cx="23" cy="21" r="2.6" fill="#3ddc84"/></svg></span>
+          <span>TECHBISS</span>
+        </a>
+        <p>The platform behind your business's entire digital presence — website, apps, hosting, payments and growth, built and run as one connected system.</p>
+        <div class="footer-social">
+          <a href="https://www.linkedin.com/company/techbiss" target="_blank" rel="noopener" aria-label="TECHBISS on LinkedIn"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="4" stroke="currentColor" stroke-width="1.4"/><path d="M8 10v6M8 7.6v.01M12 16v-3.6c0-1.4 1-2.4 2.4-2.4S16.8 11 16.8 12.4V16" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></a>
+          <a href="https://x.com/techbiss" target="_blank" rel="noopener" aria-label="TECHBISS on X"><svg viewBox="0 0 24 24" fill="none"><path d="M5 5l14 14M19 5L5 19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></a>
+          <a href="https://github.com/techbiss" target="_blank" rel="noopener" aria-label="TECHBISS on GitHub"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2a10 10 0 00-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.46-1.16-1.11-1.47-1.11-1.47-.9-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.52 2.34 1.08 2.91.83.09-.65.35-1.08.63-1.33-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02a9.53 9.53 0 015 0c1.91-1.3 2.75-1.02 2.75-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10 10 0 0012 2z" fill="currentColor"/></svg></a>
+          <a href="https://instagram.com/techbiss" target="_blank" rel="noopener" aria-label="TECHBISS on Instagram"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="1.4"/><circle cx="12" cy="12" r="3.6" stroke="currentColor" stroke-width="1.4"/><circle cx="17.2" cy="6.8" r="1" fill="currentColor"/></svg></a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Services</h4>
+        <ul>
+          <li><a href="index.html#services">Website Design &amp; Development</a></li>
+          <li><a href="index.html#services">E-commerce Development</a></li>
+          <li><a href="index.html#services">Mobile App Development</a></li>
+          <li><a href="index.html#services">Business Digitization</a></li>
+          <li><a href="index.html#services">All services →</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Solutions</h4>
+        <ul>
+          <li><a href="marketplace.html?industry=Restaurant">Restaurants</a></li>
+          <li><a href="marketplace.html?industry=Retail">Retail</a></li>
+          <li><a href="marketplace.html?industry=Hotel">Hotels &amp; Travel</a></li>
+          <li><a href="marketplace.html?industry=Clinic">Clinics &amp; Healthcare</a></li>
+          <li><a href="marketplace.html?industry=Real Estate">Real Estate</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Marketplace</h4>
+        <ul>
+          <li><a href="marketplace.html">Browse all products</a></li>
+          <li><a href="marketplace.html?sort=newest">Newest releases</a></li>
+          <li><a href="marketplace-product.html">Ember &amp; Table — Restaurant</a></li>
+          <li><a href="installer.html">Deploy a product</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="index.html#trust">Why TECHBISS</a></li>
+          <li><a href="index.html#process">Our process</a></li>
+          <li><a href="index.html#transformations">Client transformations</a></li>
+          <li><a href="dashboard.html">Client dashboard</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Support</h4>
+        <ul>
+          <li><a href="installer.html">Installer guide</a></li>
+          <li><a href="dashboard.html#support">Support tickets</a></li>
+          <li><a href="dashboard.html#billing">Billing &amp; invoices</a></li>
+          <li><a href="login.html">Staff / Admin login</a></li>
+          <li><a href="mailto:hello@techbiss.com">hello@techbiss.com</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom" id="legal">
+      <p>© 2026 TECHBISS. All rights reserved.</p>
+      <div class="footer-legal">
+        <a href="mailto:legal@techbiss.com">Privacy Policy</a>
+        <a href="mailto:legal@techbiss.com">Terms of Service</a>
+        <a href="mailto:legal@techbiss.com">Cookie Policy</a>
+      </div>
+      <div class="footer-status"><span class="status-dot is-live pulse"></span> All systems operational</div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1/dist/lenis.min.js"></script>
+<script src="assets/js/main.js"></script>
+</body>
+</html>
