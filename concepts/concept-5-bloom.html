@@ -409,15 +409,30 @@ button{ cursor:pointer; }
 @keyframes scrollx{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
 
 /* ============================= FLIP CARDS (marketplace) ============================= */
-.flip-card{ perspective:1400px; height:340px; }
+.flip-card{ perspective:1400px; height:388px; transition:transform .35s cubic-bezier(.34,1.4,.4,1); }
+.flip-card:hover{ transform:translateY(-5px); }
 .flip-inner{ position:relative; width:100%; height:100%; transition:transform .7s cubic-bezier(.4,.2,.2,1); transform-style:preserve-3d; }
 .flip-card.flipped .flip-inner, .flip-card:hover .flip-inner{ transform:rotateY(180deg); }
 .flip-face{ position:absolute; inset:0; backface-visibility:hidden; border-radius:var(--r-xl); padding:26px; display:flex; flex-direction:column; border:1px solid var(--border-soft); box-shadow:var(--shadow-sm); }
+.flip-card:hover .flip-face{ box-shadow:var(--shadow-md); }
 .flip-front{ background:var(--surface); }
-.flip-back{ background:var(--grad); color:#fff5ee; transform:rotateY(180deg); justify-content:space-between; }
+.flip-back{ background:var(--grad); color:#fff5ee; transform:rotateY(180deg); justify-content:space-between; padding-top:54px; }
 .flip-back p{ color:rgba(255,245,238,.92); }
 .flip-peek{ position:absolute; top:12px; right:12px; width:34px; height:34px; border-radius:50%; background:var(--surface-2); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; z-index:3; }
 .flip-peek svg{ width:16px; height:16px; }
+
+.pf-cover{ display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:16px; }
+.pf-rating{ display:inline-flex; align-items:center; gap:5px; font-family:var(--font-display); font-weight:700; font-size:.78rem; color:var(--ink-soft); background:var(--surface-2); padding:5px 10px; border-radius:var(--r-full); flex:none; }
+.pf-rating .icon{ width:12px; height:12px; color:#f0a83c; }
+.pf-tags{ display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap; }
+.pf-foot{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:auto; padding-top:16px; border-top:1px solid var(--border-soft); }
+.pf-price{ font-family:var(--font-display); font-weight:800; font-size:1.2rem; color:var(--ink); }
+.pf-price span{ font-size:.72rem; font-weight:600; color:var(--ink-faint); }
+.pf-hint{ display:inline-flex; align-items:center; gap:5px; font-size:.72rem; font-weight:600; color:var(--ink-faint); }
+.pf-hint .icon{ width:12px; height:12px; }
+.fb-specs{ display:flex; flex-direction:column; gap:9px; margin:14px 0; }
+.fb-specs .icon{ width:14px; height:14px; flex:none; color:#fff2ea; }
+.fb-specs span{ font-size:.85rem; }
 
 /* ============================= FILTER CHIPS ============================= */
 .chip-row{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:34px; }
@@ -425,6 +440,7 @@ button{ cursor:pointer; }
 .chip.active{ background:var(--grad); color:#fff2ea; border-color:transparent; }
 .search-field{ display:flex; align-items:center; gap:10px; background:var(--surface); border:1.5px solid var(--border); border-radius:var(--r-full); padding:10px 20px; max-width:320px; margin-bottom:24px; }
 .search-field input{ border:none; background:none; outline:none; width:100%; }
+.mkt-count{ color:var(--ink-faint); font-size:.85rem; font-weight:600; margin:-8px 0 22px; }
 
 /* ============================= TABS / STEPPER ============================= */
 .tabbar{ display:flex; gap:8px; background:var(--surface-2); padding:6px; border-radius:var(--r-full); width:max-content; margin-bottom:32px; flex-wrap:wrap; }
@@ -718,7 +734,8 @@ var ICONS = {
   search:'<circle cx="10.5" cy="10.5" r="6" stroke="currentColor" stroke-width="1.8"/><path d="m19 19-4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
   refresh:'<path d="M4 12a8 8 0 0 1 13.9-5.4M20 12a8 8 0 0 1-13.9 5.4M17 3.5V7h-3.5M7 20.5V17h3.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>',
   spark:'<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M18 6l-2.5 2.5M8.5 15.5 6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
-  layers:'<path d="M12 3.5 3.5 8 12 12.5 20.5 8 12 3.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="m3.5 12 8.5 4.5L20.5 12M3.5 16l8.5 4.5L20.5 16" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>'
+  layers:'<path d="M12 3.5 3.5 8 12 12.5 20.5 8 12 3.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="m3.5 12 8.5 4.5L20.5 12M3.5 16l8.5 4.5L20.5 16" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>',
+  star:'<path d="M12 3.4l2.7 5.5 6 .9-4.4 4.2 1 6-5.3-2.8-5.3 2.8 1-6-4.4-4.2 6-.9L12 3.4Z" fill="currentColor"/>'
 };
 function ico(name,cls){ return '<svg class="icon '+(cls||'')+'" viewBox="0 0 24 24" fill="none" aria-hidden="true">'+(ICONS[name]||ICONS.spark)+'</svg>'; }
 function blobIcon(name,size,soft){ return '<div class="blob-icon '+(size||'')+' '+(soft?'soft':'')+'">'+ico(name)+'</div>'; }
@@ -1063,7 +1080,7 @@ Pages['/'] = function(){
     +'<div class="hero-cta"><a href="#/solutions" class="btn btn-primary magnetic">Explore solutions '+ico('arrow')+'</a><a href="#/contact" class="btn btn-ghost magnetic">Book a walkthrough</a></div>'
     +'<div class="hero-stats">'+statBlock('1,240+','Platforms shipped')+statBlock('54','Countries served')+statBlock('99.98%','Average uptime')+statBlock('4.9/5','Client rating')+'</div>'
     +'</div>'
-    +'<div class="hero-visual"><svg class="hero-blob-main" viewBox="0 0 200 200"><path fill="url(#heroGrad)" d="M52,-64C67,-54,78,-38,81,-20C84,-2,79,17,68,33C57,49,40,62,20,69C0,76,-24,77,-42,66C-60,55,-72,32,-75,8C-78,-16,-72,-42,-56,-58C-40,-74,-14,-80,7,-83C28,-86,37,-74,52,-64Z" transform="translate(100 100)"/><defs><linearGradient id="heroGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ff7a52"/><stop offset="55%" stop-color="#ff9c6b"/><stop offset="100%" stop-color="#ffb648"/></linearGradient></defs></svg>'
+    +'<div class="hero-visual"><svg class="hero-blob-main" viewBox="0 0 200 200"><path fill="url(#heroGrad)" d="M52,-64C67,-54,78,-38,81,-20C84,-2,79,17,68,33C57,49,40,62,20,69C0,76,-24,77,-42,66C-60,55,-72,32,-75,8C-78,-16,-72,-42,-56,-58C-40,-74,-14,-80,7,-83C28,-86,37,-74,52,-64Z" transform="translate(100 100)"/><defs><linearGradient id="heroGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" style="stop-color:var(--accent-1)"/><stop offset="55%" style="stop-color:var(--accent-3)"/><stop offset="100%" style="stop-color:var(--accent-2)"/></linearGradient></defs></svg>'
       +'<div class="float-chip chip-1">'+ico('rocket')+'<span>Launch in weeks</span></div>'
       +'<div class="float-chip chip-2">'+ico('shield')+'<span>Audit-ready by default</span></div>'
       +'<div class="float-chip chip-3">'+ico('users')+'<span>200+ specialists</span></div>'
@@ -1172,6 +1189,7 @@ Pages['/marketplace'] = function(){
   +'<section class="section tone-a" style="padding-top:10px;"><div class="container">'
     +'<div class="search-field">'+ico('search')+'<input type="search" id="mktSearch" placeholder="Search the marketplace" aria-label="Search marketplace"></div>'
     +'<div class="chip-row" id="mktChips">'+cats.map(function(c,i){return '<button class="chip'+(i===0?' active':'')+'" data-cat="'+c+'">'+c+'</button>';}).join('')+'</div>'
+    +'<p class="mkt-count" id="mktCount"></p>'
     +'<div class="grid grid-4" id="mktGrid"></div>'
   +'</div></section>';
 };
@@ -1187,7 +1205,7 @@ Pages['/marketplace/detail'] = function(id){
         +'<p class="lede">'+p.tagline+'</p>'
         +'<div class="flex items-center gap-12" style="margin:18px 0 28px;"><span class="stat"><span class="num" style="font-size:1.4rem;">'+fmtMoney(p.price)+'</span></span><span class="badge">★ '+p.rating+' rating</span></div>'
       +'</div>'
-      +'<div class="hero-visual" style="aspect-ratio:4/3;"><svg viewBox="0 0 200 150" style="width:100%;height:100%;"><path fill="url(#pdGrad)" d="M40,-40C56,-30,68,-10,66,10C64,30,48,46,28,54C8,62,-16,62,-34,50C-52,38,-64,14,-62,-8C-60,-30,-44,-50,-24,-58C-4,-66,20,-50,40,-40Z" transform="translate(100 76)"/><defs><linearGradient id="pdGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ff7a52"/><stop offset="100%" stop-color="#ffb648"/></linearGradient></defs></svg><div style="position:absolute;color:#fff;">'+ico(p.icon).replace('width:22px;height:22px','width:56px;height:56px')+'</div></div>'
+      +'<div class="hero-visual" style="aspect-ratio:4/3;"><svg viewBox="0 0 200 150" style="width:100%;height:100%;"><path fill="url(#pdGrad)" d="M40,-40C56,-30,68,-10,66,10C64,30,48,46,28,54C8,62,-16,62,-34,50C-52,38,-64,14,-62,-8C-60,-30,-44,-50,-24,-58C-4,-66,20,-50,40,-40Z" transform="translate(100 76)"/><defs><linearGradient id="pdGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" style="stop-color:var(--accent-1)"/><stop offset="100%" style="stop-color:var(--accent-2)"/></linearGradient></defs></svg><div style="position:absolute;color:#fff;">'+ico(p.icon).replace('width:22px;height:22px','width:56px;height:56px')+'</div></div>'
     +'</div></div></section>'
   +'<section class="section tone-a" style="padding-top:26px;"><div class="container">'
     +'<div class="tabbar" id="pdTabs" role="tablist">'
@@ -1488,11 +1506,22 @@ function wireMarketplace(){
     });
     grid.innerHTML = items.map(function(p){
       return '<div class="flip-card"><div class="flip-inner">'
-        +'<div class="flip-face flip-front">'+blobIcon(p.icon)+'<span class="badge" style="margin-bottom:8px;">'+p.cat+'</span><h3 style="font-size:1.05rem;">'+p.name+'</h3><p style="font-size:.85rem;flex:1;">'+p.tagline+'</p><b style="font-family:var(--font-display);color:var(--accent-1);">'+fmtMoney(p.price)+'</b></div>'
-        +'<div class="flip-face flip-back"><div><h3 style="color:#fff2ea;font-size:1.05rem;">'+p.name+'</h3><p>'+p.desc.slice(0,120)+'…</p></div><a href="#/marketplace/detail/'+p.id+'" class="btn" style="background:#fff2ea;color:var(--accent-1);">View details</a></div>'
+        +'<div class="flip-face flip-front">'
+          +'<div class="pf-cover">'+blobIcon(p.icon)+'<span class="pf-rating">'+ico('star')+' '+p.rating+'</span></div>'
+          +'<div class="pf-tags"><span class="badge">'+p.cat+'</span>'+(p.rating>=4.9?'<span class="badge grad">Popular</span>':'')+'</div>'
+          +'<h3 style="font-size:1.05rem;">'+p.name+'</h3>'
+          +'<p style="font-size:.85rem;flex:1;">'+p.tagline+'</p>'
+          +'<div class="pf-foot"><span class="pf-price">'+fmtMoney(p.price)+'<span> /mo</span></span><span class="pf-hint">Flip to preview '+ico('refresh')+'</span></div>'
+        +'</div>'
+        +'<div class="flip-face flip-back">'
+          +'<div><h3 style="color:#fff2ea;font-size:1.05rem;">'+p.name+'</h3>'
+          +'<div class="fb-specs">'+p.specs.slice(0,3).map(function(s){return '<div class="flex items-center gap-8">'+ico('check')+'<span>'+s+'</span></div>';}).join('')+'</div></div>'
+          +'<a href="#/marketplace/detail/'+p.id+'" class="btn" style="background:#fff2ea;color:var(--accent-1);">View details '+ico('arrow')+'</a>'
+        +'</div>'
         +'<button class="flip-peek" aria-label="Toggle preview">'+ico('refresh')+'</button>'
       +'</div></div>';
     }).join('') || '<p>No products match that search yet — try another term.</p>';
+    $('#mktCount').textContent = items.length + (items.length===1 ? ' product' : ' products');
     $all('.flip-peek', grid).forEach(function(btn){
       btn.addEventListener('click', function(){ btn.closest('.flip-card').classList.toggle('flipped'); });
     });
@@ -1587,7 +1616,7 @@ function wireProductDetail(id){
   function renderPreview(){
     return '<div class="grid grid-2"><div><h3>Overview</h3><p>'+p.desc+'</p>'
       +'<h3 style="margin-top:22px;">What\'s included</h3><ul style="display:flex;flex-direction:column;gap:8px;">'+p.specs.map(function(s){return '<li style="display:flex;gap:8px;font-size:.9rem;">'+ico('check')+'<span>'+s+'</span></li>';}).join('')+'</ul></div>'
-      +'<div class="hero-visual" style="aspect-ratio:1/1;"><svg viewBox="0 0 200 200" style="width:80%;height:80%;"><path fill="url(#pvGrad)" d="M46,-52C58,-42,64,-24,64,-6C64,12,58,28,46,40C34,52,16,60,-3,63C-22,66,-44,64,-56,52C-68,40,-70,18,-67,-3C-64,-24,-56,-46,-40,-58C-24,-70,-2,-72,17,-68C36,-64,34,-62,46,-52Z" transform="translate(100 100)"/><defs><linearGradient id="pvGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ff7a52"/><stop offset="100%" stop-color="#ffb648"/></linearGradient></defs></svg></div>'
+      +'<div class="hero-visual" style="aspect-ratio:1/1;"><svg viewBox="0 0 200 200" style="width:80%;height:80%;"><path fill="url(#pvGrad)" d="M46,-52C58,-42,64,-24,64,-6C64,12,58,28,46,40C34,52,16,60,-3,63C-22,66,-44,64,-56,52C-68,40,-70,18,-67,-3C-64,-24,-56,-46,-40,-58C-24,-70,-2,-72,17,-68C36,-64,34,-62,46,-52Z" transform="translate(100 100)"/><defs><linearGradient id="pvGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" style="stop-color:var(--accent-1)"/><stop offset="100%" style="stop-color:var(--accent-2)"/></linearGradient></defs></svg></div>'
       +'</div><button class="btn btn-primary magnetic" style="margin-top:24px;" data-goto="customize">Customize this product '+ico('arrow')+'</button>';
   }
   function total(){
