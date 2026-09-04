@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="TECHBISS is the coordinate system enterprises build on — a global digital transformation platform for instrumented, reversible change across 142 countries. Services, solutions, module marketplace, installer and console.">
-<title>Quantum Grid</title>
+<title>TECHBISS — Quantum Grid</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
@@ -428,7 +428,7 @@ body.has-cursor,body.has-cursor a,body.has-cursor button{cursor:none}
 .prod-art .corner{position:absolute; top:10px; left:10px; font-family:var(--f-mono); font-size:9.5px; letter-spacing:.16em; color:var(--ink-3)}
 .prod-body{padding:20px; display:flex; flex-direction:column; gap:10px; flex:1; transform:translateZ(24px)}
 .prod-body .cat{font-family:var(--f-mono); font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--accent)}
-.prod-body p{font-size:13.5px; color:var(--ink-2); line-height:1.55}
+.prod-body .blurb{font-size:13.5px; color:var(--ink-2); line-height:1.55; display:block}
 .prod-foot{margin-top:auto; padding-top:14px; border-top:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; gap:12px}
 .prod-foot .price{font-family:var(--f-mono); font-size:13px; letter-spacing:.04em; color:var(--ink)}
 .prod-foot .price s{color:var(--ink-3); font-size:10px; letter-spacing:.14em; text-transform:uppercase; text-decoration:none; display:block}
@@ -2129,6 +2129,7 @@ function money(n){ return '$' + fmt(n); }
   if(seen || REDUCED){
     el.style.display='none'; el.setAttribute('hidden','');
     if(REDUCED && !seen){ try{ sessionStorage.setItem('tb-intro','1'); }catch(e){} }
+    setTimeout(function(){ if(window.__heroKinetic) window.__heroKinetic(); }, 80);
     return;
   }
 
@@ -2297,17 +2298,17 @@ function bindTilts(scope){ $$('.tilt', scope||document).forEach(function(el){ bi
 /* ---------------------------------------------------------------
    8. marquee
 --------------------------------------------------------------- */
-(function(){
-  var track = $('#mq'); if(!track || REDUCED) return;
+function initMarquee(){
+  var track = $('#mq');
+  if(!track || REDUCED || track.__mq) return;
+  track.__mq = true;
   track.innerHTML = track.innerHTML + track.innerHTML;
-  if(HAS_GSAP){
-    var half = 0;
-    var tw = gsap.to(track, {x:function(){ half = track.scrollWidth/2; return -half; }, duration:34, ease:'none', repeat:-1, modifiers:{
-      x:function(x){ return (parseFloat(x) % -(track.scrollWidth/2)) + 'px'; }
-    }});
-    document.addEventListener('visibilitychange', function(){ document.hidden ? tw.pause() : tw.play(); });
-  }
-})();
+  if(!HAS_GSAP) return;
+  var half = track.scrollWidth / 2;
+  if(half < 10){ track.__mq = false; return; }
+  var tw = gsap.fromTo(track, {x:0}, {x:-half, duration:38, ease:'none', repeat:-1});
+  document.addEventListener('visibilitychange', function(){ document.hidden ? tw.pause() : tw.play(); });
+}
 
 /* ---------------------------------------------------------------
    9. parallax layers
@@ -2387,7 +2388,7 @@ function productCard(p){
       '<span class="prod-body">'+
         '<span class="cat">'+p.cat+'</span>'+
         '<span class="h3" style="font-size:19px;font-weight:600;letter-spacing:-.02em;display:block">'+p.name+'</span>'+
-        '<p>'+p.blurb+'</p>'+
+        '<span class="blurb">'+p.blurb+'</span>'+
         '<span class="prod-foot">'+
           '<span class="price"><s>FROM / MONTH</s>'+money(p.price)+'</span>'+
           '<span class="rating"><i></i>'+p.rating.toFixed(1)+' · '+p.deploys+' DEPLOYS</span>'+
@@ -2994,6 +2995,7 @@ function activate(id, ctx){
   if(id==='v-dashboard'){ renderDash(); requestAnimationFrame(function(){ window.__rolePlace && window.__rolePlace(); }); }
   if(id==='v-pricing'){ requestAnimationFrame(function(){ window.__pricingPlace && window.__pricingPlace(); }); }
   if(id==='v-about'){ requestAnimationFrame(function(){ window.__drawMap && window.__drawMap(); }); }
+  if(id==='v-home'){ requestAnimationFrame(initMarquee); }
   if(id==='v-installer' && INST.step===0){ instEnter(0); }
   if(id!=='v-installer'){ instClear(); }
   if(id!=='v-product'){ clearInterval(pdState.timer); }
@@ -3008,6 +3010,13 @@ function activate(id, ctx){
   if(!REDUCED && HAS_GSAP){
     gsap.fromTo(view, {opacity:0, y:16}, {opacity:1, y:0, duration:.5, ease:'power3.out'});
   }
+  clearTimeout(view.__rvT);
+  view.__rvT = setTimeout(function(){
+    $$('.rv:not(.in)', view).forEach(function(el){
+      var r = el.getBoundingClientRect();
+      if(r.top < window.innerHeight * 1.1) el.classList.add('in');
+    });
+  }, 1400);
 }
 
 function wipeThen(fn){
