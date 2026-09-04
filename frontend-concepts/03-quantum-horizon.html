@@ -192,7 +192,7 @@ h3{font-size:clamp(1.2rem,1.8vw,1.5rem);line-height:1.25}
 /* ===== footer ===== */
 .site-footer{border-top:1px solid var(--line);padding:64px 0 32px;background:var(--surface)}
 .footer-top{display:grid;grid-template-columns:1.4fr repeat(4,1fr);gap:32px;padding-bottom:40px;border-bottom:1px solid var(--line)}
-.footer-top h4{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-muted);margin-bottom:14px}
+.footer-top h3{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-muted);margin-bottom:14px;font-weight:600}
 .footer-top ul li{margin-bottom:9px}
 .footer-top ul a{font-size:.9rem;color:var(--ink-muted);transition:color .2s ease}
 .footer-top ul a:hover{color:var(--accent)}
@@ -751,7 +751,7 @@ h3{font-size:clamp(1.2rem,1.8vw,1.5rem);line-height:1.25}
         <p style="text-align:center;margin-top:20px;font-size:.88rem;color:var(--ink-muted)">No account yet? <button type="button" id="show-request-access" style="color:var(--accent);font-weight:600">Request access</button></p>
       </div>
       <div id="login-panel-request" hidden>
-        <h1 style="font-size:1.9rem;text-align:center">Request access</h1>
+        <h2 id="request-access-h2" style="font-size:1.9rem;text-align:center;font-family:var(--font-display)">Request access</h2>
         <p style="text-align:center;color:var(--ink-muted);margin-top:8px">Tell us about your organization and we'll provision an account.</p>
         <form id="request-form" novalidate style="margin-top:24px">
           <div class="field" data-field="r-name"><label for="r-name">Full name</label><input type="text" id="r-name" aria-describedby="err-r-name"><span class="field-error" id="err-r-name">Please enter your name.</span></div>
@@ -819,7 +819,7 @@ h3{font-size:clamp(1.2rem,1.8vw,1.5rem);line-height:1.25}
         <p class="measure" style="color:var(--ink-muted);font-size:.9rem;max-width:32ch">Engineering the next global economy — cloud, AI, security, data and enterprise software for 120+ countries.</p>
       </div>
       <div>
-        <h4>Platform</h4>
+        <h3>Platform</h3>
         <ul>
           <li><a href="#services">Services</a></li>
           <li><a href="#solutions">Solutions</a></li>
@@ -828,7 +828,7 @@ h3{font-size:clamp(1.2rem,1.8vw,1.5rem);line-height:1.25}
         </ul>
       </div>
       <div>
-        <h4>Company</h4>
+        <h3>Company</h3>
         <ul>
           <li><a href="#about">About</a></li>
           <li><a href="#work">Case Studies</a></li>
@@ -837,7 +837,7 @@ h3{font-size:clamp(1.2rem,1.8vw,1.5rem);line-height:1.25}
         </ul>
       </div>
       <div>
-        <h4>Access</h4>
+        <h3>Access</h3>
         <ul>
           <li><a href="#login">Sign in</a></li>
           <li><a href="#installer">Installer</a></li>
@@ -846,7 +846,7 @@ h3{font-size:clamp(1.2rem,1.8vw,1.5rem);line-height:1.25}
         </ul>
       </div>
       <div>
-        <h4>Regions</h4>
+        <h3>Regions</h3>
         <ul>
           <li>New York · HQ</li>
           <li>London · EMEA</li>
@@ -1765,6 +1765,830 @@ function initAboutNetwork(){
     dot.addEventListener('blur', hide);
   });
 }
+
+/* ---------------------------------------------------------------------
+   RESOURCES
+   --------------------------------------------------------------------- */
+var resourceFilter = 'All';
+function resourceCategories(){
+  var cats = ['All'];
+  RESOURCES.forEach(function(r){ if(cats.indexOf(r.category)===-1) cats.push(r.category); });
+  return cats;
+}
+function renderResourceChips(){
+  var wrap = $('#resources-chips');
+  if(!wrap) return;
+  wrap.innerHTML = resourceCategories().map(function(c){
+    return '<button type="button" class="chip" data-res-cat="'+escapeHtml(c)+'" aria-pressed="'+(c===resourceFilter?'true':'false')+'">'+escapeHtml(c)+'</button>';
+  }).join('');
+  wrap.addEventListener('click', function(ev){
+    var btn = ev.target.closest('[data-res-cat]');
+    if(!btn) return;
+    resourceFilter = btn.getAttribute('data-res-cat');
+    renderResourceChips();
+    renderResourceGrid();
+  });
+}
+function renderResourceGrid(){
+  var grid = $('#resources-grid');
+  if(!grid) return;
+  var list = RESOURCES.filter(function(r){ return resourceFilter==='All' || r.category===resourceFilter; });
+  grid.innerHTML = list.map(function(r, i){
+    return '<article class="card">'+
+      '<svg viewBox="0 0 40 40" style="width:28px;height:28px;color:var(--accent-2)" aria-hidden="true"><circle cx="20" cy="20" r="16" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="20" cy="20" r="3" fill="currentColor"/><path d="M20 4v6M20 30v6M4 20h6M30 20h6" stroke="currentColor" stroke-width="1.2"/></svg>'+
+      '<span class="mono" style="display:block;margin-top:14px;font-size:.7rem;color:var(--accent);letter-spacing:.05em;text-transform:uppercase">'+escapeHtml(r.category)+'</span>'+
+      '<h3 style="margin-top:10px;font-size:1.02rem">'+escapeHtml(r.title)+'</h3>'+
+      '<p class="mono" style="margin-top:14px;font-size:.76rem;color:var(--ink-muted)">'+escapeHtml(r.time)+'</p>'+
+      '</article>';
+  }).join('') || '<p style="grid-column:1/-1;color:var(--ink-muted)">No resources in this category yet.</p>';
+}
+function initNewsletter(){
+  var form = $('#newsletter-form');
+  if(!form) return;
+  form.addEventListener('submit', function(ev){
+    ev.preventDefault();
+    var field = $('#newsletter-field');
+    var input = $('#newsletter-email');
+    var valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value.trim());
+    if(!valid){
+      field.classList.add('error');
+      input.setAttribute('aria-invalid','true');
+      return;
+    }
+    field.classList.remove('error');
+    input.removeAttribute('aria-invalid');
+    form.hidden = true;
+    $('#newsletter-success').hidden = false;
+  });
+}
+
+/* ---------------------------------------------------------------------
+   PRICING
+   --------------------------------------------------------------------- */
+var billingAnnual = false;
+function tierDisplayPrice(tier){
+  if(tier.monthly==null) return null;
+  return billingAnnual ? Math.round(tier.monthly*0.82) : tier.monthly;
+}
+function renderPricingGrid(){
+  var grid = $('#pricing-grid');
+  if(!grid) return;
+  grid.innerHTML = PRICING_TIERS.map(function(t){
+    var price = tierDisplayPrice(t);
+    return '<div class="card" style="'+(t.highlight?'border-color:var(--accent);position:relative':'')+'">'+
+      (t.highlight ? '<span class="pill pill-active" style="position:absolute;top:-12px;left:24px">Most Common</span>' : '')+
+      '<h3>'+escapeHtml(t.name)+'</h3>'+
+      '<p style="margin-top:14px;font-family:var(--font-display);font-size:2rem" data-tier-price="'+t.id+'">'+(price==null?'Custom':'$'+price.toLocaleString('en-US'))+'</p>'+
+      '<p class="mono" style="font-size:.72rem;color:var(--ink-muted)">'+(price==null?'contact sales':'per month'+(billingAnnual?', billed annually':''))+'</p>'+
+      '<ul style="margin-top:20px;display:flex;flex-direction:column;gap:10px">'+
+        t.features.map(function(f){ return '<li style="display:flex;gap:10px;font-size:.86rem"><span style="color:var(--accent)">✓</span>'+escapeHtml(f)+'</li>'; }).join('')+
+      '</ul>'+
+      '<a href="#contact" class="btn '+(t.highlight?'btn-primary':'btn-outline')+' btn-block" style="margin-top:24px">'+(t.monthly==null?'Talk to Sales':'Get Started')+'</a>'+
+      '</div>';
+  }).join('');
+}
+function animateTierPrices(){
+  PRICING_TIERS.forEach(function(t){
+    if(t.monthly==null) return;
+    var node = document.querySelector('[data-tier-price="'+t.id+'"]');
+    if(!node) return;
+    var from = parseInt(node.textContent.replace(/[^0-9]/g,''),10) || t.monthly;
+    var to = tierDisplayPrice(t);
+    if(prefersReducedMotion){ node.textContent = '$'+to.toLocaleString('en-US'); return; }
+    var start = performance.now(), duration=450;
+    function tick(now){
+      var p = Math.min(1,(now-start)/duration);
+      var val = Math.round(from + (to-from)*p);
+      node.textContent = '$'+val.toLocaleString('en-US');
+      if(p<1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  });
+}
+function renderPricingTable(){
+  var table = $('#pricing-table');
+  if(!table) return;
+  var head = '<thead><tr><th style="text-align:left;padding:14px;border-bottom:1px solid var(--line)">Feature</th>'+
+    PRICING_TIERS.map(function(t){ return '<th style="text-align:left;padding:14px;border-bottom:1px solid var(--line)">'+escapeHtml(t.name)+'</th>'; }).join('')+
+    '</tr></thead>';
+  function cell(v){
+    if(v===true) return '<span style="color:var(--accent)">✓</span>';
+    if(v===false) return '<span style="color:var(--ink-muted)">—</span>';
+    return '<span style="font-size:.86rem">'+escapeHtml(v)+'</span>';
+  }
+  var body = '<tbody>'+PRICING_FEATURE_ROWS.map(function(row){
+    return '<tr><td style="padding:14px;border-bottom:1px solid var(--line);font-size:.9rem;font-weight:600">'+escapeHtml(row.label)+'</td>'+
+      '<td style="padding:14px;border-bottom:1px solid var(--line)">'+cell(row.starter)+'</td>'+
+      '<td style="padding:14px;border-bottom:1px solid var(--line)">'+cell(row.growth)+'</td>'+
+      '<td style="padding:14px;border-bottom:1px solid var(--line)">'+cell(row.enterprise)+'</td>'+
+      '<td style="padding:14px;border-bottom:1px solid var(--line)">'+cell(row.global)+'</td>'+
+      '</tr>';
+  }).join('')+'</tbody>';
+  table.innerHTML = table.querySelector('caption').outerHTML + head + body;
+}
+function initPricingToggle(){
+  var toggle = $('#billing-toggle');
+  var knob = $('#billing-knob');
+  if(!toggle) return;
+  toggle.addEventListener('click', function(){
+    billingAnnual = !billingAnnual;
+    toggle.setAttribute('aria-checked', billingAnnual?'true':'false');
+    knob.style.transform = billingAnnual ? 'translateX(24px)' : 'translateX(0)';
+    toggle.style.background = billingAnnual ? 'color-mix(in srgb, var(--accent) 25%, var(--surface-2))' : 'var(--surface-2)';
+    $('#billing-label-monthly').style.color = billingAnnual ? 'var(--ink-muted)' : 'var(--ink)';
+    $('#billing-label-annual').style.color = billingAnnual ? 'var(--ink)' : 'var(--ink-muted)';
+    animateTierPrices();
+  });
+}
+function initFaq(){
+  var host = $('#pricing-faq');
+  if(!host) return;
+  host.innerHTML = FAQS.map(function(f, i){
+    return '<div style="border-bottom:1px solid var(--line)">'+
+      '<h3><button type="button" class="faq-trigger" id="faq-btn-'+i+'" aria-expanded="false" aria-controls="faq-panel-'+i+'" style="width:100%;display:flex;justify-content:space-between;align-items:center;padding:18px 4px;text-align:left;font-family:var(--font-body);font-weight:600;font-size:.96rem">'+
+        '<span>'+escapeHtml(f.q)+'</span>'+
+        '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true" class="faq-chevron" style="width:16px;height:16px;flex:none;transition:transform .25s ease"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'+
+      '</button></h3>'+
+      '<div id="faq-panel-'+i+'" role="region" aria-labelledby="faq-btn-'+i+'" style="max-height:0;overflow:hidden;transition:max-height .3s ease"><p style="padding:0 4px 18px;color:var(--ink-muted);font-size:.9rem">'+escapeHtml(f.a)+'</p></div>'+
+      '</div>';
+  }).join('');
+  host.addEventListener('click', function(ev){
+    var btn = ev.target.closest('.faq-trigger');
+    if(!btn) return;
+    var panel = document.getElementById(btn.getAttribute('aria-controls'));
+    var open = btn.getAttribute('aria-expanded')==='true';
+    btn.setAttribute('aria-expanded', open?'false':'true');
+    btn.querySelector('.faq-chevron').style.transform = open ? 'rotate(0deg)' : 'rotate(180deg)';
+    panel.style.maxHeight = open ? '0px' : panel.scrollHeight+'px';
+  });
+}
+
+/* ---------------------------------------------------------------------
+   FORM VALIDATION HELPERS
+   --------------------------------------------------------------------- */
+var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+function setFieldError(fieldEl, hasError){
+  if(!fieldEl) return;
+  fieldEl.classList.toggle('error', !!hasError);
+  var input = fieldEl.querySelector('input, select, textarea');
+  if(input) input.setAttribute('aria-invalid', hasError?'true':'false');
+}
+function validateRequiredText(el){ return el && el.value.trim().length>0; }
+
+/* ---------------------------------------------------------------------
+   CONTACT FORM
+   --------------------------------------------------------------------- */
+function initContactForm(){
+  var form = $('#contact-form');
+  if(!form) return;
+  form.addEventListener('submit', function(ev){
+    ev.preventDefault();
+    var ok = true;
+    var name = $('#c-name'), email = $('#c-email'), company = $('#c-company'), interest = $('#c-interest'), message = $('#c-message');
+    var fName = name.closest('.field'), fEmail = email.closest('.field'), fCompany = company.closest('.field'), fInterest = interest.closest('.field'), fMessage = message.closest('.field');
+    var okName = validateRequiredText(name); setFieldError(fName, !okName); ok = ok && okName;
+    var okEmail = EMAIL_RE.test(email.value.trim()); setFieldError(fEmail, !okEmail); ok = ok && okEmail;
+    var okCompany = validateRequiredText(company); setFieldError(fCompany, !okCompany); ok = ok && okCompany;
+    var okInterest = interest.value !== ''; setFieldError(fInterest, !okInterest); ok = ok && okInterest;
+    var okMessage = validateRequiredText(message); setFieldError(fMessage, !okMessage); ok = ok && okMessage;
+    if(!ok){
+      var firstError = form.querySelector('.field.error input, .field.error select, .field.error textarea');
+      if(firstError) firstError.focus();
+      return;
+    }
+    form.hidden = true;
+    $('#contact-success').hidden = false;
+  });
+  $all('input, select, textarea', form).forEach(function(inp){
+    inp.addEventListener('input', function(){
+      var f = inp.closest('.field');
+      if(f && f.classList.contains('error')) setFieldError(f, false);
+    });
+  });
+}
+
+/* ---------------------------------------------------------------------
+   LOGIN / REQUEST ACCESS
+   --------------------------------------------------------------------- */
+function initLogin(){
+  var form = $('#login-form');
+  if(form){
+    form.addEventListener('submit', function(ev){
+      ev.preventDefault();
+      var email = $('#l-email'), pass = $('#l-password');
+      var fEmail = email.closest('.field'), fPass = pass.closest('.field');
+      var okEmail = EMAIL_RE.test(email.value.trim()); setFieldError(fEmail, !okEmail);
+      var okPass = pass.value.length>=8; setFieldError(fPass, !okPass);
+      if(!okEmail){ email.focus(); return; }
+      if(!okPass){ pass.focus(); return; }
+      var btn = form.querySelector('button[type="submit"]');
+      var original = btn.textContent;
+      btn.textContent = 'Signing in…';
+      btn.disabled = true;
+      setTimeout(function(){
+        btn.textContent = original;
+        btn.disabled = false;
+        location.hash = '#dashboard';
+      }, 900);
+    });
+  }
+  var toggleBtn = $('#toggle-password');
+  if(toggleBtn){
+    toggleBtn.addEventListener('click', function(){
+      var input = $('#l-password');
+      var showing = input.type === 'text';
+      input.type = showing ? 'password' : 'text';
+      toggleBtn.setAttribute('aria-pressed', showing ? 'false':'true');
+      toggleBtn.setAttribute('aria-label', showing ? 'Show password' : 'Hide password');
+    });
+  }
+  var showRequest = $('#show-request-access'), showSignin = $('#show-signin');
+  if(showRequest) showRequest.addEventListener('click', function(){
+    $('#login-panel-signin').hidden = true;
+    $('#login-panel-request').hidden = false;
+    var h = $('#login-panel-request h2'); if(h){ h.setAttribute('tabindex','-1'); h.focus(); }
+  });
+  if(showSignin) showSignin.addEventListener('click', function(){
+    $('#login-panel-request').hidden = true;
+    $('#login-panel-signin').hidden = false;
+  });
+  var reqForm = $('#request-form');
+  if(reqForm){
+    reqForm.addEventListener('submit', function(ev){
+      ev.preventDefault();
+      var name=$('#r-name'), email=$('#r-email'), company=$('#r-company');
+      var okName = validateRequiredText(name); setFieldError(name.closest('.field'), !okName);
+      var okEmail = EMAIL_RE.test(email.value.trim()); setFieldError(email.closest('.field'), !okEmail);
+      var okCompany = validateRequiredText(company); setFieldError(company.closest('.field'), !okCompany);
+      if(!(okName && okEmail && okCompany)) return;
+      reqForm.hidden = true;
+      $('#request-success').hidden = false;
+    });
+  }
+  $all('.sso-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      btn.style.borderColor = 'var(--accent)';
+      setTimeout(function(){ btn.style.borderColor=''; }, 400);
+    });
+  });
+}
+
+/* ---------------------------------------------------------------------
+   INSTALLER WIZARD
+   --------------------------------------------------------------------- */
+var INSTALLER_STEPS = [
+  {id:'select', label:'Select'},
+  {id:'detect', label:'Detect'},
+  {id:'configure', label:'Configure'},
+  {id:'migrate', label:'Import/Migrate'},
+  {id:'install', label:'Install'},
+  {id:'verify', label:'Verify'},
+  {id:'launch', label:'Launch'}
+];
+var INSTALLER_MODULES = [
+  {id:'cloud-migration', name:'Cloud Migration Suite', desc:'Re-platform workloads onto governed, cost-monitored cloud infrastructure.'},
+  {id:'ai-copilot', name:'AI Copilot Deployment', desc:'Deploy an agentic copilot directly into core enterprise workflows.'},
+  {id:'security-pack', name:'Security Compliance Pack', desc:'Automated control mapping and continuous compliance monitoring.'},
+  {id:'data-platform', name:'Data Platform Rollout', desc:'Stand up a unified, governed data platform across your estate.'}
+];
+var DETECTED_ITEMS = [
+  'Detected: cloud tenant — techbiss-prod-01',
+  'Detected: 14 active workloads',
+  'Detected: identity provider — Okta',
+  'Detected: compliance baseline — SOC 2 Type II',
+  'Detected: 3 candidate migration regions'
+];
+var MIGRATE_LOG = [
+  'Establishing secure tunnel to source environment…',
+  'Authenticating with identity provider…',
+  'Indexing source schema (2/6)…',
+  'Indexing source schema (6/6)…',
+  'Transferring data blocks…',
+  'Validating checksums…',
+  'Migration complete.'
+];
+var INSTALL_LOG = [
+  'Provisioning target infrastructure…',
+  'Applying baseline configuration…',
+  'Installing module packages…',
+  'Registering service endpoints…',
+  'Running post-install health checks…',
+  'Installation complete.'
+];
+var VERIFY_ITEMS = ['Network connectivity','Identity federation','Data integrity','Rollback snapshot created'];
+
+var installerState = {
+  stepIndex:0, module:null,
+  detectRunning:false, detectDone:false, detectedShown:0,
+  config:{name:'', region:'', size:''},
+  migrateRunning:false, migrateProgress:0, migrateDone:false, migrateLog:[],
+  installRunning:false, installProgress:0, installDone:false, installLog:[],
+  verifyChecks:[false,false,false,false], verifyRunning:false
+};
+
+function installerCanAdvance(idx){
+  switch(INSTALLER_STEPS[idx].id){
+    case 'select': return !!installerState.module;
+    case 'detect': return installerState.detectDone;
+    case 'configure': return installerState.config.name.trim().length>0 && installerState.config.region && installerState.config.size;
+    case 'migrate': return installerState.migrateDone;
+    case 'install': return installerState.installDone;
+    case 'verify': return installerState.verifyChecks.every(function(v){return v;});
+    default: return true;
+  }
+}
+
+function renderInstallerStepper(){
+  var host = $('#installer-stepper');
+  if(!host) return;
+  host.innerHTML = INSTALLER_STEPS.map(function(s, i){
+    var state = i < installerState.stepIndex ? 'done' : (i===installerState.stepIndex ? 'current' : 'upcoming');
+    var color = state==='upcoming' ? 'var(--ink-muted)' : 'var(--ink)';
+    var circleBg = state==='current' ? 'var(--accent)' : (state==='done' ? 'var(--surface-2)' : 'transparent');
+    var circleColor = state==='current' ? 'var(--accent-ink)' : (state==='done' ? 'var(--accent)' : 'var(--ink-muted)');
+    var circleBorder = state==='upcoming' ? '1px solid var(--line)' : 'none';
+    return '<li style="flex:1;min-width:96px;text-align:center" '+(state==='current'?'aria-current="step"':'')+'>'+
+      '<div class="mono" style="width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto;background:'+circleBg+';color:'+circleColor+';border:'+circleBorder+';font-size:.78rem">'+(state==='done'?'✓':(i+1))+'</div>'+
+      '<div class="mono" style="margin-top:8px;font-size:.66rem;letter-spacing:.04em;text-transform:uppercase;color:'+color+'">'+escapeHtml(s.label)+'</div>'+
+      '</li>';
+  }).join('');
+}
+
+function updateInstallerNav(){
+  var back = $('#installer-back'), next = $('#installer-next');
+  var isLast = installerState.stepIndex === INSTALLER_STEPS.length-1;
+  back.disabled = installerState.stepIndex===0;
+  if(isLast){
+    next.hidden = true;
+  } else {
+    next.hidden = false;
+    next.disabled = !installerCanAdvance(installerState.stepIndex);
+    next.textContent = INSTALLER_STEPS[installerState.stepIndex].id==='verify' ? 'Finish' : 'Next';
+  }
+}
+
+function runDetectScan(){
+  if(installerState.detectRunning || installerState.detectDone) { renderInstallerStep(); return; }
+  installerState.detectRunning = true;
+  installerState.detectedShown = 0;
+  renderInstallerStep();
+  var delay = prefersReducedMotion ? 0 : 550;
+  function showNext(){
+    installerState.detectedShown++;
+    var list = $('#detect-list');
+    if(list){
+      var item = document.createElement('div');
+      item.className = 'mono';
+      item.style.cssText = 'padding:8px 0;border-bottom:1px solid var(--line);font-size:.82rem;color:var(--accent)';
+      item.textContent = DETECTED_ITEMS[installerState.detectedShown-1];
+      list.appendChild(item);
+    }
+    if(installerState.detectedShown < DETECTED_ITEMS.length){
+      setTimeout(showNext, delay || 10);
+    } else {
+      installerState.detectRunning = false;
+      installerState.detectDone = true;
+      updateInstallerNav();
+      var status = $('#detect-status');
+      if(status) status.textContent = 'Scan complete — 5 items detected.';
+    }
+  }
+  setTimeout(showNext, delay || 10);
+}
+
+function runMigrate(){
+  if(installerState.migrateRunning || installerState.migrateDone){ return; }
+  installerState.migrateRunning = true;
+  var log = $('#migrate-log'), bar = $('#migrate-bar');
+  var i=0;
+  var step = prefersReducedMotion ? 100 : 700;
+  function tick(){
+    if(i < MIGRATE_LOG.length){
+      if(log){
+        var line = document.createElement('div');
+        line.textContent = '> '+MIGRATE_LOG[i];
+        log.appendChild(line);
+        log.scrollTop = log.scrollHeight;
+      }
+      installerState.migrateProgress = Math.round(((i+1)/MIGRATE_LOG.length)*100);
+      if(bar) bar.style.width = installerState.migrateProgress+'%';
+      i++;
+      setTimeout(tick, step);
+    } else {
+      installerState.migrateRunning = false;
+      installerState.migrateDone = true;
+      updateInstallerNav();
+    }
+  }
+  tick();
+}
+
+function runInstall(){
+  if(installerState.installRunning || installerState.installDone){ return; }
+  installerState.installRunning = true;
+  var log = $('#install-log'), bar = $('#install-bar');
+  var i=0;
+  var step = prefersReducedMotion ? 100 : 650;
+  function tick(){
+    if(i < INSTALL_LOG.length){
+      if(log){
+        var line = document.createElement('div');
+        line.textContent = '> '+INSTALL_LOG[i];
+        log.appendChild(line);
+        log.scrollTop = log.scrollHeight;
+      }
+      installerState.installProgress = Math.round(((i+1)/INSTALL_LOG.length)*100);
+      if(bar) bar.style.width = installerState.installProgress+'%';
+      i++;
+      setTimeout(tick, step);
+    } else {
+      installerState.installRunning = false;
+      installerState.installDone = true;
+      updateInstallerNav();
+    }
+  }
+  tick();
+}
+
+function runVerify(){
+  if(installerState.verifyRunning) return;
+  installerState.verifyRunning = true;
+  var i=0;
+  var step = prefersReducedMotion ? 100 : 500;
+  function tick(){
+    if(i < VERIFY_ITEMS.length){
+      installerState.verifyChecks[i] = true;
+      var row = document.getElementById('verify-item-'+i);
+      if(row) row.querySelector('.verify-check').textContent = '✓';
+      if(row) row.querySelector('.verify-check').style.color = 'var(--accent)';
+      i++;
+      setTimeout(tick, step);
+    } else {
+      installerState.verifyRunning = false;
+      updateInstallerNav();
+    }
+  }
+  tick();
+}
+
+function renderInstallerStep(){
+  var host = $('#installer-steps');
+  if(!host) return;
+  var step = INSTALLER_STEPS[installerState.stepIndex].id;
+  var html = '';
+
+  if(step==='select'){
+    html = '<h2 style="font-size:1.4rem">Select a module</h2><p style="color:var(--ink-muted);margin-top:8px">Choose the module you want to provision into your environment.</p>'+
+      '<div role="radiogroup" aria-label="Select module" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:22px">'+
+      INSTALLER_MODULES.map(function(m){
+        var checked = installerState.module===m.id;
+        return '<button type="button" role="radio" aria-checked="'+checked+'" data-module="'+m.id+'" class="card" style="text-align:left;'+(checked?'border-color:var(--accent);background:color-mix(in srgb, var(--accent) 6%, var(--surface))':'')+'">'+
+          '<h3 style="font-size:1rem">'+escapeHtml(m.name)+'</h3>'+
+          '<p style="margin-top:8px;font-size:.84rem;color:var(--ink-muted)">'+escapeHtml(m.desc)+'</p>'+
+          '</button>';
+      }).join('')+
+      '</div>';
+  }
+  else if(step==='detect'){
+    html = '<h2 style="font-size:1.4rem">Detect environment</h2><p style="color:var(--ink-muted);margin-top:8px">Scanning your environment for existing services and configuration.</p>'+
+      '<div class="telemetry-log" id="detect-list" style="margin-top:20px;height:190px"></div>'+
+      '<p class="mono" id="detect-status" style="margin-top:12px;font-size:.8rem;color:'+(installerState.detectDone?'var(--accent)':'var(--ink-muted)')+'">'+(installerState.detectRunning?'Scanning…':(installerState.detectDone?'Scan complete — 5 items detected.':'Ready to scan.'))+'</p>'+
+      (installerState.detectDone ? '' : '<button type="button" class="btn btn-outline" id="detect-run-btn" style="margin-top:8px">'+(installerState.detectRunning?'Scanning…':'Run Scan')+'</button>');
+  }
+  else if(step==='configure'){
+    html = '<h2 style="font-size:1.4rem">Configure deployment</h2><p style="color:var(--ink-muted);margin-top:8px">Set the basics for this environment.</p>'+
+      '<div class="field"><label for="cfg-name">Environment name</label><input type="text" id="cfg-name" value="'+escapeHtml(installerState.config.name)+'" placeholder="e.g. techbiss-prod-eu"></div>'+
+      '<div class="field"><label for="cfg-region">Region</label><select id="cfg-region"><option value="">Select a region…</option>'+
+        ['North America','Europe','Asia Pacific','Latin America'].map(function(r){ return '<option '+(installerState.config.region===r?'selected':'')+'>'+r+'</option>'; }).join('')+
+      '</select></div>'+
+      '<div class="field"><label>Deployment size</label><div style="display:flex;gap:10px" role="radiogroup" aria-label="Deployment size">'+
+        ['Small','Medium','Large'].map(function(sz){
+          var checked = installerState.config.size===sz;
+          return '<button type="button" data-size="'+sz+'" aria-pressed="'+checked+'" class="chip" style="'+(checked?'':'')+'">'+sz+'</button>';
+        }).join('')+
+      '</div></div>';
+  }
+  else if(step==='migrate'){
+    html = '<h2 style="font-size:1.4rem">Import &amp; migrate</h2><p style="color:var(--ink-muted);margin-top:8px">Migrating source data and schema into the new environment.</p>'+
+      '<div class="progress-track" style="margin-top:20px"><div class="progress-fill" id="migrate-bar" style="width:'+installerState.migrateProgress+'%"></div></div>'+
+      '<div class="telemetry-log" id="migrate-log" style="margin-top:16px"></div>'+
+      (installerState.migrateDone ? '<p class="mono" style="margin-top:10px;font-size:.8rem;color:var(--accent)">Migration complete.</p>' :
+        (installerState.migrateRunning ? '<p class="mono" style="margin-top:10px;font-size:.8rem;color:var(--ink-muted)">Migration in progress…</p>' :
+        '<button type="button" class="btn btn-outline" id="migrate-run-btn" style="margin-top:10px">Start Migration</button>'));
+  }
+  else if(step==='install'){
+    html = '<h2 style="font-size:1.4rem">Install</h2><p style="color:var(--ink-muted);margin-top:8px">Provisioning infrastructure and installing module packages.</p>'+
+      '<div class="progress-track" style="margin-top:20px"><div class="progress-fill" id="install-bar" style="width:'+installerState.installProgress+'%"></div></div>'+
+      '<div class="telemetry-log" id="install-log" style="margin-top:16px"></div>'+
+      (installerState.installDone ? '<p class="mono" style="margin-top:10px;font-size:.8rem;color:var(--accent)">Installation complete.</p>' :
+        (installerState.installRunning ? '<p class="mono" style="margin-top:10px;font-size:.8rem;color:var(--ink-muted)">Installing…</p>' :
+        '<button type="button" class="btn btn-outline" id="install-run-btn" style="margin-top:10px">Start Install</button>'));
+  }
+  else if(step==='verify'){
+    html = '<h2 style="font-size:1.4rem">Verify</h2><p style="color:var(--ink-muted);margin-top:8px">Running final checks before launch.</p>'+
+      '<ul style="margin-top:20px;display:flex;flex-direction:column;gap:2px">'+
+      VERIFY_ITEMS.map(function(v, i){
+        return '<li id="verify-item-'+i+'" style="display:flex;justify-content:space-between;padding:14px 4px;border-bottom:1px solid var(--line)"><span>'+escapeHtml(v)+'</span><span class="verify-check mono" style="color:'+(installerState.verifyChecks[i]?'var(--accent)':'var(--ink-muted)')+'">'+(installerState.verifyChecks[i]?'✓':'—')+'</span></li>';
+      }).join('')+
+      '</ul>'+
+      (installerState.verifyChecks.every(function(v){return v;}) ? '<p class="mono" style="margin-top:12px;font-size:.8rem;color:var(--accent)">All checks passed.</p>' :
+        '<button type="button" class="btn btn-outline" id="verify-run-btn" style="margin-top:14px">Run Verification</button>');
+  }
+  else if(step==='launch'){
+    var modName = INSTALLER_MODULES.find(function(m){return m.id===installerState.module;});
+    html = '<div style="text-align:center;padding:20px 0">'+
+      '<svg viewBox="0 0 64 64" style="width:56px;height:56px;margin:0 auto;color:var(--accent)" aria-hidden="true"><circle cx="32" cy="32" r="28" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 33l8 8 16-18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>'+
+      '<h2 style="margin-top:18px;font-size:1.5rem">Deployment complete</h2>'+
+      '<p style="color:var(--ink-muted);margin-top:8px">'+escapeHtml(modName?modName.name:'Your module')+' is live in '+escapeHtml(installerState.config.name||'your environment')+'.</p>'+
+      '<a href="#dashboard" class="btn btn-primary" style="margin-top:24px">Go to Dashboard</a>'+
+      '</div>';
+  }
+
+  host.innerHTML = html;
+  wireInstallerStepEvents(step);
+  updateInstallerNav();
+}
+
+function wireInstallerStepEvents(step){
+  if(step==='select'){
+    $all('[data-module]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        installerState.module = btn.getAttribute('data-module');
+        renderInstallerStep();
+      });
+    });
+  }
+  if(step==='detect'){
+    var btn = $('#detect-run-btn');
+    if(btn) btn.addEventListener('click', runDetectScan);
+    if(installerState.detectRunning){
+      /* resume showing remaining items handled by runDetectScan timers already in flight */
+    }
+  }
+  if(step==='configure'){
+    var nameInput = $('#cfg-name');
+    if(nameInput) nameInput.addEventListener('input', function(){ installerState.config.name = nameInput.value; updateInstallerNav(); });
+    var regionSel = $('#cfg-region');
+    if(regionSel) regionSel.addEventListener('change', function(){ installerState.config.region = regionSel.value; updateInstallerNav(); });
+    $all('[data-size]').forEach(function(b){
+      b.addEventListener('click', function(){
+        installerState.config.size = b.getAttribute('data-size');
+        renderInstallerStep();
+      });
+    });
+  }
+  if(step==='migrate'){
+    var mbtn = $('#migrate-run-btn');
+    if(mbtn) mbtn.addEventListener('click', runMigrate);
+  }
+  if(step==='install'){
+    var ibtn = $('#install-run-btn');
+    if(ibtn) ibtn.addEventListener('click', runInstall);
+  }
+  if(step==='verify'){
+    var vbtn = $('#verify-run-btn');
+    if(vbtn) vbtn.addEventListener('click', runVerify);
+  }
+}
+
+function initInstaller(){
+  var back = $('#installer-back'), next = $('#installer-next');
+  if(!back || !next) return;
+  renderInstallerStepper();
+  renderInstallerStep();
+  back.addEventListener('click', function(){
+    if(installerState.stepIndex>0){
+      installerState.stepIndex--;
+      renderInstallerStepper();
+      renderInstallerStep();
+    }
+  });
+  next.addEventListener('click', function(){
+    if(installerCanAdvance(installerState.stepIndex) && installerState.stepIndex < INSTALLER_STEPS.length-1){
+      installerState.stepIndex++;
+      renderInstallerStepper();
+      renderInstallerStep();
+    }
+  });
+}
+
+/* ---------------------------------------------------------------------
+   DASHBOARD PREVIEW
+   --------------------------------------------------------------------- */
+function kpiCard(label, value, sub){
+  return '<div class="card"><p class="mono" style="font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-muted)">'+escapeHtml(label)+'</p>'+
+    '<p style="font-family:var(--font-display);font-size:1.8rem;margin-top:8px">'+value+'</p>'+
+    (sub ? '<p style="margin-top:4px;font-size:.8rem;color:var(--accent)">'+escapeHtml(sub)+'</p>' : '')+
+    '</div>';
+}
+function barChartSvg(values, labels, opts){
+  opts = opts || {};
+  var w=520, h=180, pad=28;
+  var max = Math.max.apply(null, values) * 1.15;
+  var barW = (w-pad*2)/values.length*0.55;
+  var gap = (w-pad*2)/values.length;
+  var bars='', labelsSvg='';
+  values.forEach(function(v, i){
+    var barH = (v/max)*(h-pad*2);
+    var x = pad + i*gap + (gap-barW)/2;
+    var y = h-pad-barH;
+    bars += '<rect x="'+x+'" y="'+y+'" width="'+barW+'" height="'+barH+'" rx="3" fill="'+(i===values.length-1?'var(--accent)':'var(--accent-2)')+'" opacity="'+(i===values.length-1?1:0.55)+'"/>';
+    labelsSvg += '<text x="'+(x+barW/2)+'" y="'+(h-8)+'" text-anchor="middle" font-size="9" fill="var(--ink-muted)" font-family="var(--font-mono)">'+escapeHtml(labels[i])+'</text>';
+  });
+  return '<svg viewBox="0 0 '+w+' '+h+'" style="width:100%;height:auto" role="img" aria-label="'+escapeHtml(opts.ariaLabel||'Bar chart')+'"><line x1="'+pad+'" y1="'+(h-pad)+'" x2="'+(w-pad)+'" y2="'+(h-pad)+'" stroke="var(--line)"/>'+bars+labelsSvg+'</svg>';
+}
+function lineChartSvg(values, labels, opts){
+  opts = opts || {};
+  var w=520, h=180, pad=28;
+  var max = Math.max.apply(null, values)*1.15, min=0;
+  var stepX = (w-pad*2)/(values.length-1);
+  var points = values.map(function(v,i){ var x=pad+i*stepX; var y = h-pad-((v-min)/(max-min))*(h-pad*2); return x+','+y; });
+  var area = 'M'+pad+','+(h-pad)+' L'+points.join(' L')+' L'+(w-pad)+','+(h-pad)+' Z';
+  var dots = values.map(function(v,i){ var x=pad+i*stepX; var y=h-pad-((v-min)/(max-min))*(h-pad*2); return '<circle cx="'+x+'" cy="'+y+'" r="3" fill="var(--accent)"/>'; }).join('');
+  var labelsSvg = labels.map(function(l,i){ var x=pad+i*stepX; return '<text x="'+x+'" y="'+(h-8)+'" text-anchor="middle" font-size="9" fill="var(--ink-muted)" font-family="var(--font-mono)">'+escapeHtml(l)+'</text>'; }).join('');
+  return '<svg viewBox="0 0 '+w+' '+h+'" style="width:100%;height:auto" role="img" aria-label="'+escapeHtml(opts.ariaLabel||'Line chart')+'"><line x1="'+pad+'" y1="'+(h-pad)+'" x2="'+(w-pad)+'" y2="'+(h-pad)+'" stroke="var(--line)"/>'+
+    '<path d="'+area+'" fill="var(--accent)" opacity="0.12"/>'+
+    '<polyline points="'+points.join(' ')+'" fill="none" stroke="var(--accent)" stroke-width="2"/>'+dots+labelsSvg+'</svg>';
+}
+function activityFeed(items){
+  return '<ul style="display:flex;flex-direction:column">'+items.map(function(it){
+    return '<li style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)">'+
+      '<span style="width:8px;height:8px;border-radius:50%;background:var(--accent);margin-top:6px;flex:none"></span>'+
+      '<div><p style="font-size:.88rem">'+escapeHtml(it.text)+'</p><p class="mono" style="font-size:.7rem;color:var(--ink-muted);margin-top:2px">'+escapeHtml(it.time)+'</p></div>'+
+      '</li>';
+  }).join('')+'</ul>';
+}
+function pillFor(status){
+  var map = {Active:'pill-active', Trial:'pill-trial', 'At Risk':'pill-risk', Paid:'pill-paid', Pending:'pill-pending', High:'pill-high', Medium:'pill-trial', Low:'pill-active', Open:'pill-pending', 'In Progress':'pill-trial', Resolved:'pill-active'};
+  return '<span class="pill '+(map[status]||'pill-trial')+'">'+escapeHtml(status)+'</span>';
+}
+function dataTable(cols, rows){
+  var head = '<thead><tr>'+cols.map(function(c){ return '<th style="text-align:left;padding:12px;border-bottom:1px solid var(--line);font-size:.76rem;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.04em">'+escapeHtml(c)+'</th>'; }).join('')+'</tr></thead>';
+  var body = '<tbody>'+rows.map(function(r){
+    return '<tr>'+r.map(function(cell){ return '<td style="padding:12px;border-bottom:1px solid var(--line);font-size:.88rem">'+cell+'</td>'; }).join('')+'</tr>';
+  }).join('')+'</tbody>';
+  return '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:560px">'+head+body+'</table></div>';
+}
+
+function renderDashboardAdmin(){
+  var host = $('#panel-admin');
+  if(!host) return;
+  host.innerHTML =
+    '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px">'+
+      kpiCard('Active Tenants','482','+18 this month')+
+      kpiCard('MRR','$6.4M','+4.2% MoM')+
+      kpiCard('Platform Uptime','99.99%','SLA met')+
+      kpiCard('Open Support Tickets','37','-6 this week')+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:1.4fr 1fr;gap:16px">'+
+      '<div class="card"><h3 style="font-size:.98rem">Monthly Recurring Revenue</h3>'+barChartSvg([4.8,5.1,5.4,5.7,6.0,6.4], ['Apr','May','Jun','Jul','Aug','Sep'], {ariaLabel:'Monthly recurring revenue in millions, April through September'})+'</div>'+
+      '<div class="card"><h3 style="font-size:.98rem">Recent Activity</h3>'+activityFeed([
+        {text:'Meridian Capital renewed Enterprise tier', time:'2 hours ago'},
+        {text:'New tenant provisioned — Arclight Energy', time:'5 hours ago'},
+        {text:'Security patch deployed platform-wide', time:'1 day ago'},
+        {text:'Novatel Group upgraded to Global Scale', time:'2 days ago'},
+        {text:'Quarterly compliance audit passed', time:'3 days ago'}
+      ])+'</div>'+
+    '</div>'+
+    '<div class="card" style="margin-top:16px"><h3 style="font-size:.98rem;margin-bottom:10px">Tenants</h3>'+
+      dataTable(['Tenant','Plan','MRR','Status'], [
+        ['Meridian Capital Group','Enterprise','$22,000',pillFor('Active')],
+        ['Novatel Group','Global Scale','Custom',pillFor('Active')],
+        ['Continental Freight Alliance','Growth','$7,800',pillFor('Active')],
+        ['Beacon Health Network','Enterprise','$22,000',pillFor('Active')],
+        ['Arclight Energy','Starter','$2,400',pillFor('Trial')],
+        ['Vantage Retail Group','Growth','$7,800',pillFor('At Risk')]
+      ])+
+    '</div>';
+}
+function renderDashboardClient(){
+  var host = $('#panel-client');
+  if(!host) return;
+  var projects = [
+    {name:'Core Banking Modernization', pct:72},
+    {name:'AI Copilot Rollout — Treasury', pct:45},
+    {name:'Zero-Trust Network Rebuild', pct:90}
+  ];
+  host.innerHTML =
+    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px">'+
+      kpiCard('Active Projects','3','On track')+
+      kpiCard('Deployed Modules','7','2 pending')+
+      kpiCard('Outstanding Invoices','$18,400','Due in 12 days')+
+    '</div>'+
+    '<div class="card" style="margin-bottom:16px"><h3 style="font-size:.98rem;margin-bottom:14px">Project Status</h3>'+
+      projects.map(function(p){
+        return '<div style="margin-bottom:16px"><div style="display:flex;justify-content:space-between;font-size:.88rem;margin-bottom:6px"><span>'+escapeHtml(p.name)+'</span><span class="mono" style="color:var(--ink-muted)">'+p.pct+'%</span></div>'+
+          '<div class="progress-track"><div class="progress-fill" style="width:'+p.pct+'%"></div></div></div>';
+      }).join('')+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:1.3fr 1fr;gap:16px">'+
+      '<div class="card"><h3 style="font-size:.98rem;margin-bottom:10px">Invoices</h3>'+
+        dataTable(['Invoice','Date','Amount','Status'],[
+          ['INV-3391','Aug 1, 2026','$22,000',pillFor('Paid')],
+          ['INV-3402','Jul 1, 2026','$22,000',pillFor('Paid')],
+          ['INV-3418','Sep 1, 2026','$18,400',pillFor('Pending')]
+        ])+
+      '</div>'+
+      '<div class="card"><h3 style="font-size:.98rem">Activity</h3>'+activityFeed([
+        {text:'Zero-Trust Network Rebuild passed staging review', time:'3 hours ago'},
+        {text:'New module deployed: Nexus Identity Connector', time:'1 day ago'},
+        {text:'Invoice INV-3418 issued', time:'3 days ago'}
+      ])+'</div>'+
+    '</div>';
+}
+function renderDashboardStaff(){
+  var host = $('#panel-staff');
+  if(!host) return;
+  host.innerHTML =
+    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px">'+
+      kpiCard('Assigned Tickets','14','3 high priority')+
+      kpiCard('Utilization','86%','Target 80-90%')+
+      kpiCard('Sprint Tasks Closed','23','This week')+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:1.3fr 1fr;gap:16px;margin-bottom:16px">'+
+      '<div class="card"><h3 style="font-size:.98rem">Weekly Utilization</h3>'+lineChartSvg([78,82,75,90,86,88], ['W1','W2','W3','W4','W5','W6'], {ariaLabel:'Weekly utilization percentage over six weeks'})+'</div>'+
+      '<div class="card"><h3 style="font-size:.98rem">Team Activity</h3>'+activityFeed([
+        {text:'Priya closed TCK-1042', time:'40 min ago'},
+        {text:'Marcus started TCK-1039', time:'2 hours ago'},
+        {text:'Diego updated architecture runbook', time:'6 hours ago'}
+      ])+'</div>'+
+    '</div>'+
+    '<div class="card"><h3 style="font-size:.98rem;margin-bottom:10px">Assigned Tickets</h3>'+
+      dataTable(['Ticket','Title','Priority','Status'],[
+        ['TCK-1042','Reconciliation job timeout — Meridian','High',pillFor('Resolved')],
+        ['TCK-1039','SSO federation error — Novatel','High',pillFor('In Progress')],
+        ['TCK-1051','Dashboard chart render delay','Medium',pillFor('Open')],
+        ['TCK-1055','Add new region — Continental Freight','Low',pillFor('Open')]
+      ])+
+    '</div>';
+}
+function initDashboard(){
+  renderDashboardAdmin();
+  renderDashboardClient();
+  renderDashboardStaff();
+  var tabs = $all('#dashboard-tabs [role="tab"]');
+  if(!tabs.length) return;
+  tabs.forEach(function(tab){
+    tab.addEventListener('click', function(){
+      tabs.forEach(function(t){
+        var on = t===tab;
+        t.setAttribute('aria-selected', on?'true':'false');
+        t.className = on ? 'btn btn-sm' : 'btn btn-sm btn-ghost';
+        var panel = document.getElementById('panel-'+t.getAttribute('data-tab'));
+        if(panel) panel.hidden = !on;
+      });
+    });
+    tab.addEventListener('keydown', function(ev){
+      var idx = tabs.indexOf(tab);
+      if(ev.key==='ArrowRight'){ ev.preventDefault(); tabs[(idx+1)%tabs.length].focus(); tabs[(idx+1)%tabs.length].click(); }
+      if(ev.key==='ArrowLeft'){ ev.preventDefault(); tabs[(idx-1+tabs.length)%tabs.length].focus(); tabs[(idx-1+tabs.length)%tabs.length].click(); }
+    });
+  });
+}
+
+/* ---------------------------------------------------------------------
+   INIT
+   --------------------------------------------------------------------- */
+function init(){
+  initTheme();
+  initMobileMenu();
+  initLoader();
+  initOrbitalCanvas();
+  renderServices();
+  initSolutions();
+  initModal();
+  initMarketplace();
+  renderProductDetail(activeProduct);
+  renderWorkChips();
+  renderWorkGrid();
+  initHomeCarousel();
+  renderProcessTeaser();
+  initProcessTimeline();
+  initAboutNetwork();
+  renderResourceChips();
+  renderResourceGrid();
+  initNewsletter();
+  renderPricingGrid();
+  renderPricingTable();
+  initPricingToggle();
+  initFaq();
+  initContactForm();
+  initLogin();
+  initInstaller();
+  initDashboard();
+  initRouter();
+  initCounters();
+  refreshRevealObserver();
+}
+
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+
+})();
+</script>
 
 
 
