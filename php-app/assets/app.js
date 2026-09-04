@@ -623,9 +623,10 @@ Pages['/resources'] = function(){
   +'<section class="section tone-c"><div class="container text-center">'
     +'<h2 style="max-width:20ch;margin-inline:auto;">Get the next field note before anyone else</h2>'
     +'<form id="newsForm" class="flex" style="max-width:420px;margin:24px auto 0;gap:10px;" onsubmit="return false;">'
-      +'<input type="email" required placeholder="you@company.com" aria-label="Email address" style="flex:1;padding:14px 18px;border-radius:var(--r-full);border:1.5px solid var(--border);background:var(--surface);outline:none;">'
+      +'<input type="email" id="newsEmail" required placeholder="you@company.com" aria-label="Email address" style="flex:1;padding:14px 18px;border-radius:var(--r-full);border:1.5px solid var(--border);background:var(--surface);outline:none;">'
       +'<button class="btn btn-primary" type="submit">Subscribe</button>'
     +'</form><p id="newsMsg" class="badge success" style="display:none;margin-top:14px;">'+ico('check')+' You\'re on the list — welcome!</p>'
+    +'<p id="newsError" class="badge danger" hidden style="margin-top:14px;"></p>'
   +'</div></section>';
 };
 
@@ -705,7 +706,7 @@ Pages['/login'] = function(){
           +'<button class="btn btn-primary btn-block magnetic" type="submit">Sign in</button>'
         +'</form>'
         +'<div class="flex items-center gap-12" style="margin:22px 0;color:var(--ink-faint);font-size:.8rem;"><span style="flex:1;height:1px;background:var(--border);"></span>or<span style="flex:1;height:1px;background:var(--border);"></span></div>'
-        +'<button class="btn btn-ghost btn-block" style="margin-bottom:10px;">'+ico('shield')+' Continue with SSO</button>'
+        +'<button class="btn btn-ghost btn-block" type="button" disabled title="Single sign-on is not set up yet" style="margin-bottom:10px;opacity:.6;cursor:not-allowed;">'+ico('shield')+' Continue with SSO (coming soon)</button>'
         +'<p id="loginMsg" class="badge success" style="display:none;margin-top:16px;">'+ico('check')+' Welcome back — redirecting…</p>'
         +'<p id="loginError" class="badge danger" hidden style="margin-top:16px;"></p>'
       +'</div>'
@@ -720,25 +721,6 @@ Pages['/login'] = function(){
   +'</div></section>';
 };
 
-Pages['/installer'] = function(){
-  var steps=['Select','Detect','Configure','Import','Install','Verify','Launch'];
-  return '<section class="hero" style="padding-bottom:0;"><div class="container">'
-    +'<span class="eyebrow">Installer</span><h1 style="max-width:18ch;">Get everything set up in seven guided steps.</h1>'
-    +'<p class="lede">A companion blob keeps you company the whole way — and throws confetti when you land.</p>'
-  +'</div></section>'
-  +'<section class="section tone-a" style="padding-top:24px;"><div class="container">'
-    +'<div class="stepper" id="instStepper">'
-      +steps.map(function(s,i){
-        return (i>0?'<div class="step-line" data-line="'+i+'"></div>':'')
-        +'<div class="step-node" data-step="'+i+'"><div class="step-dot">'+(i+1)+'</div><div class="step-label">'+s+'</div></div>';
-      }).join('')
-    +'</div>'
-    +'<div class="hero-grid" style="align-items:flex-start;">'
-      +'<div class="card" id="instPanel" style="min-height:340px;"></div>'
-      +'<div class="text-center"><div class="blob-icon lg" id="instCompanion" style="margin:0 auto 14px;">'+ico('bolt')+'</div><p style="font-size:.85rem;">Your migration companion</p></div>'
-    +'</div>'
-  +'</div></section>';
-};
 
 Pages['/dashboard'] = function(){
   return '<section class="hero" style="padding-bottom:12px;"><div class="container">'
@@ -859,7 +841,22 @@ function wireResources(){
     });
   });
   var form = $('#newsForm');
-  if(form){ form.addEventListener('submit', function(){ $('#newsMsg').style.display='inline-flex'; form.style.opacity=.5; form.querySelectorAll('input,button').forEach(function(i){i.disabled=true;}); }); }
+  if(form){
+    form.addEventListener('submit', function(){
+      var err = $('#newsError'); err.hidden = true;
+      var email = $('#newsEmail').value;
+      var btn = form.querySelector('button[type=submit]'); btn.disabled = true;
+      fetch('api/newsletter.php', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email:email}) })
+        .then(function(r){ return r.json().then(function(data){ return {ok:r.ok, data:data}; }); })
+        .then(function(res){
+          if(!res.ok){ btn.disabled=false; err.textContent = res.data.error || 'Something went wrong — please try again.'; err.hidden = false; return; }
+          $('#newsMsg').style.display='inline-flex';
+          form.style.opacity=.5;
+          form.querySelectorAll('input,button').forEach(function(i){i.disabled=true;});
+        })
+        .catch(function(){ btn.disabled=false; err.textContent='Could not reach the server — please try again.'; err.hidden=false; });
+    });
+  }
 }
 function wirePricing(){
   var toggle = $('#priceToggle');
@@ -920,7 +917,7 @@ function wireLogin(){
     var b=e.target.closest('button'); if(!b) return;
     $all('button',tabs).forEach(function(x){x.classList.remove('active');}); b.classList.add('active');
     if(b.dataset.t==='signup'){ panels.innerHTML = signup; bindForm('signupForm','signupMsg','signupError','api/signup.php'); }
-    else { panels.innerHTML = signin + '<div class="flex items-center gap-12" style="margin:22px 0;color:var(--ink-faint);font-size:.8rem;"><span style="flex:1;height:1px;background:var(--border);"></span>or<span style="flex:1;height:1px;background:var(--border);"></span></div><button class="btn btn-ghost btn-block" style="margin-bottom:10px;">'+ico('shield')+' Continue with SSO</button><p id="loginMsg" class="badge success" style="display:none;margin-top:16px;">'+ico('check')+' Welcome back — redirecting…</p><p id="loginError" class="badge danger" hidden style="margin-top:16px;"></p>'; bindForm('signinForm','loginMsg','loginError','api/login.php'); attachTilt(panels); }
+    else { panels.innerHTML = signin + '<div class="flex items-center gap-12" style="margin:22px 0;color:var(--ink-faint);font-size:.8rem;"><span style="flex:1;height:1px;background:var(--border);"></span>or<span style="flex:1;height:1px;background:var(--border);"></span></div><button class="btn btn-ghost btn-block" type="button" disabled title="Single sign-on is not set up yet" style="margin-bottom:10px;opacity:.6;cursor:not-allowed;">'+ico('shield')+' Continue with SSO (coming soon)</button><p id="loginMsg" class="badge success" style="display:none;margin-top:16px;">'+ico('check')+' Welcome back — redirecting…</p><p id="loginError" class="badge danger" hidden style="margin-top:16px;"></p>'; bindForm('signinForm','loginMsg','loginError','api/login.php'); attachTilt(panels); }
   });
   function bindForm(fid,mid,eid,endpoint){
     var f = $('#'+fid);
@@ -1080,96 +1077,6 @@ function wireProductDetail(id){
   showTab('preview');
 }
 
-function wireInstaller(){
-  var STEPS = [
-    {t:'Select', icon:'compass', body:'Choose what you\'re installing today.', content:function(){
-      return optionsBlock(['New TECHBISS platform install','Migrate from an existing system','Add a marketplace product to a live install']);
-    }},
-    {t:'Detect', icon:'search', body:'We scan your environment for compatible services automatically.', auto:true, items:['Checking DNS & hosting','Scanning existing databases','Detecting installed integrations']},
-    {t:'Configure', icon:'gear', body:'Confirm the basics — you can change all of this later.', content:function(){
-      return '<div class="grid grid-2"><div class="field"><label>Business name</label><input value="Maple & Co. Bakery"></div><div class="field"><label>Primary region</label><select><option>US East</option><option>EU West</option><option>Asia Pacific</option></select></div></div>';
-    }},
-    {t:'Import', icon:'download', body:'Pulling in your existing data with a dry-run safety net.', auto:true, items:['Reading source schema','Mapping fields','Validating record counts']},
-    {t:'Install', icon:'box', body:'Provisioning services and applying your configuration.', auto:true, items:['Provisioning compute','Applying configuration','Installing dependencies']},
-    {t:'Verify', icon:'shield', body:'Running health checks before we hand you the keys.', auto:true, items:['Running health checks','Confirming data integrity','Checking SSL & DNS']},
-    {t:'Launch', icon:'rocket', body:'Everything checks out. Ready when you are.', content:function(){ return '<p style="text-align:center;">Your workspace is provisioned and verified.</p>'; }}
-  ];
-  function optionsBlock(opts){
-    return '<div style="display:flex;flex-direction:column;gap:10px;">'+opts.map(function(o,i){return '<label class="option-card'+(i===0?' selected':'')+'" data-opt="'+i+'" style="display:flex;align-items:center;gap:10px;"><input type="radio" name="selopt">'+o+'</label>';}).join('')+'</div>';
-  }
-  var cur = 0;
-  var stepper = $('#instStepper'), panel = $('#instPanel'), companion=$('#instCompanion');
-  function paintStepper(){
-    $all('.step-node', stepper).forEach(function(n){
-      var i=+n.dataset.step;
-      n.classList.toggle('done', i<cur);
-      n.classList.toggle('current', i===cur);
-      n.querySelector('.step-dot').textContent = i<cur ? '' : (i+1);
-      if(i<cur) n.querySelector('.step-dot').innerHTML = ico('check').replace('width:22px;height:22px','width:14px;height:14px');
-    });
-    $all('.step-line', stepper).forEach(function(l){ l.classList.toggle('done', +l.dataset.line<=cur); });
-  }
-  function bounceCompanion(){
-    companion.style.transition='transform .4s cubic-bezier(.4,1.8,.4,1)';
-    companion.style.transform='scale(1.25) rotate(-6deg)';
-    setTimeout(function(){ companion.style.transform=''; }, 420);
-  }
-  function renderStep(){
-    var s = STEPS[cur];
-    companion.innerHTML = ico(s.icon).replace('width:22px;height:22px','width:34px;height:34px');
-    var html = '<h3>'+s.t+'</h3><p class="lede">'+s.body+'</p>';
-    if(s.content){ html += s.content(); }
-    else if(s.auto){
-      html += '<div class="deploy-log" id="autoLog">'+s.items.map(function(it,i){ return '<div class="row" data-i="'+i+'"><span class="dot"></span><span>'+it+'</span></div>'; }).join('')+'</div>';
-      html += '<div class="progress-track" style="margin-top:18px;"><div class="progress-fill" id="autoFill"></div></div>';
-    }
-    html += '<div class="flex justify-between" style="margin-top:26px;">'
-      + (cur>0 ? '<button class="btn btn-ghost" id="instBack">Back</button>' : '<span></span>')
-      + '<button class="btn btn-primary magnetic" id="instNext">'+(cur===STEPS.length-1?'Launch':(s.auto?'Run '+s.t.toLowerCase()+' scan':'Continue'))+' '+ico('arrow')+'</button>'
-    +'</div>';
-    panel.innerHTML = html;
-    attachTilt(panel);
-    paintStepper();
-    $all('[data-opt]', panel).forEach(function(o){ o.addEventListener('click', function(){ $all('[data-opt]',panel).forEach(function(x){x.classList.remove('selected');}); o.classList.add('selected'); }); });
-    var back = $('#instBack'); if(back) back.addEventListener('click', function(){ cur=Math.max(0,cur-1); renderStep(); });
-    var next = $('#instNext');
-    next.addEventListener('click', function(){
-      if(s.auto && !next.dataset.ran){
-        next.dataset.ran='1'; next.disabled=true;
-        runAuto(s.items.length, function(){ next.disabled=false; advance(); });
-      } else {
-        advance();
-      }
-    });
-  }
-  function runAuto(n, done){
-    var rows = $all('#autoLog .row'), fill=$('#autoFill');
-    var i=0;
-    function step(){
-      if(i>=n){ done(); return; }
-      rows[i].classList.add('on');
-      rows[i].querySelector('.dot').innerHTML = ico('check').replace('width:22px;height:22px','width:11px;height:11px');
-      fill.style.width = Math.round(((i+1)/n)*100)+'%';
-      i++;
-      setTimeout(step, motionOK?550:60);
-    }
-    step();
-  }
-  function advance(){
-    bounceCompanion();
-    if(cur===STEPS.length-1){
-      cur = STEPS.length;
-      paintStepper();
-      var r = panel.getBoundingClientRect();
-      panel.innerHTML = '<div class="text-center" style="padding:10px 0;">'+blobIcon('rocket','lg')+'<h3>You\'re live, Maple & Co. Bakery.</h3><p>Your site is installed, verified and ready to go.</p><a href="#/dashboard" class="btn btn-primary magnetic">Go to dashboard '+ico('arrow')+'</a></div>';
-      attachTilt(panel);
-      confettiBurst(r.left+r.width/2, r.top+40);
-      return;
-    }
-    cur++; renderStep();
-  }
-  renderStep();
-}
 
 /* ===================================================================
    12. ROUTER
@@ -1202,7 +1109,7 @@ function doRender(){
   var afterMap = {
     '/': wireHome, '/work': wireWork, '/marketplace': wireMarketplace,
     '/resources': wireResources, '/pricing': wirePricing, '/contact': wireContact,
-    '/login': wireLogin, '/installer': wireInstaller
+    '/login': wireLogin
   };
   if(r.key==='/marketplace/detail'){ wireProductDetail(r.param); }
   else if(afterMap[r.key]){ afterMap[r.key](); }

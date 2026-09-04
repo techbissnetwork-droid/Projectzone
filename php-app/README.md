@@ -11,6 +11,8 @@ a genuinely access-controlled staff admin panel.
   `assets/style.css`, driven by `assets/app.js`.
 - Marketplace products — pulled live from the `products` table.
 - The contact form — saves every submission to `contact_messages`.
+- The Resources page newsletter signup — saves to `newsletter_subscribers`
+  (previously faked a "you're on the list" success without saving anything).
 - Customer sign up / log in / log out — real accounts in `customers`,
   hashed passwords (`password_hash`/`password_verify`), PHP sessions.
 - `/dashboard` (hash route `#/dashboard`) requires a signed-in customer —
@@ -40,8 +42,9 @@ a genuinely access-controlled staff admin panel.
 - No outbound email — the contact form saves to the database but does not
   send a notification email. Add `mail()`/PHPMailer/a transactional email
   API in `api/contact.php` if you want that.
-- The "Continue with SSO" button on the login page is decorative, exactly
-  as it was in the original design concept — it does nothing.
+- The "Continue with SSO" button on the login page is a disabled
+  "coming soon" placeholder (grayed out, can't be clicked) rather than a
+  live no-op — wire real OAuth into it once you have a provider set up.
 - The customer dashboard shows the same illustrative content to every
   customer rather than that customer's real projects — see below.
 

@@ -126,4 +126,14 @@ CREATE TABLE `contact_messages` (
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- ---------------------------------------------------------------
+-- newsletter_subscribers — Resources page "get the next field note" form.
+-- ---------------------------------------------------------------
+DROP TABLE IF EXISTS `newsletter_subscribers`;
+CREATE TABLE `newsletter_subscribers` (
+  `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `email` VARCHAR(190) NOT NULL UNIQUE,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 SET FOREIGN_KEY_CHECKS = 1;
