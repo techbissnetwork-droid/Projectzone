@@ -1,0 +1,1565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+(function(){
+  try{
+    var m = localStorage.getItem('tb-orbital-mode');
+    if(!m){ m = (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) ? 'day' : 'night'; }
+    document.documentElement.setAttribute('data-mode', m);
+  }catch(e){ document.documentElement.setAttribute('data-mode','night'); }
+})();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TECHBISS — Orbital</title>
+<meta name="description" content="TECHBISS is a global digital transformation platform partnering with enterprises to modernize infrastructure, build AI-native products, and run mission-critical systems at scale.">
+<meta property="og:title" content="TECHBISS — Global Digital Transformation Platform">
+<meta property="og:description" content="Modernize infrastructure, build AI-native products, and run mission-critical systems at scale with TECHBISS — 1,200+ engineers across 40+ countries.">
+<meta property="og:type" content="website">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+  :root{
+    --bg:#05070D;
+    --panel:#0B0F1A;
+    --panel-2:#111726;
+    --amber:#FFB454;
+    --amber-strong:#FFC97A;
+    --amber-dim:#C98A3B;
+    --steel:#6E85A3;
+    --steel-soft:#4C5C70;
+    --text:#EDEFF3;
+    --text-dim:#A9B4C4;
+    --border:rgba(110,133,163,0.32);
+    --border-strong:rgba(255,180,84,0.55);
+    --success:#7FD9A0;
+    --danger:#FF8A80;
+    --glow-amber:rgba(255,180,84,0.35);
+    --glow-steel:rgba(110,133,163,0.28);
+    --shadow-panel:0 20px 60px -25px rgba(0,0,0,0.7);
+    --radius-tick:18px;
+    --font-display:'Unbounded', 'Segoe UI', system-ui, sans-serif;
+    --font-body:'Hanken Grotesk', 'Segoe UI', Roboto, system-ui, sans-serif;
+    --font-mono:'JetBrains Mono', 'Consolas', 'SFMono-Regular', monospace;
+  }
+  html[data-mode="day"]{
+    --bg:#E7EAEF;
+    --panel:#F2F4F7;
+    --panel-2:#FFFFFF;
+    --amber:#A85D00;
+    --amber-strong:#8A4B00;
+    --amber-dim:#C98A3B;
+    --steel:#3E4E63;
+    --steel-soft:#5C6E84;
+    --text:#1B2230;
+    --text-dim:#4B5568;
+    --border:rgba(27,34,48,0.18);
+    --border-strong:rgba(168,93,0,0.55);
+    --success:#2F8F5B;
+    --danger:#C23B2E;
+    --glow-amber:rgba(168,93,0,0.22);
+    --glow-steel:rgba(62,78,99,0.18);
+    --shadow-panel:0 20px 50px -28px rgba(27,34,48,0.35);
+  }
+  *,*::before,*::after{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--font-body);
+    font-size:16px;
+    line-height:1.6;
+    transition:background .6s ease, color .6s ease;
+    overflow-x:hidden;
+  }
+  img{max-width:100%;}
+  h1,h2,h3,h4{
+    font-family:var(--font-display);
+    font-weight:600;
+    line-height:1.15;
+    margin:0 0 .6em;
+    text-wrap:balance;
+    letter-spacing:-0.01em;
+  }
+  p{margin:0 0 1em;color:var(--text-dim);}
+  a{color:inherit;}
+  ul{margin:0;padding:0;list-style:none;}
+  button{font-family:inherit;}
+  .num{font-family:var(--font-mono);font-variant-numeric:tabular-nums;}
+
+  /* ---------- accessibility helpers ---------- */
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+  .skip-link{
+    position:absolute;left:1rem;top:-100px;z-index:1000;
+    background:var(--amber);color:#05070D;padding:.7rem 1.2rem;
+    font-family:var(--font-mono);font-weight:700;font-size:.85rem;text-decoration:none;
+    border-radius:2px;transition:top .2s ease;
+  }
+  .skip-link:focus{top:1rem;}
+  :focus-visible{outline:2px solid var(--amber);outline-offset:3px;}
+  main:focus-visible{outline:none;}
+
+  /* ---------- starfield + route-lock overlay ---------- */
+  #starfield{
+    position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;
+    background:radial-gradient(ellipse at 50% -10%, rgba(110,133,163,0.10), transparent 55%);
+  }
+  html[data-mode="day"] #starfield{background:radial-gradient(ellipse at 50% -10%, rgba(62,78,99,0.06), transparent 55%);}
+  .route-lock{position:fixed;inset:0;z-index:60;pointer-events:none;opacity:0;}
+  .route-lock.active{opacity:1;}
+  .lock-corner{position:absolute;width:34px;height:34px;border-color:var(--amber);border-style:solid;border-width:0;opacity:0;transform:scale(.85);transition:opacity .22s ease, transform .22s ease;}
+  .route-lock.active .lock-corner{opacity:1;transform:scale(1);}
+  .lock-corner.tl{top:14px;left:14px;border-top-width:2px;border-left-width:2px;}
+  .lock-corner.tr{top:14px;right:14px;border-top-width:2px;border-right-width:2px;}
+  .lock-corner.bl{bottom:14px;left:14px;border-bottom-width:2px;border-left-width:2px;}
+  .lock-corner.br{bottom:14px;right:14px;border-bottom-width:2px;border-right-width:2px;}
+
+  /* ---------- boot loader ---------- */
+  .boot-loader{
+    position:fixed;inset:0;z-index:200;background:var(--bg);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.4rem;
+    transition:opacity .5s ease, visibility .5s ease;
+  }
+  .boot-loader.hide{opacity:0;visibility:hidden;pointer-events:none;}
+  .radar{width:150px;height:150px;overflow:visible;}
+  .radar-ring{fill:none;stroke:var(--border);stroke-width:1;}
+  .radar-cross{stroke:var(--border);stroke-width:1;}
+  .radar-sweep{fill:var(--amber);opacity:.25;transform-origin:100px 100px;animation:radarSpin 1.6s linear infinite;}
+  @keyframes radarSpin{to{transform:rotate(360deg);}}
+  .boot-text{font-family:var(--font-mono);letter-spacing:.18em;font-size:.8rem;color:var(--steel);text-transform:uppercase;}
+  .dots span{animation:dotFade 1.2s infinite;opacity:0;}
+  .dots span:nth-child(2){animation-delay:.2s;}
+  .dots span:nth-child(3){animation-delay:.4s;}
+  @keyframes dotFade{0%,100%{opacity:0;}40%{opacity:1;}}
+
+  /* ---------- header ---------- */
+  .site-header{position:sticky;top:0;z-index:50;background:color-mix(in srgb, var(--bg) 88%, transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);}
+  .header-inner{max-width:1320px;margin:0 auto;padding:.9rem 1.5rem;display:flex;align-items:center;gap:1.5rem;justify-content:space-between;}
+  .brand{display:flex;align-items:center;gap:.65rem;text-decoration:none;color:var(--text);}
+  .brand-mark{width:30px;height:30px;color:var(--amber);flex-shrink:0;}
+  .brand-text{font-family:var(--font-display);font-weight:600;font-size:1.05rem;letter-spacing:.02em;display:flex;flex-direction:column;line-height:1.1;}
+  .brand-sub{font-family:var(--font-mono);font-weight:400;font-size:.6rem;letter-spacing:.14em;color:var(--steel);margin-top:.2rem;}
+  .main-nav{display:flex;align-items:center;}
+  .nav-toggle{display:none;background:none;border:1px solid var(--border);color:var(--text);width:38px;height:38px;border-radius:2px;align-items:center;justify-content:center;cursor:pointer;}
+  .nav-toggle svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.7;}
+  .nav-list{display:flex;gap:1.6rem;flex-wrap:wrap;}
+  .nav-list a{
+    text-decoration:none;font-size:.86rem;font-weight:500;color:var(--text-dim);
+    padding:.3rem 0;position:relative;letter-spacing:.01em;
+  }
+  .nav-list a::after{content:'';position:absolute;left:0;right:0;bottom:-4px;height:2px;background:var(--amber);transform:scaleX(0);transition:transform .2s ease;transform-origin:left;}
+  .nav-list a:hover{color:var(--text);}
+  .nav-list a:hover::after{transform:scaleX(1);}
+  .nav-list a[aria-current="page"]{color:var(--amber);}
+  .nav-list a[aria-current="page"]::after{transform:scaleX(1);}
+  .header-tools{display:flex;align-items:center;gap:.9rem;}
+  .btn-ghost-sm{font-size:.82rem;text-decoration:none;color:var(--text-dim);border:1px solid var(--border);padding:.45rem .9rem;border-radius:2px;transition:.2s;font-weight:500;}
+  .btn-ghost-sm:hover{color:var(--amber);border-color:var(--border-strong);}
+  .mode-toggle{
+    width:38px;height:38px;border-radius:2px;border:1px solid var(--border);background:var(--panel);
+    color:var(--amber);cursor:pointer;display:flex;align-items:center;justify-content:center;position:relative;transition:border-color .2s;
+  }
+  .mode-toggle:hover{border-color:var(--border-strong);}
+  .mode-toggle svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.6;position:absolute;transition:opacity .3s ease, transform .3s ease;}
+  .icon-moon{opacity:1;transform:scale(1);}
+  .icon-sun{opacity:0;transform:scale(.5) rotate(-40deg);}
+  html[data-mode="day"] .icon-moon{opacity:0;transform:scale(.5) rotate(40deg);}
+  html[data-mode="day"] .icon-sun{opacity:1;transform:scale(1);}
+  .telemetry-strip{
+    border-top:1px solid var(--border);background:var(--panel);
+    display:flex;gap:1.6rem;flex-wrap:wrap;padding:.4rem 1.5rem;max-width:1320px;margin:0 auto;
+    font-family:var(--font-mono);font-size:.68rem;letter-spacing:.08em;color:var(--steel);text-transform:uppercase;
+  }
+  .tel-item .num{color:var(--text-dim);}
+  .status-ok{color:var(--success)!important;}
+
+  /* ---------- layout shells ---------- */
+  main{position:relative;z-index:1;}
+  .view{max-width:1320px;margin:0 auto;padding:3.2rem 1.5rem 5rem;}
+  .view-narrow{max-width:920px;}
+  .tag{
+    display:inline-flex;align-items:center;gap:.5rem;font-family:var(--font-mono);font-size:.72rem;
+    letter-spacing:.16em;text-transform:uppercase;color:var(--amber);margin-bottom:1rem;
+  }
+  .tag::before{content:'';width:7px;height:7px;background:var(--amber);border-radius:50%;box-shadow:0 0 8px var(--glow-amber);}
+  h1{font-size:clamp(2.1rem,4.4vw,3.4rem);}
+  h2{font-size:clamp(1.5rem,2.6vw,2.1rem);}
+  .lede{font-size:1.08rem;max-width:640px;}
+
+  /* ---------- HUD panel ---------- */
+  .panel{
+    position:relative;background:var(--panel);border:1px solid var(--border);
+    clip-path:polygon(0 0, calc(100% - var(--radius-tick)) 0, 100% var(--radius-tick), 100% 100%, var(--radius-tick) 100%, 0 calc(100% - var(--radius-tick)));
+    padding:1.8rem;box-shadow:var(--shadow-panel);
+    transition:border-color .25s ease, transform .3s ease;
+  }
+  .panel::before{content:'';position:absolute;top:8px;left:8px;width:10px;height:10px;border-top:1.5px solid var(--steel);border-left:1.5px solid var(--steel);}
+  .panel::after{content:'';position:absolute;bottom:8px;left:8px;width:10px;height:10px;border-bottom:1.5px solid var(--steel);border-left:1.5px solid var(--steel);}
+  .panel:hover{border-color:var(--border-strong);}
+  .panel-tilt{will-change:transform;}
+
+  /* buttons */
+  .btn{
+    display:inline-flex;align-items:center;gap:.55rem;font-weight:600;font-size:.92rem;
+    padding:.85rem 1.5rem;border-radius:2px;text-decoration:none;cursor:pointer;border:1px solid transparent;
+    transition:transform .15s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease, color .2s ease;
+    font-family:var(--font-body);
+  }
+  .btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;}
+  .btn-primary{background:var(--amber);color:#0B0700;}
+  .btn-primary:hover{box-shadow:0 0 0 3px var(--glow-amber),0 12px 30px -12px var(--glow-amber);transform:translateY(-1px);background:var(--amber-strong);}
+  .btn-secondary{background:transparent;color:var(--text);border-color:var(--border);}
+  .btn-secondary:hover{border-color:var(--border-strong);color:var(--amber);box-shadow:0 0 0 3px var(--glow-steel);}
+  .btn-block{width:100%;justify-content:center;}
+  .btn[disabled]{opacity:.5;cursor:not-allowed;}
+  .btn-sm{padding:.55rem 1rem;font-size:.8rem;}
+
+  /* icon */
+  .icon{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+
+  /* ---------- hero (home) ---------- */
+  .hero{display:grid;grid-template-columns:1.1fr .9fr;gap:3rem;align-items:center;padding-top:1rem;}
+  .hero-actions{display:flex;gap:1rem;flex-wrap:wrap;margin-top:1.8rem;}
+  .hero-core{position:relative;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;}
+  .orbit-svg{width:100%;height:100%;overflow:visible;}
+  .orbit-ring{fill:none;stroke:var(--border);stroke-width:1;}
+  .orbit-group{transform-origin:200px 200px;animation:orbitSpin linear infinite;}
+  .orbit-group.r1{animation-duration:22s;}
+  .orbit-group.r2{animation-duration:34s;animation-direction:reverse;}
+  .orbit-group.r3{animation-duration:48s;}
+  @keyframes orbitSpin{to{transform:rotate(360deg);}}
+  .orbit-node{fill:var(--panel);stroke:var(--amber);stroke-width:1.4;filter:drop-shadow(0 0 5px var(--glow-amber));}
+  .orbit-core{fill:var(--panel-2);stroke:var(--amber);stroke-width:1.6;}
+  .orbit-core-inner{fill:var(--amber);opacity:.85;}
+
+  /* strips */
+  .strip-head{display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:1.8rem;}
+  .grid-services{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;}
+  .service-card{display:flex;flex-direction:column;gap:.8rem;}
+  .service-card .icon{color:var(--amber);}
+  .service-card h3{font-size:1.05rem;margin-bottom:.2rem;}
+  .service-card p{font-size:.9rem;margin-bottom:0;}
+  .cap-list{margin-top:.4rem;display:flex;flex-direction:column;gap:.4rem;}
+  .cap-list li{display:flex;gap:.5rem;font-size:.84rem;color:var(--text-dim);align-items:flex-start;}
+  .cap-list .icon{width:14px;height:14px;color:var(--steel);flex-shrink:0;margin-top:.25rem;}
+
+  .stat-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;}
+  .stat-tile{text-align:left;padding:1.5rem;}
+  .stat-num{font-family:var(--font-mono);font-size:2rem;color:var(--amber);font-variant-numeric:tabular-nums;display:block;}
+  .stat-label{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--steel);margin-top:.4rem;display:block;}
+
+  .grid-two{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;}
+
+  /* footer */
+  .site-footer{border-top:1px solid var(--border);background:var(--panel);position:relative;z-index:1;}
+  .footer-inner{max-width:1320px;margin:0 auto;padding:3rem 1.5rem 2rem;display:grid;grid-template-columns:1.4fr repeat(3,1fr);gap:2rem;}
+  .footer-col h4{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--steel);margin-bottom:.9rem;}
+  .footer-col ul{display:flex;flex-direction:column;gap:.55rem;}
+  .footer-col a{font-size:.86rem;color:var(--text-dim);text-decoration:none;}
+  .footer-col a:hover{color:var(--amber);}
+  .footer-bottom{border-top:1px solid var(--border);max-width:1320px;margin:0 auto;padding:1.2rem 1.5rem;display:flex;justify-content:space-between;flex-wrap:wrap;gap:.6rem;font-family:var(--font-mono);font-size:.68rem;color:var(--steel);letter-spacing:.05em;}
+
+  /* ---------- grids for other pages ---------- */
+  .grid-solutions{display:grid;grid-template-columns:repeat(2,1fr);gap:1.2rem;}
+  .sector-tag{font-family:var(--font-mono);font-size:.68rem;letter-spacing:.14em;color:var(--steel);text-transform:uppercase;display:block;margin-bottom:.6rem;}
+
+  .grid-market{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;}
+  .module-card{display:flex;flex-direction:column;gap:.7rem;cursor:pointer;text-align:left;background:var(--panel);color:inherit;font:inherit;}
+  .module-cat{font-family:var(--font-mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--steel);}
+  .module-price{margin-top:auto;display:flex;align-items:center;justify-content:space-between;padding-top:.6rem;border-top:1px solid var(--border);}
+  .price-num{font-family:var(--font-mono);color:var(--amber);font-size:1.1rem;}
+  .tier-pill{font-family:var(--font-mono);font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--steel);border:1px solid var(--border);padding:.2rem .5rem;}
+
+  .grid-work{display:grid;grid-template-columns:repeat(2,1fr);gap:1.2rem;}
+  .work-metric{font-family:var(--font-mono);font-size:2.3rem;color:var(--amber);display:block;}
+  .work-metric-label{font-family:var(--font-mono);font-size:.68rem;letter-spacing:.1em;color:var(--steel);text-transform:uppercase;}
+  .work-sector{font-family:var(--font-mono);font-size:.68rem;color:var(--steel);letter-spacing:.08em;text-transform:uppercase;margin-bottom:.3rem;display:block;}
+
+  .process-list{display:flex;flex-direction:column;gap:0;}
+  .process-step{display:grid;grid-template-columns:110px 1fr;gap:1.5rem;padding:1.6rem 0;border-bottom:1px solid var(--border);}
+  .process-step:last-child{border-bottom:none;}
+  .process-marker{font-family:var(--font-mono);color:var(--amber);font-size:1rem;letter-spacing:.05em;}
+  .process-marker .sub{display:block;font-size:.65rem;color:var(--steel);letter-spacing:.14em;margin-top:.3rem;}
+
+  .leader-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.2rem;}
+  .leader-card{text-align:center;}
+  .monogram{width:64px;height:64px;margin:0 auto .9rem;border-radius:50%;border:1.4px solid var(--amber);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:1.1rem;color:var(--amber);background:var(--panel-2);box-shadow:0 0 0 4px var(--glow-amber) inset,0 0 18px -6px var(--glow-amber);}
+  .leader-role{font-family:var(--font-mono);font-size:.72rem;color:var(--steel);letter-spacing:.05em;}
+
+  .timeline{display:flex;flex-direction:column;gap:0;border-left:1px solid var(--border);padding-left:1.6rem;margin-top:1rem;}
+  .timeline-item{position:relative;padding:0 0 1.6rem;}
+  .timeline-item::before{content:'';position:absolute;left:-1.98rem;top:.3rem;width:9px;height:9px;background:var(--bg);border:1.5px solid var(--amber);border-radius:50%;box-shadow:0 0 6px var(--glow-amber);}
+  .timeline-year{font-family:var(--font-mono);color:var(--amber);font-size:.85rem;}
+
+  .grid-resources{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;}
+  .resource-card{text-decoration:none;color:inherit;display:block;}
+  .resource-meta{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:.65rem;letter-spacing:.08em;color:var(--steel);text-transform:uppercase;margin-top:.9rem;}
+
+  .billing-toggle{display:inline-flex;align-items:center;gap:.8rem;background:var(--panel);border:1px solid var(--border);padding:.4rem;border-radius:999px;}
+  .billing-toggle button{background:none;border:none;color:var(--text-dim);font-size:.82rem;padding:.5rem 1rem;border-radius:999px;cursor:pointer;font-weight:600;transition:.2s;}
+  .billing-toggle button[aria-pressed="true"]{background:var(--amber);color:#0B0700;}
+  .save-badge{font-family:var(--font-mono);font-size:.62rem;color:var(--success);letter-spacing:.06em;margin-left:.4rem;}
+  .grid-pricing{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin-top:2rem;}
+  .price-tier{display:flex;flex-direction:column;}
+  .price-tier.featured{border-color:var(--border-strong);}
+  .price-amount{font-family:var(--font-mono);font-size:2.3rem;color:var(--amber);margin:.6rem 0;}
+  .price-amount .per{font-size:.9rem;color:var(--steel);}
+  .price-features{display:flex;flex-direction:column;gap:.55rem;margin:1.2rem 0;}
+  .price-features li{display:flex;gap:.5rem;font-size:.86rem;align-items:flex-start;}
+  .price-features .icon{width:14px;height:14px;color:var(--success);margin-top:.2rem;flex-shrink:0;}
+
+  .office-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.2rem;}
+  .office-card h3{font-size:1rem;}
+  .office-card p{font-size:.86rem;margin-bottom:.3rem;}
+
+  form .field{margin-bottom:1.1rem;display:flex;flex-direction:column;gap:.4rem;}
+  form label{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--steel);}
+  form input,form select,form textarea{
+    background:var(--bg);border:1px solid var(--border);color:var(--text);padding:.75rem .9rem;border-radius:2px;
+    font-family:var(--font-body);font-size:.92rem;transition:border-color .2s;
+  }
+  form input:focus,form select:focus,form textarea:focus{border-color:var(--amber);}
+  form .err{color:var(--danger);font-size:.76rem;min-height:1em;}
+  form input[aria-invalid="true"],form textarea[aria-invalid="true"]{border-color:var(--danger);}
+  .field-hint{font-size:.76rem;color:var(--steel);}
+
+  .success-box{display:flex;flex-direction:column;align-items:flex-start;gap:.8rem;}
+  .success-box .icon-check-wrap{width:52px;height:52px;border-radius:50%;border:1.5px solid var(--success);display:flex;align-items:center;justify-content:center;color:var(--success);}
+
+  .login-shell{max-width:420px;margin:0 auto;}
+  .sso-row{display:flex;flex-direction:column;gap:.7rem;margin-top:1.2rem;}
+  .divider{display:flex;align-items:center;gap:.8rem;margin:1.4rem 0;color:var(--steel);font-family:var(--font-mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;}
+  .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
+
+  /* installer */
+  .stepper{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:2.2rem;}
+  .step-pill{font-family:var(--font-mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;color:var(--steel);border:1px solid var(--border);padding:.4rem .8rem;display:flex;align-items:center;gap:.4rem;}
+  .step-pill.active{color:var(--amber);border-color:var(--border-strong);}
+  .step-pill.done{color:var(--success);}
+  .env-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;}
+  .env-card{cursor:pointer;text-align:left;background:var(--panel);color:inherit;font:inherit;border:1px solid var(--border);}
+  .env-card[aria-pressed="true"]{border-color:var(--amber);box-shadow:0 0 0 2px var(--glow-amber);}
+  .scan-list{display:flex;flex-direction:column;gap:.6rem;margin-top:1.2rem;}
+  .scan-item{display:flex;justify-content:space-between;align-items:center;padding:.7rem .9rem;background:var(--panel-2);border:1px solid var(--border);font-family:var(--font-mono);font-size:.82rem;opacity:0;transform:translateX(-8px);transition:opacity .3s ease, transform .3s ease;}
+  .scan-item.shown{opacity:1;transform:none;}
+  .progress-row{margin-bottom:1rem;}
+  .progress-row .p-label{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:.76rem;margin-bottom:.35rem;}
+  .progress-track{height:8px;background:var(--panel-2);border:1px solid var(--border);position:relative;overflow:hidden;}
+  .progress-fill{height:100%;background:var(--amber);width:0%;transition:width .25s linear;box-shadow:0 0 8px var(--glow-amber);}
+  .log-box{background:#000;border:1px solid var(--border);padding:1rem;font-family:var(--font-mono);font-size:.78rem;color:var(--success);height:200px;overflow-y:auto;line-height:1.7;}
+  html[data-mode="day"] .log-box{background:#101418;}
+  .check-list{display:flex;flex-direction:column;gap:.6rem;margin-top:1rem;}
+  .check-item{display:flex;align-items:center;gap:.7rem;font-family:var(--font-mono);font-size:.86rem;}
+  .check-item .icon{width:16px;height:16px;color:var(--border-strong);flex-shrink:0;transition:color .3s;}
+  .check-item.verified .icon{color:var(--success);}
+
+  /* dashboard */
+  .dash-tabs{display:flex;gap:.6rem;margin-bottom:1.6rem;}
+  .dash-tab{background:none;border:1px solid var(--border);color:var(--text-dim);padding:.6rem 1.1rem;cursor:pointer;font-weight:600;font-size:.85rem;}
+  .dash-tab[aria-selected="true"]{color:var(--amber);border-color:var(--border-strong);}
+  .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem;}
+  .preview-badge{display:inline-block;font-family:var(--font-mono);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--amber);border:1px solid var(--border-strong);padding:.2rem .6rem;margin-bottom:1rem;}
+  .activity-list{display:flex;flex-direction:column;gap:.7rem;}
+  .activity-item{display:flex;justify-content:space-between;font-size:.85rem;padding:.6rem 0;border-bottom:1px solid var(--border);}
+  .activity-time{font-family:var(--font-mono);color:var(--steel);font-size:.75rem;}
+
+  /* modal */
+  .modal-backdrop{position:fixed;inset:0;background:rgba(2,3,6,0.72);z-index:100;display:flex;align-items:center;justify-content:center;padding:1.5rem;}
+  html[data-mode="day"] .modal-backdrop{background:rgba(20,24,32,0.55);}
+  .modal-backdrop[hidden]{display:none;}
+  .modal{background:var(--panel);border:1px solid var(--border-strong);max-width:560px;width:100%;max-height:85vh;overflow-y:auto;padding:2rem;position:relative;box-shadow:0 30px 80px -20px rgba(0,0,0,0.6);clip-path:polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 22px 100%, 0 calc(100% - 22px));}
+  .modal-close{position:absolute;top:1rem;right:1rem;width:34px;height:34px;border:1px solid var(--border);background:none;color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;}
+  .modal-close .icon{width:15px;height:15px;}
+  .addon-row{display:flex;align-items:center;justify-content:space-between;padding:.7rem 0;border-bottom:1px solid var(--border);}
+  .addon-row label{display:flex;align-items:center;gap:.6rem;font-size:.88rem;color:var(--text);cursor:pointer;}
+  .modal-total{display:flex;justify-content:space-between;align-items:center;margin:1.4rem 0;padding-top:1rem;border-top:1px solid var(--border);}
+  .modal-total .price-num{font-size:1.6rem;}
+  .modal-actions{display:flex;gap:.8rem;margin-top:1rem;}
+  .deploy-log{margin-top:1rem;}
+
+  /* generic mono list for compare / testimonial */
+  .testimonial{border-left:2px solid var(--amber);padding-left:1.4rem;margin:1.6rem 0;font-size:1.05rem;font-style:normal;color:var(--text);}
+  .testimonial cite{display:block;margin-top:.8rem;font-family:var(--font-mono);font-size:.78rem;color:var(--steel);font-style:normal;}
+
+  .feature-list{display:flex;flex-direction:column;gap:.7rem;margin:1.4rem 0;}
+  .feature-list li{display:flex;gap:.6rem;font-size:.92rem;align-items:flex-start;}
+  .feature-list .icon{width:15px;height:15px;color:var(--amber);margin-top:.2rem;flex-shrink:0;}
+
+  .section-gap{margin-top:4.4rem;}
+
+  /* responsive */
+  @media (max-width:980px){
+    .hero{grid-template-columns:1fr;}
+    .grid-services,.grid-market,.leader-grid,.grid-pricing,.env-grid{grid-template-columns:repeat(2,1fr);}
+    .stat-strip,.grid-solutions,.grid-work,.grid-resources,.office-grid,.grid-two,.kpi-grid{grid-template-columns:repeat(2,1fr);}
+    .footer-inner{grid-template-columns:1fr 1fr;}
+  }
+  @media (max-width:720px){
+    .nav-toggle{display:flex;}
+    .nav-list{position:absolute;top:100%;left:0;right:0;background:var(--panel);border-bottom:1px solid var(--border);flex-direction:column;gap:0;padding:.5rem 1.5rem;display:none;}
+    .nav-list.open{display:flex;}
+    .nav-list li{border-bottom:1px solid var(--border);}
+    .nav-list a{display:block;padding:.9rem 0;}
+    .main-nav{position:relative;}
+    .grid-services,.grid-market,.leader-grid,.grid-pricing,.env-grid,.stat-strip,.grid-solutions,.grid-work,.grid-resources,.office-grid,.grid-two,.kpi-grid{grid-template-columns:1fr;}
+    .process-step{grid-template-columns:1fr;}
+    .footer-inner{grid-template-columns:1fr;}
+    .telemetry-strip{font-size:.6rem;gap:.9rem;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.15s !important;scroll-behavior:auto !important;}
+  }
+</style>
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to content</a>
+
+<svg style="display:none" aria-hidden="true">
+<defs>
+<symbol id="icon-cloud" viewBox="0 0 24 24"><path d="M7 18h10a4 4 0 0 0 .5-7.97A5.5 5.5 0 0 0 7.1 9.02 4 4 0 0 0 7 18Z" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="icon-spark" viewBox="0 0 24 24"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6.5 6.5l2.1 2.1M15.4 15.4l2.1 2.1M17.5 6.5l-2.1 2.1M8.6 15.4l-2.1 2.1" stroke-linecap="round"/></symbol>
+<symbol id="icon-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3Z" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="icon-code" viewBox="0 0 24 24"><path d="M9 8l-4 4 4 4M15 8l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="icon-layers" viewBox="0 0 24 24"><path d="M12 4 3 9l9 5 9-5-9-5Z" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 14l9 5 9-5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="icon-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M4 12h16M12 4c2.4 2.4 2.4 13.6 0 16M12 4c-2.4 2.4-2.4 13.6 0 16"/></symbol>
+<symbol id="icon-arrow-right" viewBox="0 0 24 24"><path d="M4 12h15M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="icon-check" viewBox="0 0 24 24"><path d="M4 12.5l5 5 11-11" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="icon-chevron-down" viewBox="0 0 24 24"><path d="M5 8l7 7 7-7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="icon-cart" viewBox="0 0 24 24"><circle cx="9" cy="20" r="1.3"/><circle cx="18" cy="20" r="1.3"/><path d="M3 4h2l2.3 12h10.4L20 8H6.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="icon-download" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M4 19h16" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="icon-gauge" viewBox="0 0 24 24"><path d="M4 15a8 8 0 1 1 16 0" stroke-linecap="round"/><path d="M12 15l4-5" stroke-linecap="round"/><circle cx="12" cy="15" r="1"/></symbol>
+<symbol id="icon-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke-linecap="round"/><circle cx="17.5" cy="9" r="2.3"/><path d="M15.8 14a5 5 0 0 1 5.2 5" stroke-linecap="round"/></symbol>
+<symbol id="icon-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3v2.4M12 18.6V21M3 12h2.4M18.6 12H21M5.7 5.7l1.7 1.7M16.6 16.6l1.7 1.7M18.3 5.7l-1.7 1.7M7.4 16.6l-1.7 1.7" stroke-linecap="round"/></symbol>
+<symbol id="icon-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.5-4.5" stroke-linecap="round"/></symbol>
+<symbol id="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2.4M12 19.6V22M2 12h2.4M19.6 12H22M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M19.1 4.9l-1.7 1.7M6.6 17.4l-1.7 1.7" stroke-linecap="round"/></symbol>
+<symbol id="icon-moon" viewBox="0 0 24 24"><path d="M20 14.2A8.4 8.4 0 1 1 9.8 4a7 7 0 0 0 10.2 10.2Z" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="icon-package" viewBox="0 0 24 24"><path d="M12 3 4 7v10l8 4 8-4V7l-8-4Z" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 7l8 4 8-4M12 11v10"/></symbol>
+<symbol id="icon-terminal" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="1"/><path d="M7 10l3 3-3 3M13 16h4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</defs>
+</svg>
+
+<canvas id="starfield" aria-hidden="true"></canvas>
+
+<div class="route-lock" id="routeLock" aria-hidden="true">
+  <span class="lock-corner tl"></span><span class="lock-corner tr"></span><span class="lock-corner bl"></span><span class="lock-corner br"></span>
+</div>
+
+<div id="bootLoader" class="boot-loader" role="status" aria-live="polite">
+  <svg class="radar" viewBox="0 0 200 200" aria-hidden="true">
+    <circle cx="100" cy="100" r="88" class="radar-ring"/>
+    <circle cx="100" cy="100" r="58" class="radar-ring"/>
+    <circle cx="100" cy="100" r="28" class="radar-ring"/>
+    <line x1="100" y1="12" x2="100" y2="188" class="radar-cross"/>
+    <line x1="12" y1="100" x2="188" y2="100" class="radar-cross"/>
+    <path d="M100 100 L100 12 A88 88 0 0 1 188 100 Z" class="radar-sweep"/>
+  </svg>
+  <p class="boot-text">Establishing uplink<span class="dots"><span>.</span><span>.</span><span>.</span></span></p>
+</div>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="#/" class="brand" aria-label="TECHBISS home">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+        <circle cx="16" cy="16" r="4.2" fill="currentColor"/>
+        <ellipse cx="16" cy="16" rx="14" ry="6" fill="none" stroke="currentColor" stroke-width="1.3"/>
+        <ellipse cx="16" cy="16" rx="14" ry="6" fill="none" stroke="currentColor" stroke-width="1.3" transform="rotate(60 16 16)"/>
+        <ellipse cx="16" cy="16" rx="14" ry="6" fill="none" stroke="currentColor" stroke-width="1.3" transform="rotate(120 16 16)"/>
+      </svg>
+      <span class="brand-text">TECHBISS<span class="brand-sub">ORBITAL // MISSION CONSOLE</span></span>
+    </a>
+    <nav class="main-nav" aria-label="Primary">
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="navList">
+        <svg viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="1.7" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <ul class="nav-list" id="navList">
+        <li><a href="#/" data-route="">Home</a></li>
+        <li><a href="#/services" data-route="services">Services</a></li>
+        <li><a href="#/solutions" data-route="solutions">Solutions</a></li>
+        <li><a href="#/marketplace" data-route="marketplace">Marketplace</a></li>
+        <li><a href="#/work" data-route="work">Work</a></li>
+        <li><a href="#/process" data-route="process">Process</a></li>
+        <li><a href="#/about" data-route="about">About</a></li>
+        <li><a href="#/resources" data-route="resources">Resources</a></li>
+        <li><a href="#/pricing" data-route="pricing">Pricing</a></li>
+        <li><a href="#/contact" data-route="contact">Contact</a></li>
+      </ul>
+    </nav>
+    <div class="header-tools">
+      <a href="#/login" class="btn-ghost-sm">Login</a>
+      <button id="modeToggle" class="mode-toggle" aria-label="Switch to Day Ops mode">
+        <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-moon"></use></svg>
+        <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-sun"></use></svg>
+      </button>
+    </div>
+  </div>
+  <div class="telemetry-strip">
+    <span class="tel-item">MODE <span id="telMode" class="num">NIGHT_OPS</span></span>
+    <span class="tel-item">ROUTE <span id="telRoute" class="num">/HOME</span></span>
+    <span class="tel-item">CLOCK <span id="telClock" class="num">00:00:00Z</span></span>
+    <span class="tel-item">STATUS <span class="num status-ok">NOMINAL</span></span>
+  </div>
+</header>
+
+<main id="main" tabindex="-1">
+  <div id="content"></div>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-col">
+      <span class="brand-sub" style="color:var(--steel);font-family:var(--font-mono);letter-spacing:.14em;font-size:.68rem;">TECHBISS ORBITAL</span>
+      <p style="margin-top:.8rem;max-width:280px;font-size:.86rem;">A global digital transformation platform partnering with enterprises to modernize infrastructure, build AI-native products, and run mission-critical systems at scale.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Platform</h4>
+      <ul>
+        <li><a href="#/services">Services</a></li>
+        <li><a href="#/solutions">Solutions</a></li>
+        <li><a href="#/marketplace">Marketplace</a></li>
+        <li><a href="#/pricing">Pricing</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="#/about">About</a></li>
+        <li><a href="#/work">Work</a></li>
+        <li><a href="#/resources">Resources</a></li>
+        <li><a href="#/contact">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Console</h4>
+      <ul>
+        <li><a href="#/login">Client Login</a></li>
+        <li><a href="#/dashboard">Dashboard Preview</a></li>
+        <li><a href="#/installer">Installer</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 TECHBISS. Design concept — illustrative content.</span>
+    <span>SECTOR 04 // ORBITAL BUILD</span>
+  </div>
+</footer>
+
+<div class="modal-backdrop" id="modalBackdrop" hidden>
+  <div class="modal" id="modalPanel" role="dialog" aria-modal="true" aria-labelledby="modalTitle" tabindex="-1">
+    <button class="modal-close" id="modalCloseBtn" aria-label="Close dialog"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19" stroke-linecap="round"/></svg></button>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ============================= DATA ============================= */
+var SERVICES = [
+  {icon:'cloud', name:'Cloud & Infrastructure', desc:'Modernize compute, network, and platform foundations for elastic scale and lower operating cost.', caps:['Multi-cloud architecture','Kubernetes & platform engineering','Cost & capacity optimization']},
+  {icon:'spark', name:'AI & Automation', desc:'Ship AI-native products and automate operational workflows with production-grade rigor.', caps:['LLM & agent integration','MLOps and model governance','Intelligent process automation']},
+  {icon:'code', name:'Enterprise Software Engineering', desc:'Build and modernize the core systems that run your business, end to end.', caps:['Legacy modernization','Custom platform builds','API & integration layers']},
+  {icon:'layers', name:'Digital Product Design', desc:'Design systems and product experiences that hold up at enterprise scale.', caps:['Product strategy & UX research','Design systems','Prototyping & usability testing']},
+  {icon:'shield', name:'Cybersecurity & Risk', desc:'Zero-trust security architecture and continuous risk management across your estate.', caps:['Zero-trust architecture','Threat detection & response','Compliance & audit readiness']},
+  {icon:'gauge', name:'Managed Operations', desc:'24/7 operational stewardship of mission-critical systems with measurable SLAs.', caps:['Site reliability engineering','Incident & change management','98.7% uptime SLA']}
+];
+
+var SOLUTIONS = [
+  {sector:'SECTOR 01', name:'Financial Services', desc:'Core banking modernization, real-time payments, and risk platforms built for regulatory scrutiny and scale.'},
+  {sector:'SECTOR 02', name:'Healthcare & Life Sciences', desc:'Interoperable clinical and research systems engineered around data integrity, privacy, and uptime.'},
+  {sector:'SECTOR 03', name:'Retail & Commerce', desc:'Unified commerce platforms spanning storefront, fulfillment, and omnichannel inventory in real time.'},
+  {sector:'SECTOR 04', name:'Manufacturing & Industry 4.0', desc:'Connected-factory platforms linking shop-floor telemetry to enterprise planning and forecasting.'},
+  {sector:'SECTOR 05', name:'Public Sector', desc:'Secure, accessible citizen-facing services and modernized back-office infrastructure at agency scale.'}
+];
+
+var ADDONS = [
+  {id:'support', name:'24/7 Priority Support', price:250},
+  {id:'sla', name:'99.99% SLA Uplift', price:400},
+  {id:'training', name:'Team Enablement Program', price:180}
+];
+
+var MODULES = [
+  {id:'erp', name:'Core ERP Accelerator', cat:'Enterprise Systems', desc:'Pre-integrated ERP core with finance, procurement, and HR modules ready to configure.', price:1200, tier:'GROWTH'},
+  {id:'aiops', name:'AI Ops Copilot', cat:'AI & Automation', desc:'An AI copilot that monitors, explains, and remediates operational incidents in real time.', price:1800, tier:'ENTERPRISE'},
+  {id:'zerotrust', name:'Zero-Trust Security Suite', cat:'Cybersecurity', desc:'Identity-first access control, micro-segmentation, and continuous verification out of the box.', price:2200, tier:'ENTERPRISE'},
+  {id:'commerce', name:'Commerce Engine', cat:'Digital Commerce', desc:'Composable storefront and checkout engine with real-time inventory synchronization.', price:1500, tier:'GROWTH'},
+  {id:'datafabric', name:'Data Fabric Connector', cat:'Data Platform', desc:'Unify siloed data sources into a governed, queryable fabric across your estate.', price:950, tier:'STARTER'},
+  {id:'legacy', name:'Legacy Migration Toolkit', cat:'Modernization', desc:'Automated assessment and migration tooling for retiring legacy monolith systems safely.', price:1100, tier:'GROWTH'}
+];
+
+var WORK = [
+  {name:'Northbridge Logistics', sector:'Global Logistics Network', metric:'−42%', label:'Fulfillment Latency', desc:'Rebuilt a fragmented routing stack into a unified real-time logistics platform across 30 hubs.'},
+  {name:'Aurelia Health Systems', sector:'Multi-Region Healthcare Provider', metric:'99.99%', label:'Platform Uptime', desc:'Modernized clinical infrastructure to a zero-downtime architecture across four regions.'},
+  {name:'Solace Retail Group', sector:'Omnichannel Retail', metric:'3.1×', label:'Checkout Throughput', desc:'Re-platformed commerce and inventory systems to handle peak-season demand without failover.'},
+  {name:'Ferrum Industrial', sector:'Heavy Manufacturing', metric:'−61%', label:'Unplanned Downtime', desc:'Connected shop-floor telemetry to predictive maintenance across 12 production sites.'}
+];
+
+var PROCESS = [
+  {n:'01', name:'Discover', desc:'We map your systems, constraints, and business objectives into a shared operating picture.'},
+  {n:'02', name:'Design', desc:'Architecture and product design decisions are made explicit, reviewed, and stress-tested early.'},
+  {n:'03', name:'Build', desc:'Cross-functional pods ship in short, instrumented cycles against a fixed telemetry baseline.'},
+  {n:'04', name:'Deploy', desc:'Progressive rollout with automated verification gates and rollback paths at every stage.'},
+  {n:'05', name:'Optimize', desc:'Managed operations continuously tune performance, cost, and reliability post-launch.'}
+];
+
+var LEADERS = [
+  {name:'Naomi Reyes', role:'Chief Executive Officer', initials:'NR'},
+  {name:'Daniel Okonkwo', role:'Chief Technology Officer', initials:'DO'},
+  {name:'Priya Anand', role:'Chief AI Officer', initials:'PA'},
+  {name:'Lucas Bergström', role:'Chief Security Officer', initials:'LB'}
+];
+
+var MILESTONES = [
+  {year:'2016', text:'Founded as an infrastructure modernization consultancy.'},
+  {year:'2018', text:'Expanded into enterprise software engineering at scale.'},
+  {year:'2020', text:'Launched the managed operations division and 24/7 SRE desk.'},
+  {year:'2023', text:'Crossed 1,200 engineers operating across 40+ countries.'},
+  {year:'2025', text:'Introduced the AI Ops Copilot platform-wide across every engagement.'}
+];
+
+var RESOURCES = [
+  {title:'Zero-Trust Isn’t Optional Anymore', cat:'Cybersecurity', time:'6 min'},
+  {title:'Designing AI-Native Products from Day One', cat:'AI & Automation', time:'8 min'},
+  {title:'The Real Cost of Legacy Infrastructure', cat:'Cloud & Infrastructure', time:'5 min'},
+  {title:'What 40 Countries Taught Us About Uptime', cat:'Managed Operations', time:'7 min'},
+  {title:'A Field Guide to Enterprise Modernization', cat:'Engineering', time:'9 min'},
+  {title:'Inside the TECHBISS Marketplace', cat:'Platform', time:'4 min'}
+];
+
+var OFFICES = [
+  {city:'New York', region:'United States', line:'One Orbital Plaza, Floor 42', hours:'09:00 – 18:00 EST'},
+  {city:'London', region:'United Kingdom', line:'14 Meridian Row, Canary Wharf', hours:'09:00 – 18:00 GMT'},
+  {city:'Singapore', region:'Singapore', line:'88 Telemetry Tower, Marina Bay', hours:'09:00 – 18:00 SGT'},
+  {city:'São Paulo', region:'Brazil', line:'Av. Vetor Norte 210, Andar 18', hours:'09:00 – 18:00 BRT'}
+];
+
+var PRICING = [
+  {name:'Starter', monthly:1200, annual:990, features:['Up to 3 marketplace modules','Business-hours support','Standard SLA (99.5%)','Quarterly business review'], featured:false},
+  {name:'Growth', monthly:3400, annual:2790, features:['Up to 10 marketplace modules','24/7 priority support','Elevated SLA (99.9%)','Dedicated delivery pod','Monthly optimization review'], featured:true},
+  {name:'Enterprise', monthly:null, annual:null, features:['Unlimited marketplace modules','24/7 dedicated SRE desk','Custom SLA up to 99.99%','Named technical account team','Quarterly architecture audit'], featured:false}
+];
+
+/* ============================= STATE ============================= */
+var state = {
+  mode: document.documentElement.getAttribute('data-mode') || 'night',
+  billingAnnual: false,
+  reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+  cart: { moduleId:null, addons:[] },
+  dashTab: 'admin'
+};
+
+/* ============================= UTIL ============================= */
+function $(sel, root){ return (root||document).querySelector(sel); }
+function $all(sel, root){ return Array.prototype.slice.call((root||document).querySelectorAll(sel)); }
+function esc(s){ return String(s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function fmtMoney(n){ return '$' + n.toLocaleString('en-US'); }
+function icon(name, cls){ return '<svg class="icon' + (cls?(' '+cls):'') + '" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-' + name + '"></use></svg>'; }
+
+/* ============================= THEME ============================= */
+function applyMode(m, persist){
+  state.mode = m;
+  document.documentElement.setAttribute('data-mode', m);
+  var toggle = $('#modeToggle');
+  if(toggle){ toggle.setAttribute('aria-label', m === 'night' ? 'Switch to Day Ops mode' : 'Switch to Night Ops mode'); }
+  var tel = $('#telMode');
+  if(tel){ tel.textContent = m === 'night' ? 'NIGHT_OPS' : 'DAY_OPS'; }
+  if(persist){
+    try{ localStorage.setItem('tb-orbital-mode', m); }catch(e){}
+  }
+}
+$('#modeToggle').addEventListener('click', function(){
+  applyMode(state.mode === 'night' ? 'day' : 'night', true);
+});
+applyMode(state.mode, false);
+
+/* ============================= NAV TOGGLE ============================= */
+var navToggle = $('#navToggle'), navList = $('#navList');
+navToggle.addEventListener('click', function(){
+  var open = navList.classList.toggle('open');
+  navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+});
+navList.addEventListener('click', function(e){
+  if(e.target.tagName === 'A'){ navList.classList.remove('open'); navToggle.setAttribute('aria-expanded','false'); }
+});
+
+/* ============================= CLOCK ============================= */
+function tickClock(){
+  var d = new Date();
+  var s = d.getUTCHours().toString().padStart(2,'0') + ':' + d.getUTCMinutes().toString().padStart(2,'0') + ':' + d.getUTCSeconds().toString().padStart(2,'0') + 'Z';
+  var el = $('#telClock');
+  if(el) el.textContent = s;
+}
+tickClock();
+setInterval(tickClock, 1000);
+
+/* ============================= STARFIELD CANVAS ============================= */
+(function(){
+  var canvas = $('#starfield');
+  var ctx = canvas.getContext('2d');
+  var stars = [];
+  var w, h, dpr;
+  var mouseX = 0, mouseY = 0, targetX = 0, targetY = 0;
+  var running = true;
+  var rafId = null;
+
+  function resize(){
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    w = window.innerWidth; h = window.innerHeight;
+    canvas.width = w * dpr; canvas.height = h * dpr;
+    canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    seedStars();
+  }
+  function seedStars(){
+    var count = Math.max(50, Math.min(150, Math.floor((w*h)/9000)));
+    stars = [];
+    for(var i=0;i<count;i++){
+      var depth = Math.random();
+      stars.push({
+        x: Math.random()*w,
+        y: Math.random()*h,
+        r: depth*1.3 + 0.3,
+        depth: depth,
+        speed: depth*0.06 + 0.01,
+        tw: Math.random()*Math.PI*2
+      });
+    }
+  }
+  function starColor(){
+    return state.mode === 'day' ? 'rgba(62,78,99,ALPHA)' : 'rgba(237,239,243,ALPHA)';
+  }
+  function draw(){
+    ctx.clearRect(0,0,w,h);
+    targetX += (mouseX - targetX) * 0.03;
+    targetY += (mouseY - targetY) * 0.03;
+    for(var i=0;i<stars.length;i++){
+      var s = stars[i];
+      s.y += s.speed;
+      if(s.y > h){ s.y = -2; s.x = Math.random()*w; }
+      s.tw += 0.02;
+      var alpha = 0.35 + Math.sin(s.tw)*0.25*s.depth + s.depth*0.3;
+      alpha = Math.max(0.08, Math.min(0.85, alpha));
+      var px = s.x + targetX * s.depth * 18;
+      var py = s.y + targetY * s.depth * 10;
+      ctx.beginPath();
+      ctx.fillStyle = starColor().replace('ALPHA', alpha.toFixed(2));
+      ctx.arc(px, py, s.r, 0, Math.PI*2);
+      ctx.fill();
+    }
+  }
+  function loop(){
+    if(!running) return;
+    draw();
+    rafId = requestAnimationFrame(loop);
+  }
+  function start(){
+    if(rafId) return;
+    running = true;
+    rafId = requestAnimationFrame(loop);
+  }
+  function stop(){
+    running = false;
+    if(rafId){ cancelAnimationFrame(rafId); rafId = null; }
+  }
+
+  window.addEventListener('resize', resize, {passive:true});
+  window.addEventListener('mousemove', function(e){
+    mouseX = (e.clientX / w - 0.5) * 2;
+    mouseY = (e.clientY / h - 0.5) * 2;
+  }, {passive:true});
+  document.addEventListener('visibilitychange', function(){
+    if(document.hidden){ stop(); } else if(!state.reducedMotion){ start(); }
+  });
+  try{
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting && !document.hidden && !state.reducedMotion){ start(); } else { stop(); }
+      });
+    }, {threshold:0});
+    io.observe(canvas);
+  }catch(e){}
+
+  resize();
+  if(state.reducedMotion){
+    draw(); /* paint once, then freeze */
+  } else {
+    start();
+  }
+})();
+
+/* ============================= ROUTE-LOCK TRANSITION ============================= */
+function playRouteLock(cb){
+  if(state.reducedMotion){ cb(); return; }
+  var lock = $('#routeLock');
+  lock.classList.add('active');
+  setTimeout(function(){
+    cb();
+    setTimeout(function(){ lock.classList.remove('active'); }, 260);
+  }, 240);
+}
+
+/* ============================= 3D TILT ON PANELS ============================= */
+function wireTilt(root){
+  if(state.reducedMotion) return;
+  if(window.matchMedia && window.matchMedia('(pointer: coarse)').matches) return;
+  $all('.panel-tilt', root).forEach(function(p){
+    p.style.perspective = '900px';
+    p.addEventListener('mousemove', function(e){
+      var r = p.getBoundingClientRect();
+      var px = (e.clientX - r.left)/r.width - 0.5;
+      var py = (e.clientY - r.top)/r.height - 0.5;
+      p.style.transform = 'rotateX(' + (py*-6) + 'deg) rotateY(' + (px*6) + 'deg)';
+    });
+    p.addEventListener('mouseleave', function(){ p.style.transform = 'rotateX(0) rotateY(0)'; });
+  });
+}
+
+/* ============================= COUNTER ANIMATION ============================= */
+function animateCounters(root){
+  var els = $all('[data-count]', root);
+  if(state.reducedMotion){
+    els.forEach(function(el){ el.textContent = el.getAttribute('data-count-display') || el.getAttribute('data-count'); });
+    return;
+  }
+  els.forEach(function(el){
+    var target = parseFloat(el.getAttribute('data-count'));
+    var suffix = el.getAttribute('data-suffix') || '';
+    var decimals = el.getAttribute('data-decimals') ? parseInt(el.getAttribute('data-decimals'),10) : 0;
+    var dur = 1200, start = null;
+    function step(ts){
+      if(!start) start = ts;
+      var p = Math.min(1, (ts-start)/dur);
+      var eased = 1 - Math.pow(1-p, 3);
+      var val = target * eased;
+      el.textContent = val.toFixed(decimals) + suffix;
+      if(p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  });
+}
+
+/* ============================= MODAL ============================= */
+var modalBackdrop = $('#modalBackdrop'), modalPanel = $('#modalPanel'), modalBody = $('#modalBody');
+var lastFocused = null;
+function openModal(html, titleId){
+  lastFocused = document.activeElement;
+  modalBody.innerHTML = html;
+  modalBackdrop.hidden = false;
+  modalPanel.focus();
+  document.addEventListener('keydown', modalKeydown);
+}
+function closeModal(){
+  modalBackdrop.hidden = true;
+  modalBody.innerHTML = '';
+  moduleFlowModule = null;
+  document.removeEventListener('keydown', modalKeydown);
+  if(lastFocused && lastFocused.focus) lastFocused.focus();
+}
+function modalKeydown(e){
+  if(e.key === 'Escape'){ closeModal(); return; }
+  if(e.key === 'Tab'){
+    var focusables = $all('button, a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])', modalPanel).filter(function(el){ return !el.disabled; });
+    if(!focusables.length) return;
+    var first = focusables[0], last = focusables[focusables.length-1];
+    if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+    else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+  }
+}
+$('#modalCloseBtn').addEventListener('click', closeModal);
+modalBackdrop.addEventListener('click', function(e){ if(e.target === modalBackdrop) closeModal(); });
+
+/* ============================= MARKETPLACE FLOW ============================= */
+function computeTotal(module){
+  var total = module.price;
+  state.cart.addons.forEach(function(id){
+    var a = ADDONS.filter(function(x){ return x.id === id; })[0];
+    if(a) total += a.price;
+  });
+  return total;
+}
+function renderModulePreview(module){
+  return '' +
+  '<span class="module-cat num">' + esc(module.cat) + '</span>' +
+  '<h2 id="modalTitle" style="margin-top:.4rem;">' + esc(module.name) + '</h2>' +
+  '<p>' + esc(module.desc) + '</p>' +
+  '<div class="modal-total"><span class="tag" style="margin:0;">From</span><span class="price-num num">' + fmtMoney(module.price) + '/mo</span></div>' +
+  '<div class="modal-actions"><button class="btn btn-primary btn-block" data-action="customize">Customize' + icon('arrow-right') + '</button></div>';
+}
+function renderModuleCustomize(module){
+  var rows = ADDONS.map(function(a){
+    var checked = state.cart.addons.indexOf(a.id) > -1;
+    return '<div class="addon-row"><label><input type="checkbox" data-addon="' + a.id + '"' + (checked?' checked':'') + '> ' + esc(a.name) + '</label><span class="num">' + fmtMoney(a.price) + '/mo</span></div>';
+  }).join('');
+  return '' +
+  '<h2 id="modalTitle">Customize — ' + esc(module.name) + '</h2>' +
+  '<p>Toggle add-ons below. Your monthly total recalculates live.</p>' +
+  rows +
+  '<div class="modal-total"><span>Monthly total</span><span class="price-num num" id="customizeTotal">' + fmtMoney(computeTotal(module)) + '</span></div>' +
+  '<div class="modal-actions"><button class="btn btn-secondary" data-action="back-preview">Back</button><button class="btn btn-primary btn-block" data-action="purchase">Review Order' + icon('arrow-right') + '</button></div>';
+}
+function renderModulePurchase(module){
+  var addonRows = state.cart.addons.map(function(id){
+    var a = ADDONS.filter(function(x){ return x.id === id; })[0];
+    return a ? '<div class="addon-row"><span>' + esc(a.name) + '</span><span class="num">' + fmtMoney(a.price) + '/mo</span></div>' : '';
+  }).join('');
+  return '' +
+  '<h2 id="modalTitle">Order Summary</h2>' +
+  '<div class="addon-row"><span>' + esc(module.name) + '</span><span class="num">' + fmtMoney(module.price) + '/mo</span></div>' +
+  addonRows +
+  '<div class="modal-total"><span>Total due monthly</span><span class="price-num num">' + fmtMoney(computeTotal(module)) + '</span></div>' +
+  '<p class="field-hint">Simulated checkout — no payment is processed and no data is transmitted.</p>' +
+  '<div class="modal-actions"><button class="btn btn-secondary" data-action="back-customize">Back</button><button class="btn btn-primary btn-block" data-action="deploy">Confirm & Deploy' + icon('check') + '</button></div>';
+}
+function renderModuleDeploy(module){
+  return '' +
+  '<h2 id="modalTitle">Deploying — ' + esc(module.name) + '</h2>' +
+  '<div class="progress-row"><div class="p-label"><span>Provisioning module</span><span class="num" id="deployPct">0%</span></div><div class="progress-track"><div class="progress-fill" id="deployFill"></div></div></div>' +
+  '<div class="log-box" id="deployLog" aria-live="polite"></div>';
+}
+function renderModuleSuccess(module){
+  return '' +
+  '<div class="success-box"><div class="icon-check-wrap">' + icon('check') + '</div>' +
+  '<h2 id="modalTitle" style="margin:0;">Deployment Complete</h2>' +
+  '<p>' + esc(module.name) + ' is live in your simulated environment at ' + fmtMoney(computeTotal(module)) + '/mo.</p>' +
+  '<button class="btn btn-primary" data-action="close">Done</button></div>';
+}
+var moduleFlowModule = null;
+function moduleFlowStep(module, step){
+  moduleFlowModule = module;
+  var html;
+  if(step === 'preview') html = renderModulePreview(module);
+  else if(step === 'customize') html = renderModuleCustomize(module);
+  else if(step === 'purchase') html = renderModulePurchase(module);
+  else if(step === 'deploy') html = renderModuleDeploy(module);
+  else html = renderModuleSuccess(module);
+  openModal(html);
+}
+/* Delegated listener attached once — survives modalBody.innerHTML swaps between
+   flow steps, avoiding the "consumed by an unrelated click" bug of a {once:true}
+   handler re-registered per step (e.g. clicking an add-on checkbox). */
+modalBody.addEventListener('click', function(e){
+  var module = moduleFlowModule;
+  if(!module) return;
+  var btn = e.target.closest('[data-action]');
+  if(!btn) return;
+  var action = btn.getAttribute('data-action');
+  if(action === 'customize') moduleFlowStep(module, 'customize');
+  else if(action === 'back-preview') moduleFlowStep(module, 'preview');
+  else if(action === 'back-customize') moduleFlowStep(module, 'customize');
+  else if(action === 'purchase') moduleFlowStep(module, 'purchase');
+  else if(action === 'deploy') { moduleFlowStep(module, 'deploy'); runDeploySequence(module); }
+  else if(action === 'close') closeModal();
+});
+modalBody.addEventListener('change', function(e){
+  var module = moduleFlowModule;
+  if(!module) return;
+  var cb = e.target.closest('[data-addon]');
+  if(!cb) return;
+  var id = cb.getAttribute('data-addon');
+  var idx = state.cart.addons.indexOf(id);
+  if(cb.checked && idx === -1) state.cart.addons.push(id);
+  if(!cb.checked && idx > -1) state.cart.addons.splice(idx,1);
+  var totalEl = $('#customizeTotal', modalBody);
+  if(totalEl) totalEl.textContent = fmtMoney(computeTotal(module));
+});
+function runDeploySequence(module){
+  var lines = ['Allocating orbital compute nodes…','Provisioning ' + module.name + ' container…','Syncing configuration manifest…','Running verification checks…','Deployment stable.'];
+  var i = 0, pct = 0;
+  var fill = $('#deployFill'), pctEl = $('#deployPct'), log = $('#deployLog');
+  var delay = state.reducedMotion ? 20 : 480;
+  function step(){
+    if(i < lines.length){
+      var line = document.createElement('div');
+      line.textContent = '> ' + lines[i];
+      if(log) log.appendChild(line);
+      if(log) log.scrollTop = log.scrollHeight;
+      pct = Math.round(((i+1)/lines.length)*100);
+      if(fill) fill.style.width = pct + '%';
+      if(pctEl) pctEl.textContent = pct + '%';
+      i++;
+      setTimeout(step, delay);
+    } else {
+      setTimeout(function(){ moduleFlowStep(module, 'success'); }, delay);
+    }
+  }
+  step();
+}
+
+/* ============================= VIEW RENDERERS ============================= */
+function iconSvcRow(caps){
+  return '<ul class="cap-list">' + caps.map(function(c){ return '<li>' + icon('check') + '<span>' + esc(c) + '</span></li>'; }).join('') + '</ul>';
+}
+
+function renderHome(){
+  var svcCards = SERVICES.slice(0,3).map(function(s){
+    return '<div class="panel panel-tilt service-card">' + icon(s.icon) + '<h3>' + esc(s.name) + '</h3><p>' + esc(s.desc) + '</p></div>';
+  }).join('');
+  var mods = MODULES.slice(0,3).map(function(m){
+    return '<div class="panel panel-tilt module-card" role="listitem"><span class="module-cat num">' + esc(m.cat) + '</span><h3>' + esc(m.name) + '</h3><p>' + esc(m.desc) + '</p><div class="module-price"><span class="price-num num">' + fmtMoney(m.price) + '/mo</span><span class="tier-pill">' + esc(m.tier) + '</span></div></div>';
+  }).join('');
+  var work = WORK.slice(0,2).map(function(w){
+    return '<div class="panel panel-tilt"><span class="work-sector">' + esc(w.sector) + '</span><h3>' + esc(w.name) + '</h3><span class="work-metric num">' + esc(w.metric) + '</span><span class="work-metric-label">' + esc(w.label) + '</span><p style="margin-top:.8rem;">' + esc(w.desc) + '</p></div>';
+  }).join('');
+  return '' +
+  '<section class="view">' +
+    '<div class="hero">' +
+      '<div>' +
+        '<span class="tag">SECTOR 04 // GLOBAL PLATFORM</span>' +
+        '<h1 id="pageTitle" tabindex="-1">Mission control for enterprise digital transformation.</h1>' +
+        '<p class="lede">TECHBISS partners with enterprises to modernize infrastructure, build AI-native products, and run mission-critical systems at scale — with the telemetry to prove it every step of the way.</p>' +
+        '<div class="hero-actions">' +
+          '<a href="#/services" class="btn btn-primary">Explore Services' + icon('arrow-right') + '</a>' +
+          '<a href="#/contact" class="btn btn-secondary">Talk to Us</a>' +
+        '</div>' +
+      '</div>' +
+      '<div class="hero-core" aria-hidden="true">' +
+        '<svg class="orbit-svg" viewBox="0 0 400 400">' +
+          '<circle class="orbit-ring" cx="200" cy="200" r="80"/>' +
+          '<circle class="orbit-ring" cx="200" cy="200" r="140"/>' +
+          '<circle class="orbit-ring" cx="200" cy="200" r="190"/>' +
+          '<circle class="orbit-core" cx="200" cy="200" r="34"/>' +
+          '<circle class="orbit-core-inner" cx="200" cy="200" r="10"/>' +
+          '<g class="orbit-group r1"><circle class="orbit-node" cx="280" cy="200" r="7"/></g>' +
+          '<g class="orbit-group r2"><circle class="orbit-node" cx="60" cy="200" r="6"/></g>' +
+          '<g class="orbit-group r3"><circle class="orbit-node" cx="200" cy="10" r="5.5"/></g>' +
+        '</svg>' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="section-gap">' +
+      '<div class="strip-head"><h2>Core Services</h2><a href="#/services" class="btn-ghost-sm">All services' + icon('arrow-right') + '</a></div>' +
+      '<div class="grid-services">' + svcCards + '</div>' +
+    '</div>' +
+
+    '<div class="section-gap">' +
+      '<div class="strip-head"><h2>Why TECHBISS</h2></div>' +
+      '<div class="stat-strip">' +
+        '<div class="panel stat-tile"><span class="stat-num num" data-count="1200" data-suffix="+">0</span><span class="stat-label">Engineers</span></div>' +
+        '<div class="panel stat-tile"><span class="stat-num num" data-count="40" data-suffix="+">0</span><span class="stat-label">Countries</span></div>' +
+        '<div class="panel stat-tile"><span class="stat-num num" data-count="98.7" data-decimals="1" data-suffix="%">0</span><span class="stat-label">Uptime SLA</span></div>' +
+        '<div class="panel stat-tile"><span class="stat-num num" data-count="10" data-suffix="B+">0</span><span class="stat-label">Platform Valuation</span></div>' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="section-gap">' +
+      '<div class="strip-head"><h2>Marketplace</h2><a href="#/marketplace" class="btn-ghost-sm">Browse modules' + icon('arrow-right') + '</a></div>' +
+      '<div class="grid-market" role="list">' + mods + '</div>' +
+    '</div>' +
+
+    '<div class="section-gap">' +
+      '<div class="strip-head"><h2>Selected Work</h2><a href="#/work" class="btn-ghost-sm">All case studies' + icon('arrow-right') + '</a></div>' +
+      '<div class="grid-work">' + work + '</div>' +
+    '</div>' +
+  '</section>';
+}
+
+function renderServices(){
+  var cards = SERVICES.map(function(s){
+    return '<div class="panel panel-tilt service-card">' + icon(s.icon) + '<h3>' + esc(s.name) + '</h3><p>' + esc(s.desc) + '</p>' + iconSvcRow(s.caps) + '</div>';
+  }).join('');
+  return '<section class="view"><span class="tag">CAPABILITY MATRIX</span><h1 id="pageTitle" tabindex="-1">Services</h1><p class="lede">Six practice areas, one delivery model — built to operate together across your platform.</p><div class="grid-services section-gap" style="margin-top:2rem;">' + cards + '</div></section>';
+}
+
+function renderSolutions(){
+  var cards = SOLUTIONS.map(function(s){
+    return '<div class="panel panel-tilt"><span class="sector-tag num">' + esc(s.sector) + '</span><h3>' + esc(s.name) + '</h3><p>' + esc(s.desc) + '</p></div>';
+  }).join('');
+  return '<section class="view"><span class="tag">INDUSTRY TELEMETRY</span><h1 id="pageTitle" tabindex="-1">Solutions</h1><p class="lede">Deep domain expertise, applied to the systems that run each industry’s hardest problems.</p><div class="grid-solutions section-gap" style="margin-top:2rem;">' + cards + '</div></section>';
+}
+
+function renderMarketplace(){
+  var cards = MODULES.map(function(m){
+    return '<button class="panel panel-tilt module-card" data-module="' + m.id + '"><span class="module-cat num">' + esc(m.cat) + '</span><h3>' + esc(m.name) + '</h3><p>' + esc(m.desc) + '</p><div class="module-price"><span class="price-num num">' + fmtMoney(m.price) + '/mo</span><span class="tier-pill">' + esc(m.tier) + '</span></div></button>';
+  }).join('');
+  return '<section class="view"><span class="tag">MODULE REGISTRY</span><h1 id="pageTitle" tabindex="-1">Marketplace</h1><p class="lede">Pre-built platform modules, ready to preview, customize, and simulate a deploy.</p><div class="grid-market section-gap" style="margin-top:2rem;" role="list">' + cards + '</div></section>';
+}
+
+function renderProduct(){
+  var features = ['Real-time incident detection across your full stack','Natural-language runbooks that execute with approval gates','Root-cause explanations grounded in your own telemetry','Continuous learning from every resolved incident'];
+  var tiers = [
+    {name:'Team', price:900, feats:['Up to 20 monitored services','Business-hours escalation','Standard incident explanations']},
+    {name:'Business', price:1800, feats:['Up to 100 monitored services','24/7 escalation routing','Automated remediation playbooks']},
+    {name:'Enterprise', price:null, feats:['Unlimited monitored services','Dedicated reliability pod','Custom model fine-tuning']}
+  ];
+  var featHtml = features.map(function(f){ return '<li>' + icon('check') + '<span>' + esc(f) + '</span></li>'; }).join('');
+  var tierHtml = tiers.map(function(t){
+    return '<div class="panel panel-tilt price-tier"><h3>' + esc(t.name) + '</h3><div class="price-amount num">' + (t.price? fmtMoney(t.price) : 'Custom') + (t.price?'<span class="per">/mo</span>':'') + '</div><ul class="price-features">' + t.feats.map(function(f){ return '<li>' + icon('check') + '<span>' + esc(f) + '</span></li>'; }).join('') + '</ul></div>';
+  }).join('');
+  return '<section class="view"><span class="tag">PRODUCT DEEP-DIVE</span><h1 id="pageTitle" tabindex="-1">AI Ops Copilot</h1><p class="lede">An AI copilot that monitors, explains, and remediates operational incidents in real time — grounded in your own telemetry, not generic heuristics.</p>' +
+  '<ul class="feature-list section-gap">' + featHtml + '</ul>' +
+  '<blockquote class="testimonial">“AI Ops Copilot cut our mean time to resolution by more than half in the first quarter. It reads our systems the way our best engineers do.”<cite>— VP Engineering, a global logistics network</cite></blockquote>' +
+  '<h2 class="section-gap">Pricing Tiers</h2><div class="grid-pricing" style="margin-top:1rem;">' + tierHtml + '</div>' +
+  '<div class="hero-actions section-gap"><a href="#/marketplace" class="btn btn-primary">View in Marketplace' + icon('arrow-right') + '</a></div>' +
+  '</section>';
+}
+
+function renderWork(){
+  var cards = WORK.map(function(w){
+    return '<div class="panel panel-tilt"><span class="work-sector">' + esc(w.sector) + '</span><h3>' + esc(w.name) + '</h3><span class="work-metric num">' + esc(w.metric) + '</span><span class="work-metric-label">' + esc(w.label) + '</span><p style="margin-top:.8rem;">' + esc(w.desc) + '</p></div>';
+  }).join('');
+  return '<section class="view"><span class="tag">MISSION LOG</span><h1 id="pageTitle" tabindex="-1">Work</h1><p class="lede">A sample of engagements across industries — illustrative outcomes from representative work.</p><div class="grid-work section-gap" style="margin-top:2rem;">' + cards + '</div></section>';
+}
+
+function renderProcess(){
+  var steps = PROCESS.map(function(p){
+    return '<div class="process-step"><div class="process-marker num">STAGE ' + p.n + '<span class="sub">' + esc(p.name.toUpperCase()) + '</span></div><div><h3>' + esc(p.name) + '</h3><p>' + esc(p.desc) + '</p></div></div>';
+  }).join('');
+  return '<section class="view view-narrow"><span class="tag">METHODOLOGY</span><h1 id="pageTitle" tabindex="-1">Process</h1><p class="lede">Five sequential stages, instrumented end to end, from first discovery call to steady-state operation.</p><div class="process-list section-gap">' + steps + '</div></section>';
+}
+
+function renderAbout(){
+  var leaders = LEADERS.map(function(l){
+    return '<div class="panel panel-tilt leader-card"><div class="monogram">' + esc(l.initials) + '</div><h3 style="font-size:1rem;">' + esc(l.name) + '</h3><span class="leader-role">' + esc(l.role) + '</span></div>';
+  }).join('');
+  var mile = MILESTONES.map(function(m){
+    return '<div class="timeline-item"><span class="timeline-year num">' + esc(m.year) + '</span><p style="margin-top:.3rem;">' + esc(m.text) + '</p></div>';
+  }).join('');
+  return '<section class="view"><span class="tag">FLIGHT RECORD</span><h1 id="pageTitle" tabindex="-1">About TECHBISS</h1><p class="lede">We exist to make enterprise systems modern, resilient, and genuinely intelligent — without the risk of a rip-and-replace.</p>' +
+  '<div class="stat-strip section-gap">' +
+    '<div class="panel stat-tile"><span class="stat-num num" data-count="1200" data-suffix="+">0</span><span class="stat-label">Engineers</span></div>' +
+    '<div class="panel stat-tile"><span class="stat-num num" data-count="40" data-suffix="+">0</span><span class="stat-label">Countries</span></div>' +
+    '<div class="panel stat-tile"><span class="stat-num num" data-count="98.7" data-decimals="1" data-suffix="%">0</span><span class="stat-label">Uptime SLA</span></div>' +
+    '<div class="panel stat-tile"><span class="stat-num num" data-count="10" data-suffix="B+">0</span><span class="stat-label">Valuation</span></div>' +
+  '</div>' +
+  '<h2 class="section-gap">Leadership</h2><div class="leader-grid" style="margin-top:1rem;">' + leaders + '</div>' +
+  '<h2 class="section-gap">Milestones</h2><div class="timeline">' + mile + '</div>' +
+  '</section>';
+}
+
+function renderResources(){
+  var cards = RESOURCES.map(function(r){
+    return '<a href="#" class="panel panel-tilt resource-card" onclick="return false;"><span class="module-cat num">' + esc(r.cat) + '</span><h3 style="margin-top:.6rem;font-size:1.02rem;">' + esc(r.title) + '</h3><div class="resource-meta"><span>Insight</span><span>' + esc(r.time) + ' read</span></div></a>';
+  }).join('');
+  return '<section class="view"><span class="tag">SIGNAL ARCHIVE</span><h1 id="pageTitle" tabindex="-1">Resources</h1><p class="lede">Field notes from the engagements, platforms, and postmortems that shape how we build.</p><div class="grid-resources section-gap" style="margin-top:2rem;">' + cards + '</div></section>';
+}
+
+function renderPricing(){
+  return '<section class="view"><span class="tag">RATE CARD</span><h1 id="pageTitle" tabindex="-1">Pricing</h1><p class="lede">Transparent tiers that scale with the number of platform modules you run.</p>' +
+  '<div class="section-gap" style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">' +
+    '<div class="billing-toggle" role="group" aria-label="Billing period">' +
+      '<button type="button" id="billMonthly" aria-pressed="true">Monthly</button>' +
+      '<button type="button" id="billAnnual" aria-pressed="false">Annual</button>' +
+    '</div><span class="save-badge">Annual saves ~18%</span>' +
+  '</div>' +
+  '<div class="grid-pricing" id="pricingGrid"></div>' +
+  '</section>';
+}
+function renderPricingGrid(){
+  var grid = $('#pricingGrid');
+  if(!grid) return;
+  grid.innerHTML = PRICING.map(function(t){
+    var amount = t.monthly === null ? 'Custom' : fmtMoney(state.billingAnnual ? t.annual : t.monthly);
+    var per = t.monthly === null ? '' : '<span class="per">/mo</span>';
+    return '<div class="panel panel-tilt price-tier' + (t.featured?' featured':'') + '">' +
+      (t.featured ? '<span class="tag">MOST DEPLOYED</span>' : '') +
+      '<h3>' + esc(t.name) + '</h3>' +
+      '<div class="price-amount num">' + amount + per + '</div>' +
+      '<ul class="price-features">' + t.features.map(function(f){ return '<li>' + icon('check') + '<span>' + esc(f) + '</span></li>'; }).join('') + '</ul>' +
+      '<button class="btn ' + (t.featured?'btn-primary':'btn-secondary') + ' btn-block" type="button" data-plan="' + esc(t.name) + '">' + (t.monthly===null?'Talk to Sales':'Get Started') + '</button>' +
+    '</div>';
+  }).join('');
+  wireTilt(grid);
+}
+
+function renderOfficeCards(){
+  return OFFICES.map(function(o){
+    return '<div class="panel office-card"><h3>' + esc(o.city) + '</h3><p>' + esc(o.region) + '</p><p>' + esc(o.line) + '</p><p class="num" style="color:var(--steel);font-size:.78rem;">' + esc(o.hours) + '</p></div>';
+  }).join('');
+}
+function renderContact(){
+  return '<section class="view"><span class="tag">UPLINK CHANNELS</span><h1 id="pageTitle" tabindex="-1">Contact</h1><p class="lede">Reach a regional office directly, or send a message to route to the right team.</p>' +
+  '<div class="office-grid section-gap">' + renderOfficeCards() + '</div>' +
+  '<div class="panel section-gap" style="max-width:640px;" id="contactPanel">' +
+    '<h2>Send a Message</h2>' +
+    '<form id="contactForm" novalidate>' +
+      '<div class="field"><label for="cName">Name</label><input type="text" id="cName" name="name" autocomplete="name" required><span class="err" id="cNameErr"></span></div>' +
+      '<div class="field"><label for="cEmail">Email</label><input type="email" id="cEmail" name="email" autocomplete="email" required><span class="err" id="cEmailErr"></span></div>' +
+      '<div class="field"><label for="cMsg">Message</label><textarea id="cMsg" name="message" rows="4" required></textarea><span class="err" id="cMsgErr"></span></div>' +
+      '<button type="submit" class="btn btn-primary btn-block">Send Message' + icon('arrow-right') + '</button>' +
+    '</form>' +
+  '</div>' +
+  '</section>';
+}
+
+function renderLogin(){
+  return '<section class="view login-shell"><span class="tag">CLIENT PORTAL</span><h1 id="pageTitle" tabindex="-1">Login</h1><p class="lede">Access your mission dashboard and marketplace deployments.</p>' +
+  '<div class="panel section-gap" id="loginPanel">' +
+    '<form id="loginForm" novalidate>' +
+      '<div class="field"><label for="lEmail">Email</label><input type="email" id="lEmail" name="email" autocomplete="email" required><span class="err" id="lEmailErr"></span></div>' +
+      '<div class="field"><label for="lPass">Password</label><input type="password" id="lPass" name="password" autocomplete="current-password" required><span class="err" id="lPassErr"></span></div>' +
+      '<div style="display:flex;justify-content:flex-end;margin-bottom:1rem;"><a href="#" class="btn-ghost-sm" id="forgotLink" style="border:none;padding:0;">Forgot password?</a></div>' +
+      '<button type="submit" class="btn btn-primary btn-block">Sign In' + icon('arrow-right') + '</button>' +
+    '</form>' +
+    '<div class="divider">or continue with</div>' +
+    '<div class="sso-row">' +
+      '<button type="button" class="btn btn-secondary btn-block" id="ssoSaml">' + icon('shield') + ' SSO — SAML</button>' +
+      '<button type="button" class="btn btn-secondary btn-block" id="ssoOauth">' + icon('globe') + ' SSO — OAuth</button>' +
+    '</div>' +
+  '</div>' +
+  '</section>';
+}
+
+function renderInstaller(){
+  return '<section class="view"><span class="tag">DEPLOYMENT SEQUENCE</span><h1 id="pageTitle" tabindex="-1">Installer</h1><p class="lede">A guided, fully simulated environment setup — nothing here touches a real system.</p>' +
+  '<div class="stepper section-gap" id="installStepper"></div>' +
+  '<div class="panel" id="installBody"></div>' +
+  '</section>';
+}
+
+function renderDashboard(){
+  return '<section class="view"><span class="preview-badge">PREVIEW — SIMULATED DATA</span><h1 id="pageTitle" tabindex="-1">Dashboard</h1><p class="lede">A read-only preview of the client mission console.</p>' +
+  '<div class="dash-tabs section-gap" role="tablist" aria-label="Dashboard view">' +
+    '<button class="dash-tab" role="tab" id="tabAdmin" aria-selected="true" aria-controls="dashPanel">Admin</button>' +
+    '<button class="dash-tab" role="tab" id="tabClient" aria-selected="false" aria-controls="dashPanel">Client</button>' +
+    '<button class="dash-tab" role="tab" id="tabStaff" aria-selected="false" aria-controls="dashPanel">Staff</button>' +
+  '</div>' +
+  '<div id="dashPanel" role="tabpanel"></div>' +
+  '</section>';
+}
+
+/* ============================= PAGE INIT (interactive wiring) ============================= */
+function initContact(){
+  var form = $('#contactForm');
+  if(!form) return;
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var name = $('#cName'), email = $('#cEmail'), msg = $('#cMsg');
+    var ok = true;
+    if(!name.value.trim()){ $('#cNameErr').textContent = 'Name is required.'; name.setAttribute('aria-invalid','true'); ok = false; }
+    else { $('#cNameErr').textContent = ''; name.removeAttribute('aria-invalid'); }
+    var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if(!emailPattern.test(email.value.trim())){ $('#cEmailErr').textContent = 'Enter a valid email address.'; email.setAttribute('aria-invalid','true'); ok = false; }
+    else { $('#cEmailErr').textContent = ''; email.removeAttribute('aria-invalid'); }
+    if(!msg.value.trim()){ $('#cMsgErr').textContent = 'Message cannot be empty.'; msg.setAttribute('aria-invalid','true'); ok = false; }
+    else { $('#cMsgErr').textContent = ''; msg.removeAttribute('aria-invalid'); }
+    if(!ok) return;
+    var panel = $('#contactPanel');
+    panel.innerHTML = '<div class="success-box"><div class="icon-check-wrap">' + icon('check') + '</div><h2 style="margin:0;">Message received</h2><p>Your message has been logged. A regional team will respond within one business day.</p></div>';
+  });
+}
+function initLogin(){
+  var form = $('#loginForm');
+  if(!form) return;
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var email = $('#lEmail'), pass = $('#lPass');
+    var ok = true;
+    var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if(!emailPattern.test(email.value.trim())){ $('#lEmailErr').textContent = 'Enter a valid email address.'; email.setAttribute('aria-invalid','true'); ok = false; }
+    else { $('#lEmailErr').textContent = ''; email.removeAttribute('aria-invalid'); }
+    if(!pass.value){ $('#lPassErr').textContent = 'Password is required.'; pass.setAttribute('aria-invalid','true'); ok = false; }
+    else { $('#lPassErr').textContent = ''; pass.removeAttribute('aria-invalid'); }
+    if(!ok) return;
+    var panel = $('#loginPanel');
+    panel.innerHTML = '<div class="success-box"><div class="icon-check-wrap">' + icon('check') + '</div><h2 style="margin:0;">Uplink established</h2><p>Sign-in simulated successfully. This concept does not connect to a real account.</p><a href="#/dashboard" class="btn btn-primary">Go to Dashboard' + icon('arrow-right') + '</a></div>';
+  });
+  var forgot = $('#forgotLink');
+  if(forgot) forgot.addEventListener('click', function(e){
+    e.preventDefault();
+    forgot.textContent = 'Reset link simulated — check a real inbox in production.';
+  });
+  ['ssoSaml','ssoOauth'].forEach(function(id){
+    var b = $('#' + id);
+    if(b) b.addEventListener('click', function(){ b.textContent = 'Simulated — no real SSO provider connected.'; b.disabled = true; });
+  });
+}
+function initMarketplace(){
+  $all('[data-module]').forEach(function(card){
+    card.addEventListener('click', function(){
+      var mod = MODULES.filter(function(m){ return m.id === card.getAttribute('data-module'); })[0];
+      if(!mod) return;
+      state.cart = { moduleId: mod.id, addons: [] };
+      moduleFlowStep(mod, 'preview');
+    });
+  });
+}
+function initPricing(){
+  renderPricingGrid();
+  var m = $('#billMonthly'), a = $('#billAnnual');
+  if(!m) return;
+  m.addEventListener('click', function(){ state.billingAnnual = false; m.setAttribute('aria-pressed','true'); a.setAttribute('aria-pressed','false'); renderPricingGrid(); });
+  a.addEventListener('click', function(){ state.billingAnnual = true; a.setAttribute('aria-pressed','true'); m.setAttribute('aria-pressed','false'); renderPricingGrid(); });
+}
+
+/* -------- Installer stepper -------- */
+var installerState = { step: 0, env: null };
+var INSTALL_STEPS = ['Select','Detect','Configure','Import','Install','Verify','Launch'];
+var ENVS = [
+  {id:'aws', name:'AWS', icon:'cloud'},
+  {id:'azure', name:'Azure', icon:'layers'},
+  {id:'gcp', name:'Google Cloud', icon:'globe'},
+  {id:'hybrid', name:'On-Prem / Hybrid', icon:'terminal'}
+];
+var DETECTED = ['Identity Provider','Primary Database Cluster','Object Storage Bucket','API Gateway','Message Queue'];
+var MIGRATE_ITEMS = ['Database','Auth Service','Storage','API Gateway'];
+
+function renderStepper(){
+  var el = $('#installStepper');
+  if(!el) return;
+  el.innerHTML = INSTALL_STEPS.map(function(s, i){
+    var cls = i === installerState.step ? 'active' : (i < installerState.step ? 'done' : '');
+    return '<span class="step-pill ' + cls + '">' + (i < installerState.step ? icon('check') : '') + (i+1) + '. ' + s + '</span>';
+  }).join('');
+}
+function renderInstallBody(){
+  var body = $('#installBody');
+  if(!body) return;
+  var step = installerState.step;
+  var html = '';
+  if(step === 0){
+    html = '<h2>Select Environment</h2><p>Choose the stack this deployment will simulate.</p><div class="env-grid section-gap">' +
+      ENVS.map(function(e){ return '<button type="button" class="panel env-card" data-env="' + e.id + '" aria-pressed="' + (installerState.env===e.id?'true':'false') + '">' + icon(e.icon) + '<h3 style="margin-top:.6rem;font-size:.95rem;">' + esc(e.name) + '</h3></button>'; }).join('') +
+      '</div><div class="modal-actions"><button class="btn btn-primary" id="toDetect"' + (installerState.env?'':' disabled') + '>Begin Scan' + icon('arrow-right') + '</button></div>';
+  } else if(step === 1){
+    html = '<h2>Detect Services</h2><p>Scanning selected environment for existing services…</p><div class="scan-list" id="scanList">' +
+      DETECTED.map(function(d){ return '<div class="scan-item"><span>' + esc(d) + '</span><span class="num" style="color:var(--success);">FOUND</span></div>'; }).join('') +
+      '</div><div class="modal-actions"><button class="btn btn-primary" id="toConfigure" disabled>Continue' + icon('arrow-right') + '</button></div>';
+  } else if(step === 2){
+    html = '<h2>Configure</h2><form id="configForm">' +
+      '<div class="field"><label for="projName">Project Name</label><input type="text" id="projName" value="orbital-deployment-01"></div>' +
+      '<div class="field"><label for="projRegion">Region</label><select id="projRegion"><option>us-east-1</option><option>eu-west-2</option><option>ap-southeast-1</option><option>sa-east-1</option></select></div>' +
+      '<div class="field"><label for="projTier">Environment Tier</label><select id="projTier"><option>Staging</option><option>Production</option></select></div>' +
+      '</form><div class="modal-actions"><button class="btn btn-primary" id="toImport">Continue' + icon('arrow-right') + '</button></div>';
+  } else if(step === 3){
+    html = '<h2>Import & Migrate</h2><p>Migrating detected services into the new configuration.</p><div id="migrateList" class="section-gap">' +
+      MIGRATE_ITEMS.map(function(m,i){ return '<div class="progress-row"><div class="p-label"><span>' + esc(m) + '</span><span class="num" data-pct="' + i + '">0%</span></div><div class="progress-track"><div class="progress-fill" data-fill="' + i + '" style="width:0%"></div></div></div>'; }).join('') +
+      '</div><div class="modal-actions"><button class="btn btn-primary" id="toInstall" disabled>Continue' + icon('arrow-right') + '</button></div>';
+  } else if(step === 4){
+    html = '<h2>Install</h2><div class="progress-row"><div class="p-label"><span>Overall progress</span><span class="num" id="installPct">0%</span></div><div class="progress-track"><div class="progress-fill" id="installFill"></div></div></div><div class="log-box deploy-log" id="installLog" aria-live="polite"></div><div class="modal-actions"><button class="btn btn-primary" id="toVerify" disabled>Continue' + icon('arrow-right') + '</button></div>';
+  } else if(step === 5){
+    var checks = ['Configuration integrity','Network reachability','Security policy compliance','Service health checks'];
+    html = '<h2>Verify</h2><div class="check-list" id="verifyList">' +
+      checks.map(function(c,i){ return '<div class="check-item" data-check="' + i + '">' + icon('check') + '<span>' + esc(c) + '</span></div>'; }).join('') +
+      '</div><div class="modal-actions"><button class="btn btn-primary" id="toLaunch" disabled>Continue' + icon('arrow-right') + '</button></div>';
+  } else {
+    html = '<div class="success-box"><div class="icon-check-wrap">' + icon('check') + '</div><h2 style="margin:0;">Environment Launched</h2><p>Your simulated ' + esc((ENVS.filter(function(e){return e.id===installerState.env;})[0]||{}).name || 'environment') + ' deployment is live. No real infrastructure was created.</p><button class="btn btn-primary" id="restartInstaller">Run Another Simulation</button></div>';
+  }
+  body.innerHTML = html;
+  wireInstallBody();
+}
+function wireInstallBody(){
+  var step = installerState.step;
+  if(step === 0){
+    $all('[data-env]').forEach(function(c){
+      c.addEventListener('click', function(){
+        installerState.env = c.getAttribute('data-env');
+        renderInstallBody();
+      });
+    });
+    var btn = $('#toDetect');
+    if(btn) btn.addEventListener('click', function(){ installerState.step = 1; renderStepper(); renderInstallBody(); runDetectScan(); });
+  } else if(step === 1){
+    /* scan runs automatically */
+  } else if(step === 2){
+    var toImport = $('#toImport');
+    if(toImport) toImport.addEventListener('click', function(){ installerState.step = 3; renderStepper(); renderInstallBody(); runMigrate(); });
+  } else if(step === 3){
+    /* migrate runs automatically */
+  } else if(step === 4){
+    /* install runs automatically */
+  } else if(step === 5){
+    /* verify runs automatically */
+  } else if(step === 6){
+    var restart = $('#restartInstaller');
+    if(restart) restart.addEventListener('click', function(){ installerState = {step:0, env:null}; renderStepper(); renderInstallBody(); });
+  }
+}
+function runDetectScan(){
+  var items = $all('.scan-item', $('#scanList'));
+  var d = state.reducedMotion ? 10 : 260;
+  items.forEach(function(el){ el.classList.remove('shown'); });
+  var i = 0;
+  (function step(){
+    if(i < items.length){ items[i].classList.add('shown'); i++; setTimeout(step, d); }
+    else { var b = $('#toConfigure'); if(b) b.disabled = false; }
+  })();
+}
+function runMigrate(){
+  var d = state.reducedMotion ? 8 : 30;
+  var idx = 0;
+  function migrateOne(){
+    if(idx >= MIGRATE_ITEMS.length){ var b = $('#toInstall'); if(b) b.disabled = false; return; }
+    var pct = 0;
+    var fill = document.querySelector('[data-fill="' + idx + '"]');
+    var label = document.querySelector('[data-pct="' + idx + '"]');
+    var timer = setInterval(function(){
+      pct += 100 / 12;
+      if(pct >= 100){ pct = 100; clearInterval(timer); idx++; setTimeout(migrateOne, 120); }
+      if(fill) fill.style.width = pct + '%';
+      if(label) label.textContent = Math.round(pct) + '%';
+    }, d*4);
+  }
+  migrateOne();
+}
+function runInstall(){
+  var lines = ['Booting simulated runtime…','Applying network policies…','Registering service mesh entries…','Writing configuration manifest…','Install complete.'];
+  var log = $('#installLog'), fill = $('#installFill'), pct = $('#installPct');
+  var i = 0, d = state.reducedMotion ? 15 : 420;
+  (function step(){
+    if(i < lines.length){
+      var l = document.createElement('div'); l.textContent = '> ' + lines[i]; if(log) log.appendChild(l); if(log) log.scrollTop = log.scrollHeight;
+      var p = Math.round(((i+1)/lines.length)*100);
+      if(fill) fill.style.width = p + '%'; if(pct) pct.textContent = p + '%';
+      i++; setTimeout(step, d);
+    } else {
+      var b = $('#toVerify'); if(b) b.disabled = false;
+    }
+  })();
+}
+function runVerify(){
+  var items = $all('.check-item', $('#verifyList'));
+  var d = state.reducedMotion ? 10 : 300;
+  var i = 0;
+  (function step(){
+    if(i < items.length){ items[i].classList.add('verified'); i++; setTimeout(step, d); }
+    else { var b = $('#toLaunch'); if(b) b.disabled = false; }
+  })();
+}
+function initInstaller(){
+  installerState = { step:0, env:null };
+  renderStepper();
+  renderInstallBody();
+  var body = $('#installBody');
+  body.addEventListener('click', function(e){
+    var t = e.target;
+    if(t.id === 'toInstall'){ installerState.step = 4; renderStepper(); renderInstallBody(); runInstall(); }
+    else if(t.id === 'toVerify'){ installerState.step = 5; renderStepper(); renderInstallBody(); runVerify(); }
+    else if(t.id === 'toLaunch'){ installerState.step = 6; renderStepper(); renderInstallBody(); }
+  });
+}
+
+/* -------- Dashboard -------- */
+var DASH_DATA = {
+  admin: { kpis:[['Active Tenants','312'],['Monthly Recurring','$1.84M'],['Open Incidents','3'],['Global Uptime','99.98%']] },
+  client: { kpis:[['Deployed Modules','6'],['Monthly Spend','$4,120'],['SLA Status','Nominal'],['Support Tickets','1']] },
+  staff: { kpis:[['Assigned Pods','5'],['On-Call Rotations','2'],['Avg Response Time','11m'],['Reliability Score','98.4']] }
+};
+var ACTIVITY = [
+  ['AI Ops Copilot flagged a latency anomaly on cluster eu-west-2', '2m ago'],
+  ['Zero-Trust Security Suite policy sync completed', '18m ago'],
+  ['New marketplace deployment: Data Fabric Connector', '1h ago'],
+  ['Quarterly optimization review scheduled', '3h ago']
+];
+function chartSvg(){
+  var pts = [40,65,50,80,60,95,72];
+  var max = Math.max.apply(null, pts);
+  var w = 560, h = 160, pad = 24;
+  var stepX = (w - pad*2) / (pts.length - 1);
+  var path = pts.map(function(v,i){
+    var x = pad + i*stepX;
+    var y = h - pad - (v/max)*(h-pad*2);
+    return (i===0?'M':'L') + x.toFixed(1) + ',' + y.toFixed(1);
+  }).join(' ');
+  var dots = pts.map(function(v,i){
+    var x = pad + i*stepX;
+    var y = h - pad - (v/max)*(h-pad*2);
+    return '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="3" fill="var(--amber)"/>';
+  }).join('');
+  var labels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  var labelEls = labels.map(function(l,i){
+    var x = pad + i*stepX;
+    return '<text x="' + x.toFixed(1) + '" y="' + (h-4) + '" font-size="9" fill="var(--steel)" text-anchor="middle" font-family="JetBrains Mono, monospace">' + l + '</text>';
+  }).join('');
+  return '<svg viewBox="0 0 ' + w + ' ' + h + '" role="img" aria-label="Weekly platform throughput chart, values trending upward from 40 to 72 units">' +
+    '<line x1="' + pad + '" y1="' + (h-pad) + '" x2="' + (w-pad) + '" y2="' + (h-pad) + '" stroke="var(--border)" stroke-width="1"/>' +
+    '<path d="' + path + '" fill="none" stroke="var(--amber)" stroke-width="2"/>' + dots + labelEls +
+  '</svg>';
+}
+function renderDashPanel(){
+  var panel = $('#dashPanel');
+  if(!panel) return;
+  var data = DASH_DATA[state.dashTab];
+  panel.innerHTML = '<div class="kpi-grid">' + data.kpis.map(function(k){ return '<div class="panel stat-tile"><span class="stat-num num" style="font-size:1.5rem;">' + esc(k[1]) + '</span><span class="stat-label">' + esc(k[0]) + '</span></div>'; }).join('') + '</div>' +
+    '<div class="grid-two">' +
+      '<div class="panel"><h3>Weekly Platform Throughput</h3>' + chartSvg() + '</div>' +
+      '<div class="panel"><h3>Recent Activity</h3><div class="activity-list">' + ACTIVITY.map(function(a){ return '<div class="activity-item"><span>' + esc(a[0]) + '</span><span class="activity-time num">' + esc(a[1]) + '</span></div>'; }).join('') + '</div></div>' +
+    '</div>';
+}
+function initDashboard(){
+  state.dashTab = 'admin';
+  renderDashPanel();
+  ['Admin','Client','Staff'].forEach(function(name){
+    var tab = $('#tab' + name);
+    if(tab) tab.addEventListener('click', function(){
+      $all('.dash-tab').forEach(function(t){ t.setAttribute('aria-selected','false'); });
+      tab.setAttribute('aria-selected','true');
+      state.dashTab = name.toLowerCase();
+      renderDashPanel();
+    });
+  });
+}
+
+/* ============================= ROUTER ============================= */
+var ROUTES = {
+  '': { render: renderHome, init: function(root){ animateCounters(root); wireTilt(root); } },
+  'services': { render: renderServices, init: wireTilt },
+  'solutions': { render: renderSolutions, init: wireTilt },
+  'marketplace': { render: renderMarketplace, init: function(root){ wireTilt(root); initMarketplace(); } },
+  'product': { render: renderProduct, init: wireTilt },
+  'work': { render: renderWork, init: wireTilt },
+  'process': { render: renderProcess, init: function(){} },
+  'about': { render: renderAbout, init: function(root){ animateCounters(root); wireTilt(root); } },
+  'resources': { render: renderResources, init: wireTilt },
+  'pricing': { render: renderPricing, init: function(){ initPricing(); } },
+  'contact': { render: renderContact, init: function(root){ wireTilt(root); initContact(); } },
+  'login': { render: renderLogin, init: function(){ initLogin(); } },
+  'installer': { render: renderInstaller, init: function(){ initInstaller(); } },
+  'dashboard': { render: renderDashboard, init: function(){ initDashboard(); } }
+};
+
+function currentHash(){
+  var h = window.location.hash || '#/';
+  h = h.replace(/^#\/?/, '');
+  h = h.split('?')[0].split('&')[0];
+  return h;
+}
+
+function updateNavActive(route){
+  $all('.nav-list a').forEach(function(a){
+    if(a.getAttribute('data-route') === route){ a.setAttribute('aria-current','page'); }
+    else { a.removeAttribute('aria-current'); }
+  });
+}
+
+function renderRoute(){
+  var route = currentHash();
+  var entry = ROUTES.hasOwnProperty(route) ? ROUTES[route] : null;
+  if(!entry){ window.location.hash = '#/'; return; }
+  var content = $('#content');
+  content.innerHTML = entry.render();
+  updateNavActive(route);
+  var telRoute = $('#telRoute');
+  if(telRoute) telRoute.textContent = '/' + (route ? route.toUpperCase() : 'HOME');
+  try{ entry.init(content); }catch(e){ /* non-fatal */ }
+  var h1 = $('#pageTitle', content);
+  if(h1){ h1.focus(); }
+}
+
+function onHashChange(){
+  playRouteLock(renderRoute);
+}
+window.addEventListener('hashchange', onHashChange);
+
+/* ============================= BOOT ============================= */
+function boot(){
+  if(!window.location.hash){ window.location.hash = '#/'; }
+  renderRoute();
+  var loader = $('#bootLoader');
+  var bootDelay = state.reducedMotion ? 200 : 1500;
+  setTimeout(function(){
+    loader.classList.add('hide');
+    loader.addEventListener('transitionend', function(){ loader.remove(); }, {once:true});
+  }, bootDelay);
+}
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', boot);
+} else {
+  boot();
+}
+
+})();
+</script>
+</body>
+</html>

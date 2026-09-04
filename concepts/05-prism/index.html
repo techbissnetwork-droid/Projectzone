@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TECHBISS — Prism</title>
+<meta name="description" content="TECHBISS partners with global enterprises to modernize infrastructure, build AI-native products, and run mission-critical systems at scale — 1,200+ engineers across 40+ countries.">
+<meta property="og:title" content="TECHBISS — Radiant Enterprise Platform">
+<meta property="og:description" content="A global digital transformation platform for infrastructure, AI, and mission-critical systems.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="TECHBISS">
+<meta name="theme-color" content="#FAFAF7">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+<style>
+  /* ============ RESET ============ */
+  *,*::before,*::after{box-sizing:border-box;}
+  * { margin:0; }
+  html{-webkit-text-size-adjust:100%; scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} }
+  img,svg{display:block; max-width:100%;}
+  a{color:inherit;}
+  button,input,textarea,select{font:inherit; color:inherit;}
+  ul{list-style:none; padding:0;}
+  button{cursor:pointer;}
+
+  /* ============ TOKENS — LIGHT (default) ============ */
+  :root{
+    --paper:#FAFAF7;
+    --surface:#FFFFFF;
+    --surface-2:#F2F1EC;
+    --ink:#14151A;
+    --ink-muted:#5B5D66;
+    --border:rgba(20,21,26,0.12);
+    --border-strong:rgba(20,21,26,0.22);
+    --accent:#2451FF;
+    --accent-ink:#FFFFFF;
+    --accent-soft:rgba(36,81,255,0.08);
+    --c1:#2451FF; --c2:#8B5CF6; --c3:#EC4899; --c4:#F59E0B;
+    --spectrum: linear-gradient(90deg, var(--c1), var(--c2), var(--c3), var(--c4));
+    --spectrum-diag: linear-gradient(135deg, var(--c1), var(--c2) 40%, var(--c3) 70%, var(--c4));
+    --shadow-sm: 0 1px 2px rgba(20,21,26,.06), 0 1px 1px rgba(20,21,26,.04);
+    --shadow-md: 0 8px 24px rgba(20,21,26,.08), 0 2px 6px rgba(20,21,26,.05);
+    --shadow-lg: 0 24px 64px rgba(20,21,26,.14), 0 4px 16px rgba(20,21,26,.08);
+    --radius-sm:4px; --radius:6px; --radius-lg:8px; --radius-xl:14px;
+    --s1:.5rem; --s2:1rem; --s3:1.5rem; --s4:2rem; --s5:3rem; --s6:4rem; --s7:6rem; --s8:8rem;
+    --font-display:'Instrument Serif', Georgia, 'Times New Roman', serif;
+    --font-body:'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --ease-spring: cubic-bezier(.34,1.56,.64,1);
+    --ease-snap: cubic-bezier(.2,.8,.2,1);
+    --dur-fast: .22s;
+    --dur-med: .45s;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#111219; --surface:#17181F; --surface-2:#1D1E27;
+      --ink:#F2F2F0; --ink-muted:#A0A2AD;
+      --border:rgba(242,242,240,0.12); --border-strong:rgba(242,242,240,0.24);
+      --accent:#6D8CFF; --accent-ink:#0B0C11; --accent-soft:rgba(109,140,255,0.14);
+      --c1:#6D8CFF; --c2:#A78BFA; --c3:#F472B6; --c4:#FBBF24;
+      --shadow-sm:0 1px 2px rgba(0,0,0,.4); --shadow-md:0 8px 24px rgba(0,0,0,.45); --shadow-lg:0 24px 64px rgba(0,0,0,.55);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#111219; --surface:#17181F; --surface-2:#1D1E27;
+    --ink:#F2F2F0; --ink-muted:#A0A2AD;
+    --border:rgba(242,242,240,0.12); --border-strong:rgba(242,242,240,0.24);
+    --accent:#6D8CFF; --accent-ink:#0B0C11; --accent-soft:rgba(109,140,255,0.14);
+    --c1:#6D8CFF; --c2:#A78BFA; --c3:#F472B6; --c4:#FBBF24;
+    --shadow-sm:0 1px 2px rgba(0,0,0,.4); --shadow-md:0 8px 24px rgba(0,0,0,.45); --shadow-lg:0 24px 64px rgba(0,0,0,.55);
+    color-scheme: dark;
+  }
+
+  /* ============ BASE ============ */
+  html,body{background:var(--paper); color:var(--ink);}
+  body{
+    font-family:var(--font-body);
+    font-size:16px; line-height:1.55; font-weight:400;
+    transition: background var(--dur-med) var(--ease-snap), color var(--dur-med) var(--ease-snap);
+    overflow-x:hidden;
+    min-height:100vh;
+  }
+  h1,h2,h3,h4{
+    font-family:var(--font-display); font-weight:400; line-height:1.05;
+    text-wrap:balance; letter-spacing:-0.01em;
+  }
+  h1{font-size:clamp(2.6rem,6vw,5.2rem);}
+  h2{font-size:clamp(1.9rem,3.6vw,3.1rem);}
+  h3{font-size:clamp(1.35rem,2vw,1.8rem);}
+  p{color:var(--ink-muted);}
+  .lede{font-size:1.15rem; max-width:56ch; color:var(--ink-muted);}
+  strong{color:var(--ink); font-weight:600;}
+  .eyebrow{
+    font-family:var(--font-body); font-weight:700; font-size:.72rem; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--accent); display:inline-flex; align-items:center; gap:.5em;
+  }
+  .eyebrow::before{content:''; width:16px; height:2px; background:var(--spectrum); border-radius:2px; display:inline-block;}
+
+  /* ============ SKIP LINK ============ */
+  .skip-link{
+    position:fixed; top:-100px; left:var(--s2); z-index:10000;
+    background:var(--ink); color:var(--paper); padding:.75em 1.25em; border-radius:var(--radius);
+    font-weight:600; transition:top var(--dur-fast) var(--ease-snap);
+  }
+  .skip-link:focus{top:var(--s2);}
+
+  /* ============ FOCUS STATES ============ */
+  a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible, [tabindex]:focus-visible{
+    outline:2px solid var(--accent); outline-offset:3px; border-radius:2px;
+  }
+  h1[tabindex]{ outline:none; }
+  @keyframes h1Flash{ from{ box-shadow:inset 4px 0 0 0 var(--accent); } to{ box-shadow:inset 4px 0 0 0 transparent; } }
+  h1.route-flash{ animation:h1Flash .7s var(--ease-snap) forwards; }
+  @media (prefers-reduced-motion: reduce){ h1.route-flash{ animation:none; } }
+
+  /* ============ SCROLL PROGRESS RAIL ============ */
+  .scroll-rail{
+    position:fixed; top:0; left:0; bottom:0; width:3px; z-index:9000; background:var(--border);
+    pointer-events:none;
+  }
+  .scroll-rail-fill{
+    width:100%; height:0%; background:var(--spectrum); background-size:100% 400%;
+    transition:height .08s linear;
+  }
+
+  /* ============ ROUTE WIPE ============ */
+  .route-wipe{
+    position:fixed; inset:-20% -30%; z-index:9500; pointer-events:none;
+    background:var(--ink);
+    transform:skewX(-10deg) translateX(-140%);
+    box-shadow: 6px 0 0 0 var(--c1) inset;
+  }
+  .route-wipe::after{
+    content:''; position:absolute; top:0; right:-4px; bottom:0; width:4px; background:var(--spectrum);
+  }
+  .route-wipe.cover{ transition:transform var(--dur-fast) var(--ease-snap); transform:skewX(-10deg) translateX(0%); }
+  .route-wipe.reveal{ transition:transform .32s var(--ease-spring); transform:skewX(-10deg) translateX(140%); }
+
+  /* ============ HEADER ============ */
+  .site-header{
+    position:sticky; top:0; z-index:800; background:color-mix(in srgb, var(--paper) 88%, transparent);
+    backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);
+  }
+  .header-inner{
+    max-width:1320px; margin:0 auto; padding:0 var(--s3);
+    display:flex; align-items:center; justify-content:space-between; gap:var(--s3); height:72px;
+  }
+  .wordmark{
+    display:inline-flex; align-items:center; gap:.55em; font-family:var(--font-body);
+    font-weight:800; font-size:1.15rem; letter-spacing:-.01em; text-decoration:none; flex-shrink:0;
+  }
+  .wordmark-mark{
+    width:11px; height:11px; border-radius:3px; background:var(--spectrum); flex-shrink:0;
+    transform:rotate(45deg);
+  }
+  .main-nav{display:flex; align-items:center;}
+  .nav-list{display:flex; align-items:center; gap:var(--s4); flex-wrap:wrap;}
+  .nav-list a{
+    text-decoration:none; font-size:.92rem; font-weight:500; color:var(--ink-muted);
+    position:relative; padding:.35em 0; transition:color var(--dur-fast) var(--ease-snap);
+    white-space:nowrap;
+  }
+  .nav-list a::after{
+    content:''; position:absolute; left:0; right:100%; bottom:-2px; height:2px; background:var(--spectrum);
+    border-radius:2px; transition:right var(--dur-fast) var(--ease-spring);
+  }
+  .nav-list a:hover{color:var(--ink);}
+  .nav-list a:hover::after{right:0;}
+  .nav-list a[aria-current="page"]{color:var(--ink); font-weight:700;}
+  .nav-list a[aria-current="page"]::after{right:0;}
+  .header-actions{display:flex; align-items:center; gap:var(--s2); flex-shrink:0;}
+  .nav-toggle{display:none; background:none; border:1px solid var(--border); border-radius:var(--radius); width:40px; height:40px; align-items:center; justify-content:center; flex-direction:column; gap:4px;}
+  .nav-toggle span{width:18px; height:2px; background:var(--ink); border-radius:2px; transition:transform var(--dur-fast) var(--ease-snap), opacity var(--dur-fast);}
+  .nav-toggle[aria-expanded="true"] span:nth-child(1){transform:translateY(6px) rotate(45deg);}
+  .nav-toggle[aria-expanded="true"] span:nth-child(2){opacity:0;}
+  .nav-toggle[aria-expanded="true"] span:nth-child(3){transform:translateY(-6px) rotate(-45deg);}
+
+  /* ============ BUTTONS ============ */
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:.55em;
+    font-family:var(--font-body); font-weight:700; font-size:.92rem; letter-spacing:-0.005em;
+    padding:.85em 1.5em; border-radius:var(--radius); border:1px solid transparent;
+    text-decoration:none; transition:transform .18s var(--ease-spring), box-shadow .18s var(--ease-snap), background .18s var(--ease-snap), border-color .18s;
+    white-space:nowrap; position:relative;
+  }
+  .btn svg{width:16px; height:16px; flex-shrink:0;}
+  .btn-primary{background:var(--accent); color:var(--accent-ink); box-shadow:var(--shadow-sm);}
+  .btn-primary:hover{transform:translateY(-2px); box-shadow:var(--shadow-md);}
+  .btn-ghost{background:transparent; color:var(--ink); border-color:var(--border-strong);}
+  .btn-ghost:hover{border-color:var(--ink); transform:translateY(-2px);}
+  .btn-dark{background:var(--ink); color:var(--paper);}
+  .btn-dark:hover{transform:translateY(-2px); box-shadow:var(--shadow-md);}
+  .btn-sm{padding:.6em 1.1em; font-size:.82rem;}
+  .btn-block{width:100%;}
+  .btn:disabled{opacity:.45; cursor:not-allowed; transform:none !important;}
+  .icon-btn{
+    width:40px; height:40px; display:inline-flex; align-items:center; justify-content:center;
+    background:transparent; border:1px solid var(--border); border-radius:var(--radius);
+    transition:transform .18s var(--ease-spring), border-color .18s;
+  }
+  .icon-btn:hover{border-color:var(--border-strong); transform:translateY(-2px) rotate(-4deg);}
+  .icon-btn svg{width:18px; height:18px;}
+
+  /* ============ LAYOUT ============ */
+  .container{max-width:1240px; margin:0 auto; padding:0 var(--s3);}
+  main{display:block; outline:none;}
+  .section{padding:var(--s7) 0;}
+  .section-tight{padding:var(--s5) 0;}
+  .grid-2{display:grid; grid-template-columns:1fr 1fr; gap:var(--s5);}
+  .grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:var(--s3);}
+  .grid-4{display:grid; grid-template-columns:repeat(4,1fr); gap:var(--s3);}
+  .grid-6{display:grid; grid-template-columns:repeat(3,1fr); gap:var(--s3);}
+  @media (max-width:980px){ .grid-2{grid-template-columns:1fr;} .grid-3{grid-template-columns:1fr 1fr;} .grid-4{grid-template-columns:1fr 1fr;} .grid-6{grid-template-columns:1fr 1fr;} }
+  @media (max-width:620px){ .grid-3,.grid-4,.grid-6{grid-template-columns:1fr;} }
+
+  .divider{height:2px; background:var(--spectrum); border:0; border-radius:2px; width:100%; max-width:120px; margin:var(--s4) 0;}
+  .edge-rule{height:2px; width:0; background:var(--spectrum); border-radius:2px; transition:width .7s var(--ease-snap);}
+  .edge-rule.in-view{width:100%;}
+  .reveal{opacity:0; transform:translateY(18px); transition:opacity .6s var(--ease-snap), transform .6s var(--ease-snap);}
+  .reveal.in-view{opacity:1; transform:translateY(0);}
+  @media (prefers-reduced-motion: reduce){
+    .reveal{opacity:1; transform:none; transition:none;}
+    .edge-rule{width:100%; transition:none;}
+  }
+
+  /* ============ HERO / SPLIT DIAGONAL ============ */
+  .hero{
+    position:relative; padding:var(--s7) 0 var(--s6);
+    display:grid; grid-template-columns:1.1fr .9fr; gap:var(--s5); align-items:center;
+  }
+  .hero-copy h1{margin-bottom:var(--s3);}
+  .hero-actions{display:flex; gap:var(--s2); margin-top:var(--s4); flex-wrap:wrap;}
+  .hero-meta{display:flex; gap:var(--s4); margin-top:var(--s5); flex-wrap:wrap;}
+  .hero-meta div{font-size:.78rem; color:var(--ink-muted); font-weight:600; letter-spacing:.03em;}
+  .hero-meta strong{display:block; font-family:var(--font-display); font-size:1.6rem; color:var(--ink); font-weight:400;}
+  .hero-visual{
+    position:relative; aspect-ratio:1/1; border-radius:var(--radius-xl); overflow:hidden;
+    background:var(--surface); border:1px solid var(--border);
+    clip-path:polygon(14% 0,100% 0,100% 100%,0 100%);
+  }
+  .hero-visual::before{
+    content:''; position:absolute; inset:0;
+    background:
+      linear-gradient(135deg, transparent 48%, var(--border) 49%, var(--border) 50%, transparent 51%),
+      repeating-linear-gradient(135deg, transparent 0 34px, var(--border) 34px 35px);
+    opacity:.55;
+  }
+  .hero-visual-edge{position:absolute; top:0; left:0; bottom:0; width:4px; background:var(--spectrum);}
+  .hero-orb{
+    position:absolute; width:64%; aspect-ratio:1/1; border-radius:50%; top:50%; left:56%; transform:translate(-50%,-50%);
+    background:conic-gradient(from 200deg, var(--c1), var(--c2), var(--c3), var(--c4), var(--c1));
+    filter:blur(0px); opacity:.16;
+  }
+  .hero-panel{
+    position:absolute; bottom:8%; left:8%; right:16%; background:var(--paper); border:1px solid var(--border);
+    border-radius:var(--radius-lg); padding:var(--s3); box-shadow:var(--shadow-lg);
+  }
+  .hero-panel .k{font-size:.7rem; text-transform:uppercase; letter-spacing:.1em; color:var(--ink-muted); font-weight:700;}
+  .hero-panel .v{font-family:var(--font-display); font-size:2.1rem; margin-top:.15em;}
+  @media (max-width:900px){ .hero{grid-template-columns:1fr;} .hero-visual{aspect-ratio:16/11;} }
+
+  /* ============ CARDS ============ */
+  .card{
+    position:relative; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg);
+    padding:var(--s4); transition:transform .28s var(--ease-spring), box-shadow .28s var(--ease-snap), border-color .28s;
+  }
+  .card::before{
+    content:''; position:absolute; inset:-1px; border-radius:inherit; padding:2px;
+    background:var(--spectrum-diag);
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor; mask-composite:exclude;
+    opacity:0; transition:opacity .28s var(--ease-snap); pointer-events:none;
+  }
+  .card:hover, .card:focus-within{ transform:translateY(-5px); box-shadow:var(--shadow-lg); }
+  .card:hover::before, .card:focus-within::before{ opacity:1; }
+  .card .icon-tile{
+    width:44px; height:44px; border-radius:var(--radius); background:var(--accent-soft); color:var(--accent);
+    display:flex; align-items:center; justify-content:center; margin-bottom:var(--s3);
+  }
+  .card .icon-tile svg{width:22px; height:22px;}
+  .card h3{margin-bottom:.5em;}
+  .card p{font-size:.94rem;}
+  .cap-list{margin-top:var(--s2); display:flex; flex-direction:column; gap:.5em;}
+  .cap-list li{display:flex; align-items:flex-start; gap:.6em; font-size:.85rem; color:var(--ink-muted);}
+  .cap-list svg{width:15px; height:15px; color:var(--accent); flex-shrink:0; margin-top:.2em;}
+
+  /* magnetic buttons container helper */
+  .magnetic{ will-change:transform; }
+
+  /* ============ STAT STRIP ============ */
+  .stat-strip{
+    display:grid; grid-template-columns:repeat(4,1fr); border-top:1px solid var(--border); border-bottom:1px solid var(--border);
+  }
+  .stat-strip .stat{ padding:var(--s4) var(--s3); border-left:1px solid var(--border); }
+  .stat-strip .stat:first-child{border-left:0;}
+  .stat .num{font-family:var(--font-display); font-size:clamp(2rem,4vw,3.2rem); font-weight:400; display:block;}
+  .stat .label{font-size:.78rem; color:var(--ink-muted); font-weight:600; letter-spacing:.03em; margin-top:.3em; display:block;}
+  @media (max-width:760px){ .stat-strip{grid-template-columns:1fr 1fr;} .stat-strip .stat:nth-child(2n+1){border-left:0;} }
+
+  /* ============ SECTION HEADER ============ */
+  .section-head{display:flex; align-items:flex-end; justify-content:space-between; gap:var(--s4); margin-bottom:var(--s5); flex-wrap:wrap;}
+  .section-head h2{max-width:24ch;}
+
+  /* ============ FOOTER ============ */
+  .site-footer{border-top:1px solid var(--border); padding:var(--s6) 0 var(--s4); margin-top:var(--s6);}
+  .footer-top{display:grid; grid-template-columns:1.4fr repeat(4,1fr); gap:var(--s4); padding-bottom:var(--s5);}
+  .footer-top h4{font-size:.78rem; text-transform:uppercase; letter-spacing:.08em; color:var(--ink); margin-bottom:var(--s2); font-family:var(--font-body); font-weight:700;}
+  .footer-top ul{display:flex; flex-direction:column; gap:.65em;}
+  .footer-top a{color:var(--ink-muted); text-decoration:none; font-size:.88rem;}
+  .footer-top a:hover{color:var(--accent);}
+  .footer-bottom{display:flex; justify-content:space-between; align-items:center; padding-top:var(--s4); border-top:1px solid var(--border); font-size:.8rem; color:var(--ink-muted); flex-wrap:wrap; gap:var(--s2);}
+  @media (max-width:900px){ .footer-top{grid-template-columns:1fr 1fr;} }
+
+  /* ============ FORMS ============ */
+  .field{display:flex; flex-direction:column; gap:.5em; margin-bottom:var(--s3);}
+  .field label{font-size:.82rem; font-weight:700; letter-spacing:.01em;}
+  .field input, .field textarea, .field select{
+    background:var(--surface); border:1px solid var(--border-strong); border-radius:var(--radius);
+    padding:.85em 1em; font-size:.95rem; color:var(--ink); transition:border-color .18s, box-shadow .18s;
+  }
+  .field input:focus, .field textarea:focus, .field select:focus{ border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft); outline:none; }
+  .field textarea{resize:vertical; min-height:110px;}
+  .field .error{font-size:.78rem; color:var(--c3); font-weight:600; min-height:1em;}
+  .field input[aria-invalid="true"], .field textarea[aria-invalid="true"]{border-color:var(--c3);}
+  .field-check{display:flex; align-items:center; gap:.6em; font-size:.85rem; color:var(--ink-muted);}
+
+  /* ============ BADGES / TAGS ============ */
+  .badge{display:inline-flex; align-items:center; gap:.4em; font-size:.7rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; padding:.35em .7em; border-radius:999px; border:1px solid var(--border-strong); color:var(--ink-muted);}
+  .badge-preview{border-color:transparent; background:var(--spectrum); color:#fff; -webkit-text-fill-color:#fff;}
+  .tag{font-size:.72rem; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--accent); background:var(--accent-soft); padding:.3em .65em; border-radius:var(--radius-sm);}
+
+  /* ============ PRICE CARD ============ */
+  .price-card{display:flex; flex-direction:column; gap:var(--s3);}
+  .price-card .amount{font-family:var(--font-display); font-size:3rem; display:flex; align-items:baseline; gap:.2em;}
+  .price-card .amount span{font-family:var(--font-body); font-size:.9rem; color:var(--ink-muted); font-weight:600;}
+  .price-card.featured{border-color:var(--accent); box-shadow:var(--shadow-md);}
+  .price-card ul{display:flex; flex-direction:column; gap:.65em; margin:var(--s2) 0;}
+  .price-card ul li{display:flex; gap:.6em; font-size:.87rem; align-items:flex-start;}
+  .price-card ul li svg{width:15px; height:15px; color:var(--accent); flex-shrink:0; margin-top:.25em;}
+
+  /* billing toggle */
+  .billing-toggle{display:inline-flex; align-items:center; gap:var(--s2); background:var(--surface-2); border:1px solid var(--border); border-radius:999px; padding:.3em; position:relative;}
+  .billing-toggle button{background:none; border:0; padding:.55em 1.2em; border-radius:999px; font-size:.82rem; font-weight:700; color:var(--ink-muted); position:relative; z-index:1;}
+  .billing-toggle .knob{position:absolute; top:3px; bottom:3px; left:3px; width:calc(50% - 3px); background:var(--surface); border-radius:999px; box-shadow:var(--shadow-sm); transition:transform .32s var(--ease-spring);}
+  .billing-toggle[data-billing="annual"] .knob{transform:translateX(100%);}
+  .billing-toggle button[aria-pressed="true"]{color:var(--ink);}
+  .save-pill{font-size:.68rem; font-weight:700; color:var(--c4); background:color-mix(in srgb, var(--c4) 16%, transparent); padding:.2em .55em; border-radius:999px; margin-left:.4em;}
+
+  /* ============ TABLE ============ */
+  .compare-table{width:100%; border-collapse:collapse; margin-top:var(--s5);}
+  .compare-table th, .compare-table td{padding:.9em 1em; text-align:left; border-bottom:1px solid var(--border); font-size:.88rem;}
+  .compare-table th{font-family:var(--font-body); font-weight:700; font-size:.75rem; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-muted);}
+  .compare-table td svg{width:16px; height:16px; color:var(--accent);}
+  .table-scroll{overflow-x:auto;}
+
+  /* ============ TIMELINE ============ */
+  .timeline{position:relative; padding-left:var(--s5); margin-top:var(--s5);}
+  .timeline::before{content:''; position:absolute; left:6px; top:6px; bottom:6px; width:2px; background:var(--spectrum);}
+  .timeline-item{position:relative; padding-bottom:var(--s5);}
+  .timeline-item:last-child{padding-bottom:0;}
+  .timeline-item::before{content:''; position:absolute; left:calc(-1 * var(--s5) + 1px); top:4px; width:11px; height:11px; border-radius:50%; background:var(--paper); border:2px solid var(--accent);}
+  .timeline-item .yr{font-family:var(--font-display); font-size:1.5rem;}
+
+  /* ============ PROCESS STEPS ============ */
+  .process-steps{display:flex; flex-direction:column;}
+  .process-step{display:grid; grid-template-columns:80px 1fr; gap:var(--s4); padding:var(--s5) 0; border-bottom:1px solid var(--border); align-items:start;}
+  .process-step:last-child{border-bottom:0;}
+  .process-num{font-family:var(--font-display); font-size:3rem; color:var(--ink-muted); opacity:.5;}
+  .process-step:hover .process-num{background:var(--spectrum); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; opacity:1; transition:.3s;}
+
+  /* ============ LEADERSHIP ============ */
+  .person{display:flex; flex-direction:column; gap:.9em;}
+  .avatar{width:64px; height:64px; border-radius:50%; border:1px solid var(--border); background:var(--surface-2); display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-size:1.5rem; color:var(--accent);}
+
+  /* ============ MODAL ============ */
+  .modal-overlay{position:fixed; inset:0; background:rgba(10,10,14,.55); backdrop-filter:blur(3px); z-index:2000; display:flex; align-items:center; justify-content:center; padding:var(--s3); opacity:0; transition:opacity .25s var(--ease-snap);}
+  .modal-overlay.open{opacity:1;}
+  .modal{background:var(--paper); border:1px solid var(--border); border-radius:var(--radius-xl); max-width:640px; width:100%; max-height:88vh; overflow-y:auto; box-shadow:var(--shadow-lg); transform:translateY(24px) scale(.97); transition:transform .3s var(--ease-spring); position:relative;}
+  .modal-overlay.open .modal{transform:translateY(0) scale(1);}
+  .modal-top{height:4px; background:var(--spectrum); border-radius:var(--radius-xl) var(--radius-xl) 0 0;}
+  .modal-body{padding:var(--s4);}
+  .modal-close{position:absolute; top:var(--s3); right:var(--s3); z-index:2;}
+  .modal-steps{display:flex; gap:.4em; margin-bottom:var(--s3);}
+  .modal-steps span{height:3px; flex:1; background:var(--border); border-radius:3px;}
+  .modal-steps span.done{background:var(--spectrum);}
+  @media (prefers-reduced-motion: reduce){ .modal, .modal-overlay{transition:none;} }
+
+  /* ============ MARKETPLACE / DASHBOARD MISC ============ */
+  .module-card{cursor:pointer; text-align:left; width:100%; background:var(--surface); font:inherit;}
+  .addon-row{display:flex; align-items:center; justify-content:space-between; padding:.8em 0; border-bottom:1px solid var(--border); gap:1em;}
+  .addon-row:last-child{border-bottom:0;}
+  .switch{position:relative; width:40px; height:22px; flex-shrink:0;}
+  .switch input{position:absolute; opacity:0; width:100%; height:100%; margin:0; cursor:pointer;}
+  .switch .track{position:absolute; inset:0; background:var(--border-strong); border-radius:999px; transition:background .2s;}
+  .switch .thumb{position:absolute; top:2px; left:2px; width:18px; height:18px; border-radius:50%; background:var(--surface); box-shadow:var(--shadow-sm); transition:transform .25s var(--ease-spring);}
+  .switch input:checked + .track{background:var(--accent);}
+  .switch input:checked + .track + .thumb{transform:translateX(18px);}
+  .switch input:focus-visible + .track{outline:2px solid var(--accent); outline-offset:2px;}
+  .order-line{display:flex; justify-content:space-between; padding:.55em 0; font-size:.9rem;}
+  .order-total{display:flex; justify-content:space-between; padding-top:.9em; margin-top:.5em; border-top:1px solid var(--border); font-weight:700; font-size:1.1rem;}
+  .deploy-log{background:var(--ink); color:#B8FFCB; font-family:ui-monospace,'SFMono-Regular',Menlo,Consolas,monospace; font-size:.8rem; border-radius:var(--radius); padding:var(--s3); min-height:180px; display:flex; flex-direction:column; gap:.35em;}
+  :root[data-theme="dark"] .deploy-log, @media (prefers-color-scheme:dark){ .deploy-log{background:#0B0C11;} }
+  .deploy-log .ln{opacity:0; transform:translateY(4px); animation:lnIn .3s var(--ease-snap) forwards;}
+  @keyframes lnIn{to{opacity:1; transform:none;}}
+  .progress-bar{height:6px; background:var(--border); border-radius:999px; overflow:hidden;}
+  .progress-bar > i{display:block; height:100%; background:var(--spectrum); width:0%; transition:width .4s var(--ease-snap); border-radius:999px;}
+
+  /* ============ STEPPER (installer) ============ */
+  .stepper-rail{display:flex; align-items:center; margin-bottom:var(--s5); overflow-x:auto; gap:0;}
+  .stepper-node{display:flex; flex-direction:column; align-items:center; gap:.5em; flex-shrink:0; min-width:110px; position:relative;}
+  .stepper-node .dot{width:32px; height:32px; border-radius:50%; border:2px solid var(--border-strong); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:.82rem; background:var(--surface); transition:.3s var(--ease-spring);}
+  .stepper-node.active .dot{border-color:var(--accent); color:var(--accent); transform:scale(1.1);}
+  .stepper-node.done .dot{background:var(--accent); border-color:var(--accent); color:var(--accent-ink);}
+  .stepper-node .lbl{font-size:.72rem; color:var(--ink-muted); font-weight:600; text-align:center;}
+  .stepper-node.active .lbl{color:var(--ink);}
+  .stepper-line{flex:1; height:2px; background:var(--border-strong); min-width:24px; margin-bottom:1.6em;}
+  .stepper-line.done{background:var(--spectrum);}
+  .stack-card{border:1px solid var(--border); border-radius:var(--radius-lg); padding:var(--s3); text-align:left; background:var(--surface); transition:.2s var(--ease-spring);}
+  .stack-card[aria-pressed="true"]{border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft);}
+  .stack-card:hover{transform:translateY(-3px);}
+  .checklist-item{display:flex; align-items:center; gap:.8em; padding:.7em 0; border-bottom:1px solid var(--border);}
+  .checklist-item:last-child{border-bottom:0;}
+  .check-circle{width:22px; height:22px; border-radius:50%; border:2px solid var(--border-strong); display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:.3s var(--ease-spring);}
+  .check-circle svg{width:12px; height:12px; opacity:0; transform:scale(.5); transition:.25s var(--ease-spring);}
+  .checklist-item.verified .check-circle{background:var(--accent); border-color:var(--accent);}
+  .checklist-item.verified .check-circle svg{opacity:1; transform:scale(1); color:var(--accent-ink);}
+
+  /* ============ DASHBOARD ============ */
+  .tabs{display:flex; gap:.4em; border-bottom:1px solid var(--border); margin-bottom:var(--s4);}
+  .tabs button{background:none; border:0; padding:.9em 1.2em; font-weight:700; font-size:.88rem; color:var(--ink-muted); border-bottom:2px solid transparent; margin-bottom:-1px;}
+  .tabs button[aria-selected="true"]{color:var(--ink); border-color:var(--accent);}
+  .kpi-tile{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:var(--s3);}
+  .kpi-tile .num{font-family:var(--font-display); font-size:2.1rem;}
+  .kpi-tile .lbl{font-size:.78rem; color:var(--ink-muted); font-weight:600;}
+  .kpi-tile .delta{font-size:.75rem; font-weight:700; color:var(--c1);}
+  .activity-row{display:flex; justify-content:space-between; padding:.75em 0; border-bottom:1px solid var(--border); font-size:.87rem; gap:1em;}
+  .activity-row:last-child{border-bottom:0;}
+  .activity-row .t{color:var(--ink-muted); font-size:.78rem; flex-shrink:0;}
+
+  /* Login SSO */
+  .sso-btn{display:flex; align-items:center; justify-content:center; gap:.6em; width:100%; padding:.8em; border:1px solid var(--border-strong); border-radius:var(--radius); background:var(--surface); font-weight:600; font-size:.87rem;}
+  .sso-btn:hover{border-color:var(--ink); transform:translateY(-1px);}
+  .sso-row{display:grid; grid-template-columns:1fr 1fr; gap:.8em; margin-top:var(--s3);}
+  .or-sep{display:flex; align-items:center; gap:.8em; margin:var(--s3) 0; color:var(--ink-muted); font-size:.78rem;}
+  .or-sep::before,.or-sep::after{content:''; flex:1; height:1px; background:var(--border);}
+
+  /* offices */
+  .office-card{border-top:2px solid transparent; border-image:var(--spectrum) 1;}
+
+  /* aria-live visually hidden */
+  .sr-only{position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;}
+
+  .split-diag{position:relative; overflow:hidden;}
+  .split-diag .panel-b{clip-path:polygon(12% 0,100% 0,100% 100%,0% 100%);}
+
+  @media (max-width:900px){
+    .main-nav{position:fixed; top:72px; left:0; right:0; bottom:0; background:var(--paper); border-top:1px solid var(--border); padding:var(--s4); transform:translateX(100%); transition:transform .32s var(--ease-snap); overflow-y:auto;}
+    .main-nav.open{transform:translateX(0);}
+    .nav-list{flex-direction:column; align-items:flex-start; gap:var(--s3);}
+    .nav-list a{font-size:1.1rem;}
+    .nav-toggle{display:inline-flex;}
+    .header-actions .btn-sm{display:none;}
+  }
+  @media (max-width:640px){
+    .hero-meta{gap:var(--s3);}
+    .footer-top{grid-template-columns:1fr;}
+    .stat-strip{grid-template-columns:1fr 1fr;}
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<svg style="display:none" aria-hidden="true">
+  <symbol id="icon-cloud" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18h10.5a3.5 3.5 0 0 0 .4-6.98A5.5 5.5 0 0 0 7.2 9.4 4 4 0 0 0 7 18Z"/></symbol>
+  <symbol id="icon-spark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.6 5.4L19 10l-5.4 1.6L12 17l-1.6-5.4L5 10l5.4-1.6L12 3Z"/><path d="M19 15l.6 2 2 .6-2 .6-.6 2-.6-2-2-.6 2-.6.6-2Z"/></symbol>
+  <symbol id="icon-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5 19 6v6c0 4.6-3 7.6-7 8.5-4-.9-7-3.9-7-8.5V6l7-2.5Z"/><path d="M9 12l2 2 4-4"/></symbol>
+  <symbol id="icon-code" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 8 4 12l5 4"/><path d="M15 8l5 4-5 4"/></symbol>
+  <symbol id="icon-layers" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 3.5 8 12 13l8.5-5L12 3Z"/><path d="M3.5 12 12 17l8.5-5"/><path d="M3.5 16 12 21l8.5-5"/></symbol>
+  <symbol id="icon-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><ellipse cx="12" cy="12" rx="3.6" ry="8.5"/><path d="M3.7 12h16.6"/></symbol>
+  <symbol id="icon-arrow-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12h15"/><path d="M13 5.5 19.5 12 13 18.5"/></symbol>
+  <symbol id="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 9 17.5 20 5.5"/></symbol>
+  <symbol id="icon-chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 8.5 12 15l6.5-6.5"/></symbol>
+  <symbol id="icon-cart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 4h2.2l1.1 11.2A2 2 0 0 0 8.8 17H18a2 2 0 0 0 2-1.6L21.4 8H6"/><circle cx="9.5" cy="20" r="1.2"/><circle cx="17.5" cy="20" r="1.2"/></symbol>
+  <symbol id="icon-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5v11.5"/><path d="M7 10.5 12 15.5 17 10.5"/><path d="M4.5 19.5h15"/></symbol>
+  <symbol id="icon-gauge" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 13 15.5 9"/><path d="M8 6.5l.8 1.6M16 6.5l-.8 1.6"/></symbol>
+  <symbol id="icon-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8.5" r="3"/><path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><circle cx="17" cy="9" r="2.4"/><path d="M15.7 14.2c2.4.3 4.3 2.1 4.3 4.8"/></symbol>
+  <symbol id="icon-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 3.5v2.4M12 18.1v2.4M20.5 12h-2.4M5.9 12H3.5M17.7 6.3l-1.7 1.7M8 16l-1.7 1.7M17.7 17.7 16 16M8 8 6.3 6.3"/></symbol>
+  <symbol id="icon-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.5-4.5"/></symbol>
+  <symbol id="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.4M12 19.1v2.4M21.5 12h-2.4M4.9 12H2.5M18.4 5.6l-1.7 1.7M7.3 16.7l-1.7 1.7M18.4 18.4l-1.7-1.7M7.3 7.3 5.6 5.6"/></symbol>
+  <symbol id="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 14.8A8.5 8.5 0 1 1 9.7 3.6a7 7 0 0 0 10.8 11.2Z"/></symbol>
+  <symbol id="icon-package" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 7v10l8 4 8-4V7l-8-4Z"/><path d="M4 7l8 4 8-4"/><path d="M12 11v10"/></symbol>
+  <symbol id="icon-terminal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="15" rx="2"/><path d="M7 9.5 10.5 12 7 14.5"/><path d="M12.5 14.5h4.5"/></symbol>
+  <symbol id="icon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.5v15M4.5 12h15"/></symbol>
+  <symbol id="icon-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5l14 14M19 5 5 19"/></symbol>
+  <symbol id="icon-key" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9"/><path d="M15 8l3 3M18 5l3 3"/></symbol>
+</svg>
+
+<div class="route-wipe" id="routeWipe" aria-hidden="true"></div>
+<div class="scroll-rail" aria-hidden="true"><div class="scroll-rail-fill" id="scrollRailFill"></div></div>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="#/" class="wordmark"><span class="wordmark-mark" aria-hidden="true"></span>TECHBISS</a>
+    <nav class="main-nav" id="mainNav" aria-label="Primary">
+      <ul class="nav-list" id="navList">
+        <li><a href="#/services" data-route="/services">Services</a></li>
+        <li><a href="#/solutions" data-route="/solutions">Solutions</a></li>
+        <li><a href="#/marketplace" data-route="/marketplace">Marketplace</a></li>
+        <li><a href="#/work" data-route="/work">Work</a></li>
+        <li><a href="#/process" data-route="/process">Process</a></li>
+        <li><a href="#/about" data-route="/about">About</a></li>
+        <li><a href="#/pricing" data-route="/pricing">Pricing</a></li>
+        <li><a href="#/resources" data-route="/resources">Resources</a></li>
+        <li><a href="#/contact" data-route="/contact">Contact</a></li>
+      </ul>
+    </nav>
+    <div class="header-actions">
+      <a href="#/login" class="btn btn-ghost btn-sm" data-route="/login">Log in</a>
+      <a href="#/dashboard" class="btn btn-primary btn-sm" data-route="/dashboard">Dashboard</a>
+      <button class="icon-btn" id="themeToggle" aria-label="Switch to dark theme"><svg id="themeIcon"><use href="#icon-moon"></use></svg></button>
+      <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="mainNav" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<main id="main" tabindex="-1"></main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-top">
+      <div>
+        <a href="#/" class="wordmark"><span class="wordmark-mark" aria-hidden="true"></span>TECHBISS</a>
+        <p style="margin-top:var(--s2); font-size:.88rem; max-width:32ch;">A global digital transformation platform for infrastructure, AI, and mission-critical systems.</p>
+      </div>
+      <div>
+        <h4>Platform</h4>
+        <ul>
+          <li><a href="#/services">Services</a></li>
+          <li><a href="#/solutions">Solutions</a></li>
+          <li><a href="#/marketplace">Marketplace</a></li>
+          <li><a href="#/pricing">Pricing</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#/about">About</a></li>
+          <li><a href="#/work">Work</a></li>
+          <li><a href="#/process">Process</a></li>
+          <li><a href="#/resources">Resources</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Account</h4>
+        <ul>
+          <li><a href="#/login">Log in</a></li>
+          <li><a href="#/dashboard">Dashboard</a></li>
+          <li><a href="#/installer">Installer</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="#/contact">Get in touch</a></li>
+          <li><a href="mailto:hello@techbiss.example">hello@techbiss.example</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 TECHBISS. Concept 05 — Prism. Design pitch, not a live product.</span>
+      <span>1,200+ engineers · 40+ countries · 98.7% uptime SLA</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+"use strict";
+var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ================= THEME ================= */
+function getStoredTheme(){ try{ return localStorage.getItem('tb-prism-theme'); }catch(e){ return null; } }
+function storeTheme(v){ try{ localStorage.setItem('tb-prism-theme', v); }catch(e){} }
+function applyTheme(t){
+  document.body.setAttribute('data-theme', t);
+  var icon = document.getElementById('themeIcon');
+  var btn = document.getElementById('themeToggle');
+  if(t === 'dark'){ icon.innerHTML = '<use href="#icon-sun"></use>'; btn.setAttribute('aria-label','Switch to light theme'); }
+  else { icon.innerHTML = '<use href="#icon-moon"></use>'; btn.setAttribute('aria-label','Switch to dark theme'); }
+}
+(function initTheme(){
+  var stored = getStoredTheme();
+  var theme = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  applyTheme(theme);
+})();
+document.getElementById('themeToggle').addEventListener('click', function(){
+  var current = document.body.getAttribute('data-theme') || 'light';
+  var next = current === 'dark' ? 'light' : 'dark';
+  applyTheme(next);
+  storeTheme(next);
+});
+
+/* ================= NAV TOGGLE (mobile) ================= */
+var navToggle = document.getElementById('navToggle');
+var mainNav = document.getElementById('mainNav');
+navToggle.addEventListener('click', function(){
+  var open = navToggle.getAttribute('aria-expanded') === 'true';
+  navToggle.setAttribute('aria-expanded', String(!open));
+  mainNav.classList.toggle('open', !open);
+});
+mainNav.addEventListener('click', function(e){
+  if(e.target.tagName === 'A'){ navToggle.setAttribute('aria-expanded','false'); mainNav.classList.remove('open'); }
+});
+
+/* ================= SCROLL RAIL ================= */
+var railFill = document.getElementById('scrollRailFill');
+var ticking = false;
+function updateRail(){
+  var doc = document.documentElement;
+  var scrollTop = window.scrollY || doc.scrollTop;
+  var height = doc.scrollHeight - doc.clientHeight;
+  var pct = height > 0 ? Math.min(100, (scrollTop / height) * 100) : 0;
+  railFill.style.height = pct + '%';
+  ticking = false;
+}
+window.addEventListener('scroll', function(){
+  if(!ticking){ requestAnimationFrame(updateRail); ticking = true; }
+}, { passive:true });
+
+/* ================= REVEAL OBSERVER ================= */
+var observer = new IntersectionObserver(function(entries){
+  entries.forEach(function(en){
+    if(en.isIntersecting){ en.target.classList.add('in-view'); observer.unobserve(en.target); }
+  });
+}, { threshold: .15 });
+function observeReveals(root){
+  root.querySelectorAll('.reveal, .edge-rule').forEach(function(el){ observer.observe(el); });
+}
+
+/* ================= COUNTERS ================= */
+function animateCounters(root){
+  var els = root.querySelectorAll('[data-count]');
+  var counterObs = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if(!en.isIntersecting) return;
+      counterObs.unobserve(en.target);
+      var el = en.target;
+      var target = parseFloat(el.getAttribute('data-count'));
+      var suffix = el.getAttribute('data-suffix') || '';
+      var decimals = el.getAttribute('data-decimals') ? parseInt(el.getAttribute('data-decimals'),10) : 0;
+      if(reduceMotion){ el.textContent = target.toFixed(decimals) + suffix; return; }
+      var start = null; var dur = 1100;
+      function step(ts){
+        if(!start) start = ts;
+        var p = Math.min(1, (ts - start) / dur);
+        var eased = 1 - Math.pow(1 - p, 3);
+        el.textContent = (target * eased).toFixed(decimals) + suffix;
+        if(p < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    });
+  }, { threshold:.4 });
+  els.forEach(function(el){ counterObs.observe(el); });
+}
+
+/* ================= MAGNETIC BUTTONS ================= */
+function initMagnetic(root){
+  var els = root.querySelectorAll('.btn-primary, .btn-dark');
+  els.forEach(function(el){
+    if(el.__magnetic) return; el.__magnetic = true;
+    var raf = null;
+    el.addEventListener('mousemove', function(e){
+      if(reduceMotion) return;
+      var r = el.getBoundingClientRect();
+      var x = (e.clientX - r.left - r.width/2) * .28;
+      var y = (e.clientY - r.top - r.height/2) * .35;
+      if(raf) cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(function(){ el.style.transform = 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px)'; });
+    });
+    el.addEventListener('mouseleave', function(){ el.style.transform = ''; });
+  });
+}
+
+/* ================= HELPERS ================= */
+function icon(name, cls){ return '<svg class="' + (cls||'') + '" aria-hidden="true"><use href="#icon-' + name + '"></use></svg>'; }
+function fmt(n){ return '$' + n.toLocaleString('en-US'); }
+
+/* =====================================================================
+   VIEW CONTENT
+   ===================================================================== */
+var Views = {};
+var ViewInit = {};
+var ViewTitle = {
+  '/': 'Home',
+  '/services': 'Services',
+  '/solutions': 'Solutions',
+  '/marketplace': 'Marketplace',
+  '/product': 'AI Ops Copilot',
+  '/work': 'Work',
+  '/process': 'Process',
+  '/about': 'About',
+  '/resources': 'Resources',
+  '/pricing': 'Pricing',
+  '/contact': 'Contact',
+  '/login': 'Log in',
+  '/installer': 'Installer',
+  '/dashboard': 'Dashboard'
+};
+
+/* ---------- HOME ---------- */
+Views['/'] = function(){
+  return '' +
+  '<section class="hero container">' +
+    '<div class="hero-copy">' +
+      '<span class="eyebrow">Global digital transformation</span>' +
+      '<h1 style="margin-top:.5em;">Enterprise systems, rebuilt for what comes next.</h1>' +
+      '<p class="lede">TECHBISS partners with global enterprises to modernize infrastructure, build AI-native products, and run mission-critical systems at a scale few platforms are trusted with.</p>' +
+      '<div class="hero-actions">' +
+        '<a class="btn btn-primary" href="#/contact">Start a conversation ' + icon('arrow-right') + '</a>' +
+        '<a class="btn btn-ghost" href="#/work">See our work</a>' +
+      '</div>' +
+      '<div class="hero-meta">' +
+        '<div><strong>1,200+</strong>Engineers worldwide</div>' +
+        '<div><strong>40+</strong>Countries served</div>' +
+        '<div><strong>98.7%</strong>Uptime SLA</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="hero-visual" aria-hidden="true">' +
+      '<div class="hero-visual-edge"></div>' +
+      '<div class="hero-orb"></div>' +
+      '<div class="hero-panel"><span class="k">Platform valuation</span><div class="v">$10B+</div></div>' +
+    '</div>' +
+  '</section>' +
+
+  '<section class="container section-tight reveal">' +
+    '<div class="section-head">' +
+      '<div><span class="eyebrow">What we do</span><h2 style="margin-top:.4em;">One platform, six disciplines.</h2></div>' +
+      '<a class="btn btn-ghost btn-sm" href="#/services">All services ' + icon('arrow-right') + '</a>' +
+    '</div>' +
+    '<div class="grid-3">' +
+      serviceCardMini('cloud','Cloud & Infrastructure','Resilient, cost-efficient platforms built for global scale.') +
+      serviceCardMini('spark','AI & Automation','Production-grade AI systems, not prototypes.') +
+      serviceCardMini('code','Enterprise Software','Custom platforms engineered for longevity.') +
+    '</div>' +
+  '</section>' +
+
+  '<section class="section-tight stat-strip reveal">' +
+    statTile('1200','+','Engineers across 40+ countries') +
+    statTile('98.7','%','Platform uptime SLA', 1) +
+    statTile('10','B+','Platform valuation','$') +
+    statTile('340','+','Enterprise clients served') +
+  '</section>' +
+
+  '<section class="container section reveal">' +
+    '<div class="grid-2" style="align-items:center;">' +
+      '<div>' +
+        '<span class="eyebrow">Marketplace</span>' +
+        '<h2 style="margin-top:.4em;">Pre-built modules. Live in days, not quarters.</h2>' +
+        '<p class="lede">Composable, production-hardened building blocks — from AI operations copilots to zero-trust security suites — configured and deployed without a single line of custom code.</p>' +
+        '<a class="btn btn-primary" style="margin-top:var(--s3);" href="#/marketplace">Browse the marketplace ' + icon('arrow-right') + '</a>' +
+      '</div>' +
+      '<div class="card" style="padding:0; overflow:hidden;">' +
+        '<div style="padding:var(--s3); border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">' +
+          '<strong>AI Ops Copilot</strong><span class="tag">AI & Automation</span>' +
+        '</div>' +
+        '<div style="padding:var(--s3);">' +
+          '<p style="font-size:.88rem;">Autonomous monitoring and remediation for hybrid infrastructure.</p>' +
+          '<div class="edge-rule" style="margin:var(--s3) 0;"></div>' +
+          '<div style="display:flex; justify-content:space-between; font-size:.85rem;"><span>From</span><strong style="color:var(--ink);">' + fmt(1450) + '/mo</strong></div>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+  '</section>' +
+
+  '<section class="container section-tight reveal">' +
+    '<div class="card" style="padding:var(--s5); display:grid; grid-template-columns:1fr auto; gap:var(--s4); align-items:center;">' +
+      '<div>' +
+        '<span class="eyebrow">Case study</span>' +
+        '<h3 style="margin-top:.4em;">A global logistics network cut infrastructure spend 42% in nine months</h3>' +
+        '<p style="margin-top:.5em;">Migrating a decade of accumulated infrastructure onto a unified, elastic platform — without a single service interruption.</p>' +
+      '</div>' +
+      '<a class="btn btn-dark" href="#/work">Read the work ' + icon('arrow-right') + '</a>' +
+    '</div>' +
+  '</section>';
+};
+function serviceCardMini(ic,title,desc){
+  return '<div class="card"><div class="icon-tile">' + icon(ic) + '</div><h3>' + title + '</h3><p>' + desc + '</p></div>';
+}
+function statTile(num, suffix, label, decimals, prefix){
+  return '<div class="stat"><span class="num">' + (prefix||'') + '<span data-count="' + num + '" data-suffix="' + suffix + '"' + (decimals?(' data-decimals="'+decimals+'"'):'') + '>0</span></span><span class="label">' + label + '</span></div>';
+}
+ViewInit['/'] = function(root){ animateCounters(root); };
+
+/* ---------- SERVICES ---------- */
+var SERVICES = [
+  { ic:'cloud', name:'Cloud & Infrastructure', desc:'Elastic, resilient platforms engineered for global scale and predictable cost.', caps:['Multi-cloud & hybrid architecture','Cost & capacity optimization','24/7 reliability engineering'] },
+  { ic:'spark', name:'AI & Automation', desc:'Production-grade AI systems that ship, not prototypes that stall in review.', caps:['Applied ML & LLM systems','Workflow & operations automation','Model governance & evaluation'] },
+  { ic:'code', name:'Enterprise Software Engineering', desc:'Custom platforms engineered for a decade of change, not a single release.', caps:['Platform & API architecture','Legacy modernization','Quality engineering at scale'] },
+  { ic:'layers', name:'Digital Product Design', desc:'Interfaces and systems designed for the people who use them daily.', caps:['Product & UX strategy','Design systems','Research-led iteration'] },
+  { ic:'shield', name:'Cybersecurity & Risk', desc:'Zero-trust architecture and continuous assurance for regulated industries.', caps:['Threat modeling & pen testing','Compliance & risk programs','Zero-trust identity'] },
+  { ic:'gauge', name:'Managed Operations', desc:'Round-the-clock operation of mission-critical systems, backed by SLAs.', caps:['24/7 platform monitoring','Incident response & SRE','Continuous optimization'] }
+];
+Views['/services'] = function(){
+  return pageHeader('Services','What we do','Six disciplines. One accountable partner.','From infrastructure to interface, TECHBISS teams cover the full stack of enterprise transformation — engaged individually or as one integrated program.') +
+  '<section class="container section-tight"><div class="grid-3">' +
+    SERVICES.map(function(s){
+      return '<div class="card reveal"><div class="icon-tile">' + icon(s.ic) + '</div><h3>' + s.name + '</h3><p>' + s.desc + '</p>' +
+        '<ul class="cap-list">' + s.caps.map(function(c){ return '<li>' + icon('check') + '<span>' + c + '</span></li>'; }).join('') + '</ul></div>';
+    }).join('') +
+  '</div></section>' + ctaBand();
+};
+
+/* ---------- SOLUTIONS ---------- */
+var SOLUTIONS = [
+  { ic:'gauge', name:'Financial Services', desc:'Core modernization, real-time risk platforms, and compliant AI for banks, insurers, and capital markets.' },
+  { ic:'shield', name:'Healthcare & Life Sciences', desc:'Interoperable, secure systems for providers, payers, and life-sciences organizations.' },
+  { ic:'cart', name:'Retail & Commerce', desc:'Composable commerce platforms built to hold peak demand without breaking a sweat.' },
+  { ic:'layers', name:'Manufacturing & Industry 4.0', desc:'Connected factories, predictive maintenance, and supply-chain visibility end to end.' },
+  { ic:'globe', name:'Public Sector', desc:'Secure, accessible digital services for government agencies operating at national scale.' }
+];
+Views['/solutions'] = function(){
+  return pageHeader('Solutions','By industry','Built for the specifics of your industry.','Every sector has its own regulatory weight, legacy footprint, and definition of "mission-critical." Our teams specialize accordingly.') +
+  '<section class="container section-tight"><div class="grid-3">' +
+    SOLUTIONS.map(function(s){
+      return '<div class="card reveal"><div class="icon-tile">' + icon(s.ic) + '</div><h3>' + s.name + '</h3><p>' + s.desc + '</p></div>';
+    }).join('') +
+  '</div></section>' + ctaBand();
+};
+
+/* ---------- MARKETPLACE ---------- */
+var MODULES = [
+  { id:'erp', name:'Core ERP Accelerator', cat:'Enterprise Software', desc:'A pre-configured ERP core for finance, procurement, and inventory.', price:2200, addons:[{n:'Advanced reporting',p:280},{n:'Multi-entity support',p:410},{n:'Custom workflow builder',p:340}] },
+  { id:'aiops', name:'AI Ops Copilot', cat:'AI & Automation', desc:'Autonomous monitoring and remediation for hybrid infrastructure.', price:1450, addons:[{n:'Anomaly forecasting',p:220},{n:'Auto-remediation playbooks',p:300},{n:'Executive insights digest',p:120}] },
+  { id:'zerotrust', name:'Zero-Trust Security Suite', cat:'Cybersecurity', desc:'Identity-first security architecture with continuous verification.', price:1890, addons:[{n:'Device posture checks',p:250},{n:'Privileged access vault',p:380},{n:'24/7 SOC monitoring',p:560}] },
+  { id:'commerce', name:'Commerce Engine', cat:'Retail & Commerce', desc:'Composable commerce core built for peak-traffic resilience.', price:1650, addons:[{n:'Subscription billing',p:260},{n:'Global tax engine',p:190},{n:'Personalization layer',p:340}] },
+  { id:'datafabric', name:'Data Fabric Connector', cat:'Cloud & Infrastructure', desc:'Unified data access layer across warehouses, lakes, and APIs.', price:1320, addons:[{n:'Real-time streaming',p:300},{n:'Data quality monitors',p:180},{n:'Lineage & catalog',p:210}] },
+  { id:'legacy', name:'Legacy Migration Toolkit', cat:'Managed Operations', desc:'Automated assessment and migration tooling for aging systems.', price:980, addons:[{n:'Code translation engine',p:400},{n:'Rollback safety net',p:220},{n:'Migration concierge',p:500}] }
+];
+Views['/marketplace'] = function(){
+  return pageHeader('Marketplace','Modules','Composable modules, deployed in days.','Production-hardened building blocks you can preview, customize, and deploy without writing custom integration code.') +
+  '<section class="container section-tight">' +
+    '<div class="grid-3">' +
+      MODULES.map(function(m){
+        return '<button class="card module-card reveal" data-module="' + m.id + '"><div class="icon-tile">' + icon('package') + '</div>' +
+          '<span class="tag">' + m.cat + '</span><h3 style="margin-top:.5em;">' + m.name + '</h3><p>' + m.desc + '</p>' +
+          '<div class="edge-rule" style="margin:var(--s2) 0;"></div>' +
+          '<div style="display:flex; justify-content:space-between; align-items:center;"><strong style="font-family:var(--font-display); font-size:1.4rem;">' + fmt(m.price) + '<span style="font-size:.7rem; font-weight:600; color:var(--ink-muted); font-family:var(--font-body);">/mo</span></strong>' + icon('arrow-right') + '</div></button>';
+      }).join('') +
+    '</div>' +
+  '</section>' +
+  '<div id="marketModalRoot"></div>';
+};
+var marketState = { step:'preview', moduleId:null, addons:{} };
+function moduleById(id){ return MODULES.filter(function(m){ return m.id === id; })[0]; }
+function marketTotal(m){
+  var t = m.price;
+  m.addons.forEach(function(a){ if(marketState.addons[a.n]) t += a.p; });
+  return t;
+}
+function openMarketModal(id){
+  marketState.step = 'preview'; marketState.moduleId = id; marketState.addons = {};
+  renderMarketModal();
+}
+function closeMarketModal(){
+  var overlay = document.querySelector('.modal-overlay');
+  if(!overlay) return;
+  overlay.classList.remove('open');
+  var trigger = document.querySelector('[data-module="' + marketState.moduleId + '"]');
+  setTimeout(function(){ document.getElementById('marketModalRoot').innerHTML=''; if(trigger) trigger.focus(); }, reduceMotion?0:220);
+}
+function marketStepIndex(s){ return {preview:0,customize:1,purchase:2,deploy:3}[s]; }
+function renderMarketModal(){
+  var root = document.getElementById('marketModalRoot');
+  if(!root) return;
+  var m = moduleById(marketState.moduleId);
+  if(!m) return;
+  var idx = marketStepIndex(marketState.step);
+  var stepsHtml = '<div class="modal-steps">' + [0,1,2,3].map(function(i){ return '<span class="' + (i<=idx?'done':'') + '"></span>'; }).join('') + '</div>';
+  var body = '';
+  if(marketState.step === 'preview'){
+    body = '<span class="tag">' + m.cat + '</span><h2 style="margin-top:.4em;">' + m.name + '</h2><p class="lede" style="margin-top:.5em;">' + m.desc + '</p>' +
+      '<div class="edge-rule" style="margin:var(--s3) 0;"></div>' +
+      '<h4 style="font-size:.78rem; text-transform:uppercase; letter-spacing:.06em; margin-bottom:.6em;">Included capabilities</h4>' +
+      '<ul class="cap-list">' + m.addons.map(function(a){ return '<li>' + icon('check') + '<span>Core ' + a.n.toLowerCase() + ' compatibility</span></li>'; }).join('') + '<li>' + icon('check') + '<span>Deploys on TECHBISS managed infrastructure</span></li></ul>' +
+      '<div style="display:flex; justify-content:space-between; align-items:center; margin-top:var(--s4);"><strong style="font-family:var(--font-display); font-size:1.8rem;">' + fmt(m.price) + '<span style="font-size:.75rem; color:var(--ink-muted); font-family:var(--font-body);">/mo base</span></strong>' +
+      '<button class="btn btn-primary" id="mktNext">Customize ' + icon('arrow-right') + '</button></div>';
+  } else if(marketState.step === 'customize'){
+    body = '<h2>Customize ' + m.name + '</h2><p style="margin-top:.4em;">Toggle add-ons — price recalculates instantly.</p>' +
+      '<div style="margin-top:var(--s3);">' + m.addons.map(function(a){
+        var checked = marketState.addons[a.n] ? 'checked' : '';
+        return '<div class="addon-row"><div><strong style="display:block; font-size:.9rem;">' + a.n + '</strong><span style="font-size:.78rem; color:var(--ink-muted);">+' + fmt(a.p) + '/mo</span></div>' +
+          '<label class="switch"><input type="checkbox" data-addon="' + a.n + '" ' + checked + ' aria-label="Toggle ' + a.n + '"><span class="track"></span><span class="thumb"></span></label></div>';
+      }).join('') + '</div>' +
+      '<div style="display:flex; justify-content:space-between; align-items:center; margin-top:var(--s4);"><strong style="font-family:var(--font-display); font-size:1.8rem;" id="mktLiveTotal">' + fmt(marketTotal(m)) + '<span style="font-size:.75rem; color:var(--ink-muted); font-family:var(--font-body);">/mo</span></strong>' +
+      '<div style="display:flex; gap:.6em;"><button class="btn btn-ghost" id="mktBack">Back</button><button class="btn btn-primary" id="mktNext">Purchase ' + icon('arrow-right') + '</button></div></div>';
+  } else if(marketState.step === 'purchase'){
+    var addonLines = m.addons.filter(function(a){ return marketState.addons[a.n]; });
+    body = '<h2>Order summary</h2><p style="margin-top:.4em;">Review before confirming this simulated deployment.</p>' +
+      '<div style="margin-top:var(--s3);"><div class="order-line"><span>' + m.name + ' (base)</span><span>' + fmt(m.price) + '</span></div>' +
+      addonLines.map(function(a){ return '<div class="order-line"><span>' + a.n + '</span><span>+' + fmt(a.p) + '</span></div>'; }).join('') +
+      '<div class="order-total"><span>Total</span><span>' + fmt(marketTotal(m)) + '/mo</span></div></div>' +
+      '<div style="display:flex; justify-content:flex-end; gap:.6em; margin-top:var(--s4);"><button class="btn btn-ghost" id="mktBack">Back</button><button class="btn btn-primary" id="mktNext">Confirm & deploy</button></div>';
+  } else if(marketState.step === 'deploy'){
+    body = '<h2>Deploying ' + m.name + '</h2><p style="margin-top:.4em;">Simulated deployment — illustrative only, no live systems are affected.</p>' +
+      '<div class="deploy-log" id="deployLog" style="margin-top:var(--s3);" aria-live="polite"></div>' +
+      '<div class="progress-bar" style="margin-top:var(--s3);"><i id="deployBar"></i></div>' +
+      '<div id="deployDone" style="display:none; margin-top:var(--s4); text-align:center;">' +
+        '<div class="icon-tile" style="margin:0 auto var(--s2); background:var(--spectrum); color:#fff;">' + icon('check') + '</div>' +
+        '<h3>Deployment successful</h3><p>' + m.name + ' is live in your simulated environment.</p>' +
+        '<button class="btn btn-primary" id="mktDone" style="margin-top:var(--s3);">Done</button>' +
+      '</div>';
+  }
+  root.innerHTML = '<div class="modal-overlay" role="presentation"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="mktTitle"><div class="modal-top"></div>' +
+    '<button class="icon-btn modal-close" id="mktClose" aria-label="Close dialog">' + icon('x') + '</button>' +
+    '<div class="modal-body">' + stepsHtml + '<div id="mktTitle">' + body + '</div></div></div></div>';
+  requestAnimationFrame(function(){ document.querySelector('.modal-overlay').classList.add('open'); });
+  var overlay = document.querySelector('.modal-overlay');
+  var modal = document.querySelector('.modal');
+  modal.focus && modal.setAttribute('tabindex','-1');
+  var firstFocusable = document.getElementById('mktClose');
+  if(firstFocusable) firstFocusable.focus();
+  overlay.addEventListener('click', function(e){ if(e.target === overlay) closeMarketModal(); });
+  document.getElementById('mktClose').addEventListener('click', closeMarketModal);
+  var backBtn = document.getElementById('mktBack');
+  if(backBtn) backBtn.addEventListener('click', function(){ marketState.step = marketState.step === 'customize' ? 'preview' : 'customize'; renderMarketModal(); });
+  var nextBtn = document.getElementById('mktNext');
+  if(nextBtn) nextBtn.addEventListener('click', function(){
+    if(marketState.step === 'preview') marketState.step = 'customize';
+    else if(marketState.step === 'customize') marketState.step = 'purchase';
+    else if(marketState.step === 'purchase') marketState.step = 'deploy';
+    renderMarketModal();
+    if(marketState.step === 'deploy') runDeploySequence(m);
+  });
+  root.querySelectorAll('[data-addon]').forEach(function(cb){
+    cb.addEventListener('change', function(){
+      marketState.addons[cb.getAttribute('data-addon')] = cb.checked;
+      var t = document.getElementById('mktLiveTotal');
+      if(t) t.innerHTML = fmt(marketTotal(m)) + '<span style="font-size:.75rem; color:var(--ink-muted); font-family:var(--font-body);">/mo</span>';
+    });
+  });
+  var doneBtn = document.getElementById('mktDone');
+  if(doneBtn) doneBtn.addEventListener('click', closeMarketModal);
+}
+function runDeploySequence(m){
+  var lines = ['Provisioning environment…','Allocating compute & network…','Installing ' + m.name + '…','Applying selected add-ons…','Running health checks…','Registering with control plane…','Finalizing deployment…'];
+  var logEl = document.getElementById('deployLog');
+  var bar = document.getElementById('deployBar');
+  var i = 0;
+  function step(){
+    if(i < lines.length){
+      var d = document.createElement('div');
+      d.className = 'ln'; d.textContent = '$ ' + lines[i];
+      logEl.appendChild(d);
+      logEl.scrollTop = logEl.scrollHeight;
+      bar.style.width = Math.round(((i+1)/lines.length)*100) + '%';
+      i++;
+      setTimeout(step, reduceMotion?60:380);
+    } else {
+      setTimeout(function(){
+        var done = document.getElementById('deployDone');
+        if(done){ done.style.display='block'; var b=document.getElementById('mktDone'); if(b) b.focus(); }
+      }, 250);
+    }
+  }
+  step();
+}
+ViewInit['/marketplace'] = function(root){
+  root.querySelectorAll('[data-module]').forEach(function(btn){
+    btn.addEventListener('click', function(){ openMarketModal(btn.getAttribute('data-module')); });
+  });
+  document.addEventListener('keydown', marketEscHandler);
+};
+function marketEscHandler(e){ if(e.key === 'Escape' && document.querySelector('.modal-overlay')) closeMarketModal(); }
+
+/* ---------- PRODUCT DETAIL ---------- */
+Views['/product'] = function(){
+  return pageHeader('AI Ops Copilot','AI & Automation','Autonomous operations for hybrid infrastructure.','AI Ops Copilot continuously observes your environment, predicts incidents before they page anyone, and resolves the routine ones automatically.') +
+  '<section class="container section-tight">' +
+    '<div class="grid-2">' +
+      '<div>' +
+        '<h3>Features</h3>' +
+        '<ul class="cap-list" style="margin-top:var(--s3); gap:.9em;">' +
+          ['Real-time anomaly detection across services','Automated remediation playbooks','Root-cause analysis with full trace context','Forecasting for capacity & cost','Native integration with major cloud providers','Slack, Teams & PagerDuty native alerts','Full audit trail for every automated action','Role-based access & approval workflows'].map(function(f){ return '<li>' + icon('check') + '<span>' + f + '</span></li>'; }).join('') +
+        '</ul>' +
+      '</div>' +
+      '<div class="card">' +
+        '<span class="eyebrow">Testimonial</span>' +
+        '<blockquote style="margin-top:var(--s3); font-family:var(--font-display); font-size:1.5rem; line-height:1.3;">"AI Ops Copilot found and resolved an intermittent memory leak three weeks before it would have caused an outage during peak season."</blockquote>' +
+        '<p style="margin-top:var(--s3); font-weight:600; color:var(--ink);">VP Engineering<span style="display:block; color:var(--ink-muted); font-weight:400; font-size:.85rem;">A global logistics network</span></p>' +
+      '</div>' +
+    '</div>' +
+  '</section>' +
+  '<section class="container section-tight">' +
+    '<div class="section-head"><div><span class="eyebrow">Pricing</span><h2 style="margin-top:.4em;">Choose your tier</h2></div></div>' +
+    '<div class="grid-3">' +
+      productTier('Starter', 690, ['Up to 10 services monitored','Business-hours support','Weekly digest reports']) +
+      productTier('Professional', 1450, ['Up to 60 services monitored','24/7 support & auto-remediation','Real-time forecasting'], true) +
+      productTier('Enterprise', null, ['Unlimited services','Dedicated SRE liaison','Custom SLA & on-prem options']) +
+    '</div>' +
+  '</section>' + ctaBand();
+};
+function productTier(name, price, feats, featured){
+  return '<div class="card price-card' + (featured?' featured':'') + '">' + (featured?'<span class="badge" style="align-self:flex-start; border:0; background:var(--spectrum); color:#fff; -webkit-text-fill-color:#fff;">Most popular</span>':'') +
+    '<h3>' + name + '</h3><div class="amount">' + (price?fmt(price):'Custom') + (price?'<span>/mo</span>':'') + '</div>' +
+    '<ul>' + feats.map(function(f){ return '<li>' + icon('check') + '<span>' + f + '</span></li>'; }).join('') + '</ul>' +
+    '<a href="#/contact" class="btn ' + (featured?'btn-primary':'btn-ghost') + ' btn-block">Get started</a></div>';
+}
+
+/* ---------- WORK ---------- */
+var CASES = [
+  { org:'Global Logistics Network', metric:'42%', metricLabel:'reduction in infrastructure cost', desc:'A unified, elastic platform replaced a decade of accumulated infrastructure sprawl without a single service interruption.' },
+  { org:'Regional Healthcare Provider', metric:'3.2x', metricLabel:'faster claims processing', desc:'An AI-assisted claims pipeline cut manual review time while improving accuracy across every intake channel.' },
+  { org:'Retail Commerce Group', metric:'99.99%', metricLabel:'checkout uptime during peak', desc:'A re-architected commerce engine absorbed record holiday traffic with zero checkout downtime.' },
+  { org:'Manufacturing Consortium', metric:'6 mo', metricLabel:'legacy migration, down from 18', desc:'Automated migration tooling compressed a multi-year modernization roadmap into two quarters.' }
+];
+Views['/work'] = function(){
+  return pageHeader('Work','Case studies','Outcomes, not anecdotes.','A sample of engagements across industries — each with a headline metric that mattered to the business.') +
+  '<section class="container section-tight"><div class="grid-2">' +
+    CASES.map(function(c){
+      return '<div class="card reveal"><span class="eyebrow">Case study</span><div style="display:flex; align-items:baseline; gap:.5em; margin-top:.5em;"><span style="font-family:var(--font-display); font-size:2.6rem;">' + c.metric + '</span><span style="color:var(--ink-muted); font-size:.85rem; font-weight:600;">' + c.metricLabel + '</span></div><h3 style="margin-top:.4em;">' + c.org + '</h3><p style="margin-top:.4em;">' + c.desc + '</p></div>';
+    }).join('') +
+  '</div></section>' + ctaBand();
+};
+
+/* ---------- PROCESS ---------- */
+var PROCESS = [
+  { n:'01', t:'Discover', d:'We map your systems, constraints, and business objectives before proposing a single solution.' },
+  { n:'02', t:'Design', d:'Architecture and product design proceed together, validated against real operating conditions.' },
+  { n:'03', t:'Build', d:'Cross-functional pods ship in weekly increments with full visibility for your team.' },
+  { n:'04', t:'Deploy', d:'Progressive rollouts, automated rollback, and zero-downtime cutovers as standard practice.' },
+  { n:'05', t:'Optimize', d:'Continuous tuning of cost, performance, and reliability long after go-live.' }
+];
+Views['/process'] = function(){
+  return pageHeader('Process','Methodology','Five steps. Zero surprises.','A disciplined, repeatable methodology built from hundreds of enterprise engagements.') +
+  '<section class="container section-tight"><div class="process-steps">' +
+    PROCESS.map(function(p){ return '<div class="process-step reveal"><span class="process-num">' + p.n + '</span><div><h3>' + p.t + '</h3><p style="margin-top:.4em; max-width:60ch;">' + p.d + '</p></div></div>'; }).join('') +
+  '</div></section>' + ctaBand();
+};
+
+/* ---------- ABOUT ---------- */
+var LEADERS = [
+  { i:'MK', n:'Mara Kessler', r:'Chief Executive Officer' },
+  { i:'DO', n:'Daniel Osei', r:'Chief Technology Officer' },
+  { i:'RV', n:'Renata Vidal', r:'Chief Operating Officer' },
+  { i:'JL', n:'Jonah Lindqvist', r:'Chief AI Officer' },
+  { i:'PS', n:'Priya Shankar', r:'Chief Security Officer' }
+];
+var MILESTONES = [
+  { y:'2014', t:'Founded', d:'TECHBISS opens its first delivery center with a focus on infrastructure modernization.' },
+  { y:'2017', t:'European expansion', d:'Operations extend across the EU to support financial services clients.' },
+  { y:'2020', t:'AI division launched', d:'A dedicated applied-AI practice begins shipping production ML systems.' },
+  { y:'2023', t:'40+ countries', d:'Global delivery footprint crosses 40 countries with 24/7 coverage.' },
+  { y:'2026', t:'Today', d:'1,200+ engineers supporting 340+ enterprise clients worldwide.' }
+];
+Views['/about'] = function(){
+  return pageHeader('About','Our mission','Trust is the product.','TECHBISS exists to give enterprises the confidence to modernize — pairing rigorous engineering with the accountability of a long-term partner, not a vendor.') +
+  '<section class="section-tight stat-strip">' +
+    statTile('1200','+','Engineers worldwide') +
+    statTile('40','+','Countries served') +
+    statTile('98.7','%','Uptime SLA', 1) +
+    statTile('340','+','Enterprise clients') +
+  '</section>' +
+  '<section class="container section-tight">' +
+    '<span class="eyebrow">Leadership</span><h2 style="margin-top:.4em;">The people setting direction.</h2>' +
+    '<div class="grid-6" style="margin-top:var(--s4); grid-template-columns:repeat(5,1fr);">' +
+      LEADERS.map(function(l){ return '<div class="person reveal"><div class="avatar">' + l.i + '</div><div><strong style="display:block;">' + l.n + '</strong><span style="font-size:.82rem; color:var(--ink-muted);">' + l.r + '</span></div></div>'; }).join('') +
+    '</div>' +
+  '</section>' +
+  '<section class="container section-tight">' +
+    '<span class="eyebrow">Milestones</span><h2 style="margin-top:.4em;">A decade of momentum.</h2>' +
+    '<div class="timeline">' +
+      MILESTONES.map(function(m){ return '<div class="timeline-item reveal"><span class="yr">' + m.y + '</span><h3 style="margin-top:.2em;">' + m.t + '</h3><p style="margin-top:.3em;">' + m.d + '</p></div>'; }).join('') +
+    '</div>' +
+  '</section>' + ctaBand();
+};
+
+/* ---------- RESOURCES ---------- */
+var RESOURCES = [
+  { t:'The real cost of infrastructure sprawl', c:'Cloud & Infrastructure', r:'6 min read' },
+  { t:'Why most enterprise AI pilots never ship', c:'AI & Automation', r:'8 min read' },
+  { t:'A CISO’s guide to zero-trust migration', c:'Cybersecurity', r:'10 min read' },
+  { t:'Designing for the 40-country enterprise', c:'Product Design', r:'5 min read' },
+  { t:'What "mission-critical" should actually mean', c:'Managed Operations', r:'7 min read' },
+  { t:'Legacy migration without the horror stories', c:'Enterprise Software', r:'9 min read' }
+];
+Views['/resources'] = function(){
+  return pageHeader('Resources','Insights','Field notes from enterprise transformation.','Perspectives from the engineers, architects, and strategists building at TECHBISS.') +
+  '<section class="container section-tight"><div class="grid-3">' +
+    RESOURCES.map(function(r){
+      return '<a href="#" class="card reveal" style="text-decoration:none; display:block;"><span class="tag">' + r.c + '</span><h3 style="margin-top:.6em;">' + r.t + '</h3><p style="margin-top:.5em; font-size:.8rem; color:var(--ink-muted);">' + r.r + '</p></a>';
+    }).join('') +
+  '</div></section>' + ctaBand();
+};
+
+/* ---------- PRICING ---------- */
+var PRICING_PLANS = [
+  { name:'Starter', monthly:1200, annual:960, feats:['Up to 5 services', 'Business-hours support', 'Standard SLA'] },
+  { name:'Growth', monthly:3400, annual:2720, feats:['Up to 30 services', '24/7 support', 'Priority SLA','Quarterly reviews'], featured:true },
+  { name:'Enterprise', monthly:null, annual:null, feats:['Unlimited services', 'Dedicated delivery pod', 'Custom SLA & compliance','On-prem & air-gapped options'] }
+];
+Views['/pricing'] = function(){
+  return pageHeader('Pricing','Plans','Straightforward pricing at every stage.','Predictable plans that scale from a first engagement to a global, multi-region program.') +
+  '<section class="container section-tight">' +
+    '<div style="display:flex; justify-content:center; margin-bottom:var(--s5);">' +
+      '<div class="billing-toggle" id="billingToggle" data-billing="monthly"><div class="knob" aria-hidden="true"></div>' +
+        '<button aria-pressed="true" data-b="monthly">Monthly</button>' +
+        '<button aria-pressed="false" data-b="annual">Annual<span class="save-pill">Save 20%</span></button></div>' +
+    '</div>' +
+    '<div class="grid-3" id="pricingGrid">' + PRICING_PLANS.map(pricingCard).join('') + '</div>' +
+    '<div class="table-scroll"><table class="compare-table">' +
+      '<thead><tr><th>Feature</th><th>Starter</th><th>Growth</th><th>Enterprise</th></tr></thead>' +
+      '<tbody>' +
+        compareRow('Managed services', '5', '30', 'Unlimited') +
+        compareRow('Support', 'Business hours', '24/7', '24/7 + dedicated pod') +
+        compareRow('SLA', 'Standard', 'Priority', 'Custom') +
+        compareRow('On-prem / air-gapped', false, false, true) +
+        compareRow('Dedicated delivery pod', false, false, true) +
+      '</tbody></table></div>' +
+  '</section>' + ctaBand();
+};
+function pricingCard(p){
+  var priceHtml = p.monthly === null ? 'Custom' : '<span data-monthly="' + p.monthly + '" data-annual="' + p.annual + '">' + fmt(p.monthly) + '</span><span>/mo</span>';
+  return '<div class="card price-card' + (p.featured?' featured':'') + '">' + (p.featured?'<span class="badge" style="align-self:flex-start; border:0; background:var(--spectrum); color:#fff; -webkit-text-fill-color:#fff;">Most popular</span>':'') +
+    '<h3>' + p.name + '</h3><div class="amount">' + priceHtml + '</div>' +
+    '<ul>' + p.feats.map(function(f){ return '<li>' + icon('check') + '<span>' + f + '</span></li>'; }).join('') + '</ul>' +
+    '<a href="#/contact" class="btn ' + (p.featured?'btn-primary':'btn-ghost') + ' btn-block">' + (p.monthly===null?'Talk to sales':'Choose plan') + '</a></div>';
+}
+function compareRow(label, a, b, c){
+  function cell(v){ return v === true ? icon('check') : v === false ? '—' : v; }
+  return '<tr><td>' + label + '</td><td>' + cell(a) + '</td><td>' + cell(b) + '</td><td>' + cell(c) + '</td></tr>';
+}
+ViewInit['/pricing'] = function(root){
+  var toggle = root.querySelector('#billingToggle');
+  if(!toggle) return;
+  toggle.querySelectorAll('button').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var mode = btn.getAttribute('data-b');
+      toggle.setAttribute('data-billing', mode);
+      toggle.querySelectorAll('button').forEach(function(b){ b.setAttribute('aria-pressed', String(b === btn)); });
+      root.querySelectorAll('[data-monthly]').forEach(function(el){
+        var v = mode === 'annual' ? el.getAttribute('data-annual') : el.getAttribute('data-monthly');
+        el.textContent = fmt(parseInt(v,10));
+      });
+    });
+  });
+};
+
+/* ---------- CONTACT ---------- */
+var OFFICES = [
+  { c:'New York', a:'One Liberty Plaza, Floor 42' },
+  { c:'London', a:'20 Fenchurch Street' },
+  { c:'Singapore', a:'Marina One, East Tower' },
+  { c:'São Paulo', a:'Av. Paulista, 1200' }
+];
+Views['/contact'] = function(){
+  return pageHeader('Contact','Get in touch','Let’s talk about what’s next.','Tell us about your systems and objectives — a member of our team will follow up within one business day.') +
+  '<section class="container section-tight"><div class="grid-2">' +
+    '<div id="contactFormWrap">' +
+      '<form id="contactForm" novalidate>' +
+        '<div class="field"><label for="cName">Name</label><input id="cName" name="name" type="text" required autocomplete="name"><span class="error" id="errName" aria-live="polite"></span></div>' +
+        '<div class="field"><label for="cEmail">Email</label><input id="cEmail" name="email" type="email" required autocomplete="email"><span class="error" id="errEmail" aria-live="polite"></span></div>' +
+        '<div class="field"><label for="cMsg">Message</label><textarea id="cMsg" name="message" required></textarea><span class="error" id="errMsg" aria-live="polite"></span></div>' +
+        '<button class="btn btn-primary btn-block" type="submit">Send message ' + icon('arrow-right') + '</button>' +
+      '</form>' +
+    '</div>' +
+    '<div>' +
+      '<span class="eyebrow">Global offices</span>' +
+      '<div style="margin-top:var(--s3); display:flex; flex-direction:column; gap:var(--s3);">' +
+        OFFICES.map(function(o){ return '<div class="card office-card"><strong>' + o.c + '</strong><p style="margin-top:.3em; font-size:.86rem;">' + o.a + '</p></div>'; }).join('') +
+      '</div>' +
+    '</div>' +
+  '</div></section>';
+};
+ViewInit['/contact'] = function(root){
+  var form = root.querySelector('#contactForm');
+  if(!form) return;
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var name = form.name.value.trim(), email = form.email.value.trim(), msg = form.message.value.trim();
+    var ok = true;
+    var errName = root.querySelector('#errName'), errEmail = root.querySelector('#errEmail'), errMsg = root.querySelector('#errMsg');
+    errName.textContent = ''; errEmail.textContent=''; errMsg.textContent='';
+    form.name.removeAttribute('aria-invalid'); form.email.removeAttribute('aria-invalid'); form.message.removeAttribute('aria-invalid');
+    if(!name){ errName.textContent = 'Please enter your name.'; form.name.setAttribute('aria-invalid','true'); ok = false; }
+    if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ errEmail.textContent = 'Please enter a valid email.'; form.email.setAttribute('aria-invalid','true'); ok = false; }
+    if(!msg){ errMsg.textContent = 'Please enter a message.'; form.message.setAttribute('aria-invalid','true'); ok = false; }
+    if(!ok) return;
+    var wrap = root.querySelector('#contactFormWrap');
+    wrap.innerHTML = '<div class="card reveal in-view" style="text-align:center; padding:var(--s5);"><div class="icon-tile" style="margin:0 auto var(--s3); background:var(--spectrum); color:#fff;">' + icon('check') + '</div><h3>Message sent</h3><p style="margin-top:.5em;">Thanks, ' + name.split(' ')[0] + ' — a member of our team will reply within one business day.</p></div>';
+  });
+};
+
+/* ---------- LOGIN ---------- */
+Views['/login'] = function(){
+  return '<section class="container section" style="max-width:460px; margin:0 auto;">' +
+    '<h1 style="text-align:center;">Client portal</h1><p class="lede" style="text-align:center; margin:.6em auto 0;">Sign in to access your dashboard.</p>' +
+    '<div class="card" style="margin-top:var(--s4);" id="loginWrap">' +
+      '<form id="loginForm" novalidate>' +
+        '<div class="field"><label for="lEmail">Email</label><input id="lEmail" name="email" type="email" required autocomplete="email"><span class="error" id="lErrEmail" aria-live="polite"></span></div>' +
+        '<div class="field"><label for="lPass">Password</label><input id="lPass" name="password" type="password" required autocomplete="current-password"><span class="error" id="lErrPass" aria-live="polite"></span></div>' +
+        '<div style="display:flex; justify-content:flex-end; margin-bottom:var(--s3);"><a href="#" id="forgotLink" style="font-size:.8rem; color:var(--accent); text-decoration:none;">Forgot password?</a></div>' +
+        '<button class="btn btn-primary btn-block" type="submit">Sign in</button>' +
+      '</form>' +
+      '<div class="or-sep">or continue with</div>' +
+      '<div class="sso-row">' +
+        '<button class="sso-btn" id="ssoBtn1">' + icon('shield') + 'SSO</button>' +
+        '<button class="sso-btn" id="ssoBtn2">' + icon('key') + 'Security key</button>' +
+      '</div>' +
+      '<p class="sr-only" id="ssoNote" aria-live="polite"></p>' +
+    '</div>' +
+  '</section>';
+};
+ViewInit['/login'] = function(root){
+  var form = root.querySelector('#loginForm');
+  var note = root.querySelector('#ssoNote');
+  root.querySelector('#forgotLink').addEventListener('click', function(e){ e.preventDefault(); note.textContent = 'This is a design preview — password reset is illustrative only.'; });
+  ['ssoBtn1','ssoBtn2'].forEach(function(id){
+    root.querySelector('#' + id).addEventListener('click', function(){ note.textContent = 'This is a design preview — SSO is illustrative only.'; });
+  });
+  if(!form) return;
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var email = form.email.value.trim(), pass = form.password.value;
+    var okE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    var errE = root.querySelector('#lErrEmail'), errP = root.querySelector('#lErrPass');
+    errE.textContent=''; errP.textContent='';
+    if(!okE){ errE.textContent = 'Please enter a valid email.'; return; }
+    if(!pass){ errP.textContent = 'Please enter your password.'; return; }
+    var wrap = root.querySelector('#loginWrap');
+    var firstName = email.split('@')[0];
+    wrap.innerHTML = '<div style="text-align:center; padding:var(--s3) 0;"><div class="icon-tile" style="margin:0 auto var(--s3); background:var(--spectrum); color:#fff;">' + icon('check') + '</div><h3>Welcome, ' + firstName + '</h3><p style="margin-top:.5em;">This is a design preview — no account was created or accessed.</p><a class="btn btn-primary" style="margin-top:var(--s3);" href="#/dashboard">Go to dashboard ' + icon('arrow-right') + '</a></div>';
+  });
+};
+
+/* ---------- INSTALLER ---------- */
+var INSTALL_STEPS = ['Select','Detect','Configure','Import','Install','Verify','Launch'];
+var installState = { step:1, stack:null, detected:[], scanned:false, importDone:false, installDone:false, verifyDone:false };
+Views['/installer'] = function(){
+  return '<section class="container section">' +
+    '<h1>Installer</h1><p class="lede" style="margin-top:.5em;">A simulated setup flow — nothing here touches a real system.</p>' +
+    '<div id="installerRoot" style="margin-top:var(--s5);"></div>' +
+  '</section>';
+};
+function stepperHtml(){
+  var html = '<div class="stepper-rail">';
+  INSTALL_STEPS.forEach(function(label, i){
+    var n = i + 1;
+    var cls = n < installState.step ? 'done' : (n === installState.step ? 'active' : '');
+    html += '<div class="stepper-node ' + cls + '"><div class="dot">' + (n < installState.step ? icon('check','') : n) + '</div><span class="lbl">' + label + '</span></div>';
+    if(i < INSTALL_STEPS.length - 1) html += '<div class="stepper-line ' + (n < installState.step ? 'done' : '') + '"></div>';
+  });
+  return html + '</div>';
+}
+var STACKS = [
+  { id:'aws', name:'AWS', desc:'Amazon Web Services environment' },
+  { id:'azure', name:'Azure', desc:'Microsoft Azure environment' },
+  { id:'gcp', name:'Google Cloud', desc:'Google Cloud Platform environment' },
+  { id:'onprem', name:'On-Premises', desc:'Self-managed data center' }
+];
+var DETECTED_SERVICES = ['PostgreSQL cluster','Redis cache layer','Message queue (Kafka)','Object storage bucket','Identity provider','Load balancer'];
+var IMPORT_ITEMS = ['User accounts','Configuration policies','Historical metrics'];
+var VERIFY_ITEMS = ['Network connectivity','Service health checks','Security policy compliance','Data integrity','Endpoint availability'];
+function renderInstaller(){
+  var root = document.getElementById('installerRoot');
+  if(!root) return;
+  var body = '';
+  if(installState.step === 1){
+    body = '<h3>Select your environment</h3><p style="margin:.4em 0 var(--s3);">Choose the stack you’d like to configure.</p>' +
+      '<div class="grid-4">' + STACKS.map(function(s){
+        return '<button class="stack-card" data-stack="' + s.id + '" aria-pressed="' + (installState.stack===s.id) + '"><div class="icon-tile">' + icon('cloud') + '</div><strong>' + s.name + '</strong><p style="font-size:.8rem; margin-top:.3em;">' + s.desc + '</p></button>';
+      }).join('') + '</div>' +
+      '<div style="display:flex; justify-content:flex-end; margin-top:var(--s4);"><button class="btn btn-primary" id="stepNext" ' + (installState.stack?'':'disabled') + '>Next ' + icon('arrow-right') + '</button></div>';
+  } else if(installState.step === 2){
+    body = '<h3>Detecting services</h3><p style="margin:.4em 0 var(--s3);">Scanning your ' + (STACKS.filter(function(s){return s.id===installState.stack;})[0]||{}).name + ' environment…</p>' +
+      '<div class="progress-bar"><i id="scanBar"></i></div>' +
+      '<ul id="detectedList" style="margin-top:var(--s3); display:flex; flex-direction:column; gap:.5em;"></ul>' +
+      '<div style="display:flex; justify-content:space-between; margin-top:var(--s4);"><button class="btn btn-ghost" id="stepBack">Back</button><button class="btn btn-primary" id="stepNext" disabled>Next ' + icon('arrow-right') + '</button></div>';
+  } else if(installState.step === 3){
+    body = '<h3>Configure</h3><p style="margin:.4em 0 var(--s3);">Basic settings for this environment.</p>' +
+      '<div class="field"><label for="orgName">Organization name</label><input id="orgName" type="text" placeholder="Acme Global Holdings"></div>' +
+      '<div class="field"><label for="regionSel">Primary region</label><select id="regionSel"><option>US East</option><option>EU West</option><option>Asia Pacific</option></select></div>' +
+      '<div class="field"><label for="envName">Environment name</label><input id="envName" type="text" placeholder="production"></div>' +
+      '<div style="display:flex; justify-content:space-between; margin-top:var(--s3);"><button class="btn btn-ghost" id="stepBack">Back</button><button class="btn btn-primary" id="stepNext">Next ' + icon('arrow-right') + '</button></div>';
+  } else if(installState.step === 4){
+    body = '<h3>Import & migrate</h3><p style="margin:.4em 0 var(--s3);">Transferring existing data into the new environment.</p>' +
+      '<div id="importItems" style="display:flex; flex-direction:column; gap:var(--s3);">' + IMPORT_ITEMS.map(function(item,i){
+        return '<div><div style="display:flex; justify-content:space-between; font-size:.86rem; margin-bottom:.4em;"><span>' + item + '</span><span id="imPct' + i + '">0%</span></div><div class="progress-bar"><i id="imBar' + i + '"></i></div></div>';
+      }).join('') + '</div>' +
+      '<div style="display:flex; justify-content:space-between; margin-top:var(--s4);"><button class="btn btn-ghost" id="stepBack">Back</button><button class="btn btn-primary" id="stepNext" disabled>Next ' + icon('arrow-right') + '</button></div>';
+  } else if(installState.step === 5){
+    body = '<h3>Install</h3><p style="margin:.4em 0 var(--s3);">Applying the configuration to your environment.</p>' +
+      '<div class="deploy-log" id="installLog" aria-live="polite"></div>' +
+      '<div class="progress-bar" style="margin-top:var(--s3);"><i id="installBar"></i></div>' +
+      '<div style="display:flex; justify-content:space-between; margin-top:var(--s4);"><button class="btn btn-ghost" id="stepBack">Back</button><button class="btn btn-primary" id="stepNext" disabled>Next ' + icon('arrow-right') + '</button></div>';
+  } else if(installState.step === 6){
+    body = '<h3>Verify</h3><p style="margin:.4em 0 var(--s3);">Running final checks before launch.</p>' +
+      '<div id="verifyList">' + VERIFY_ITEMS.map(function(v,i){ return '<div class="checklist-item" id="vItem' + i + '"><div class="check-circle">' + icon('check') + '</div><span>' + v + '</span></div>'; }).join('') + '</div>' +
+      '<div style="display:flex; justify-content:space-between; margin-top:var(--s4);"><button class="btn btn-ghost" id="stepBack">Back</button><button class="btn btn-primary" id="stepNext" disabled>Next ' + icon('arrow-right') + '</button></div>';
+  } else if(installState.step === 7){
+    body = '<div style="text-align:center; padding:var(--s4) 0;"><div class="icon-tile" style="margin:0 auto var(--s3); background:var(--spectrum); color:#fff; width:56px; height:56px;">' + icon('check') + '</div><h2>Environment launched</h2><p style="margin-top:.5em;">Your simulated environment is configured and verified.</p>' +
+      '<div style="display:flex; gap:.8em; justify-content:center; margin-top:var(--s4);"><a class="btn btn-ghost" href="#/installer" id="restartInstaller">Start over</a><a class="btn btn-primary" href="#/dashboard">Go to dashboard ' + icon('arrow-right') + '</a></div></div>';
+  }
+  root.innerHTML = stepperHtml() + '<div class="card" style="padding:var(--s4);">' + body + '</div>';
+  wireInstaller(root);
+  if(installState.step === 2 && !installState.scanned) runScan();
+  if(installState.step === 4 && !installState.importDone) runImport();
+  if(installState.step === 5 && !installState.installDone) runInstallLog();
+  if(installState.step === 6 && !installState.verifyDone) runVerify();
+}
+function wireInstaller(root){
+  var back = root.querySelector('#stepBack');
+  if(back) back.addEventListener('click', function(){ installState.step--; renderInstaller(); });
+  var next = root.querySelector('#stepNext');
+  if(next) next.addEventListener('click', function(){ installState.step++; renderInstaller(); });
+  root.querySelectorAll('[data-stack]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      installState.stack = btn.getAttribute('data-stack');
+      root.querySelectorAll('[data-stack]').forEach(function(b){ b.setAttribute('aria-pressed', String(b===btn)); });
+      var nb = root.querySelector('#stepNext'); if(nb) nb.disabled = false;
+    });
+  });
+  var restart = root.querySelector('#restartInstaller');
+  if(restart) restart.addEventListener('click', function(e){ e.preventDefault(); installState = { step:1, stack:null, detected:[], scanned:false, importDone:false, installDone:false, verifyDone:false }; location.hash = '#/installer'; renderInstaller(); });
+}
+function runScan(){
+  installState.scanned = true;
+  var bar = document.getElementById('scanBar');
+  var list = document.getElementById('detectedList');
+  var pct = 0;
+  var scanInterval = setInterval(function(){
+    pct += reduceMotion ? 100 : 14;
+    if(pct >= 100){ pct = 100; clearInterval(scanInterval); var nb=document.getElementById('stepNext'); if(nb) nb.disabled=false; }
+    if(bar) bar.style.width = pct + '%';
+  }, reduceMotion?10:180);
+  DETECTED_SERVICES.forEach(function(svc, i){
+    setTimeout(function(){
+      if(!list) return;
+      var li = document.createElement('li');
+      li.style.cssText = 'display:flex;align-items:center;gap:.6em;font-size:.86rem;';
+      li.innerHTML = '<span style="color:var(--accent);">' + icon('check') + '</span>' + svc + ' detected';
+      list.appendChild(li);
+    }, reduceMotion ? 10 : (i+1) * 220);
+  });
+}
+function runImport(){
+  installState.importDone = true;
+  var total = IMPORT_ITEMS.length; var completed = 0;
+  IMPORT_ITEMS.forEach(function(item, i){
+    var pct = 0;
+    var bar = document.getElementById('imBar' + i);
+    var pctLbl = document.getElementById('imPct' + i);
+    var iv = setInterval(function(){
+      pct += reduceMotion ? 100 : (6 + Math.random()*10);
+      if(pct >= 100){ pct = 100; clearInterval(iv); completed++; if(completed === total){ var nb=document.getElementById('stepNext'); if(nb) nb.disabled = false; } }
+      if(bar) bar.style.width = pct + '%';
+      if(pctLbl) pctLbl.textContent = Math.round(pct) + '%';
+    }, reduceMotion?10:(150 + i*40));
+  });
+}
+function runInstallLog(){
+  installState.installDone = true;
+  var lines = ['Applying network policies…','Provisioning compute nodes…','Installing platform services…','Configuring monitoring agents…','Registering environment…','Running smoke tests…'];
+  var logEl = document.getElementById('installLog');
+  var bar = document.getElementById('installBar');
+  var i = 0;
+  function step(){
+    if(i < lines.length){
+      var d = document.createElement('div'); d.className='ln'; d.textContent = '$ ' + lines[i];
+      if(logEl){ logEl.appendChild(d); logEl.scrollTop = logEl.scrollHeight; }
+      if(bar) bar.style.width = Math.round(((i+1)/lines.length)*100) + '%';
+      i++; setTimeout(step, reduceMotion?15:340);
+    } else {
+      var nb = document.getElementById('stepNext'); if(nb) nb.disabled = false;
+    }
+  }
+  step();
+}
+function runVerify(){
+  installState.verifyDone = true;
+  VERIFY_ITEMS.forEach(function(v, i){
+    setTimeout(function(){
+      var el = document.getElementById('vItem' + i);
+      if(el) el.classList.add('verified');
+      if(i === VERIFY_ITEMS.length - 1){ var nb = document.getElementById('stepNext'); if(nb) nb.disabled = false; }
+    }, reduceMotion ? 10 : (i+1) * 300);
+  });
+}
+ViewInit['/installer'] = function(){ renderInstaller(); };
+
+/* ---------- DASHBOARD ---------- */
+var DASH_DATA = {
+  admin: { kpis:[['Active clients','340','+12 this qtr'],['Uptime','98.7%','+0.2pt'],['Open incidents','3','-2 vs last wk'],['Revenue run-rate','$10.2B','+8% YoY']], activity:[['Deployed AI Ops Copilot for client #4021','2h ago'],['SLA review completed — EU region','5h ago'],['New enterprise contract signed','1d ago']] },
+  client: { kpis:[['Services deployed','12','+1 this month'],['Uptime','99.1%','stable'],['Support tickets','2','-1 vs last wk'],['Monthly spend','$18,400','on budget']], activity:[['Zero-Trust Suite health check passed','1h ago'],['Invoice generated for August','3h ago'],['New team member added','2d ago']] },
+  staff: { kpis:[['Assigned tickets','7','2 due today'],['Avg response time','24m','-6m'],['Deployments this week','5','+2'],['On-call status','Active','rotation ends Fri']], activity:[['Resolved ticket #8842','40m ago'],['Deployed hotfix to staging','3h ago'],['Completed on-call handoff notes','6h ago']] }
+};
+Views['/dashboard'] = function(){
+  return '<section class="container section">' +
+    '<div style="display:flex; align-items:center; gap:.8em; flex-wrap:wrap;"><h1 style="margin:0;">Dashboard</h1><span class="badge badge-preview">Preview</span></div>' +
+    '<p class="lede" style="margin-top:.5em;">Sample data for illustration only — not connected to a live system.</p>' +
+    '<div class="tabs" role="tablist" aria-label="Dashboard view" style="margin-top:var(--s4);">' +
+      '<button role="tab" aria-selected="true" data-tab="admin" id="tabAdmin">Admin</button>' +
+      '<button role="tab" aria-selected="false" data-tab="client" id="tabClient">Client</button>' +
+      '<button role="tab" aria-selected="false" data-tab="staff" id="tabStaff">Staff</button>' +
+    '</div>' +
+    '<div id="dashBody"></div>' +
+  '</section>';
+};
+function renderDash(tab){
+  var d = DASH_DATA[tab];
+  var body = document.getElementById('dashBody');
+  if(!body) return;
+  body.innerHTML =
+    '<div class="grid-4">' + d.kpis.map(function(k){ return '<div class="kpi-tile"><span class="lbl">' + k[0] + '</span><span class="num">' + k[1] + '</span><span class="delta">' + k[2] + '</span></div>'; }).join('') + '</div>' +
+    '<div class="grid-2" style="margin-top:var(--s4); align-items:start;">' +
+      '<div class="card"><h3>Weekly request volume</h3>' + chartSvg() + '</div>' +
+      '<div class="card"><h3>Recent activity</h3><div style="margin-top:var(--s2);">' + d.activity.map(function(a){ return '<div class="activity-row"><span>' + a[0] + '</span><span class="t">' + a[1] + '</span></div>'; }).join('') + '</div></div>' +
+    '</div>';
+}
+function chartSvg(){
+  var pts = [62,71,68,80,76,88,94];
+  var labels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  var w = 560, h = 200, pad = 24;
+  var max = 100, min = 40;
+  var stepX = (w - pad*2) / (pts.length - 1);
+  var coords = pts.map(function(v,i){ var x = pad + i*stepX; var y = h - pad - ((v - min)/(max-min))*(h - pad*2); return [x,y]; });
+  var path = coords.map(function(c,i){ return (i===0?'M':'L') + c[0].toFixed(1) + ',' + c[1].toFixed(1); }).join(' ');
+  var areaPath = path + ' L' + coords[coords.length-1][0].toFixed(1) + ',' + (h-pad) + ' L' + coords[0][0].toFixed(1) + ',' + (h-pad) + ' Z';
+  var dots = coords.map(function(c,i){ return '<circle cx="' + c[0].toFixed(1) + '" cy="' + c[1].toFixed(1) + '" r="3.5" fill="var(--accent)"></circle>'; }).join('');
+  var labelsSvg = coords.map(function(c,i){ return '<text x="' + c[0].toFixed(1) + '" y="' + (h-4) + '" font-size="10" text-anchor="middle" fill="var(--ink-muted)">' + labels[i] + '</text>'; }).join('');
+  return '<svg viewBox="0 0 ' + w + ' ' + h + '" style="margin-top:var(--s2); width:100%; height:auto;" role="img" aria-label="Weekly platform request volume, rising from 62 percent on Monday to 94 percent on Sunday">' +
+    '<line x1="' + pad + '" y1="' + (h-pad) + '" x2="' + (w-pad) + '" y2="' + (h-pad) + '" stroke="var(--border)" stroke-width="1"></line>' +
+    '<path d="' + areaPath + '" fill="var(--accent)" opacity="0.08"></path>' +
+    '<path d="' + path + '" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>' +
+    dots + labelsSvg + '</svg>';
+}
+ViewInit['/dashboard'] = function(root){
+  renderDash('admin');
+  root.querySelectorAll('[data-tab]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      root.querySelectorAll('[data-tab]').forEach(function(b){ b.setAttribute('aria-selected', String(b===btn)); });
+      renderDash(btn.getAttribute('data-tab'));
+    });
+  });
+};
+
+/* ---------- SHARED FRAGMENTS ---------- */
+function pageHeader(title, eyebrow, headline, lede){
+  return '<section class="container section-tight split-diag">' +
+    '<span class="eyebrow">' + eyebrow + '</span>' +
+    '<h1 style="margin-top:.4em;">' + headline + '</h1>' +
+    '<p class="lede" style="margin-top:.6em;">' + lede + '</p>' +
+    '<div class="edge-rule in-view" style="margin-top:var(--s4); max-width:200px;"></div>' +
+  '</section>';
+}
+function ctaBand(){
+  return '<section class="container section-tight"><div class="card" style="padding:var(--s5); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:var(--s3);">' +
+    '<div><h3>Ready to modernize?</h3><p style="margin-top:.3em;">Talk to our team about what a transformation program looks like for you.</p></div>' +
+    '<a class="btn btn-primary" href="#/contact">Get in touch ' + icon('arrow-right') + '</a>' +
+  '</div></section>';
+}
+
+/* =====================================================================
+   ROUTER
+   ===================================================================== */
+var mainEl = document.getElementById('main');
+var wipeEl = document.getElementById('routeWipe');
+var currentPath = null;
+
+function parseRoute(){
+  var h = location.hash.replace(/^#/, '');
+  if(!h) h = '/';
+  if(h.charAt(0) !== '/') h = '/' + h;
+  return h;
+}
+function updateNavCurrent(path){
+  document.querySelectorAll('[data-route]').forEach(function(a){
+    if(a.getAttribute('data-route') === path) a.setAttribute('aria-current','page');
+    else a.removeAttribute('aria-current');
+  });
+}
+function runInit(path){
+  var fn = ViewInit[path];
+  if(fn) fn(mainEl);
+  observeReveals(mainEl);
+  initMagnetic(mainEl);
+}
+function renderRoute(path){
+  var view = Views[path] || Views['/'];
+  mainEl.innerHTML = view();
+  document.title = 'TECHBISS — ' + (ViewTitle[path] || 'Prism') + (path==='/'? ' | Radiant Enterprise Platform':'');
+  window.scrollTo(0,0);
+  updateNavCurrent(path);
+  runInit(path);
+  var h1 = mainEl.querySelector('h1');
+  if(h1){ h1.setAttribute('tabindex','-1'); h1.focus({preventScroll:true}); h1.classList.add('route-flash'); setTimeout(function(){ h1.classList.remove('route-flash'); }, 750); }
+  else { mainEl.focus({preventScroll:true}); }
+}
+function onRouteChange(){
+  var path = parseRoute();
+  if(path === currentPath) return;
+  currentPath = path;
+  if(reduceMotion){ renderRoute(path); return; }
+  wipeEl.classList.add('cover');
+  setTimeout(function(){
+    renderRoute(path);
+    wipeEl.classList.remove('cover');
+    wipeEl.classList.add('reveal');
+    setTimeout(function(){ wipeEl.classList.remove('reveal'); }, 340);
+  }, 240);
+}
+window.addEventListener('hashchange', onRouteChange);
+
+/* Escape key: close market modal if open (global) */
+document.addEventListener('keydown', function(e){
+  if(e.key !== 'Escape') return;
+  var overlay = document.querySelector('.modal-overlay');
+  if(overlay && overlay.classList.contains('open')) closeMarketModal();
+});
+
+/* Initial load */
+currentPath = parseRoute();
+renderRoute(currentPath);
+updateRail();
+
+})();
+</script>
+</body>
+</html>
