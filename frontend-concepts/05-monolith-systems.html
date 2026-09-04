@@ -1,0 +1,2160 @@
+<title>Monolith Systems</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@400;500;600;700;800;900&family=Archivo:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap">
+<style>
+  /* ============ TOKENS ============ */
+  :root{
+    --bg:#ffffff;
+    --surface:#f4f4f2;
+    --ink:#0a0a0a;
+    --ink-muted:#6f6f6f;
+    --line:#0a0a0a;
+    --line-soft:#d8d8d5;
+    --accent:#d1361f;
+    --accent-ink:#ffffff;
+    --font-display:"Big Shoulders Display",'Arial Narrow',Impact,sans-serif;
+    --font-body:"Archivo",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    --font-mono:"Roboto Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --ease:cubic-bezier(0.65,0,0.35,1);
+    --dur-s:.18s;
+    --dur-m:.42s;
+    --dur-l:.7s;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0a0a0a;
+      --surface:#141414;
+      --ink:#f0f0ee;
+      --ink-muted:#9a9a96;
+      --line:#f0f0ee;
+      --line-soft:#2c2c2a;
+      --accent:#e34430;
+      --accent-ink:#0a0a0a;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0a0a0a;
+    --surface:#141414;
+    --ink:#f0f0ee;
+    --ink-muted:#9a9a96;
+    --line:#f0f0ee;
+    --line-soft:#2c2c2a;
+    --accent:#e34430;
+    --accent-ink:#0a0a0a;
+  }
+
+  *,*::before,*::after{box-sizing:border-box;}
+  html{color-scheme:light dark;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);}
+  #app{background:var(--bg);color:var(--ink);min-height:100vh;transition:background var(--dur-m) var(--ease),color var(--dur-m) var(--ease);}
+  img,svg{max-width:100%;display:block;}
+  a{color:inherit;}
+  button,input,select,textarea{font-family:inherit;color:inherit;}
+  h1,h2,h3,h4,p,figure{margin:0;}
+  ul{margin:0;padding:0;list-style:none;}
+  .visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
+  ::selection{background:var(--accent);color:var(--accent-ink);}
+
+  :focus{outline:none;}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+  /* ============ TYPE SCALE ============ */
+  .type-display{font-family:var(--font-display);font-weight:800;letter-spacing:-0.01em;line-height:.92;text-transform:uppercase;}
+  .type-mono{font-family:var(--font-mono);letter-spacing:.02em;}
+  .eyebrow{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-muted);}
+  .eyebrow .dash{color:var(--accent);}
+
+  /* ============ LAYOUT PRIMITIVES ============ */
+  .wrap{width:100%;max-width:1440px;margin:0 auto;padding:0 clamp(20px,4vw,56px);}
+  .grid12{display:grid;grid-template-columns:repeat(12,1fr);gap:0;}
+  .hairline{border:0;border-top:1px solid var(--line);margin:0;}
+  .hairline-soft{border:0;border-top:1px solid var(--line-soft);margin:0;}
+  .band{background:var(--surface);}
+  .measure{max-width:65ch;}
+
+  section[data-route]{display:none;}
+  section[data-route].is-active{display:block;}
+  .route-fade{animation:routeIn var(--dur-m) var(--ease);}
+  @keyframes routeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+
+  /* ============ REVEAL ============ */
+  .reveal{opacity:1;transform:none;}
+  @media (prefers-reduced-motion:no-preference){
+    .reveal{opacity:0;transform:translateY(28px);transition:opacity var(--dur-l) var(--ease),transform var(--dur-l) var(--ease);}
+    .reveal.in-view{opacity:1;transform:none;}
+  }
+
+  /* ============ BUTTONS ============ */
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:.5em;
+    font-family:var(--font-mono);font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;
+    padding:1em 1.6em;border:1px solid var(--line);background:transparent;color:var(--ink);
+    cursor:pointer;border-radius:0;transition:background var(--dur-s) linear,color var(--dur-s) linear,border-color var(--dur-s) linear;
+    white-space:nowrap;
+  }
+  .btn:hover{background:var(--ink);color:var(--bg);}
+  .btn-primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);}
+  .btn-primary:hover{background:transparent;color:var(--accent);}
+  .btn-block{width:100%;}
+  .btn-sm{padding:.7em 1.2em;font-size:.72rem;}
+  .btn[disabled]{opacity:.35;cursor:not-allowed;pointer-events:none;}
+
+  /* ============ NAV ============ */
+  #topnav{position:sticky;top:0;z-index:60;background:var(--bg);border-bottom:1px solid var(--line);}
+  .nav-row{display:flex;align-items:center;justify-content:space-between;height:76px;gap:24px;}
+  .logo{font-family:var(--font-display);font-weight:800;font-size:1.5rem;letter-spacing:.02em;text-transform:uppercase;text-decoration:none;display:flex;align-items:center;gap:.5em;}
+  .logo .dot{width:9px;height:9px;background:var(--accent);display:inline-block;}
+  .nav-links{display:flex;gap:2px;align-items:center;}
+  .nav-link{font-family:var(--font-mono);font-size:.76rem;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;padding:.7em .9em;border-bottom:2px solid transparent;transition:border-color var(--dur-s) linear,color var(--dur-s) linear;color:var(--ink-muted);}
+  .nav-link:hover{color:var(--ink);}
+  .nav-link.is-active{color:var(--ink);border-bottom-color:var(--accent);}
+  .nav-right{display:flex;align-items:center;gap:14px;}
+  .icon-btn{width:40px;height:40px;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);background:transparent;cursor:pointer;flex:0 0 auto;}
+  .icon-btn svg{width:18px;height:18px;stroke:var(--ink);fill:none;}
+  .icon-btn:hover{background:var(--ink);}
+  .icon-btn:hover svg{stroke:var(--bg);}
+  .hamburger{display:none;}
+  @media (max-width:960px){
+    .nav-links,.nav-signin{display:none;}
+    .hamburger{display:flex;}
+  }
+
+  /* ============ MOBILE MENU ============ */
+  #mobile-menu{position:fixed;inset:0;background:var(--bg);z-index:100;display:flex;flex-direction:column;transform:translateX(100%);transition:transform var(--dur-m) var(--ease);}
+  #mobile-menu.is-open{transform:translateX(0);}
+  .mm-head{display:flex;justify-content:space-between;align-items:center;height:76px;padding:0 20px;border-bottom:1px solid var(--line);flex:0 0 auto;}
+  .mm-list{flex:1;overflow:auto;padding:24px 20px;display:flex;flex-direction:column;}
+  .mm-list a{font-family:var(--font-display);font-size:clamp(2.2rem,10vw,3.4rem);text-transform:uppercase;text-decoration:none;padding:.22em 0;border-bottom:1px solid var(--line-soft);opacity:0;transform:translateX(24px);transition:opacity var(--dur-m) var(--ease),transform var(--dur-m) var(--ease);}
+  #mobile-menu.is-open .mm-list a{opacity:1;transform:none;}
+  .mm-foot{padding:20px;border-top:1px solid var(--line);font-family:var(--font-mono);font-size:.75rem;color:var(--ink-muted);}
+
+  /* ============ INTRO LOADER ============ */
+  #intro{position:fixed;inset:0;background:var(--ink);color:var(--bg);z-index:200;display:flex;align-items:center;justify-content:center;transition:opacity var(--dur-l) var(--ease),visibility var(--dur-l) var(--ease);}
+  #intro.done{opacity:0;visibility:hidden;pointer-events:none;}
+  .intro-mark{font-family:var(--font-display);font-weight:800;font-size:clamp(3rem,14vw,9rem);letter-spacing:.02em;display:flex;}
+  .intro-mark span{display:inline-block;opacity:0;transform:translateY(.4em);animation:introLetter .5s var(--ease) forwards;}
+  @keyframes introLetter{to{opacity:1;transform:none;}}
+  @media (prefers-reduced-motion:reduce){
+    .intro-mark span{animation:none;opacity:1;transform:none;}
+  }
+
+  /* ============ HERO ============ */
+  .hero{padding:64px 0 0;}
+  .hero-grid{display:grid;grid-template-columns:7fr 5fr;gap:40px;align-items:end;padding-bottom:56px;}
+  .hero h1{font-size:clamp(2.6rem,7.2vw,6.4rem);}
+  .kinetic-word{display:inline-block;overflow:hidden;vertical-align:top;}
+  .kinetic-word span{display:inline-block;}
+  @media (prefers-reduced-motion:no-preference){
+    .kinetic-word span{transform:translateY(110%);opacity:0;animation:kineticIn .7s var(--ease) forwards;}
+  }
+  @keyframes kineticIn{to{transform:none;opacity:1;}}
+  .hero-sub{margin-top:22px;font-size:1.1rem;color:var(--ink-muted);}
+  .hero-ctas{display:flex;gap:14px;margin-top:34px;flex-wrap:wrap;}
+  .hero-visual{position:relative;aspect-ratio:1/1;border:1px solid var(--line);}
+  .hero-visual svg{width:100%;height:100%;}
+
+  .stat-strip{border-top:1px solid var(--line);}
+  .stat-cell{padding:34px 28px;border-right:1px solid var(--line);}
+  .stat-cell:last-child{border-right:0;}
+  .stat-num{font-family:var(--font-display);font-weight:800;font-size:clamp(2.4rem,5vw,4.2rem);line-height:1;}
+  .stat-label{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-muted);margin-top:8px;}
+
+  /* ============ SECTION HEADERS ============ */
+  .section-head{position:relative;padding:80px 0 44px;overflow:hidden;}
+  .section-num{position:absolute;top:-.28em;right:0;font-family:var(--font-display);font-weight:800;font-size:clamp(6rem,18vw,15rem);color:var(--ink);opacity:.05;line-height:1;pointer-events:none;user-select:none;}
+  .section-title{font-size:clamp(2rem,5vw,3.6rem);position:relative;}
+  .section-lead{margin-top:16px;max-width:52ch;color:var(--ink-muted);font-size:1.02rem;}
+
+  /* ============ SERVICES TEASER (home) ============ */
+  .teaser-grid{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);border-left:1px solid var(--line);}
+  .teaser-cell{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:32px;text-decoration:none;color:var(--ink);position:relative;min-height:190px;display:flex;flex-direction:column;justify-content:space-between;transition:background var(--dur-s) linear;}
+  .teaser-cell:hover{background:var(--surface);}
+  .teaser-cell:hover .teaser-arrow{transform:translate(4px,-4px);}
+  .teaser-idx{font-family:var(--font-mono);font-size:.72rem;color:var(--ink-muted);}
+  .teaser-name{font-family:var(--font-display);font-weight:700;font-size:1.5rem;text-transform:uppercase;margin-top:14px;}
+  .teaser-arrow{align-self:flex-end;transition:transform var(--dur-s) var(--ease);}
+  @media (max-width:960px){.teaser-grid{grid-template-columns:repeat(2,1fr);}}
+  @media (max-width:600px){.teaser-grid{grid-template-columns:1fr;}}
+
+  /* ============ TRUSTED STRIP ============ */
+  .trust-strip{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:26px 0;overflow:hidden;}
+  .trust-track{display:flex;gap:64px;white-space:nowrap;width:max-content;animation:trustScroll 32s linear infinite;}
+  @media (prefers-reduced-motion:reduce){.trust-track{animation:none;}}
+  .trust-track span{font-family:var(--font-display);font-weight:700;font-size:1.3rem;text-transform:uppercase;color:var(--ink-muted);letter-spacing:.02em;}
+  @keyframes trustScroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+  /* ============ CAROUSEL ============ */
+  .carousel{position:relative;border-top:1px solid var(--line);}
+  .carousel-track{display:flex;gap:0;overflow-x:auto;scroll-snap-type:x mandatory;cursor:grab;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+  .carousel-track::-webkit-scrollbar{display:none;}
+  .carousel-track.dragging{cursor:grabbing;scroll-snap-type:none;user-select:none;}
+  .cs-card{flex:0 0 min(560px,88vw);scroll-snap-align:start;border-right:1px solid var(--line);padding:40px;min-height:280px;display:flex;flex-direction:column;justify-content:space-between;}
+  .cs-metric{font-family:var(--font-display);font-weight:800;font-size:clamp(3rem,7vw,5rem);color:var(--accent);line-height:1;}
+  .carousel-nav{display:flex;gap:8px;justify-content:flex-end;padding:16px 0 0;}
+
+  /* ============ FOOTER ============ */
+  #site-footer{border-top:1px solid var(--line);background:var(--surface);margin-top:100px;}
+  .footer-grid{display:grid;grid-template-columns:2fr repeat(4,1fr);gap:32px;padding:64px 0 40px;}
+  .footer-col h4{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-muted);margin-bottom:16px;}
+  .footer-col a{display:block;text-decoration:none;padding:6px 0;font-size:.92rem;border-bottom:1px solid transparent;}
+  .footer-col a:hover{border-color:var(--line);}
+  .footer-bottom{display:flex;justify-content:space-between;align-items:center;padding:22px 0;border-top:1px solid var(--line-soft);font-family:var(--font-mono);font-size:.72rem;color:var(--ink-muted);flex-wrap:wrap;gap:12px;}
+  .social-row{display:flex;gap:16px;}
+  @media (max-width:900px){.footer-grid{grid-template-columns:repeat(2,1fr);}}
+
+  /* ============ CTA BAND ============ */
+  .cta-band{border-top:1px solid var(--line);padding:90px 0;text-align:left;}
+  .cta-band h2{font-size:clamp(2.2rem,6vw,4.4rem);max-width:14ch;}
+
+  /* ============ SERVICES PAGE ============ */
+  .svc-grid{display:grid;grid-template-columns:repeat(2,1fr);border-top:1px solid var(--line);border-left:1px solid var(--line);}
+  .svc-cell{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:44px;}
+  .svc-icon{width:44px;height:44px;stroke:var(--ink);fill:none;stroke-width:1.4;margin-bottom:22px;}
+  .svc-cell h3{font-family:var(--font-display);font-size:1.9rem;text-transform:uppercase;font-weight:700;}
+  .svc-desc{margin-top:12px;color:var(--ink-muted);max-width:48ch;}
+  .svc-bullets{margin-top:20px;display:flex;flex-direction:column;gap:8px;}
+  .svc-bullets li{font-size:.9rem;padding-left:1.4em;position:relative;}
+  .svc-bullets li::before{content:"";position:absolute;left:0;top:.55em;width:8px;height:1px;background:var(--accent);}
+  .svc-note{margin-top:22px;font-family:var(--font-mono);font-size:.72rem;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.06em;}
+  @media (max-width:800px){.svc-grid{grid-template-columns:1fr;}}
+
+  /* ============ SOLUTIONS PAGE ============ */
+  .sol-layout{display:grid;grid-template-columns:1fr 2fr;border-top:1px solid var(--line);}
+  .sol-tabs{border-right:1px solid var(--line);}
+  .sol-tab{display:block;width:100%;text-align:left;background:transparent;border:0;border-bottom:1px solid var(--line-soft);padding:22px 28px;font-family:var(--font-display);font-size:1.3rem;text-transform:uppercase;cursor:pointer;color:var(--ink-muted);position:relative;}
+  .sol-tab:hover{color:var(--ink);}
+  .sol-tab[aria-selected="true"]{color:var(--ink);background:var(--surface);}
+  .sol-tab[aria-selected="true"]::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent);}
+  .sol-panel{padding:48px;}
+  .sol-panel h3{font-family:var(--font-display);font-size:2.4rem;text-transform:uppercase;}
+  .sol-panel p{margin-top:16px;color:var(--ink-muted);max-width:60ch;}
+  .sol-stats{display:flex;gap:0;margin-top:32px;border-top:1px solid var(--line);}
+  .sol-stat{padding:20px 28px 0 0;margin-right:28px;}
+  .sol-stat b{display:block;font-family:var(--font-display);font-size:2rem;color:var(--accent);}
+  .sol-stat span{font-family:var(--font-mono);font-size:.68rem;text-transform:uppercase;color:var(--ink-muted);}
+  @media (max-width:800px){.sol-layout{grid-template-columns:1fr;}.sol-tabs{border-right:0;border-bottom:1px solid var(--line);display:flex;overflow-x:auto;}.sol-tab{white-space:nowrap;border-bottom:0;border-right:1px solid var(--line-soft);}}
+
+  /* ============ MARKETPLACE ============ */
+  .mp-controls{display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between;padding-bottom:32px;border-bottom:1px solid var(--line);}
+  .chip-row{display:flex;gap:8px;flex-wrap:wrap;}
+  .chip{font-family:var(--font-mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;padding:.6em 1em;border:1px solid var(--line);background:transparent;cursor:pointer;}
+  .chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);}
+  .search-input{font-family:var(--font-mono);font-size:.85rem;padding:.8em 1em;border:1px solid var(--line);background:var(--bg);color:var(--ink);min-width:220px;}
+  .mp-grid{display:grid;grid-template-columns:repeat(3,1fr);border-left:1px solid var(--line);margin-top:0;}
+  .mp-card{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:28px;display:flex;flex-direction:column;gap:10px;background:transparent;text-align:left;cursor:pointer;border-top:0;color:var(--ink);}
+  .mp-card:hover{background:var(--surface);}
+  .mp-cat{font-family:var(--font-mono);font-size:.66rem;text-transform:uppercase;color:var(--accent);letter-spacing:.06em;}
+  .mp-name{font-family:var(--font-display);font-size:1.4rem;text-transform:uppercase;font-weight:700;}
+  .mp-vendor{font-size:.8rem;color:var(--ink-muted);}
+  .mp-stars{font-family:var(--font-mono);font-size:.8rem;}
+  .mp-blurb{font-size:.85rem;color:var(--ink-muted);flex:1;}
+  .mp-price{font-family:var(--font-display);font-size:1.6rem;font-weight:700;margin-top:6px;}
+  .mp-empty{padding:60px 0;text-align:center;color:var(--ink-muted);font-family:var(--font-mono);}
+  @media (max-width:960px){.mp-grid{grid-template-columns:repeat(2,1fr);}}
+  @media (max-width:600px){.mp-grid{grid-template-columns:1fr;}}
+
+  /* ============ MODAL / DRAWER ============ */
+  .overlay{position:fixed;inset:0;background:rgba(10,10,10,.6);z-index:150;opacity:0;visibility:hidden;transition:opacity var(--dur-m) var(--ease),visibility var(--dur-m) var(--ease);display:flex;justify-content:flex-end;}
+  .overlay.is-open{opacity:1;visibility:visible;}
+  .drawer{width:min(560px,92vw);background:var(--bg);height:100%;border-left:1px solid var(--line);display:flex;flex-direction:column;transform:translateX(100%);transition:transform var(--dur-m) var(--ease);}
+  .overlay.is-open .drawer{transform:translateX(0);}
+  .drawer-head{display:flex;justify-content:space-between;align-items:center;padding:22px 28px;border-bottom:1px solid var(--line);}
+  .drawer-body{flex:1;overflow:auto;padding:28px;}
+  .drawer-visual{aspect-ratio:16/9;border:1px solid var(--line);margin-bottom:24px;overflow:hidden;}
+  .drawer-visual svg{width:100%;height:100%;}
+  .drawer-foot{padding:22px 28px;border-top:1px solid var(--line);}
+
+  /* ============ PRODUCT PAGE ============ */
+  .product-layout{display:grid;grid-template-columns:1.3fr 1fr;gap:0;border-top:1px solid var(--line);}
+  .product-visual{border-right:1px solid var(--line);aspect-ratio:4/3;}
+  .product-visual svg{width:100%;height:100%;}
+  .product-side{padding:40px;}
+  .product-main{padding:40px;}
+  .feature-list li{padding:12px 0;border-bottom:1px solid var(--line-soft);display:flex;gap:12px;font-size:.94rem;}
+  .review{padding:18px 0;border-bottom:1px solid var(--line-soft);}
+  .review-stars{color:var(--accent);font-family:var(--font-mono);}
+  @media (max-width:900px){.product-layout{grid-template-columns:1fr;}.product-visual{border-right:0;border-bottom:1px solid var(--line);}}
+
+  /* ============ WORK / CASE STUDIES ============ */
+  .work-filter{display:flex;gap:8px;flex-wrap:wrap;padding-bottom:32px;}
+  .work-grid{display:grid;grid-template-columns:repeat(2,1fr);border-top:1px solid var(--line);border-left:1px solid var(--line);}
+  .work-card{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:40px;}
+  .work-industry{font-family:var(--font-mono);font-size:.7rem;text-transform:uppercase;color:var(--ink-muted);}
+  .work-card h3{font-family:var(--font-display);font-size:1.9rem;text-transform:uppercase;margin-top:10px;}
+  .work-metric{font-family:var(--font-display);font-weight:800;font-size:clamp(2.6rem,5vw,4rem);color:var(--accent);margin-top:20px;line-height:1;}
+  .work-metric-label{font-family:var(--font-mono);font-size:.68rem;text-transform:uppercase;color:var(--ink-muted);}
+  .work-block{margin-top:16px;}
+  .work-block b{font-family:var(--font-mono);font-size:.68rem;text-transform:uppercase;color:var(--ink-muted);display:block;margin-bottom:4px;}
+  .work-block p{font-size:.88rem;}
+  @media (max-width:800px){.work-grid{grid-template-columns:1fr;}}
+
+  /* ============ PROCESS TIMELINE ============ */
+  .timeline{position:relative;border-top:1px solid var(--line);}
+  .tl-step{display:grid;grid-template-columns:120px 1fr;gap:24px;padding:56px 0;border-bottom:1px solid var(--line-soft);position:relative;}
+  .tl-num{font-family:var(--font-display);font-weight:800;font-size:clamp(3rem,7vw,5.5rem);color:var(--ink);opacity:.08;line-height:1;}
+  .tl-body h3{font-family:var(--font-display);font-size:2rem;text-transform:uppercase;}
+  .tl-body p{margin-top:10px;color:var(--ink-muted);max-width:56ch;}
+  .tl-progress{position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--accent);transform-origin:top;transform:scaleY(0);transition:transform .1s linear;}
+  @media (max-width:600px){.tl-step{grid-template-columns:1fr;}}
+
+  /* ============ ABOUT ============ */
+  .about-narrative{padding:56px 0;border-top:1px solid var(--line);}
+  .values-grid{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);border-left:1px solid var(--line);}
+  .value-cell{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:32px;}
+  .value-cell h4{font-family:var(--font-display);font-size:1.4rem;text-transform:uppercase;}
+  .value-cell p{margin-top:10px;font-size:.88rem;color:var(--ink-muted);}
+  .presence-wrap{border-top:1px solid var(--line);padding:56px 0;}
+  .presence-svg{width:100%;height:auto;}
+  @media (max-width:800px){.values-grid{grid-template-columns:1fr;}}
+
+  /* ============ RESOURCES ============ */
+  .res-controls{display:flex;justify-content:space-between;align-items:center;padding-bottom:24px;border-bottom:1px solid var(--line);flex-wrap:wrap;gap:16px;}
+  .res-list{border-top:1px solid var(--line);}
+  .res-item{display:grid;grid-template-columns:110px 1fr 120px;gap:20px;align-items:center;padding:26px 0;border-bottom:1px solid var(--line-soft);}
+  .res-tag{font-family:var(--font-mono);font-size:.66rem;text-transform:uppercase;color:var(--accent);border:1px solid var(--accent);padding:.4em .6em;text-align:center;}
+  .res-item h3{font-family:var(--font-display);font-size:1.5rem;text-transform:uppercase;font-weight:700;}
+  .res-time{font-family:var(--font-mono);font-size:.75rem;color:var(--ink-muted);text-align:right;}
+  @media (max-width:700px){.res-item{grid-template-columns:1fr;gap:8px;}.res-time{text-align:left;}}
+  .newsletter{border:1px solid var(--line);padding:40px;margin-top:56px;display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:center;}
+  .newsletter form{display:flex;gap:0;}
+  .newsletter input{flex:1;border:1px solid var(--line);border-right:0;background:var(--bg);padding:1em;font-family:var(--font-mono);font-size:.85rem;}
+  .newsletter .btn{border-left:0;}
+  .newsletter-success{display:none;font-family:var(--font-mono);font-size:.85rem;color:var(--accent);}
+  .newsletter-success.show{display:block;}
+  @media (max-width:700px){.newsletter{grid-template-columns:1fr;}}
+
+  /* ============ PRICING ============ */
+  .price-toggle{display:flex;align-items:center;gap:14px;padding-bottom:40px;}
+  .toggle-switch{width:56px;height:28px;border:1px solid var(--line);position:relative;cursor:pointer;background:transparent;flex:0 0 auto;}
+  .toggle-knob{position:absolute;top:2px;left:2px;width:22px;height:22px;background:var(--ink);transition:transform var(--dur-s) var(--ease);}
+  .toggle-switch[aria-checked="true"] .toggle-knob{transform:translateX(26px);background:var(--accent);}
+  .save-badge{font-family:var(--font-mono);font-size:.7rem;color:var(--accent);text-transform:uppercase;}
+  .price-grid{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);border-left:1px solid var(--line);}
+  .price-cell{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:32px;display:flex;flex-direction:column;}
+  .price-cell.is-featured{background:var(--ink);color:var(--bg);}
+  .price-cell.is-featured .btn{border-color:var(--bg);}
+  .price-cell.is-featured .btn:hover{background:var(--bg);color:var(--ink);}
+  .price-cell.is-featured .hairline-soft{border-color:#444;}
+  .price-tier{font-family:var(--font-mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-muted);}
+  .price-cell.is-featured .price-tier{color:#b8b8b4;}
+  .price-num{font-family:var(--font-display);font-weight:800;font-size:2.6rem;margin-top:12px;}
+  .price-num sup{font-family:var(--font-mono);font-size:.9rem;font-weight:400;}
+  .price-features{margin-top:22px;flex:1;display:flex;flex-direction:column;gap:10px;}
+  .price-features li{font-size:.85rem;padding-left:1.2em;position:relative;}
+  .price-features li::before{content:"+";position:absolute;left:0;color:var(--accent);font-family:var(--font-mono);}
+  .price-cell .btn{margin-top:24px;}
+  @media (max-width:960px){.price-grid{grid-template-columns:repeat(2,1fr);}}
+  @media (max-width:600px){.price-grid{grid-template-columns:1fr;}}
+  .compare-table{width:100%;border-collapse:collapse;margin-top:64px;font-size:.88rem;}
+  .compare-table th,.compare-table td{text-align:left;padding:14px 16px;border-bottom:1px solid var(--line-soft);}
+  .compare-table th{font-family:var(--font-mono);font-size:.7rem;text-transform:uppercase;color:var(--ink-muted);border-bottom:1px solid var(--line);}
+  .compare-table td.yes{color:var(--accent);font-family:var(--font-mono);}
+  .table-scroll{overflow-x:auto;}
+
+  .faq-item{border-bottom:1px solid var(--line);}
+  .faq-q{width:100%;text-align:left;background:transparent;border:0;padding:22px 0;display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-family:var(--font-display);font-size:1.2rem;text-transform:uppercase;color:var(--ink);}
+  .faq-plus{width:16px;height:16px;position:relative;flex:0 0 auto;}
+  .faq-plus::before,.faq-plus::after{content:"";position:absolute;background:var(--ink);}
+  .faq-plus::before{left:0;top:7px;width:16px;height:1px;}
+  .faq-plus::after{left:7px;top:0;width:1px;height:16px;transition:transform var(--dur-s) var(--ease);}
+  .faq-item[data-open="true"] .faq-plus::after{transform:scaleY(0);}
+  .faq-a{max-height:0;overflow:hidden;transition:max-height var(--dur-m) var(--ease);}
+  .faq-a p{padding-bottom:22px;color:var(--ink-muted);max-width:60ch;}
+
+  /* ============ CONTACT ============ */
+  .contact-layout{display:grid;grid-template-columns:1.2fr 1fr;gap:0;border-top:1px solid var(--line);}
+  .contact-form{padding:48px;border-right:1px solid var(--line);}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+  .field{margin-bottom:22px;}
+  .field label{display:block;font-family:var(--font-mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;color:var(--ink-muted);}
+  .field input,.field textarea,.field select{width:100%;border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:.9em 1em;font-family:var(--font-body);font-size:.95rem;border-radius:0;}
+  .field textarea{min-height:120px;resize:vertical;}
+  .field.has-error input,.field.has-error textarea{border-color:var(--accent);}
+  .field-err{display:none;color:var(--accent);font-family:var(--font-mono);font-size:.72rem;margin-top:6px;}
+  .field.has-error .field-err{display:block;}
+  .form-success{display:none;border:1px solid var(--accent);padding:32px;text-align:center;}
+  .form-success.show{display:block;}
+  .form-success h3{font-family:var(--font-display);font-size:1.8rem;text-transform:uppercase;color:var(--accent);}
+  .region-block{padding:40px;border-bottom:1px solid var(--line-soft);}
+  .region-block:last-child{border-bottom:0;}
+  .region-block h4{font-family:var(--font-display);font-size:1.4rem;text-transform:uppercase;}
+  .region-block p{margin-top:8px;font-family:var(--font-mono);font-size:.82rem;color:var(--ink-muted);}
+  @media (max-width:800px){.contact-layout{grid-template-columns:1fr;}.contact-form{border-right:0;border-bottom:1px solid var(--line);}.form-row{grid-template-columns:1fr;}}
+
+  /* ============ LOGIN ============ */
+  .login-wrap{max-width:440px;margin:0 auto;padding:80px 0 100px;}
+  .login-wrap .field{margin-bottom:18px;}
+  .pw-wrap{position:relative;}
+  .pw-toggle{position:absolute;right:0;top:0;bottom:0;background:transparent;border:0;border-left:1px solid var(--line);padding:0 1em;cursor:pointer;font-family:var(--font-mono);font-size:.68rem;text-transform:uppercase;}
+  .row-between{display:flex;justify-content:space-between;align-items:center;margin:18px 0 26px;font-size:.85rem;}
+  .checkbox-row{display:flex;align-items:center;gap:8px;}
+  .checkbox-row input{width:16px;height:16px;accent-color:var(--accent);}
+  .sso-row{display:flex;flex-direction:column;gap:10px;margin-top:22px;}
+  .sso-btn{display:flex;align-items:center;gap:12px;border:1px solid var(--line);background:transparent;padding:.9em 1.2em;cursor:pointer;font-family:var(--font-mono);font-size:.8rem;text-transform:uppercase;}
+  .sso-btn:hover{background:var(--surface);}
+  .divider-row{display:flex;align-items:center;gap:14px;margin:26px 0;color:var(--ink-muted);font-family:var(--font-mono);font-size:.7rem;text-transform:uppercase;}
+  .divider-row .hairline-soft{flex:1;}
+  .login-foot{text-align:center;margin-top:24px;font-size:.85rem;color:var(--ink-muted);}
+  .login-foot a{color:var(--accent);text-decoration:underline;}
+
+  /* ============ INSTALLER ============ */
+  .stepper{display:flex;border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow-x:auto;}
+  .step-tab{flex:1;min-width:120px;padding:18px 14px;border-right:1px solid var(--line-soft);font-family:var(--font-mono);font-size:.68rem;text-transform:uppercase;color:var(--ink-muted);position:relative;}
+  .step-tab:last-child{border-right:0;}
+  .step-tab .n{display:block;font-family:var(--font-display);font-size:1.4rem;color:var(--ink);margin-bottom:4px;}
+  .step-tab.is-active{color:var(--ink);}
+  .step-tab.is-active::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:var(--accent);}
+  .step-tab.is-done .n::after{content:" ✓";}
+  .install-panel{padding:56px 0;min-height:320px;}
+  .install-panel[hidden]{display:none;}
+  .module-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid var(--line);border-left:1px solid var(--line);}
+  .module-card{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:24px;cursor:pointer;background:transparent;text-align:left;color:var(--ink);}
+  .module-card[aria-pressed="true"]{background:var(--ink);color:var(--bg);}
+  .module-card h4{font-family:var(--font-display);font-size:1.2rem;text-transform:uppercase;}
+  .module-card p{font-size:.8rem;margin-top:6px;color:var(--ink-muted);}
+  .module-card[aria-pressed="true"] p{color:#c8c8c4;}
+  .scan-list{margin-top:24px;display:flex;flex-direction:column;gap:0;font-family:var(--font-mono);font-size:.85rem;}
+  .scan-item{padding:10px 0;border-bottom:1px solid var(--line-soft);opacity:0;transform:translateY(6px);animation:scanIn .4s var(--ease) forwards;display:flex;justify-content:space-between;}
+  @keyframes scanIn{to{opacity:1;transform:none;}}
+  .scan-status{color:var(--accent);}
+  .progress-track{height:6px;background:var(--surface);border:1px solid var(--line);margin:20px 0;}
+  .progress-fill{height:100%;background:var(--accent);width:0%;transition:width .2s linear;}
+  .log-console{background:var(--ink);color:#d6d6d2;font-family:var(--font-mono);font-size:.78rem;padding:18px;min-height:160px;max-height:220px;overflow:auto;}
+  .log-console div{padding:2px 0;opacity:0;animation:scanIn .3s var(--ease) forwards;}
+  .checklist{margin-top:20px;}
+  .checklist li{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line-soft);font-family:var(--font-mono);font-size:.85rem;}
+  .checklist .mark{width:18px;height:18px;border:1px solid var(--line);flex:0 0 auto;position:relative;}
+  .checklist li[data-checked="true"] .mark{background:var(--accent);border-color:var(--accent);}
+  .checklist li[data-checked="true"] .mark::after{content:"";position:absolute;left:5px;top:2px;width:5px;height:9px;border-right:2px solid var(--accent-ink);border-bottom:2px solid var(--accent-ink);transform:rotate(45deg);}
+  .install-actions{display:flex;justify-content:space-between;padding-top:32px;border-top:1px solid var(--line-soft);margin-top:32px;}
+  .success-panel{text-align:center;padding:60px 0;}
+  .success-panel .big-check{width:80px;height:80px;border:1px solid var(--accent);margin:0 auto 24px;position:relative;}
+  .success-panel .big-check::after{content:"";position:absolute;left:26px;top:16px;width:16px;height:30px;border-right:3px solid var(--accent);border-bottom:3px solid var(--accent);transform:rotate(45deg);}
+  @media (max-width:700px){.module-grid{grid-template-columns:1fr;}}
+
+  /* ============ DASHBOARD ============ */
+  .dash-banner{background:var(--ink);color:var(--bg);padding:12px 0;font-family:var(--font-mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;text-align:center;}
+  .dash-tabs{display:flex;border-bottom:1px solid var(--line);}
+  .dash-tab{padding:18px 26px;font-family:var(--font-mono);font-size:.78rem;text-transform:uppercase;background:transparent;border:0;border-bottom:2px solid transparent;cursor:pointer;color:var(--ink-muted);}
+  .dash-tab[aria-selected="true"]{color:var(--ink);border-color:var(--accent);}
+  .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);border-left:1px solid var(--line);margin-top:32px;}
+  .kpi-cell{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:26px;}
+  .kpi-label{font-family:var(--font-mono);font-size:.68rem;text-transform:uppercase;color:var(--ink-muted);}
+  .kpi-num{font-family:var(--font-display);font-weight:800;font-size:2.6rem;margin-top:8px;}
+  .kpi-delta{font-family:var(--font-mono);font-size:.72rem;margin-top:6px;color:var(--accent);}
+  .chart-block{border:1px solid var(--line);margin-top:32px;padding:28px;}
+  .chart-block h4{font-family:var(--font-mono);font-size:.72rem;text-transform:uppercase;color:var(--ink-muted);margin-bottom:20px;}
+  .bar-chart{display:flex;align-items:flex-end;gap:14px;height:180px;border-bottom:1px solid var(--line);}
+  .bar{flex:1;background:var(--ink-muted);position:relative;transition:height .6s var(--ease);}
+  .bar.hi{background:var(--accent);}
+  .bar-labels{display:flex;gap:14px;margin-top:8px;}
+  .bar-labels span{flex:1;text-align:center;font-family:var(--font-mono);font-size:.65rem;color:var(--ink-muted);}
+  .line-chart{width:100%;height:180px;}
+  .dash-lower{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-top:32px;}
+  .activity-feed{border:1px solid var(--line);}
+  .activity-feed h4{padding:18px 20px;border-bottom:1px solid var(--line);font-family:var(--font-mono);font-size:.72rem;text-transform:uppercase;color:var(--ink-muted);}
+  .activity-item{display:flex;gap:14px;padding:14px 20px;border-bottom:1px solid var(--line-soft);font-size:.85rem;}
+  .activity-time{font-family:var(--font-mono);font-size:.7rem;color:var(--ink-muted);white-space:nowrap;}
+  .data-table{width:100%;border-collapse:collapse;font-size:.85rem;}
+  .data-table th,.data-table td{text-align:left;padding:12px 16px;border-bottom:1px solid var(--line-soft);}
+  .data-table th{font-family:var(--font-mono);font-size:.66rem;text-transform:uppercase;color:var(--ink-muted);border-bottom:1px solid var(--line);}
+  .pill{display:inline-block;padding:.3em .8em;font-family:var(--font-mono);font-size:.65rem;text-transform:uppercase;border:1px solid var(--ink-muted);color:var(--ink-muted);}
+  .pill.critical{border-color:var(--accent);color:var(--accent);}
+  @media (max-width:960px){.kpi-grid{grid-template-columns:repeat(2,1fr);}.dash-lower{grid-template-columns:1fr;}}
+  @media (max-width:600px){.kpi-grid{grid-template-columns:1fr;}}
+
+  /* ============ GENERIC RESPONSIVE ============ */
+  html,body{overflow-x:hidden;}
+  @media (max-width:900px){
+    .hero-grid{grid-template-columns:1fr;}
+    .stat-strip{grid-template-columns:repeat(2,1fr)!important;}
+  }
+  @media (max-width:700px){
+    .stat-strip .grid12{display:grid;grid-template-columns:repeat(2,1fr);}
+  }
+</style>
+
+<div id="app">
+
+  <div id="intro" aria-hidden="true">
+    <div class="intro-mark" id="intro-mark"></div>
+  </div>
+
+  <header id="topnav">
+    <div class="wrap nav-row">
+      <a href="#home" class="logo"><span class="dot"></span>TECHBISS</a>
+      <nav class="nav-links" aria-label="Primary">
+        <a class="nav-link" data-nav href="#home">Home</a>
+        <a class="nav-link" data-nav href="#services">Services</a>
+        <a class="nav-link" data-nav href="#solutions">Solutions</a>
+        <a class="nav-link" data-nav href="#marketplace">Marketplace</a>
+        <a class="nav-link" data-nav href="#work">Work</a>
+        <a class="nav-link" data-nav href="#process">Process</a>
+        <a class="nav-link" data-nav href="#about">About</a>
+        <a class="nav-link" data-nav href="#resources">Resources</a>
+        <a class="nav-link" data-nav href="#pricing">Pricing</a>
+        <a class="nav-link" data-nav href="#contact">Contact</a>
+      </nav>
+      <div class="nav-right">
+        <a class="nav-link nav-signin" data-nav href="#login">Sign In</a>
+        <a class="btn btn-primary btn-sm" data-nav href="#contact">Start a Project</a>
+        <button class="icon-btn" id="theme-toggle" aria-label="Toggle dark mode" aria-pressed="false">
+          <svg viewBox="0 0 24 24" id="theme-icon"><rect x="3" y="3" width="18" height="18" stroke-width="1.5"/><rect x="3" y="3" width="9" height="18" fill="currentColor" stroke="none"/></svg>
+        </button>
+        <button class="icon-btn hamburger" id="menu-open" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
+          <svg viewBox="0 0 24 24" stroke-width="1.5"><line x1="3" y1="7" x2="21" y2="7"/><line x1="3" y1="17" x2="21" y2="17"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div id="mobile-menu" aria-hidden="true">
+    <div class="mm-head">
+      <a href="#home" class="logo"><span class="dot"></span>TECHBISS</a>
+      <button class="icon-btn" id="menu-close" aria-label="Close menu">
+        <svg viewBox="0 0 24 24" stroke-width="1.5"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
+      </button>
+    </div>
+    <ul class="mm-list" role="list">
+      <li><a data-nav href="#home">Home</a></li>
+      <li><a data-nav href="#services">Services</a></li>
+      <li><a data-nav href="#solutions">Solutions</a></li>
+      <li><a data-nav href="#marketplace">Marketplace</a></li>
+      <li><a data-nav href="#work">Work</a></li>
+      <li><a data-nav href="#process">Process</a></li>
+      <li><a data-nav href="#about">About</a></li>
+      <li><a data-nav href="#resources">Resources</a></li>
+      <li><a data-nav href="#pricing">Pricing</a></li>
+      <li><a data-nav href="#contact">Contact</a></li>
+      <li><a data-nav href="#login">Sign In</a></li>
+    </ul>
+    <div class="mm-foot">TECHBISS GLOBAL &mdash; EST. INFRASTRUCTURE, ENGINEERED.</div>
+  </div>
+
+  <main id="main-content">
+
+    <!-- ================= HOME ================= -->
+    <section data-route="home" aria-labelledby="home-h1">
+      <div class="hero wrap">
+        <div class="hero-grid">
+          <div>
+            <p class="eyebrow"><span class="dash">/ 01</span> GLOBAL DIGITAL TRANSFORMATION</p>
+            <h1 id="home-h1" class="type-display" style="margin-top:18px;">
+              <span class="kinetic-word"><span style="animation-delay:.02s">Engineering</span></span><br>
+              <span class="kinetic-word"><span style="animation-delay:.1s">the&nbsp;</span></span><span class="kinetic-word"><span style="animation-delay:.16s">Next</span></span><br>
+              <span class="kinetic-word" style="color:var(--accent);"><span style="animation-delay:.24s">Global</span></span><span class="kinetic-word" style="color:var(--accent);"><span style="animation-delay:.3s">&nbsp;Economy</span></span>
+            </h1>
+            <p class="hero-sub measure">TECHBISS is a $10B+ digital transformation platform &mdash; cloud, AI, cybersecurity, data and enterprise software delivered with the discipline of structural engineering. We build the infrastructure enterprises run on.</p>
+            <div class="hero-ctas">
+              <a href="#contact" data-nav class="btn btn-primary">Start a Project</a>
+              <a href="#work" data-nav class="btn">View Our Work</a>
+            </div>
+          </div>
+          <div class="hero-visual" aria-hidden="true">
+            <svg viewBox="0 0 400 400">
+              <line x1="0" y1="0" x2="400" y2="400" stroke="currentColor" stroke-width="1"/>
+              <line x1="400" y1="0" x2="0" y2="400" stroke="currentColor" stroke-width="1"/>
+              <rect x="40" y="40" width="320" height="320" fill="none" stroke="currentColor" stroke-width="1"/>
+              <rect x="90" y="90" width="220" height="220" fill="none" stroke="currentColor" stroke-width="1"/>
+              <circle cx="200" cy="200" r="70" fill="none" stroke="currentColor" stroke-width="1"/>
+              <circle cx="200" cy="200" r="6" fill="#d1361f" stroke="none"/>
+              <line x1="200" y1="0" x2="200" y2="400" stroke="currentColor" stroke-width="1" stroke-dasharray="2 6"/>
+              <line x1="0" y1="200" x2="400" y2="200" stroke="currentColor" stroke-width="1" stroke-dasharray="2 6"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-strip">
+        <div class="wrap grid12" id="home-stats">
+          <div class="stat-cell" style="grid-column:span 3;"><div class="stat-num" data-count="120" data-suffix="+">0</div><div class="stat-label">Countries</div></div>
+          <div class="stat-cell" style="grid-column:span 3;"><div class="stat-num" data-count="4.2" data-prefix="$" data-suffix="T" data-decimals="1">0</div><div class="stat-label">Client AUM Modernized</div></div>
+          <div class="stat-cell" style="grid-column:span 3;"><div class="stat-num" data-count="99.99" data-suffix="%" data-decimals="2">0</div><div class="stat-label">Platform Uptime</div></div>
+          <div class="stat-cell" style="grid-column:span 3;"><div class="stat-num" data-count="3400" data-suffix="+">0</div><div class="stat-label">Engineers &amp; Architects</div></div>
+        </div>
+      </div>
+
+      <div class="wrap section-head reveal">
+        <span class="section-num">02</span>
+        <p class="eyebrow"><span class="dash">/</span> WHAT WE BUILD</p>
+        <h2 class="section-title type-display">Six Disciplines. <br>One Platform.</h2>
+      </div>
+      <div class="wrap">
+        <div class="teaser-grid" id="home-services-teaser"></div>
+      </div>
+
+      <div class="trust-strip">
+        <div class="trust-track" id="trust-track" aria-label="Trusted by fictional global clients"></div>
+      </div>
+
+      <div class="wrap section-head reveal">
+        <span class="section-num">03</span>
+        <p class="eyebrow"><span class="dash">/</span> PROOF OF SCALE</p>
+        <h2 class="section-title type-display">Selected Engagements</h2>
+      </div>
+      <div class="carousel wrap" style="padding:0;">
+        <div class="carousel-track" id="home-carousel" tabindex="0" aria-label="Case study carousel, draggable"></div>
+      </div>
+      <div class="wrap carousel-nav">
+        <button class="icon-btn" id="cs-prev" aria-label="Previous case study"><svg viewBox="0 0 24 24" stroke-width="1.5"><line x1="18" y1="12" x2="6" y2="12"/><polyline points="12 6 6 12 12 18" fill="none"/></svg></button>
+        <button class="icon-btn" id="cs-next" aria-label="Next case study"><svg viewBox="0 0 24 24" stroke-width="1.5"><line x1="6" y1="12" x2="18" y2="12"/><polyline points="12 6 18 12 12 18" fill="none"/></svg></button>
+      </div>
+
+      <div class="wrap section-head reveal">
+        <span class="section-num">04</span>
+        <p class="eyebrow"><span class="dash">/</span> METHODOLOGY</p>
+        <h2 class="section-title type-display">A Six-Step<br>Build Sequence</h2>
+        <p class="section-lead">From first diagnostic to global scale &mdash; the same disciplined sequence on every engagement. <a href="#process" data-nav style="color:var(--accent);text-decoration:underline;">See full methodology &rarr;</a></p>
+      </div>
+      <div class="wrap" style="padding-bottom:40px;">
+        <div class="grid12 hairline" style="border-top:1px solid var(--line);">
+          <div class="stat-cell" style="grid-column:span 2;padding:22px 14px;"><span class="type-mono" style="font-size:.7rem;color:var(--ink-muted);">01</span><div style="font-family:var(--font-display);font-size:1.1rem;text-transform:uppercase;margin-top:6px;">Discover</div></div>
+          <div class="stat-cell" style="grid-column:span 2;padding:22px 14px;"><span class="type-mono" style="font-size:.7rem;color:var(--ink-muted);">02</span><div style="font-family:var(--font-display);font-size:1.1rem;text-transform:uppercase;margin-top:6px;">Architect</div></div>
+          <div class="stat-cell" style="grid-column:span 2;padding:22px 14px;"><span class="type-mono" style="font-size:.7rem;color:var(--ink-muted);">03</span><div style="font-family:var(--font-display);font-size:1.1rem;text-transform:uppercase;margin-top:6px;">Build</div></div>
+          <div class="stat-cell" style="grid-column:span 2;padding:22px 14px;"><span class="type-mono" style="font-size:.7rem;color:var(--ink-muted);">04</span><div style="font-family:var(--font-display);font-size:1.1rem;text-transform:uppercase;margin-top:6px;">Migrate</div></div>
+          <div class="stat-cell" style="grid-column:span 2;padding:22px 14px;"><span class="type-mono" style="font-size:.7rem;color:var(--ink-muted);">05</span><div style="font-family:var(--font-display);font-size:1.1rem;text-transform:uppercase;margin-top:6px;">Launch</div></div>
+          <div class="stat-cell" style="grid-column:span 2;padding:22px 14px;border-right:0;"><span class="type-mono" style="font-size:.7rem;color:var(--ink-muted);">06</span><div style="font-family:var(--font-display);font-size:1.1rem;text-transform:uppercase;margin-top:6px;">Scale</div></div>
+        </div>
+      </div>
+
+      <div class="cta-band">
+        <div class="wrap" style="display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;">
+          <h2 class="type-display">Ready to build the infrastructure behind your next decade?</h2>
+          <a href="#contact" data-nav class="btn btn-primary">Start a Project</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= SERVICES ================= -->
+    <section data-route="services" aria-labelledby="services-h1">
+      <div class="wrap section-head reveal">
+        <span class="section-num">01</span>
+        <p class="eyebrow"><span class="dash">/</span> CAPABILITIES</p>
+        <h1 id="services-h1" class="section-title type-display">Services</h1>
+        <p class="section-lead">Six disciplines, engineered as one integrated platform &mdash; from infrastructure to intelligence.</p>
+      </div>
+      <div class="wrap">
+        <div class="svc-grid" id="services-grid"></div>
+      </div>
+    </section>
+
+    <!-- ================= SOLUTIONS ================= -->
+    <section data-route="solutions" aria-labelledby="solutions-h1">
+      <div class="wrap section-head reveal">
+        <span class="section-num">02</span>
+        <p class="eyebrow"><span class="dash">/</span> INDUSTRY SOLUTIONS</p>
+        <h1 id="solutions-h1" class="section-title type-display">Solutions</h1>
+        <p class="section-lead">Built for the regulatory, operational and structural realities of six global industries.</p>
+      </div>
+      <div class="wrap">
+        <div class="sol-layout">
+          <div class="sol-tabs" role="tablist" aria-orientation="vertical" id="sol-tabs"></div>
+          <div class="sol-panel" id="sol-panel" role="tabpanel"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= MARKETPLACE ================= -->
+    <section data-route="marketplace" aria-labelledby="marketplace-h1">
+      <div class="wrap section-head reveal">
+        <span class="section-num">03</span>
+        <p class="eyebrow"><span class="dash">/</span> ENTERPRISE MARKETPLACE</p>
+        <h1 id="marketplace-h1" class="section-title type-display">Marketplace</h1>
+        <p class="section-lead">Pre-engineered modules, agents and kits &mdash; deployable directly into your TECHBISS platform.</p>
+      </div>
+      <div class="wrap">
+        <div class="mp-controls">
+          <div class="chip-row" id="mp-chips"></div>
+          <input class="search-input" type="search" id="mp-search" placeholder="Search products&hellip;" aria-label="Search marketplace products">
+        </div>
+        <div class="mp-grid" id="mp-grid" style="margin-top:0;"></div>
+      </div>
+    </section>
+
+    <!-- ================= PRODUCT ================= -->
+    <section data-route="product" aria-labelledby="product-h1">
+      <div class="wrap" style="padding-top:40px;">
+        <p class="eyebrow"><a href="#marketplace" data-nav style="text-decoration:none;color:inherit;">&larr; Back to Marketplace</a></p>
+      </div>
+      <div class="wrap product-layout" id="product-layout"></div>
+    </section>
+
+    <!-- ================= WORK ================= -->
+    <section data-route="work" aria-labelledby="work-h1">
+      <div class="wrap section-head reveal">
+        <span class="section-num">04</span>
+        <p class="eyebrow"><span class="dash">/</span> CASE STUDIES</p>
+        <h1 id="work-h1" class="section-title type-display">Our Work</h1>
+        <p class="section-lead">Measured outcomes, at global scale, across regulated and mission-critical industries.</p>
+      </div>
+      <div class="wrap">
+        <div class="work-filter" id="work-filter"></div>
+        <div class="work-grid" id="work-grid"></div>
+      </div>
+    </section>
+
+    <!-- ================= PROCESS ================= -->
+    <section data-route="process" aria-labelledby="process-h1">
+      <div class="wrap section-head reveal">
+        <span class="section-num">05</span>
+        <p class="eyebrow"><span class="dash">/</span> METHODOLOGY</p>
+        <h1 id="process-h1" class="section-title type-display">Process</h1>
+        <p class="section-lead">A disciplined six-stage build sequence used on every TECHBISS engagement, regardless of scale.</p>
+      </div>
+      <div class="wrap" style="position:relative;">
+        <div class="timeline" id="process-timeline"></div>
+      </div>
+    </section>
+
+    <!-- ================= ABOUT ================= -->
+    <section data-route="about" aria-labelledby="about-h1">
+      <div class="wrap section-head reveal">
+        <span class="section-num">06</span>
+        <p class="eyebrow"><span class="dash">/</span> THE COMPANY</p>
+        <h1 id="about-h1" class="section-title type-display">About TECHBISS</h1>
+      </div>
+      <div class="wrap about-narrative">
+        <div class="grid12">
+          <div style="grid-column:span 7;">
+            <p class="measure" style="font-size:1.15rem;">TECHBISS was founded on a single premise: that the world's largest enterprises deserve infrastructure engineered with the same rigor as physical construction &mdash; poured, load-tested, and built to outlast the decade it was designed for. Today we operate as a $10B+ global digital transformation platform spanning cloud, artificial intelligence, cybersecurity, data and enterprise software engineering.</p>
+            <p class="measure" style="margin-top:20px;color:var(--ink-muted);">We are not a staffing pool. We are a permanent bench of 3,400+ engineers and architects, organized around six disciplines, deployed against the hardest infrastructure problems in finance, healthcare, manufacturing, government, retail and energy.</p>
+          </div>
+          <div style="grid-column:span 5;padding-left:40px;">
+            <div class="eyebrow" style="margin-bottom:14px;">LEADERSHIP PRINCIPLES</div>
+            <ul style="display:flex;flex-direction:column;gap:14px;">
+              <li style="border-left:2px solid var(--accent);padding-left:14px;font-size:.92rem;">Engineering discipline over trend-chasing.</li>
+              <li style="border-left:2px solid var(--accent);padding-left:14px;font-size:.92rem;">Structural transparency with every client, every quarter.</li>
+              <li style="border-left:2px solid var(--accent);padding-left:14px;font-size:.92rem;">Built to be inherited by the next team, not just delivered.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="wrap">
+        <div class="values-grid" id="values-grid"></div>
+      </div>
+      <div class="wrap presence-wrap">
+        <p class="eyebrow" style="margin-bottom:18px;">GLOBAL PRESENCE &mdash; 120+ COUNTRIES</p>
+        <svg class="presence-svg" viewBox="0 0 1000 340" id="presence-svg" role="img" aria-label="Abstract diagram of global office locations connected by lines"></svg>
+      </div>
+      <div class="stat-strip">
+        <div class="wrap grid12">
+          <div class="stat-cell" style="grid-column:span 3;"><div class="stat-num" data-count="120" data-suffix="+">0</div><div class="stat-label">Countries</div></div>
+          <div class="stat-cell" style="grid-column:span 3;"><div class="stat-num" data-count="4.2" data-prefix="$" data-suffix="T" data-decimals="1">0</div><div class="stat-label">Client AUM Modernized</div></div>
+          <div class="stat-cell" style="grid-column:span 3;"><div class="stat-num" data-count="99.99" data-suffix="%" data-decimals="2">0</div><div class="stat-label">Platform Uptime</div></div>
+          <div class="stat-cell" style="grid-column:span 3;"><div class="stat-num" data-count="3400" data-suffix="+">0</div><div class="stat-label">Engineers &amp; Architects</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= RESOURCES ================= -->
+    <section data-route="resources" aria-labelledby="resources-h1">
+      <div class="wrap section-head reveal">
+        <span class="section-num">07</span>
+        <p class="eyebrow"><span class="dash">/</span> INSIGHTS</p>
+        <h1 id="resources-h1" class="section-title type-display">Resources</h1>
+        <p class="section-lead">Research, field notes and frameworks from the engineers building the platform.</p>
+      </div>
+      <div class="wrap">
+        <div class="res-controls">
+          <div class="chip-row" id="res-chips"></div>
+        </div>
+        <div class="res-list" id="res-list"></div>
+        <div class="newsletter">
+          <div>
+            <h3 class="type-display" style="font-size:1.6rem;">Field Notes,<br>Monthly.</h3>
+            <p style="color:var(--ink-muted);font-size:.88rem;margin-top:8px;">One dispatch a month. No noise.</p>
+          </div>
+          <div>
+            <form id="newsletter-form" novalidate>
+              <label for="newsletter-email" class="visually-hidden">Email address</label>
+              <input type="email" id="newsletter-email" placeholder="you@company.com" required>
+              <button type="submit" class="btn btn-primary">Subscribe</button>
+            </form>
+            <p class="newsletter-success" id="newsletter-success" role="status">Confirmed &mdash; check your inbox.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= PRICING ================= -->
+    <section data-route="pricing" aria-labelledby="pricing-h1">
+      <div class="wrap section-head reveal">
+        <span class="section-num">08</span>
+        <p class="eyebrow"><span class="dash">/</span> ENGAGEMENT TIERS</p>
+        <h1 id="pricing-h1" class="section-title type-display">Pricing</h1>
+        <p class="section-lead">Structured engagement tiers built to scale from first deployment to global rollout.</p>
+      </div>
+      <div class="wrap">
+        <div class="price-toggle">
+          <span class="type-mono" style="font-size:.8rem;text-transform:uppercase;">Monthly</span>
+          <button class="toggle-switch" id="price-toggle" role="switch" aria-checked="false" aria-label="Toggle annual billing"><span class="toggle-knob"></span></button>
+          <span class="type-mono" style="font-size:.8rem;text-transform:uppercase;">Annual</span>
+          <span class="save-badge">Save ~18%</span>
+        </div>
+        <div class="price-grid" id="price-grid"></div>
+
+        <div class="table-scroll">
+          <table class="compare-table" id="compare-table"></table>
+        </div>
+
+        <div class="wrap" style="padding:80px 0 0;max-width:900px;margin:0 auto 0 0;">
+          <h2 class="type-display" style="font-size:2.2rem;">Frequently Asked</h2>
+          <div id="faq-list" style="margin-top:24px;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= CONTACT ================= -->
+    <section data-route="contact" aria-labelledby="contact-h1">
+      <div class="wrap section-head reveal">
+        <span class="section-num">09</span>
+        <p class="eyebrow"><span class="dash">/</span> GET IN TOUCH</p>
+        <h1 id="contact-h1" class="section-title type-display">Contact</h1>
+      </div>
+      <div class="wrap">
+        <div class="contact-layout">
+          <div class="contact-form">
+            <form id="contact-form" novalidate>
+              <div class="form-row">
+                <div class="field" data-field="firstName">
+                  <label for="cf-first">First Name</label>
+                  <input type="text" id="cf-first" required>
+                  <p class="field-err">First name is required.</p>
+                </div>
+                <div class="field" data-field="lastName">
+                  <label for="cf-last">Last Name</label>
+                  <input type="text" id="cf-last" required>
+                  <p class="field-err">Last name is required.</p>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="field" data-field="email">
+                  <label for="cf-email">Work Email</label>
+                  <input type="email" id="cf-email" required>
+                  <p class="field-err">Enter a valid email address.</p>
+                </div>
+                <div class="field" data-field="company">
+                  <label for="cf-company">Company</label>
+                  <input type="text" id="cf-company" required>
+                  <p class="field-err">Company is required.</p>
+                </div>
+              </div>
+              <div class="field" data-field="topic">
+                <label for="cf-topic">Engagement Type</label>
+                <select id="cf-topic">
+                  <option>Cloud &amp; Infrastructure</option>
+                  <option>AI &amp; Automation</option>
+                  <option>Cybersecurity</option>
+                  <option>Data &amp; Analytics</option>
+                  <option>Enterprise Software</option>
+                  <option>Strategy &amp; Consulting</option>
+                </select>
+              </div>
+              <div class="field" data-field="message">
+                <label for="cf-message">Project Details</label>
+                <textarea id="cf-message" required></textarea>
+                <p class="field-err">Tell us a little about the project.</p>
+              </div>
+              <button type="submit" class="btn btn-primary btn-block">Submit Inquiry</button>
+              <div class="form-success" id="contact-success">
+                <h3>Received.</h3>
+                <p style="margin-top:10px;color:var(--ink-muted);">A TECHBISS engagement lead will respond within one business day.</p>
+              </div>
+            </form>
+          </div>
+          <div>
+            <div class="region-block"><h4>New York &mdash; HQ</h4><p>350 Structural Ave, New York, NY 10001 &mdash; +1 212 555 0148</p></div>
+            <div class="region-block"><h4>London</h4><p>12 Concrete Yard, London EC2A &mdash; +44 20 7946 0891</p></div>
+            <div class="region-block"><h4>Singapore</h4><p>88 Steel Quay, Singapore 018956 &mdash; +65 6011 4402</p></div>
+            <div class="region-block"><h4>São Paulo</h4><p>Av. Engenharia 240, São Paulo &mdash; +55 11 4002 8922</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= LOGIN ================= -->
+    <section data-route="login" aria-labelledby="login-h1">
+      <div class="wrap login-wrap">
+        <p class="eyebrow" style="text-align:center;">/ SECURE ACCESS</p>
+        <h1 id="login-h1" class="type-display" style="text-align:center;font-size:2.4rem;margin-top:10px;">Sign In</h1>
+        <form id="login-form" novalidate style="margin-top:36px;">
+          <div class="field" data-field="loginEmail">
+            <label for="lf-email">Email</label>
+            <input type="email" id="lf-email" required>
+            <p class="field-err">Enter a valid email address.</p>
+          </div>
+          <div class="field" data-field="loginPassword">
+            <label for="lf-password">Password</label>
+            <div class="pw-wrap">
+              <input type="password" id="lf-password" required>
+              <button type="button" class="pw-toggle" id="pw-toggle" aria-label="Show password" aria-pressed="false">Show</button>
+            </div>
+            <p class="field-err">Password is required.</p>
+          </div>
+          <div class="row-between">
+            <label class="checkbox-row"><input type="checkbox" id="lf-remember"> Remember me</label>
+            <a href="#login" style="text-decoration:underline;color:var(--ink-muted);font-size:.85rem;">Forgot password?</a>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+          <div class="form-success" id="login-success" style="margin-top:20px;">
+            <h3>Access Granted.</h3>
+            <p style="margin-top:10px;color:var(--ink-muted);">Redirecting to your dashboard preview&hellip;</p>
+          </div>
+        </form>
+        <div class="divider-row"><span class="hairline-soft"></span>OR CONTINUE WITH<span class="hairline-soft"></span></div>
+        <div class="sso-row">
+          <button class="sso-btn" type="button">
+            <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.9c1.7-1.57 2.7-3.87 2.7-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.9-2.26c-.8.54-1.84.86-3.06.86-2.35 0-4.34-1.59-5.05-3.72H.98v2.33A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.95 10.7A5.4 5.4 0 0 1 3.66 9c0-.59.1-1.17.29-1.7V4.97H.98A9 9 0 0 0 0 9c0 1.45.35 2.83.98 4.03l2.97-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.51.46 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0A9 9 0 0 0 .98 4.97l2.97 2.33C4.66 5.17 6.65 3.58 9 3.58z"/></svg>
+            Continue with Google
+          </button>
+          <button class="sso-btn" type="button">
+            <svg width="18" height="18" viewBox="0 0 18 18"><rect width="8.5" height="8.5" fill="#F25022"/><rect x="9.5" width="8.5" height="8.5" fill="#7FBA00"/><rect y="9.5" width="8.5" height="8.5" fill="#00A4EF"/><rect x="9.5" y="9.5" width="8.5" height="8.5" fill="#FFB900"/></svg>
+            Continue with Microsoft
+          </button>
+          <button class="sso-btn" type="button">
+            <svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="9" fill="#000"/><circle cx="9" cy="9" r="4.2" fill="#fff"/></svg>
+            Continue with Okta
+          </button>
+        </div>
+        <p class="login-foot">No account yet? <a href="#contact" data-nav>Request Access</a></p>
+      </div>
+    </section>
+
+    <!-- ================= INSTALLER ================= -->
+    <section data-route="installer" aria-labelledby="installer-h1">
+      <div class="wrap section-head reveal">
+        <span class="section-num">10</span>
+        <p class="eyebrow"><span class="dash">/</span> PLATFORM SETUP</p>
+        <h1 id="installer-h1" class="section-title type-display">Installer</h1>
+        <p class="section-lead">Provision a TECHBISS module into your environment in seven structured steps.</p>
+      </div>
+      <div class="wrap">
+        <div class="stepper" id="install-stepper" role="tablist" aria-label="Installer steps"></div>
+
+        <div class="install-panel" data-step="0">
+          <h2 class="type-display" style="font-size:1.8rem;">Select a Module</h2>
+          <p style="color:var(--ink-muted);margin-top:8px;">Choose the module to provision into your TECHBISS environment.</p>
+          <div class="module-grid" id="install-modules"></div>
+        </div>
+
+        <div class="install-panel" data-step="1" hidden>
+          <h2 class="type-display" style="font-size:1.8rem;">Detect Environment</h2>
+          <p style="color:var(--ink-muted);margin-top:8px;">Scanning your infrastructure for compatible services and dependencies.</p>
+          <button class="btn btn-primary" id="run-scan" style="margin-top:20px;">Run Scan</button>
+          <div class="scan-list" id="scan-list"></div>
+        </div>
+
+        <div class="install-panel" data-step="2" hidden>
+          <h2 class="type-display" style="font-size:1.8rem;">Configure</h2>
+          <p style="color:var(--ink-muted);margin-top:8px;">Set deployment parameters for this module.</p>
+          <div style="max-width:520px;margin-top:24px;">
+            <div class="field"><label for="cfg-env">Environment Name</label><input type="text" id="cfg-env" value="prod-us-east-1"></div>
+            <div class="field"><label for="cfg-region">Primary Region</label>
+              <select id="cfg-region"><option>US-East</option><option>EU-West</option><option>AP-Southeast</option></select>
+            </div>
+            <div class="field"><label class="checkbox-row"><input type="checkbox" id="cfg-ha" checked> Enable high-availability replica set</label></div>
+          </div>
+        </div>
+
+        <div class="install-panel" data-step="3" hidden>
+          <h2 class="type-display" style="font-size:1.8rem;">Import &amp; Migrate</h2>
+          <p style="color:var(--ink-muted);margin-top:8px;">Migrating existing configuration and historical data.</p>
+          <button class="btn btn-primary" id="run-migrate" style="margin-top:16px;">Start Migration</button>
+          <div class="progress-track"><div class="progress-fill" id="migrate-fill"></div></div>
+          <div class="log-console" id="migrate-log" aria-live="polite"></div>
+        </div>
+
+        <div class="install-panel" data-step="4" hidden>
+          <h2 class="type-display" style="font-size:1.8rem;">Install</h2>
+          <p style="color:var(--ink-muted);margin-top:8px;">Provisioning module binaries and platform hooks.</p>
+          <button class="btn btn-primary" id="run-install" style="margin-top:16px;">Begin Install</button>
+          <div class="progress-track"><div class="progress-fill" id="install-fill"></div></div>
+          <div class="log-console" id="install-log" aria-live="polite"></div>
+        </div>
+
+        <div class="install-panel" data-step="5" hidden>
+          <h2 class="type-display" style="font-size:1.8rem;">Verify</h2>
+          <p style="color:var(--ink-muted);margin-top:8px;">Running post-install verification checks.</p>
+          <button class="btn btn-primary" id="run-verify" style="margin-top:16px;">Run Checks</button>
+          <ul class="checklist" id="verify-list"></ul>
+        </div>
+
+        <div class="install-panel" data-step="6" hidden>
+          <div class="success-panel">
+            <div class="big-check"></div>
+            <h2 class="type-display" style="font-size:2.2rem;">Module Live.</h2>
+            <p style="color:var(--ink-muted);margin-top:10px;">Deployment verified and running in production.</p>
+            <a href="#dashboard" data-nav class="btn btn-primary" style="margin-top:28px;">Go to Dashboard</a>
+          </div>
+        </div>
+
+        <div class="install-actions">
+          <button class="btn" id="install-back">Back</button>
+          <button class="btn btn-primary" id="install-next">Next</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= DASHBOARD ================= -->
+    <section data-route="dashboard" aria-labelledby="dashboard-h1">
+      <div class="dash-banner">Preview Mode &mdash; Simulated Data, No Live Connection</div>
+      <div class="wrap section-head reveal" style="padding-bottom:0;">
+        <span class="section-num">11</span>
+        <p class="eyebrow"><span class="dash">/</span> PLATFORM DASHBOARD</p>
+        <h1 id="dashboard-h1" class="section-title type-display">Dashboard</h1>
+      </div>
+      <div class="wrap">
+        <div class="dash-tabs" role="tablist" id="dash-tabs">
+          <button class="dash-tab" role="tab" aria-selected="true" data-dash="admin">Admin</button>
+          <button class="dash-tab" role="tab" aria-selected="false" data-dash="client">Client</button>
+          <button class="dash-tab" role="tab" aria-selected="false" data-dash="staff">Staff</button>
+        </div>
+        <div id="dash-content" style="padding-bottom:100px;"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer id="site-footer">
+    <div class="wrap footer-grid">
+      <div class="footer-col">
+        <a href="#home" data-nav class="logo"><span class="dot"></span>TECHBISS</a>
+        <p style="margin-top:16px;color:var(--ink-muted);font-size:.85rem;max-width:32ch;">Engineering the next global economy &mdash; cloud, AI, cybersecurity, data and enterprise software, at structural scale.</p>
+      </div>
+      <div class="footer-col"><h4>Company</h4>
+        <a data-nav href="#about">About</a><a data-nav href="#work">Work</a><a data-nav href="#process">Process</a><a data-nav href="#resources">Resources</a>
+      </div>
+      <div class="footer-col"><h4>Platform</h4>
+        <a data-nav href="#services">Services</a><a data-nav href="#solutions">Solutions</a><a data-nav href="#marketplace">Marketplace</a><a data-nav href="#pricing">Pricing</a>
+      </div>
+      <div class="footer-col"><h4>Access</h4>
+        <a data-nav href="#login">Sign In</a><a data-nav href="#installer">Installer</a><a data-nav href="#dashboard">Dashboard</a><a data-nav href="#contact">Contact</a>
+      </div>
+      <div class="footer-col"><h4>Legal</h4>
+        <a href="#" onclick="return false;">Privacy Policy</a><a href="#" onclick="return false;">Terms of Service</a><a href="#" onclick="return false;">Security</a>
+      </div>
+    </div>
+    <div class="wrap footer-bottom">
+      <span>&copy; 2026 TECHBISS Global Holdings. All rights reserved. Registered in 120+ jurisdictions.</span>
+      <div class="social-row">
+        <a href="#" onclick="return false;" aria-label="TECHBISS on LinkedIn">LN</a>
+        <a href="#" onclick="return false;" aria-label="TECHBISS on X">X</a>
+        <a href="#" onclick="return false;" aria-label="TECHBISS on GitHub">GH</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ============ MARKETPLACE DRAWER ============ -->
+  <div class="overlay" id="drawer-overlay" aria-hidden="true">
+    <div class="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title" id="mp-drawer">
+      <div class="drawer-head">
+        <h3 id="drawer-title" class="type-display" style="font-size:1.3rem;">Preview</h3>
+        <button class="icon-btn" id="drawer-close" aria-label="Close preview">
+          <svg viewBox="0 0 24 24" stroke-width="1.5"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
+        </button>
+      </div>
+      <div class="drawer-body" id="drawer-body"></div>
+      <div class="drawer-foot">
+        <button class="btn btn-primary btn-block" id="drawer-purchase">Purchase</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ========================================================================
+   DATA
+   ======================================================================== */
+var SERVICES = [
+  {
+    name:"Cloud & Infrastructure Modernization",
+    desc:"We re-platform legacy estates onto resilient, cost-efficient hybrid and multi-cloud architecture without disrupting operations.",
+    bullets:["Hybrid & multi-cloud architecture","Legacy-to-cloud migration at scale","Zero-downtime platform re-engineering"],
+    icon:'<rect x="6" y="20" width="36" height="20" /><path d="M14 20a10 10 0 0 1 19-4 8 8 0 0 1 9 8"/>'
+  },
+  {
+    name:"AI & Intelligent Automation",
+    desc:"Enterprise-grade AI agents and automation pipelines that remove manual work from mission-critical processes.",
+    bullets:["Enterprise LLM & agent deployment","Process mining & automation design","MLOps and model governance"],
+    icon:'<circle cx="24" cy="24" r="6"/><circle cx="8" cy="10" r="3"/><circle cx="40" cy="10" r="3"/><circle cx="8" cy="38" r="3"/><circle cx="40" cy="38" r="3"/><line x1="20" y1="21" x2="10" y2="12"/><line x1="28" y1="21" x2="38" y2="12"/><line x1="20" y1="27" x2="10" y2="36"/><line x1="28" y1="27" x2="38" y2="36"/>'
+  },
+  {
+    name:"Cybersecurity & Risk Engineering",
+    desc:"Zero-trust security architecture and 24/7 operations built for regulated, high-consequence environments.",
+    bullets:["Zero-trust architecture","Threat detection & SOC operations","Regulatory & compliance engineering"],
+    icon:'<path d="M24 6 8 12v12c0 12 8 18 16 20 8-2 16-8 16-20V12z"/><path d="M17 24l5 5 10-11"/>'
+  },
+  {
+    name:"Data, Analytics & AI Platforms",
+    desc:"Governed data mesh and real-time analytics platforms that turn enterprise data into a durable competitive asset.",
+    bullets:["Enterprise data mesh design","Real-time analytics pipelines","Governed AI/ML platform build"],
+    icon:'<ellipse cx="24" cy="12" rx="16" ry="6"/><path d="M8 12v24c0 3.3 7.2 6 16 6s16-2.7 16-6V12"/><path d="M8 24c0 3.3 7.2 6 16 6s16-2.7 16-6"/>'
+  },
+  {
+    name:"Enterprise Software Engineering",
+    desc:"Custom platform and product engineering built on modern API and microservice architecture, at scale.",
+    bullets:["Custom platform engineering","API & microservices architecture","Legacy system re-platforming"],
+    icon:'<rect x="7" y="7" width="14" height="14"/><rect x="27" y="7" width="14" height="14"/><rect x="7" y="27" width="14" height="14"/><rect x="27" y="27" width="14" height="14"/>'
+  },
+  {
+    name:"Digital Transformation Strategy & Consulting",
+    desc:"Executive-level roadmaps and operating model redesign that align technology investment with enterprise strategy.",
+    bullets:["Operating model redesign","Technology roadmap & investment strategy","Change management at enterprise scale"],
+    icon:'<polyline points="6,38 16,24 26,30 42,10"/><polyline points="32,10 42,10 42,20"/>'
+  }
+];
+
+var INDUSTRIES = [
+  {name:"Financial Services", desc:"Core banking modernization, real-time settlement infrastructure and regulatory-grade risk platforms for global financial institutions.", stats:[["40%","Faster Settlement"],["120+","Bank Clients"],["24/7","Compliance Ops"]]},
+  {name:"Healthcare & Life Sciences", desc:"Interoperable data platforms, clinical systems integration and secure infrastructure built for patient-scale reliability.", stats:[["60M+","Patient Records"],["99.99%","System Uptime"],["18","National Networks"]]},
+  {name:"Manufacturing & Supply Chain", desc:"AI-driven supply chain visibility, predictive maintenance and factory-floor automation across global operations.", stats:[["27%","Cost Reduction"],["340","Plants Connected"],["11","Countries Deployed"]]},
+  {name:"Public Sector & Government", desc:"Secure, citizen-scale digital infrastructure engineered to government compliance and continuity standards.", stats:[["45","Government Agencies"],["100%","FedRAMP-Aligned"],["12","Years Avg. Tenure"]]},
+  {name:"Retail & Commerce", desc:"Unified commerce platforms, real-time inventory intelligence and personalization engines for global retail brands.", stats:[["2.1B","Transactions/Yr"],["31%","Conversion Lift"],["54","Retail Brands"]]},
+  {name:"Energy & Utilities", desc:"Grid modernization, predictive asset management and resilient infrastructure for energy and utility operators.", stats:[["19","Grid Networks"],["99.9%","Grid Availability"],["8","Regions Served"]]}
+];
+
+var PRODUCTS = [
+  {id:"p1", name:"FlowState Automation Engine", vendor:"Ionic Systems", category:"Automation Modules", price:12400, unit:"one-time", rating:4.8, blurb:"Orchestrates cross-department workflow automation with a visual process builder and audit trail."},
+  {id:"p2", name:"Sentinel AI Copilot", vendor:"Northwind Cognition", category:"AI Agents & Copilots", price:890, unit:"/mo", rating:4.6, blurb:"An enterprise copilot trained on your internal knowledge base, deployable across support and ops teams."},
+  {id:"p3", name:"LedgerBridge Finance Kit", vendor:"Vantage Rail", category:"Industry Solution Kits", price:28000, unit:"one-time", rating:4.9, blurb:"Pre-built settlement, reconciliation and reporting modules for Tier-1 financial institutions."},
+  {id:"p4", name:"ComplyGuard Compliance Pack", vendor:"Ironclad Labs", category:"Security & Compliance Packs", price:15600, unit:"one-time", rating:4.7, blurb:"Automated policy enforcement and audit-ready reporting across SOC 2, ISO 27001 and GDPR."},
+  {id:"p5", name:"ConnectHub Integration Suite", vendor:"Meridian Systems", category:"Integration Connectors", price:4200, unit:"one-time", rating:4.5, blurb:"400+ pre-built connectors linking legacy systems to the TECHBISS platform layer."},
+  {id:"p6", name:"PulseBoard Analytics", vendor:"Quanta Insight", category:"Analytics Dashboards", price:2100, unit:"/mo", rating:4.6, blurb:"Real-time operational dashboards with anomaly detection tuned for executive reporting."},
+  {id:"p7", name:"CareChain Health Kit", vendor:"Northwind Cognition", category:"Industry Solution Kits", price:34000, unit:"one-time", rating:4.8, blurb:"Interoperable clinical data exchange and patient record modules built for HL7/FHIR compliance."},
+  {id:"p8", name:"TriageBot Support Agent", vendor:"Ionic Systems", category:"AI Agents & Copilots", price:1200, unit:"/mo", rating:4.4, blurb:"Autonomous first-line support agent that resolves tier-1 tickets and escalates with full context."},
+  {id:"p9", name:"FactoryFlow Manufacturing Automation", vendor:"Vantage Rail", category:"Automation Modules", price:48000, unit:"one-time", rating:4.9, blurb:"Predictive maintenance and factory-floor orchestration for large-scale manufacturing operations."}
+];
+var MP_CATEGORIES = ["All","Automation Modules","AI Agents & Copilots","Industry Solution Kits","Security & Compliance Packs","Integration Connectors","Analytics Dashboards"];
+
+var CASE_STUDIES = [
+  {title:"Meridian Capital Group", industry:"Financial Services", challenge:"Settlement cycles spanning 3 days across 40 correlated markets, creating capital drag and counterparty risk.", approach:"Re-architected core settlement infrastructure onto a distributed, real-time ledger with automated reconciliation.", result:"Settlement cycle time cut nearly in half, releasing billions in trapped capital.", metric:"40%", metricLabel:"Faster Settlement Cycle"},
+  {title:"Atlas Logistics Network", industry:"Manufacturing & Supply Chain", challenge:"Fragmented visibility across 340 facilities led to reactive, costly supply chain decisions.", approach:"Deployed AI-driven demand forecasting and a unified supply chain control tower across all regions.", result:"Structural reduction in logistics and inventory carrying cost within 14 months.", metric:"27%", metricLabel:"Supply Chain Cost Reduction"},
+  {title:"Continental Telecom Group", industry:"Energy & Utilities", challenge:"Aging on-premise infrastructure across 14 countries was constraining product velocity and reliability.", approach:"Executed a phased, zero-downtime cloud migration with a unified network operations platform.", result:"Unified infrastructure across all 14 markets with material reduction in platform incidents.", metric:"14", metricLabel:"Countries Migrated"},
+  {title:"Unity Health Network", industry:"Healthcare & Life Sciences", challenge:"Clinical data siloed across 18 disconnected hospital systems, slowing care coordination.", approach:"Built an interoperable, HL7/FHIR-compliant data platform connecting every facility in the network.", result:"Real-time patient data now available across the entire network at point of care.", metric:"18", metricLabel:"Systems Unified"}
+];
+
+var PROCESS_STEPS = [
+  {name:"Discover", desc:"We map your current infrastructure, risk surface and business objectives before a single line is written."},
+  {name:"Architect", desc:"Our engineers design the target-state architecture, validated against your regulatory and scale requirements."},
+  {name:"Build", desc:"Cross-functional delivery pods build the platform in disciplined, testable increments."},
+  {name:"Migrate", desc:"Legacy systems are migrated with zero-downtime cutover protocols and full rollback capability."},
+  {name:"Launch", desc:"The platform goes live under structured monitoring, with a dedicated launch command team on call."},
+  {name:"Scale", desc:"We tune, harden and extend the platform as your organization's scale and ambition grow."}
+];
+
+var PRICING = [
+  {name:"Starter", monthly:2400, features:["1 active engagement pod","Core cloud & data modules","Business-hours support","Quarterly architecture review","Standard SLA (99.9%)"]},
+  {name:"Growth", monthly:7800, features:["3 active engagement pods","Full platform module access","24/5 support coverage","Monthly architecture review","Enhanced SLA (99.95%)","Dedicated delivery lead"], featured:true},
+  {name:"Enterprise", monthly:22000, features:["Unlimited engagement pods","Full platform + AI & security suite","24/7 dedicated support","Weekly architecture review","Enterprise SLA (99.99%)","Named executive sponsor"]},
+  {name:"Global Scale", monthly:null, features:["Multi-region delivery network","Custom compliance engineering","White-glove onboarding","Continuous embedded team","Custom SLA & governance","Board-level reporting"]}
+];
+var COMPARE_ROWS = [
+  ["Engagement pods","1","3","Unlimited","Unlimited"],
+  ["Platform modules","Core","Full","Full + AI/Security","Full + Custom"],
+  ["Support coverage","Business hours","24/5","24/7","24/7 Dedicated"],
+  ["SLA","99.9%","99.95%","99.99%","Custom"],
+  ["Architecture review","Quarterly","Monthly","Weekly","Continuous"],
+  ["Executive sponsor","—","—","Named","Board-level"]
+];
+var FAQS = [
+  {q:"How quickly can an engagement begin?", a:"Most engagements begin discovery within two weeks of contract signature. Global Scale engagements typically begin with a structural audit in week one."},
+  {q:"Can we mix modules across tiers?", a:"Yes. Growth and above allow custom module composition across all six service disciplines, priced against your engagement scope."},
+  {q:"What does the annual discount apply to?", a:"The annual toggle applies an approximately 18% discount across all named tiers, billed in a single annual cycle."},
+  {q:"Is Global Scale pricing negotiated per contract?", a:"Yes. Global Scale is a custom-quoted tier built around multi-region delivery, compliance engineering and embedded teams."}
+];
+
+var RESOURCES = [
+  {title:"The Structural Case for Zero-Trust at Scale", tag:"Security", time:"9 min"},
+  {title:"Why Legacy Core Banking Systems Fail Under Modern Load", tag:"Financial Services", time:"12 min"},
+  {title:"Designing AI Agents That Enterprises Can Actually Govern", tag:"AI & Automation", time:"7 min"},
+  {title:"A Field Guide to Zero-Downtime Cloud Migration", tag:"Cloud", time:"11 min"},
+  {title:"Data Mesh vs. Data Lake: An Engineering Comparison", tag:"Data & Analytics", time:"8 min"},
+  {title:"What 120 Countries Taught Us About Platform Resilience", tag:"Infrastructure", time:"10 min"}
+];
+
+var TRUST_CLIENTS = ["MERIDIAN CAPITAL","ATLAS LOGISTICS","CONTINENTAL TELECOM","UNITY HEALTH","VANTAGE RAIL","IRONCLAD LABS","QUANTA INSIGHT","NORTHWIND COGNITION","IONIC SYSTEMS"];
+
+/* ========================================================================
+   UTIL
+   ======================================================================== */
+function $(sel, ctx){ return (ctx||document).querySelector(sel); }
+function $all(sel, ctx){ return Array.prototype.slice.call((ctx||document).querySelectorAll(sel)); }
+function el(tag, cls, html){ var e=document.createElement(tag); if(cls) e.className=cls; if(html!==undefined) e.innerHTML=html; return e; }
+function prefersReducedMotion(){ return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
+function fmtMoney(n){ return '$' + n.toLocaleString('en-US'); }
+function starString(rating){
+  var full = Math.round(rating);
+  var s = '';
+  for(var i=0;i<5;i++){ s += (i<full ? '★' : '☆'); }
+  return s + ' ' + rating.toFixed(1);
+}
+
+/* ========================================================================
+   THEME
+   ======================================================================== */
+(function initTheme(){
+  var stored = null;
+  try{ stored = localStorage.getItem('techbiss-theme'); }catch(e){}
+  if(stored === 'dark' || stored === 'light'){
+    document.documentElement.setAttribute('data-theme', stored);
+  }
+  updateThemeIcon();
+})();
+function updateThemeIcon(){
+  var btn = $('#theme-toggle');
+  var isDark = document.documentElement.getAttribute('data-theme') === 'dark' ||
+    (!document.documentElement.hasAttribute('data-theme') && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  if(btn) btn.setAttribute('aria-pressed', isDark ? 'true' : 'false');
+}
+$('#theme-toggle').addEventListener('click', function(){
+  var current = document.documentElement.getAttribute('data-theme');
+  var isDarkNow = current === 'dark' || (!current && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  var next = isDarkNow ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  try{ localStorage.setItem('techbiss-theme', next); }catch(e){}
+  updateThemeIcon();
+});
+
+/* ========================================================================
+   INTRO LOADER
+   ======================================================================== */
+(function intro(){
+  var mark = $('#intro-mark');
+  var word = "TECHBISS";
+  if(prefersReducedMotion()){
+    mark.textContent = word;
+  } else {
+    word.split('').forEach(function(ch, i){
+      var span = document.createElement('span');
+      span.textContent = ch;
+      span.style.animationDelay = (i*0.06) + 's';
+      mark.appendChild(span);
+    });
+  }
+  var dismissDelay = prefersReducedMotion() ? 400 : 1500;
+  setTimeout(function(){
+    $('#intro').classList.add('done');
+    $('#intro').setAttribute('aria-hidden','true');
+  }, dismissDelay);
+})();
+
+/* ========================================================================
+   MOBILE MENU
+   ======================================================================== */
+var mobileMenu = $('#mobile-menu');
+var menuOpenBtn = $('#menu-open');
+var menuCloseBtn = $('#menu-close');
+function openMenu(){
+  mobileMenu.classList.add('is-open');
+  mobileMenu.setAttribute('aria-hidden','false');
+  menuOpenBtn.setAttribute('aria-expanded','true');
+  menuCloseBtn.focus();
+  document.body.style.overflow = 'hidden';
+}
+function closeMenu(){
+  mobileMenu.classList.remove('is-open');
+  mobileMenu.setAttribute('aria-hidden','true');
+  menuOpenBtn.setAttribute('aria-expanded','false');
+  document.body.style.overflow = '';
+  menuOpenBtn.focus();
+}
+menuOpenBtn.addEventListener('click', openMenu);
+menuCloseBtn.addEventListener('click', closeMenu);
+mobileMenu.addEventListener('click', function(e){
+  if(e.target.matches('a[data-nav]')) closeMenu();
+});
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Escape' && mobileMenu.classList.contains('is-open')) closeMenu();
+});
+
+/* ========================================================================
+   RENDER: HOME
+   ======================================================================== */
+function renderHomeServicesTeaser(){
+  var host = $('#home-services-teaser');
+  host.innerHTML = SERVICES.map(function(s, i){
+    return '<a class="teaser-cell" data-nav href="#services">' +
+      '<span class="teaser-idx">0' + (i+1) + '</span>' +
+      '<span><span class="teaser-name">' + s.name + '</span></span>' +
+      '<span class="teaser-arrow" aria-hidden="true">' +
+        '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="6" y1="18" x2="18" y2="6"/><polyline points="8 6 18 6 18 16"/></svg>' +
+      '</span></a>';
+  }).join('');
+}
+
+function renderTrustStrip(){
+  var host = $('#trust-track');
+  var doubled = TRUST_CLIENTS.concat(TRUST_CLIENTS);
+  host.innerHTML = doubled.map(function(c){ return '<span>' + c + '</span>'; }).join('');
+}
+
+function renderHomeCarousel(){
+  var host = $('#home-carousel');
+  host.innerHTML = CASE_STUDIES.map(function(c){
+    return '<div class="cs-card">' +
+      '<div><p class="eyebrow">' + c.industry + '</p><h3 class="type-display" style="font-size:1.7rem;margin-top:10px;">' + c.title + '</h3><p style="margin-top:10px;color:var(--ink-muted);font-size:.9rem;">' + c.result + '</p></div>' +
+      '<div><div class="cs-metric">' + c.metric + '</div><div class="type-mono" style="font-size:.7rem;text-transform:uppercase;color:var(--ink-muted);">' + c.metricLabel + '</div></div>' +
+    '</div>';
+  }).join('');
+  initDraggable(host);
+  $('#cs-prev').addEventListener('click', function(){ host.scrollBy({left:-580, behavior: prefersReducedMotion() ? 'auto' : 'smooth'}); });
+  $('#cs-next').addEventListener('click', function(){ host.scrollBy({left:580, behavior: prefersReducedMotion() ? 'auto' : 'smooth'}); });
+}
+
+function initDraggable(host){
+  var isDown = false, startX, scrollLeft;
+  host.addEventListener('mousedown', function(e){
+    isDown = true;
+    host.classList.add('dragging');
+    startX = e.pageX - host.offsetLeft;
+    scrollLeft = host.scrollLeft;
+  });
+  window.addEventListener('mouseup', function(){ isDown = false; host.classList.remove('dragging'); });
+  host.addEventListener('mouseleave', function(){ isDown = false; host.classList.remove('dragging'); });
+  host.addEventListener('mousemove', function(e){
+    if(!isDown) return;
+    e.preventDefault();
+    var x = e.pageX - host.offsetLeft;
+    var walk = (x - startX) * 1.4;
+    host.scrollLeft = scrollLeft - walk;
+  });
+}
+
+/* ========================================================================
+   COUNTERS
+   ======================================================================== */
+function initCounters(){
+  var counters = $all('[data-count]');
+  if(!('IntersectionObserver' in window)){
+    counters.forEach(runCounter);
+    return;
+  }
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting && !entry.target.dataset.done){
+        entry.target.dataset.done = '1';
+        runCounter(entry.target);
+      }
+    });
+  }, {threshold:0.4});
+  counters.forEach(function(c){ io.observe(c); });
+}
+function runCounter(elx){
+  var target = parseFloat(elx.getAttribute('data-count'));
+  var decimals = parseInt(elx.getAttribute('data-decimals') || '0', 10);
+  var prefix = elx.getAttribute('data-prefix') || '';
+  var suffix = elx.getAttribute('data-suffix') || '';
+  if(prefersReducedMotion()){
+    elx.textContent = prefix + target.toFixed(decimals) + suffix;
+    return;
+  }
+  var duration = 1400;
+  var startTime = null;
+  function frame(ts){
+    if(!startTime) startTime = ts;
+    var progress = Math.min((ts - startTime) / duration, 1);
+    var eased = 1 - Math.pow(1 - progress, 3);
+    var val = target * eased;
+    elx.textContent = prefix + val.toFixed(decimals) + suffix;
+    if(progress < 1) requestAnimationFrame(frame);
+    else elx.textContent = prefix + target.toFixed(decimals) + suffix;
+  }
+  requestAnimationFrame(frame);
+}
+
+/* ========================================================================
+   REVEAL ON SCROLL
+   ======================================================================== */
+function initReveal(root){
+  var targets = $all('.reveal', root);
+  if(!('IntersectionObserver' in window) || prefersReducedMotion()){
+    targets.forEach(function(t){ t.classList.add('in-view'); });
+    return;
+  }
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting){
+        entry.target.classList.add('in-view');
+        io.unobserve(entry.target);
+      }
+    });
+  }, {threshold:0.15});
+  targets.forEach(function(t){ io.observe(t); });
+}
+function markRevealable(root){
+  $all('.section-head', root).forEach(function(h){ h.classList.add('reveal'); });
+}
+
+/* ========================================================================
+   RENDER: SERVICES
+   ======================================================================== */
+function renderServices(){
+  var host = $('#services-grid');
+  host.innerHTML = SERVICES.map(function(s){
+    return '<div class="svc-cell">' +
+      '<svg class="svc-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor">' + s.icon + '</svg>' +
+      '<h3>' + s.name + '</h3>' +
+      '<p class="svc-desc">' + s.desc + '</p>' +
+      '<ul class="svc-bullets">' + s.bullets.map(function(b){ return '<li>' + b + '</li>'; }).join('') + '</ul>' +
+      '<p class="svc-note">Engagements begin from four-week discovery sprints</p>' +
+    '</div>';
+  }).join('');
+}
+
+/* ========================================================================
+   RENDER: SOLUTIONS
+   ======================================================================== */
+var currentSolutionIndex = 0;
+function renderSolutions(){
+  var tabHost = $('#sol-tabs');
+  tabHost.innerHTML = INDUSTRIES.map(function(ind, i){
+    return '<button class="sol-tab" role="tab" id="sol-tab-' + i + '" aria-selected="' + (i===currentSolutionIndex ? 'true':'false') + '" aria-controls="sol-panel" data-idx="' + i + '">' + ind.name + '</button>';
+  }).join('');
+  $all('.sol-tab', tabHost).forEach(function(btn){
+    btn.addEventListener('click', function(){
+      currentSolutionIndex = parseInt(btn.getAttribute('data-idx'), 10);
+      renderSolutions();
+    });
+  });
+  renderSolutionPanel();
+}
+function renderSolutionPanel(){
+  var ind = INDUSTRIES[currentSolutionIndex];
+  var panel = $('#sol-panel');
+  panel.setAttribute('aria-labelledby', 'sol-tab-' + currentSolutionIndex);
+  panel.innerHTML = '<p class="eyebrow">/ SOLUTION</p>' +
+    '<h3>' + ind.name + '</h3>' +
+    '<p>' + ind.desc + '</p>' +
+    '<div class="sol-stats">' + ind.stats.map(function(st){
+      return '<div class="sol-stat"><b>' + st[0] + '</b><span>' + st[1] + '</span></div>';
+    }).join('') + '</div>' +
+    '<a href="#contact" data-nav class="btn btn-primary" style="margin-top:32px;">Discuss This Industry</a>';
+  bindNavLinks(panel);
+}
+
+/* ========================================================================
+   RENDER: MARKETPLACE
+   ======================================================================== */
+var mpActiveCategory = 'All';
+var mpSearchTerm = '';
+function renderMpChips(){
+  var host = $('#mp-chips');
+  host.innerHTML = MP_CATEGORIES.map(function(c){
+    return '<button class="chip" aria-pressed="' + (c===mpActiveCategory ? 'true':'false') + '" data-cat="' + c + '">' + c + '</button>';
+  }).join('');
+  $all('.chip', host).forEach(function(chip){
+    chip.addEventListener('click', function(){
+      mpActiveCategory = chip.getAttribute('data-cat');
+      renderMpChips();
+      renderMpGrid();
+    });
+  });
+}
+function renderMpGrid(){
+  var host = $('#mp-grid');
+  var filtered = PRODUCTS.filter(function(p){
+    var catOk = mpActiveCategory === 'All' || p.category === mpActiveCategory;
+    var term = mpSearchTerm.trim().toLowerCase();
+    var searchOk = !term || (p.name.toLowerCase().indexOf(term) > -1 || p.vendor.toLowerCase().indexOf(term) > -1 || p.category.toLowerCase().indexOf(term) > -1);
+    return catOk && searchOk;
+  });
+  if(filtered.length === 0){
+    host.innerHTML = '<div class="mp-empty">No products match your search.</div>';
+    return;
+  }
+  host.innerHTML = filtered.map(function(p){
+    return '<button class="mp-card" data-id="' + p.id + '">' +
+      '<span class="mp-cat">' + p.category + '</span>' +
+      '<span class="mp-name">' + p.name + '</span>' +
+      '<span class="mp-vendor">' + p.vendor + '</span>' +
+      '<span class="mp-stars">' + starString(p.rating) + '</span>' +
+      '<span class="mp-blurb">' + p.blurb + '</span>' +
+      '<span class="mp-price">' + fmtMoney(p.price) + (p.unit === '/mo' ? '<span style="font-size:.8rem;">/mo</span>' : '') + '</span>' +
+    '</button>';
+  }).join('');
+  $all('.mp-card', host).forEach(function(card){
+    card.addEventListener('click', function(){ openDrawer(card.getAttribute('data-id')); });
+  });
+}
+$('#mp-search').addEventListener('input', function(e){
+  mpSearchTerm = e.target.value;
+  renderMpGrid();
+});
+
+/* ---- Drawer / Modal ---- */
+var lastFocusedBeforeDrawer = null;
+var drawerCurrentProduct = null;
+function openDrawer(id){
+  var product = PRODUCTS.filter(function(p){ return p.id === id; })[0];
+  if(!product) return;
+  drawerCurrentProduct = product;
+  lastFocusedBeforeDrawer = document.activeElement;
+  $('#drawer-title').textContent = product.name;
+  $('#drawer-body').innerHTML =
+    '<div class="drawer-visual">' + abstractPatternSVG(product.id) + '</div>' +
+    '<p class="eyebrow">' + product.category + ' &middot; ' + product.vendor + '</p>' +
+    '<p style="margin-top:12px;">' + product.blurb + '</p>' +
+    '<p style="margin-top:16px;font-family:var(--font-mono);font-size:.85rem;">' + starString(product.rating) + '</p>' +
+    '<p class="type-display" style="font-size:2rem;margin-top:16px;">' + fmtMoney(product.price) + (product.unit==='/mo' ? '<span style="font-size:1rem;font-family:var(--font-mono);">/mo</span>' : '') + '</p>' +
+    '<p style="margin-top:16px;"><a href="#product" data-nav data-product-id="' + product.id + '" style="text-decoration:underline;color:var(--accent);">View full product page &rarr;</a></p>';
+  bindNavLinks($('#drawer-body'));
+  $all('a[data-product-id]', $('#drawer-body')).forEach(function(a){
+    a.addEventListener('click', function(){ currentProductId = product.id; closeDrawer(); });
+  });
+  var overlay = $('#drawer-overlay');
+  overlay.classList.add('is-open');
+  overlay.setAttribute('aria-hidden','false');
+  $('#drawer-close').focus();
+  document.body.style.overflow = 'hidden';
+}
+function closeDrawer(){
+  var overlay = $('#drawer-overlay');
+  overlay.classList.remove('is-open');
+  overlay.setAttribute('aria-hidden','true');
+  document.body.style.overflow = '';
+  if(lastFocusedBeforeDrawer) lastFocusedBeforeDrawer.focus();
+}
+$('#drawer-close').addEventListener('click', closeDrawer);
+$('#drawer-overlay').addEventListener('click', function(e){ if(e.target === $('#drawer-overlay')) closeDrawer(); });
+$('#drawer-purchase').addEventListener('click', function(){
+  if(drawerCurrentProduct) currentProductId = drawerCurrentProduct.id;
+  closeDrawer();
+  location.hash = '#product';
+});
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Escape' && $('#drawer-overlay').classList.contains('is-open')) closeDrawer();
+  if(e.key === 'Tab' && $('#drawer-overlay').classList.contains('is-open')) trapFocus(e, $('#mp-drawer'));
+});
+function trapFocus(e, container){
+  var focusables = $all('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])', container).filter(function(elx){ return !elx.disabled; });
+  if(focusables.length === 0) return;
+  var first = focusables[0], last = focusables[focusables.length-1];
+  if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+  else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+}
+function abstractPatternSVG(seed){
+  var n = 0; for(var i=0;i<seed.length;i++) n += seed.charCodeAt(i);
+  var lines = '';
+  for(var j=0;j<8;j++){
+    var x1 = (n*j*13)%400, y1=(n*j*7)%225, x2=(n*(j+3)*11)%400, y2=(n*(j+5)*5)%225;
+    lines += '<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="currentColor" stroke-width="1"/>';
+  }
+  return '<svg viewBox="0 0 400 225" preserveAspectRatio="xMidYMid slice"><rect width="400" height="225" fill="none"/>' + lines + '<circle cx="'+(n%400)+'" cy="'+(n%225)+'" r="5" fill="#d1361f"/></svg>';
+}
+
+/* ========================================================================
+   RENDER: PRODUCT
+   ======================================================================== */
+var currentProductId = 'p3';
+function renderProduct(){
+  var product = PRODUCTS.filter(function(p){ return p.id === currentProductId; })[0] || PRODUCTS[2];
+  var host = $('#product-layout');
+  var reviews = [
+    {name:"VP Engineering, Global Bank", stars:5, text:"Deployment was clean and the support team clearly understands regulated environments."},
+    {name:"Director of Platform, Logistics Group", stars:4, text:"Strong module. Documentation could be more detailed for custom configurations."},
+    {name:"CTO, Mid-Market Retailer", stars:5, text:"Integrated with our existing stack in under three weeks. Meaningful ROI by month two."}
+  ];
+  host.innerHTML =
+    '<div class="product-visual">' + abstractPatternSVG(product.id + 'detail') + '</div>' +
+    '<div class="product-side">' +
+      '<p class="eyebrow">' + product.category + '</p>' +
+      '<h1 id="product-h1" class="type-display" style="font-size:2.2rem;margin-top:10px;">' + product.name + '</h1>' +
+      '<p style="color:var(--ink-muted);margin-top:6px;">by ' + product.vendor + '</p>' +
+      '<p class="type-mono" style="margin-top:12px;">' + starString(product.rating) + ' &middot; ' + reviews.length + ' reviews</p>' +
+      '<p class="type-display" style="font-size:2.4rem;margin-top:20px;">' + fmtMoney(product.price) + (product.unit==='/mo' ? '<span style="font-size:1.1rem;font-family:var(--font-mono);">/mo</span>' : '') + '</p>' +
+      '<button class="btn btn-primary btn-block" style="margin-top:20px;" id="product-purchase-btn">Purchase</button>' +
+      '<hr class="hairline-soft" style="margin:24px 0;">' +
+      '<p style="font-size:.85rem;color:var(--ink-muted);">Deployed directly into your TECHBISS environment. Onboarding support included with every purchase.</p>' +
+    '</div>' +
+    '<div class="product-main" style="grid-column:1 / -1;border-top:1px solid var(--line);">' +
+      '<h2 class="type-display" style="font-size:1.6rem;">Overview</h2>' +
+      '<p class="measure" style="margin-top:12px;color:var(--ink-muted);">' + product.blurb + ' Built as a modular component of the TECHBISS platform, it deploys against existing enterprise identity, data and compliance frameworks without requiring a parallel infrastructure buildout.</p>' +
+      '<h2 class="type-display" style="font-size:1.6rem;margin-top:40px;">Features</h2>' +
+      '<ul class="feature-list" style="margin-top:12px;max-width:60ch;">' +
+        '<li>Native integration with core TECHBISS platform identity & data layer</li>' +
+        '<li>Enterprise-grade audit logging and compliance reporting</li>' +
+        '<li>Configurable deployment across single or multi-region environments</li>' +
+        '<li>Dedicated onboarding engineer for first 30 days</li>' +
+      '</ul>' +
+      '<h2 class="type-display" style="font-size:1.6rem;margin-top:40px;">Reviews</h2>' +
+      '<div style="margin-top:12px;max-width:60ch;">' + reviews.map(function(r){
+        return '<div class="review"><p class="review-stars">' + '★'.repeat(r.stars) + '☆'.repeat(5-r.stars) + '</p><p style="margin-top:6px;">' + r.text + '</p><p style="margin-top:6px;font-family:var(--font-mono);font-size:.72rem;color:var(--ink-muted);">' + r.name + '</p></div>';
+      }).join('') + '</div>' +
+    '</div>';
+  var buyBtn = $('#product-purchase-btn');
+  if(buyBtn) buyBtn.addEventListener('click', function(){ location.hash = '#installer'; });
+}
+
+/* ========================================================================
+   RENDER: WORK
+   ======================================================================== */
+var workActiveFilter = 'All';
+function renderWork(){
+  var industries = ['All'].concat(CASE_STUDIES.map(function(c){ return c.industry; }));
+  var uniqueIndustries = industries.filter(function(v,i,a){ return a.indexOf(v) === i; });
+  var filterHost = $('#work-filter');
+  filterHost.innerHTML = uniqueIndustries.map(function(ind){
+    return '<button class="chip" aria-pressed="' + (ind===workActiveFilter ? 'true':'false') + '" data-ind="' + ind + '">' + ind + '</button>';
+  }).join('');
+  $all('.chip', filterHost).forEach(function(chip){
+    chip.addEventListener('click', function(){
+      workActiveFilter = chip.getAttribute('data-ind');
+      renderWork();
+    });
+  });
+  var grid = $('#work-grid');
+  var filtered = CASE_STUDIES.filter(function(c){ return workActiveFilter === 'All' || c.industry === workActiveFilter; });
+  grid.innerHTML = filtered.map(function(c){
+    return '<div class="work-card">' +
+      '<p class="work-industry">' + c.industry + '</p>' +
+      '<h3>' + c.title + '</h3>' +
+      '<div class="work-metric">' + c.metric + '</div>' +
+      '<div class="work-metric-label">' + c.metricLabel + '</div>' +
+      '<div class="work-block"><b>Challenge</b><p>' + c.challenge + '</p></div>' +
+      '<div class="work-block"><b>Approach</b><p>' + c.approach + '</p></div>' +
+      '<div class="work-block"><b>Result</b><p>' + c.result + '</p></div>' +
+    '</div>';
+  }).join('');
+}
+
+/* ========================================================================
+   RENDER: PROCESS TIMELINE
+   ======================================================================== */
+function renderProcess(){
+  var host = $('#process-timeline');
+  var progressBar = $('#tl-progress');
+  host.innerHTML = '<div class="tl-progress" id="tl-progress"></div>' + PROCESS_STEPS.map(function(s, i){
+    return '<div class="tl-step" data-step-el>' +
+      '<div class="tl-num">0' + (i+1) + '</div>' +
+      '<div class="tl-body"><h3>' + s.name + '</h3><p>' + s.desc + '</p></div>' +
+    '</div>';
+  }).join('');
+  updateTimelineProgress();
+}
+function updateTimelineProgress(){
+  var host = $('#process-timeline');
+  var bar = $('#tl-progress');
+  if(!host || !bar) return;
+  var rect = host.getBoundingClientRect();
+  var viewportH = window.innerHeight;
+  var total = rect.height;
+  var visibleStart = Math.min(Math.max(viewportH - rect.top, 0), total);
+  var ratio = total > 0 ? visibleStart / total : 0;
+  bar.style.transform = 'scaleY(' + Math.min(Math.max(ratio,0),1) + ')';
+}
+window.addEventListener('scroll', function(){
+  if(currentRoute === 'process') updateTimelineProgress();
+}, {passive:true});
+
+/* ========================================================================
+   RENDER: ABOUT
+   ======================================================================== */
+function renderAbout(){
+  var values = [
+    {name:"Structural Integrity", desc:"Every system we build is designed to be inherited, audited and extended by the next team."},
+    {name:"Radical Transparency", desc:"Clients see the same architecture diagrams and risk registers our engineers work from."},
+    {name:"Built to Outlast", desc:"We design for the decade ahead, not the next funding round or vendor trend."}
+  ];
+  $('#values-grid').innerHTML = values.map(function(v){
+    return '<div class="value-cell"><h4>' + v.name + '</h4><p>' + v.desc + '</p></div>';
+  }).join('');
+  renderPresenceSVG();
+}
+function renderPresenceSVG(){
+  var svg = $('#presence-svg');
+  var points = [];
+  var seedX = [80,180,260,340,420,500,580,660,740,820,900,150,610,940,60];
+  var seedY = [120,60,180,90,200,50,150,220,80,160,110,240,260,230,190];
+  for(var i=0;i<seedX.length;i++){ points.push([seedX[i], seedY[i]]); }
+  var lines = '';
+  for(var j=0;j<points.length;j++){
+    var next = points[(j+3)%points.length];
+    lines += '<line x1="'+points[j][0]+'" y1="'+points[j][1]+'" x2="'+next[0]+'" y2="'+next[1]+'" stroke="currentColor" stroke-width="0.6" opacity="0.35"/>';
+  }
+  var dots = points.map(function(p, i){
+    return '<circle cx="'+p[0]+'" cy="'+p[1]+'" r="' + (i%4===0?5:3) + '" fill="' + (i%4===0 ? '#d1361f' : 'currentColor') + '" />';
+  }).join('');
+  svg.innerHTML = '<line x1="0" y1="170" x2="1000" y2="170" stroke="currentColor" stroke-width="0.5" opacity="0.25"/>' + lines + dots;
+}
+
+/* ========================================================================
+   RENDER: RESOURCES
+   ======================================================================== */
+var resActiveTag = 'All';
+function renderResources(){
+  var tags = ['All'].concat(RESOURCES.map(function(r){ return r.tag; }).filter(function(v,i,a){ return a.indexOf(v)===i; }));
+  var chipHost = $('#res-chips');
+  chipHost.innerHTML = tags.map(function(t){
+    return '<button class="chip" aria-pressed="' + (t===resActiveTag?'true':'false') + '" data-tag="' + t + '">' + t + '</button>';
+  }).join('');
+  $all('.chip', chipHost).forEach(function(chip){
+    chip.addEventListener('click', function(){ resActiveTag = chip.getAttribute('data-tag'); renderResources(); });
+  });
+  var list = $('#res-list');
+  var filtered = RESOURCES.filter(function(r){ return resActiveTag === 'All' || r.tag === resActiveTag; });
+  list.innerHTML = filtered.map(function(r){
+    return '<div class="res-item"><span class="res-tag">' + r.tag + '</span><h3>' + r.title + '</h3><span class="res-time">' + r.time + ' READ</span></div>';
+  }).join('');
+}
+var newsletterForm = $('#newsletter-form');
+newsletterForm.addEventListener('submit', function(e){
+  e.preventDefault();
+  var input = $('#newsletter-email');
+  if(input.checkValidity()){
+    newsletterForm.style.display = 'none';
+    $('#newsletter-success').classList.add('show');
+  } else {
+    input.reportValidity();
+  }
+});
+
+/* ========================================================================
+   RENDER: PRICING
+   ======================================================================== */
+var isAnnual = false;
+var ANNUAL_DISCOUNT = 0.18;
+function renderPricing(){
+  var grid = $('#price-grid');
+  grid.innerHTML = PRICING.map(function(tier){
+    var priceDisplay;
+    if(tier.monthly === null){
+      priceDisplay = '<div class="price-num">Custom</div>';
+    } else {
+      var val = isAnnual ? Math.round(tier.monthly * (1 - ANNUAL_DISCOUNT)) : tier.monthly;
+      priceDisplay = '<div class="price-num" data-live-price data-base="' + tier.monthly + '">$' + val.toLocaleString('en-US') + '<sup>/mo</sup></div>';
+    }
+    return '<div class="price-cell' + (tier.featured ? ' is-featured' : '') + '">' +
+      '<span class="price-tier">' + tier.name + '</span>' +
+      priceDisplay +
+      '<hr class="hairline-soft" style="margin:18px 0;">' +
+      '<ul class="price-features">' + tier.features.map(function(f){ return '<li>' + f + '</li>'; }).join('') + '</ul>' +
+      '<a href="#contact" data-nav class="btn' + (tier.featured ? ' btn-primary' : '') + '">' + (tier.monthly === null ? 'Request Quote' : 'Choose Plan') + '</a>' +
+    '</div>';
+  }).join('');
+  bindNavLinks(grid);
+
+  var table = $('#compare-table');
+  table.innerHTML = '<thead><tr><th>Feature</th>' + PRICING.map(function(t){ return '<th>' + t.name + '</th>'; }).join('') + '</tr></thead>' +
+    '<tbody>' + COMPARE_ROWS.map(function(row){
+      return '<tr><td>' + row[0] + '</td>' + row.slice(1).map(function(cell){ return '<td>' + cell + '</td>'; }).join('') + '</tr>';
+    }).join('') + '</tbody>';
+
+  var faqHost = $('#faq-list');
+  if(!faqHost.dataset.rendered){
+    faqHost.innerHTML = FAQS.map(function(f, i){
+      return '<div class="faq-item" data-open="false"><button class="faq-q" aria-expanded="false" aria-controls="faq-a-' + i + '" id="faq-q-' + i + '">' + f.q + '<span class="faq-plus" aria-hidden="true"></span></button>' +
+        '<div class="faq-a" id="faq-a-' + i + '" role="region" aria-labelledby="faq-q-' + i + '"><p>' + f.a + '</p></div></div>';
+    }).join('');
+    $all('.faq-q', faqHost).forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var item = btn.closest('.faq-item');
+        var answer = $('.faq-a', item);
+        var isOpen = item.getAttribute('data-open') === 'true';
+        if(isOpen){
+          item.setAttribute('data-open','false');
+          btn.setAttribute('aria-expanded','false');
+          answer.style.maxHeight = null;
+        } else {
+          item.setAttribute('data-open','true');
+          btn.setAttribute('aria-expanded','true');
+          answer.style.maxHeight = answer.scrollHeight + 'px';
+        }
+      });
+    });
+    faqHost.dataset.rendered = '1';
+  }
+}
+$('#price-toggle').addEventListener('click', function(){
+  isAnnual = !isAnnual;
+  var toggle = $('#price-toggle');
+  toggle.setAttribute('aria-checked', isAnnual ? 'true' : 'false');
+  animatePriceTransition();
+});
+function animatePriceTransition(){
+  var nums = $all('[data-live-price]');
+  nums.forEach(function(numEl){
+    var base = parseFloat(numEl.getAttribute('data-base'));
+    var target = isAnnual ? Math.round(base * (1 - ANNUAL_DISCOUNT)) : base;
+    if(prefersReducedMotion()){
+      numEl.innerHTML = '$' + target.toLocaleString('en-US') + '<sup>/mo</sup>';
+      return;
+    }
+    var startVal = parseFloat((numEl.textContent||'').replace(/[^0-9.]/g,'')) || base;
+    var startTime = null;
+    var duration = 400;
+    function frame(ts){
+      if(!startTime) startTime = ts;
+      var progress = Math.min((ts-startTime)/duration,1);
+      var val = Math.round(startVal + (target-startVal)*progress);
+      numEl.innerHTML = '$' + val.toLocaleString('en-US') + '<sup>/mo</sup>';
+      if(progress<1) requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  });
+}
+
+/* ========================================================================
+   CONTACT FORM
+   ======================================================================== */
+function validateField(field, validatorFn){
+  var isValid = validatorFn();
+  field.classList.toggle('has-error', !isValid);
+  return isValid;
+}
+var contactForm = $('#contact-form');
+contactForm.addEventListener('submit', function(e){
+  e.preventDefault();
+  var first = $('#cf-first'), last = $('#cf-last'), email = $('#cf-email'), company = $('#cf-company'), message = $('#cf-message');
+  var emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  var okFirst = validateField($('[data-field="firstName"]'), function(){ return first.value.trim().length > 0; });
+  var okLast = validateField($('[data-field="lastName"]'), function(){ return last.value.trim().length > 0; });
+  var okEmail = validateField($('[data-field="email"]'), function(){ return emailRe.test(email.value.trim()); });
+  var okCompany = validateField($('[data-field="company"]'), function(){ return company.value.trim().length > 0; });
+  var okMessage = validateField($('[data-field="message"]'), function(){ return message.value.trim().length > 3; });
+  if(okFirst && okLast && okEmail && okCompany && okMessage){
+    contactForm.querySelectorAll('.field, button[type="submit"]').forEach(function(node){ node.style.display = 'none'; });
+    $('#contact-success').classList.add('show');
+  }
+});
+
+/* ========================================================================
+   LOGIN FORM
+   ======================================================================== */
+var pwToggle = $('#pw-toggle');
+pwToggle.addEventListener('click', function(){
+  var pwInput = $('#lf-password');
+  var isPassword = pwInput.type === 'password';
+  pwInput.type = isPassword ? 'text' : 'password';
+  pwToggle.textContent = isPassword ? 'Hide' : 'Show';
+  pwToggle.setAttribute('aria-pressed', isPassword ? 'true' : 'false');
+});
+var loginForm = $('#login-form');
+loginForm.addEventListener('submit', function(e){
+  e.preventDefault();
+  var email = $('#lf-email'), pw = $('#lf-password');
+  var emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  var okEmail = validateField($('[data-field="loginEmail"]'), function(){ return emailRe.test(email.value.trim()); });
+  var okPw = validateField($('[data-field="loginPassword"]'), function(){ return pw.value.length > 0; });
+  if(okEmail && okPw){
+    loginForm.querySelectorAll('.field, .row-between, button[type="submit"]').forEach(function(node){ node.style.display = 'none'; });
+    $('#login-success').classList.add('show');
+    setTimeout(function(){ location.hash = '#dashboard'; }, 1300);
+  }
+});
+
+/* ========================================================================
+   INSTALLER WIZARD
+   ======================================================================== */
+var INSTALL_STEPS = ["Select","Detect","Configure","Migrate","Install","Verify","Launch"];
+var installStepIndex = 0;
+var installState = { module:null, scanned:false, migrated:false, installed:false, verified:false };
+var SCAN_ITEMS = [
+  {label:"Identity Provider", status:"Compatible"},
+  {label:"Network Topology", status:"3 VPCs Detected"},
+  {label:"Existing Data Stores", status:"2 Sources Found"},
+  {label:"Compliance Baseline", status:"SOC 2 Aligned"},
+  {label:"Compute Capacity", status:"Sufficient"}
+];
+var VERIFY_ITEMS = ["Module binaries verified", "Health checks passing", "Data integrity confirmed", "Rollback snapshot created"];
+var MODULES = [
+  {name:"Cloud Foundation", desc:"Core infrastructure module."},
+  {name:"AI Copilot Layer", desc:"Enterprise agent deployment."},
+  {name:"Security Baseline", desc:"Zero-trust policy engine."}
+];
+
+function renderStepper(){
+  var host = $('#install-stepper');
+  host.innerHTML = INSTALL_STEPS.map(function(name, i){
+    var cls = 'step-tab' + (i===installStepIndex ? ' is-active':'') + (i<installStepIndex ? ' is-done':'');
+    return '<button class="' + cls + '" role="tab" aria-selected="' + (i===installStepIndex?'true':'false') + '" data-step="' + i + '"><span class="n">0' + (i+1) + '</span>' + name + '</button>';
+  }).join('');
+  $all('.step-tab', host).forEach(function(tab){
+    tab.addEventListener('click', function(){
+      var idx = parseInt(tab.getAttribute('data-step'),10);
+      if(idx <= installStepIndex || idx === installStepIndex+1){ goToInstallStep(Math.min(idx, installStepIndex)); }
+    });
+  });
+}
+function renderModules(){
+  var host = $('#install-modules');
+  host.innerHTML = MODULES.map(function(m, i){
+    return '<button class="module-card" aria-pressed="' + (installState.module===i ? 'true':'false') + '" data-idx="' + i + '"><h4>' + m.name + '</h4><p>' + m.desc + '</p></button>';
+  }).join('');
+  $all('.module-card', host).forEach(function(card){
+    card.addEventListener('click', function(){
+      installState.module = parseInt(card.getAttribute('data-idx'),10);
+      renderModules();
+      updateInstallNextState();
+    });
+  });
+}
+$('#run-scan').addEventListener('click', function(){
+  var list = $('#scan-list');
+  list.innerHTML = '';
+  SCAN_ITEMS.forEach(function(item, i){
+    setTimeout(function(){
+      var row = document.createElement('div');
+      row.className = 'scan-item';
+      row.style.animationDelay = '0s';
+      row.innerHTML = '<span>' + item.label + '</span><span class="scan-status">' + item.status + '</span>';
+      list.appendChild(row);
+      if(i === SCAN_ITEMS.length-1){ installState.scanned = true; updateInstallNextState(); }
+    }, prefersReducedMotion() ? 0 : i * 350);
+  });
+});
+$('#run-migrate').addEventListener('click', function(){
+  var fill = $('#migrate-fill'), log = $('#migrate-log');
+  log.innerHTML = '';
+  fill.style.width = '0%';
+  var lines = ["Connecting to source environment...","Snapshotting existing configuration...","Transferring historical records (1.2M rows)...","Validating referential integrity...","Migration complete."];
+  var progress = 0;
+  var stepDur = prefersReducedMotion() ? 50 : 500;
+  lines.forEach(function(line, i){
+    setTimeout(function(){
+      var div = document.createElement('div');
+      div.textContent = '[' + new Date().toLocaleTimeString() + '] ' + line;
+      log.appendChild(div);
+      log.scrollTop = log.scrollHeight;
+      progress = Math.round(((i+1)/lines.length)*100);
+      fill.style.width = progress + '%';
+      if(i === lines.length-1){ installState.migrated = true; updateInstallNextState(); }
+    }, i*stepDur);
+  });
+});
+$('#run-install').addEventListener('click', function(){
+  var fill = $('#install-fill'), log = $('#install-log');
+  log.innerHTML = '';
+  fill.style.width = '0%';
+  var lines = ["Provisioning compute resources...","Installing module binaries...","Registering platform hooks...","Running smoke tests...","Install complete."];
+  var stepDur = prefersReducedMotion() ? 50 : 480;
+  lines.forEach(function(line, i){
+    setTimeout(function(){
+      var div = document.createElement('div');
+      div.textContent = '[' + new Date().toLocaleTimeString() + '] ' + line;
+      log.appendChild(div);
+      log.scrollTop = log.scrollHeight;
+      fill.style.width = Math.round(((i+1)/lines.length)*100) + '%';
+      if(i === lines.length-1){ installState.installed = true; updateInstallNextState(); }
+    }, i*stepDur);
+  });
+});
+$('#run-verify').addEventListener('click', function(){
+  var list = $('#verify-list');
+  list.innerHTML = VERIFY_ITEMS.map(function(item){
+    return '<li data-checked="false"><span class="mark"></span>' + item + '</li>';
+  }).join('');
+  var items = $all('li', list);
+  items.forEach(function(item, i){
+    setTimeout(function(){
+      item.setAttribute('data-checked','true');
+      if(i === items.length-1){ installState.verified = true; updateInstallNextState(); }
+    }, prefersReducedMotion() ? 0 : (i+1)*400);
+  });
+});
+function updateInstallNextState(){
+  var nextBtn = $('#install-next');
+  var requirements = [
+    installState.module !== null,
+    installState.scanned,
+    true, // configure step always allowed
+    installState.migrated,
+    installState.installed,
+    installState.verified,
+    false // final step: no next
+  ];
+  nextBtn.disabled = !requirements[installStepIndex];
+  if(installStepIndex === INSTALL_STEPS.length-1) nextBtn.style.visibility = 'hidden';
+  else nextBtn.style.visibility = 'visible';
+}
+function goToInstallStep(idx){
+  installStepIndex = Math.max(0, Math.min(idx, INSTALL_STEPS.length-1));
+  $all('.install-panel').forEach(function(panel){
+    panel.hidden = parseInt(panel.getAttribute('data-step'),10) !== installStepIndex;
+  });
+  renderStepper();
+  updateInstallNextState();
+  $('#install-back').disabled = installStepIndex === 0;
+}
+$('#install-next').addEventListener('click', function(){
+  if(installStepIndex < INSTALL_STEPS.length-1) goToInstallStep(installStepIndex+1);
+});
+$('#install-back').addEventListener('click', function(){
+  if(installStepIndex > 0) goToInstallStep(installStepIndex-1);
+});
+function initInstaller(){
+  installStepIndex = 0;
+  installState = { module:null, scanned:false, migrated:false, installed:false, verified:false };
+  renderModules();
+  renderStepper();
+  goToInstallStep(0);
+}
+
+/* ========================================================================
+   DASHBOARD
+   ======================================================================== */
+var dashActiveTab = 'admin';
+var DASH_DATA = {
+  admin:{
+    kpis:[["Active Tenants","842","+18 this mo."],["MRR","$4.86M","+6.2%"],["Platform Uptime","99.99%","stable"],["Open Support Tickets","37","-4 this wk"]],
+    chartLabels:["Apr","May","Jun","Jul","Aug","Sep"],
+    chartValues:[3.9,4.1,4.3,4.5,4.7,4.86],
+    activity:[["09:14","Tenant Vantage Rail upgraded to Enterprise tier"],["08:47","New region EU-West-2 provisioned"],["Yesterday","3 support tickets escalated to critical"],["Yesterday","Quarterly SLA report generated"]],
+    table:{headers:["Tenant","Plan","MRR","Status"], rows:[
+      ["Meridian Capital Group","Global Scale","$182,000","Healthy"],
+      ["Atlas Logistics Network","Enterprise","$22,000","Healthy"],
+      ["Continental Telecom","Enterprise","$22,000","At Risk"],
+      ["Unity Health Network","Growth","$7,800","Healthy"],
+      ["Ironclad Labs","Starter","$2,400","Critical"]
+    ]}
+  },
+  client:{
+    kpis:[["Active Projects","4","on schedule"],["Deployed Modules","11","+2 this mo."],["Open Invoices","2","$48,200 due"],["Support SLA","99.95%","met"]],
+    chartLabels:["W1","W2","W3","W4","W5","W6"],
+    chartValues:[62,68,71,75,80,88],
+    activity:[["Today","Migration module completed Verify step"],["Yesterday","Invoice INV-3391 issued"],["2 days ago","New environment prod-eu-west provisioned"],["4 days ago","Quarterly architecture review scheduled"]],
+    table:{headers:["Project","Module","Progress","Status"], rows:[
+      ["Core Banking Modernization","Cloud Foundation","82%","Healthy"],
+      ["Fraud Detection Rollout","AI Copilot Layer","54%","Healthy"],
+      ["Compliance Hardening","Security Baseline","91%","Healthy"],
+      ["Data Platform Expansion","Analytics Dashboards","23%","At Risk"]
+    ]}
+  },
+  staff:{
+    kpis:[["Assigned Tickets","14","3 due today"],["Utilization","87%","+4% this wk"],["Avg. Resolution","6.2h","-0.8h"],["Team Capacity","92%","near limit"]],
+    chartLabels:["Mon","Tue","Wed","Thu","Fri"],
+    chartValues:[71,84,79,90,87],
+    activity:[["11:02","Ticket #4821 resolved by A. Chen"],["10:30","Escalation raised on Continental Telecom account"],["09:15","Standup notes posted to team channel"],["Yesterday","Sprint retro completed"]],
+    table:{headers:["Ticket","Client","Priority","Status"], rows:[
+      ["#4821","Meridian Capital","Medium","Healthy"],
+      ["#4822","Continental Telecom","High","Critical"],
+      ["#4809","Unity Health Network","Low","Healthy"],
+      ["#4815","Atlas Logistics","High","At Risk"]
+    ]}
+  }
+};
+function renderDashboard(){
+  var data = DASH_DATA[dashActiveTab];
+  var host = $('#dash-content');
+  var maxVal = Math.max.apply(null, data.chartValues);
+  var bars = data.chartValues.map(function(v, i){
+    var pct = Math.round((v/maxVal)*100);
+    var isHi = i === data.chartValues.length-1;
+    return '<div class="bar' + (isHi ? ' hi':'') + '" style="height:' + pct + '%" data-val="' + v + '"></div>';
+  }).join('');
+  var barLabels = data.chartLabels.map(function(l){ return '<span>' + l + '</span>'; }).join('');
+  var kpis = data.kpis.map(function(k){
+    return '<div class="kpi-cell"><div class="kpi-label">' + k[0] + '</div><div class="kpi-num">' + k[1] + '</div><div class="kpi-delta">' + k[2] + '</div></div>';
+  }).join('');
+  var activity = data.activity.map(function(a){
+    return '<div class="activity-item"><span class="activity-time">' + a[0] + '</span><span>' + a[1] + '</span></div>';
+  }).join('');
+  var tableHead = data.table.headers.map(function(h){ return '<th>' + h + '</th>'; }).join('');
+  var tableRows = data.table.rows.map(function(row){
+    var status = row[row.length-1];
+    var pillClass = (status === 'Critical' || status === 'At Risk') ? 'pill critical' : 'pill';
+    var cells = row.slice(0,-1).map(function(c){ return '<td>' + c + '</td>'; }).join('');
+    return '<tr>' + cells + '<td><span class="' + pillClass + '">' + status + '</span></td></tr>';
+  }).join('');
+
+  host.innerHTML =
+    '<div class="kpi-grid">' + kpis + '</div>' +
+    '<div class="chart-block"><h4>Trend &mdash; Last ' + data.chartLabels.length + ' Periods</h4>' +
+      '<div class="bar-chart">' + bars + '</div>' +
+      '<div class="bar-labels">' + barLabels + '</div>' +
+    '</div>' +
+    '<div class="dash-lower">' +
+      '<div class="activity-feed"><h4>Activity Feed</h4>' + activity + '</div>' +
+      '<div style="border:1px solid var(--line);overflow-x:auto;">' +
+        '<table class="data-table"><thead><tr>' + tableHead + '</tr></thead><tbody>' + tableRows + '</tbody></table>' +
+      '</div>' +
+    '</div>';
+}
+$all('.dash-tab').forEach(function(tab){
+  tab.addEventListener('click', function(){
+    dashActiveTab = tab.getAttribute('data-dash');
+    $all('.dash-tab').forEach(function(t){ t.setAttribute('aria-selected', t===tab ? 'true':'false'); });
+    renderDashboard();
+  });
+});
+
+/* ========================================================================
+   ROUTER
+   ======================================================================== */
+var VALID_ROUTES = ["home","services","solutions","marketplace","product","work","process","about","resources","pricing","contact","login","installer","dashboard"];
+var currentRoute = 'home';
+
+function bindNavLinks(root){
+  $all('a[data-nav]', root).forEach(function(a){
+    if(a.dataset.bound) return;
+    a.dataset.bound = '1';
+  });
+}
+
+function setActiveNav(route){
+  $all('.nav-link[data-nav]').forEach(function(link){
+    var href = link.getAttribute('href').replace('#','');
+    if(href === route){ link.classList.add('is-active'); link.setAttribute('aria-current','page'); }
+    else { link.classList.remove('is-active'); link.removeAttribute('aria-current'); }
+  });
+}
+
+function renderRoute(route){
+  switch(route){
+    case 'home': break;
+    case 'services': renderServices(); break;
+    case 'solutions': renderSolutions(); break;
+    case 'marketplace': renderMpChips(); renderMpGrid(); break;
+    case 'product': renderProduct(); break;
+    case 'work': renderWork(); break;
+    case 'process': renderProcess(); break;
+    case 'about': renderAbout(); break;
+    case 'resources': renderResources(); break;
+    case 'pricing': renderPricing(); break;
+    case 'contact': break;
+    case 'login': break;
+    case 'installer': initInstaller(); break;
+    case 'dashboard': renderDashboard(); break;
+  }
+}
+
+function router(){
+  var hash = location.hash.replace('#','') || 'home';
+  if(VALID_ROUTES.indexOf(hash) === -1) hash = 'home';
+  currentRoute = hash;
+  $all('section[data-route]').forEach(function(sec){
+    var isMatch = sec.getAttribute('data-route') === hash;
+    sec.classList.toggle('is-active', isMatch);
+    sec.classList.remove('route-fade');
+    if(isMatch){
+      void sec.offsetWidth;
+      sec.classList.add('route-fade');
+    }
+  });
+  setActiveNav(hash);
+  renderRoute(hash);
+  markRevealable(document.querySelector('section[data-route="' + hash + '"]'));
+  initReveal(document.querySelector('section[data-route="' + hash + '"]'));
+  window.scrollTo({top:0, behavior:'auto'});
+  if(hash === 'process') setTimeout(updateTimelineProgress, 60);
+}
+
+window.addEventListener('hashchange', router);
+
+/* ========================================================================
+   INIT
+   ======================================================================== */
+document.addEventListener('DOMContentLoaded', function(){});
+
+renderHomeServicesTeaser();
+renderTrustStrip();
+renderHomeCarousel();
+initCounters();
+router();
+markRevealable(document);
+initReveal(document);
+
+})();
+</script>
