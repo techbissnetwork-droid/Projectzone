@@ -1141,7 +1141,7 @@ Pages['/'] = function(){
   +'<section class="section tone-a"><div class="container">'
     +'<div class="section-head center"><span class="eyebrow">Recent work</span><h2>Outcomes our clients keep quoting back to us</h2></div>'
     +'<div class="grid grid-3">'+CASESTUDIES.slice(0,3).map(function(c){
-      return '<div class="card tilt">'+blobIcon(c.icon)+'<span class="badge" style="margin-bottom:10px;">'+c.sector+'</span><h3>'+c.client+'</h3><p>'+c.body+'</p>'
+      return '<div class="card tilt"><span class="badge" style="margin-bottom:10px;">'+c.sector+'</span><div class="card-head">'+blobIcon(c.icon,'sm')+'<h3>'+c.client+'</h3></div><p>'+c.body+'</p>'
       +'<div class="stat" style="margin-bottom:14px;">'+statBlock(c.stat,c.statLabel)+'</div>'
       +'<a href="#/work" class="card-link">Read the story '+ico('arrow')+'</a></div>';
     }).join('')+'</div>'
@@ -1181,7 +1181,7 @@ Pages['/services'] = function(){
       +[['Project','Fixed scope, fixed timeline — ideal for a single system or migration.','box'],
         ['Embedded team','A dedicated pod that plugs into your sprint cadence for as long as you need.','users'],
         ['Retainer','Ongoing support, dashboards and small builds on a monthly cadence.','refresh']]
-      .map(function(m){ return '<div class="card tilt">'+blobIcon(m[2],'',true)+'<h3>'+m[0]+'</h3><p>'+m[1]+'</p></div>'; }).join('')
+      .map(function(m){ return '<div class="card tilt"><div class="card-head">'+blobIcon(m[2],'sm',true)+'<h3>'+m[0]+'</h3></div><p>'+m[1]+'</p></div>'; }).join('')
     +'</div>'
   +'</div></section>';
 };
@@ -1305,7 +1305,7 @@ Pages['/about'] = function(){
   +wave('a','var(--bg-alt)')
   +'<section class="section tone-b"><div class="container">'
     +'<div class="section-head center"><span class="eyebrow">What we hold onto</span><h2>Values that show up in the work</h2></div>'
-    +'<div class="grid grid-4">'+values.map(function(v){return '<div class="card tilt">'+blobIcon(v.icon,'',true)+'<h3 style="font-size:1.05rem;">'+v.t+'</h3><p style="font-size:.88rem;">'+v.d+'</p></div>';}).join('')+'</div>'
+    +'<div class="grid grid-4">'+values.map(function(v){return '<div class="card tilt"><div class="card-head">'+blobIcon(v.icon,'sm',true)+'<h3 style="font-size:1.05rem;">'+v.t+'</h3></div><p style="font-size:.88rem;">'+v.d+'</p></div>';}).join('')+'</div>'
   +'</div></section>'
   +wave('b','var(--bg)',true)
   +'<section class="section tone-a"><div class="container">'
@@ -1336,7 +1336,7 @@ Pages['/resources'] = function(){
   +'<section class="section tone-a" style="padding-top:10px;"><div class="container">'
     +'<div class="chip-row" id="resChips">'+types.map(function(t,i){return '<button class="chip'+(i===0?' active':'')+'" data-cat="'+t+'">'+t+'</button>';}).join('')+'</div>'
     +'<div class="grid grid-3" id="resGrid">'+res.map(function(r){
-      return '<div class="card tilt" data-cat="'+r.k+'">'+blobIcon(r.icon,'sm',true)+'<span class="badge" style="margin-bottom:10px;">'+r.k+'</span><h3 style="font-size:1.08rem;">'+r.t+'</h3><p style="font-size:.85rem;">'+r.min+'</p><span class="card-link">Read '+ico('arrow')+'</span></div>';
+      return '<div class="card tilt" data-cat="'+r.k+'"><span class="badge" style="margin-bottom:10px;">'+r.k+'</span><div class="card-head">'+blobIcon(r.icon,'sm',true)+'<h3 style="font-size:1.08rem;">'+r.t+'</h3></div><p style="font-size:.85rem;">'+r.min+'</p><span class="card-link">Read '+ico('arrow')+'</span></div>';
     }).join('')+'</div>'
   +'</div></section>'
   +wave('c','var(--bg-alt-2)')
@@ -1404,9 +1404,9 @@ Pages['/contact'] = function(){
       +'<div id="contactSuccess" hidden style="text-align:center;padding:20px 0;">'+blobIcon('check','lg')+'<h3>Message sent</h3><p>Thanks — a real human will reply within two business days.</p></div>'
     +'</div>'
     +'<div style="display:flex;flex-direction:column;gap:20px;">'
-      +'<div class="card">'+blobIcon('mail','',true)+'<h3 style="font-size:1.05rem;">Email</h3><p style="font-size:.9rem;">hello@techbiss.com</p></div>'
-      +'<div class="card">'+blobIcon('phone','',true)+'<h3 style="font-size:1.05rem;">Phone</h3><p style="font-size:.9rem;">+1 (415) 555-0148</p></div>'
-      +'<div class="card">'+blobIcon('globe','',true)+'<h3 style="font-size:1.05rem;">Studios</h3><p style="font-size:.9rem;">San Francisco · Lisbon · Singapore</p></div>'
+      +'<div class="card"><div class="card-head">'+blobIcon('mail','sm',true)+'<h3 style="font-size:1.05rem;">Email</h3></div><p style="font-size:.9rem;">hello@techbiss.com</p></div>'
+      +'<div class="card"><div class="card-head">'+blobIcon('phone','sm',true)+'<h3 style="font-size:1.05rem;">Phone</h3></div><p style="font-size:.9rem;">+1 (415) 555-0148</p></div>'
+      +'<div class="card"><div class="card-head">'+blobIcon('globe','sm',true)+'<h3 style="font-size:1.05rem;">Studios</h3></div><p style="font-size:.9rem;">San Francisco · Lisbon · Singapore</p></div>'
     +'</div>'
   +'</div></section>';
 };
@@ -1487,7 +1487,7 @@ Pages['/dashboard'] = function(){
           +ticketRow('#1042','Checkout error on mobile Safari','warning','Open')
           +ticketRow('#1039','Add export-to-CSV on Ops Dashboard','success','In progress')
         +'<a href="#/contact" class="card-link" style="margin-top:12px;">Open a new ticket '+ico('arrow')+'</a></div>'
-        +'<div class="card" style="background:var(--grad);color:#fff2ea;border:none;">'+blobIcon('users','',false)+'<h3 style="color:#fff2ea;margin-top:12px;">Book a strategy call</h3><p style="color:rgba(255,242,234,.9);">Quarterly roadmap review with your engagement lead.</p><a href="#/contact" class="btn" style="background:#fff2ea;color:var(--accent-1);">Schedule now</a></div>'
+        +'<div class="card" style="background:var(--grad);color:#fff2ea;border:none;"><div class="card-head">'+blobIcon('users','sm',false)+'<h3 style="color:#fff2ea;">Book a strategy call</h3></div><p style="color:rgba(255,242,234,.9);">Quarterly roadmap review with your engagement lead.</p><a href="#/contact" class="btn" style="background:#fff2ea;color:var(--accent-1);">Schedule now</a></div>'
       +'</div>'
     +'</div>'
   +'</div></section>';
