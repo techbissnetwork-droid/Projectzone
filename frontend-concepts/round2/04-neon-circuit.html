@@ -1,0 +1,1555 @@
+<title>TECHBISS — Neon Circuit</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&family=Rajdhani:wght@400;500;600;700&display=swap">
+<style>
+  /* ============================= TOKENS ============================= */
+  :root{
+    --bg:#faf7ff;
+    --surface:#ffffff;
+    --surface-2:#f3ecff;
+    --surface-3:#ece0ff;
+    --ink:#170a2e;
+    --ink-muted:#5c4b7a;
+    --accent-1:#e0189f;
+    --accent-2:#0098b3;
+    --accent-3:#7c2ff0;
+    --accent-1-rgb:224,24,159;
+    --accent-2-rgb:0,152,179;
+    --accent-3-rgb:124,47,240;
+    --border:rgba(23,10,46,.16);
+    --border-strong:rgba(23,10,46,.32);
+    --shadow-sm:0 2px 10px rgba(23,10,46,.08);
+    --shadow-md:0 10px 30px rgba(23,10,46,.12);
+    --glow-text-1:none;
+    --glow-text-2:none;
+    --glow-text-3:none;
+    --glow-border-1:0 0 0 1px var(--accent-1);
+    --glow-border-2:0 0 0 1px var(--accent-2);
+    --glow-border-1-hover:0 0 0 2px var(--accent-1),var(--shadow-md);
+    --glow-border-2-hover:0 0 0 2px var(--accent-2),var(--shadow-md);
+    --glow-btn:0 4px 14px rgba(var(--accent-1-rgb),.35);
+    --glow-btn-hover:0 6px 22px rgba(var(--accent-1-rgb),.5);
+    --icon-glow:none;
+    --grid-line-strong: rgba(124,47,240,.35);
+    --grid-line-soft: rgba(0,152,179,.22);
+    --scanline-opacity:0;
+    --radius-sm:10px;
+    --radius-md:16px;
+    --radius-lg:26px;
+    --font-display:'Orbitron','Segoe UI',Arial,sans-serif;
+    --font-body:'Rajdhani','Segoe UI',Arial,sans-serif;
+    --focus-ring:0 0 0 3px rgba(var(--accent-2-rgb),.55);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0a0118;
+      --surface:#150726;
+      --surface-2:#1d0a35;
+      --surface-3:#26103f;
+      --ink:#f5eaff;
+      --ink-muted:#b39ed6;
+      --accent-1:#ff2ee0;
+      --accent-2:#21e6ff;
+      --accent-3:#9d4bff;
+      --accent-1-rgb:255,46,224;
+      --accent-2-rgb:33,230,255;
+      --accent-3-rgb:157,75,255;
+      --border:rgba(255,255,255,.14);
+      --border-strong:rgba(255,255,255,.32);
+      --shadow-sm:0 2px 14px rgba(0,0,0,.4);
+      --shadow-md:0 14px 40px rgba(0,0,0,.55);
+      --glow-text-1:0 0 6px rgba(var(--accent-1-rgb),.9),0 0 22px rgba(var(--accent-1-rgb),.55),0 0 52px rgba(var(--accent-1-rgb),.3);
+      --glow-text-2:0 0 6px rgba(var(--accent-2-rgb),.9),0 0 22px rgba(var(--accent-2-rgb),.55),0 0 52px rgba(var(--accent-2-rgb),.3);
+      --glow-text-3:0 0 6px rgba(var(--accent-3-rgb),.9),0 0 22px rgba(var(--accent-3-rgb),.55),0 0 52px rgba(var(--accent-3-rgb),.3);
+      --glow-border-1:0 0 0 1px var(--accent-1),0 0 10px rgba(var(--accent-1-rgb),.65),0 0 34px rgba(var(--accent-1-rgb),.32);
+      --glow-border-2:0 0 0 1px var(--accent-2),0 0 10px rgba(var(--accent-2-rgb),.65),0 0 34px rgba(var(--accent-2-rgb),.32);
+      --glow-border-1-hover:0 0 0 1.5px var(--accent-1),0 0 18px rgba(var(--accent-1-rgb),.85),0 0 54px rgba(var(--accent-1-rgb),.45);
+      --glow-border-2-hover:0 0 0 1.5px var(--accent-2),0 0 18px rgba(var(--accent-2-rgb),.85),0 0 54px rgba(var(--accent-2-rgb),.45);
+      --glow-btn:0 0 16px rgba(var(--accent-1-rgb),.65),0 0 40px rgba(var(--accent-3-rgb),.35);
+      --glow-btn-hover:0 0 26px rgba(var(--accent-1-rgb),.9),0 0 64px rgba(var(--accent-3-rgb),.5);
+      --icon-glow:drop-shadow(0 0 6px currentColor);
+      --grid-line-strong: rgba(157,75,255,.75);
+      --grid-line-soft: rgba(33,230,255,.4);
+      --scanline-opacity:.06;
+      --focus-ring:0 0 0 3px rgba(var(--accent-2-rgb),.65),0 0 18px rgba(var(--accent-2-rgb),.5);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0a0118;
+    --surface:#150726;
+    --surface-2:#1d0a35;
+    --surface-3:#26103f;
+    --ink:#f5eaff;
+    --ink-muted:#b39ed6;
+    --accent-1:#ff2ee0;
+    --accent-2:#21e6ff;
+    --accent-3:#9d4bff;
+    --accent-1-rgb:255,46,224;
+    --accent-2-rgb:33,230,255;
+    --accent-3-rgb:157,75,255;
+    --border:rgba(255,255,255,.14);
+    --border-strong:rgba(255,255,255,.32);
+    --shadow-sm:0 2px 14px rgba(0,0,0,.4);
+    --shadow-md:0 14px 40px rgba(0,0,0,.55);
+    --glow-text-1:0 0 6px rgba(var(--accent-1-rgb),.9),0 0 22px rgba(var(--accent-1-rgb),.55),0 0 52px rgba(var(--accent-1-rgb),.3);
+    --glow-text-2:0 0 6px rgba(var(--accent-2-rgb),.9),0 0 22px rgba(var(--accent-2-rgb),.55),0 0 52px rgba(var(--accent-2-rgb),.3);
+    --glow-text-3:0 0 6px rgba(var(--accent-3-rgb),.9),0 0 22px rgba(var(--accent-3-rgb),.55),0 0 52px rgba(var(--accent-3-rgb),.3);
+    --glow-border-1:0 0 0 1px var(--accent-1),0 0 10px rgba(var(--accent-1-rgb),.65),0 0 34px rgba(var(--accent-1-rgb),.32);
+    --glow-border-2:0 0 0 1px var(--accent-2),0 0 10px rgba(var(--accent-2-rgb),.65),0 0 34px rgba(var(--accent-2-rgb),.32);
+    --glow-border-1-hover:0 0 0 1.5px var(--accent-1),0 0 18px rgba(var(--accent-1-rgb),.85),0 0 54px rgba(var(--accent-1-rgb),.45);
+    --glow-border-2-hover:0 0 0 1.5px var(--accent-2),0 0 18px rgba(var(--accent-2-rgb),.85),0 0 54px rgba(var(--accent-2-rgb),.45);
+    --glow-btn:0 0 16px rgba(var(--accent-1-rgb),.65),0 0 40px rgba(var(--accent-3-rgb),.35);
+    --glow-btn-hover:0 0 26px rgba(var(--accent-1-rgb),.9),0 0 64px rgba(var(--accent-3-rgb),.5);
+    --icon-glow:drop-shadow(0 0 6px currentColor);
+    --grid-line-strong: rgba(157,75,255,.75);
+    --grid-line-soft: rgba(33,230,255,.4);
+    --scanline-opacity:.06;
+    --focus-ring:0 0 0 3px rgba(var(--accent-2-rgb),.65),0 0 18px rgba(var(--accent-2-rgb),.5);
+  }
+
+  /* ============================= RESET / BASE ============================= */
+  *,*::before,*::after{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} }
+  body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.55;overflow-x:hidden;}
+  h1,h2,h3,h4{font-family:var(--font-display);font-weight:800;line-height:1.15;margin:0 0 .5em;text-wrap:balance;letter-spacing:.01em;}
+  p{margin:0 0 1em;color:var(--ink-muted);}
+  a{color:inherit;}
+  img{max-width:100%;}
+  button{font-family:inherit;}
+  ul{list-style:none;margin:0;padding:0;}
+  section{position:relative;padding:5.5rem 1.5rem;max-width:1280px;margin:0 auto;}
+  .eyebrow{font-family:var(--font-display);font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--accent-2);text-shadow:var(--glow-text-2);margin:0 0 .9rem;font-weight:700;}
+  .section-head{max-width:760px;margin:0 auto 3rem;text-align:center;}
+  .section-head h2{font-size:clamp(1.8rem,4vw,2.6rem);}
+  .section-head p{font-size:1.05rem;}
+  :focus-visible{outline:2px solid var(--accent-2);outline-offset:3px;box-shadow:var(--focus-ring);border-radius:4px;}
+
+  /* scanline overlay */
+  .scanlines{position:fixed;inset:0;pointer-events:none;z-index:5;background:repeating-linear-gradient(to bottom, rgba(255,255,255,var(--scanline-opacity)) 0px, rgba(255,255,255,var(--scanline-opacity)) 1px, transparent 2px, transparent 4px);mix-blend-mode:overlay;}
+
+  /* ============================= LOADER ============================= */
+  .loader{position:fixed;inset:0;background:#0a0118;z-index:999;display:flex;align-items:center;justify-content:center;transition:opacity .6s ease, visibility .6s ease;}
+  .loader[hidden]{opacity:0;visibility:hidden;display:flex;}
+  .loader-mark{font-family:var(--font-display);font-weight:900;font-size:clamp(2rem,8vw,4rem);letter-spacing:.08em;color:#ff2ee0;text-shadow:0 0 8px rgba(255,46,224,.9),0 0 30px rgba(255,46,224,.6),0 0 70px rgba(157,75,255,.4);animation:flicker-on 1.4s steps(1) both;}
+  @keyframes flicker-on{
+    0%{opacity:0;}
+    8%{opacity:1;}
+    10%{opacity:.2;}
+    14%{opacity:1;}
+    20%{opacity:.3;}
+    24%{opacity:1;}
+    40%{opacity:1;}
+    42%{opacity:.4;}
+    46%{opacity:1;}
+    100%{opacity:1;}
+  }
+  @media (prefers-reduced-motion: reduce){ .loader-mark{animation:none;opacity:1;} }
+
+  /* ============================= NAV ============================= */
+  .nav{position:sticky;top:0;z-index:60;background:rgba(10,1,24,0);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);}
+  :root:not([data-theme="light"]) .nav, :root[data-theme="dark"] .nav{background:rgba(10,1,24,.72);}
+  :root[data-theme="light"] .nav{background:rgba(250,247,255,.86);}
+  .nav-inner{max-width:1280px;margin:0 auto;display:flex;align-items:center;gap:1.25rem;padding:.9rem 1.5rem;}
+  .wordmark{font-family:var(--font-display);font-weight:900;font-size:1.3rem;letter-spacing:.08em;color:var(--ink);text-decoration:none;text-shadow:var(--glow-text-1);white-space:nowrap;}
+  .wordmark span{color:var(--accent-2);text-shadow:var(--glow-text-2);}
+  .nav-links{display:flex;gap:1.6rem;margin-left:1rem;flex:1;}
+  .nav-links a{text-decoration:none;font-weight:600;font-size:.95rem;letter-spacing:.02em;color:var(--ink-muted);position:relative;padding:.3rem 0;}
+  .nav-links a:hover,.nav-links a:focus-visible{color:var(--accent-2);text-shadow:var(--glow-text-2);}
+  .nav-actions{display:flex;align-items:center;gap:.9rem;}
+  .signin-link{font-weight:600;font-size:.92rem;text-decoration:none;color:var(--ink-muted);white-space:nowrap;}
+  .signin-link:hover{color:var(--accent-1);}
+  .theme-toggle{background:transparent;border:1px solid var(--border);border-radius:999px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;color:var(--accent-2);cursor:pointer;transition:box-shadow .25s ease,border-color .25s ease,transform .2s ease;flex:none;}
+  .theme-toggle:hover{border-color:var(--accent-2);box-shadow:var(--glow-border-2);transform:translateY(-1px);}
+  .theme-toggle svg{width:20px;height:20px;filter:var(--icon-glow);}
+  .icon-moon{display:none;}
+  :root[data-theme="light"] .icon-sun{display:none;}
+  :root[data-theme="light"] .icon-moon{display:block;}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;font-family:var(--font-display);font-weight:700;font-size:.85rem;letter-spacing:.04em;text-transform:uppercase;text-decoration:none;border-radius:999px;padding:.8rem 1.5rem;cursor:pointer;transition:box-shadow .25s ease, transform .2s ease, background .25s ease, color .25s ease;border:1.5px solid transparent;white-space:nowrap;}
+  .btn:active{transform:translateY(1px);}
+  .btn-primary{background:linear-gradient(120deg,var(--accent-1),var(--accent-3));color:#fff;box-shadow:var(--glow-btn);}
+  .btn-primary:hover{box-shadow:var(--glow-btn-hover);transform:translateY(-2px);}
+  .btn-outline{background:transparent;border-color:var(--accent-2);color:var(--accent-2);box-shadow:var(--glow-border-2);}
+  .btn-outline:hover{box-shadow:var(--glow-border-2-hover);transform:translateY(-2px);}
+  .btn-ghost{background:transparent;border-color:var(--border-strong);color:var(--ink);}
+  .btn-ghost:hover{border-color:var(--accent-1);color:var(--accent-1);}
+  .btn-sm{padding:.55rem 1.1rem;font-size:.75rem;}
+  .btn-block{width:100%;}
+
+  .hamburger{display:none;background:transparent;border:1px solid var(--border);border-radius:8px;width:42px;height:42px;align-items:center;justify-content:center;color:var(--ink);cursor:pointer;flex:none;}
+  .hamburger span{display:block;width:20px;height:2px;background:currentColor;position:relative;transition:background .2s;}
+  .hamburger span::before,.hamburger span::after{content:"";position:absolute;left:0;width:20px;height:2px;background:currentColor;transition:transform .25s ease;}
+  .hamburger span::before{top:-6px;}
+  .hamburger span::after{top:6px;}
+  .hamburger[aria-expanded="true"] span{background:transparent;}
+  .hamburger[aria-expanded="true"] span::before{transform:translateY(6px) rotate(45deg);}
+  .hamburger[aria-expanded="true"] span::after{transform:translateY(-6px) rotate(-45deg);}
+
+  .mobile-menu{position:fixed;top:0;right:0;height:100%;width:min(320px,86vw);background:var(--surface);border-left:1px solid var(--border-strong);z-index:80;transform:translateX(100%);transition:transform .35s ease;padding:5.5rem 1.6rem 2rem;overflow-y:auto;box-shadow:-10px 0 40px rgba(0,0,0,.35);}
+  .mobile-menu.open{transform:translateX(0);}
+  .mobile-menu ul{display:flex;flex-direction:column;gap:1.4rem;}
+  .mobile-menu a{text-decoration:none;font-family:var(--font-display);font-weight:700;font-size:1.1rem;color:var(--ink);}
+  .mobile-menu a:hover{color:var(--accent-1);}
+  .menu-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:70;opacity:0;pointer-events:none;transition:opacity .3s ease;}
+  .menu-backdrop.open{opacity:1;pointer-events:auto;}
+  .mobile-menu-actions{display:flex;flex-direction:column;gap:.8rem;margin-top:2rem;}
+
+  @media (max-width:880px){
+    .nav-links{display:none;}
+    .nav-actions .btn-outline{display:none;}
+    .nav-actions .signin-link{display:none;}
+    .hamburger{display:flex;}
+  }
+
+  /* ============================= HERO ============================= */
+  .hero{padding-top:3.5rem;display:grid;grid-template-columns:1.05fr .95fr;gap:3rem;align-items:center;}
+  @media (max-width:980px){ .hero{grid-template-columns:1fr;} }
+  .hero h1{font-size:clamp(2.3rem,5.2vw,3.6rem);color:var(--ink);}
+  .hero h1 em{font-style:normal;color:var(--accent-1);text-shadow:var(--glow-text-1);}
+  .hero-sub{font-size:1.15rem;max-width:52ch;}
+  .hero-ctas{display:flex;gap:1rem;flex-wrap:wrap;margin-top:1.6rem;}
+  .hero-visual{position:relative;border-radius:var(--radius-lg);border:1px solid var(--border-strong);box-shadow:var(--glow-border-2);overflow:hidden;background:radial-gradient(120% 100% at 50% 100%, rgba(var(--accent-3-rgb),.18), transparent 60%),var(--surface);}
+  #gridCanvas{display:block;width:100%;height:320px;}
+  @media (max-width:980px){ #gridCanvas{height:240px;} }
+
+  .stat-row{margin-top:3.4rem;display:grid;grid-template-columns:repeat(4,1fr);gap:1.2rem;}
+  @media (max-width:780px){ .stat-row{grid-template-columns:repeat(2,1fr);} }
+  .stat{border:1px solid var(--border);border-radius:var(--radius-md);padding:1.2rem 1rem;text-align:center;background:var(--surface);}
+  .stat-num{font-family:var(--font-display);font-weight:900;font-size:clamp(1.4rem,2.6vw,2rem);color:var(--accent-2);text-shadow:var(--glow-text-2);letter-spacing:.02em;}
+  .stat-label{font-size:.8rem;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.08em;margin-top:.3rem;}
+
+  /* ============================= REVEAL ============================= */
+  .has-js [data-reveal]{opacity:0;transform:translateY(22px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1);}
+  .has-js [data-reveal].is-visible{opacity:1;transform:none;}
+  @media (prefers-reduced-motion: reduce){ .has-js [data-reveal]{opacity:1;transform:none;transition:none;} }
+
+  /* ============================= TRUSTED MARQUEE ============================= */
+  .trusted{padding:3rem 0;max-width:100%;}
+  .trusted-label{text-align:center;font-size:.78rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-muted);margin-bottom:1.6rem;}
+  .marquee{overflow:hidden;border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:1.1rem 0;}
+  .marquee-track{display:flex;gap:3.2rem;width:max-content;animation:scroll-left 26s linear infinite;}
+  .marquee:hover .marquee-track{animation-play-state:paused;}
+  @keyframes scroll-left{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+  @media (prefers-reduced-motion: reduce){ .marquee-track{animation:none;} .marquee{overflow-x:auto;} }
+  .client-mark{font-family:var(--font-display);font-weight:800;font-size:1.1rem;letter-spacing:.06em;color:var(--ink-muted);border:1px solid var(--border);border-radius:999px;padding:.55rem 1.4rem;white-space:nowrap;}
+  .client-mark:nth-child(6n+1){color:var(--accent-1);border-color:rgba(var(--accent-1-rgb),.45);}
+  .client-mark:nth-child(6n+2){color:var(--accent-2);border-color:rgba(var(--accent-2-rgb),.45);}
+  .client-mark:nth-child(6n+3){color:var(--accent-3);border-color:rgba(var(--accent-3-rgb),.45);}
+  .client-mark:nth-child(6n+4){color:var(--accent-1);border-color:rgba(var(--accent-1-rgb),.45);}
+  .client-mark:nth-child(6n+5){color:var(--accent-2);border-color:rgba(var(--accent-2-rgb),.45);}
+  .client-mark:nth-child(6n+6){color:var(--accent-3);border-color:rgba(var(--accent-3-rgb),.45);}
+
+  /* ============================= SERVICES ============================= */
+  .services-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;}
+  @media (max-width:980px){ .services-grid{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:620px){ .services-grid{grid-template-columns:1fr;} }
+  .service-card{border:1px solid var(--border);border-radius:var(--radius-md);padding:1.8rem;background:var(--surface);transition:box-shadow .3s ease,border-color .3s ease,transform .3s ease;}
+  .service-card:hover,.service-card:focus-within{border-color:var(--accent-2);box-shadow:var(--glow-border-2-hover);transform:translateY(-6px);}
+  .service-icon{width:46px;height:46px;color:var(--accent-2);filter:var(--icon-glow);margin-bottom:1rem;}
+  .service-card h3{font-size:1.15rem;color:var(--ink);}
+  .service-card p{font-size:.95rem;}
+  .service-bullets{margin-top:1rem;display:flex;flex-direction:column;gap:.5rem;}
+  .service-bullets li{font-size:.86rem;color:var(--ink-muted);padding-left:1.1rem;position:relative;}
+  .service-bullets li::before{content:"";position:absolute;left:0;top:.5em;width:6px;height:6px;border-radius:50%;background:var(--accent-1);box-shadow:0 0 6px rgba(var(--accent-1-rgb),.8);}
+
+  /* ============================= SOLUTIONS TABS ============================= */
+  .tabs-wrap{display:flex;flex-direction:column;gap:2rem;}
+  .tablist{display:flex;flex-wrap:wrap;gap:.7rem;justify-content:center;}
+  .tab-chip{border:1px solid var(--border-strong);background:var(--surface);color:var(--ink-muted);border-radius:999px;padding:.6rem 1.3rem;font-weight:700;font-size:.88rem;cursor:pointer;transition:all .25s ease;}
+  .tab-chip:hover{color:var(--accent-2);border-color:var(--accent-2);}
+  .tab-chip[aria-selected="true"]{color:#fff;background:linear-gradient(120deg,var(--accent-3),var(--accent-1));border-color:transparent;box-shadow:var(--glow-btn);}
+  .tab-panel{border:1px solid var(--border);border-radius:var(--radius-lg);padding:2.2rem;background:var(--surface);display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:center;}
+  @media (max-width:780px){ .tab-panel{grid-template-columns:1fr;} }
+  .tab-panel h3{color:var(--accent-1);text-shadow:var(--glow-text-1);font-size:1.5rem;}
+  .tab-panel-bullets li{padding:.5rem 0;border-top:1px dashed var(--border);font-size:.92rem;color:var(--ink-muted);}
+  .tab-panel-bullets li:first-child{border-top:none;}
+  .tab-stat-box{border:1px solid var(--border);border-radius:var(--radius-md);padding:1.4rem;text-align:center;background:var(--surface-2);}
+  .tab-stat-box strong{display:block;font-family:var(--font-display);font-size:1.8rem;color:var(--accent-2);text-shadow:var(--glow-text-2);}
+
+  /* ============================= MARKETPLACE ============================= */
+  .filter-row{display:flex;flex-wrap:wrap;gap:.6rem;justify-content:center;margin-bottom:2.2rem;}
+  .filter-chip{border:1px solid var(--border-strong);background:transparent;color:var(--ink-muted);border-radius:999px;padding:.5rem 1.1rem;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .2s ease;}
+  .filter-chip:hover{color:var(--accent-1);border-color:var(--accent-1);}
+  .filter-chip[aria-pressed="true"]{background:var(--accent-1);color:#fff;border-color:var(--accent-1);box-shadow:0 0 16px rgba(var(--accent-1-rgb),.55);}
+  .market-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem;}
+  @media (max-width:980px){ .market-grid{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:620px){ .market-grid{grid-template-columns:1fr;} }
+  .product-card{border:1px solid var(--border);border-radius:var(--radius-md);background:var(--surface);padding:1.4rem;text-align:left;cursor:pointer;transition:box-shadow .25s ease,border-color .25s ease,transform .25s ease;display:flex;flex-direction:column;gap:.5rem;color:var(--ink);font-family:var(--font-body);}
+  .product-card:hover,.product-card:focus-visible{border-color:var(--accent-3);box-shadow:var(--glow-border-1-hover);transform:translateY(-5px);}
+  .product-cat{font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-3);font-weight:700;}
+  .product-card h3{font-size:1.08rem;font-family:var(--font-display);margin:0;}
+  .product-vendor{font-size:.82rem;color:var(--ink-muted);}
+  .product-rating{color:var(--accent-2);font-weight:700;font-size:.86rem;}
+  .product-price{font-family:var(--font-display);font-weight:800;font-size:1.15rem;color:var(--accent-1);text-shadow:var(--glow-text-1);margin-top:.2rem;}
+  .product-card[hidden]{display:none;}
+
+  /* modal */
+  .modal-backdrop{position:fixed;inset:0;background:rgba(4,0,12,.72);backdrop-filter:blur(3px);z-index:120;display:flex;align-items:center;justify-content:center;padding:1.5rem;opacity:0;pointer-events:none;transition:opacity .25s ease;}
+  .modal-backdrop.open{opacity:1;pointer-events:auto;}
+  .modal{background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--radius-lg);box-shadow:var(--glow-border-1);max-width:520px;width:100%;padding:2rem;position:relative;max-height:88vh;overflow-y:auto;}
+  .modal-close{position:absolute;top:1rem;right:1rem;background:transparent;border:1px solid var(--border);border-radius:50%;width:36px;height:36px;color:var(--ink);cursor:pointer;font-size:1.1rem;line-height:1;}
+  .modal-close:hover{border-color:var(--accent-1);color:var(--accent-1);}
+  .modal h3{font-size:1.4rem;color:var(--ink);margin-top:.4rem;}
+  .modal .product-price{font-size:1.5rem;}
+  .modal-meta{display:flex;gap:1rem;flex-wrap:wrap;margin:1rem 0;font-size:.85rem;color:var(--ink-muted);}
+  .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(20px);background:var(--surface);border:1px solid var(--accent-2);box-shadow:var(--glow-border-2);border-radius:999px;padding:.85rem 1.6rem;font-weight:700;color:var(--ink);z-index:200;opacity:0;pointer-events:none;transition:opacity .3s ease,transform .3s ease;display:flex;align-items:center;gap:.6rem;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  .toast-dot{width:9px;height:9px;border-radius:50%;background:var(--accent-2);box-shadow:0 0 8px var(--accent-2);flex:none;}
+
+  /* ============================= PROCESS TIMELINE ============================= */
+  .circuit{display:flex;justify-content:space-between;gap:0;position:relative;}
+  @media (max-width:900px){ .circuit{flex-direction:column;gap:2.4rem;} }
+  .circuit-step{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;position:relative;padding:0 .5rem;}
+  .circuit-node{width:64px;height:64px;border-radius:50%;border:2px solid var(--accent-2);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:900;font-size:1.3rem;color:var(--accent-2);background:var(--surface);box-shadow:var(--glow-border-2);position:relative;z-index:2;}
+  .circuit-step h3{font-size:1rem;margin:1rem 0 .4rem;color:var(--ink);}
+  .circuit-step p{font-size:.85rem;max-width:22ch;}
+  .circuit-connector{position:absolute;top:32px;left:50%;width:100%;height:2px;background:var(--border-strong);z-index:1;overflow:visible;}
+  .circuit-step:last-child .circuit-connector{display:none;}
+  .circuit-connector::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,var(--accent-2),var(--accent-3));opacity:.55;}
+  .circuit-pulse{position:absolute;top:-4px;left:0;width:10px;height:10px;border-radius:50%;background:var(--accent-1);box-shadow:0 0 10px rgba(var(--accent-1-rgb),.9),0 0 24px rgba(var(--accent-1-rgb),.6);animation:travel-h 2.6s ease-in-out infinite;animation-play-state:paused;}
+  .circuit.in-view .circuit-pulse{animation-play-state:running;}
+  @keyframes travel-h{0%{left:0;opacity:0;}10%{opacity:1;}90%{opacity:1;}100%{left:100%;opacity:0;}}
+  @media (max-width:900px){
+    .circuit-connector{top:auto;left:32px;top:64px;width:2px;height:calc(100% - 4px);}
+    .circuit-step{align-items:flex-start;text-align:left;flex-direction:row;gap:1.2rem;padding:0;}
+    .circuit-step > div{padding-top:.2rem;}
+    .circuit-pulse{animation-name:travel-v;left:-4px;top:0;}
+    @keyframes travel-v{0%{top:0;opacity:0;}10%{opacity:1;}90%{opacity:1;}100%{top:100%;opacity:0;}}
+  }
+  @media (prefers-reduced-motion: reduce){ .circuit-pulse{animation:none;opacity:.9;} }
+
+  /* ============================= CASE STUDIES CAROUSEL ============================= */
+  .carousel-wrap{position:relative;}
+  .carousel{display:flex;gap:1.4rem;overflow-x:auto;scroll-snap-type:x mandatory;padding:.5rem .2rem 1.4rem;cursor:grab;scrollbar-width:thin;}
+  .carousel.dragging{cursor:grabbing;scroll-snap-type:none;user-select:none;}
+  .carousel::-webkit-scrollbar{height:6px;}
+  .carousel::-webkit-scrollbar-thumb{background:var(--accent-3);border-radius:3px;}
+  .case-card{flex:0 0 min(420px,86vw);scroll-snap-align:start;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--surface);padding:1.8rem;display:flex;flex-direction:column;gap:.9rem;}
+  .case-card .eyebrow{margin-bottom:0;}
+  .case-metric{font-family:var(--font-display);font-weight:900;font-size:2.2rem;color:var(--accent-1);text-shadow:var(--glow-text-1);}
+  .case-field{font-size:.85rem;}
+  .case-field b{display:block;color:var(--ink);font-family:var(--font-display);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.2rem;color:var(--accent-2);}
+  .carousel-controls{display:flex;justify-content:center;gap:1rem;margin-top:.5rem;}
+  .carousel-btn{width:42px;height:42px;border-radius:50%;border:1px solid var(--border-strong);background:var(--surface);color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;}
+  .carousel-btn:hover{border-color:var(--accent-1);color:var(--accent-1);box-shadow:var(--glow-border-1);}
+
+  /* ============================= PRICING ============================= */
+  .pricing-toggle{display:flex;align-items:center;justify-content:center;gap:1rem;margin-bottom:2.6rem;}
+  .toggle-switch{position:relative;width:58px;height:30px;border-radius:999px;border:1px solid var(--border-strong);background:var(--surface-2);cursor:pointer;flex:none;}
+  .toggle-switch::after{content:"";position:absolute;top:2px;left:2px;width:24px;height:24px;border-radius:50%;background:var(--accent-1);box-shadow:0 0 10px rgba(var(--accent-1-rgb),.7);transition:transform .25s ease;}
+  .toggle-switch[aria-checked="true"]::after{transform:translateX(28px);background:var(--accent-2);box-shadow:0 0 10px rgba(var(--accent-2-rgb),.7);}
+  .toggle-label{font-weight:700;font-size:.92rem;color:var(--ink-muted);}
+  .toggle-label.active{color:var(--ink);}
+  .save-badge{font-size:.72rem;font-weight:800;color:var(--accent-2);border:1px solid var(--accent-2);border-radius:999px;padding:.15rem .6rem;}
+  .pricing-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.3rem;align-items:stretch;}
+  @media (max-width:1100px){ .pricing-grid{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:620px){ .pricing-grid{grid-template-columns:1fr;} }
+  .price-card{border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.8rem;background:var(--surface);display:flex;flex-direction:column;transition:box-shadow .3s ease,transform .3s ease,border-color .3s ease;}
+  .price-card:hover{transform:translateY(-6px);}
+  .price-card.recommended{border-color:var(--accent-1);box-shadow:var(--glow-border-1-hover);position:relative;}
+  .price-card.recommended::before{content:"Recommended";position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(120deg,var(--accent-1),var(--accent-3));color:#fff;font-family:var(--font-display);font-size:.68rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:.35rem .9rem;border-radius:999px;box-shadow:var(--glow-btn);}
+  .price-card h3{font-size:1.15rem;}
+  .price-amount{font-family:var(--font-display);font-weight:900;font-size:2.1rem;color:var(--ink);margin:.6rem 0 0;}
+  .price-amount span{font-size:.95rem;color:var(--ink-muted);font-family:var(--font-body);font-weight:600;}
+  .price-card p.desc{font-size:.86rem;min-height:2.6em;}
+  .price-features{display:flex;flex-direction:column;gap:.6rem;margin:1.2rem 0 1.6rem;flex:1;}
+  .price-features li{font-size:.86rem;color:var(--ink-muted);padding-left:1.3rem;position:relative;}
+  .price-features li::before{content:"✓";position:absolute;left:0;color:var(--accent-2);font-weight:800;}
+
+  /* ============================= FAQ ============================= */
+  .faq-list{max-width:820px;margin:0 auto;display:flex;flex-direction:column;gap:.8rem;}
+  .faq-item{border:1px solid var(--border);border-radius:var(--radius-md);background:var(--surface);overflow:hidden;}
+  .faq-q{width:100%;text-align:left;background:transparent;border:none;padding:1.2rem 1.4rem;display:flex;justify-content:space-between;align-items:center;gap:1rem;cursor:pointer;font-family:var(--font-display);font-weight:700;font-size:.98rem;color:var(--ink);}
+  .faq-q:hover{color:var(--accent-2);}
+  .faq-q .plus{flex:none;width:22px;height:22px;position:relative;color:var(--accent-1);}
+  .faq-q .plus::before,.faq-q .plus::after{content:"";position:absolute;background:currentColor;top:50%;left:50%;transform:translate(-50%,-50%);}
+  .faq-q .plus::before{width:14px;height:2px;}
+  .faq-q .plus::after{width:2px;height:14px;transition:transform .25s ease;}
+  .faq-q[aria-expanded="true"] .plus::after{transform:translate(-50%,-50%) rotate(90deg) scaleY(0);}
+  .faq-a{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s ease;}
+  .faq-item.open .faq-a{grid-template-rows:1fr;}
+  .faq-a-inner{overflow:hidden;}
+  .faq-a p{padding:0 1.4rem 1.3rem;font-size:.92rem;margin:0;}
+
+  /* ============================= CONTACT ============================= */
+  .contact-wrap{display:grid;grid-template-columns:1fr 1.15fr;gap:3rem;}
+  @media (max-width:900px){ .contact-wrap{grid-template-columns:1fr;} }
+  .contact-info h2{font-size:clamp(1.7rem,3.6vw,2.3rem);}
+  .contact-detail{margin-top:1.6rem;display:flex;flex-direction:column;gap:1rem;}
+  .contact-detail div{border-left:2px solid var(--accent-2);padding-left:1rem;}
+  .contact-detail b{display:block;font-family:var(--font-display);font-size:.82rem;color:var(--accent-2);}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem;}
+  @media (max-width:640px){ .form-grid{grid-template-columns:1fr;} }
+  .field{display:flex;flex-direction:column;gap:.4rem;}
+  .field.full{grid-column:1/-1;}
+  .field label{font-size:.82rem;font-weight:700;color:var(--ink-muted);}
+  .field input,.field select,.field textarea{background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--radius-sm);padding:.75rem .9rem;color:var(--ink);font-family:var(--font-body);font-size:.98rem;transition:box-shadow .2s ease,border-color .2s ease;}
+  .field textarea{resize:vertical;min-height:110px;}
+  .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--accent-2);box-shadow:var(--glow-border-2);}
+  .field.error input,.field.error select,.field.error textarea{border-color:var(--accent-1);box-shadow:0 0 0 1px var(--accent-1);}
+  .error-msg{font-size:.78rem;color:var(--accent-1);min-height:1em;}
+  .contact-form{border:1px solid var(--border);border-radius:var(--radius-lg);padding:2rem;background:var(--surface);box-shadow:var(--shadow-sm);}
+  .form-success{display:none;text-align:center;padding:2.4rem 1rem;}
+  .form-success.show{display:block;}
+  .contact-form.submitted form{display:none;}
+  .success-glow{width:64px;height:64px;margin:0 auto 1rem;border-radius:50%;border:2px solid var(--accent-2);box-shadow:var(--glow-border-2);display:flex;align-items:center;justify-content:center;color:var(--accent-2);font-size:1.6rem;}
+
+  /* ============================= FOOTER ============================= */
+  footer{border-top:1px solid var(--border);padding:4rem 1.5rem 2rem;}
+  .footer-inner{max-width:1280px;margin:0 auto;}
+  .footer-grid{display:grid;grid-template-columns:1.4fr repeat(4,1fr);gap:2rem;}
+  @media (max-width:900px){ .footer-grid{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:520px){ .footer-grid{grid-template-columns:1fr;} }
+  .footer-grid h4{font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-2);margin-bottom:1rem;}
+  .footer-grid ul{display:flex;flex-direction:column;gap:.6rem;}
+  .footer-grid a{text-decoration:none;color:var(--ink-muted);font-size:.9rem;}
+  .footer-grid a:hover{color:var(--accent-1);}
+  .footer-bottom{margin-top:3rem;padding-top:1.6rem;border-top:1px solid var(--border);display:flex;flex-wrap:wrap;gap:1.2rem;justify-content:space-between;align-items:center;}
+  .footer-legal{font-size:.8rem;color:var(--ink-muted);}
+  .social-row{display:flex;gap:.8rem;}
+  .social-row a{width:36px;height:36px;border-radius:50%;border:1px solid var(--border-strong);display:flex;align-items:center;justify-content:center;color:var(--ink-muted);}
+  .social-row a:hover{color:var(--accent-1);border-color:var(--accent-1);box-shadow:var(--glow-border-1);}
+  .social-row svg{width:16px;height:16px;}
+
+  .visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+  .skip-link{position:absolute;left:1rem;top:-60px;background:var(--accent-1);color:#fff;padding:.7rem 1.2rem;border-radius:8px;z-index:200;transition:top .2s ease;font-weight:700;text-decoration:none;}
+  .skip-link:focus{top:1rem;}
+</style>
+
+<a class="skip-link" href="#main">Skip to main content</a>
+<div class="scanlines" aria-hidden="true"></div>
+
+<div class="loader" id="loader" aria-hidden="true">
+  <div class="loader-mark">TECHBISS</div>
+</div>
+
+<div class="menu-backdrop" id="menuBackdrop"></div>
+
+<header>
+  <nav class="nav" aria-label="Primary">
+    <div class="nav-inner">
+      <a class="wordmark" href="#top">TECH<span>BISS</span></a>
+      <ul class="nav-links">
+        <li><a href="#services">Services</a></li>
+        <li><a href="#solutions">Solutions</a></li>
+        <li><a href="#marketplace">Marketplace</a></li>
+        <li><a href="#process">Process</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      <div class="nav-actions">
+        <a class="signin-link" href="#contact">Sign in</a>
+        <a class="btn btn-outline" href="#contact">Talk to Sales</a>
+        <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false" aria-label="Switch to light mode">
+          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"></circle><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"></path></svg>
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.8 6.8 0 0 0 10.5 10.5Z"></path></svg>
+        </button>
+        <button class="hamburger" id="hamburger" type="button" aria-expanded="false" aria-controls="mobileMenu" aria-label="Open menu">
+          <span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+  <nav class="mobile-menu" id="mobileMenu" aria-label="Mobile">
+    <ul>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#solutions">Solutions</a></li>
+      <li><a href="#marketplace">Marketplace</a></li>
+      <li><a href="#process">Process</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="#faq">FAQ</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <div class="mobile-menu-actions">
+      <a class="btn btn-outline btn-block" href="#contact">Sign in</a>
+      <a class="btn btn-primary btn-block" href="#contact">Talk to Sales</a>
+    </div>
+  </nav>
+</header>
+
+<main id="main">
+  <div id="top"></div>
+  <!-- ============================= HERO ============================= -->
+  <section class="hero" aria-labelledby="hero-heading">
+    <div>
+      <p class="eyebrow">Global Digital Transformation Platform</p>
+      <h1 id="hero-heading">Engineering the <em>Next Global Economy</em></h1>
+      <p class="hero-sub">TECHBISS fuses cloud, AI, cybersecurity, data, and enterprise engineering into one platform — powering modernization for the institutions that run the world, across 120+ countries.</p>
+      <div class="hero-ctas">
+        <a class="btn btn-primary" href="#contact">Start a Transformation</a>
+        <a class="btn btn-outline" href="#marketplace">Explore Marketplace</a>
+      </div>
+
+      <div class="stat-row" id="statRow">
+        <div class="stat" data-reveal><div class="stat-num" data-count-to="120" data-prefix="" data-suffix="+">0</div><div class="stat-label">Countries</div></div>
+        <div class="stat" data-reveal><div class="stat-num" data-count-to="4.2" data-prefix="$" data-suffix="T" data-decimals="1">0</div><div class="stat-label">Client AUM Modernized</div></div>
+        <div class="stat" data-reveal><div class="stat-num" data-count-to="99.99" data-prefix="" data-suffix="%" data-decimals="2">0</div><div class="stat-label">Platform Uptime</div></div>
+        <div class="stat" data-reveal><div class="stat-num" data-count-to="3400" data-prefix="" data-suffix="+">0</div><div class="stat-label">Engineers &amp; Architects</div></div>
+      </div>
+    </div>
+    <div class="hero-visual" data-reveal aria-hidden="true">
+      <canvas id="gridCanvas"></canvas>
+    </div>
+  </section>
+
+  <!-- ============================= TRUSTED ============================= -->
+  <section class="trusted" aria-labelledby="trusted-heading">
+    <p class="trusted-label" id="trusted-heading">Trusted by industry leaders worldwide</p>
+    <div class="marquee">
+      <div class="marquee-track">
+        <span class="client-mark">MERIDIAN CAPITAL</span>
+        <span class="client-mark">NORTHSTAR HEALTH</span>
+        <span class="client-mark">VULCAN MANUFACTURING</span>
+        <span class="client-mark">APEX PUBLIC SERVICES</span>
+        <span class="client-mark">ORBITAL RETAIL GROUP</span>
+        <span class="client-mark">HELIOS ENERGY</span>
+        <span class="client-mark" aria-hidden="true">MERIDIAN CAPITAL</span>
+        <span class="client-mark" aria-hidden="true">NORTHSTAR HEALTH</span>
+        <span class="client-mark" aria-hidden="true">VULCAN MANUFACTURING</span>
+        <span class="client-mark" aria-hidden="true">APEX PUBLIC SERVICES</span>
+        <span class="client-mark" aria-hidden="true">ORBITAL RETAIL GROUP</span>
+        <span class="client-mark" aria-hidden="true">HELIOS ENERGY</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================= SERVICES ============================= -->
+  <section id="services" aria-labelledby="services-heading">
+    <div class="section-head" data-reveal>
+      <p class="eyebrow">What We Do</p>
+      <h2 id="services-heading">Six disciplines. One integrated platform.</h2>
+      <p>From core infrastructure to boardroom strategy, TECHBISS delivers the full transformation stack under one accountable team.</p>
+    </div>
+    <div class="services-grid">
+      <article class="service-card" data-reveal>
+        <svg class="service-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M34 30h1a7 7 0 0 0 0-14 9 9 0 0 0-17-3 6.5 6.5 0 0 0-6 6.4A6.5 6.5 0 0 0 13 30h1"></path><path d="M18 30v6M24 30v9M30 30v6"></path></svg>
+        <h3>Cloud &amp; Infrastructure Modernization</h3>
+        <p>We re-platform legacy estates onto elastic, multi-cloud foundations engineered for scale. From lift-and-shift to full cloud-native rearchitecture, we cut infrastructure spend while raising resilience.</p>
+        <ul class="service-bullets">
+          <li>Multi-cloud &amp; hybrid architecture</li>
+          <li>Kubernetes &amp; container orchestration</li>
+          <li>FinOps cost governance</li>
+        </ul>
+      </article>
+      <article class="service-card" data-reveal>
+        <svg class="service-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="16" y="16" width="16" height="16" rx="2"></rect><path d="M24 6v8M24 34v8M6 24h8M34 24h8M11 11l5 5M37 11l-5 5M11 37l5-5M37 37l-5-5"></path></svg>
+        <h3>AI &amp; Intelligent Automation</h3>
+        <p>We embed applied AI into core operations — from predictive models to autonomous agent workflows — turning manual processes into self-optimizing systems.</p>
+        <ul class="service-bullets">
+          <li>Custom LLM &amp; agent deployment</li>
+          <li>RPA &amp; workflow orchestration</li>
+          <li>MLOps &amp; model governance</li>
+        </ul>
+      </article>
+      <article class="service-card" data-reveal>
+        <svg class="service-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M24 6l14 6v10c0 10-6 16.5-14 20-8-3.5-14-10-14-20V12z"></path><path d="M18 24l4.5 4.5L31 19"></path></svg>
+        <h3>Cybersecurity &amp; Risk Engineering</h3>
+        <p>We build zero-trust security architectures and continuous risk-monitoring systems that protect global enterprises against tomorrow's threat landscape, not just today's.</p>
+        <ul class="service-bullets">
+          <li>Zero-trust network architecture</li>
+          <li>Threat detection &amp; SOC-as-a-service</li>
+          <li>Regulatory &amp; compliance engineering</li>
+        </ul>
+      </article>
+      <article class="service-card" data-reveal>
+        <svg class="service-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 34V18M18 34V10M28 34V22M38 34V14"></path><path d="M4 40h40"></path></svg>
+        <h3>Data, Analytics &amp; AI Platforms</h3>
+        <p>We unify fragmented data estates into governed, real-time platforms — giving every business unit trusted data and every model a reliable foundation.</p>
+        <ul class="service-bullets">
+          <li>Enterprise data mesh &amp; lakehouse</li>
+          <li>Real-time analytics pipelines</li>
+          <li>Data governance &amp; lineage</li>
+        </ul>
+      </article>
+      <article class="service-card" data-reveal>
+        <svg class="service-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 15l-9 9 9 9M31 15l9 9-9 9M27 11l-6 26"></path></svg>
+        <h3>Enterprise Software Engineering</h3>
+        <p>We design and ship mission-critical software at global scale — resilient, API-first systems built by engineers who've shipped for the world's largest enterprises.</p>
+        <ul class="service-bullets">
+          <li>API-first platform engineering</li>
+          <li>Legacy system re-architecture</li>
+          <li>Quality engineering &amp; SRE</li>
+        </ul>
+      </article>
+      <article class="service-card" data-reveal>
+        <svg class="service-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="24" cy="24" r="17"></circle><path d="M24 24l7-11-11 7-7 11 11-7z"></path></svg>
+        <h3>Digital Transformation Strategy &amp; Consulting</h3>
+        <p>We pair boardroom strategy with hands-on delivery, aligning technology investment to enterprise value and guiding transformation from roadmap to results.</p>
+        <ul class="service-bullets">
+          <li>Operating model redesign</li>
+          <li>Technology investment roadmapping</li>
+          <li>Change management &amp; enablement</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============================= SOLUTIONS ============================= -->
+  <section id="solutions" aria-labelledby="solutions-heading">
+    <div class="section-head" data-reveal>
+      <p class="eyebrow">Industries</p>
+      <h2 id="solutions-heading">Built for the sectors running the world</h2>
+      <p>Deep domain engineering for the industries where downtime, risk, and scale matter most.</p>
+    </div>
+    <div class="tabs-wrap" data-reveal>
+      <div class="tablist" role="tablist" aria-label="Industries" id="solutionsTabs"></div>
+      <div id="solutionsPanel"></div>
+    </div>
+  </section>
+
+  <!-- ============================= MARKETPLACE ============================= -->
+  <section id="marketplace" aria-labelledby="marketplace-heading">
+    <div class="section-head" data-reveal>
+      <p class="eyebrow">TECHBISS Marketplace</p>
+      <h2 id="marketplace-heading">Deploy proven capability, instantly</h2>
+      <p>Pre-built automation modules, AI agents, and industry kits from a vetted partner catalog — ready to integrate into your platform.</p>
+    </div>
+    <div class="filter-row" id="filterRow" role="group" aria-label="Filter marketplace by category"></div>
+    <div class="market-grid" id="marketGrid"></div>
+  </section>
+
+  <!-- ============================= PROCESS ============================= -->
+  <section id="process" aria-labelledby="process-heading">
+    <div class="section-head" data-reveal>
+      <p class="eyebrow">How We Deliver</p>
+      <h2 id="process-heading">A six-stage delivery circuit</h2>
+      <p>Every engagement runs the same disciplined methodology — from first discovery call to continuous scale.</p>
+    </div>
+    <div class="circuit" id="circuit" data-reveal>
+      <div class="circuit-step">
+        <div class="circuit-node">1</div>
+        <div><h3>Discover</h3><p>We embed with your teams to map systems, risks, and opportunity — building the evidence base for transformation.</p></div>
+        <div class="circuit-connector"><span class="circuit-pulse" style="animation-delay:0s;"></span></div>
+      </div>
+      <div class="circuit-step">
+        <div class="circuit-node">2</div>
+        <div><h3>Architect</h3><p>We design the target-state architecture — cloud, data, security, and application layers — aligned to business outcomes.</p></div>
+        <div class="circuit-connector"><span class="circuit-pulse" style="animation-delay:.4s;"></span></div>
+      </div>
+      <div class="circuit-step">
+        <div class="circuit-node">3</div>
+        <div><h3>Build</h3><p>Engineering pods ship in agile increments, with quality and security gated into every release.</p></div>
+        <div class="circuit-connector"><span class="circuit-pulse" style="animation-delay:.8s;"></span></div>
+      </div>
+      <div class="circuit-step">
+        <div class="circuit-node">4</div>
+        <div><h3>Migrate</h3><p>We move workloads and data with zero-downtime cutover strategies, validated against production-grade test suites.</p></div>
+        <div class="circuit-connector"><span class="circuit-pulse" style="animation-delay:1.2s;"></span></div>
+      </div>
+      <div class="circuit-step">
+        <div class="circuit-node">5</div>
+        <div><h3>Launch</h3><p>Go-live is orchestrated with rollback-ready deployment pipelines and 24/7 hypercare support.</p></div>
+        <div class="circuit-connector"><span class="circuit-pulse" style="animation-delay:1.6s;"></span></div>
+      </div>
+      <div class="circuit-step">
+        <div class="circuit-node">6</div>
+        <div><h3>Scale</h3><p>We optimize for cost, performance, and resilience as your platform grows — continuously, not just at launch.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================= CASE STUDIES ============================= -->
+  <section id="case-studies" aria-labelledby="case-heading">
+    <div class="section-head" data-reveal>
+      <p class="eyebrow">Proof, Not Promises</p>
+      <h2 id="case-heading">Results at global scale</h2>
+      <p>Drag, swipe, or use the arrows to browse how TECHBISS transforms mission-critical operations.</p>
+    </div>
+    <div class="carousel-wrap" data-reveal>
+      <div class="carousel" id="carousel" tabindex="0" role="region" aria-label="Case studies" aria-roledescription="carousel">
+        <article class="case-card">
+          <p class="eyebrow">Tier-1 Global Bank</p>
+          <div class="case-metric">40% faster settlement</div>
+          <div class="case-field"><b>Challenge</b>Settlement cycles lagged behind real-time payment rails, exposing the bank to liquidity risk across 40 markets.</div>
+          <div class="case-field"><b>Approach</b>Re-architected core settlement infrastructure onto an event-driven, cloud-native platform with real-time reconciliation.</div>
+          <div class="case-field"><b>Result</b>40% faster settlement cycles across all major currency corridors.</div>
+        </article>
+        <article class="case-card">
+          <p class="eyebrow">Global Logistics Network</p>
+          <div class="case-metric">27% cost reduction</div>
+          <div class="case-field"><b>Challenge</b>Fragmented visibility across a 60-country freight network drove excess inventory and routing inefficiency.</div>
+          <div class="case-field"><b>Approach</b>Deployed a unified supply-chain data platform with predictive routing and dynamic inventory optimization.</div>
+          <div class="case-field"><b>Result</b>27% reduction in logistics operating cost within 14 months.</div>
+        </article>
+        <article class="case-card">
+          <p class="eyebrow">Multinational Telecom Group</p>
+          <div class="case-metric">14 countries migrated</div>
+          <div class="case-field"><b>Challenge</b>Legacy on-prem infrastructure across 14 countries couldn't support 5G rollout timelines.</div>
+          <div class="case-field"><b>Approach</b>Executed a phased, zero-downtime cloud migration with localized data-sovereignty compliance in every market.</div>
+          <div class="case-field"><b>Result</b>Cloud migration completed across 14 countries, eight months ahead of schedule.</div>
+        </article>
+        <article class="case-card">
+          <p class="eyebrow">Regional Healthcare Network</p>
+          <div class="case-metric">42 facilities unified</div>
+          <div class="case-field"><b>Challenge</b>42 disconnected clinical systems blocked a unified view of patient care across the network.</div>
+          <div class="case-field"><b>Approach</b>Built a FHIR-native interoperable data platform connecting every facility and care team in real time.</div>
+          <div class="case-field"><b>Result</b>Unified data platform live across 42 facilities, cutting care-coordination delays by half.</div>
+        </article>
+      </div>
+      <div class="carousel-controls">
+        <button class="carousel-btn" id="carPrev" type="button" aria-label="Previous case study">&#8592;</button>
+        <button class="carousel-btn" id="carNext" type="button" aria-label="Next case study">&#8594;</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================= PRICING ============================= -->
+  <section id="pricing" aria-labelledby="pricing-heading">
+    <div class="section-head" data-reveal>
+      <p class="eyebrow">Pricing</p>
+      <h2 id="pricing-heading">Plans that scale with your platform</h2>
+      <p>From first modernization sprint to planetary-scale operations, TECHBISS pricing grows with you.</p>
+    </div>
+    <div class="pricing-toggle" data-reveal>
+      <span class="toggle-label active" id="labelMonthly">Monthly</span>
+      <button class="toggle-switch" id="billingToggle" role="switch" aria-checked="false" aria-label="Toggle annual billing"></button>
+      <span class="toggle-label" id="labelAnnual">Annual</span>
+      <span class="save-badge">Save up to 20%</span>
+    </div>
+    <div class="pricing-grid" data-reveal>
+      <div class="price-card">
+        <h3>Starter</h3>
+        <p class="desc">For teams beginning their modernization journey.</p>
+        <div class="price-amount"><span>$</span><span class="price-num" data-monthly="2400" data-annual="2000">2,400</span><span>/mo</span></div>
+        <ul class="price-features">
+          <li>Cloud readiness assessment</li>
+          <li>Up to 3 workloads migrated</li>
+          <li>Standard security baseline</li>
+          <li>Business-hours support</li>
+          <li>Quarterly architecture review</li>
+        </ul>
+        <a class="btn btn-outline btn-block" href="#contact">Get Started</a>
+      </div>
+      <div class="price-card recommended">
+        <h3>Growth</h3>
+        <p class="desc">For scaling organizations modernizing core systems.</p>
+        <div class="price-amount"><span>$</span><span class="price-num" data-monthly="7800" data-annual="6400">7,800</span><span>/mo</span></div>
+        <ul class="price-features">
+          <li>Everything in Starter</li>
+          <li>Up to 15 workloads migrated</li>
+          <li>AI automation starter pack</li>
+          <li>24/5 dedicated support</li>
+          <li>Dedicated solutions architect</li>
+          <li>Monthly optimization review</li>
+        </ul>
+        <a class="btn btn-primary btn-block" href="#contact">Get Started</a>
+      </div>
+      <div class="price-card">
+        <h3>Enterprise</h3>
+        <p class="desc">For global enterprises running mission-critical platforms.</p>
+        <div class="price-amount"><span>$</span><span class="price-num" data-monthly="22000" data-annual="18200">22,000</span><span>/mo</span></div>
+        <ul class="price-features">
+          <li>Everything in Growth</li>
+          <li>Unlimited workload migration</li>
+          <li>Advanced threat detection &amp; SOC</li>
+          <li>24/7 priority support</li>
+          <li>Multi-region deployment</li>
+          <li>Custom AI agent development</li>
+        </ul>
+        <a class="btn btn-outline btn-block" href="#contact">Get Started</a>
+      </div>
+      <div class="price-card">
+        <h3>Global Scale</h3>
+        <p class="desc">For $10B+ organizations operating at planetary scale.</p>
+        <div class="price-amount">Custom</div>
+        <ul class="price-features">
+          <li>Everything in Enterprise</li>
+          <li>Dedicated engineering pod</li>
+          <li>Sovereign &amp; multi-cloud architecture</li>
+          <li>White-glove onboarding across regions</li>
+          <li>Executive transformation office</li>
+          <li>Custom SLAs &amp; compliance frameworks</li>
+        </ul>
+        <a class="btn btn-outline btn-block" href="#contact">Contact Sales</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================= FAQ ============================= -->
+  <section id="faq" aria-labelledby="faq-heading">
+    <div class="section-head" data-reveal>
+      <p class="eyebrow">FAQ</p>
+      <h2 id="faq-heading">Frequently asked questions</h2>
+    </div>
+    <div class="faq-list" data-reveal>
+      <div class="faq-item">
+        <h3><button class="faq-q" aria-expanded="false" aria-controls="faq-a-1" id="faq-q-1"><span>How quickly can TECHBISS begin a transformation engagement?</span><span class="plus" aria-hidden="true"></span></button></h3>
+        <div class="faq-a" id="faq-a-1" role="region" aria-labelledby="faq-q-1"><div class="faq-a-inner"><p>Most engagements begin discovery within two weeks of contract signature. For urgent modernization needs, our Rapid Start program can mobilize a pod in as little as five business days.</p></div></div>
+      </div>
+      <div class="faq-item">
+        <h3><button class="faq-q" aria-expanded="false" aria-controls="faq-a-2" id="faq-q-2"><span>Do you work with organizations that have strict regulatory or sovereignty requirements?</span><span class="plus" aria-hidden="true"></span></button></h3>
+        <div class="faq-a" id="faq-a-2" role="region" aria-labelledby="faq-q-2"><div class="faq-a-inner"><p>Yes. We operate sovereign-cloud and FedRAMP-ready environments across 120+ countries, with dedicated compliance engineering for financial services, healthcare, and public sector clients.</p></div></div>
+      </div>
+      <div class="faq-item">
+        <h3><button class="faq-q" aria-expanded="false" aria-controls="faq-a-3" id="faq-q-3"><span>Can TECHBISS integrate with our existing technology vendors?</span><span class="plus" aria-hidden="true"></span></button></h3>
+        <div class="faq-a" id="faq-a-3" role="region" aria-labelledby="faq-q-3"><div class="faq-a-inner"><p>Our Integration Connectors library covers 300+ enterprise systems out of the box, and our engineering teams build custom connectors for anything outside that catalog.</p></div></div>
+      </div>
+      <div class="faq-item">
+        <h3><button class="faq-q" aria-expanded="false" aria-controls="faq-a-4" id="faq-q-4"><span>What does the Marketplace offer beyond consulting services?</span><span class="plus" aria-hidden="true"></span></button></h3>
+        <div class="faq-a" id="faq-a-4" role="region" aria-labelledby="faq-q-4"><div class="faq-a-inner"><p>The TECHBISS Marketplace is a catalog of pre-built automation modules, AI agents, industry solution kits, and analytics tools — so teams can deploy proven capability without a full custom build.</p></div></div>
+      </div>
+      <div class="faq-item">
+        <h3><button class="faq-q" aria-expanded="false" aria-controls="faq-a-5" id="faq-q-5"><span>How is pricing structured for Enterprise and Global Scale engagements?</span><span class="plus" aria-hidden="true"></span></button></h3>
+        <div class="faq-a" id="faq-a-5" role="region" aria-labelledby="faq-q-5"><div class="faq-a-inner"><p>Enterprise and Global Scale pricing is tailored to workload volume, region count, and compliance scope. Our team builds a custom proposal after a short scoping call.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================= CONTACT ============================= -->
+  <section id="contact" aria-labelledby="contact-heading">
+    <div class="contact-wrap">
+      <div class="contact-info" data-reveal>
+        <p class="eyebrow">Get In Touch</p>
+        <h2 id="contact-heading">Let's engineer your transformation</h2>
+        <p>Tell us about your platform, your risk profile, and your timeline. A TECHBISS solutions architect will respond within one business day.</p>
+        <div class="contact-detail">
+          <div><b>Global Headquarters</b>One Meridian Plaza, Singapore</div>
+          <div><b>Sales</b>sales@techbiss.example</div>
+          <div><b>Support</b>24/7 across every region we serve</div>
+        </div>
+      </div>
+      <div class="contact-form" id="contactFormWrap" data-reveal>
+        <form id="contactForm" novalidate>
+          <div class="form-grid">
+            <div class="field">
+              <label for="cf-name">Full name</label>
+              <input type="text" id="cf-name" name="name" required aria-required="true" aria-describedby="err-name">
+              <span class="error-msg" id="err-name"></span>
+            </div>
+            <div class="field">
+              <label for="cf-email">Work email</label>
+              <input type="email" id="cf-email" name="email" required aria-required="true" aria-describedby="err-email">
+              <span class="error-msg" id="err-email"></span>
+            </div>
+            <div class="field">
+              <label for="cf-company">Company</label>
+              <input type="text" id="cf-company" name="company" required aria-required="true" aria-describedby="err-company">
+              <span class="error-msg" id="err-company"></span>
+            </div>
+            <div class="field">
+              <label for="cf-phone">Phone <span style="font-weight:400;">(optional)</span></label>
+              <input type="tel" id="cf-phone" name="phone" aria-describedby="err-phone">
+              <span class="error-msg" id="err-phone"></span>
+            </div>
+            <div class="field full">
+              <label for="cf-service">Service interest</label>
+              <select id="cf-service" name="service">
+                <option value="">Select a service</option>
+                <option>Cloud &amp; Infrastructure Modernization</option>
+                <option>AI &amp; Intelligent Automation</option>
+                <option>Cybersecurity &amp; Risk Engineering</option>
+                <option>Data, Analytics &amp; AI Platforms</option>
+                <option>Enterprise Software Engineering</option>
+                <option>Digital Transformation Strategy &amp; Consulting</option>
+              </select>
+            </div>
+            <div class="field full">
+              <label for="cf-message">Message</label>
+              <textarea id="cf-message" name="message" required aria-required="true" aria-describedby="err-message"></textarea>
+              <span class="error-msg" id="err-message"></span>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-block" type="submit" style="margin-top:1.4rem;">Send Message</button>
+        </form>
+        <div class="form-success" id="formSuccess" role="status" aria-live="polite">
+          <div class="success-glow">&#10003;</div>
+          <h3>Message sent</h3>
+          <p>Thank you — a TECHBISS solutions architect will reach out within one business day.</p>
+          <button class="btn btn-outline" id="resetForm" type="button">Send another message</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div>
+        <a class="wordmark" href="#top" style="font-size:1.15rem;">TECH<span>BISS</span></a>
+        <p style="margin-top:1rem;font-size:.88rem;max-width:32ch;">Engineering the next global economy across cloud, AI, cybersecurity, data, and enterprise software.</p>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#top">About</a></li>
+          <li><a href="#top">Careers</a></li>
+          <li><a href="#top">Newsroom</a></li>
+          <li><a href="#top">Investors</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Solutions</h4>
+        <ul>
+          <li><a href="#solutions">Financial Services</a></li>
+          <li><a href="#solutions">Healthcare &amp; Life Sciences</a></li>
+          <li><a href="#solutions">Public Sector</a></li>
+          <li><a href="#solutions">Retail &amp; Commerce</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Resources</h4>
+        <ul>
+          <li><a href="#marketplace">Marketplace</a></li>
+          <li><a href="#case-studies">Case Studies</a></li>
+          <li><a href="#top">Documentation</a></li>
+          <li><a href="#top">Blog</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="#top">Privacy Policy</a></li>
+          <li><a href="#top">Terms of Service</a></li>
+          <li><a href="#top">Security</a></li>
+          <li><a href="#top">Accessibility</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-legal">TECHBISS Global Holdings · Operating in 120+ countries · &copy; 2026 TECHBISS. All rights reserved.</p>
+      <div class="social-row">
+        <a href="#top" aria-label="TECHBISS on LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM3 9h4v12H3zM9 9h3.8v1.7h.05c.53-1 1.83-2 3.77-2 4.03 0 4.78 2.65 4.78 6.1V21h-4v-5.5c0-1.3 0-3-1.83-3s-2.12 1.43-2.12 2.9V21H9z"></path></svg></a>
+        <a href="#top" aria-label="TECHBISS on X"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 4l7.2 9.6L4.4 20h2.3l6-6.5 4.8 6.5H20l-7.6-10.1L19.4 4h-2.3l-5.6 6-4.4-6z"></path></svg></a>
+        <a href="#top" aria-label="TECHBISS on YouTube"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.6 7.2s-.2-1.5-.8-2.1c-.8-.8-1.7-.8-2.1-.9C15.9 4 12 4 12 4s-3.9 0-6.7.2c-.4.1-1.3.1-2.1.9-.6.6-.8 2.1-.8 2.1S2.2 9 2.2 10.8v1.4C2.2 14 2.4 15.8 2.4 15.8s.2 1.5.8 2.1c.8.8 1.9.8 2.4.9 1.7.2 7.4.2 7.4.2s3.9 0 6.7-.3c.4 0 1.3-.1 2.1-.9.6-.6.8-2.1.8-2.1s.2-1.8.2-3.6v-1.4c0-1.8-.2-3.6-.2-3.6zM9.9 14.6V8.9l5.4 2.9z"></path></svg></a>
+        <a href="#top" aria-label="TECHBISS on GitHub"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.7c-2.8.6-3.4-1.3-3.4-1.3-.4-1.2-1-1.5-1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.3 1.1 2.9.8.1-.7.4-1.1.6-1.4-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.5-1.4.1-2.8 0 0 .8-.3 2.7 1a9.4 9.4 0 0 1 4.9 0c1.9-1.3 2.7-1 2.7-1 .6 1.4.2 2.5.1 2.8.6.7 1 1.6 1 2.7 0 3.9-2.4 4.7-4.6 5 .4.3.7 1 .7 2v2.9c0 .3.2.6.7.5A10 10 0 0 0 12 2z"></path></svg></a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <button class="modal-close" id="modalClose" type="button" aria-label="Close dialog">&#10005;</button>
+    <p class="product-cat" id="modalCat"></p>
+    <h3 id="modalTitle"></h3>
+    <p class="product-vendor" id="modalVendor"></p>
+    <div class="modal-meta">
+      <span id="modalRating"></span>
+      <span id="modalPrice" class="product-price"></span>
+    </div>
+    <p id="modalDesc"></p>
+    <button class="btn btn-primary btn-block" id="purchaseBtn" type="button">Purchase License</button>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite">
+  <span class="toast-dot" aria-hidden="true"></span>
+  <span id="toastMsg">Purchase successful — check your inbox for access details.</span>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  document.documentElement.classList.add("has-js");
+
+  /* ---------------- THEME ---------------- */
+  var THEME_KEY = "techbiss-theme";
+  var themeToggle = document.getElementById("themeToggle");
+  function applyTheme(theme, persist){
+    document.documentElement.setAttribute("data-theme", theme);
+    if(themeToggle){
+      themeToggle.setAttribute("aria-pressed", theme === "light" ? "true" : "false");
+      themeToggle.setAttribute("aria-label", theme === "light" ? "Switch to dark mode" : "Switch to light mode");
+    }
+    if(persist){
+      try{ localStorage.setItem(THEME_KEY, theme); }catch(e){}
+    }
+  }
+  (function initTheme(){
+    var stored = null;
+    try{ stored = localStorage.getItem(THEME_KEY); }catch(e){}
+    if(stored === "light" || stored === "dark"){
+      applyTheme(stored, false);
+    }else{
+      applyTheme("dark", false);
+    }
+  })();
+  if(themeToggle){
+    themeToggle.addEventListener("click", function(){
+      var current = document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark";
+      applyTheme(current === "light" ? "dark" : "light", true);
+    });
+  }
+
+  /* ---------------- LOADER ---------------- */
+  var loader = document.getElementById("loader");
+  function hideLoader(){
+    if(!loader) return;
+    loader.setAttribute("hidden","");
+  }
+  if(reduceMotion){
+    hideLoader();
+  }else{
+    window.addEventListener("load", function(){
+      setTimeout(hideLoader, 1300);
+    });
+    setTimeout(hideLoader, 3200);
+  }
+
+  /* ---------------- MOBILE MENU ---------------- */
+  var hamburger = document.getElementById("hamburger");
+  var mobileMenu = document.getElementById("mobileMenu");
+  var menuBackdrop = document.getElementById("menuBackdrop");
+  function closeMenu(){
+    hamburger.setAttribute("aria-expanded","false");
+    hamburger.setAttribute("aria-label","Open menu");
+    mobileMenu.classList.remove("open");
+    menuBackdrop.classList.remove("open");
+  }
+  function openMenu(){
+    hamburger.setAttribute("aria-expanded","true");
+    hamburger.setAttribute("aria-label","Close menu");
+    mobileMenu.classList.add("open");
+    menuBackdrop.classList.add("open");
+  }
+  if(hamburger){
+    hamburger.addEventListener("click", function(){
+      var expanded = hamburger.getAttribute("aria-expanded") === "true";
+      if(expanded){ closeMenu(); } else { openMenu(); }
+    });
+  }
+  menuBackdrop.addEventListener("click", closeMenu);
+  mobileMenu.querySelectorAll("a").forEach(function(a){
+    a.addEventListener("click", closeMenu);
+  });
+  document.addEventListener("keydown", function(e){
+    if(e.key === "Escape" && mobileMenu.classList.contains("open")){
+      closeMenu();
+      hamburger.focus();
+    }
+  });
+
+  /* ---------------- SCROLL REVEAL ---------------- */
+  var revealEls = document.querySelectorAll("[data-reveal]");
+  if("IntersectionObserver" in window && revealEls.length){
+    var revealObserver = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          entry.target.classList.add("is-visible");
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.14, rootMargin: "0px 0px -60px 0px" });
+    revealEls.forEach(function(el){ revealObserver.observe(el); });
+  }else{
+    revealEls.forEach(function(el){ el.classList.add("is-visible"); });
+  }
+
+  /* ---------------- STAT COUNTERS ---------------- */
+  function animateCount(el){
+    var to = parseFloat(el.getAttribute("data-count-to"));
+    var decimals = parseInt(el.getAttribute("data-decimals") || "0", 10);
+    var prefix = el.getAttribute("data-prefix") || "";
+    var suffix = el.getAttribute("data-suffix") || "";
+    if(reduceMotion){
+      el.textContent = prefix + to.toLocaleString(undefined, {minimumFractionDigits:decimals, maximumFractionDigits:decimals}) + suffix;
+      return;
+    }
+    var duration = 1600;
+    var start = null;
+    function step(ts){
+      if(start === null) start = ts;
+      var progress = Math.min((ts - start) / duration, 1);
+      var eased = 1 - Math.pow(1 - progress, 3);
+      var val = to * eased;
+      el.textContent = prefix + val.toLocaleString(undefined, {minimumFractionDigits:decimals, maximumFractionDigits:decimals}) + suffix;
+      if(progress < 1){ requestAnimationFrame(step); }
+    }
+    requestAnimationFrame(step);
+  }
+  var statEls = document.querySelectorAll("[data-count-to]");
+  if("IntersectionObserver" in window && statEls.length){
+    var statObserver = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          animateCount(entry.target);
+          statObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.4 });
+    statEls.forEach(function(el){ statObserver.observe(el); });
+  }else{
+    statEls.forEach(animateCount);
+  }
+
+  /* ---------------- HERO GRID CANVAS ---------------- */
+  (function(){
+    var canvas = document.getElementById("gridCanvas");
+    if(!canvas || !canvas.getContext) return;
+    var ctx = canvas.getContext("2d");
+    var raf = null;
+    var running = true;
+    var scrollPhase = 0;
+    var lastTs = 0;
+    var ROWS = 14;
+
+    function resize(){
+      var rect = canvas.getBoundingClientRect();
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.max(1, Math.round(rect.width * dpr));
+      canvas.height = Math.max(1, Math.round(rect.height * dpr));
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function colors(){
+      var dark = document.documentElement.getAttribute("data-theme") !== "light";
+      return {
+        dark: dark,
+        a1: dark ? "255,46,224" : "224,24,159",
+        a2: dark ? "33,230,255" : "0,152,179",
+        a3: dark ? "157,75,255" : "124,47,240"
+      };
+    }
+
+    function drawFrame(){
+      var w = canvas.clientWidth, h = canvas.clientHeight;
+      if(w <= 0 || h <= 0) return;
+      var c = colors();
+      ctx.clearRect(0, 0, w, h);
+      var horizonY = h * 0.42;
+
+      var sunGrad = ctx.createRadialGradient(w/2, horizonY, 4, w/2, horizonY, Math.min(w,h)*0.36);
+      sunGrad.addColorStop(0, "rgba(" + c.a1 + "," + (c.dark ? 0.55 : 0.28) + ")");
+      sunGrad.addColorStop(1, "rgba(" + c.a1 + ",0)");
+      ctx.fillStyle = sunGrad;
+      ctx.beginPath();
+      ctx.arc(w/2, horizonY, Math.min(w,h)*0.36, 0, Math.PI*2);
+      ctx.fill();
+
+      ctx.save();
+      ctx.strokeStyle = "rgba(" + c.a1 + "," + (c.dark ? 0.9 : 0.55) + ")";
+      ctx.lineWidth = 2;
+      if(c.dark){ ctx.shadowColor = "rgba(" + c.a1 + ",0.9)"; ctx.shadowBlur = 16; }
+      ctx.beginPath();
+      ctx.arc(w/2, horizonY, Math.min(w,h)*0.16, Math.PI, 0);
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.save();
+      ctx.strokeStyle = "rgba(" + c.a2 + "," + (c.dark ? 0.9 : 0.6) + ")";
+      ctx.lineWidth = 1.4;
+      if(c.dark){ ctx.shadowColor = "rgba(" + c.a2 + ",0.8)"; ctx.shadowBlur = 10; }
+      ctx.beginPath();
+      ctx.moveTo(0, horizonY);
+      ctx.lineTo(w, horizonY);
+      ctx.stroke();
+      ctx.restore();
+
+      var vCount = 12;
+      ctx.save();
+      ctx.lineWidth = 1;
+      for(var i = -vCount; i <= vCount; i++){
+        var xh = w/2 + i * (w / (vCount * 4));
+        var xb = w/2 + i * (w / (vCount * 0.9));
+        var t = Math.abs(i) / vCount;
+        ctx.strokeStyle = "rgba(" + c.a3 + "," + ((c.dark ? 0.55 : 0.32) * (1 - t*0.5)) + ")";
+        if(c.dark){ ctx.shadowColor = "rgba(" + c.a3 + ",0.5)"; ctx.shadowBlur = 6; }
+        ctx.beginPath();
+        ctx.moveTo(xh, horizonY);
+        ctx.lineTo(xb, h);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      ctx.save();
+      ctx.lineWidth = 1.2;
+      for(var r = 0; r < ROWS; r++){
+        var z = (r / ROWS) + scrollPhase;
+        z = z % 1;
+        if(z < 0) z += 1;
+        var tt = z * z;
+        var y = horizonY + (h - horizonY) * tt;
+        var alpha = (1 - z) * (c.dark ? 0.85 : 0.5);
+        if(alpha <= 0.02) continue;
+        ctx.strokeStyle = "rgba(" + c.a2 + "," + alpha + ")";
+        if(c.dark){ ctx.shadowColor = "rgba(" + c.a2 + "," + alpha + ")"; ctx.shadowBlur = 8; }
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(w, y);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function tick(ts){
+      if(!running){ return; }
+      if(!lastTs) lastTs = ts;
+      var dt = ts - lastTs;
+      if(dt > 45){
+        lastTs = ts;
+        if(!reduceMotion){
+          scrollPhase += 0.0065;
+        }
+        drawFrame();
+      }
+      raf = requestAnimationFrame(tick);
+    }
+
+    function start(){
+      if(raf) return;
+      raf = requestAnimationFrame(tick);
+    }
+    function stop(){
+      if(raf){ cancelAnimationFrame(raf); raf = null; }
+    }
+
+    resize();
+    drawFrame();
+    if(!reduceMotion){
+      start();
+    }
+
+    window.addEventListener("resize", function(){
+      resize();
+      drawFrame();
+    });
+    document.addEventListener("visibilitychange", function(){
+      if(document.hidden){ running = false; stop(); }
+      else{ running = true; if(!reduceMotion){ lastTs = 0; start(); } else { drawFrame(); } }
+    });
+
+    var themeBtn = document.getElementById("themeToggle");
+    if(themeBtn){ themeBtn.addEventListener("click", function(){ drawFrame(); }); }
+  })();
+
+  /* ---------------- SOLUTIONS TABS ---------------- */
+  (function(){
+    var industries = [
+      { id:"fin", name:"Financial Services", desc:"Core banking modernization, real-time payments, and regulatory-grade risk platforms for the institutions the global economy runs on.", bullets:["Real-time payment rail integration","Basel III/IV-ready risk engines","Fraud detection at 12M+ transactions/day"], stat:"40%", statLabel:"Faster settlement cycles" },
+      { id:"health", name:"Healthcare & Life Sciences", desc:"Interoperable data platforms, clinical AI, and secure infrastructure built for HIPAA/GDPR-grade compliance across care networks.", bullets:["FHIR-native interoperability","Clinical decision-support AI","Secure patient data mesh"], stat:"42", statLabel:"Facilities unified on one platform" },
+      { id:"mfg", name:"Manufacturing & Supply Chain", desc:"Connected factories, predictive maintenance, and end-to-end supply chain visibility engineered for resilience under global disruption.", bullets:["Digital twin & IoT integration","Predictive maintenance AI","Multi-tier supplier visibility"], stat:"27%", statLabel:"Logistics cost reduction" },
+      { id:"gov", name:"Public Sector & Government", desc:"Citizen-facing digital services and secure modernization for agencies serving millions, built to FedRAMP and sovereign-cloud standards.", bullets:["Sovereign & FedRAMP-ready cloud","Citizen service portals","Legacy mainframe migration"], stat:"120+", statLabel:"Countries with sovereign deployments" },
+      { id:"retail", name:"Retail & Commerce", desc:"Unified commerce platforms, real-time inventory intelligence, and AI-personalized customer experience across every channel.", bullets:["Headless commerce architecture","Real-time inventory AI","Omnichannel personalization"], stat:"3,400+", statLabel:"Engineers building commerce systems" },
+      { id:"energy", name:"Energy & Utilities", desc:"Grid modernization, predictive asset management, and carbon-intelligent operations for the energy transition.", bullets:["Smart grid & IoT telemetry","Predictive asset maintenance","Carbon & ESG reporting platforms"], stat:"99.99%", statLabel:"Platform uptime for grid operators" }
+    ];
+    var tablist = document.getElementById("solutionsTabs");
+    var panelWrap = document.getElementById("solutionsPanel");
+    if(!tablist || !panelWrap) return;
+
+    industries.forEach(function(ind, i){
+      var btn = document.createElement("button");
+      btn.className = "tab-chip";
+      btn.setAttribute("role","tab");
+      btn.setAttribute("type","button");
+      btn.id = "tab-" + ind.id;
+      btn.setAttribute("aria-controls", "panel-" + ind.id);
+      btn.setAttribute("aria-selected", i === 0 ? "true" : "false");
+      btn.setAttribute("tabindex", i === 0 ? "0" : "-1");
+      btn.textContent = ind.name;
+      btn.addEventListener("click", function(){ selectTab(i); });
+      btn.addEventListener("keydown", function(e){
+        var tabs = Array.prototype.slice.call(tablist.querySelectorAll(".tab-chip"));
+        var idx = tabs.indexOf(btn);
+        if(e.key === "ArrowRight" || e.key === "ArrowDown"){
+          e.preventDefault();
+          selectTab((idx + 1) % tabs.length);
+          tabs[(idx + 1) % tabs.length].focus();
+        }else if(e.key === "ArrowLeft" || e.key === "ArrowUp"){
+          e.preventDefault();
+          selectTab((idx - 1 + tabs.length) % tabs.length);
+          tabs[(idx - 1 + tabs.length) % tabs.length].focus();
+        }
+      });
+      tablist.appendChild(btn);
+    });
+
+    function renderPanel(ind){
+      panelWrap.innerHTML =
+        '<div class="tab-panel" id="panel-' + ind.id + '" role="tabpanel" aria-labelledby="tab-' + ind.id + '" tabindex="0">' +
+          '<div>' +
+            '<h3>' + ind.name + '</h3>' +
+            '<p>' + ind.desc + '</p>' +
+            '<ul class="tab-panel-bullets">' + ind.bullets.map(function(b){ return "<li>" + b + "</li>"; }).join("") + "</ul>" +
+          "</div>" +
+          '<div class="tab-stat-box"><strong>' + ind.stat + "</strong>" + ind.statLabel + "</div>" +
+        "</div>";
+    }
+
+    function selectTab(i){
+      var tabs = Array.prototype.slice.call(tablist.querySelectorAll(".tab-chip"));
+      tabs.forEach(function(t, idx){
+        t.setAttribute("aria-selected", idx === i ? "true" : "false");
+        t.setAttribute("tabindex", idx === i ? "0" : "-1");
+      });
+      renderPanel(industries[i]);
+    }
+    renderPanel(industries[0]);
+  })();
+
+  /* ---------------- MARKETPLACE ---------------- */
+  (function(){
+    var products = [
+      { name:"FlowPilot Automation Suite", vendor:"Meridian Labs", cat:"Automation Modules", rating:4.8, price:12400, blurb:"Drag-and-drop workflow automation for cross-department process orchestration at enterprise scale." },
+      { name:"CopilotX Agent Framework", vendor:"Northwind AI", cat:"AI Agents & Copilots", rating:4.9, price:28000, blurb:"Deploy autonomous AI agents that execute multi-step enterprise workflows with human-in-the-loop oversight." },
+      { name:"FinCore Banking Kit", vendor:"Ledgerhouse", cat:"Industry Solution Kits", rating:4.7, price:48000, blurb:"Pre-built core-banking modules for real-time settlement, KYC, and regulatory reporting." },
+      { name:"SentinelGuard Compliance Pack", vendor:"Vantage Point Security", cat:"Security & Compliance Packs", rating:4.6, price:9600, blurb:"Continuous compliance monitoring mapped to SOC 2, ISO 27001, and GDPR controls out of the box." },
+      { name:"LinkForge Connector Hub", vendor:"Bridgeware", cat:"Integration Connectors", rating:4.5, price:1200, blurb:"300+ prebuilt connectors for instant integration across ERP, CRM, and legacy systems." },
+      { name:"PulseBoard Analytics", vendor:"Clearview Data", cat:"Analytics Dashboards", rating:4.8, price:6800, blurb:"Real-time executive dashboards with anomaly detection and natural-language query." }
+    ];
+    var cats = ["All"].concat(products.map(function(p){return p.cat;}).filter(function(c,i,arr){return arr.indexOf(c)===i;}));
+    var filterRow = document.getElementById("filterRow");
+    var grid = document.getElementById("marketGrid");
+    var activeCat = "All";
+
+    function stars(rating){
+      var full = Math.round(rating);
+      var out = "";
+      for(var i=0;i<5;i++){ out += i < full ? "★" : "☆"; }
+      return out + " " + rating.toFixed(1);
+    }
+
+    cats.forEach(function(cat, i){
+      var chip = document.createElement("button");
+      chip.className = "filter-chip";
+      chip.type = "button";
+      chip.textContent = cat;
+      chip.setAttribute("aria-pressed", i === 0 ? "true" : "false");
+      chip.addEventListener("click", function(){
+        activeCat = cat;
+        filterRow.querySelectorAll(".filter-chip").forEach(function(c){ c.setAttribute("aria-pressed", c === chip ? "true" : "false"); });
+        renderGrid();
+      });
+      filterRow.appendChild(chip);
+    });
+
+    function renderGrid(){
+      grid.innerHTML = "";
+      products.forEach(function(p, idx){
+        var visible = activeCat === "All" || activeCat === p.cat;
+        var card = document.createElement("button");
+        card.type = "button";
+        card.className = "product-card";
+        if(!visible) card.setAttribute("hidden","");
+        card.innerHTML =
+          '<span class="product-cat">' + p.cat + "</span>" +
+          "<h3>" + p.name + "</h3>" +
+          '<span class="product-vendor">by ' + p.vendor + "</span>" +
+          '<span class="product-rating">' + stars(p.rating) + "</span>" +
+          '<span class="product-price">$' + p.price.toLocaleString() + "</span>";
+        card.addEventListener("click", function(){ openModal(idx); });
+        grid.appendChild(card);
+      });
+    }
+    renderGrid();
+
+    /* modal */
+    var backdrop = document.getElementById("modalBackdrop");
+    var modal = document.getElementById("modal");
+    var modalClose = document.getElementById("modalClose");
+    var lastFocused = null;
+
+    function openModal(idx){
+      var p = products[idx];
+      document.getElementById("modalCat").textContent = p.cat;
+      document.getElementById("modalTitle").textContent = p.name;
+      document.getElementById("modalVendor").textContent = "by " + p.vendor;
+      document.getElementById("modalRating").textContent = stars(p.rating);
+      document.getElementById("modalPrice").textContent = "$" + p.price.toLocaleString();
+      document.getElementById("modalDesc").textContent = p.blurb;
+      lastFocused = document.activeElement;
+      backdrop.classList.add("open");
+      modalClose.focus();
+      document.addEventListener("keydown", trapFocus);
+    }
+    function closeModal(){
+      backdrop.classList.remove("open");
+      document.removeEventListener("keydown", trapFocus);
+      if(lastFocused) lastFocused.focus();
+    }
+    function trapFocus(e){
+      if(e.key === "Escape"){ closeModal(); return; }
+      if(e.key !== "Tab") return;
+      var focusables = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+      if(!focusables.length) return;
+      var first = focusables[0], last = focusables[focusables.length - 1];
+      if(e.shiftKey && document.activeElement === first){
+        e.preventDefault(); last.focus();
+      }else if(!e.shiftKey && document.activeElement === last){
+        e.preventDefault(); first.focus();
+      }
+    }
+    modalClose.addEventListener("click", closeModal);
+    backdrop.addEventListener("click", function(e){ if(e.target === backdrop) closeModal(); });
+
+    var toast = document.getElementById("toast");
+    var toastTimer = null;
+    document.getElementById("purchaseBtn").addEventListener("click", function(){
+      closeModal();
+      document.getElementById("toastMsg").textContent = "Purchase successful — check your inbox for access details.";
+      toast.classList.add("show");
+      if(toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(function(){ toast.classList.remove("show"); }, 3200);
+    });
+  })();
+
+  /* ---------------- PROCESS TIMELINE PULSE ---------------- */
+  (function(){
+    var circuit = document.getElementById("circuit");
+    if(!circuit || !("IntersectionObserver" in window)) { if(circuit) circuit.classList.add("in-view"); return; }
+    var obs = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          circuit.classList.add("in-view");
+        }
+      });
+    }, { threshold: 0.3 });
+    obs.observe(circuit);
+  })();
+
+  /* ---------------- CASE STUDY CAROUSEL ---------------- */
+  (function(){
+    var carousel = document.getElementById("carousel");
+    var prevBtn = document.getElementById("carPrev");
+    var nextBtn = document.getElementById("carNext");
+    if(!carousel) return;
+    var isDown = false, startX = 0, scrollStart = 0, moved = false;
+
+    carousel.addEventListener("pointerdown", function(e){
+      isDown = true; moved = false;
+      startX = e.clientX;
+      scrollStart = carousel.scrollLeft;
+      carousel.classList.add("dragging");
+      carousel.setPointerCapture(e.pointerId);
+    });
+    carousel.addEventListener("pointermove", function(e){
+      if(!isDown) return;
+      var dx = e.clientX - startX;
+      if(Math.abs(dx) > 4) moved = true;
+      carousel.scrollLeft = scrollStart - dx;
+    });
+    function endDrag(){
+      isDown = false;
+      carousel.classList.remove("dragging");
+    }
+    carousel.addEventListener("pointerup", endDrag);
+    carousel.addEventListener("pointerleave", endDrag);
+    carousel.addEventListener("click", function(e){ if(moved){ e.preventDefault(); e.stopPropagation(); } }, true);
+
+    function cardWidth(){
+      var card = carousel.querySelector(".case-card");
+      return card ? card.getBoundingClientRect().width + 22 : 300;
+    }
+    if(prevBtn) prevBtn.addEventListener("click", function(){ carousel.scrollBy({ left: -cardWidth(), behavior: reduceMotion ? "auto" : "smooth" }); });
+    if(nextBtn) nextBtn.addEventListener("click", function(){ carousel.scrollBy({ left: cardWidth(), behavior: reduceMotion ? "auto" : "smooth" }); });
+    carousel.addEventListener("keydown", function(e){
+      if(e.key === "ArrowRight"){ carousel.scrollBy({ left: cardWidth(), behavior: reduceMotion ? "auto" : "smooth" }); }
+      if(e.key === "ArrowLeft"){ carousel.scrollBy({ left: -cardWidth(), behavior: reduceMotion ? "auto" : "smooth" }); }
+    });
+  })();
+
+  /* ---------------- PRICING TOGGLE ---------------- */
+  (function(){
+    var toggle = document.getElementById("billingToggle");
+    var labelM = document.getElementById("labelMonthly");
+    var labelA = document.getElementById("labelAnnual");
+    var nums = document.querySelectorAll(".price-num");
+    if(!toggle) return;
+    var annual = false;
+
+    function tween(el, from, to){
+      if(reduceMotion){
+        el.textContent = to.toLocaleString();
+        return;
+      }
+      var duration = 450;
+      var start = null;
+      function step(ts){
+        if(start === null) start = ts;
+        var progress = Math.min((ts - start) / duration, 1);
+        var eased = 1 - Math.pow(1 - progress, 3);
+        var val = Math.round(from + (to - from) * eased);
+        el.textContent = val.toLocaleString();
+        if(progress < 1){ requestAnimationFrame(step); }
+      }
+      requestAnimationFrame(step);
+    }
+
+    toggle.addEventListener("click", function(){
+      annual = !annual;
+      toggle.setAttribute("aria-checked", annual ? "true" : "false");
+      labelM.classList.toggle("active", !annual);
+      labelA.classList.toggle("active", annual);
+      nums.forEach(function(num){
+        var from = parseInt(num.textContent.replace(/,/g,""), 10);
+        var to = parseInt(num.getAttribute(annual ? "data-annual" : "data-monthly"), 10);
+        tween(num, from, to);
+      });
+    });
+  })();
+
+  /* ---------------- FAQ ACCORDION ---------------- */
+  (function(){
+    document.querySelectorAll(".faq-q").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var item = btn.closest(".faq-item");
+        var open = btn.getAttribute("aria-expanded") === "true";
+        btn.setAttribute("aria-expanded", open ? "false" : "true");
+        item.classList.toggle("open", !open);
+      });
+    });
+  })();
+
+  /* ---------------- CONTACT FORM ---------------- */
+  (function(){
+    var form = document.getElementById("contactForm");
+    var wrap = document.getElementById("contactFormWrap");
+    var success = document.getElementById("formSuccess");
+    var resetBtn = document.getElementById("resetForm");
+    if(!form) return;
+
+    var emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    function setError(fieldId, msg){
+      var field = document.getElementById(fieldId).closest(".field");
+      var err = document.getElementById("err-" + fieldId.replace("cf-",""));
+      if(msg){
+        field.classList.add("error");
+        if(err) err.textContent = msg;
+        document.getElementById(fieldId).setAttribute("aria-invalid","true");
+      }else{
+        field.classList.remove("error");
+        if(err) err.textContent = "";
+        document.getElementById(fieldId).removeAttribute("aria-invalid");
+      }
+    }
+
+    form.addEventListener("submit", function(e){
+      e.preventDefault();
+      var valid = true;
+      var name = document.getElementById("cf-name").value.trim();
+      var email = document.getElementById("cf-email").value.trim();
+      var company = document.getElementById("cf-company").value.trim();
+      var message = document.getElementById("cf-message").value.trim();
+
+      if(!name){ setError("cf-name","Please enter your full name."); valid = false; } else { setError("cf-name", null); }
+      if(!email){ setError("cf-email","Please enter your work email."); valid = false; }
+      else if(!emailRe.test(email)){ setError("cf-email","Please enter a valid email address."); valid = false; }
+      else { setError("cf-email", null); }
+      if(!company){ setError("cf-company","Please enter your company name."); valid = false; } else { setError("cf-company", null); }
+      if(!message){ setError("cf-message","Please tell us a little about your project."); valid = false; } else { setError("cf-message", null); }
+      setError("cf-phone", null);
+
+      if(!valid){
+        var firstError = form.querySelector(".field.error input, .field.error textarea, .field.error select");
+        if(firstError) firstError.focus();
+        return;
+      }
+
+      wrap.classList.add("submitted");
+      success.classList.add("show");
+    });
+
+    if(resetBtn){
+      resetBtn.addEventListener("click", function(){
+        form.reset();
+        wrap.classList.remove("submitted");
+        success.classList.remove("show");
+        document.getElementById("cf-name").focus();
+      });
+    }
+  })();
+
+})();
+</script>
