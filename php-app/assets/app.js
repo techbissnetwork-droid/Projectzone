@@ -730,12 +730,37 @@ function dashProjectCard(p){
     +'<div class="progress-track" style="margin-bottom:12px;"><div class="progress-fill" style="width:'+(parseInt(p.progress_pct,10)||0)+'%;"></div></div>'
     +(expiries?'<div class="flex gap-8" style="flex-wrap:wrap;margin-bottom:'+(p.notes?'12px':'0')+';">'+expiries+'</div>':'')
     +(p.notes?'<p style="font-size:.9rem;color:var(--ink-soft);margin:0;">'+esc(p.notes)+'</p>':'')
+    +projectTicketSection(p)
+  +'</div>';
+}
+function projectTicketSection(p){
+  if(p.open_ticket){
+    return '<div class="badge warning" style="margin-top:12px;display:inline-flex;">'+ico('chat')+' Request open: '+esc(p.open_ticket.title)+'</div>';
+  }
+  return '<div style="margin-top:12px;">'
+    +'<button type="button" class="btn btn-ghost btn-sm proj-ticket-toggle" data-pid="'+p.id+'">Need something on this project?</button>'
+    +'<form class="proj-ticket-form" data-pid="'+p.id+'" onsubmit="return false;" hidden style="margin-top:12px;">'
+      +'<div class="field"><label>What do you need?</label><input class="pt-title" required placeholder="e.g. Update the homepage photos"></div>'
+      +'<div class="field"><label>Any details?</label><textarea class="pt-desc" placeholder="Optional"></textarea></div>'
+      +'<button class="btn btn-primary btn-sm" type="submit">Send request</button>'
+      +'<p class="pt-msg badge success" style="display:none;margin-top:10px;">'+ico('check')+' Sent — we\'ll follow up.</p>'
+      +'<p class="pt-error badge danger" hidden style="margin-top:10px;"></p>'
+    +'</form>'
   +'</div>';
 }
 function dashRequestFormHTML(businesses){
-  var picker = (businesses && businesses.length > 1)
-    ? '<div class="field"><label for="reqBiz">Which business is this for?</label><select id="reqBiz">'+businesses.map(function(b){ return '<option value="'+b.id+'">'+esc(b.name)+'</option>'; }).join('')+'</select></div>'
-    : '';
+  var eligible = (businesses || []).filter(function(b){ return !b.open_request_ticket; });
+  var pending = (businesses || []).filter(function(b){ return b.open_request_ticket; });
+  if(!eligible.length){
+    var names = pending.map(function(b){ return esc(b.name); }).join(', ');
+    return '<div class="card" style="margin-top:18px;">'
+      +'<div class="card-head">'+blobIcon('chat','sm',true)+'<h3>Request a new project</h3></div>'
+      +'<p class="lede" style="margin-bottom:0;">You already have an open request'+(pending.length>1?' for '+names:'')+' — we\'ll be in touch soon.</p>'
+    +'</div>';
+  }
+  var picker = (eligible.length > 1)
+    ? '<div class="field"><label for="reqBiz">Which business is this for?</label><select id="reqBiz">'+eligible.map(function(b){ return '<option value="'+b.id+'">'+esc(b.name)+'</option>'; }).join('')+'</select></div>'
+    : '<input type="hidden" id="reqBiz" value="'+eligible[0].id+'">';
   return '<div class="card" style="margin-top:18px;">'
     +'<div class="card-head">'+blobIcon('plus','sm',true)+'<h3>Request a new project</h3></div>'
     +'<p class="lede" style="margin-bottom:14px;">Need a new site, app, or something added to what you already have? Tell us here and we\'ll follow up.</p>'
@@ -800,8 +825,44 @@ function wireDashboard(){
     html += dashRequestFormHTML(businesses);
     body.innerHTML = html;
     wireRequestForm();
+    wireProjectTicketForms(body);
   }).catch(function(){
     body.innerHTML = '<p class="badge danger">Could not load your project details — please try again.</p>';
+  });
+}
+function wireProjectTicketForms(scope){
+  scope.addEventListener('click', function(e){
+    var btn = e.target.closest('.proj-ticket-toggle');
+    if(!btn) return;
+    var form = scope.querySelector('.proj-ticket-form[data-pid="'+btn.dataset.pid+'"]');
+    if(form){ form.hidden = !form.hidden; btn.style.display = form.hidden ? '' : 'none'; }
+  });
+  scope.addEventListener('submit', function(e){
+    var form = e.target.closest('.proj-ticket-form');
+    if(!form) return;
+    e.preventDefault();
+    var errEl = form.querySelector('.pt-error'), msgEl = form.querySelector('.pt-msg');
+    errEl.hidden = true;
+    var btn = form.querySelector('button[type=submit]'); btn.disabled = true;
+    var payload = {
+      project_id: form.dataset.pid,
+      title: form.querySelector('.pt-title').value,
+      description: form.querySelector('.pt-desc').value
+    };
+    fetch(BP+'/api/project-ticket.php', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) })
+      .then(function(r){ return r.json().then(function(data){ return {ok:r.ok, data:data}; }); })
+      .then(function(res){
+        btn.disabled = false;
+        if(!res.ok){ errEl.textContent = res.data.error || 'Something went wrong — please try again.'; errEl.hidden = false; return; }
+        msgEl.style.display = 'inline-flex';
+        form.querySelector('.pt-title').disabled = true;
+        form.querySelector('.pt-desc').disabled = true;
+        btn.style.display = 'none';
+      })
+      .catch(function(){
+        btn.disabled = false;
+        errEl.textContent = 'Could not reach the server — please try again.'; errEl.hidden = false;
+      });
   });
 }
 Pages['/account'] = function(){

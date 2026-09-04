@@ -44,13 +44,17 @@ if ($title === '') {
     send_json(['error' => 'Please describe what you\'d like built.'], 400);
 }
 
-$ticketTitle = 'New project request: ' . $title;
-if ($description !== '') {
-    $ticketTitle .= ' — ' . $description;
+$openCheck = $pdo->prepare(
+    "SELECT id FROM tickets WHERE business_id = ? AND type = 'new_project' AND status != 'Closed'"
+);
+$openCheck->execute([$businessId]);
+if ($openCheck->fetch()) {
+    send_json(['error' => 'You already have an open project request for this business — we\'ll be in touch soon.'], 409);
 }
-$ticketTitle = mb_substr($ticketTitle, 0, 255);
 
-$stmt = $pdo->prepare('INSERT INTO tickets (business_id, title, priority, status) VALUES (?, ?, ?, ?)');
-$stmt->execute([$businessId, $ticketTitle, 'Normal', 'Open']);
+$ticketTitle = mb_substr($title, 0, 255);
+
+$stmt = $pdo->prepare("INSERT INTO tickets (business_id, title, description, type, priority, status) VALUES (?, ?, ?, 'new_project', ?, ?)");
+$stmt->execute([$businessId, $ticketTitle, $description !== '' ? $description : null, 'Normal', 'Open']);
 
 send_json(['ok' => true]);

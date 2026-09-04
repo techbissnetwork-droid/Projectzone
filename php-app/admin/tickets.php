@@ -10,6 +10,7 @@ $pdo = db();
 
 $PRIORITIES = ['Low', 'Normal', 'High'];
 $STATUSES = ['Open', 'In progress', 'Closed'];
+$TYPES = ['project_task' => 'Project task', 'new_project' => 'New project request'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
@@ -19,18 +20,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $id = (int)($_POST['id'] ?? 0);
         $businessId = (int)($_POST['business_id'] ?? 0);
         $title = trim((string)($_POST['title'] ?? ''));
+        $description = trim((string)($_POST['description'] ?? ''));
+        $type = array_key_exists($_POST['type'] ?? '', $TYPES) ? $_POST['type'] : 'project_task';
         $priority = in_array($_POST['priority'] ?? '', $PRIORITIES, true) ? $_POST['priority'] : 'Normal';
         $status = in_array($_POST['status'] ?? '', $STATUSES, true) ? $_POST['status'] : 'Open';
         $assigneeId = (int)($_POST['assignee_staff_id'] ?? 0) ?: null;
         if ($title === '' || $businessId <= 0) {
             flash('Pick a business and enter a title.', 'error');
         } elseif ($id > 0) {
-            $stmt = $pdo->prepare('UPDATE tickets SET business_id=?, title=?, priority=?, status=?, assignee_staff_id=? WHERE id=?');
-            $stmt->execute([$businessId, $title, $priority, $status, $assigneeId, $id]);
+            $stmt = $pdo->prepare('UPDATE tickets SET business_id=?, title=?, description=?, type=?, priority=?, status=?, assignee_staff_id=? WHERE id=?');
+            $stmt->execute([$businessId, $title, $description !== '' ? $description : null, $type, $priority, $status, $assigneeId, $id]);
             flash('Ticket updated.');
         } else {
-            $stmt = $pdo->prepare('INSERT INTO tickets (business_id, title, priority, status, assignee_staff_id) VALUES (?,?,?,?,?)');
-            $stmt->execute([$businessId, $title, $priority, $status, $assigneeId]);
+            $stmt = $pdo->prepare('INSERT INTO tickets (business_id, title, description, type, priority, status, assignee_staff_id) VALUES (?,?,?,?,?,?,?)');
+            $stmt->execute([$businessId, $title, $description !== '' ? $description : null, $type, $priority, $status, $assigneeId]);
             flash('Ticket created.');
         }
     } elseif ($action === 'delete') {
@@ -51,10 +54,12 @@ if (isset($_GET['edit'])) {
 $businesses = $pdo->query('SELECT id, name FROM businesses ORDER BY name')->fetchAll();
 $staffList = $pdo->query('SELECT id, name FROM staff ORDER BY name')->fetchAll();
 $tickets = $pdo->query(
-    "SELECT t.*, b.name AS business_name, s.name AS assignee_name, s.initials AS assignee_initials
+    "SELECT t.*, b.name AS business_name, s.name AS assignee_name, s.initials AS assignee_initials,
+            p.title AS project_title
      FROM tickets t
      JOIN businesses b ON b.id = t.business_id
      LEFT JOIN staff s ON s.id = t.assignee_staff_id
+     LEFT JOIN projects p ON p.id = t.project_id
      ORDER BY FIELD(t.status,'Open','In progress','Closed'), FIELD(t.priority,'High','Normal','Low'), t.created_at DESC"
 )->fetchAll();
 $priTone = ['High' => 'danger', 'Normal' => 'warning', 'Low' => 'success'];
@@ -90,9 +95,13 @@ $token = csrf_token();
       <input type="hidden" name="csrf" value="<?= e($token) ?>">
       <input type="hidden" name="id" value="<?= e((string)($editing['id'] ?? 0)) ?>">
       <div class="field"><label>Title</label><input name="title" required value="<?= e($editing['title'] ?? '') ?>"></div>
+      <div class="field"><label>Description <small style="font-weight:400;color:var(--ink-faint);">(optional)</small></label><textarea name="description"><?= e($editing['description'] ?? '') ?></textarea></div>
       <div class="grid grid-4" style="gap:16px;">
         <div class="field"><label>Business</label><select name="business_id">
           <?php foreach ($businesses as $b): ?><option value="<?= (int)$b['id'] ?>" <?= (int)($editing['business_id'] ?? 0) === (int)$b['id'] ? 'selected' : '' ?>><?= e($b['name']) ?></option><?php endforeach; ?>
+        </select></div>
+        <div class="field"><label>Type</label><select name="type">
+          <?php foreach ($TYPES as $val => $label): ?><option value="<?= e($val) ?>" <?= ($editing['type'] ?? 'project_task') === $val ? 'selected' : '' ?>><?= e($label) ?></option><?php endforeach; ?>
         </select></div>
         <div class="field"><label>Priority</label><select name="priority">
           <?php foreach ($PRIORITIES as $p): ?><option value="<?= e($p) ?>" <?= ($editing['priority'] ?? '') === $p ? 'selected' : '' ?>><?= e($p) ?></option><?php endforeach; ?>
@@ -100,11 +109,11 @@ $token = csrf_token();
         <div class="field"><label>Status</label><select name="status">
           <?php foreach ($STATUSES as $s): ?><option value="<?= e($s) ?>" <?= ($editing['status'] ?? '') === $s ? 'selected' : '' ?>><?= e($s) ?></option><?php endforeach; ?>
         </select></div>
-        <div class="field"><label>Assignee</label><select name="assignee_staff_id">
-          <option value="">Unassigned</option>
-          <?php foreach ($staffList as $s): ?><option value="<?= (int)$s['id'] ?>" <?= (int)($editing['assignee_staff_id'] ?? 0) === (int)$s['id'] ? 'selected' : '' ?>><?= e($s['name']) ?></option><?php endforeach; ?>
-        </select></div>
       </div>
+      <div class="field"><label>Assignee</label><select name="assignee_staff_id">
+        <option value="">Unassigned</option>
+        <?php foreach ($staffList as $s): ?><option value="<?= (int)$s['id'] ?>" <?= (int)($editing['assignee_staff_id'] ?? 0) === (int)$s['id'] ? 'selected' : '' ?>><?= e($s['name']) ?></option><?php endforeach; ?>
+      </select></div>
       <div class="flex gap-12">
         <button class="btn btn-primary" type="submit"><?= $editing ? 'Save changes' : 'Create ticket' ?></button>
         <?php if ($editing): ?><a href="tickets.php" class="btn btn-ghost">Cancel</a><?php endif; ?>
@@ -114,11 +123,26 @@ $token = csrf_token();
   <?php endif; ?>
 
   <div class="card">
-    <div class="table-wrap"><table><thead><tr><th>Business</th><th>Title</th><th>Priority</th><th>Status</th><th>Assignee</th><th></th></tr></thead><tbody>
+    <div class="table-wrap"><table><thead><tr><th>Business</th><th>Title</th><th>Type</th><th>Priority</th><th>Status</th><th>Assignee</th><th></th></tr></thead><tbody>
       <?php foreach ($tickets as $t): ?>
       <tr>
         <td style="font-weight:600;"><?= e($t['business_name']) ?></td>
-        <td><?= e($t['title']) ?></td>
+        <td><?= e($t['title']) ?><?= $t['description'] ? '<br><span style="font-weight:400;color:var(--ink-faint);font-size:.82rem;">' . e(mb_strimwidth($t['description'], 0, 80, '…')) . '</span>' : '' ?></td>
+        <td>
+          <?php if (($t['type'] ?? 'project_task') === 'new_project'): ?>
+            <span class="badge">New project</span>
+            <?php if ($t['project_id']): ?>
+              <br><a class="card-link" style="font-size:.78rem;" href="projects.php?business=<?= (int)$t['business_id'] ?>&edit=<?= (int)$t['project_id'] ?>"><?= e($t['project_title']) ?> <?= ico('arrow') ?></a>
+            <?php elseif ($t['status'] !== 'Closed'): ?>
+              <br><a class="card-link" style="font-size:.78rem;" href="projects.php?business=<?= (int)$t['business_id'] ?>&title=<?= urlencode($t['title']) ?>&from_ticket=<?= (int)$t['id'] ?>">Create project <?= ico('arrow') ?></a>
+            <?php endif; ?>
+          <?php else: ?>
+            <span class="badge">Project task</span>
+            <?php if ($t['project_id']): ?>
+              <br><a class="card-link" style="font-size:.78rem;" href="projects.php?business=<?= (int)$t['business_id'] ?>&edit=<?= (int)$t['project_id'] ?>"><?= e($t['project_title'] ?? 'Open project') ?> <?= ico('arrow') ?></a>
+            <?php endif; ?>
+          <?php endif; ?>
+        </td>
         <td><span class="badge <?= $priTone[$t['priority']] ?? '' ?>"><?= e($t['priority']) ?></span></td>
         <td><span class="badge <?= $statusTone[$t['status']] ?? '' ?>"><?= e($t['status']) ?></span></td>
         <td style="color:var(--ink-faint);"><?= e($t['assignee_name'] ?? 'Unassigned') ?></td>
@@ -133,7 +157,7 @@ $token = csrf_token();
         </td>
       </tr>
       <?php endforeach; ?>
-      <?php if (!$tickets): ?><tr><td colspan="6" style="color:var(--ink-faint);">No tickets yet.</td></tr><?php endif; ?>
+      <?php if (!$tickets): ?><tr><td colspan="7" style="color:var(--ink-faint);">No tickets yet.</td></tr><?php endif; ?>
     </tbody></table></div>
   </div>
 </main>

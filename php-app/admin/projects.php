@@ -64,6 +64,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $dates['domain_expires_at'], $dates['hosting_expires_at'], $dates['ssl_expires_at'], $dates['email_expires_at'],
                     $notes, $portfolioVisible,
                 ]);
+                $newProjectId = (int)$pdo->lastInsertId();
+                $fromTicket = (int)($_POST['from_ticket'] ?? 0);
+                if ($fromTicket > 0) {
+                    $pdo->prepare("UPDATE tickets SET project_id=?, status='Closed' WHERE id=? AND type='new_project'")
+                        ->execute([$newProjectId, $fromTicket]);
+                }
                 flash('Project added.');
             }
             $businessId = $bizId;
@@ -95,6 +101,8 @@ if (isset($_GET['edit'])) {
     $stmt->execute([(int)$_GET['edit'], $businessId]);
     $editing = $stmt->fetch() ?: null;
 }
+$prefillTitle = (string)($_GET['title'] ?? '');
+$fromTicket = (int)($_GET['from_ticket'] ?? 0);
 
 $projects = $pdo->prepare('SELECT * FROM projects WHERE business_id=? ORDER BY created_at DESC');
 $projects->execute([$businessId]);
@@ -143,8 +151,9 @@ $token = csrf_token();
       <input type="hidden" name="csrf" value="<?= e($token) ?>">
       <input type="hidden" name="id" value="<?= e((string)($editing['id'] ?? 0)) ?>">
       <input type="hidden" name="business_id" value="<?= (int)$businessId ?>">
+      <?php if (!$editing && $fromTicket > 0): ?><input type="hidden" name="from_ticket" value="<?= $fromTicket ?>"><?php endif; ?>
       <div class="grid grid-2" style="gap:16px;">
-        <div class="field"><label>Project title</label><input name="title" required value="<?= e($editing['title'] ?? '') ?>" placeholder="e.g. Website redesign"></div>
+        <div class="field"><label>Project title</label><input name="title" required value="<?= e($editing['title'] ?? $prefillTitle) ?>" placeholder="e.g. Website redesign"></div>
         <div class="field"><label>Domain</label><input name="domain" value="<?= e($editing['domain'] ?? '') ?>" placeholder="example.com"></div>
       </div>
       <div class="grid grid-2" style="gap:16px;">

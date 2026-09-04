@@ -98,12 +98,16 @@ DROP TABLE IF EXISTS `tickets`;
 CREATE TABLE `tickets` (
   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   `business_id` INT UNSIGNED NOT NULL,
+  `project_id` INT UNSIGNED NULL,
   `title` VARCHAR(255) NOT NULL,
+  `description` TEXT NULL,
+  `type` ENUM('new_project','project_task') NOT NULL DEFAULT 'project_task',
   `priority` ENUM('Low','Normal','High') NOT NULL DEFAULT 'Normal',
   `status` ENUM('Open','In progress','Closed') NOT NULL DEFAULT 'Open',
   `assignee_staff_id` INT UNSIGNED NULL,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (`business_id`) REFERENCES `businesses`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`project_id`) REFERENCES `projects`(`id`) ON DELETE SET NULL,
   FOREIGN KEY (`assignee_staff_id`) REFERENCES `staff`(`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
