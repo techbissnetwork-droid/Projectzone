@@ -82,49 +82,6 @@ $('#themeToggle').addEventListener('click', function(){
 });
 
 /* ===================================================================
-   2b. COLOR THEME PICKER
-=================================================================== */
-(function colorTheme(){
-  var pop = $('#palettePop'), toggle = $('#paletteToggle'), swatch = $('#paletteSwatch');
-  var opts = $all('.palette-opt');
-
-  function applyPalette(p, persist){
-    if(p){ root.setAttribute('data-palette', p); } else { root.removeAttribute('data-palette'); }
-    opts.forEach(function(o){
-      var on = (o.dataset.palette||'') === (p||'');
-      o.setAttribute('aria-checked', String(on));
-    });
-    swatch.style.background = 'var(--grad)';
-    if(persist){ try{ localStorage.setItem('bloom-palette', p||''); }catch(e){} }
-  }
-  function openPop(o){
-    pop.classList.toggle('open', o);
-    toggle.setAttribute('aria-expanded', String(o));
-  }
-  toggle.addEventListener('click', function(e){
-    e.stopPropagation();
-    openPop(!pop.classList.contains('open'));
-  });
-  opts.forEach(function(o){
-    o.addEventListener('click', function(){
-      applyPalette(o.dataset.palette, true);
-      if(o.dataset.forcesDark) applyTheme('dark');
-      openPop(false);
-    });
-  });
-  document.addEventListener('click', function(e){
-    if(!pop.contains(e.target) && e.target!==toggle) openPop(false);
-  });
-  document.addEventListener('keydown', function(e){
-    if(e.key==='Escape') openPop(false);
-  });
-
-  var saved = null;
-  try{ saved = localStorage.getItem('bloom-palette'); }catch(e){}
-  applyPalette(saved || '', false);
-})();
-
-/* ===================================================================
    3. SPLASH (once per tab session)
 =================================================================== */
 (function splash(){

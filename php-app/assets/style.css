@@ -78,39 +78,6 @@
   --shadow-lg: 0 32px 70px -18px hsl(var(--shadow-tint) / .65);
 }
 
-/* ============================= COLOR THEMES ============================= */
-/* Each theme overrides only the two base hues; --accent-1/2/3, --grad, --grad-soft
-   and --grad-text all derive from them automatically in every light/dark state. */
-:root[data-palette="fresh"]{ --hue-1:#0ea394; --hue-2:#8fd14f; }
-:root[data-palette="dusk"]{ --hue-1:#7c5cff; --hue-2:#4fc3f7; }
-:root[data-palette="ember"]{ --hue-1:#e0457a; --hue-2:#f6b93b; }
-:root[data-palette="sunrise"]{ --hue-1:#ff6a3d; --hue-2:#ff4f8b; }
-:root[data-palette="lagoon"]{ --hue-1:#0098c9; --hue-2:#2f6fed; }
-:root[data-palette="orchid"]{ --hue-1:#a83df0; --hue-2:#6a5cff; }
-:root[data-palette="citrus"]{ --hue-1:#7ec242; --hue-2:#17a672; }
-:root[data-palette="slate"]{ --hue-1:#7a63d1; --hue-2:#c9718a; }
-:root[data-palette="midnight"]{ --hue-1:#4a3aff; --hue-2:#e0389c; }
-:root[data-palette="noir"]{ --hue-1:#c9a45c; --hue-2:#efe6d0; }
-
-/* Noir is the one theme that also swaps the base surfaces — a true near-black,
-   not just gold accents on the standard warm-brown dark mode. Only kicks in
-   once dark mode is actually active (selecting Noir auto-switches to dark). */
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"])[data-palette="noir"]{
-    --bg:#0e0d0b; --bg-alt:#141210; --bg-alt-2:#171512;
-    --surface:#161412; --surface-2:#1c1916;
-    --ink:#f3ede0; --ink-soft:#c7bdaa; --ink-faint:#8f8574;
-    --border:#2c2822; --border-soft:#242019;
-    --shadow-tint: 38 18% 3%;
-  }
-}
-:root[data-theme="dark"][data-palette="noir"]{
-  --bg:#0e0d0b; --bg-alt:#141210; --bg-alt-2:#171512;
-  --surface:#161412; --surface-2:#1c1916;
-  --ink:#f3ede0; --ink-soft:#c7bdaa; --ink-faint:#8f8574;
-  --border:#2c2822; --border-soft:#242019;
-  --shadow-tint: 38 18% 3%;
-}
 
 /* ============================= RESET ============================= */
 *,*::before,*::after{ box-sizing:border-box; }
@@ -212,12 +179,6 @@ button{ cursor:pointer; }
 .logo:hover .logo-mark g{ animation-play-state:paused; transform:rotate(-10deg) scale(1.08); }
 @keyframes logoBreathe{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.06); } }
 .logo b{ color:var(--ink); letter-spacing:-.01em; }
-.logo-badge{
-  display:inline-flex; align-items:center; padding:3px 10px; margin-left:1px;
-  border-radius:var(--r-full); background:var(--grad-soft); color:var(--accent-1);
-  font-family:var(--font-display); font-weight:700; font-size:.6rem;
-  text-transform:uppercase; letter-spacing:.09em; transform:translateY(-1px);
-}
 
 .site-header .container{ max-width:1400px; }
 .nav-links{ position:relative; display:flex; align-items:center; gap:1px; flex:1 1 auto; justify-content:center; min-width:0; }
@@ -240,7 +201,6 @@ button{ cursor:pointer; }
   .nav-burger{ display:flex; }
 }
 @media (max-width:480px){
-  .logo-badge{ display:none; }
   .nav-actions{ gap:8px; }
 }
 @media (max-width:400px){
@@ -274,39 +234,6 @@ button{ cursor:pointer; }
 .nav-burger svg{ width:20px; height:20px; }
 
 /* ============================= COLOR THEME PICKER ============================= */
-.palette-wrap{ position:relative; flex:none; }
-.palette-toggle{
-  width:34px; height:34px; border-radius:50%; padding:2px; flex:none;
-  background:var(--surface-2); border:1.5px solid var(--border);
-}
-.palette-toggle .sw-current{ display:block; width:100%; height:100%; border-radius:50%; background:var(--grad); transition:background .3s ease; }
-.palette-toggle:hover{ border-color:var(--accent-1); }
-.palette-pop{
-  position:absolute; top:calc(100% + 12px); right:0; z-index:520; width:216px;
-  background:var(--surface); border:1px solid var(--border-soft); border-radius:18px;
-  box-shadow:var(--shadow-lg); padding:8px; display:flex; flex-direction:column; gap:2px;
-  opacity:0; visibility:hidden; transform:translateY(-6px) scale(.97); transform-origin:top right;
-  transition:opacity .22s ease, transform .22s cubic-bezier(.34,1.4,.4,1), visibility .22s;
-}
-.palette-pop.open{ opacity:1; visibility:visible; transform:translateY(0) scale(1); }
-.palette-opt{
-  display:flex; align-items:center; gap:10px; width:100%; padding:9px 10px; border-radius:12px;
-  background:none; border:none; text-align:left; font-family:var(--font-display); font-weight:600;
-  font-size:.86rem; color:var(--ink-soft);
-}
-.palette-opt:hover{ background:var(--surface-2); color:var(--ink); }
-.palette-opt[aria-checked="true"]{ background:var(--grad-soft); color:var(--ink); }
-.opt-sw{ width:20px; height:20px; border-radius:50%; flex:none; background:linear-gradient(135deg,var(--sw1),var(--sw2)); box-shadow:0 0 0 1px var(--border-soft); }
-.opt-name{ flex:1; display:flex; flex-direction:column; line-height:1.3; }
-.opt-name em{ font-style:normal; font-weight:500; font-size:.68rem; letter-spacing:.02em; color:var(--ink-faint); }
-.palette-sep{ height:1px; background:var(--border-soft); margin:5px 8px; }
-.opt-check{ width:15px; height:15px; flex:none; color:var(--accent-1); opacity:0; }
-.palette-opt[aria-checked="true"] .opt-check{ opacity:1; }
-@media (max-width:480px){
-  .palette-pop{ right:auto; left:50%; transform:translate(-50%,-6px) scale(.97); transform-origin:top center; }
-  .palette-pop.open{ transform:translate(-50%,0) scale(1); }
-}
-
 .mobile-sheet{
   position:fixed; inset:auto 0 0 0; z-index:600; background:var(--surface);
   border-radius:32px 32px 0 0; box-shadow:0 -20px 60px -20px rgba(0,0,0,.3);

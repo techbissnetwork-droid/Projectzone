@@ -16,7 +16,7 @@ unset($p);
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>TECHBISS — Bloom</title>
+<title>TECHBISS — Get your business online</title>
 <meta name="description" content="TECHBISS helps offline businesses get online: websites, apps, domains, hosting, email and everything after launch.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -60,31 +60,12 @@ unset($p);
   <div class="container nav-wrap">
     <a href="#/" class="logo" aria-label="TECHBISS home">
       <span class="logo-mark"><svg viewBox="0 0 24 24" fill="none"><g><rect x="3" y="3" width="18" height="18" rx="6" fill="url(#logoGrad)"/><rect x="7.5" y="7.5" width="9" height="2.6" rx="1.3" fill="#fff2ea"/><rect x="10.7" y="7.5" width="2.6" height="9.5" rx="1.3" fill="#fff2ea"/></g></svg></span>
-      <b>techbiss</b><span class="logo-badge">bloom</span>
+      <b>techbiss</b>
     </a>
     <nav class="nav-links" id="navLinks" aria-label="Primary">
       <div class="nav-blob" id="navBlob"></div>
     </nav>
     <div class="nav-actions">
-      <div class="palette-wrap">
-        <button class="palette-toggle" id="paletteToggle" aria-label="Choose color theme" aria-haspopup="true" aria-expanded="false">
-          <span class="sw-current" id="paletteSwatch"></span>
-        </button>
-        <div class="palette-pop" id="palettePop" role="menu" aria-label="Color themes">
-          <button class="palette-opt" data-palette="" role="menuitemradio" aria-checked="true"><span class="opt-sw" style="--sw1:#ff7a52;--sw2:#ffb648;"></span><span class="opt-name">Bloom</span><svg class="opt-check" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-          <button class="palette-opt" data-palette="fresh" role="menuitemradio" aria-checked="false"><span class="opt-sw" style="--sw1:#0ea394;--sw2:#8fd14f;"></span><span class="opt-name">Fresh</span><svg class="opt-check" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-          <button class="palette-opt" data-palette="dusk" role="menuitemradio" aria-checked="false"><span class="opt-sw" style="--sw1:#7c5cff;--sw2:#4fc3f7;"></span><span class="opt-name">Dusk</span><svg class="opt-check" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-          <button class="palette-opt" data-palette="ember" role="menuitemradio" aria-checked="false"><span class="opt-sw" style="--sw1:#e0457a;--sw2:#f6b93b;"></span><span class="opt-name">Ember</span><svg class="opt-check" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-          <button class="palette-opt" data-palette="sunrise" role="menuitemradio" aria-checked="false"><span class="opt-sw" style="--sw1:#ff6a3d;--sw2:#ff4f8b;"></span><span class="opt-name">Sunrise</span><svg class="opt-check" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-          <button class="palette-opt" data-palette="lagoon" role="menuitemradio" aria-checked="false"><span class="opt-sw" style="--sw1:#0098c9;--sw2:#2f6fed;"></span><span class="opt-name">Lagoon</span><svg class="opt-check" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-          <button class="palette-opt" data-palette="orchid" role="menuitemradio" aria-checked="false"><span class="opt-sw" style="--sw1:#a83df0;--sw2:#6a5cff;"></span><span class="opt-name">Orchid</span><svg class="opt-check" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-          <button class="palette-opt" data-palette="citrus" role="menuitemradio" aria-checked="false"><span class="opt-sw" style="--sw1:#7ec242;--sw2:#17a672;"></span><span class="opt-name">Citrus</span><svg class="opt-check" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-          <button class="palette-opt" data-palette="slate" role="menuitemradio" aria-checked="false"><span class="opt-sw" style="--sw1:#7a63d1;--sw2:#c9718a;"></span><span class="opt-name">Slate Bloom</span><svg class="opt-check" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-          <button class="palette-opt" data-palette="midnight" role="menuitemradio" aria-checked="false"><span class="opt-sw" style="--sw1:#4a3aff;--sw2:#e0389c;"></span><span class="opt-name">Midnight Bloom</span><svg class="opt-check" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-          <div class="palette-sep"></div>
-          <button class="palette-opt" data-palette="noir" data-forces-dark="1" role="menuitemradio" aria-checked="false"><span class="opt-sw" style="--sw1:#c9a45c;--sw2:#efe6d0;"></span><span class="opt-name">Noir<em>premium black</em></span><svg class="opt-check" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-        </div>
-      </div>
       <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" aria-pressed="false">
         <span class="theme-icon-wrap">
           <svg id="themeIconSun" class="theme-icon sun" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.8"/><path d="M12 2v2M12 20v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2 12h2M20 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
@@ -139,7 +120,7 @@ unset($p);
       <div>
         <a href="#/" class="logo" style="margin-bottom:14px;">
           <span class="logo-mark"><svg viewBox="0 0 24 24" fill="none"><g><rect x="3" y="3" width="18" height="18" rx="6" fill="url(#logoGrad)"/><rect x="7.5" y="7.5" width="9" height="2.6" rx="1.3" fill="#fff2ea"/><rect x="10.7" y="7.5" width="2.6" height="9.5" rx="1.3" fill="#fff2ea"/></g></svg></span>
-          <b>techbiss</b><span class="logo-badge">bloom</span>
+          <b>techbiss</b>
         </a>
         <p style="max-width:32ch;">We help offline businesses get online — website or app, domain, hosting, email and everything after launch.</p>
         <div class="flex gap-12" style="margin-top:18px;">
@@ -160,8 +141,7 @@ unset($p);
       </div>
     </div>
     <div class="footer-bottom">
-      <span>© 2026 TECHBISS. Concept 5 — Bloom.</span>
-      <span>Designed light-first, built for both themes.</span>
+      <span>© 2026 TECHBISS. All rights reserved.</span>
     </div>
   </div>
 </footer>
