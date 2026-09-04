@@ -16,6 +16,7 @@ $TEXT_FIELDS = [
     'stat5_value', 'stat5_label',
 ];
 $THEME_OPTIONS = ['auto' => 'Automatic (matches visitor device)', 'light' => 'Light', 'dark' => 'Dark'];
+$LOGO_STYLE_OPTIONS = ['icon_text' => 'Icon + site name', 'text_only' => 'Site name only (no icon)'];
 $PALETTE_OPTIONS = [
     '' => 'Bloom (coral & amber — default)',
     'fresh' => 'Fresh (teal & lime)',
@@ -90,6 +91,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute(['default_theme', $theme]);
         $palette = array_key_exists($_POST['color_palette'] ?? '', $PALETTE_OPTIONS) ? $_POST['color_palette'] : '';
         $stmt->execute(['color_palette', $palette]);
+        $logoStyle = array_key_exists($_POST['logo_style'] ?? '', $LOGO_STYLE_OPTIONS) ? $_POST['logo_style'] : 'icon_text';
+        $stmt->execute(['logo_style', $logoStyle]);
 
         if (isset($_POST['remove_logo'])) {
             branding_remove('logo_path', '', 'logo');
@@ -236,7 +239,14 @@ $socialPath = $current['social_image_path'] ?? 'assets/social-default.png';
           <?php if ($logoPath !== ''): ?>
           <label class="flex items-center gap-8" style="font-size:.8rem;margin-top:8px;"><input type="checkbox" name="remove_logo"> Remove custom logo (revert to the default TECHBISS mark)</label>
           <?php endif; ?>
-          <p style="font-size:.78rem;color:var(--ink-faint);margin-top:6px;">Square image, transparent PNG recommended.</p>
+          <p style="font-size:.78rem;color:var(--ink-faint);margin-top:6px;">Square image, transparent PNG recommended. Uploading one here replaces the icon + name below entirely.</p>
+        </div>
+        <div class="field"><label>Logo style <small style="font-weight:400;color:var(--ink-faint);">(only applies while no custom logo is uploaded)</small></label>
+          <select name="logo_style">
+            <?php foreach ($LOGO_STYLE_OPTIONS as $val => $label): ?>
+            <option value="<?= e($val) ?>" <?= ($current['logo_style'] ?? 'icon_text') === $val ? 'selected' : '' ?>><?= e($label) ?></option>
+            <?php endforeach; ?>
+          </select>
         </div>
         <div class="field"><label>Favicon</label>
           <div class="flex items-center gap-12">

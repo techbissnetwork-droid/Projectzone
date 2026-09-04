@@ -177,6 +177,7 @@ CREATE TABLE `settings` (
 
 INSERT INTO `settings` (`id`, `value`) VALUES
 ('site_name', 'TECHBISS'),
+('logo_style', 'icon_text'),
 ('hero_headline_main', 'We help offline businesses'),
 ('hero_headline_accent', 'thrive online.'),
 ('hero_subheadline', 'TECHBISS builds your website or app, then sets up your domain, hosting, email and app store listing — so you launch with everything working and ready to be found.'),
