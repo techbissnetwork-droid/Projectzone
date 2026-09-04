@@ -30,15 +30,14 @@ $siteSettings = [
     'stat5Value' => get_setting('stat5_value', '9'),
     'stat5Label' => get_setting('stat5_label', 'Years in business'),
 ];
-$defaultContent = require __DIR__ . '/includes/default_content.php';
 $contentSections = [
-    'services' => content_section('services_json', $defaultContent['services']),
-    'solutions' => content_section('solutions_json', $defaultContent['solutions']),
-    'caseStudies' => content_section('case_studies_json', $defaultContent['case_studies']),
-    'pricing' => content_section('pricing_json', $defaultContent['pricing']),
-    'pricingFaq' => content_section('pricing_faq_json', $defaultContent['pricing_faq']),
-    'team' => content_section('team_json', $defaultContent['team']),
-    'values' => content_section('values_json', $defaultContent['values']),
+    'services' => content_services_rows(),
+    'solutions' => content_industries_rows(),
+    'caseStudies' => content_case_studies_rows(),
+    'pricing' => content_pricing_rows(),
+    'pricingFaq' => content_pricing_faqs_rows(),
+    'team' => content_team_rows(),
+    'values' => content_values_rows(),
 ];
 
 $siteName = get_setting('site_name', 'TECHBISS');

@@ -66,6 +66,16 @@ function branding_upload(string $field, array $allowedExts, string $destBasename
     return null;
 }
 
+function branding_remove(string $settingKey, string $defaultValue, string $destBasename): void
+{
+    $uploadDir = __DIR__ . '/../assets/uploads';
+    foreach (glob($uploadDir . '/' . $destBasename . '.*') ?: [] as $old) {
+        @unlink($old);
+    }
+    $stmt = db()->prepare('INSERT INTO settings (id, value) VALUES (?, ?) ON DUPLICATE KEY UPDATE value = VALUES(value)');
+    $stmt->execute([$settingKey, $defaultValue]);
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!csrf_check((string)($_POST['csrf'] ?? ''))) {
         flash('Your session expired — please try again.', 'error');
@@ -81,13 +91,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $palette = array_key_exists($_POST['color_palette'] ?? '', $PALETTE_OPTIONS) ? $_POST['color_palette'] : '';
         $stmt->execute(['color_palette', $palette]);
 
-        if ($err = branding_upload('logo', ['png', 'jpg', 'jpeg', 'webp'], 'logo', 'logo_path')) {
+        if (isset($_POST['remove_logo'])) {
+            branding_remove('logo_path', '', 'logo');
+        } elseif ($err = branding_upload('logo', ['png', 'jpg', 'jpeg', 'webp'], 'logo', 'logo_path')) {
             $errors[] = $err;
         }
-        if ($err = branding_upload('favicon', ['png'], 'favicon', 'favicon_path')) {
+        if (isset($_POST['remove_favicon'])) {
+            branding_remove('favicon_path', 'assets/favicon.ico', 'favicon');
+        } elseif ($err = branding_upload('favicon', ['png'], 'favicon', 'favicon_path')) {
             $errors[] = $err;
         }
-        if ($err = branding_upload('social_image', ['png', 'jpg', 'jpeg'], 'social', 'social_image_path')) {
+        if (isset($_POST['remove_social_image'])) {
+            branding_remove('social_image_path', 'assets/social-default.png', 'social');
+        } elseif ($err = branding_upload('social_image', ['png', 'jpg', 'jpeg'], 'social', 'social_image_path')) {
             $errors[] = $err;
         }
 
@@ -201,6 +217,9 @@ $socialPath = $current['social_image_path'] ?? 'assets/social-default.png';
           <img class="settings-preview" src="../<?= e($socialPath) ?>" alt="" style="width:100px;height:56px;">
           <input type="file" name="social_image" accept="image/png,image/jpeg">
         </div>
+        <?php if (($current['social_image_path'] ?? 'assets/social-default.png') !== 'assets/social-default.png'): ?>
+        <label class="flex items-center gap-8" style="font-size:.8rem;margin-top:8px;"><input type="checkbox" name="remove_social_image"> Remove custom social image (revert to default)</label>
+        <?php endif; ?>
         <p style="font-size:.78rem;color:var(--ink-faint);margin-top:6px;">Shown when the site is shared on social media/messaging apps. Recommended size: 1200×630px.</p>
       </div>
     </div>
@@ -214,6 +233,9 @@ $socialPath = $current['social_image_path'] ?? 'assets/social-default.png';
             <img class="settings-preview" src="<?= $logoPath !== '' ? '../' . e($logoPath) : '../assets/brand/logo-512.png' ?>" alt="">
             <input type="file" name="logo" accept="image/png,image/jpeg,image/webp">
           </div>
+          <?php if ($logoPath !== ''): ?>
+          <label class="flex items-center gap-8" style="font-size:.8rem;margin-top:8px;"><input type="checkbox" name="remove_logo"> Remove custom logo (revert to the default TECHBISS mark)</label>
+          <?php endif; ?>
           <p style="font-size:.78rem;color:var(--ink-faint);margin-top:6px;">Square image, transparent PNG recommended.</p>
         </div>
         <div class="field"><label>Favicon</label>
@@ -221,6 +243,9 @@ $socialPath = $current['social_image_path'] ?? 'assets/social-default.png';
             <img class="settings-preview" src="../<?= e($faviconPath) ?>" alt="">
             <input type="file" name="favicon" accept="image/png">
           </div>
+          <?php if (($current['favicon_path'] ?? 'assets/favicon.ico') !== 'assets/favicon.ico'): ?>
+          <label class="flex items-center gap-8" style="font-size:.8rem;margin-top:8px;"><input type="checkbox" name="remove_favicon"> Remove custom favicon (revert to default)</label>
+          <?php endif; ?>
           <p style="font-size:.78rem;color:var(--ink-faint);margin-top:6px;">PNG, ideally 512×512px (square).</p>
         </div>
       </div>

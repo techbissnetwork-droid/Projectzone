@@ -1,10 +1,10 @@
 <?php
 /**
  * The site's built-in Services / Industries / Case Studies / Pricing /
- * Team / Values content — used both to seed the editable settings rows
- * on install (install/migrations/010_content_sections.php) and as the
- * fallback if a settings row is ever missing or fails to decode
- * (includes/db.php's content_section()).
+ * Team / Values content — used to seed the content_* tables on install
+ * (install/migrations/010_content_sections.php, superseded by
+ * install/migrations/014_content_tables.php, which reads this same file
+ * as its ultimate fallback).
  */
 return [
     'services' => [

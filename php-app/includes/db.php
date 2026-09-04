@@ -194,18 +194,68 @@ function get_setting(string $key, string $default = ''): string
 }
 
 /**
- * Reads a repeatable content section (Services, Case Studies, Team, etc.)
- * stored as a JSON blob under $key. Falls back to $default (the section's
- * built-in content) if the setting is missing or fails to decode.
+ * Repeatable content sections (Services, Industries, Case Studies,
+ * Pricing, FAQ, Team, Values) — each backed by its own table
+ * (install/migrations/014_content_tables.php) so admin/content.php can
+ * add/edit/delete individual items. Shaped to match exactly what
+ * assets/app.js expects for each section (see Pages['/'], ['/about'],
+ * ['/pricing'], etc.) so the frontend needs no changes when content
+ * is added, edited or removed.
  */
-function content_section(string $key, array $default): array
+function content_services_rows(): array
 {
-    $raw = get_setting($key, '');
-    if ($raw === '') {
-        return $default;
-    }
-    $decoded = json_decode($raw, true);
-    return is_array($decoded) && $decoded !== [] ? $decoded : $default;
+    $rows = db()->query('SELECT icon, name, blurb, bullets_json FROM content_services ORDER BY sort_order ASC, id ASC')->fetchAll();
+    return array_map(fn($r) => [
+        'icon' => $r['icon'], 'name' => $r['name'], 'blurb' => $r['blurb'],
+        'bullets' => json_decode($r['bullets_json'], true) ?: [],
+    ], $rows);
+}
+
+function content_industries_rows(): array
+{
+    $rows = db()->query('SELECT icon, name, out_json FROM content_industries ORDER BY sort_order ASC, id ASC')->fetchAll();
+    return array_map(fn($r) => [
+        'icon' => $r['icon'], 'name' => $r['name'], 'out' => json_decode($r['out_json'], true) ?: [],
+    ], $rows);
+}
+
+function content_case_studies_rows(): array
+{
+    $rows = db()->query('SELECT sector, icon, client, stat, stat_label, quote, body FROM content_case_studies ORDER BY sort_order ASC, id ASC')->fetchAll();
+    return array_map(fn($r) => [
+        'sector' => $r['sector'], 'icon' => $r['icon'], 'client' => $r['client'],
+        'stat' => $r['stat'], 'statLabel' => $r['stat_label'], 'quote' => $r['quote'], 'body' => $r['body'],
+    ], $rows);
+}
+
+function content_pricing_rows(): array
+{
+    $rows = db()->query('SELECT name, monthly_price, yearly_price, description, features_json, cta, is_recommended FROM content_pricing_plans ORDER BY sort_order ASC, id ASC')->fetchAll();
+    return array_map(fn($r) => [
+        'n' => $r['name'],
+        'm' => $r['monthly_price'] !== null ? (int)$r['monthly_price'] : null,
+        'y' => $r['yearly_price'] !== null ? (int)$r['yearly_price'] : null,
+        'd' => $r['description'], 'f' => json_decode($r['features_json'], true) ?: [],
+        'cta' => $r['cta'], 'rec' => (bool)$r['is_recommended'],
+    ], $rows);
+}
+
+function content_pricing_faqs_rows(): array
+{
+    $rows = db()->query('SELECT question, answer FROM content_pricing_faqs ORDER BY sort_order ASC, id ASC')->fetchAll();
+    return array_map(fn($r) => [$r['question'], $r['answer']], $rows);
+}
+
+function content_team_rows(): array
+{
+    $rows = db()->query('SELECT initials, name, role FROM content_team ORDER BY sort_order ASC, id ASC')->fetchAll();
+    return array_map(fn($r) => ['i' => $r['initials'], 'n' => $r['name'], 'r' => $r['role']], $rows);
+}
+
+function content_values_rows(): array
+{
+    $rows = db()->query('SELECT icon, title, description FROM content_values ORDER BY sort_order ASC, id ASC')->fetchAll();
+    return array_map(fn($r) => ['icon' => $r['icon'], 't' => $r['title'], 'd' => $r['description']], $rows);
 }
 
 function palette_attr(): string

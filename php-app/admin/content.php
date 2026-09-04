@@ -8,8 +8,6 @@ $staff = require_staff();
 require_staff_access($staff, 'content.php');
 $pdo = db();
 
-$defaults = require __DIR__ . '/../includes/default_content.php';
-
 // A curated set of icon keys that exist in the public site's icon set
 // (assets/app.js ICONS) — kept separate from the admin panel's own
 // smaller icon set in includes/icons.php.
@@ -18,6 +16,79 @@ $ICON_CHOICES = [
     'spark', 'flag', 'box', 'shield', 'users', 'chat', 'star', 'compass',
     'target', 'bolt', 'layers', 'refresh', 'mail', 'phone', 'calendar',
     'lock', 'book', 'search', 'cloud',
+];
+
+/**
+ * One entry per Content tab. Each field's key is also its form field
+ * name; 'column' overrides the DB column name when it differs (e.g. a
+ * "lines" field stored as JSON in a `..._json` column). 'title' says
+ * which field to show as each list row's heading.
+ */
+$SECTIONS = [
+    'services' => [
+        'table' => 'content_services', 'label' => 'Service', 'title' => 'name',
+        'fields' => [
+            'icon' => ['type' => 'icon', 'label' => 'Icon'],
+            'name' => ['type' => 'text', 'label' => 'Name', 'required' => true],
+            'blurb' => ['type' => 'text', 'label' => 'Short description'],
+            'bullets' => ['type' => 'lines', 'label' => 'Bullet points (one per line)', 'column' => 'bullets_json'],
+        ],
+    ],
+    'industries' => [
+        'table' => 'content_industries', 'label' => 'Industry', 'title' => 'name',
+        'fields' => [
+            'icon' => ['type' => 'icon', 'label' => 'Icon'],
+            'name' => ['type' => 'text', 'label' => 'Name', 'required' => true],
+            'out' => ['type' => 'lines', 'label' => 'What they get (one per line)', 'column' => 'out_json'],
+        ],
+    ],
+    'cases' => [
+        'table' => 'content_case_studies', 'label' => 'Case study', 'title' => 'client',
+        'fields' => [
+            'client' => ['type' => 'text', 'label' => 'Client name', 'required' => true],
+            'sector' => ['type' => 'text', 'label' => 'Sector', 'placeholder' => 'e.g. Bakery'],
+            'icon' => ['type' => 'icon', 'label' => 'Icon'],
+            'stat' => ['type' => 'text', 'label' => 'Stat', 'placeholder' => 'e.g. +64%'],
+            'stat_label' => ['type' => 'text', 'label' => 'Stat label', 'placeholder' => 'e.g. online orders in month one'],
+            'quote' => ['type' => 'text', 'label' => 'Quote'],
+            'body' => ['type' => 'textarea', 'label' => 'Story'],
+        ],
+    ],
+    'pricing' => [
+        'table' => 'content_pricing_plans', 'label' => 'Plan', 'title' => 'name',
+        'fields' => [
+            'name' => ['type' => 'text', 'label' => 'Plan name', 'required' => true],
+            'cta' => ['type' => 'text', 'label' => 'Button text'],
+            'monthly_price' => ['type' => 'number_nullable', 'label' => 'Monthly price ($) — leave blank for "Custom"'],
+            'yearly_price' => ['type' => 'number_nullable', 'label' => 'Annual price ($/mo, billed yearly)'],
+            'description' => ['type' => 'text', 'label' => 'Description'],
+            'features' => ['type' => 'lines', 'label' => 'Features (one per line)', 'column' => 'features_json'],
+            'is_recommended' => ['type' => 'checkbox', 'label' => 'Mark as "Most popular"'],
+        ],
+    ],
+    'faqs' => [
+        'table' => 'content_pricing_faqs', 'label' => 'FAQ', 'title' => 'question',
+        'fields' => [
+            'question' => ['type' => 'text', 'label' => 'Question', 'required' => true],
+            'answer' => ['type' => 'textarea', 'label' => 'Answer'],
+        ],
+    ],
+    'team' => [
+        'table' => 'content_team', 'label' => 'Team member', 'title' => 'name',
+        'fields' => [
+            'name' => ['type' => 'text', 'label' => 'Name', 'required' => true],
+            'role' => ['type' => 'text', 'label' => 'Role'],
+            'initials' => ['type' => 'text', 'label' => 'Initials', 'maxlength' => 3],
+        ],
+    ],
+    'values' => [
+        'table' => 'content_values', 'label' => 'Value', 'title' => 'title',
+        'fields' => [
+            'icon' => ['type' => 'icon', 'label' => 'Icon'],
+            'title' => ['type' => 'text', 'label' => 'Title', 'required' => true],
+            'description' => ['type' => 'textarea', 'label' => 'Description'],
+        ],
+    ],
 ];
 
 function icon_select(string $name, string $selected, array $choices): string
@@ -37,135 +108,109 @@ function lines_to_array(string $text): array
     return array_values(array_filter($lines, fn($l) => $l !== ''));
 }
 
+$activeTab = $_GET['tab'] ?? 'services';
+if (!isset($SECTIONS[$activeTab])) {
+    $activeTab = 'services';
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!csrf_check((string)($_POST['csrf'] ?? ''))) {
+    $section = $_POST['section'] ?? '';
+    if (!csrf_check((string)($_POST['csrf'] ?? '')) || !isset($SECTIONS[$section])) {
         flash('Your session expired — please try again.', 'error');
-        header('Location: content.php');
+        header('Location: content.php?tab=' . e($activeTab));
         exit;
     }
 
-    $services = [];
-    for ($i = 0; $i < 6; $i++) {
-        $name = trim((string)($_POST["svc_name_$i"] ?? ''));
-        if ($name === '') {
-            continue;
+    $cfg = $SECTIONS[$section];
+    $table = $cfg['table'];
+    $action = $_POST['action'] ?? '';
+
+    if ($action === 'save') {
+        $id = (int)($_POST['id'] ?? 0);
+        $data = [];
+        $errors = [];
+        foreach ($cfg['fields'] as $key => $f) {
+            $col = $f['column'] ?? $key;
+            switch ($f['type']) {
+                case 'lines':
+                    $data[$col] = json_encode(lines_to_array((string)($_POST[$key] ?? '')));
+                    break;
+                case 'number_nullable':
+                    $v = trim((string)($_POST[$key] ?? ''));
+                    $data[$col] = $v === '' ? null : max(0, (int)$v);
+                    break;
+                case 'checkbox':
+                    $data[$col] = isset($_POST[$key]) ? 1 : 0;
+                    break;
+                default:
+                    $data[$col] = trim((string)($_POST[$key] ?? ''));
+            }
+            if (!empty($f['required']) && trim((string)($_POST[$key] ?? '')) === '') {
+                $errors[] = $f['label'] . ' is required.';
+            }
         }
-        $services[] = [
-            'icon' => trim((string)($_POST["svc_icon_$i"] ?? '')) ?: 'star',
-            'name' => $name,
-            'blurb' => trim((string)($_POST["svc_blurb_$i"] ?? '')),
-            'bullets' => lines_to_array((string)($_POST["svc_bullets_$i"] ?? '')),
-        ];
-    }
 
-    $solutions = [];
-    for ($i = 0; $i < 5; $i++) {
-        $name = trim((string)($_POST["sol_name_$i"] ?? ''));
-        if ($name === '') {
-            continue;
+        if ($errors) {
+            flash(implode(' ', $errors), 'error');
+        } elseif ($id > 0) {
+            $sets = implode(', ', array_map(fn($c) => "`$c` = ?", array_keys($data)));
+            $pdo->prepare("UPDATE `$table` SET $sets WHERE id = ?")->execute([...array_values($data), $id]);
+            flash($cfg['label'] . ' updated.');
+        } else {
+            $maxOrder = (int)$pdo->query("SELECT COALESCE(MAX(sort_order),-1) FROM `$table`")->fetchColumn();
+            $data['sort_order'] = $maxOrder + 1;
+            $cols = implode(',', array_map(fn($c) => "`$c`", array_keys($data)));
+            $qs = implode(',', array_fill(0, count($data), '?'));
+            $pdo->prepare("INSERT INTO `$table` ($cols) VALUES ($qs)")->execute(array_values($data));
+            flash($cfg['label'] . ' added.');
         }
-        $solutions[] = [
-            'icon' => trim((string)($_POST["sol_icon_$i"] ?? '')) ?: 'star',
-            'name' => $name,
-            'out' => lines_to_array((string)($_POST["sol_out_$i"] ?? '')),
-        ];
+    } elseif ($action === 'delete') {
+        $id = (int)($_POST['id'] ?? 0);
+        $pdo->prepare("DELETE FROM `$table` WHERE id = ?")->execute([$id]);
+        flash($cfg['label'] . ' removed.');
     }
-
-    $caseStudies = [];
-    for ($i = 0; $i < 6; $i++) {
-        $client = trim((string)($_POST["case_client_$i"] ?? ''));
-        if ($client === '') {
-            continue;
-        }
-        $caseStudies[] = [
-            'sector' => trim((string)($_POST["case_sector_$i"] ?? '')),
-            'icon' => trim((string)($_POST["case_icon_$i"] ?? '')) ?: 'star',
-            'client' => $client,
-            'stat' => trim((string)($_POST["case_stat_$i"] ?? '')),
-            'statLabel' => trim((string)($_POST["case_statlabel_$i"] ?? '')),
-            'quote' => trim((string)($_POST["case_quote_$i"] ?? '')),
-            'body' => trim((string)($_POST["case_body_$i"] ?? '')),
-        ];
-    }
-
-    $pricing = [];
-    for ($i = 0; $i < 3; $i++) {
-        $name = trim((string)($_POST["plan_name_$i"] ?? ''));
-        if ($name === '') {
-            continue;
-        }
-        $m = trim((string)($_POST["plan_m_$i"] ?? ''));
-        $y = trim((string)($_POST["plan_y_$i"] ?? ''));
-        $pricing[] = [
-            'n' => $name,
-            'm' => $m === '' ? null : (int)$m,
-            'y' => $y === '' ? null : (int)$y,
-            'd' => trim((string)($_POST["plan_desc_$i"] ?? '')),
-            'f' => lines_to_array((string)($_POST["plan_features_$i"] ?? '')),
-            'cta' => trim((string)($_POST["plan_cta_$i"] ?? '')),
-            'rec' => isset($_POST["plan_rec_$i"]),
-        ];
-    }
-
-    $pricingFaq = [];
-    for ($i = 0; $i < 5; $i++) {
-        $q = trim((string)($_POST["faq_q_$i"] ?? ''));
-        if ($q === '') {
-            continue;
-        }
-        $pricingFaq[] = [$q, trim((string)($_POST["faq_a_$i"] ?? ''))];
-    }
-
-    $team = [];
-    for ($i = 0; $i < 4; $i++) {
-        $name = trim((string)($_POST["team_name_$i"] ?? ''));
-        if ($name === '') {
-            continue;
-        }
-        $team[] = [
-            'i' => strtoupper(trim((string)($_POST["team_initials_$i"] ?? ''))) ?: strtoupper(substr($name, 0, 2)),
-            'n' => $name,
-            'r' => trim((string)($_POST["team_role_$i"] ?? '')),
-        ];
-    }
-
-    $values = [];
-    for ($i = 0; $i < 4; $i++) {
-        $title = trim((string)($_POST["val_title_$i"] ?? ''));
-        if ($title === '') {
-            continue;
-        }
-        $values[] = [
-            'icon' => trim((string)($_POST["val_icon_$i"] ?? '')) ?: 'star',
-            't' => $title,
-            'd' => trim((string)($_POST["val_desc_$i"] ?? '')),
-        ];
-    }
-
-    $stmt = $pdo->prepare('INSERT INTO settings (id, value) VALUES (?, ?) ON DUPLICATE KEY UPDATE value = VALUES(value)');
-    $stmt->execute(['services_json', json_encode($services ?: $defaults['services'])]);
-    $stmt->execute(['solutions_json', json_encode($solutions ?: $defaults['solutions'])]);
-    $stmt->execute(['case_studies_json', json_encode($caseStudies ?: $defaults['case_studies'])]);
-    $stmt->execute(['pricing_json', json_encode($pricing ?: $defaults['pricing'])]);
-    $stmt->execute(['pricing_faq_json', json_encode($pricingFaq ?: $defaults['pricing_faq'])]);
-    $stmt->execute(['team_json', json_encode($team ?: $defaults['team'])]);
-    $stmt->execute(['values_json', json_encode($values ?: $defaults['values'])]);
-
-    flash('Content updated — live on the public site now.');
-    header('Location: content.php');
+    header('Location: content.php?tab=' . e($section));
     exit;
 }
 
-// Bypass the request-lifetime cache so the form shows what was just saved.
-$current = $pdo->query('SELECT id, value FROM settings')->fetchAll(PDO::FETCH_KEY_PAIR);
-$services = content_section('services_json', $defaults['services']);
-$solutions = content_section('solutions_json', $defaults['solutions']);
-$caseStudies = content_section('case_studies_json', $defaults['case_studies']);
-$pricing = content_section('pricing_json', $defaults['pricing']);
-$pricingFaq = content_section('pricing_faq_json', $defaults['pricing_faq']);
-$team = content_section('team_json', $defaults['team']);
-$values = content_section('values_json', $defaults['values']);
+$editingId = (int)($_GET['edit'] ?? 0);
+$editing = null;
+if ($editingId > 0) {
+    $stmt = $pdo->prepare("SELECT * FROM `{$SECTIONS[$activeTab]['table']}` WHERE id = ?");
+    $stmt->execute([$editingId]);
+    $editing = $stmt->fetch() ?: null;
+}
+
+$rowsBySection = [];
+foreach ($SECTIONS as $key => $cfg) {
+    $rowsBySection[$key] = $pdo->query("SELECT * FROM `{$cfg['table']}` ORDER BY sort_order ASC, id ASC")->fetchAll();
+}
+
 $token = csrf_token();
+
+function content_field_html(string $key, array $f, ?array $editing): string
+{
+    global $ICON_CHOICES;
+    $col = $f['column'] ?? $key;
+    $value = $editing[$col] ?? '';
+    switch ($f['type']) {
+        case 'icon':
+            return icon_select($key, (string)$value, $ICON_CHOICES);
+        case 'lines':
+            $lines = $value !== '' ? (json_decode((string)$value, true) ?: []) : [];
+            return '<textarea name="' . e($key) . '">' . e(implode("\n", $lines)) . '</textarea>';
+        case 'textarea':
+            return '<textarea name="' . e($key) . '">' . e((string)$value) . '</textarea>';
+        case 'number_nullable':
+            return '<input name="' . e($key) . '" value="' . e($value === null ? '' : (string)$value) . '" inputmode="numeric">';
+        case 'checkbox':
+            return '<input type="checkbox" name="' . e($key) . '" ' . (!empty($value) ? 'checked' : '') . '>';
+        default:
+            $attrs = !empty($f['maxlength']) ? ' maxlength="' . (int)$f['maxlength'] . '"' : '';
+            $placeholder = !empty($f['placeholder']) ? ' placeholder="' . e($f['placeholder']) . '"' : '';
+            return '<input name="' . e($key) . '" value="' . e((string)$value) . '"' . $attrs . $placeholder . '>';
+    }
+}
 ?>
 <!doctype html>
 <html lang="en"<?= palette_attr() ?>>
@@ -177,139 +222,77 @@ $token = csrf_token();
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/style.css?v=<?= @filemtime(__DIR__ . '/../assets/style.css') ?: '1' ?>">
-<style>.content-item{ border:1px solid var(--border-soft); border-radius:14px; padding:16px; margin-bottom:14px; }
-.content-item summary{ cursor:pointer; font-family:var(--font-display); font-weight:600; margin-bottom:12px; }</style>
+<style>.content-row{ display:flex; justify-content:space-between; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid var(--border-soft); }
+.content-row:last-child{ border-bottom:none; }
+.content-row-title{ font-weight:600; font-size:.92rem; }
+.content-row-sub{ font-size:.8rem; color:var(--ink-faint); }</style>
 </head>
 <body>
 <?= admin_header($staff, 'content.php') ?>
 <main class="admin-page">
   <?= admin_flash_html() ?>
   <div class="admin-toolbar">
-    <div><h1 style="margin-bottom:4px;">Site content</h1><p class="lede" style="margin-bottom:0;">Edit the Services, Industries, Case Studies, Pricing and About page content shown on the public site.</p></div>
+    <div><h1 style="margin-bottom:4px;">Site content</h1><p class="lede" style="margin-bottom:0;">Add, edit or remove the Services, Industries, Case Studies, Pricing and About page content shown on the public site.</p></div>
   </div>
 
-  <form method="post">
-    <input type="hidden" name="csrf" value="<?= e($token) ?>">
+  <?php
+  $tabList = [
+      'services' => ['grid', 'Services'], 'industries' => ['users', 'Industries'], 'cases' => ['star', 'Case Studies'],
+      'pricing' => ['chart', 'Pricing'], 'faqs' => ['chat', 'FAQ'], 'team' => ['edit', 'Team'], 'values' => ['shield', 'Values'],
+  ];
+  ?>
+  <div class="tab-labels">
+    <?php foreach ($tabList as $slug => [$icon, $label]): ?>
+    <a href="content.php?tab=<?= e($slug) ?>" class="<?= $activeTab === $slug ? 'active' : '' ?>"><?= ico($icon) ?> <?= e($label) ?></a>
+    <?php endforeach; ?>
+  </div>
 
-    <div class="settings-tabs">
-      <input type="radio" name="ctab" id="tab-c-services" class="tab-radio" checked>
-      <input type="radio" name="ctab" id="tab-c-industries" class="tab-radio">
-      <input type="radio" name="ctab" id="tab-c-cases" class="tab-radio">
-      <input type="radio" name="ctab" id="tab-c-pricing" class="tab-radio">
-      <input type="radio" name="ctab" id="tab-c-team" class="tab-radio">
-
-      <div class="tab-labels">
-        <label for="tab-c-services"><?= ico('grid') ?> Services</label>
-        <label for="tab-c-industries"><?= ico('users') ?> Industries</label>
-        <label for="tab-c-cases"><?= ico('star') ?> Case Studies</label>
-        <label for="tab-c-pricing"><?= ico('chart') ?> Pricing &amp; FAQ</label>
-        <label for="tab-c-team"><?= ico('edit') ?> About</label>
+  <?php $cfg = $SECTIONS[$activeTab]; ?>
+  <div class="card admin-form-card">
+    <div class="card-head"><?= blob_icon($editing ? 'edit' : 'plus', 'sm', true) ?><h3><?= $editing ? 'Edit ' . strtolower($cfg['label']) : 'Add a ' . strtolower($cfg['label']) ?></h3></div>
+    <form method="post">
+      <input type="hidden" name="section" value="<?= e($activeTab) ?>">
+      <input type="hidden" name="action" value="save">
+      <input type="hidden" name="csrf" value="<?= e($token) ?>">
+      <input type="hidden" name="id" value="<?= (int)($editing['id'] ?? 0) ?>">
+      <?php foreach ($cfg['fields'] as $key => $f): ?>
+      <?php if ($f['type'] === 'checkbox'): ?>
+      <label class="flex items-center gap-8" style="font-size:.85rem;margin-bottom:14px;"><?= content_field_html($key, $f, $editing) ?> <?= e($f['label']) ?></label>
+      <?php else: ?>
+      <div class="field"><label><?= e($f['label']) ?></label><?= content_field_html($key, $f, $editing) ?></div>
+      <?php endif; ?>
+      <?php endforeach; ?>
+      <div class="flex gap-12">
+        <button class="btn btn-primary" type="submit"><?= $editing ? 'Save changes' : 'Add ' . strtolower($cfg['label']) ?></button>
+        <?php if ($editing): ?><a href="content.php?tab=<?= e($activeTab) ?>" class="btn btn-ghost">Cancel</a><?php endif; ?>
       </div>
+    </form>
+  </div>
 
-      <div class="tab-panel" id="panel-c-services">
-        <p class="lede" style="margin-bottom:14px;">Shown on the homepage and the Services page. Leave a name blank to remove that card.</p>
-        <?php for ($i = 0; $i < 6; $i++): $it = $services[$i] ?? ['icon' => '', 'name' => '', 'blurb' => '', 'bullets' => []]; ?>
-        <details class="content-item" <?= $i < 2 ? 'open' : '' ?>>
-          <summary>Service <?= $i + 1 ?><?= $it['name'] !== '' ? ' — ' . e($it['name']) : '' ?></summary>
-          <div class="grid grid-2" style="gap:16px;">
-            <div class="field"><label>Icon</label><?= icon_select("svc_icon_$i", $it['icon'], $ICON_CHOICES) ?></div>
-            <div class="field"><label>Name</label><input name="svc_name_<?= $i ?>" value="<?= e($it['name']) ?>"></div>
-          </div>
-          <div class="field"><label>Short description</label><input name="svc_blurb_<?= $i ?>" value="<?= e($it['blurb']) ?>"></div>
-          <div class="field"><label>Bullet points (one per line)</label><textarea name="svc_bullets_<?= $i ?>"><?= e(implode("\n", $it['bullets'])) ?></textarea></div>
-        </details>
-        <?php endfor; ?>
+  <div class="card">
+    <?php $rows = $rowsBySection[$activeTab]; ?>
+    <?php foreach ($rows as $r): ?>
+    <div class="content-row">
+      <div>
+        <div class="content-row-title"><?= e((string)($r[$cfg['title']] ?? '')) ?></div>
+        <?php if ($activeTab === 'pricing'): ?><div class="content-row-sub"><?= $r['monthly_price'] !== null ? '$' . (int)$r['monthly_price'] . '/mo' : 'Custom' ?><?= $r['is_recommended'] ? ' · Most popular' : '' ?></div><?php endif; ?>
+        <?php if ($activeTab === 'cases'): ?><div class="content-row-sub"><?= e($r['sector']) ?></div><?php endif; ?>
+        <?php if ($activeTab === 'team'): ?><div class="content-row-sub"><?= e($r['role']) ?></div><?php endif; ?>
       </div>
-
-      <div class="tab-panel" id="panel-c-industries">
-        <p class="lede" style="margin-bottom:14px;">Shown on the Solutions ("Who we help") page. Leave a name blank to remove that card.</p>
-        <?php for ($i = 0; $i < 5; $i++): $it = $solutions[$i] ?? ['icon' => '', 'name' => '', 'out' => []]; ?>
-        <details class="content-item" <?= $i < 2 ? 'open' : '' ?>>
-          <summary>Industry <?= $i + 1 ?><?= $it['name'] !== '' ? ' — ' . e($it['name']) : '' ?></summary>
-          <div class="grid grid-2" style="gap:16px;">
-            <div class="field"><label>Icon</label><?= icon_select("sol_icon_$i", $it['icon'], $ICON_CHOICES) ?></div>
-            <div class="field"><label>Name</label><input name="sol_name_<?= $i ?>" value="<?= e($it['name']) ?>"></div>
-          </div>
-          <div class="field"><label>What they get (one per line)</label><textarea name="sol_out_<?= $i ?>"><?= e(implode("\n", $it['out'])) ?></textarea></div>
-        </details>
-        <?php endfor; ?>
+      <div class="admin-actions-cell">
+        <a class="icon-btn" href="content.php?tab=<?= e($activeTab) ?>&edit=<?= (int)$r['id'] ?>" aria-label="Edit"><?= ico('edit') ?></a>
+        <form method="post" onsubmit="return confirm('Remove this <?= strtolower($cfg['label']) ?>?');">
+          <input type="hidden" name="section" value="<?= e($activeTab) ?>">
+          <input type="hidden" name="action" value="delete">
+          <input type="hidden" name="csrf" value="<?= e($token) ?>">
+          <input type="hidden" name="id" value="<?= (int)$r['id'] ?>">
+          <button class="icon-btn danger" type="submit" aria-label="Delete"><?= ico('trash') ?></button>
+        </form>
       </div>
-
-      <div class="tab-panel" id="panel-c-cases">
-        <p class="lede" style="margin-bottom:14px;">Shown on the homepage and the Work page. Leave a client name blank to remove that story.</p>
-        <?php for ($i = 0; $i < 6; $i++): $it = $caseStudies[$i] ?? ['sector' => '', 'icon' => '', 'client' => '', 'stat' => '', 'statLabel' => '', 'quote' => '', 'body' => '']; ?>
-        <details class="content-item">
-          <summary>Case study <?= $i + 1 ?><?= $it['client'] !== '' ? ' — ' . e($it['client']) : '' ?></summary>
-          <div class="grid grid-2" style="gap:16px;">
-            <div class="field"><label>Client name</label><input name="case_client_<?= $i ?>" value="<?= e($it['client']) ?>"></div>
-            <div class="field"><label>Sector</label><input name="case_sector_<?= $i ?>" value="<?= e($it['sector']) ?>" placeholder="e.g. Bakery"></div>
-          </div>
-          <div class="field"><label>Icon</label><?= icon_select("case_icon_$i", $it['icon'], $ICON_CHOICES) ?></div>
-          <div class="grid grid-2" style="gap:16px;">
-            <div class="field"><label>Stat</label><input name="case_stat_<?= $i ?>" value="<?= e($it['stat']) ?>" placeholder="e.g. +64%"></div>
-            <div class="field"><label>Stat label</label><input name="case_statlabel_<?= $i ?>" value="<?= e($it['statLabel']) ?>" placeholder="e.g. online orders in month one"></div>
-          </div>
-          <div class="field"><label>Quote</label><input name="case_quote_<?= $i ?>" value="<?= e($it['quote']) ?>"></div>
-          <div class="field"><label>Story</label><textarea name="case_body_<?= $i ?>"><?= e($it['body']) ?></textarea></div>
-        </details>
-        <?php endfor; ?>
-      </div>
-
-      <div class="tab-panel" id="panel-c-pricing">
-        <p class="lede" style="margin-bottom:14px;">The 3 pricing plans and their FAQ, shown on the Pricing page.</p>
-        <?php for ($i = 0; $i < 3; $i++): $it = $pricing[$i] ?? ['n' => '', 'm' => '', 'y' => '', 'd' => '', 'f' => [], 'cta' => '', 'rec' => false]; ?>
-        <details class="content-item" open>
-          <summary>Plan <?= $i + 1 ?><?= $it['n'] !== '' ? ' — ' . e($it['n']) : '' ?></summary>
-          <div class="grid grid-2" style="gap:16px;">
-            <div class="field"><label>Plan name</label><input name="plan_name_<?= $i ?>" value="<?= e($it['n']) ?>"></div>
-            <div class="field"><label>Button text</label><input name="plan_cta_<?= $i ?>" value="<?= e($it['cta']) ?>"></div>
-          </div>
-          <div class="grid grid-2" style="gap:16px;">
-            <div class="field"><label>Monthly price ($) <small style="font-weight:400;color:var(--ink-faint);">— leave blank for "Custom"</small></label><input name="plan_m_<?= $i ?>" value="<?= e($it['m'] === null ? '' : (string)$it['m']) ?>" inputmode="numeric"></div>
-            <div class="field"><label>Annual price ($/mo, billed yearly)</label><input name="plan_y_<?= $i ?>" value="<?= e($it['y'] === null ? '' : (string)$it['y']) ?>" inputmode="numeric"></div>
-          </div>
-          <div class="field"><label>Description</label><input name="plan_desc_<?= $i ?>" value="<?= e($it['d']) ?>"></div>
-          <div class="field"><label>Features (one per line)</label><textarea name="plan_features_<?= $i ?>"><?= e(implode("\n", $it['f'])) ?></textarea></div>
-          <label class="flex items-center gap-8" style="font-size:.85rem;"><input type="checkbox" name="plan_rec_<?= $i ?>" <?= !empty($it['rec']) ? 'checked' : '' ?>> Mark as "Most popular"</label>
-        </details>
-        <?php endfor; ?>
-        <?php for ($i = 0; $i < 5; $i++): $it = $pricingFaq[$i] ?? ['', '']; ?>
-        <details class="content-item">
-          <summary>FAQ <?= $i + 1 ?><?= ($it[0] ?? '') !== '' ? ' — ' . e($it[0]) : '' ?></summary>
-          <div class="field"><label>Question</label><input name="faq_q_<?= $i ?>" value="<?= e($it[0] ?? '') ?>"></div>
-          <div class="field"><label>Answer</label><textarea name="faq_a_<?= $i ?>"><?= e($it[1] ?? '') ?></textarea></div>
-        </details>
-        <?php endfor; ?>
-      </div>
-
-      <div class="tab-panel" id="panel-c-team">
-        <p class="lede" style="margin-bottom:14px;">The leadership team and company values shown on the About page.</p>
-        <?php for ($i = 0; $i < 4; $i++): $it = $team[$i] ?? ['i' => '', 'n' => '', 'r' => '']; ?>
-        <details class="content-item" <?= $i < 2 ? 'open' : '' ?>>
-          <summary>Team member <?= $i + 1 ?><?= $it['n'] !== '' ? ' — ' . e($it['n']) : '' ?></summary>
-          <div class="grid grid-2" style="gap:16px;">
-            <div class="field"><label>Name</label><input name="team_name_<?= $i ?>" value="<?= e($it['n']) ?>"></div>
-            <div class="field"><label>Role</label><input name="team_role_<?= $i ?>" value="<?= e($it['r']) ?>"></div>
-          </div>
-          <div class="field" style="max-width:160px;"><label>Initials</label><input name="team_initials_<?= $i ?>" value="<?= e($it['i']) ?>" maxlength="3"></div>
-        </details>
-        <?php endfor; ?>
-        <?php for ($i = 0; $i < 4; $i++): $it = $values[$i] ?? ['icon' => '', 't' => '', 'd' => '']; ?>
-        <details class="content-item">
-          <summary>Value <?= $i + 1 ?><?= $it['t'] !== '' ? ' — ' . e($it['t']) : '' ?></summary>
-          <div class="grid grid-2" style="gap:16px;">
-            <div class="field"><label>Icon</label><?= icon_select("val_icon_$i", $it['icon'], $ICON_CHOICES) ?></div>
-            <div class="field"><label>Title</label><input name="val_title_<?= $i ?>" value="<?= e($it['t']) ?>"></div>
-          </div>
-          <div class="field"><label>Description</label><textarea name="val_desc_<?= $i ?>"><?= e($it['d']) ?></textarea></div>
-        </details>
-        <?php endfor; ?>
-      </div>
-
     </div>
-
-    <button class="btn btn-primary" type="submit">Save content</button>
-  </form>
+    <?php endforeach; ?>
+    <?php if (!$rows): ?><p style="color:var(--ink-faint);padding:12px 0;">None yet — add the first one above.</p><?php endif; ?>
+  </div>
 </main>
 <?= admin_bottomnav($staff, 'content.php') ?>
 </body>
