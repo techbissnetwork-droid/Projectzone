@@ -1961,20 +1961,31 @@ function doRender(){
   if(r.nav==='/dashboard'||r.nav==='/login'){ loginBtn.style.display='none'; } else { loginBtn.style.display=''; }
 }
 var transitioning=false;
+function resetTransition(){
+  transitioning=false;
+  wipe.classList.remove('covering');
+}
 window.addEventListener('hashchange', function(){
   if(transitioning) return;
   transitioning=true;
-  if(!motionOK){ doRender(); transitioning=false; return; }
+  if(!motionOK){ try{ doRender(); }catch(e){} transitioning=false; return; }
   wipe.classList.add('covering');
+  var safety = setTimeout(resetTransition, 1500);
   setTimeout(function(){
-    doRender();
-    requestAnimationFrame(function(){
-      wipe.classList.remove('covering');
-      setTimeout(function(){ transitioning=false; }, 280);
-    });
+    try{ doRender(); }
+    catch(e){}
+    finally{
+      clearTimeout(safety);
+      requestAnimationFrame(function(){
+        wipe.classList.remove('covering');
+        setTimeout(function(){ transitioning=false; }, 280);
+      });
+    }
   }, 270);
 });
 window.addEventListener('resize', function(){ moveNavBlob(currentNavLink()); });
+window.addEventListener('pageshow', function(e){ if(e.persisted) resetTransition(); });
+document.addEventListener('visibilitychange', function(){ if(!document.hidden && transitioning) resetTransition(); });
 doRender();
 
 })();
