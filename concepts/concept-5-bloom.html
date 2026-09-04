@@ -1141,9 +1141,9 @@ Pages['/'] = function(){
   +'<section class="section tone-a"><div class="container">'
     +'<div class="section-head center"><span class="eyebrow">Recent work</span><h2>Outcomes our clients keep quoting back to us</h2></div>'
     +'<div class="grid grid-3">'+CASESTUDIES.slice(0,3).map(function(c){
-      return '<div class="card tilt"><span class="badge" style="margin-bottom:10px;">'+c.sector+'</span><div class="card-head">'+blobIcon(c.icon,'sm')+'<h3>'+c.client+'</h3></div><p>'+c.body+'</p>'
+      return '<div class="card tilt"><div class="card-head">'+blobIcon(c.icon,'sm')+'<h3>'+c.client+'</h3></div><p>'+c.body+'</p>'
       +'<div class="stat" style="margin-bottom:14px;">'+statBlock(c.stat,c.statLabel)+'</div>'
-      +'<a href="#/work" class="card-link">Read the story '+ico('arrow')+'</a></div>';
+      +'<div class="flex items-center justify-between"><a href="#/work" class="card-link">Read the story '+ico('arrow')+'</a><span class="badge">'+c.sector+'</span></div></div>';
     }).join('')+'</div>'
   +'</div></section>'
 
@@ -1336,7 +1336,7 @@ Pages['/resources'] = function(){
   +'<section class="section tone-a" style="padding-top:10px;"><div class="container">'
     +'<div class="chip-row" id="resChips">'+types.map(function(t,i){return '<button class="chip'+(i===0?' active':'')+'" data-cat="'+t+'">'+t+'</button>';}).join('')+'</div>'
     +'<div class="grid grid-3" id="resGrid">'+res.map(function(r){
-      return '<div class="card tilt" data-cat="'+r.k+'"><span class="badge" style="margin-bottom:10px;">'+r.k+'</span><div class="card-head">'+blobIcon(r.icon,'sm',true)+'<h3 style="font-size:1.08rem;">'+r.t+'</h3></div><p style="font-size:.85rem;">'+r.min+'</p><span class="card-link">Read '+ico('arrow')+'</span></div>';
+      return '<div class="card tilt" data-cat="'+r.k+'"><div class="card-head">'+blobIcon(r.icon,'sm',true)+'<h3 style="font-size:1.08rem;">'+r.t+'</h3></div><p style="font-size:.85rem;">'+r.min+'</p><div class="flex items-center justify-between"><span class="card-link">Read '+ico('arrow')+'</span><span class="badge">'+r.k+'</span></div></div>';
     }).join('')+'</div>'
   +'</div></section>'
   +wave('c','var(--bg-alt-2)')
