@@ -2781,6 +2781,11 @@ bindMagnetic(document);
 makeGrain();
 route();
 
+/* GSAP arrives deferred; hand the parallax over to ScrollTrigger once it lands */
+window.addEventListener('load', function(){
+  if(window.gsap && window.ScrollTrigger) initParallax(view);
+});
+
 })();
 </script>
 </body>
