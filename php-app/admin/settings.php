@@ -10,7 +10,7 @@ $pdo = db();
 
 $TEXT_FIELDS = [
     'hero_headline_main', 'hero_headline_accent', 'hero_subheadline', 'site_tagline',
-    'contact_email', 'contact_phone', 'whatsapp_number', 'seo_title', 'meta_description',
+    'site_name', 'contact_email', 'contact_phone', 'whatsapp_number', 'seo_title', 'meta_description',
     'stat1_value', 'stat1_label', 'stat2_value', 'stat2_label',
     'stat3_value', 'stat3_label', 'stat4_value', 'stat4_label',
     'stat5_value', 'stat5_label',
@@ -146,6 +146,9 @@ $socialPath = $current['social_image_path'] ?? 'assets/social-default.png';
 
     <div class="tab-panel" id="panel-general">
     <div class="card admin-form-card">
+      <div class="field"><label>Site name</label><input name="site_name" value="<?= e($current['site_name'] ?? 'TECHBISS') ?>">
+        <p style="font-size:.78rem;color:var(--ink-faint);margin-top:6px;">Shown next to the logo in the header, footer and splash screen. Hidden automatically if you upload a custom logo in the Branding tab.</p>
+      </div>
       <div class="field"><label>Homepage headline</label>
         <div class="grid grid-2" style="gap:16px;">
           <input name="hero_headline_main" value="<?= e($current['hero_headline_main'] ?? '') ?>" placeholder="Plain part">

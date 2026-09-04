@@ -41,6 +41,7 @@ $contentSections = [
     'values' => content_section('values_json', $defaultContent['values']),
 ];
 
+$siteName = get_setting('site_name', 'TECHBISS');
 $siteTagline = get_setting('site_tagline', 'TECHBISS builds the complete digital presence of your business — websites, apps, hosting, security, email, e-commerce, automation and payments.');
 
 $seoTitle = get_setting('seo_title', 'TECHBISS — Helping offline businesses go online');
@@ -107,7 +108,7 @@ if ($baseUrl !== '') {
         <rect class="s-stem" x="10.7" y="7.5" width="2.6" height="9.5" rx="1.3" fill="#fff2ea"/>
       </g>
     </svg>
-    <div class="splash-word">techbiss</div>
+    <div class="splash-word"><?= e($siteName) ?></div>
     <div class="splash-hint">Websites &amp; apps, fully handled.</div>
   </div>
 </div>
@@ -122,7 +123,7 @@ if ($baseUrl !== '') {
   <div class="container nav-wrap">
     <a href="/" class="logo" aria-label="TECHBISS home">
       <?= logo_mark_html(true, $basePath !== '' ? $basePath . '/' : '/') ?>
-      <b>techbiss</b>
+      <?= logo_wordmark_html() ?>
     </a>
     <nav class="nav-links" id="navLinks" aria-label="Primary">
       <div class="nav-blob" id="navBlob"></div>
@@ -178,7 +179,7 @@ if ($baseUrl !== '') {
       <div>
         <a href="/" class="logo" style="margin-bottom:14px;">
           <?= logo_mark_html(true, $basePath !== '' ? $basePath . '/' : '/') ?>
-          <b>techbiss</b>
+          <?= logo_wordmark_html() ?>
         </a>
         <p style="max-width:32ch;"><?= e($siteTagline) ?></p>
         <div class="flex gap-12" style="margin-top:18px;">
