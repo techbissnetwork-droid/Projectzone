@@ -385,6 +385,7 @@ button{ cursor:pointer; }
 .badge.grad{ background:var(--grad); color:#fff2ea; border:none; }
 .badge.success{ background:rgba(31,157,115,.12); color:var(--success); border-color:transparent; }
 .badge.warning{ background:rgba(217,154,43,.12); color:var(--warning); border-color:transparent; }
+.badge.danger{ background:rgba(224,96,74,.12); color:var(--danger); border-color:transparent; }
 
 .stat{ text-align:left; }
 .stat .num{ font-family:var(--font-display); font-weight:800; font-size:clamp(1.8rem,3vw,2.6rem); }
@@ -558,7 +559,7 @@ tr:last-child td{ border-bottom:none; }
 
 /* ============================= ROUTE TRANSITION ============================= */
 .route-wipe{ position:fixed; inset:0; z-index:9990; pointer-events:none; display:flex; align-items:center; justify-content:center; }
-.route-wipe svg{ position:absolute; width:220vmax; height:220vmax; transform:scale(0); transition:transform .5s cubic-bezier(.6,0,.3,1); }
+.route-wipe svg{ position:absolute; width:220vmax; height:220vmax; transform:scale(0); transition:transform .26s cubic-bezier(.5,0,.2,1); }
 .route-wipe.covering svg{ transform:scale(1); }
 
 /* ============================= VIEW ============================= */
@@ -1518,6 +1519,72 @@ function ticketRow(id,title,tone,status){
   return '<div class="flex justify-between items-center" style="padding:12px 0;border-bottom:1px solid var(--border-soft);"><div><span style="font-family:var(--font-display);font-weight:600;font-size:.85rem;color:var(--ink-faint);">'+id+'</span><p style="margin:2px 0 0;font-size:.9rem;">'+title+'</p></div><span class="badge '+tone+'">'+status+'</span></div>';
 }
 
+/* Internal staff route — reachable only at #/admin. Never referenced by ROUTES,
+   the mobile sheet links, the footer, or the bottom dock. */
+Pages['/admin'] = function(){
+  var accounts = [
+    {name:CASESTUDIES[0].client, plan:'Growth', mrr:'$149', status:'Active', tone:'success', last:'2 hours ago'},
+    {name:CASESTUDIES[1].client, plan:'Starter', mrr:'$79', status:'Active', tone:'success', last:'Yesterday'},
+    {name:CASESTUDIES[2].client, plan:'Growth', mrr:'$149', status:'Active', tone:'success', last:'3 days ago'},
+    {name:CASESTUDIES[3].client, plan:'App + Web', mrr:'$229', status:'Trial', tone:'warning', last:'6 hours ago'},
+    {name:CASESTUDIES[4].client, plan:'Starter', mrr:'$79', status:'Active', tone:'success', last:'1 day ago'},
+    {name:CASESTUDIES[5].client, plan:'Growth', mrr:'$149', status:'Past due', tone:'danger', last:'11 days ago'}
+  ];
+  var queue = [
+    {id:'#1042', biz:CASESTUDIES[0].client, title:'Checkout error on mobile Safari', tone:'danger', pri:'High', assignee:'DK'},
+    {id:'#1041', biz:CASESTUDIES[5].client, title:'Billing card declined — needs follow-up call', tone:'danger', pri:'High', assignee:'JT'},
+    {id:'#1039', biz:CASESTUDIES[0].client, title:'Add a holiday hours banner', tone:'warning', pri:'Normal', assignee:'RS'},
+    {id:'#1037', biz:CASESTUDIES[3].client, title:'App Store review flagged a screenshot', tone:'warning', pri:'Normal', assignee:'DK'},
+    {id:'#1033', biz:CASESTUDIES[4].client, title:'Domain renewal reminder', tone:'success', pri:'Low', assignee:'JT'}
+  ];
+  var staff = [
+    {i:'MA', n:'Mara Aldous', r:'Founder & CEO', load:'—'},
+    {i:'DK', n:'Devon Kwan', r:'Head of Engineering', load:'6 active builds'},
+    {i:'RS', n:'Rhea Solano', r:'Head of Design', load:'4 active builds'},
+    {i:'JT', n:'Jonah Traeger', r:'VP Client Success', load:'11 accounts'}
+  ];
+  var sellers = PRODUCTS.slice().sort(function(a,b){ return b.rating-a.rating; }).slice(0,3);
+  return '<section class="hero" style="padding-bottom:12px;"><div class="container">'
+    +'<span class="badge warning" style="margin-bottom:14px;">'+ico('shield')+' Internal — staff access only</span>'
+    +'<span class="eyebrow">Admin control center</span><h1 style="max-width:22ch;">Every client, every ticket, one screen.</h1>'
+    +'<p class="lede">Signed in as Jonah Traeger, VP Client Success.</p>'
+  +'</div></section>'
+  +'<section class="section tone-a" style="padding-top:10px;"><div class="container">'
+    +'<div class="grid grid-4" style="margin-bottom:28px;">'
+      +statCardHTML('1,904','Businesses on platform','users')
+      +statCardHTML('$148,260','Monthly recurring revenue','chart')
+      +statCardHTML('$18,430','Marketplace revenue (30d)','box')
+      +statCardHTML('34','Open support tickets','chat')
+    +'</div>'
+    +'<div class="card" style="margin-bottom:22px;"><div class="card-head">'+blobIcon('users','sm',true)+'<h3>Business accounts</h3></div>'
+      +'<div class="table-wrap"><table><thead><tr><th>Business</th><th>Plan</th><th>MRR</th><th>Status</th><th>Last activity</th></tr></thead><tbody>'
+      +accounts.map(function(a){
+        return '<tr><td style="font-weight:600;">'+a.name+'</td><td>'+a.plan+'</td><td>'+a.mrr+'</td><td><span class="badge '+a.tone+'">'+a.status+'</span></td><td style="color:var(--ink-faint);">'+a.last+'</td></tr>';
+      }).join('')
+      +'</tbody></table></div>'
+    +'</div>'
+    +'<div class="hero-grid" style="align-items:flex-start;gap:26px;">'
+      +'<div class="card"><div class="card-head">'+blobIcon('chat','sm',true)+'<h3>Support queue — all clients</h3></div>'
+        +queue.map(function(q){
+          return '<div class="flex justify-between items-center" style="padding:12px 0;border-bottom:1px solid var(--border-soft);"><div><span style="font-family:var(--font-display);font-weight:600;font-size:.85rem;color:var(--ink-faint);">'+q.id+' · '+q.biz+'</span><p style="margin:2px 0 0;font-size:.9rem;">'+q.title+'</p></div><div class="flex items-center gap-8"><span class="badge '+q.tone+'">'+q.pri+'</span><span class="blob-icon sm soft" title="Assigned to '+q.assignee+'" style="width:30px;height:30px;font-size:.65rem;">'+q.assignee+'</span></div></div>';
+        }).join('')
+      +'</div>'
+      +'<div style="display:flex;flex-direction:column;gap:22px;">'
+        +'<div class="card"><h3>Staff</h3>'
+          +staff.map(function(s){
+            return '<div class="flex items-center gap-12" style="padding:12px 0;border-bottom:1px solid var(--border-soft);"><div class="avatar-blob" style="width:38px;height:38px;font-size:.75rem;">'+s.i+'</div><div style="flex:1;"><b style="font-size:.9rem;">'+s.n+'</b><p style="margin:0;font-size:.78rem;color:var(--ink-faint);">'+s.r+'</p></div><span style="font-size:.78rem;color:var(--ink-faint);">'+s.load+'</span></div>';
+          }).join('')
+        +'</div>'
+        +'<div class="card"><h3>Top marketplace sellers</h3>'
+          +sellers.map(function(p){
+            return '<div class="flex justify-between items-center" style="padding:10px 0;border-bottom:1px solid var(--border-soft);"><span style="font-size:.9rem;">'+p.name+'</span><span class="badge">'+ico('star')+' '+p.rating+'</span></div>';
+          }).join('')
+        +'</div>'
+      +'</div>'
+    +'</div>'
+  +'</div></section>';
+};
+
 /* ===================================================================
    11. PAGE-SPECIFIC INTERACTION WIRING
 =================================================================== */
@@ -1903,9 +1970,9 @@ window.addEventListener('hashchange', function(){
     doRender();
     requestAnimationFrame(function(){
       wipe.classList.remove('covering');
-      setTimeout(function(){ transitioning=false; }, 520);
+      setTimeout(function(){ transitioning=false; }, 280);
     });
-  }, 520);
+  }, 270);
 });
 window.addEventListener('resize', function(){ moveNavBlob(currentNavLink()); });
 doRender();
