@@ -18,15 +18,15 @@
   --border:#ece0cd;
   --border-soft:#f1e6d5;
 
-  --accent-1:#ff7a52;   /* coral */
-  --accent-2:#ffb648;   /* amber */
-  --accent-3:#ff9c6b;   /* mid blend */
-  --accent-1-rgb:255,122,82;
-  --accent-2-rgb:255,182,72;
+  --hue-1:#ff7a52;   /* coral — theme base color 1 */
+  --hue-2:#ffb648;   /* amber — theme base color 2 */
+  --accent-1: var(--hue-1);
+  --accent-2: var(--hue-2);
+  --accent-3: color-mix(in srgb, var(--hue-1) 50%, var(--hue-2) 50%);
 
   --grad: linear-gradient(135deg, var(--accent-1) 0%, var(--accent-3) 52%, var(--accent-2) 100%);
-  --grad-soft: linear-gradient(135deg, rgba(255,122,82,.14), rgba(255,182,72,.14));
-  --grad-text: linear-gradient(120deg, #ff6a3d, #ffb648);
+  --grad-soft: linear-gradient(135deg, color-mix(in srgb, var(--hue-1) 15%, transparent), color-mix(in srgb, var(--hue-2) 15%, transparent));
+  --grad-text: linear-gradient(120deg, var(--hue-1), var(--hue-2));
 
   --shadow-tint: 22 55% 45%;
   --shadow-sm: 0 2px 14px -4px hsl(var(--shadow-tint) / .20);
@@ -61,13 +61,6 @@
     --border:#3d3125;
     --border-soft:#382c21;
 
-    --accent-1:#ff8f66;
-    --accent-2:#ffc169;
-    --accent-3:#ffa87c;
-    --accent-1-rgb:255,143,102;
-    --accent-2-rgb:255,193,105;
-
-    --grad-soft: linear-gradient(135deg, rgba(255,143,102,.16), rgba(255,193,105,.16));
     --shadow-tint: 20 65% 4%;
     --shadow-sm: 0 2px 14px -4px hsl(var(--shadow-tint) / .55);
     --shadow-md: 0 16px 40px -12px hsl(var(--shadow-tint) / .60);
@@ -86,18 +79,24 @@
   --border:#3d3125;
   --border-soft:#382c21;
 
-  --accent-1:#ff8f66;
-  --accent-2:#ffc169;
-  --accent-3:#ffa87c;
-  --accent-1-rgb:255,143,102;
-  --accent-2-rgb:255,193,105;
-
-  --grad-soft: linear-gradient(135deg, rgba(255,143,102,.16), rgba(255,193,105,.16));
   --shadow-tint: 20 65% 4%;
   --shadow-sm: 0 2px 14px -4px hsl(var(--shadow-tint) / .55);
   --shadow-md: 0 16px 40px -12px hsl(var(--shadow-tint) / .60);
   --shadow-lg: 0 32px 70px -18px hsl(var(--shadow-tint) / .65);
 }
+
+/* ============================= COLOR THEMES ============================= */
+/* Each theme overrides only the two base hues; --accent-1/2/3, --grad, --grad-soft
+   and --grad-text all derive from them automatically in every light/dark state. */
+:root[data-palette="fresh"]{ --hue-1:#0ea394; --hue-2:#8fd14f; }
+:root[data-palette="dusk"]{ --hue-1:#7c5cff; --hue-2:#4fc3f7; }
+:root[data-palette="ember"]{ --hue-1:#e0457a; --hue-2:#f6b93b; }
+:root[data-palette="sunrise"]{ --hue-1:#ff6a3d; --hue-2:#ff4f8b; }
+:root[data-palette="lagoon"]{ --hue-1:#0098c9; --hue-2:#2f6fed; }
+:root[data-palette="orchid"]{ --hue-1:#a83df0; --hue-2:#6a5cff; }
+:root[data-palette="citrus"]{ --hue-1:#7ec242; --hue-2:#17a672; }
+:root[data-palette="slate"]{ --hue-1:#7a63d1; --hue-2:#c9718a; }
+:root[data-palette="midnight"]{ --hue-1:#4a3aff; --hue-2:#e0389c; }
 
 /* ============================= RESET ============================= */
 *,*::before,*::after{ box-sizing:border-box; }
@@ -169,7 +168,7 @@ button{ cursor:pointer; }
   background:var(--grad); color:#fff2ea;
   border-radius:42% 58% 68% 32% / 45% 40% 60% 55%;
   animation:blobmorph 9s ease-in-out infinite;
-  box-shadow:0 10px 26px -8px rgba(var(--accent-1-rgb),.5);
+  box-shadow:0 10px 26px -8px color-mix(in srgb, var(--accent-1) 50%, transparent);
 }
 .blob-icon svg{ width:52%; height:52%; }
 .blob-icon.sm{ --size:44px; }
@@ -230,6 +229,9 @@ button{ cursor:pointer; }
   .logo-badge{ display:none; }
   .nav-actions{ gap:8px; }
 }
+@media (max-width:400px){
+  .nav-actions > .btn-primary{ display:none; }
+}
 
 .theme-toggle{
   position:relative; width:58px; height:32px; border-radius:var(--r-full);
@@ -248,6 +250,38 @@ button{ cursor:pointer; }
 
 .nav-burger{ display:none; width:44px; height:44px; border-radius:var(--r-full); background:var(--surface-2); border:1.5px solid var(--border); align-items:center; justify-content:center; }
 .nav-burger svg{ width:20px; height:20px; }
+
+/* ============================= COLOR THEME PICKER ============================= */
+.palette-wrap{ position:relative; flex:none; }
+.palette-toggle{
+  width:34px; height:34px; border-radius:50%; padding:2px; flex:none;
+  background:var(--surface-2); border:1.5px solid var(--border);
+}
+.palette-toggle .sw-current{ display:block; width:100%; height:100%; border-radius:50%; background:var(--grad); transition:background .3s ease; }
+.palette-toggle:hover{ border-color:var(--accent-1); }
+.palette-pop{
+  position:absolute; top:calc(100% + 12px); right:0; z-index:520; width:216px;
+  background:var(--surface); border:1px solid var(--border-soft); border-radius:18px;
+  box-shadow:var(--shadow-lg); padding:8px; display:flex; flex-direction:column; gap:2px;
+  opacity:0; visibility:hidden; transform:translateY(-6px) scale(.97); transform-origin:top right;
+  transition:opacity .22s ease, transform .22s cubic-bezier(.34,1.4,.4,1), visibility .22s;
+}
+.palette-pop.open{ opacity:1; visibility:visible; transform:translateY(0) scale(1); }
+.palette-opt{
+  display:flex; align-items:center; gap:10px; width:100%; padding:9px 10px; border-radius:12px;
+  background:none; border:none; text-align:left; font-family:var(--font-display); font-weight:600;
+  font-size:.86rem; color:var(--ink-soft);
+}
+.palette-opt:hover{ background:var(--surface-2); color:var(--ink); }
+.palette-opt[aria-checked="true"]{ background:var(--grad-soft); color:var(--ink); }
+.opt-sw{ width:20px; height:20px; border-radius:50%; flex:none; background:linear-gradient(135deg,var(--sw1),var(--sw2)); box-shadow:0 0 0 1px var(--border-soft); }
+.opt-name{ flex:1; }
+.opt-check{ width:15px; height:15px; flex:none; color:var(--accent-1); opacity:0; }
+.palette-opt[aria-checked="true"] .opt-check{ opacity:1; }
+@media (max-width:480px){
+  .palette-pop{ right:auto; left:50%; transform:translate(-50%,-6px) scale(.97); transform-origin:top center; }
+  .palette-pop.open{ transform:translate(-50%,0) scale(1); }
+}
 
 .mobile-sheet{
   position:fixed; inset:auto 0 0 0; z-index:600; background:var(--surface);
@@ -529,6 +563,23 @@ main{ display:block; }
       <div class="nav-blob" id="navBlob"></div>
     </nav>
     <div class="nav-actions">
+      <div class="palette-wrap">
+        <button class="palette-toggle" id="paletteToggle" aria-label="Choose color theme" aria-haspopup="true" aria-expanded="false">
+          <span class="sw-current" id="paletteSwatch"></span>
+        </button>
+        <div class="palette-pop" id="palettePop" role="menu" aria-label="Color themes">
+          <button class="palette-opt" data-palette="" role="menuitemradio" aria-checked="true"><span class="opt-sw" style="--sw1:#ff7a52;--sw2:#ffb648;"></span><span class="opt-name">Bloom</span><svg class="opt-check" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button class="palette-opt" data-palette="fresh" role="menuitemradio" aria-checked="false"><span class="opt-sw" style="--sw1:#0ea394;--sw2:#8fd14f;"></span><span class="opt-name">Fresh</span><svg class="opt-check" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button class="palette-opt" data-palette="dusk" role="menuitemradio" aria-checked="false"><span class="opt-sw" style="--sw1:#7c5cff;--sw2:#4fc3f7;"></span><span class="opt-name">Dusk</span><svg class="opt-check" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button class="palette-opt" data-palette="ember" role="menuitemradio" aria-checked="false"><span class="opt-sw" style="--sw1:#e0457a;--sw2:#f6b93b;"></span><span class="opt-name">Ember</span><svg class="opt-check" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button class="palette-opt" data-palette="sunrise" role="menuitemradio" aria-checked="false"><span class="opt-sw" style="--sw1:#ff6a3d;--sw2:#ff4f8b;"></span><span class="opt-name">Sunrise</span><svg class="opt-check" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button class="palette-opt" data-palette="lagoon" role="menuitemradio" aria-checked="false"><span class="opt-sw" style="--sw1:#0098c9;--sw2:#2f6fed;"></span><span class="opt-name">Lagoon</span><svg class="opt-check" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button class="palette-opt" data-palette="orchid" role="menuitemradio" aria-checked="false"><span class="opt-sw" style="--sw1:#a83df0;--sw2:#6a5cff;"></span><span class="opt-name">Orchid</span><svg class="opt-check" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button class="palette-opt" data-palette="citrus" role="menuitemradio" aria-checked="false"><span class="opt-sw" style="--sw1:#7ec242;--sw2:#17a672;"></span><span class="opt-name">Citrus</span><svg class="opt-check" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button class="palette-opt" data-palette="slate" role="menuitemradio" aria-checked="false"><span class="opt-sw" style="--sw1:#7a63d1;--sw2:#c9718a;"></span><span class="opt-name">Slate Bloom</span><svg class="opt-check" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button class="palette-opt" data-palette="midnight" role="menuitemradio" aria-checked="false"><span class="opt-sw" style="--sw1:#4a3aff;--sw2:#e0389c;"></span><span class="opt-name">Midnight Bloom</span><svg class="opt-check" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div>
+      </div>
       <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" aria-pressed="false">
         <span class="knob" id="themeKnob">
           <svg id="themeIcon" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="2"/><path d="M12 2v2M12 20v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2 12h2M20 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
@@ -668,6 +719,48 @@ $('#themeToggle').addEventListener('click', function(){
   var isDark = current ? current==='dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
   applyTheme(isDark ? 'light' : 'dark');
 });
+
+/* ===================================================================
+   2b. COLOR THEME PICKER
+=================================================================== */
+(function colorTheme(){
+  var pop = $('#palettePop'), toggle = $('#paletteToggle'), swatch = $('#paletteSwatch');
+  var opts = $all('.palette-opt');
+
+  function applyPalette(p, persist){
+    if(p){ root.setAttribute('data-palette', p); } else { root.removeAttribute('data-palette'); }
+    opts.forEach(function(o){
+      var on = (o.dataset.palette||'') === (p||'');
+      o.setAttribute('aria-checked', String(on));
+    });
+    swatch.style.background = 'var(--grad)';
+    if(persist){ try{ localStorage.setItem('bloom-palette', p||''); }catch(e){} }
+  }
+  function openPop(o){
+    pop.classList.toggle('open', o);
+    toggle.setAttribute('aria-expanded', String(o));
+  }
+  toggle.addEventListener('click', function(e){
+    e.stopPropagation();
+    openPop(!pop.classList.contains('open'));
+  });
+  opts.forEach(function(o){
+    o.addEventListener('click', function(){
+      applyPalette(o.dataset.palette, true);
+      openPop(false);
+    });
+  });
+  document.addEventListener('click', function(e){
+    if(!pop.contains(e.target) && e.target!==toggle) openPop(false);
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key==='Escape') openPop(false);
+  });
+
+  var saved = null;
+  try{ saved = localStorage.getItem('bloom-palette'); }catch(e){}
+  applyPalette(saved || '', false);
+})();
 
 /* ===================================================================
    3. SPLASH (once per tab session)
