@@ -417,17 +417,18 @@ button{ cursor:pointer; }
 @keyframes scrollx{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
 
 /* ============================= FLIP CARDS (marketplace) ============================= */
-.flip-card{ perspective:1400px; height:388px; transition:transform .35s cubic-bezier(.34,1.4,.4,1); }
+.flip-card{ perspective:1400px; height:388px; position:relative; transition:transform .35s cubic-bezier(.34,1.4,.4,1); }
 .flip-card:hover{ transform:translateY(-5px); }
 .flip-inner{ position:relative; width:100%; height:100%; transition:transform .7s cubic-bezier(.4,.2,.2,1); transform-style:preserve-3d; }
-.flip-card.flipped .flip-inner, .flip-card:hover .flip-inner{ transform:rotateY(180deg); }
-.flip-face{ position:absolute; inset:0; backface-visibility:hidden; border-radius:var(--r-xl); padding:26px; display:flex; flex-direction:column; border:1px solid var(--border-soft); box-shadow:var(--shadow-sm); }
+.flip-card.flipped .flip-inner{ transform:rotateY(180deg); }
+.flip-face{ position:absolute; inset:0; backface-visibility:hidden; border-radius:var(--r-xl); padding:26px; display:flex; flex-direction:column; border:1px solid var(--border-soft); box-shadow:var(--shadow-sm); overflow-y:auto; }
 .flip-card:hover .flip-face{ box-shadow:var(--shadow-md); }
 .flip-front{ background:var(--surface); }
 .flip-back{ background:var(--grad); color:#fff5ee; transform:rotateY(180deg); justify-content:space-between; padding-top:54px; }
 .flip-back p{ color:rgba(255,245,238,.92); }
 .flip-peek{ position:absolute; top:12px; right:12px; width:34px; height:34px; border-radius:50%; background:var(--surface-2); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; z-index:3; }
-.flip-peek svg{ width:16px; height:16px; }
+.flip-peek svg{ width:16px; height:16px; transition:transform .5s ease; }
+.flip-card.flipped .flip-peek svg{ transform:rotate(180deg); }
 
 .pf-cover{ display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:16px; }
 .pf-rating{ display:inline-flex; align-items:center; gap:5px; font-family:var(--font-display); font-weight:700; font-size:.78rem; color:var(--ink-soft); background:var(--surface-2); padding:5px 10px; border-radius:var(--r-full); flex:none; }
@@ -1549,11 +1550,13 @@ function wireMarketplace(){
         +'</div>'
         +'<div class="flip-face flip-back">'
           +'<div><h3 style="color:#fff2ea;font-size:1.05rem;">'+p.name+'</h3>'
+          +'<p style="font-size:.85rem;">'+p.desc+'</p>'
           +'<div class="fb-specs">'+p.specs.slice(0,3).map(function(s){return '<div class="flex items-center gap-8">'+ico('check')+'<span>'+s+'</span></div>';}).join('')+'</div></div>'
           +'<a href="#/marketplace/detail/'+p.id+'" class="btn" style="background:#fff2ea;color:var(--accent-1);">View details '+ico('arrow')+'</a>'
         +'</div>'
-        +'<button class="flip-peek" aria-label="Toggle preview">'+ico('refresh')+'</button>'
-      +'</div></div>';
+      +'</div>'
+      +'<button class="flip-peek" aria-label="Toggle preview">'+ico('refresh')+'</button>'
+      +'</div>';
     }).join('') || '<p>No products match that search yet — try another term.</p>';
     $('#mktCount').textContent = items.length + (items.length===1 ? ' product' : ' products');
     $all('.flip-peek', grid).forEach(function(btn){
