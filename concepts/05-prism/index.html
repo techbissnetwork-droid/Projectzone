@@ -111,7 +111,7 @@
   a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible, [tabindex]:focus-visible{
     outline:2px solid var(--accent); outline-offset:3px; border-radius:2px;
   }
-  h1[tabindex]{ outline:none; }
+  h1[tabindex]:focus, h1[tabindex]:focus-visible{ outline:none; }
   @keyframes h1Flash{ from{ box-shadow:inset 4px 0 0 0 var(--accent); } to{ box-shadow:inset 4px 0 0 0 transparent; } }
   h1.route-flash{ animation:h1Flash .7s var(--ease-snap) forwards; }
   @media (prefers-reduced-motion: reduce){ h1.route-flash{ animation:none; } }
@@ -433,10 +433,10 @@
   .tabs{display:flex; gap:.4em; border-bottom:1px solid var(--border); margin-bottom:var(--s4);}
   .tabs button{background:none; border:0; padding:.9em 1.2em; font-weight:700; font-size:.88rem; color:var(--ink-muted); border-bottom:2px solid transparent; margin-bottom:-1px;}
   .tabs button[aria-selected="true"]{color:var(--ink); border-color:var(--accent);}
-  .kpi-tile{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:var(--s3);}
-  .kpi-tile .num{font-family:var(--font-display); font-size:2.1rem;}
-  .kpi-tile .lbl{font-size:.78rem; color:var(--ink-muted); font-weight:600;}
-  .kpi-tile .delta{font-size:.75rem; font-weight:700; color:var(--c1);}
+  .kpi-tile{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:var(--s3); display:flex; flex-direction:column; gap:.3em;}
+  .kpi-tile .num{font-family:var(--font-display); font-size:2.1rem; display:block; line-height:1.1;}
+  .kpi-tile .lbl{font-size:.78rem; color:var(--ink-muted); font-weight:600; display:block;}
+  .kpi-tile .delta{font-size:.75rem; font-weight:700; color:var(--c1); display:block;}
   .activity-row{display:flex; justify-content:space-between; padding:.75em 0; border-bottom:1px solid var(--border); font-size:.87rem; gap:1em;}
   .activity-row:last-child{border-bottom:0;}
   .activity-row .t{color:var(--ink-muted); font-size:.78rem; flex-shrink:0;}
@@ -587,7 +587,7 @@ var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 function getStoredTheme(){ try{ return localStorage.getItem('tb-prism-theme'); }catch(e){ return null; } }
 function storeTheme(v){ try{ localStorage.setItem('tb-prism-theme', v); }catch(e){} }
 function applyTheme(t){
-  document.body.setAttribute('data-theme', t);
+  document.documentElement.setAttribute('data-theme', t);
   var icon = document.getElementById('themeIcon');
   var btn = document.getElementById('themeToggle');
   if(t === 'dark'){ icon.innerHTML = '<use href="#icon-sun"></use>'; btn.setAttribute('aria-label','Switch to light theme'); }
@@ -599,7 +599,7 @@ function applyTheme(t){
   applyTheme(theme);
 })();
 document.getElementById('themeToggle').addEventListener('click', function(){
-  var current = document.body.getAttribute('data-theme') || 'light';
+  var current = document.documentElement.getAttribute('data-theme') || 'light';
   var next = current === 'dark' ? 'light' : 'dark';
   applyTheme(next);
   storeTheme(next);
@@ -653,13 +653,19 @@ function animateCounters(root){
       var target = parseFloat(el.getAttribute('data-count'));
       var suffix = el.getAttribute('data-suffix') || '';
       var decimals = el.getAttribute('data-decimals') ? parseInt(el.getAttribute('data-decimals'),10) : 0;
-      if(reduceMotion){ el.textContent = target.toFixed(decimals) + suffix; return; }
+      function fmtNum(n){
+        var s = n.toFixed(decimals);
+        var parts = s.split('.');
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        return parts.join('.');
+      }
+      if(reduceMotion){ el.textContent = fmtNum(target) + suffix; return; }
       var start = null; var dur = 1100;
       function step(ts){
         if(!start) start = ts;
         var p = Math.min(1, (ts - start) / dur);
         var eased = 1 - Math.pow(1 - p, 3);
-        el.textContent = (target * eased).toFixed(decimals) + suffix;
+        el.textContent = fmtNum(target * eased) + suffix;
         if(p < 1) requestAnimationFrame(step);
       }
       requestAnimationFrame(step);
@@ -794,7 +800,6 @@ function serviceCardMini(ic,title,desc){
 function statTile(num, suffix, label, decimals, prefix){
   return '<div class="stat"><span class="num">' + (prefix||'') + '<span data-count="' + num + '" data-suffix="' + suffix + '"' + (decimals?(' data-decimals="'+decimals+'"'):'') + '>0</span></span><span class="label">' + label + '</span></div>';
 }
-ViewInit['/'] = function(root){ animateCounters(root); };
 
 /* ---------- SERVICES ---------- */
 var SERVICES = [
@@ -1488,6 +1493,7 @@ function runInit(path){
   if(fn) fn(mainEl);
   observeReveals(mainEl);
   initMagnetic(mainEl);
+  animateCounters(mainEl);
 }
 function renderRoute(path){
   var view = Views[path] || Views['/'];
