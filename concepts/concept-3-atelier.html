@@ -1,0 +1,1737 @@
+<title>TECHBISS — Atelier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+/* ============================================================
+   TECHBISS — ATELIER
+   A warm, editorial, boutique interface for a digital-transformation house.
+   ============================================================ */
+
+:root{
+  /* ---- palette : light (bone / ivory / espresso / brass) ---- */
+  --bg:            #f6f1e9;
+  --bg-alt:        #ece1cf;
+  --bg-deep:       #e3d5bd;
+  --ink:           #2a2420;
+  --ink-soft:      #5a4d40;
+  --ink-faint:     #8a7a68;
+  --paper:         #fffdf9;
+  --gold:          #b08d57;
+  --gold-strong:   #8f6f3e;
+  --gold-wash:     rgba(176,141,87,.14);
+  --line:          rgba(42,36,32,.16);
+  --line-strong:   rgba(42,36,32,.32);
+  --status-good:   #6f7f4f;
+  --status-warn:   #a35a3d;
+  --status-neutral:#8a7a68;
+  --shadow-soft:   0 1px 0 rgba(42,36,32,.06);
+
+  --ease-slow: cubic-bezier(.65,0,.35,1);
+  --ease-out:  cubic-bezier(.16,1,.3,1);
+  --dur-s: 320ms;
+  --dur-m: 560ms;
+  --dur-l: 760ms;
+
+  --font-display: 'Fraunces', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:            #1a1512;
+    --bg-alt:        #221b16;
+    --bg-deep:       #140f0c;
+    --ink:           #f1e7d6;
+    --ink-soft:      #cdbda5;
+    --ink-faint:     #9a8873;
+    --paper:         #211a15;
+    --gold:          #c9a06a;
+    --gold-strong:   #e0b884;
+    --gold-wash:     rgba(201,160,106,.16);
+    --line:          rgba(241,231,214,.16);
+    --line-strong:   rgba(241,231,214,.30);
+    --status-good:   #9db07a;
+    --status-warn:   #cf8b6c;
+    --status-neutral:#9a8873;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:            #1a1512;
+  --bg-alt:        #221b16;
+  --bg-deep:       #140f0c;
+  --ink:           #f1e7d6;
+  --ink-soft:      #cdbda5;
+  --ink-faint:     #9a8873;
+  --paper:         #211a15;
+  --gold:          #c9a06a;
+  --gold-strong:   #e0b884;
+  --gold-wash:     rgba(201,160,106,.16);
+  --line:          rgba(241,231,214,.16);
+  --line-strong:   rgba(241,231,214,.30);
+  --status-good:   #9db07a;
+  --status-warn:   #cf8b6c;
+  --status-neutral:#9a8873;
+  color-scheme: dark;
+}
+
+*,*::before,*::after{ box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--font-body);
+  font-size:16px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  transition:background var(--dur-l) var(--ease-slow), color var(--dur-l) var(--ease-slow);
+  overflow-x:hidden;
+}
+h1,h2,h3,h4{
+  font-family:var(--font-display);
+  font-weight:500;
+  margin:0;
+  text-wrap:balance;
+  letter-spacing:-.01em;
+}
+em{ font-style:italic; font-weight:400; color:var(--gold-strong); }
+p{ margin:0; }
+a{ color:inherit; text-decoration:none; }
+button{ font-family:inherit; background:none; border:none; color:inherit; cursor:pointer; }
+input,select,textarea{ font-family:inherit; font-size:1rem; color:inherit; background:none; }
+ul{ list-style:none; margin:0; padding:0; }
+img{ max-width:100%; display:block; }
+::selection{ background:var(--gold); color:var(--paper); }
+
+:focus-visible{ outline:2px solid var(--gold); outline-offset:3px; }
+
+.sr-only{
+  position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+  overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+}
+
+/* ---------- type & label helpers ---------- */
+.eyebrow{
+  font-family:var(--font-body);
+  font-size:.72rem;
+  font-weight:600;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--gold-strong);
+  font-variant-caps:all-small-caps;
+  margin:0 0 1.1em;
+}
+.hairline{ border:none; border-top:1px solid var(--line); margin:0; }
+.hairline-v{ border-left:1px solid var(--line); }
+
+.lede{
+  font-size:clamp(1.05rem,.95rem + .4vw,1.3rem);
+  color:var(--ink-soft);
+  max-width:44ch;
+  line-height:1.65;
+}
+
+.numeral{
+  font-family:var(--font-display);
+  font-style:italic;
+  font-weight:400;
+  color:var(--gold);
+  font-size:1.1em;
+}
+
+/* ---------- buttons ---------- */
+.btn{
+  display:inline-flex;
+  align-items:center;
+  gap:.6em;
+  font-family:var(--font-body);
+  font-size:.82rem;
+  font-weight:600;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  padding:1.05em 1.7em;
+  border:1px solid var(--ink);
+  color:var(--ink);
+  position:relative;
+  overflow:hidden;
+  transition:color var(--dur-m) var(--ease-slow), border-color var(--dur-m) var(--ease-slow);
+}
+.btn::before{
+  content:'';
+  position:absolute; inset:0;
+  background:var(--ink);
+  transform:translateY(101%);
+  transition:transform var(--dur-m) var(--ease-slow);
+  z-index:-1;
+}
+.btn:hover::before,.btn:focus-visible::before{ transform:translateY(0); }
+.btn:hover,.btn:focus-visible{ color:var(--bg); }
+.btn--gold{ border-color:var(--gold); color:var(--gold-strong); }
+.btn--gold::before{ background:var(--gold); }
+.btn--gold:hover,.btn--gold:focus-visible{ color:var(--paper); }
+.btn--ghost{ border-color:transparent; padding-left:0; padding-right:0; }
+.btn--ghost::before{ display:none; }
+.btn--ghost:hover,.btn--ghost:focus-visible{ color:var(--gold-strong); }
+.btn[disabled]{ opacity:.4; pointer-events:none; }
+
+.link-gold{
+  color:var(--ink);
+  border-bottom:1px solid var(--gold);
+  padding-bottom:.15em;
+  transition:color var(--dur-s) var(--ease-slow), border-color var(--dur-s) var(--ease-slow);
+}
+.link-gold:hover{ color:var(--gold-strong); border-color:var(--gold-strong); }
+
+/* ---------- plates (art surrogate for photography) ---------- */
+.plate{
+  position:relative;
+  overflow:hidden;
+  border:1px solid var(--line);
+  min-height:220px;
+  isolation:isolate;
+}
+.plate::after{
+  content:'';
+  position:absolute; inset:0;
+  filter:url(#techbiss-grain);
+  opacity:.5;
+  mix-blend-mode:overlay;
+  pointer-events:none;
+}
+.plate .plate-mark{
+  position:absolute; left:1.4rem; bottom:1.3rem;
+  font-family:var(--font-display); font-style:italic;
+  color:rgba(255,252,246,.85);
+  font-size:.95rem; letter-spacing:.02em;
+  z-index:2;
+  text-shadow:0 1px 8px rgba(0,0,0,.25);
+}
+.plate--sand{ background:
+  radial-gradient(120% 140% at 15% 15%, #d9b98a 0%, transparent 55%),
+  radial-gradient(100% 120% at 85% 80%, #8a5a3d 0%, transparent 60%),
+  linear-gradient(155deg,#e7c9a0,#a9724c 70%,#6b3f2c); }
+.plate--clay{ background:
+  radial-gradient(110% 130% at 80% 10%, #c98a63 0%, transparent 55%),
+  radial-gradient(100% 120% at 10% 90%, #5b3a2e 0%, transparent 60%),
+  linear-gradient(160deg,#eadfce,#b06b45 65%,#3f2a20); }
+.plate--olive{ background:
+  radial-gradient(120% 120% at 20% 80%, #97a06a 0%, transparent 55%),
+  radial-gradient(100% 100% at 90% 15%, #4b4a33 0%, transparent 60%),
+  linear-gradient(150deg,#dfd8b9,#7c8253 65%,#33341f); }
+.plate--dusk{ background:
+  radial-gradient(120% 130% at 75% 25%, #c79a72 0%, transparent 55%),
+  radial-gradient(110% 100% at 15% 85%, #372a3a 0%, transparent 60%),
+  linear-gradient(160deg,#e8d3ba,#7a5a63 65%,#2b2230); }
+.plate--brass{ background:
+  radial-gradient(120% 130% at 30% 20%, #e3c088 0%, transparent 55%),
+  radial-gradient(100% 110% at 85% 90%, #6d4425 0%, transparent 60%),
+  linear-gradient(150deg,#f1ddb8,#b6884f 65%,#4a3218); }
+.plate--stone{ background:
+  radial-gradient(120% 130% at 70% 75%, #b7ab93 0%, transparent 55%),
+  radial-gradient(100% 100% at 20% 15%, #4c463b 0%, transparent 60%),
+  linear-gradient(150deg,#ded4c0,#8f8571 65%,#332e24); }
+
+/* ---------- header ---------- */
+.site-header{
+  position:sticky; top:0; z-index:60;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:1.5rem clamp(1.25rem,4vw,3.5rem);
+  background:color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);
+}
+.wordmark{
+  font-family:var(--font-display);
+  font-size:1.35rem;
+  font-weight:500;
+  letter-spacing:.01em;
+}
+.wordmark em{ color:var(--ink); }
+.wordmark small{
+  display:block;
+  font-family:var(--font-body);
+  font-style:normal;
+  font-size:.6rem;
+  letter-spacing:.28em;
+  color:var(--gold-strong);
+  font-weight:600;
+  margin-top:.15em;
+}
+.header-right{ display:flex; align-items:center; gap:clamp(1rem,3vw,2rem); }
+.theme-switch{
+  display:inline-flex; align-items:center; gap:.6em;
+  font-size:.68rem; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-faint);
+}
+.theme-toggle{
+  --w:2.6rem; --h:1.35rem;
+  position:relative;
+  width:var(--w); height:var(--h);
+  border:1px solid var(--line-strong);
+  border-radius:999px;
+  padding:2px;
+}
+.theme-toggle .knob{
+  width:calc(var(--h) - 6px); height:calc(var(--h) - 6px);
+  border-radius:50%;
+  background:var(--gold);
+  transform:translateX(0);
+  transition:transform var(--dur-m) var(--ease-slow), background var(--dur-m) var(--ease-slow);
+}
+:root[data-theme="dark"] .theme-toggle .knob{ transform:translateX(calc(var(--w) - var(--h))); }
+.menu-trigger{
+  display:flex; align-items:center; gap:.7em;
+  font-size:.78rem; font-weight:600; letter-spacing:.12em; text-transform:uppercase;
+}
+.menu-trigger .bars{ display:flex; flex-direction:column; gap:4px; width:22px; }
+.menu-trigger .bars span{ height:1px; background:var(--ink); transition:transform var(--dur-m) var(--ease-slow), width var(--dur-m) var(--ease-slow); }
+.menu-trigger .bars span:last-child{ width:70%; align-self:flex-end; }
+.menu-trigger:hover .bars span{ width:100%; }
+
+/* ---------- full-screen menu overlay ---------- */
+.menu-overlay{
+  position:fixed; inset:0; z-index:200;
+  background:var(--ink);
+  color:var(--bg);
+  display:flex;
+  clip-path:inset(0 0 100% 0);
+  transition:clip-path var(--dur-l) var(--ease-slow);
+  pointer-events:none;
+}
+.menu-overlay.is-open{ clip-path:inset(0 0 0% 0); pointer-events:auto; }
+.menu-inner{
+  width:100%;
+  display:grid;
+  grid-template-columns:1.3fr 1fr;
+  padding:clamp(1.5rem,4vw,4rem);
+}
+.menu-close{
+  position:absolute; top:1.6rem; right:clamp(1.25rem,4vw,3.5rem);
+  color:var(--bg);
+  font-size:.78rem; font-weight:600; letter-spacing:.12em; text-transform:uppercase;
+  display:flex; align-items:center; gap:.6em;
+}
+.menu-links{ align-self:center; display:flex; flex-direction:column; gap:.15em; margin-top:2rem;}
+.menu-links a{
+  font-family:var(--font-display);
+  font-size:clamp(1.9rem,3.4vw + 1rem,4.2rem);
+  font-weight:400;
+  color:rgba(246,241,233,.55);
+  padding:.14em 0;
+  display:inline-block;
+  position:relative;
+  width:max-content;
+  transition:color var(--dur-m) var(--ease-out), transform var(--dur-m) var(--ease-out);
+}
+.menu-overlay.is-open .menu-links a{ opacity:1; }
+.menu-links a:hover,.menu-links a:focus-visible{ color:var(--bg); transform:translateX(.25em); }
+.menu-links a em{ color:var(--gold); }
+.menu-links a.is-current{ color:var(--gold); }
+.menu-aside{
+  align-self:center; justify-self:end; text-align:right;
+  max-width:26ch;
+  border-right:1px solid rgba(246,241,233,.2);
+  padding-right:2.2rem;
+}
+.menu-aside p{ color:rgba(246,241,233,.6); font-size:.92rem; line-height:1.7; margin-bottom:1.4rem; }
+.menu-aside .eyebrow{ color:var(--gold); }
+@media (max-width:860px){
+  .menu-inner{ grid-template-columns:1fr; }
+  .menu-aside{ display:none; }
+  .menu-links a{ font-size:clamp(1.6rem,7vw,2.6rem); }
+}
+
+/* ---------- curtain route transition ---------- */
+.curtain{
+  position:fixed; inset:0; z-index:500;
+  background:var(--ink);
+  transform:translateY(100%);
+  pointer-events:none;
+}
+.curtain.is-covering{ transition:transform var(--dur-m) var(--ease-slow); transform:translateY(0); }
+.curtain.is-leaving{ transition:transform var(--dur-m) var(--ease-slow); transform:translateY(-100%); }
+
+/* ---------- intro reveal ---------- */
+.intro{
+  position:fixed; inset:0; z-index:900;
+  background:var(--bg);
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.6rem;
+  cursor:pointer;
+}
+.intro-word{ display:flex; overflow:hidden; }
+.intro-word span{
+  display:inline-block;
+  font-family:var(--font-display);
+  font-size:clamp(2.2rem,7vw,4.5rem);
+  font-weight:500;
+  transform:translateY(115%);
+  animation:intro-in var(--dur-m) var(--ease-out) forwards;
+}
+.intro-sub{
+  font-size:.7rem; letter-spacing:.3em; text-transform:uppercase; color:var(--gold-strong);
+  opacity:0; animation:intro-fade var(--dur-m) var(--ease-out) forwards; animation-delay:.55s;
+}
+@keyframes intro-in{ to{ transform:translateY(0); } }
+@keyframes intro-fade{ to{ opacity:1; } }
+
+/* ---------- cursor ring ---------- */
+.cursor-ring{
+  position:fixed; top:0; left:0; z-index:999;
+  width:28px; height:28px; margin:-14px 0 0 -14px;
+  border:1px solid var(--gold);
+  border-radius:50%;
+  pointer-events:none;
+  transition:width var(--dur-s) var(--ease-out), height var(--dur-s) var(--ease-out),
+             margin var(--dur-s) var(--ease-out), border-color var(--dur-s) var(--ease-out),
+             background var(--dur-s) var(--ease-out), opacity var(--dur-s) var(--ease-out);
+  display:none;
+}
+:root.has-ring .cursor-ring{ display:block; }
+:root.has-ring, :root.has-ring a, :root.has-ring button, :root.has-ring .interactive{ cursor:none; }
+.cursor-ring.is-active{ width:56px; height:56px; margin:-28px 0 0 -28px; background:var(--gold-wash); }
+
+/* ---------- layout primitives ---------- */
+main{ display:block; }
+.section{ padding:clamp(4.5rem,9vw,8rem) clamp(1.25rem,4vw,3.5rem); position:relative; }
+.section--tight{ padding-top:clamp(2.5rem,5vw,4rem); padding-bottom:clamp(2.5rem,5vw,4rem); }
+.section--alt{ background:var(--bg-alt); }
+.section--deep{ background:var(--ink); color:var(--bg); }
+.section--deep .eyebrow{ color:var(--gold); }
+.section--deep .lede{ color:rgba(246,241,233,.7); }
+.section--deep .hairline{ border-color:rgba(246,241,233,.2); }
+.wrap{ max-width:1360px; margin:0 auto; }
+
+.split{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:clamp(2rem,5vw,5rem);
+  align-items:center;
+}
+.split--reverse .split-copy{ order:2; }
+.split--reverse .split-art{ order:1; }
+.split-art .plate{ aspect-ratio:4/5; width:100%; }
+@media (max-width:900px){
+  .split{ grid-template-columns:1fr; }
+  .split--reverse .split-copy,.split--reverse .split-art{ order:initial; }
+  .split-art .plate{ aspect-ratio:16/10; }
+}
+
+.hero{
+  display:grid;
+  grid-template-columns:1.1fr .9fr;
+  min-height:min(88vh,860px);
+  border-bottom:1px solid var(--line);
+}
+.hero-copy{
+  display:flex; flex-direction:column; justify-content:center;
+  padding:clamp(2.5rem,6vw,6rem);
+  gap:1.6rem;
+}
+.hero-copy h1{ font-size:clamp(2.6rem,3.2vw + 1.6rem,5.2rem); line-height:1.03; }
+.hero-actions{ display:flex; gap:1.6rem; align-items:center; flex-wrap:wrap; margin-top:.6rem; }
+.hero-art{ position:relative; border-left:1px solid var(--line); }
+.hero-art .plate{ position:absolute; inset:0; border:none; }
+.hero-art .plate-caption{
+  position:absolute; right:1.5rem; top:1.5rem; z-index:2;
+  color:rgba(255,252,246,.85); font-size:.72rem; letter-spacing:.16em; text-transform:uppercase;
+  writing-mode:vertical-rl;
+}
+@media (max-width:900px){
+  .hero{ grid-template-columns:1fr; min-height:auto; }
+  .hero-art{ border-left:none; border-top:1px solid var(--line); min-height:340px; }
+}
+
+.grid-asym{
+  display:grid;
+  grid-template-columns:repeat(12,1fr);
+  gap:clamp(1.25rem,2.5vw,2rem);
+}
+.g-span-7{ grid-column:span 7; }
+.g-span-5{ grid-column:span 5; }
+.g-span-4{ grid-column:span 4; }
+.g-span-8{ grid-column:span 8; }
+.g-span-6{ grid-column:span 6; }
+.g-span-12{ grid-column:span 12; }
+@media (max-width:900px){
+  .grid-asym [class*="g-span-"]{ grid-column:span 12; }
+}
+
+.stat-row{ display:flex; flex-wrap:wrap; gap:clamp(2rem,5vw,4.5rem); }
+.stat{ }
+.stat .num{ font-family:var(--font-display); font-style:italic; font-size:clamp(2.2rem,3vw + 1rem,3.6rem); color:var(--gold-strong); line-height:1; }
+.stat .cap{ margin-top:.5rem; font-size:.78rem; letter-spacing:.08em; color:var(--ink-faint); max-width:20ch; }
+
+.list-hairline > *{ padding:1.9rem 0; border-bottom:1px solid var(--line); }
+.list-hairline > *:first-child{ border-top:1px solid var(--line); }
+
+.quote{
+  font-family:var(--font-display); font-style:italic; font-weight:400;
+  font-size:clamp(1.4rem,2vw + 1rem,2.4rem); line-height:1.4; max-width:26ch;
+}
+.quote cite{ display:block; margin-top:1.4rem; font-family:var(--font-body); font-style:normal; font-size:.8rem; letter-spacing:.06em; color:var(--ink-faint); }
+
+/* ---------- footer ---------- */
+.site-footer{
+  padding:clamp(3rem,6vw,5rem) clamp(1.25rem,4vw,3.5rem) 2.5rem;
+  background:var(--ink); color:var(--bg);
+  display:grid; gap:clamp(2rem,5vw,3rem);
+}
+.site-footer a{ color:rgba(246,241,233,.72); }
+.site-footer a:hover{ color:var(--gold); }
+.footer-top{ display:grid; grid-template-columns:1.4fr repeat(3,1fr); gap:2.5rem; }
+.footer-top h4{ font-family:var(--font-body); font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; color:var(--gold); margin-bottom:1.1rem; font-weight:600; }
+.footer-top ul{ display:flex; flex-direction:column; gap:.7rem; font-size:.9rem; }
+.footer-bottom{ display:flex; justify-content:space-between; flex-wrap:wrap; gap:1rem; border-top:1px solid rgba(246,241,233,.16); padding-top:1.6rem; font-size:.76rem; color:rgba(246,241,233,.5); }
+@media (max-width:760px){ .footer-top{ grid-template-columns:1fr 1fr; } }
+
+/* ---------- page header block (non-home pages) ---------- */
+.page-head{ padding:clamp(3.5rem,7vw,6rem) clamp(1.25rem,4vw,3.5rem) clamp(2rem,4vw,3rem); border-bottom:1px solid var(--line); }
+.page-head h1{ font-size:clamp(2.2rem,3vw + 1.2rem,4rem); max-width:16ch; }
+.page-head .lede{ margin-top:1.4rem; }
+.page-head .meta-row{ display:flex; gap:2.5rem; margin-top:2.2rem; flex-wrap:wrap; }
+.page-head .meta-row div{ font-size:.75rem; letter-spacing:.08em; color:var(--ink-faint); }
+.page-head .meta-row strong{ display:block; font-family:var(--font-display); font-size:1.1rem; color:var(--ink); font-style:italic; }
+
+/* ---------- services / solutions rows ---------- */
+.offer-row{ padding:3.2rem 0; border-bottom:1px solid var(--line); display:grid; grid-template-columns:.6fr 2.4fr 1.6fr; gap:2rem; align-items:start; }
+.offer-row:first-child{ border-top:1px solid var(--line); }
+.offer-row .idx{ font-family:var(--font-display); font-style:italic; color:var(--gold); font-size:1.4rem; }
+.offer-row h3{ font-size:clamp(1.4rem,1.6vw + 1rem,2rem); margin-bottom:.7rem; }
+.offer-row .tags{ display:flex; gap:.6rem; flex-wrap:wrap; margin-top:1rem; }
+.offer-row .tag{ font-size:.68rem; letter-spacing:.08em; text-transform:uppercase; border:1px solid var(--line-strong); padding:.35em .8em; color:var(--ink-soft); }
+@media (max-width:820px){ .offer-row{ grid-template-columns:1fr; } }
+
+/* ---------- marketplace (collection pager) ---------- */
+.collection-frame{ display:grid; grid-template-columns:1fr 1.05fr; min-height:70vh; border-top:1px solid var(--line); }
+.collection-art{ position:relative; border-right:1px solid var(--line); }
+.collection-art .plate{ position:absolute; inset:0; border:none; }
+.collection-counter{
+  position:absolute; top:1.5rem; left:1.5rem; z-index:2;
+  color:rgba(255,252,246,.9); font-family:var(--font-display); font-style:italic; font-size:1rem;
+}
+.collection-copy{ padding:clamp(2rem,5vw,4.5rem); display:flex; flex-direction:column; justify-content:center; gap:1.4rem; position:relative; }
+.collection-copy .cat{ font-size:.72rem; letter-spacing:.16em; text-transform:uppercase; color:var(--gold-strong); }
+.collection-copy h2{ font-size:clamp(1.8rem,2.4vw + 1rem,3rem); }
+.collection-copy .price{ font-family:var(--font-display); font-style:italic; font-size:1.3rem; color:var(--ink-soft); }
+.collection-nav{ display:flex; align-items:center; justify-content:space-between; padding:1.6rem clamp(1.25rem,4vw,3.5rem); border-top:1px solid var(--line); }
+.collection-nav .arrows{ display:flex; gap:1rem; }
+.collection-nav button{ font-size:.78rem; letter-spacing:.1em; text-transform:uppercase; padding:.6em 1.1em; border:1px solid var(--line-strong); transition:border-color var(--dur-s) var(--ease-slow), color var(--dur-s) var(--ease-slow); }
+.collection-nav button:hover{ border-color:var(--gold); color:var(--gold-strong); }
+.collection-dots{ display:flex; gap:.5rem; }
+.collection-dots span{ width:6px; height:6px; border-radius:50%; background:var(--line-strong); }
+.collection-dots span.active{ background:var(--gold); }
+@media (max-width:900px){ .collection-frame{ grid-template-columns:1fr; } .collection-art{ border-right:none; border-bottom:1px solid var(--line); min-height:320px; } }
+
+/* ---------- product detail ---------- */
+.product-hero{ display:grid; grid-template-columns:1fr 1fr; border-bottom:1px solid var(--line); }
+.product-hero .plate{ border:none; border-right:1px solid var(--line); min-height:420px; }
+.product-hero-copy{ padding:clamp(2rem,5vw,4rem); display:flex; flex-direction:column; justify-content:center; gap:1.3rem; }
+.spec-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:1.6rem 2.5rem; }
+.spec-grid dt{ font-size:.68rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:.4rem; }
+.spec-grid dd{ margin:0; font-family:var(--font-display); font-size:1.15rem; }
+@media (max-width:900px){ .product-hero{ grid-template-columns:1fr; } .product-hero .plate{ border-right:none; border-bottom:1px solid var(--line); min-height:280px; } }
+
+.flow-steps{ display:flex; gap:0; padding:1.4rem clamp(1.25rem,4vw,3.5rem); border-bottom:1px solid var(--line); flex-wrap:wrap; }
+.flow-steps span{ font-size:.72rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-faint); padding-right:1.4rem; margin-right:1.4rem; border-right:1px solid var(--line); }
+.flow-steps span:last-child{ border-right:none; }
+.flow-steps span.current{ color:var(--gold-strong); }
+.flow-steps span.done::before{ content:'✓ '; color:var(--gold); }
+
+.customize-frame{ display:grid; grid-template-columns:1.6fr 1fr; }
+.customize-main{ padding:clamp(2rem,5vw,3.5rem); }
+.customize-side{ padding:clamp(2rem,5vw,3.5rem); border-left:1px solid var(--line); background:var(--bg-alt); }
+.tier-option{ display:flex; justify-content:space-between; gap:1.5rem; align-items:flex-start; padding:1.6rem 0; border-bottom:1px solid var(--line); cursor:pointer; }
+.tier-option:first-child{ border-top:1px solid var(--line); }
+.tier-option input{ margin-top:.4rem; accent-color:var(--gold); }
+.tier-option .t-name{ font-family:var(--font-display); font-size:1.25rem; }
+.tier-option .t-desc{ color:var(--ink-soft); font-size:.92rem; margin-top:.4rem; max-width:44ch; }
+.tier-option .t-price{ font-family:var(--font-display); font-style:italic; white-space:nowrap; }
+.addon-row{ display:flex; justify-content:space-between; padding:1rem 0; border-bottom:1px solid var(--line); font-size:.92rem; }
+.addon-row label{ display:flex; gap:.7em; align-items:center; }
+.addon-row input{ accent-color:var(--gold); }
+.summary-line{ display:flex; justify-content:space-between; padding:.9rem 0; border-bottom:1px solid var(--line); font-size:.9rem; }
+.summary-total{ display:flex; justify-content:space-between; padding-top:1.4rem; font-family:var(--font-display); font-size:1.4rem; }
+@media (max-width:900px){ .customize-frame{ grid-template-columns:1fr; } .customize-side{ border-left:none; border-top:1px solid var(--line); } }
+
+.confirm-panel{ max-width:640px; margin:0 auto; text-align:center; padding:clamp(3rem,8vw,6rem) 1.25rem; display:flex; flex-direction:column; align-items:center; gap:1.6rem; }
+.seal{ width:74px; height:74px; border:1px solid var(--gold); border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-style:italic; font-size:1.6rem; color:var(--gold-strong); }
+
+.deploy-stage-list{ max-width:640px; margin:0 auto; display:flex; flex-direction:column; }
+.deploy-stage{ display:flex; gap:1.4rem; padding:1.5rem 0; border-bottom:1px solid var(--line); opacity:.35; transition:opacity var(--dur-l) var(--ease-slow); }
+.deploy-stage.is-active{ opacity:1; }
+.deploy-stage.is-done{ opacity:.75; }
+.deploy-stage .mark{ width:26px; height:26px; border:1px solid var(--gold); border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center; font-size:.7rem; color:var(--gold-strong); }
+.deploy-stage.is-done .mark{ background:var(--gold); color:var(--paper); }
+.deploy-stage .txt strong{ font-family:var(--font-display); font-weight:500; }
+.deploy-stage .txt p{ color:var(--ink-soft); font-size:.9rem; margin-top:.3rem; }
+
+/* ---------- work / case study rail ---------- */
+.rail-wrap{ padding:0 0 clamp(3rem,6vw,5rem); }
+.rail{
+  display:flex; gap:1px; overflow-x:auto; scroll-snap-type:x proximity;
+  cursor:grab; user-select:none; -webkit-user-select:none;
+  background:var(--line);
+  scrollbar-width:none;
+}
+.rail::-webkit-scrollbar{ display:none; }
+.rail.is-dragging{ cursor:grabbing; scroll-snap-type:none; }
+.rail-card{
+  flex:0 0 clamp(280px,72vw,460px);
+  scroll-snap-align:start;
+  background:var(--bg);
+  padding:clamp(1.6rem,3vw,2.4rem);
+  display:flex; flex-direction:column; gap:1.1rem;
+}
+.rail-card .plate{ aspect-ratio:4/3; }
+.rail-card .cs-client{ font-family:var(--font-display); font-size:1.3rem; }
+.rail-card .cs-industry{ font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; color:var(--gold-strong); }
+.rail-card .cs-result{ font-size:.9rem; color:var(--ink-soft); }
+.rail-hint{ padding:0 clamp(1.25rem,4vw,3.5rem); font-size:.76rem; color:var(--ink-faint); letter-spacing:.04em; }
+
+/* ---------- process ---------- */
+.process-list{ display:flex; flex-direction:column; }
+.process-item{ display:grid; grid-template-columns:.5fr 2fr 2.5fr; gap:2rem; padding:clamp(2rem,4vw,3.2rem) 0; border-bottom:1px solid var(--line); align-items:start; }
+.process-item:first-child{ border-top:1px solid var(--line); }
+.process-item .idx{ font-family:var(--font-display); font-style:italic; font-size:2.4rem; color:var(--gold); line-height:1; }
+.process-item h3{ font-size:clamp(1.3rem,1.4vw + 1rem,1.9rem); }
+.process-item p{ color:var(--ink-soft); max-width:52ch; }
+@media (max-width:820px){ .process-item{ grid-template-columns:1fr; gap:.8rem; } }
+
+/* ---------- resources (journal) ---------- */
+.journal-item{ display:grid; grid-template-columns:.5fr 1.6fr 3.5fr .8fr; gap:1.5rem; padding:1.8rem 0; border-bottom:1px solid var(--line); align-items:baseline; }
+.journal-item:first-child{ border-top:1px solid var(--line); }
+.journal-item .cat{ font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; color:var(--gold-strong); }
+.journal-item h4{ font-size:1.15rem; font-weight:500; }
+.journal-item .desc{ font-size:.88rem; color:var(--ink-soft); }
+.journal-item .meta{ font-size:.75rem; color:var(--ink-faint); text-align:right; }
+@media (max-width:760px){ .journal-item{ grid-template-columns:1fr; gap:.4rem; } .journal-item .meta{ text-align:left; } }
+
+/* ---------- pricing ---------- */
+.pricing-list{ display:flex; flex-direction:column; }
+.pricing-row{ display:grid; grid-template-columns:1.4fr 2.4fr 1fr .9fr; gap:1.6rem; align-items:center; padding:2.2rem 0; border-bottom:1px solid var(--line); }
+.pricing-row:first-child{ border-top:1px solid var(--line); }
+.pricing-row h3{ font-size:1.5rem; }
+.pricing-row .from{ font-size:.7rem; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-faint); }
+.pricing-row .amt{ font-family:var(--font-display); font-style:italic; font-size:1.5rem; color:var(--gold-strong); }
+.pricing-row ul{ font-size:.85rem; color:var(--ink-soft); display:flex; flex-direction:column; gap:.4rem; }
+@media (max-width:900px){ .pricing-row{ grid-template-columns:1fr; } }
+
+/* ---------- contact / login forms ---------- */
+.field{ display:flex; flex-direction:column; gap:.5rem; margin-bottom:1.7rem; }
+.field label{ font-size:.72rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-faint); }
+.field input,.field select,.field textarea{
+  border:none; border-bottom:1px solid var(--line-strong);
+  padding:.7em 0; background:transparent; color:var(--ink);
+  transition:border-color var(--dur-s) var(--ease-slow);
+}
+.field input:focus,.field select:focus,.field textarea:focus{ border-color:var(--gold); outline:none; }
+.field textarea{ resize:vertical; min-height:100px; font-family:inherit; }
+.form-note{ font-size:.82rem; color:var(--ink-faint); margin-top:1.4rem; }
+.login-frame{ display:grid; grid-template-columns:1fr 1fr; min-height:78vh; }
+.login-panel{ display:flex; flex-direction:column; justify-content:center; padding:clamp(2rem,6vw,5rem); max-width:460px; }
+.login-art{ position:relative; border-left:1px solid var(--line); }
+.login-art .plate{ position:absolute; inset:0; border:none; }
+@media (max-width:900px){ .login-frame{ grid-template-columns:1fr; } .login-art{ display:none; } .login-panel{ max-width:none; } }
+
+/* ---------- installer (bespoke fitting) ---------- */
+.fitting-frame{ max-width:760px; margin:0 auto; padding:clamp(2rem,5vw,3.5rem) clamp(1.25rem,4vw,3.5rem); }
+.fitting-dots{ display:flex; justify-content:center; gap:1.1rem; margin-bottom:clamp(2.5rem,6vw,4rem); }
+.fitting-dots .dot{ display:flex; flex-direction:column; align-items:center; gap:.5rem; font-size:.62rem; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-faint); }
+.fitting-dots .dot i{ width:9px; height:9px; border-radius:50%; border:1px solid var(--line-strong); display:block; transition:background var(--dur-m) var(--ease-slow), border-color var(--dur-m) var(--ease-slow), transform var(--dur-m) var(--ease-slow); }
+.fitting-dots .dot.active i{ background:var(--gold); border-color:var(--gold); transform:scale(1.3); }
+.fitting-dots .dot.done i{ background:var(--gold); border-color:var(--gold); }
+.fitting-dots .dot.active{ color:var(--gold-strong); }
+.fitting-step{ animation:step-in var(--dur-m) var(--ease-out); }
+@keyframes step-in{ from{ opacity:0; transform:translateY(10px); } to{ opacity:1; transform:translateY(0); } }
+.fitting-step h2{ font-size:clamp(1.7rem,2.2vw + 1rem,2.6rem); margin-bottom:.6rem; }
+.fitting-step .lede{ max-width:60ch; margin-bottom:2.2rem; }
+.choice-list label{ display:flex; align-items:flex-start; gap:1em; padding:1.3rem 0; border-bottom:1px solid var(--line); cursor:pointer; }
+.choice-list label:first-of-type{ border-top:1px solid var(--line); }
+.choice-list input{ margin-top:.3rem; accent-color:var(--gold); }
+.choice-list .c-name{ font-family:var(--font-display); font-size:1.1rem; }
+.choice-list .c-desc{ font-size:.86rem; color:var(--ink-soft); margin-top:.25rem; }
+.scan-list{ display:flex; flex-direction:column; gap:1rem; margin:1.5rem 0 2rem; }
+.scan-row{ display:flex; justify-content:space-between; padding:.9rem 0; border-bottom:1px solid var(--line); opacity:0; animation:step-in var(--dur-m) var(--ease-out) forwards; }
+.scan-row .val{ color:var(--gold-strong); font-family:var(--font-display); font-style:italic; }
+.fitting-actions{ display:flex; justify-content:space-between; margin-top:2.5rem; align-items:center; }
+.progress-line{ height:1px; background:var(--line); position:relative; margin:1.6rem 0 2.2rem; }
+.progress-line i{ position:absolute; left:0; top:-1px; height:3px; background:var(--gold); transition:width var(--dur-l) var(--ease-slow); }
+
+/* ---------- dashboard preview ---------- */
+.dash{ display:grid; grid-template-columns:220px 1fr; min-height:80vh; }
+.dash-nav{ border-right:1px solid var(--line); background:var(--bg-alt); padding:2rem 1.4rem; display:flex; flex-direction:column; gap:.3rem; }
+.dash-nav .brand{ font-family:var(--font-display); font-style:italic; font-size:1.05rem; margin-bottom:2rem; padding:0 .6rem; }
+.dash-nav a{ padding:.7em .6em; font-size:.86rem; border-left:2px solid transparent; color:var(--ink-soft); }
+.dash-nav a.active{ color:var(--ink); border-left-color:var(--gold); background:var(--gold-wash); }
+.dash-main{ padding:clamp(1.6rem,3vw,2.8rem); }
+.dash-header{ display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:2.2rem; flex-wrap:wrap; gap:1rem; }
+.dash-header h1{ font-size:clamp(1.6rem,2vw + 1rem,2.2rem); }
+.dash-stats{ display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--line); border:1px solid var(--line); margin-bottom:2.4rem; }
+.dash-stat{ background:var(--bg); padding:1.5rem; }
+.dash-stat .cap{ font-size:.68rem; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-faint); }
+.dash-stat .val{ font-family:var(--font-display); font-style:italic; font-size:1.9rem; margin-top:.5rem; }
+.dash-table{ width:100%; border-collapse:collapse; font-size:.88rem; }
+.dash-table th{ text-align:left; font-size:.68rem; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-faint); padding-bottom:.8rem; border-bottom:1px solid var(--line-strong); font-weight:600; }
+.dash-table td{ padding:1rem 0; border-bottom:1px solid var(--line); }
+.chip{ font-size:.7rem; letter-spacing:.04em; padding:.3em .8em; border-radius:999px; display:inline-flex; align-items:center; gap:.4em; }
+.chip::before{ content:''; width:6px; height:6px; border-radius:50%; background:currentColor; }
+.chip--good{ color:var(--status-good); background:color-mix(in srgb, var(--status-good) 16%, transparent); }
+.chip--warn{ color:var(--status-warn); background:color-mix(in srgb, var(--status-warn) 16%, transparent); }
+.chip--neutral{ color:var(--status-neutral); background:color-mix(in srgb, var(--status-neutral) 16%, transparent); }
+.dash-grid-2{ display:grid; grid-template-columns:1.6fr 1fr; gap:2rem; margin-top:2.4rem; align-items:start; }
+.activity-item{ display:flex; gap:1rem; padding:1rem 0; border-bottom:1px solid var(--line); font-size:.86rem; }
+.activity-item time{ color:var(--ink-faint); font-size:.75rem; white-space:nowrap; }
+@media (max-width:900px){ .dash{ grid-template-columns:1fr; } .dash-nav{ display:flex; flex-direction:row; overflow-x:auto; border-right:none; border-bottom:1px solid var(--line); } .dash-stats{ grid-template-columns:repeat(2,1fr); } .dash-grid-2{ grid-template-columns:1fr; } }
+
+/* ---------- about ---------- */
+.value-row{ display:grid; grid-template-columns:1fr 3fr; gap:1.5rem; padding:2rem 0; border-bottom:1px solid var(--line); }
+.value-row:first-child{ border-top:1px solid var(--line); }
+.value-row h4{ font-size:1.1rem; }
+@media (max-width:700px){ .value-row{ grid-template-columns:1fr; } }
+
+/* ---------- misc small screens ---------- */
+@media (max-width:600px){
+  .offer-row{ padding:2.4rem 0; }
+  .journal-item, .process-item{ padding:1.4rem 0; }
+  .site-header{ padding:1.1rem 1.1rem; }
+}
+
+/* ---------- reduced motion ---------- */
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; scroll-behavior:auto !important; }
+  .cursor-ring{ display:none !important; }
+  html{ scroll-behavior:auto; }
+}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <filter id="techbiss-grain">
+    <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch" result="n"/>
+    <feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.06 0"/>
+  </filter>
+</svg>
+
+<div class="cursor-ring" id="cursorRing" aria-hidden="true"></div>
+<div class="curtain" id="curtain" aria-hidden="true"></div>
+
+<div class="intro" id="intro" role="presentation">
+  <div class="intro-word" aria-hidden="true">
+    <span style="animation-delay:.02s">T</span><span style="animation-delay:.06s">E</span><span style="animation-delay:.10s">C</span><span style="animation-delay:.14s">H</span><span style="animation-delay:.18s">B</span><span style="animation-delay:.22s">I</span><span style="animation-delay:.26s">S</span><span style="animation-delay:.30s">S</span>
+  </div>
+  <p class="intro-sub">The Atelier</p>
+  <span class="sr-only">TECHBISS Atelier — press any key to continue</span>
+</div>
+
+<header class="site-header">
+  <a href="#/" class="wordmark interactive">TECHBISS<small>The Atelier</small></a>
+  <div class="header-right">
+    <div class="theme-switch">
+      <span id="themeLabel">Bone</span>
+      <button class="theme-toggle interactive" id="themeToggle" role="switch" aria-checked="false" aria-label="Toggle dark theme">
+        <span class="knob"></span>
+      </button>
+    </div>
+    <button class="menu-trigger interactive" id="menuTrigger" aria-haspopup="true" aria-expanded="false" aria-controls="menuOverlay">
+      <span class="bars"><span></span><span></span><span></span></span>
+      Menu
+    </button>
+  </div>
+</header>
+
+<nav class="menu-overlay" id="menuOverlay" aria-label="Primary">
+  <button class="menu-close interactive" id="menuClose" aria-label="Close menu">Close <span aria-hidden="true">&times;</span></button>
+  <div class="menu-inner">
+    <ul class="menu-links" id="menuLinks">
+      <li><a href="#/" data-route="/">Home</a></li>
+      <li><a href="#/services" data-route="/services">Serv<em>i</em>ces</a></li>
+      <li><a href="#/solutions" data-route="/solutions">Sol<em>u</em>tions</a></li>
+      <li><a href="#/marketplace" data-route="/marketplace">Marketpl<em>a</em>ce</a></li>
+      <li><a href="#/work" data-route="/work">W<em>o</em>rk</a></li>
+      <li><a href="#/process" data-route="/process">Pr<em>o</em>cess</a></li>
+      <li><a href="#/about" data-route="/about">Ab<em>o</em>ut</a></li>
+      <li><a href="#/resources" data-route="/resources">Reso<em>u</em>rces</a></li>
+      <li><a href="#/pricing" data-route="/pricing">Pr<em>i</em>cing</a></li>
+      <li><a href="#/contact" data-route="/contact">Cont<em>a</em>ct</a></li>
+      <li><a href="#/installer" data-route="/installer">Inst<em>a</em>ller</a></li>
+      <li><a href="#/dashboard" data-route="/dashboard">Dashb<em>o</em>ard</a></li>
+      <li><a href="#/login" data-route="/login">L<em>o</em>gin</a></li>
+    </ul>
+    <div class="menu-aside">
+      <p class="eyebrow">Concierge Line</p>
+      <p>+1 (415) 555-0148<br>atelier@techbiss.com</p>
+      <p class="eyebrow">Studio</p>
+      <p>Pier 9, Embarcadero<br>San Francisco, CA</p>
+    </div>
+  </div>
+</nav>
+
+<main id="app" tabindex="-1"></main>
+
+<footer class="site-footer">
+  <div class="footer-top wrap" style="width:100%;max-width:1360px;margin:0 auto;">
+    <div>
+      <p class="wordmark" style="color:var(--bg)">TECHBISS<small style="color:var(--gold)">The Atelier</small></p>
+      <p style="margin-top:1.4rem;color:rgba(246,241,233,.6);max-width:34ch;font-size:.92rem;line-height:1.6;">
+        A digital-transformation house building custom software, cloud &amp; AI systems, and the tooling to carry organizations between them — with the care of a private atelier.
+      </p>
+    </div>
+    <div>
+      <h4>Studio</h4>
+      <ul>
+        <li><a href="#/services">Services</a></li>
+        <li><a href="#/solutions">Solutions</a></li>
+        <li><a href="#/work">Work</a></li>
+        <li><a href="#/process">Process</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Collection</h4>
+      <ul>
+        <li><a href="#/marketplace">Marketplace</a></li>
+        <li><a href="#/installer">Installer</a></li>
+        <li><a href="#/pricing">Pricing</a></li>
+        <li><a href="#/dashboard">Dashboard</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Correspondence</h4>
+      <ul>
+        <li><a href="#/about">About</a></li>
+        <li><a href="#/resources">Journal</a></li>
+        <li><a href="#/contact">Contact</a></li>
+        <li><a href="#/login">Client Login</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom wrap" style="width:100%;max-width:1360px;margin:0 auto;">
+    <span>&copy; 2026 TECHBISS Atelier. A concept direction — Phase 1.</span>
+    <span>Ivory &amp; Espresso, Brass No. 4</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+"use strict";
+
+var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+var finePointer = window.matchMedia('(pointer: fine)').matches;
+
+/* ============================================================
+   THEME
+   ============================================================ */
+var root = document.documentElement;
+var themeToggle = document.getElementById('themeToggle');
+var themeLabel = document.getElementById('themeLabel');
+function applyTheme(t){
+  if(t){ root.setAttribute('data-theme', t); } else { root.removeAttribute('data-theme'); }
+  var isDark = t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  themeToggle.setAttribute('aria-checked', String(isDark));
+  themeLabel.textContent = isDark ? 'Espresso' : 'Bone';
+}
+var savedTheme = null;
+try{ savedTheme = localStorage.getItem('techbiss-atelier-theme'); }catch(e){}
+applyTheme(savedTheme);
+themeToggle.addEventListener('click', function(){
+  var current = root.getAttribute('data-theme') === 'dark' || (!root.getAttribute('data-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  var next = current ? 'light' : 'dark';
+  applyTheme(next);
+  try{ localStorage.setItem('techbiss-atelier-theme', next); }catch(e){}
+});
+
+/* ============================================================
+   INTRO REVEAL — once per tab session
+   ============================================================ */
+(function(){
+  var intro = document.getElementById('intro');
+  var seen = false;
+  try{ seen = sessionStorage.getItem('techbiss-atelier-intro') === '1'; }catch(e){}
+  if(seen){ intro.remove(); return; }
+  function dismiss(){
+    if(!intro.parentNode) return;
+    intro.style.transition = reduceMotion ? 'none' : 'opacity ' + '480ms cubic-bezier(.65,0,.35,1)';
+    intro.style.opacity = '0';
+    setTimeout(function(){ intro.remove(); }, reduceMotion ? 0 : 480);
+    try{ sessionStorage.setItem('techbiss-atelier-intro','1'); }catch(e){}
+    document.removeEventListener('keydown', dismiss);
+  }
+  intro.addEventListener('click', dismiss);
+  document.addEventListener('keydown', dismiss);
+  setTimeout(dismiss, reduceMotion ? 50 : 1450);
+})();
+
+/* ============================================================
+   CUSTOM CURSOR
+   ============================================================ */
+if(finePointer && !reduceMotion){
+  root.classList.add('has-ring');
+  var ring = document.getElementById('cursorRing');
+  var rx = 0, ry = 0, tx = 0, ty = 0;
+  window.addEventListener('mousemove', function(e){ tx = e.clientX; ty = e.clientY; });
+  (function loop(){
+    rx += (tx - rx) * .18; ry += (ty - ry) * .18;
+    ring.style.transform = 'translate(' + rx + 'px,' + ry + 'px)';
+    requestAnimationFrame(loop);
+  })();
+  document.addEventListener('mouseover', function(e){
+    if(e.target.closest('a,button,input,select,.interactive,.plate,label')){ ring.classList.add('is-active'); }
+  });
+  document.addEventListener('mouseout', function(e){
+    if(e.target.closest('a,button,input,select,.interactive,.plate,label')){ ring.classList.remove('is-active'); }
+  });
+}
+
+/* ============================================================
+   MENU OVERLAY
+   ============================================================ */
+var menuTrigger = document.getElementById('menuTrigger');
+var menuOverlay = document.getElementById('menuOverlay');
+var menuClose = document.getElementById('menuClose');
+function openMenu(){
+  menuOverlay.classList.add('is-open');
+  menuTrigger.setAttribute('aria-expanded','true');
+  menuClose.focus();
+  markCurrentMenuLink();
+}
+function closeMenu(){
+  menuOverlay.classList.remove('is-open');
+  menuTrigger.setAttribute('aria-expanded','false');
+}
+menuTrigger.addEventListener('click', openMenu);
+menuClose.addEventListener('click', closeMenu);
+document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeMenu(); });
+menuOverlay.querySelectorAll('a').forEach(function(a){
+  a.addEventListener('click', closeMenu);
+});
+function markCurrentMenuLink(){
+  var path = currentBasePath();
+  menuOverlay.querySelectorAll('a').forEach(function(a){
+    a.classList.toggle('is-current', a.dataset.route === path);
+  });
+}
+
+/* ============================================================
+   ROUTER + CURTAIN TRANSITION
+   ============================================================ */
+var app = document.getElementById('app');
+var curtain = document.getElementById('curtain');
+var isTransitioning = false;
+
+function currentBasePath(){
+  var h = location.hash.replace(/^#/, '') || '/';
+  var parts = h.split('/').filter(Boolean);
+  return '/' + (parts[0] || '');
+}
+
+function afterRender(route){
+  window.scrollTo(0,0);
+  if(route.after) route.after();
+  markCurrentMenuLink();
+}
+
+function navigate(){
+  var raw = location.hash.replace(/^#/, '') || '/';
+  var route = resolveRoute(raw);
+  render(route);
+}
+
+function render(route){
+  if(isTransitioning || !curtain){ app.innerHTML = route.html; afterRender(route); return; }
+  if(reduceMotion){ app.innerHTML = route.html; afterRender(route); return; }
+  isTransitioning = true;
+  curtain.classList.add('is-covering');
+  setTimeout(function(){
+    app.innerHTML = route.html;
+    afterRender(route);
+    curtain.classList.remove('is-covering');
+    curtain.classList.add('is-leaving');
+    setTimeout(function(){
+      curtain.style.transition = 'none';
+      curtain.classList.remove('is-leaving');
+      curtain.getBoundingClientRect();
+      curtain.style.transition = '';
+      isTransitioning = false;
+    }, 560);
+  }, 560);
+}
+
+window.addEventListener('hashchange', navigate);
+
+/* ============================================================
+   SHARED UI HELPERS
+   ============================================================ */
+function plate(variant, caption){
+  return '<div class="plate plate--' + variant + '">' + (caption ? '<span class="plate-mark">' + caption + '</span>' : '') + '</div>';
+}
+function money(n){ return '$' + n.toLocaleString('en-US'); }
+
+/* ============================================================
+   DATA
+   ============================================================ */
+var PRODUCTS = [
+  { id:'cloud-suite', cat:'Cloud & Infrastructure', name:'Atelier Cloud Suite', tagline:'Multi-cloud orchestration, worn lightly.', variant:'sand',
+    desc:'A managed control plane that unifies AWS, Azure and GCP under one calm interface — provisioning, cost governance and failover handled with the same discretion as a private office.',
+    specs:[['Regions','38 worldwide'],['Uptime SLA','99.98%'],['Provisioning','Infrastructure as code'],['Support','24/7 concierge']],
+    tiers:[
+      {name:'Essential', price:1800, desc:'Single-cloud management for one production environment.'},
+      {name:'Signature', price:4200, desc:'Multi-cloud orchestration with automated cost governance.'},
+      {name:'Bespoke', price:9500, desc:'Dedicated architecture team and custom compliance tooling.'}
+    ],
+    addons:[['Dedicated Solutions Architect',900],['24/7 Concierge Response (15 min SLA)',650],['Disaster Recovery Rehearsal Program',480]]
+  },
+  { id:'vantage', cat:'AI Solutions', name:'Vantage Analytics', tagline:'Foresight, quietly delivered.', variant:'olive',
+    desc:'Predictive operations intelligence trained on your own historical patterns — forecasting demand, flagging anomalies, and briefing your leadership each morning in plain language.',
+    specs:[['Model refresh','Nightly'],['Data sources','Unlimited connectors'],['Delivery','Dashboard + digest'],['Onboarding','3 weeks']],
+    tiers:[
+      {name:'Essential', price:2200, desc:'One forecasting model, weekly briefings.'},
+      {name:'Signature', price:5100, desc:'Multi-model suite with daily briefings and alerting.'},
+      {name:'Bespoke', price:11800, desc:'Custom model development with an embedded data scientist.'}
+    ],
+    addons:[['Embedded Data Scientist (10 hrs/mo)',1200],['Executive Briefing Design',400],['Historical Data Migration',900]]
+  },
+  { id:'migration-concierge', cat:'Tooling', name:'Migration Concierge', tagline:'The move, made unremarkable.', variant:'clay',
+    desc:'Our own installer engine, licensed white-label — detect, tailor, transfer and verify a full platform migration with the guided calm we use on our own engagements.',
+    specs:[['Systems supported','120+ integrations'],['Typical timeline','2–6 weeks'],['Rollback','One click'],['Data integrity checks','Automated']],
+    tiers:[
+      {name:'Essential', price:2600, desc:'Single-system migration with guided verification.'},
+      {name:'Signature', price:6400, desc:'Multi-system migration with parallel-run support.'},
+      {name:'Bespoke', price:14200, desc:'Full legacy estate transfer with dedicated migration lead.'}
+    ],
+    addons:[['Parallel-Run Assurance (30 days)',1100],['Legacy System Archival',500],['Staff Training Sessions (×4)',700]]
+  },
+  { id:'studio-crm', cat:'Custom Software', name:'Studio CRM', tagline:'Relationships, kept in order.', variant:'dusk',
+    desc:'A bespoke client-relationship suite built around your own workflow rather than the reverse — pipelines, correspondence and billing held in one unhurried view.',
+    specs:[['Seats','Unlimited'],['Custom fields','Unlimited'],['Integrations','Open API'],['Deployment','Cloud or private']],
+    tiers:[
+      {name:'Essential', price:1400, desc:'Core CRM for a single team, standard fields.'},
+      {name:'Signature', price:3600, desc:'Multi-team CRM with workflow automation.'},
+      {name:'Bespoke', price:8900, desc:'Fully custom build with proprietary modules.'}
+    ],
+    addons:[['Workflow Automation Design',650],['Data Import & Cleansing',450],['Private Cloud Hosting',1500]]
+  },
+  { id:'threadwork', cat:'Marketplace & Commerce', name:'Threadwork Commerce', tagline:'A storefront, tailored to fit.', variant:'brass',
+    desc:'A composable commerce kit for organizations that outgrew off-the-shelf storefronts — checkout, inventory and loyalty assembled from modules cut to your exact measure.',
+    specs:[['Channels','Web, in-store, wholesale'],['Payment rails','14 supported'],['Catalog size','Unlimited'],['Launch time','4–8 weeks']],
+    tiers:[
+      {name:'Essential', price:1900, desc:'Single-channel storefront with standard checkout.'},
+      {name:'Signature', price:4600, desc:'Omnichannel commerce with loyalty and wholesale.'},
+      {name:'Bespoke', price:10600, desc:'Fully custom commerce architecture at scale.'}
+    ],
+    addons:[['Loyalty Program Design',700],['Wholesale Portal',900],['Custom Checkout Theming',350]]
+  },
+  { id:'custodian-ops', cat:'Dashboards & Operations', name:'Custodian Ops', tagline:'A single view of everything running.', variant:'stone',
+    desc:'The staff-facing operations console behind our own delivery teams — tickets, deployments and system health gathered into one composed, glanceable screen.',
+    specs:[['Roles','Admin, staff, viewer'],['Alerting','Real-time'],['Audit log','Full history'],['Deployment tracking','Automated']],
+    tiers:[
+      {name:'Essential', price:1200, desc:'Core ops console for a single product line.'},
+      {name:'Signature', price:2900, desc:'Multi-product console with automated alerting.'},
+      {name:'Bespoke', price:7400, desc:'Enterprise console with custom role architecture.'}
+    ],
+    addons:[['Custom Alert Routing',400],['SOC 2 Reporting Pack',850],['White-Label Branding',600]]
+  },
+  { id:'passage-id', cat:'Security & Identity', name:'Passage Identity', tagline:'Access, granted with certainty.', variant:'sand',
+    desc:'A federated identity and access fabric spanning every system in your estate — single sign-on, adaptive risk checks, and access reviews that write themselves.',
+    specs:[['Protocols','SAML, OIDC, SCIM'],['MFA','Adaptive, phishing-resistant'],['Provisioning','Automated lifecycle'],['Audit-ready','Continuous']],
+    tiers:[
+      {name:'Essential', price:1600, desc:'SSO and MFA across core applications.'},
+      {name:'Signature', price:3800, desc:'Full lifecycle management with adaptive risk scoring.'},
+      {name:'Bespoke', price:9100, desc:'Custom identity fabric across legacy and modern systems.'}
+    ],
+    addons:[['Access Review Automation',550],['Legacy Directory Bridge',900],['Continuous Compliance Reporting',700]]
+  },
+  { id:'loom-fabric', cat:'Integration', name:'Loom Integration Fabric', tagline:'Every system, on speaking terms.', variant:'olive',
+    desc:'An API and event mesh that lets decades-old systems converse fluently with the newest — built to disappear into the background once the stitching is done.',
+    specs:[['Connectors','200+ prebuilt'],['Latency','Sub-100ms routing'],['Event replay','90-day window'],['Monitoring','Included']],
+    tiers:[
+      {name:'Essential', price:1700, desc:'Point-to-point integration for core systems.'},
+      {name:'Signature', price:4100, desc:'Full event mesh with replay and monitoring.'},
+      {name:'Bespoke', price:9800, desc:'Custom connector development for proprietary systems.'}
+    ],
+    addons:[['Custom Connector Build',1000],['Event Replay Extension (1yr)',400],['Dedicated Integration Engineer',1300]]
+  },
+  { id:'atrium-desk', cat:'Client Success', name:'Atrium Support Desk', tagline:'Support, in a house style.', variant:'clay',
+    desc:'A concierge-grade support platform — tickets, knowledge and live chat gathered under one warm, unhurried surface that still reports every metric that matters.',
+    specs:[['Channels','Email, chat, phone'],['Response SLA','Configurable'],['Knowledge base','Included'],['CSAT tracking','Automated']],
+    tiers:[
+      {name:'Essential', price:900, desc:'Ticketing and knowledge base for one team.'},
+      {name:'Signature', price:2300, desc:'Omnichannel desk with SLA automation.'},
+      {name:'Bespoke', price:5600, desc:'White-labeled desk with custom reporting suite.'}
+    ],
+    addons:[['Live Chat Module',350],['CSAT & NPS Reporting',300],['White-Label Branding',450]]
+  },
+  { id:'ledger-ai', cat:'AI Solutions', name:'Ledger & Ledger AI', tagline:'A second set of eyes on every figure.', variant:'brass',
+    desc:'A financial-intelligence copilot that reconciles, forecasts and flags anomalies across your ledgers — trained to explain its reasoning as plainly as a trusted controller.',
+    specs:[['Ledger sources','Unlimited'],['Anomaly detection','Real-time'],['Explainability','Full reasoning trail'],['Compliance','SOC 2, GDPR']],
+    tiers:[
+      {name:'Essential', price:2000, desc:'Automated reconciliation for one entity.'},
+      {name:'Signature', price:4800, desc:'Multi-entity reconciliation with anomaly alerts.'},
+      {name:'Bespoke', price:11200, desc:'Custom financial model development and audit trail design.'}
+    ],
+    addons:[['Multi-Currency Support',500],['Audit Trail Design',700],['Embedded Financial Analyst',1400]]
+  }
+];
+
+var CASES = [
+  { client:'Meridian Hospitality Group', industry:'Hospitality · Cloud & AI', variant:'sand', result:'37% reduction in operating overhead across two quarters.', desc:'A single reservation-and-operations platform replaced eleven disconnected systems across 42 properties.' },
+  { client:'Fontaine & Co. Private Bank', industry:'Finance · Custom Software', variant:'stone', result:'Core banking modernized with zero downtime.', desc:'An eighteen-month rebuild of core banking infrastructure, migrated client-by-client with white-glove care.' },
+  { client:'Solstice Retail Collective', industry:'Retail · Marketplace', variant:'brass', result:'Unified commerce across 240 boutiques.', desc:'A composable storefront brought wholesale, retail and loyalty under one inventory system for the first time.' },
+  { client:'Northbridge Health Alliance', industry:'Healthcare · Dashboards', variant:'olive', result:'Clinical response time down 41%.', desc:'A clinical operations console gave charge nurses a single, glanceable view of bed status and staffing.' },
+  { client:'Verlaine Logistics', industry:'Logistics · Migration', variant:'clay', result:'Legacy ERP migrated in six weeks.', desc:'Twenty-two years of shipping records moved from a mainframe system with full audit parity, ahead of schedule.' },
+  { client:'Aurum Transit Authority', industry:'Public Sector · AI Solutions', variant:'dusk', result:'Predictive maintenance cut breakdowns by 29%.', desc:'A fleet-wide sensor network now tells maintenance crews what will fail before it does.' }
+];
+
+var JOURNAL = [
+  { cat:'Field Notes', title:'What a fitting teaches about onboarding', desc:'Why we borrowed the language of bespoke tailoring for our installer, and what it changed about how clients felt on day one.', time:'6 min read' },
+  { cat:'Practice', title:'The case against the all-in-one dashboard', desc:'Consolidation is not the same as clarity. Notes on designing operations screens people actually glance at.', time:'8 min read' },
+  { cat:'Perspective', title:'Migrating without a maintenance window', desc:'A working method for moving core systems while the business keeps running underneath you.', time:'11 min read' },
+  { cat:'Field Notes', title:'Where AI belongs in a finance team', desc:'On building Ledger & Ledger to explain itself, not just to be right.', time:'7 min read' },
+  { cat:'Practice', title:'Naming things so support tickets go down', desc:'A short essay on interface copy as the cheapest support reduction available to any product team.', time:'5 min read' }
+];
+
+/* ============================================================
+   PAGE BUILDERS
+   ============================================================ */
+function pageHead(eyebrow, title, lede, meta){
+  return '<div class="page-head"><p class="eyebrow">' + eyebrow + '</p><h1>' + title + '</h1>' +
+    (lede ? '<p class="lede">' + lede + '</p>' : '') +
+    (meta ? '<div class="meta-row">' + meta.map(function(m){ return '<div>' + m[0] + '<strong>' + m[1] + '</strong></div>'; }).join('') + '</div>' : '') +
+    '</div>';
+}
+
+function homePage(){
+  return '' +
+  '<section class="hero">' +
+    '<div class="hero-copy">' +
+      '<p class="eyebrow">Digital Transformation, By Appointment</p>' +
+      '<h1>Software built with the <em>patience</em> of a private house.</h1>' +
+      '<p class="lede">TECHBISS designs and builds custom software, cloud &amp; AI systems, and the migration tooling to carry an organization between them — with the discretion, precision and care of a fashion atelier, not the churn of a typical vendor.</p>' +
+      '<div class="hero-actions">' +
+        '<a class="btn btn--gold interactive" href="#/contact">Request a Consultation</a>' +
+        '<a class="btn--ghost link-gold interactive" href="#/work">See the Work &nbsp;&rarr;</a>' +
+      '</div>' +
+    '</div>' +
+    '<div class="hero-art">' + plate('sand','Plate No. 01 — Atelier Cloud Suite') + '<span class="plate-caption">TECHBISS — EST. COLLECTION No. 14</span></div>' +
+  '</section>' +
+
+  '<section class="section">' +
+    '<div class="wrap stat-row">' +
+      '<div class="stat"><p class="num">$10B+</p><p class="cap">Enterprise value moved through platforms we\'ve built</p></div>' +
+      '<div class="stat"><p class="num">180+</p><p class="cap">Engagements delivered across six industries</p></div>' +
+      '<div class="stat"><p class="num">6 wks</p><p class="cap">Median time from measurement to launch</p></div>' +
+      '<div class="stat"><p class="num">99.98%</p><p class="cap">Platform uptime across the collection</p></div>' +
+    '</div>' +
+  '</section>' +
+
+  '<section class="section section--alt">' +
+    '<div class="wrap split">' +
+      '<div class="split-art">' + plate('olive','Plate No. 02 — Vantage Analytics') + '</div>' +
+      '<div class="split-copy">' +
+        '<p class="eyebrow">The House Philosophy</p>' +
+        '<h2 style="font-size:clamp(1.9rem,2.6vw + 1rem,3.2rem);">We treat infrastructure the way a tailor treats <em>cloth</em> — measured twice, cut once.</h2>' +
+        '<p class="lede" style="margin-top:1.2rem;">Most vendors optimize for speed to contract. We optimize for the fit — the quiet confidence of a system that was measured against your business rather than assembled from a template. That takes longer at the outset and costs far less for the next decade.</p>' +
+      '</div>' +
+    '</div>' +
+  '</section>' +
+
+  '<section class="section">' +
+    '<div class="wrap">' +
+      '<p class="eyebrow">What We Cut</p>' +
+      '<div class="offer-row">' +
+        '<span class="idx">01</span><div><h3>Custom Software</h3><p class="lede">Products and internal systems built to your workflow, not the reverse.</p></div>' +
+        '<div class="tags"><span class="tag">Web &amp; Mobile</span><span class="tag">Internal Tooling</span><span class="tag">Platform Rebuilds</span></div>' +
+      '</div>' +
+      '<div class="offer-row">' +
+        '<span class="idx">02</span><div><h3>Cloud &amp; AI Solutions</h3><p class="lede">Infrastructure and intelligence that scale quietly in the background.</p></div>' +
+        '<div class="tags"><span class="tag">Multi-Cloud</span><span class="tag">Predictive Models</span><span class="tag">MLOps</span></div>' +
+      '</div>' +
+      '<div class="offer-row">' +
+        '<span class="idx">03</span><div><h3>The Marketplace</h3><p class="lede">A standing collection of ready modules for teams who need less bespoke, sooner.</p></div>' +
+        '<div class="tags"><span class="tag">CRM</span><span class="tag">Commerce</span><span class="tag">Identity</span></div>' +
+      '</div>' +
+      '<div class="offer-row">' +
+        '<span class="idx">04</span><div><h3>Migration &amp; Installer Tooling</h3><p class="lede">A guided fitting for moving legacy systems without losing a stitch.</p></div>' +
+        '<div class="tags"><span class="tag">Zero Downtime</span><span class="tag">Data Integrity</span><span class="tag">Rollback</span></div>' +
+      '</div>' +
+      '<div style="margin-top:2.5rem;"><a class="link-gold interactive" href="#/services">View the full service list &rarr;</a></div>' +
+    '</div>' +
+  '</section>' +
+
+  '<section class="section section--deep">' +
+    '<div class="wrap split split--reverse">' +
+      '<div class="split-copy">' +
+        '<p class="quote">&ldquo;They rebuilt eleven systems into one, and somehow the staff felt like less had changed, not more.&rdquo;</p>' +
+        '<cite>— Director of Operations, Meridian Hospitality Group</cite>' +
+        '<div style="margin-top:2.2rem;"><a class="btn btn--gold interactive" href="#/work">Read the Case Study</a></div>' +
+      '</div>' +
+      '<div class="split-art">' + plate('clay','Meridian Hospitality Group') + '</div>' +
+    '</div>' +
+  '</section>';
+}
+
+function servicesPage(){
+  var rows = [
+    ['Custom Software','Products, internal tools and platform rebuilds designed around your actual workflow — architecture, interface and code, cut as one garment rather than assembled from stock parts.',['Web & Mobile','Internal Tooling','Legacy Rebuilds']],
+    ['Cloud & AI Solutions','Multi-cloud infrastructure and applied AI that scale without asking for constant attention — provisioning, observability and machine-learning operations handled in-house.',['Multi-Cloud','MLOps','Predictive Systems']],
+    ['Product Marketplace','A standing collection of ready-made modules — CRM, commerce, identity, analytics — for teams who need less bespoke, sooner, without sacrificing the fit.',['CRM','Commerce','Identity & Access']],
+    ['Installer & Migration Tooling','A guided, concierge-style wizard that detects, configures and transfers legacy systems into new platforms with full data integrity and one-click rollback.',['Zero Downtime','Data Integrity','Staged Rollback']],
+    ['Dashboards & Operations','Admin, client and staff-facing consoles that surface what matters at a glance — status, cost, risk — instead of burying it in tabs.',['Admin Consoles','Client Portals','Staff Ops']]
+  ];
+  return pageHead('Services','What the atelier builds.','Five disciplines, one standard of fit. Each engagement draws from all five as the work requires — nothing is sold as a bundle you don\'t need.') +
+    '<section class="section"><div class="wrap">' +
+    rows.map(function(r,i){
+      return '<div class="offer-row"><span class="idx">0' + (i+1) + '</span><div><h3>' + r[0] + '</h3><p class="lede">' + r[1] + '</p></div><div class="tags">' + r[2].map(function(t){return '<span class="tag">'+t+'</span>';}).join('') + '</div></div>';
+    }).join('') +
+    '</div></section>' +
+    '<section class="section section--alt"><div class="wrap split">' +
+      '<div class="split-copy"><p class="eyebrow">How Engagements Begin</p><h2 style="font-size:clamp(1.8rem,2.4vw + 1rem,2.8rem)">A conversation before a proposal.</h2><p class="lede" style="margin-top:1.1rem">Every engagement opens with a working session, not a sales deck — we want to understand the system as it actually runs before we suggest anything about how it should.</p><div style="margin-top:2rem"><a class="btn btn--gold interactive" href="#/contact">Start the Conversation</a></div></div>' +
+      '<div class="split-art">' + plate('stone','Discovery, in progress') + '</div>' +
+    '</div></section>';
+}
+
+function solutionsPage(){
+  var verts = [
+    ['Hospitality & Travel','Reservation, property and guest-experience systems unified into one calm operating layer.','stone'],
+    ['Financial Services','Core banking, reconciliation and compliance infrastructure modernized without service interruption.','sand'],
+    ['Retail & Commerce','Omnichannel inventory, checkout and loyalty built to a single source of truth.','brass'],
+    ['Healthcare','Clinical operations and scheduling consoles designed for the pace of a ward, not a boardroom.','olive'],
+    ['Public Sector','Citizen-facing services and internal case systems held to the highest verification standard.','clay'],
+    ['Manufacturing & Logistics','Fleet, inventory and predictive-maintenance systems that read the floor in real time.','dusk']
+  ];
+  return pageHead('Solutions','Built to the measure of your industry.','The same five disciplines, applied through the vocabulary and constraints of six sectors we return to often.') +
+  '<section class="section"><div class="wrap grid-asym">' +
+    verts.map(function(v,i){
+      var wide = i % 3 === 0;
+      return '<div class="' + (wide ? 'g-span-8' : 'g-span-4') + '">' +
+        '<div class="plate plate--' + v[2] + '" style="aspect-ratio:' + (wide ? '16/8' : '3/4') + ';margin-bottom:1.3rem;"></div>' +
+        '<p class="eyebrow" style="margin-bottom:.5rem;">Solution 0' + (i+1) + '</p>' +
+        '<h3 style="font-size:1.4rem;margin-bottom:.5rem;">' + v[0] + '</h3>' +
+        '<p style="color:var(--ink-soft);font-size:.92rem;max-width:52ch;">' + v[1] + '</p>' +
+      '</div>';
+    }).join('') +
+  '</div></section>';
+}
+
+/* ---- marketplace collection pager ---- */
+var mpIndex = 0;
+function marketplacePageShell(){
+  return pageHead('The Marketplace','A collection, not a catalog.','Twelve modules from the standing TECHBISS collection, presented one at a time — the way you\'d page through a lookbook rather than scan a grid.') +
+    '<div id="mpFrame"></div>';
+}
+function renderMpFrame(){
+  var frame = document.getElementById('mpFrame');
+  if(!frame) return;
+  var p = PRODUCTS[mpIndex];
+  frame.innerHTML =
+    '<div class="collection-frame">' +
+      '<div class="collection-art">' + plate(p.variant) + '<span class="collection-counter">' + String(mpIndex+1).padStart(2,'0') + ' / ' + String(PRODUCTS.length).padStart(2,'0') + '</span></div>' +
+      '<div class="collection-copy">' +
+        '<p class="cat">' + p.cat + '</p>' +
+        '<h2>' + p.name + '</h2>' +
+        '<p class="lede">' + p.tagline + ' ' + p.desc + '</p>' +
+        '<p class="price">From ' + money(p.tiers[0].price) + '<span style="font-family:var(--font-body);font-style:normal;font-size:.7rem;color:var(--ink-faint);"> / month</span></p>' +
+        '<div><a class="btn btn--gold interactive" href="#/marketplace/product/' + p.id + '">View the Piece</a></div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="collection-nav">' +
+      '<button class="interactive" id="mpPrev" aria-label="Previous item">&larr; Prev</button>' +
+      '<div class="collection-dots">' + PRODUCTS.map(function(_,i){ return '<span class="' + (i===mpIndex?'active':'') + '"></span>'; }).join('') + '</div>' +
+      '<button class="interactive" id="mpNext" aria-label="Next item">Next &rarr;</button>' +
+    '</div>';
+  document.getElementById('mpPrev').addEventListener('click', function(){ mpIndex = (mpIndex - 1 + PRODUCTS.length) % PRODUCTS.length; renderMpFrame(); });
+  document.getElementById('mpNext').addEventListener('click', function(){ mpIndex = (mpIndex + 1) % PRODUCTS.length; renderMpFrame(); });
+}
+
+/* ---- product detail / customize / purchase / deploy flow ---- */
+var customizeState = {};
+function findProduct(id){ for(var i=0;i<PRODUCTS.length;i++){ if(PRODUCTS[i].id===id) return PRODUCTS[i]; } return PRODUCTS[0]; }
+function flowStepsBar(step, id){
+  var steps = ['Preview','Customize','Purchase','Deploy'];
+  return '<div class="flow-steps">' + steps.map(function(s,i){
+    var cls = i===step ? 'current' : (i<step ? 'done' : '');
+    return '<span class="' + cls + '">' + s + '</span>';
+  }).join('') + '</div>';
+}
+function productDetailPage(id){
+  var p = findProduct(id);
+  return flowStepsBar(0, id) +
+  '<div class="product-hero">' +
+    plate(p.variant) +
+    '<div class="product-hero-copy">' +
+      '<p class="eyebrow">' + p.cat + '</p>' +
+      '<h1 style="font-size:clamp(2rem,2.6vw + 1rem,3rem)">' + p.name + '</h1>' +
+      '<p class="lede">' + p.desc + '</p>' +
+      '<dl class="spec-grid" style="margin-top:1rem;">' + p.specs.map(function(s){ return '<div><dt>' + s[0] + '</dt><dd>' + s[1] + '</dd></div>'; }).join('') + '</dl>' +
+      '<div style="margin-top:1.6rem;"><a class="btn btn--gold interactive" href="#/marketplace/product/' + p.id + '/customize">Begin Customization</a></div>' +
+    '</div>' +
+  '</div>' +
+  '<section class="section"><div class="wrap"><a class="link-gold interactive" href="#/marketplace">&larr; Back to the Collection</a></div></section>';
+}
+function customizePage(id){
+  var p = findProduct(id);
+  if(!customizeState[id]) customizeState[id] = { tier:0, addons:{} };
+  var st = customizeState[id];
+  var total = p.tiers[st.tier].price;
+  p.addons.forEach(function(a,i){ if(st.addons[i]) total += a[1]; });
+  return flowStepsBar(1, id) +
+  '<div class="customize-frame">' +
+    '<div class="customize-main">' +
+      '<p class="eyebrow">Select a Tier</p>' +
+      '<div class="tier-list">' + p.tiers.map(function(t,i){
+        return '<label class="tier-option interactive" data-tier="' + i + '">' +
+          '<div><input type="radio" name="tier" ' + (st.tier===i?'checked':'') + ' data-i="' + i + '"><span style="margin-left:.9em;" class="t-name">' + t.name + '</span><div class="t-desc">' + t.desc + '</div></div>' +
+          '<span class="t-price">' + money(t.price) + '</span>' +
+        '</label>';
+      }).join('') + '</div>' +
+      '<p class="eyebrow" style="margin-top:2.4rem;">Add To The Order</p>' +
+      '<div class="addon-list">' + p.addons.map(function(a,i){
+        return '<div class="addon-row"><label><input type="checkbox" class="interactive" data-addon="' + i + '" ' + (st.addons[i]?'checked':'') + '> ' + a[0] + '</label><span>' + money(a[1]) + '</span></div>';
+      }).join('') + '</div>' +
+    '</div>' +
+    '<div class="customize-side">' +
+      '<p class="eyebrow">Running Summary</p>' +
+      '<h3 style="font-size:1.2rem;margin-bottom:1rem;">' + p.name + '</h3>' +
+      '<div class="summary-line"><span>' + p.tiers[st.tier].name + ' tier</span><span>' + money(p.tiers[st.tier].price) + '</span></div>' +
+      '<div id="summaryAddons">' + p.addons.map(function(a,i){ return st.addons[i] ? '<div class="summary-line"><span>' + a[0] + '</span><span>' + money(a[1]) + '</span></div>' : ''; }).join('') + '</div>' +
+      '<div class="summary-total" id="summaryTotal"><span>Monthly Total</span><span>' + money(total) + '</span></div>' +
+      '<a class="btn btn--gold interactive" style="width:100%;justify-content:center;margin-top:1.8rem;" href="#/marketplace/product/' + p.id + '/purchase">Proceed to Purchase</a>' +
+    '</div>' +
+  '</div>';
+}
+function purchasePage(id){
+  var p = findProduct(id);
+  var st = customizeState[id] || { tier:0, addons:{} };
+  var total = p.tiers[st.tier].price;
+  p.addons.forEach(function(a,i){ if(st.addons[i]) total += a[1]; });
+  return flowStepsBar(2, id) +
+  '<div class="confirm-panel" id="purchasePanel">' +
+    '<p class="eyebrow">Order Summary</p>' +
+    '<h2 style="font-family:var(--font-display);font-size:clamp(1.6rem,2vw + 1rem,2.4rem);">' + p.name + ' — ' + p.tiers[st.tier].name + '</h2>' +
+    '<p class="lede">You are about to place ' + p.name + ' on order at ' + money(total) + ' per month. Nothing is charged in this preview — this is a simulated acquisition.</p>' +
+    '<button class="btn btn--gold interactive" id="confirmBtn">Confirm Acquisition</button>' +
+  '</div>';
+}
+function afterPurchase(id){
+  var btn = document.getElementById('confirmBtn');
+  if(!btn) return;
+  btn.addEventListener('click', function(){
+    var panel = document.getElementById('purchasePanel');
+    panel.innerHTML = '<p class="eyebrow">Please Wait</p><h2 style="font-family:var(--font-display);font-size:1.8rem;">Preparing your confirmation&hellip;</h2>';
+    setTimeout(function(){
+      panel.innerHTML =
+        '<div class="seal">&#10003;</div>' +
+        '<p class="eyebrow">Confirmed</p>' +
+        '<h2 style="font-family:var(--font-display);font-size:clamp(1.8rem,2.4vw + 1rem,2.6rem);">Your acquisition is confirmed.</h2>' +
+        '<p class="lede">A member of the atelier will reach out within one business day to schedule your fitting. In the meantime, you may begin deployment.</p>' +
+        '<a class="btn btn--gold interactive" href="#/marketplace/product/' + id + '/deploy">Begin Deployment</a>';
+    }, 1400);
+  });
+}
+var DEPLOY_STAGES = [
+  ['Reserving your environment','Setting aside dedicated capacity in your chosen region.'],
+  ['Fitting the configuration','Applying your tier and add-ons to the base module.'],
+  ['Connecting your systems','Establishing secure channels to your existing stack.'],
+  ['Final inspection','Running verification checks across every connection.'],
+  ['Ready','Your platform is provisioned and awaiting first sign-in.']
+];
+function deployPage(id){
+  var p = findProduct(id);
+  return flowStepsBar(3, id) +
+  '<div class="section"><p class="eyebrow" style="text-align:center;">' + p.name + ' — Deployment</p>' +
+  '<h2 style="text-align:center;font-size:clamp(1.6rem,2vw + 1rem,2.2rem);margin-bottom:2.4rem;">Our concierge team is preparing your order.</h2>' +
+  '<div class="deploy-stage-list" id="deployList">' +
+    DEPLOY_STAGES.map(function(s,i){
+      return '<div class="deploy-stage" data-i="' + i + '"><span class="mark">' + (i+1) + '</span><div class="txt"><strong>' + s[0] + '</strong><p>' + s[1] + '</p></div></div>';
+    }).join('') +
+  '</div>' +
+  '<div id="deployDone" style="text-align:center;margin-top:2.5rem;display:none;">' +
+    '<a class="btn btn--gold interactive" href="#/dashboard">Enter the Dashboard</a>' +
+  '</div></div>';
+}
+function afterDeploy(id){
+  var stages = document.querySelectorAll('#deployList .deploy-stage');
+  if(!stages.length) return;
+  var i = 0;
+  function step(){
+    if(i > 0) stages[i-1].classList.remove('is-active');
+    if(i > 0) stages[i-1].classList.add('is-done');
+    if(i >= stages.length){ document.getElementById('deployDone').style.display = 'block'; return; }
+    stages[i].classList.add('is-active');
+    i++;
+    setTimeout(step, reduceMotion ? 60 : 900);
+  }
+  step();
+}
+
+/* ---- work / case studies rail ---- */
+function workPage(){
+  return pageHead('Work','Selected engagements.','A rail, not a grid — drag or swipe through recent work the way you\'d flip through a portfolio across a table.') +
+  '<div class="rail-wrap">' +
+    '<p class="rail-hint">Drag to browse &nbsp;&middot;&nbsp; ' + CASES.length + ' case studies</p>' +
+    '<div class="rail interactive" id="caseRail">' +
+      CASES.map(function(c){
+        return '<div class="rail-card">' + plate(c.variant) + '<p class="cs-industry">' + c.industry + '</p><h3 class="cs-client">' + c.client + '</h3><p class="cs-result" style="color:var(--gold-strong);font-weight:600;">' + c.result + '</p><p class="cs-result">' + c.desc + '</p></div>';
+      }).join('') +
+    '</div>' +
+  '</div>' +
+  '<section class="section section--deep"><div class="wrap split"><div class="split-copy"><p class="quote">&ldquo;The fitting metaphor sounds precious until you\'re the one migrating twenty-two years of records without a single lost shipment.&rdquo;</p><cite>— VP Operations, Verlaine Logistics</cite></div><div class="split-art">' + plate('clay') + '</div></div></section>';
+}
+function afterWork(){
+  var rail = document.getElementById('caseRail');
+  if(!rail) return;
+  var isDown = false, startX = 0, startScroll = 0, lastX = 0, lastT = 0, velocity = 0, momentumId = null;
+  function stopMomentum(){ if(momentumId){ cancelAnimationFrame(momentumId); momentumId = null; } }
+  function pointerDown(e){
+    isDown = true; stopMomentum();
+    rail.classList.add('is-dragging');
+    startX = (e.touches ? e.touches[0].clientX : e.clientX);
+    startScroll = rail.scrollLeft; lastX = startX; lastT = Date.now(); velocity = 0;
+  }
+  function pointerMove(e){
+    if(!isDown) return;
+    var x = (e.touches ? e.touches[0].clientX : e.clientX);
+    var dx = x - startX;
+    rail.scrollLeft = startScroll - dx;
+    var now = Date.now(); var dt = now - lastT;
+    if(dt > 0){ velocity = (x - lastX) / dt; lastX = x; lastT = now; }
+    if(e.cancelable) e.preventDefault();
+  }
+  function pointerUp(){
+    if(!isDown) return;
+    isDown = false; rail.classList.remove('is-dragging');
+    if(reduceMotion || Math.abs(velocity) < 0.02) return;
+    function glide(){
+      rail.scrollLeft -= velocity * 16;
+      velocity *= 0.93;
+      if(Math.abs(velocity) > 0.02){ momentumId = requestAnimationFrame(glide); }
+    }
+    momentumId = requestAnimationFrame(glide);
+  }
+  rail.addEventListener('mousedown', pointerDown);
+  window.addEventListener('mousemove', pointerMove);
+  window.addEventListener('mouseup', pointerUp);
+  rail.addEventListener('touchstart', pointerDown, { passive:true });
+  rail.addEventListener('touchmove', pointerMove, { passive:false });
+  rail.addEventListener('touchend', pointerUp);
+}
+
+function processPage(){
+  var stages = [
+    ['Discovery','We sit inside the current system before proposing anything about the next one — interviews, shadowing and an honest audit of what already works.'],
+    ['Definition','Scope, architecture and success measures are agreed in writing before a single line of code is cut.'],
+    ['Design & Build','Iterative build in close collaboration, with working software shown on a rhythm you can plan around, not a black box that appears at the end.'],
+    ['Migration & Integration','Data, systems and teams are moved with the same care as the initial fitting — verified at every seam.'],
+    ['Launch','A phased go-live with concierge support standing by, so the first week feels uneventful rather than heroic.'],
+    ['Care','Ongoing stewardship, optimization and evolution — the relationship continues well past the ribbon-cutting.']
+  ];
+  return pageHead('Process','Six stages, in order.','Every engagement moves through the same sequence, regardless of size — the stages don\'t compress, only the time inside each one does.') +
+  '<section class="section"><div class="wrap process-list">' +
+    stages.map(function(s,i){ return '<div class="process-item"><span class="idx">0' + (i+1) + '</span><h3>' + s[0] + '</h3><p>' + s[1] + '</p></div>'; }).join('') +
+  '</div></section>';
+}
+
+function aboutPage(){
+  var values = [
+    ['Fit over speed','A system that fits saves more time across a decade than one that shipped six weeks earlier ever will.'],
+    ['Discretion','We work inside sensitive systems and sensitive companies. Confidentiality is a habit, not a clause.'],
+    ['One craft, many disciplines','Software, cloud, AI and migration are treated as one continuous craft rather than separate departments handing off work.'],
+    ['Plain language','If a system can\'t be explained to the people who\'ll run it, it isn\'t finished yet.']
+  ];
+  return pageHead('About','A house, not a headcount.','Founded by engineers who kept being asked to fix the platform after the "fast" vendor left. TECHBISS was built to be the call made first instead.') +
+  '<section class="section"><div class="wrap split">' +
+    '<div class="split-art">' + plate('dusk','Founded 2014') + '</div>' +
+    '<div class="split-copy"><p class="eyebrow">Our Standing</p><h2 style="font-size:clamp(1.9rem,2.4vw + 1rem,2.8rem);">Twelve years, one standard, applied without exception.</h2><p class="lede" style="margin-top:1.1rem;">We have never taken an engagement we didn\'t believe we could finish properly, and we have declined a fair number that a faster shop would have taken. That restraint is the whole business model.</p></div>' +
+  '</div></section>' +
+  '<section class="section section--alt"><div class="wrap"><p class="eyebrow">What We Hold Ourselves To</p>' +
+    values.map(function(v){ return '<div class="value-row"><h4>' + v[0] + '</h4><p style="color:var(--ink-soft);">' + v[1] + '</p></div>'; }).join('') +
+  '</div></section>';
+}
+
+function resourcesPage(){
+  return pageHead('The Journal','Notes from the workroom.','Short essays on the craft of building durable software — written by the people doing the building, not a content team.') +
+  '<section class="section"><div class="wrap">' +
+    JOURNAL.map(function(j){
+      return '<div class="journal-item"><span class="cat">' + j.cat + '</span><h4>' + j.title + '</h4><p class="desc">' + j.desc + '</p><span class="meta">' + j.time + '</span></div>';
+    }).join('') +
+  '</div></section>';
+}
+
+function pricingPage(){
+  var tiers = [
+    ['Essential','A single module, standard configuration — for teams ready to move quickly on one system.',['One product from the collection','Standard onboarding (2 weeks)','Business-hours support'],'From $900'],
+    ['Signature','Multi-module engagements with custom configuration and dedicated onboarding support.',['Up to five modules','Dedicated onboarding lead','24/7 concierge support','Quarterly architecture review'],'From $2,900'],
+    ['Bespoke','Fully custom builds and full-estate migrations, scoped and priced against your own architecture.',['Unlimited scope, custom-scoped','Dedicated delivery team','Embedded specialists as needed','Ongoing stewardship program'],'By Consultation']
+  ];
+  return pageHead('Pricing','Priced like a fitting, not a rate card.','Every figure below is a starting point — the final measure is taken during Discovery, the first stage of Process.') +
+  '<section class="section"><div class="wrap pricing-list">' +
+    tiers.map(function(t){
+      return '<div class="pricing-row"><div><h3>' + t[0] + '</h3><p class="from">' + t[3] + '</p></div><ul>' + t[2].map(function(f){ return '<li>&mdash; ' + f + '</li>'; }).join('') + '</ul><div class="amt">' + t[3].replace('From ','') + '</div><a class="btn btn--gold interactive" href="#/contact">Enquire</a></div>';
+    }).join('') +
+  '</div></section>' +
+  '<section class="section section--alt"><div class="wrap" style="text-align:center;"><p class="lede" style="margin:0 auto;">Looking for a single ready-made module instead? <a class="link-gold interactive" href="#/marketplace">Browse the Marketplace &rarr;</a></p></div></section>';
+}
+
+function contactPage(){
+  return pageHead('Contact','Tell us what you\'re measuring for.','A short note is enough to begin — we\'ll follow up within one business day to schedule a working session.') +
+  '<section class="section"><div class="wrap split">' +
+    '<div class="split-copy">' +
+      '<form id="contactForm">' +
+        '<div class="field"><label for="cName">Full Name</label><input id="cName" type="text" required placeholder="Your name"></div>' +
+        '<div class="field"><label for="cEmail">Email</label><input id="cEmail" type="email" required placeholder="you@company.com"></div>' +
+        '<div class="field"><label for="cType">Project Type</label><select id="cType"><option>Custom Software</option><option>Cloud &amp; AI Solutions</option><option>Marketplace Module</option><option>Migration &amp; Installer</option><option>Not Sure Yet</option></select></div>' +
+        '<div class="field"><label for="cMsg">Tell Us More</label><textarea id="cMsg" placeholder="A little about the system, the timeline, or the problem."></textarea></div>' +
+        '<button class="btn btn--gold interactive" type="submit">Send to the Atelier</button>' +
+        '<p class="form-note" id="contactNote"></p>' +
+      '</form>' +
+    '</div>' +
+    '<div class="split-art">' + plate('brass') +
+      '<div style="margin-top:1.6rem;"><p class="eyebrow">Concierge Line</p><p style="font-family:var(--font-display);font-size:1.3rem;font-style:italic;">+1 (415) 555-0148</p><p class="eyebrow" style="margin-top:1.4rem;">Studio</p><p style="color:var(--ink-soft);">Pier 9, Embarcadero, San Francisco</p></div>' +
+    '</div>' +
+  '</div></section>';
+}
+function afterContact(){
+  var form = document.getElementById('contactForm');
+  if(!form) return;
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    document.getElementById('contactNote').textContent = 'Thank you — your note has reached the atelier. We\'ll be in touch within one business day.';
+  });
+}
+
+function loginPage(){
+  return '<div class="login-frame">' +
+    '<div class="login-panel">' +
+      '<p class="eyebrow">Client Access</p>' +
+      '<h1 style="font-size:clamp(1.9rem,2.4vw + 1rem,2.8rem);margin-bottom:1.5rem;">Enter the Atelier.</h1>' +
+      '<form id="loginForm">' +
+        '<div class="field"><label for="lEmail">Email</label><input id="lEmail" type="email" placeholder="you@company.com" required></div>' +
+        '<div class="field"><label for="lPass">Password</label><input id="lPass" type="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" required></div>' +
+        '<button class="btn btn--gold interactive" type="submit" style="width:100%;justify-content:center;">Sign In</button>' +
+      '</form>' +
+      '<p class="form-note">This is a Phase 1 concept — sign-in is simulated and leads to the Dashboard Preview. <a class="link-gold interactive" href="#/contact">Request access &rarr;</a></p>' +
+    '</div>' +
+    '<div class="login-art">' + plate('stone') + '</div>' +
+  '</div>';
+}
+function afterLogin(){
+  var form = document.getElementById('loginForm');
+  if(!form) return;
+  form.addEventListener('submit', function(e){ e.preventDefault(); location.hash = '#/dashboard'; });
+}
+
+/* ---- installer (bespoke fitting wizard) ---- */
+var fittingStep = 0;
+var fittingChoice = 0;
+var FITTING_STEPS = ['Select','Detect','Configure','Import','Install','Verify','Launch'];
+var SELECT_OPTIONS = [
+  ['Atelier Cloud Suite','Multi-cloud infrastructure orchestration.'],
+  ['Migration Concierge','Full legacy-system transfer with verification.'],
+  ['Custodian Ops','Staff and admin operations console.']
+];
+function installerPageShell(){
+  return pageHead('The Installer','A bespoke fitting for your platform.','A guided, seven-step measurement — from first selection to final launch — with nothing left to guess at.') +
+  '<div class="fitting-frame" id="fittingFrame"></div>';
+}
+function renderFitting(){
+  var frame = document.getElementById('fittingFrame');
+  if(!frame) return;
+  var dots = '<div class="fitting-dots">' + FITTING_STEPS.map(function(s,i){
+    var cls = i===fittingStep ? 'active' : (i<fittingStep ? 'done' : '');
+    return '<div class="dot ' + cls + '"><i></i>' + s + '</div>';
+  }).join('') + '</div>';
+  var body = '';
+  if(fittingStep === 0){
+    body = '<div class="fitting-step"><h2>Select your platform.</h2><p class="lede">Choose the module we\'ll be fitting today. You can add others later — each is measured on its own.</p>' +
+      '<div class="choice-list">' + SELECT_OPTIONS.map(function(o,i){
+        return '<label><input type="radio" name="sel" ' + (fittingChoice===i?'checked':'') + ' data-i="' + i + '"><div><div class="c-name">' + o[0] + '</div><div class="c-desc">' + o[1] + '</div></div></label>';
+      }).join('') + '</div>' +
+      '<div class="fitting-actions"><span></span><button class="btn btn--gold interactive" id="fitNext">Begin the Fitting &rarr;</button></div></div>';
+  } else if(fittingStep === 1){
+    body = '<div class="fitting-step"><h2>We\'re taking your measurements.</h2><p class="lede">Detecting your existing environment — operating stack, active regions and current load — so nothing is fitted twice.</p>' +
+      '<div class="progress-line"><i id="detectBar" style="width:0%"></i></div>' +
+      '<div class="scan-list" id="scanList"></div>' +
+      '<div class="fitting-actions"><button class="interactive" id="fitBack">&larr; Back</button><button class="btn btn--gold interactive" id="fitNext" disabled>Continue &rarr;</button></div></div>';
+  } else if(fittingStep === 2){
+    body = '<div class="fitting-step"><h2>Tailoring your configuration.</h2><p class="lede">Set the shape of the environment. Defaults are drawn from what we detected; adjust anything that doesn\'t fit.</p>' +
+      '<div class="field"><label>Environment Name</label><input type="text" value="production-primary"></div>' +
+      '<div class="field"><label>Region</label><select><option>us-west (Oregon)</option><option>us-east (Virginia)</option><option>eu-west (Dublin)</option></select></div>' +
+      '<div class="field"><label>Scale</label><select><option>Standard — up to 50k users</option><option>Elevated — up to 500k users</option><option>Enterprise — unlimited</option></select></div>' +
+      '<div class="fitting-actions"><button class="interactive" id="fitBack">&larr; Back</button><button class="btn btn--gold interactive" id="fitNext">Continue &rarr;</button></div></div>';
+  } else if(fittingStep === 3){
+    body = '<div class="fitting-step"><h2>Fitting your data into place.</h2><p class="lede">Importing records from your current system. Each batch is verified against its source before it\'s counted complete.</p>' +
+      '<div class="progress-line"><i id="importBar" style="width:0%"></i></div>' +
+      '<p class="form-note" id="importNote">Preparing transfer&hellip;</p>' +
+      '<div class="fitting-actions"><button class="interactive" id="fitBack">&larr; Back</button><button class="btn btn--gold interactive" id="fitNext" disabled>Continue &rarr;</button></div></div>';
+  } else if(fittingStep === 4){
+    body = '<div class="fitting-step"><h2>The final stitching.</h2><p class="lede">Installing your platform onto its reserved environment.</p>' +
+      '<div class="progress-line"><i id="installBar" style="width:0%"></i></div>' +
+      '<p class="form-note" id="installNote">Assembling components&hellip;</p>' +
+      '<div class="fitting-actions"><button class="interactive" id="fitBack">&larr; Back</button><button class="btn btn--gold interactive" id="fitNext" disabled>Continue &rarr;</button></div></div>';
+  } else if(fittingStep === 5){
+    body = '<div class="fitting-step"><h2>A last look in the mirror.</h2><p class="lede">Verifying every connection before we call this ready.</p>' +
+      '<div class="scan-list" id="verifyList"></div>' +
+      '<div class="fitting-actions"><button class="interactive" id="fitBack">&larr; Back</button><button class="btn btn--gold interactive" id="fitNext" disabled>Continue &rarr;</button></div></div>';
+  } else {
+    body = '<div class="fitting-step" style="text-align:center;"><div class="seal" style="margin:0 auto 1.4rem;">&#10003;</div><h2>Your platform, ready to wear.</h2><p class="lede" style="margin:0 auto;">' + SELECT_OPTIONS[fittingChoice][0] + ' is installed, verified and live. Welcome to the collection.</p>' +
+      '<div style="margin-top:2rem;"><a class="btn btn--gold interactive" href="#/dashboard">Enter the Dashboard</a></div></div>';
+  }
+  frame.innerHTML = dots + body;
+  wireFitting();
+}
+function wireFitting(){
+  var next = document.getElementById('fitNext');
+  var back = document.getElementById('fitBack');
+  if(next) next.addEventListener('click', function(){ fittingStep = Math.min(fittingStep+1, FITTING_STEPS.length-1); renderFitting(); });
+  if(back) back.addEventListener('click', function(){ fittingStep = Math.max(fittingStep-1, 0); renderFitting(); });
+  document.querySelectorAll('input[name="sel"]').forEach(function(r){ r.addEventListener('change', function(){ fittingChoice = +r.dataset.i; }); });
+
+  if(fittingStep === 1){
+    var scans = [['Cloud provider','Amazon Web Services'],['Active region','us-west-2'],['Current stack','Node.js, PostgreSQL'],['Peak concurrent load','4,200 sessions']];
+    var list = document.getElementById('scanList');
+    scans.forEach(function(s,i){
+      setTimeout(function(){
+        var row = document.createElement('div');
+        row.className = 'scan-row';
+        row.style.animationDelay = '0ms';
+        row.innerHTML = '<span>' + s[0] + '</span><span class="val">' + s[1] + '</span>';
+        list.appendChild(row);
+      }, reduceMotion ? 0 : i*420);
+    });
+    var bar = document.getElementById('detectBar');
+    var dur = reduceMotion ? 100 : 1900;
+    setTimeout(function(){ bar.style.width = '100%'; }, 50);
+    setTimeout(function(){ var b=document.getElementById('fitNext'); if(b) b.disabled=false; }, dur);
+  }
+  if(fittingStep === 3){
+    var bar2 = document.getElementById('importBar');
+    var note = document.getElementById('importNote');
+    var msgs = ['Reading source records&hellip;','Verifying integrity&hellip;','Writing to new environment&hellip;','Transfer complete.'];
+    var dur2 = reduceMotion ? 100 : 2400;
+    setTimeout(function(){ bar2.style.width = '100%'; }, 50);
+    msgs.forEach(function(m,i){ setTimeout(function(){ if(note) note.innerHTML = m; }, reduceMotion ? 0 : (i+1) * (dur2/msgs.length)); });
+    setTimeout(function(){ var b=document.getElementById('fitNext'); if(b) b.disabled=false; }, dur2);
+  }
+  if(fittingStep === 4){
+    var bar3 = document.getElementById('installBar');
+    var note3 = document.getElementById('installNote');
+    var msgs3 = ['Assembling components&hellip;','Applying configuration&hellip;','Starting services&hellip;','Installation complete.'];
+    var dur3 = reduceMotion ? 100 : 2200;
+    setTimeout(function(){ bar3.style.width = '100%'; }, 50);
+    msgs3.forEach(function(m,i){ setTimeout(function(){ if(note3) note3.innerHTML = m; }, reduceMotion ? 0 : (i+1) * (dur3/msgs3.length)); });
+    setTimeout(function(){ var b=document.getElementById('fitNext'); if(b) b.disabled=false; }, dur3);
+  }
+  if(fittingStep === 5){
+    var checks = [['SSL certificate','Valid'],['Data parity','100% matched'],['Service health','All systems nominal'],['Access controls','Configured']];
+    var vlist = document.getElementById('verifyList');
+    checks.forEach(function(c,i){
+      setTimeout(function(){
+        var row = document.createElement('div');
+        row.className = 'scan-row';
+        row.innerHTML = '<span>' + c[0] + '</span><span class="val">' + c[1] + '</span>';
+        vlist.appendChild(row);
+      }, reduceMotion ? 0 : i*380);
+    });
+    setTimeout(function(){ var b=document.getElementById('fitNext'); if(b) b.disabled=false; }, reduceMotion ? 100 : checks.length*380 + 300);
+  }
+}
+
+/* ---- dashboard preview (client persona) ---- */
+function dashboardPage(){
+  var projects = [
+    ['Threadwork Commerce — Rollout','Solstice Retail Collective','On Track','good'],
+    ['Ledger & Ledger AI — Phase 2','Fontaine & Co. Private Bank','Needs Attention','warn'],
+    ['Custodian Ops — Staff Console','Internal','Complete','neutral'],
+    ['Migration Concierge — ERP Transfer','Verlaine Logistics','On Track','good']
+  ];
+  var activity = [
+    ['2h ago','Deployment verified for Threadwork Commerce (Production).'],
+    ['Yesterday','New invoice issued — Ledger &amp; Ledger AI, Signature tier.'],
+    ['2 days ago','Support ticket #4021 resolved by Atrium Desk.'],
+    ['4 days ago','Quarterly architecture review scheduled for Oct 14.']
+  ];
+  return '<div class="dash">' +
+    '<nav class="dash-nav" aria-label="Dashboard">' +
+      '<p class="brand">Solstice &middot; Client Portal</p>' +
+      '<a href="#" class="active">Overview</a><a href="#">Projects</a><a href="#">Marketplace Orders</a><a href="#">Support</a><a href="#">Billing</a><a href="#">Settings</a>' +
+    '</nav>' +
+    '<div class="dash-main">' +
+      '<div class="dash-header"><div><p class="eyebrow" style="margin-bottom:.4rem;">Client Dashboard — Preview</p><h1>Good afternoon, Solstice Retail Collective.</h1></div><a class="btn btn--gold interactive" href="#/contact">Request a Session</a></div>' +
+      '<div class="dash-stats">' +
+        '<div class="dash-stat"><p class="cap">Active Projects</p><p class="val">3</p></div>' +
+        '<div class="dash-stat"><p class="cap">Open Tickets</p><p class="val">1</p></div>' +
+        '<div class="dash-stat"><p class="cap">Platform Uptime</p><p class="val">99.98%</p></div>' +
+        '<div class="dash-stat"><p class="cap">Next Milestone</p><p class="val" style="font-size:1.2rem;">Oct 14</p></div>' +
+      '</div>' +
+      '<p class="eyebrow">Projects</p>' +
+      '<div style="overflow-x:auto;"><table class="dash-table"><thead><tr><th>Engagement</th><th>Account</th><th>Status</th></tr></thead><tbody>' +
+        projects.map(function(p){ return '<tr><td>' + p[0] + '</td><td>' + p[1] + '</td><td><span class="chip chip--' + p[3] + '">' + p[2] + '</span></td></tr>'; }).join('') +
+      '</tbody></table></div>' +
+      '<div class="dash-grid-2">' +
+        '<div><p class="eyebrow">Recent Activity</p>' + activity.map(function(a){ return '<div class="activity-item"><time>' + a[0] + '</time><span>' + a[1] + '</span></div>'; }).join('') + '</div>' +
+        '<div class="plate plate--brass" style="aspect-ratio:1/1;"></div>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+}
+
+/* ============================================================
+   ROUTE RESOLUTION
+   ============================================================ */
+function resolveRoute(raw){
+  var parts = raw.split('/').filter(Boolean);
+  var base = parts[0] || '';
+
+  if(base === '' ) return { html: homePage() };
+  if(base === 'services') return { html: servicesPage() };
+  if(base === 'solutions') return { html: solutionsPage() };
+  if(base === 'work') return { html: workPage(), after: afterWork };
+  if(base === 'process') return { html: processPage() };
+  if(base === 'about') return { html: aboutPage() };
+  if(base === 'resources') return { html: resourcesPage() };
+  if(base === 'pricing') return { html: pricingPage() };
+  if(base === 'contact') return { html: contactPage(), after: afterContact };
+  if(base === 'login') return { html: loginPage(), after: afterLogin };
+  if(base === 'dashboard') return { html: dashboardPage() };
+  if(base === 'installer') return { html: installerPageShell(), after: function(){ fittingStep = 0; renderFitting(); } };
+  if(base === 'marketplace'){
+    if(parts[1] === 'product' && parts[2]){
+      var id = parts[2];
+      var sub = parts[3];
+      if(sub === 'customize') return { html: customizePage(id), after: function(){ wireCustomize(id); } };
+      if(sub === 'purchase') return { html: purchasePage(id), after: function(){ afterPurchase(id); } };
+      if(sub === 'deploy') return { html: deployPage(id), after: function(){ afterDeploy(id); } };
+      return { html: productDetailPage(id) };
+    }
+    return { html: marketplacePageShell(), after: function(){ mpIndex = 0; renderMpFrame(); } };
+  }
+  return { html: pageHead('Not Found','This piece isn\'t in the collection.','The page you\'re looking for may have moved. Return to the collection to keep browsing.') + '<section class="section"><div class="wrap"><a class="btn btn--gold interactive" href="#/">Return Home</a></div></section>' };
+}
+
+function wireCustomize(id){
+  var st = customizeState[id];
+  document.querySelectorAll('input[name="tier"]').forEach(function(r){
+    r.addEventListener('change', function(){ st.tier = +r.dataset.i; refreshCustomizeSummary(id); });
+  });
+  document.querySelectorAll('input[data-addon]').forEach(function(c){
+    c.addEventListener('change', function(){ st.addons[c.dataset.addon] = c.checked; refreshCustomizeSummary(id); });
+  });
+}
+function refreshCustomizeSummary(id){
+  var p = findProduct(id);
+  var st = customizeState[id];
+  var total = p.tiers[st.tier].price;
+  var addonsHtml = '';
+  p.addons.forEach(function(a,i){ if(st.addons[i]){ total += a[1]; addonsHtml += '<div class="summary-line"><span>' + a[0] + '</span><span>' + money(a[1]) + '</span></div>'; } });
+  document.getElementById('summaryAddons').innerHTML = addonsHtml;
+  document.getElementById('summaryTotal').innerHTML = '<span>Monthly Total</span><span>' + money(total) + '</span>';
+  document.querySelectorAll('.tier-option').forEach(function(el,i){ el.querySelector('.t-name').parentElement; });
+}
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+if(!location.hash) location.hash = '#/';
+navigate();
+
+})();
+</script>

@@ -1,0 +1,1522 @@
+<title>TECHBISS — Aurora</title>
+<meta name="color-scheme" content="light dark">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============ TOKENS ============ */
+:root{
+  --bg:#f3f4f9;
+  --bg-hero:#eef0f9;
+  --surface:#ffffff;
+  --surface-2:#eceefa;
+  --border:rgba(23,23,42,.12);
+  --border-strong:rgba(23,23,42,.22);
+  --text:#14141f;
+  --text-dim:#4c4d63;
+  --text-faint:#7c7d93;
+  --accent-1:#4a3fd6;
+  --accent-2:#0891b2;
+  --accent-grad:linear-gradient(135deg,var(--accent-1),var(--accent-2));
+  --accent-grad-soft:linear-gradient(135deg,rgba(74,63,214,.16),rgba(8,145,178,.16));
+  --glow:rgba(74,63,214,.20);
+  --star-rgb:79,70,229;
+  --success:#0e8f52; --warning:#a8620a; --danger:#b3392c;
+  --success-bg:rgba(14,143,82,.12); --warning-bg:rgba(168,98,10,.12); --danger-bg:rgba(179,57,44,.12);
+  --shadow-soft:0 1px 2px rgba(20,20,40,.06), 0 12px 32px -18px rgba(20,20,40,.18);
+  --font-display:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;
+  --font-body:'Inter',ui-sans-serif,system-ui,-apple-system,sans-serif;
+  --radius-lg:22px; --radius-md:14px; --radius-sm:9px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0a0a0f; --bg-hero:#0a0a10;
+    --surface:#111119; --surface-2:#16161f;
+    --border:rgba(255,255,255,.09); --border-strong:rgba(255,255,255,.18);
+    --text:#eceef7; --text-dim:#a3a4ba; --text-faint:#6d6e85;
+    --accent-1:#7c6dfb; --accent-2:#2dd8f0;
+    --accent-grad-soft:linear-gradient(135deg,rgba(124,109,251,.16),rgba(45,216,240,.14));
+    --glow:rgba(124,109,251,.38);
+    --star-rgb:255,255,255;
+    --success:#34d399; --warning:#fbbf24; --danger:#f87171;
+    --success-bg:rgba(52,211,153,.14); --warning-bg:rgba(251,191,36,.14); --danger-bg:rgba(248,113,113,.14);
+    --shadow-soft:0 1px 2px rgba(0,0,0,.4), 0 20px 60px -24px rgba(80,60,220,.35);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0a0a0f; --bg-hero:#0a0a10;
+  --surface:#111119; --surface-2:#16161f;
+  --border:rgba(255,255,255,.09); --border-strong:rgba(255,255,255,.18);
+  --text:#eceef7; --text-dim:#a3a4ba; --text-faint:#6d6e85;
+  --accent-1:#7c6dfb; --accent-2:#2dd8f0;
+  --accent-grad-soft:linear-gradient(135deg,rgba(124,109,251,.16),rgba(45,216,240,.14));
+  --glow:rgba(124,109,251,.38);
+  --star-rgb:255,255,255;
+  --success:#34d399; --warning:#fbbf24; --danger:#f87171;
+  --success-bg:rgba(52,211,153,.14); --warning-bg:rgba(251,191,36,.14); --danger-bg:rgba(248,113,113,.14);
+  --shadow-soft:0 1px 2px rgba(0,0,0,.4), 0 20px 60px -24px rgba(80,60,220,.35);
+  color-scheme:dark;
+}
+
+/* ============ BASE ============ */
+*,*::before,*::after{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+@media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto;} }
+body{
+  background:var(--bg); color:var(--text); font-family:var(--font-body);
+  font-size:16px; line-height:1.55; -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+h1,h2,h3,h4{font-family:var(--font-display); font-weight:600; text-wrap:balance; margin:0; color:var(--text);}
+p{margin:0;}
+a{color:inherit; text-decoration:none;}
+ul{list-style:none; margin:0; padding:0;}
+button{font-family:inherit; cursor:pointer; background:none; border:none; color:inherit;}
+input,select,textarea{font-family:inherit; font-size:1rem; color:var(--text); background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-sm);}
+img,svg{display:block; max-width:100%;}
+:focus-visible{outline:2px solid var(--accent-2); outline-offset:3px; border-radius:6px;}
+.visually-hidden{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap;}
+.skip-link{position:fixed; top:-60px; left:16px; z-index:10000; background:var(--surface); color:var(--text); padding:.7em 1.2em; border-radius:999px; border:1px solid var(--border-strong); transition:top .2s;}
+.skip-link:focus{top:16px;}
+.eyebrow{font-family:var(--font-display); font-size:.72rem; letter-spacing:.24em; text-transform:uppercase; color:var(--accent-2); font-weight:600;}
+.section{max-width:1180px; margin:0 auto; padding:clamp(3.5rem,7vw,7rem) clamp(1.25rem,4vw,2.5rem);}
+.section-head{display:flex; flex-direction:column; gap:.9rem; margin-bottom:clamp(2rem,4vw,3.2rem); max-width:640px;}
+.section-head h2{font-size:clamp(1.7rem,3.4vw,2.6rem); letter-spacing:.01em;}
+.section-head p{color:var(--text-dim); font-size:1.02rem; max-width:58ch;}
+.grad-text{background:var(--accent-grad); -webkit-background-clip:text; background-clip:text; color:transparent;}
+.tabular{font-variant-numeric:tabular-nums;}
+
+/* ============ NAV ============ */
+.nav-wrap{position:fixed; top:18px; left:0; right:0; z-index:500; display:flex; justify-content:center; pointer-events:none;}
+.nav-pill{
+  pointer-events:auto; display:flex; align-items:center; gap:.35rem;
+  background:var(--surface); border:1px solid var(--border); border-radius:999px;
+  padding:.5rem .6rem .5rem 1.15rem; box-shadow:var(--shadow-soft);
+  max-width:min(94vw,980px); transition:padding .35s ease, gap .35s ease, transform .3s ease;
+}
+.nav-wrap.is-scrolled .nav-pill{padding:.32rem .45rem .32rem .9rem; box-shadow:0 1px 1px rgba(0,0,0,.05),0 10px 26px -16px rgba(20,20,40,.3);}
+.nav-logo{display:flex; align-items:center; gap:.5rem; font-family:var(--font-display); font-weight:700; font-size:.98rem; letter-spacing:.02em; white-space:nowrap; margin-right:.4rem;}
+.nav-logo .dot{width:8px;height:8px;border-radius:50%;background:var(--accent-grad); box-shadow:0 0 10px var(--glow);}
+.nav-links{display:flex; align-items:center; gap:.15rem; overflow-x:auto; scrollbar-width:none; max-width:56vw;}
+.nav-links::-webkit-scrollbar{display:none;}
+.nav-links a{font-size:.85rem; color:var(--text-dim); padding:.5rem .72rem; border-radius:999px; white-space:nowrap; transition:color .2s,background .2s;}
+.nav-links a:hover,.nav-links a:focus-visible{color:var(--text); background:var(--surface-2);}
+.nav-links a[aria-current="page"]{color:var(--text); background:var(--accent-grad-soft);}
+.nav-actions{display:flex; align-items:center; gap:.3rem; margin-left:.3rem; padding-left:.5rem; border-left:1px solid var(--border);}
+.icon-btn{width:36px; height:36px; display:inline-flex; align-items:center; justify-content:center; border-radius:50%; color:var(--text-dim); transition:color .2s, background .2s, filter .2s;}
+.icon-btn:hover{color:var(--text); background:var(--surface-2); filter:drop-shadow(0 0 6px var(--glow));}
+.icon-btn svg{width:18px; height:18px;}
+.nav-mobile-trigger{display:none;}
+@media (max-width:900px){
+  .nav-links{display:none;}
+  .nav-mobile-trigger{display:inline-flex;}
+}
+.nav-mobile-panel{
+  position:fixed; top:78px; left:50%; transform:translateX(-50%) scale(.92); transform-origin:top center;
+  z-index:499; background:var(--surface); border:1px solid var(--border); border-radius:26px; padding:.6rem;
+  display:flex; flex-direction:column; gap:.15rem; min-width:220px; box-shadow:var(--shadow-soft);
+  opacity:0; pointer-events:none; transition:opacity .22s ease, transform .22s ease;
+}
+.nav-mobile-panel.open{opacity:1; pointer-events:auto; transform:translateX(-50%) scale(1);}
+.nav-mobile-panel a{padding:.65rem 1rem; border-radius:16px; font-size:.92rem; color:var(--text-dim);}
+.nav-mobile-panel a:hover{background:var(--surface-2); color:var(--text);}
+
+/* ============ BUTTONS ============ */
+.btn{display:inline-flex; align-items:center; justify-content:center; gap:.5rem; font-family:var(--font-display); font-weight:600; font-size:.9rem; letter-spacing:.02em; padding:.85rem 1.5rem; border-radius:999px; transition:transform .18s ease, box-shadow .25s ease, filter .25s ease; white-space:nowrap;}
+.btn-primary{background:var(--accent-grad); color:#fff; box-shadow:0 8px 24px -8px var(--glow);}
+.btn-primary:hover{box-shadow:0 10px 32px -6px var(--glow); filter:brightness(1.06);}
+.btn-ghost{border:1px solid var(--border-strong); color:var(--text);}
+.btn-ghost:hover{background:var(--surface-2); border-color:var(--accent-2);}
+.btn-sm{padding:.55rem 1rem; font-size:.8rem;}
+.btn[disabled]{opacity:.5; cursor:not-allowed;}
+
+/* ============ CARDS ============ */
+.card{
+  position:relative; background:var(--surface); border-radius:var(--radius-lg); padding:1.7rem;
+  border:1px solid var(--border); overflow:hidden; transition:transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s ease, border-color .35s ease;
+}
+.card::before{content:"";position:absolute; inset:0; border-radius:inherit; padding:1px; background:linear-gradient(140deg,rgba(255,255,255,0),var(--border-strong) 40%,rgba(255,255,255,0) 70%); -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask-composite:exclude; pointer-events:none; opacity:.6;}
+.card:hover{box-shadow:0 24px 60px -30px var(--glow); border-color:var(--border-strong); transform:translateY(-3px);}
+.card:hover::before{opacity:1;}
+.icon-tile{width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; background:var(--surface-2); border:1px solid var(--border); margin-bottom:1.1rem; color:var(--accent-2); transition:filter .3s;}
+.card:hover .icon-tile{filter:drop-shadow(0 0 8px var(--glow));}
+.icon-tile svg{width:22px;height:22px;}
+
+/* stagger entrance */
+.stagger-in{opacity:0; transform:translateY(18px); animation:staggerIn .7s cubic-bezier(.2,.7,.2,1) forwards; animation-delay:calc(var(--i,0) * 70ms);}
+@keyframes staggerIn{to{opacity:1; transform:translateY(0);}}
+@media (prefers-reduced-motion:reduce){ .stagger-in{animation:none; opacity:1; transform:none;} }
+
+/* ============ HERO ============ */
+.hero{position:relative; padding-top:clamp(7rem,14vw,10rem); padding-bottom:clamp(4rem,8vw,6rem); overflow:hidden; background:var(--bg-hero);}
+.hero-canvas-wrap{position:absolute; inset:0; z-index:0;}
+.hero-canvas-wrap canvas{width:100%; height:100%; display:block;}
+.hero-blob{position:absolute; border-radius:50%; filter:blur(70px); opacity:.35; pointer-events:none;}
+.hero-blob.b1{width:46vw; height:46vw; background:var(--accent-1); top:-14vw; left:-10vw; animation:driftA 26s ease-in-out infinite alternate;}
+.hero-blob.b2{width:38vw; height:38vw; background:var(--accent-2); bottom:-16vw; right:-8vw; animation:driftB 30s ease-in-out infinite alternate;}
+@keyframes driftA{from{transform:translate(0,0);} to{transform:translate(4vw,3vw);}}
+@keyframes driftB{from{transform:translate(0,0);} to{transform:translate(-3vw,-4vw);}}
+@media (prefers-reduced-motion:reduce){ .hero-blob{animation:none;} }
+.hero-inner{position:relative; z-index:2; max-width:1180px; margin:0 auto; padding:0 clamp(1.25rem,4vw,2.5rem); text-align:center; display:flex; flex-direction:column; align-items:center; gap:1.6rem;}
+.hero h1{font-size:clamp(2.6rem,6.4vw,5rem); letter-spacing:.005em; line-height:1.05; max-width:16ch;}
+.hero h1 .ch{display:inline-block; opacity:0; transform:translateY(.6em); animation:charIn .7s cubic-bezier(.2,.8,.2,1) forwards; animation-delay:calc(var(--i) * 28ms);}
+@keyframes charIn{to{opacity:1; transform:translateY(0);}}
+@media (prefers-reduced-motion:reduce){ .hero h1 .ch{animation:none; opacity:1; transform:none;} }
+.hero p.lead{font-size:clamp(1.02rem,1.5vw,1.2rem); color:var(--text-dim); max-width:52ch;}
+.hero-ctas{display:flex; gap:.9rem; flex-wrap:wrap; justify-content:center; margin-top:.4rem;}
+.hero-stats{display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--border); border:1px solid var(--border); border-radius:var(--radius-md); overflow:hidden; margin-top:3rem; max-width:900px; width:100%;}
+.hero-stats div{background:var(--surface); padding:1.4rem 1rem; text-align:center;}
+.hero-stats strong{display:block; font-family:var(--font-display); font-size:clamp(1.3rem,2.4vw,1.9rem);}
+.hero-stats span{font-size:.78rem; color:var(--text-faint); letter-spacing:.03em;}
+@media (max-width:700px){ .hero-stats{grid-template-columns:repeat(2,1fr);} }
+
+/* ============ ORBITAL GRID (home teaser + marketplace) ============ */
+.orbit-wrap{position:relative; min-height:640px; padding:2rem 0;}
+.orbit-item{position:absolute; top:50%; left:50%; width:min(230px,60vw); transform-origin:center; margin:-115px 0 0 -115px;}
+.orbit-item .card{height:100%;}
+@media (max-width:880px){
+  .orbit-wrap{min-height:auto; display:flex; flex-direction:column; gap:1.1rem; padding:0;}
+  .orbit-item{position:static; transform:none !important; width:100%; margin:0;}
+}
+.viewport{position:relative; border-radius:var(--radius-md); overflow:hidden; border:1px solid var(--border); background:var(--surface-2); aspect-ratio:16/10;}
+.viewport canvas{width:100%; height:100%; display:block;}
+.ring-badge{position:absolute; inset:-6px; border-radius:inherit; border:1px solid transparent; pointer-events:none;}
+
+/* ============ FOOTER ============ */
+footer.site{border-top:1px solid var(--border); background:var(--surface); margin-top:3rem;}
+.footer-grid{max-width:1180px; margin:0 auto; padding:3.4rem clamp(1.25rem,4vw,2.5rem) 2rem; display:grid; grid-template-columns:1.4fr repeat(3,1fr); gap:2.4rem;}
+.footer-grid h4{font-size:.78rem; letter-spacing:.1em; text-transform:uppercase; color:var(--text-faint); margin-bottom:.9rem;}
+.footer-grid a{display:block; padding:.3rem 0; color:var(--text-dim); font-size:.92rem; transition:color .2s;}
+.footer-grid a:hover{color:var(--accent-2);}
+.footer-bottom{border-top:1px solid var(--border); padding:1.2rem clamp(1.25rem,4vw,2.5rem); display:flex; justify-content:space-between; flex-wrap:wrap; gap:.6rem; color:var(--text-faint); font-size:.8rem; max-width:1180px; margin:0 auto;}
+@media (max-width:760px){ .footer-grid{grid-template-columns:1fr 1fr;} }
+
+/* ============ FORMS ============ */
+.field{display:flex; flex-direction:column; gap:.4rem;}
+.field label{font-size:.82rem; color:var(--text-dim); font-weight:600;}
+.field input,.field select,.field textarea{padding:.75rem .9rem; width:100%;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent-2);}
+.form-grid{display:grid; grid-template-columns:1fr 1fr; gap:1.1rem;}
+@media (max-width:640px){ .form-grid{grid-template-columns:1fr;} }
+
+/* pill toggle group */
+.toggle-group{display:inline-flex; background:var(--surface-2); border:1px solid var(--border); border-radius:999px; padding:.25rem;}
+.toggle-group button{padding:.5rem 1.1rem; border-radius:999px; font-size:.85rem; font-weight:600; color:var(--text-dim);}
+.toggle-group button.active{background:var(--surface); color:var(--text); box-shadow:0 2px 10px -4px rgba(0,0,0,.2);}
+
+/* chips */
+.chip{padding:.45rem .95rem; border-radius:999px; border:1px solid var(--border); font-size:.82rem; color:var(--text-dim); transition:all .2s;}
+.chip.active{background:var(--accent-grad-soft); border-color:var(--accent-2); color:var(--text);}
+.chip:hover{border-color:var(--accent-2);}
+
+/* status pills */
+.pill{display:inline-flex; align-items:center; gap:.4rem; padding:.3rem .7rem; border-radius:999px; font-size:.76rem; font-weight:600;}
+.pill::before{content:""; width:6px; height:6px; border-radius:50%; background:currentColor;}
+.pill.good{background:var(--success-bg); color:var(--success);}
+.pill.warn{background:var(--warning-bg); color:var(--warning);}
+.pill.bad{background:var(--danger-bg); color:var(--danger);}
+
+/* ============ INTRO ============ */
+.intro{position:fixed; inset:0; z-index:10000; background:#08080d; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:1rem; transition:opacity .5s ease; cursor:pointer;}
+.intro canvas{position:absolute; inset:0; width:100%; height:100%;}
+.intro-mark{position:relative; z-index:2; font-family:var(--font-display); color:#fff; text-align:center;}
+.intro-mark .w1{font-size:clamp(1.6rem,5vw,2.6rem); font-weight:700; letter-spacing:.14em; opacity:0; animation:introFade .7s ease forwards .15s;}
+.intro-mark .w2{display:block; font-size:.72rem; letter-spacing:.4em; color:#8f8ad0; margin-top:.6rem; opacity:0; animation:introFade .7s ease forwards .5s;}
+@keyframes introFade{to{opacity:1;}}
+.intro-skip{position:relative; z-index:2; color:#666; font-size:.72rem; letter-spacing:.06em; opacity:0; animation:introFade .7s ease forwards 1s;}
+@media (prefers-reduced-motion:reduce){ .intro-mark .w1,.intro-mark .w2,.intro-skip{animation:none; opacity:1;} }
+
+/* ============ IRIS TRANSITION ============ */
+.iris{position:fixed; inset:0; z-index:9999; background:var(--bg); pointer-events:none; clip-path:circle(0% at 50% 50%); will-change:clip-path;}
+.iris.animate{transition:clip-path .55s cubic-bezier(.76,0,.24,1);}
+
+main#app{min-height:60vh; padding-top:0;}
+
+/* ============ INSTALLER ============ */
+.stage-ring-wrap{display:flex; align-items:center; justify-content:center; margin:0 auto 2rem;}
+.stage-list{display:flex; flex-wrap:wrap; gap:.5rem; justify-content:center; margin-bottom:2.4rem;}
+.stage-chip{display:flex; align-items:center; gap:.5rem; padding:.5rem .9rem; border-radius:999px; border:1px solid var(--border); font-size:.8rem; color:var(--text-faint);}
+.stage-chip.active{border-color:var(--accent-2); color:var(--text); background:var(--accent-grad-soft);}
+.stage-chip.done{color:var(--success); border-color:var(--success);}
+.stage-num{width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.68rem; font-weight:700; background:var(--surface-2);}
+.stage-chip.active .stage-num{background:var(--accent-grad); color:#fff;}
+.stage-chip.done .stage-num{background:var(--success); color:#08150e;}
+.stage-panel{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:clamp(1.6rem,4vw,2.6rem); max-width:760px; margin:0 auto; position:relative; overflow:hidden;}
+.scan-sweep{position:relative; height:120px; border-radius:var(--radius-md); background:var(--surface-2); overflow:hidden; margin:1.2rem 0;}
+.scan-sweep::after{content:""; position:absolute; top:0; bottom:0; width:36%; background:linear-gradient(90deg,transparent,var(--accent-grad-soft),var(--accent-2),var(--accent-grad-soft),transparent); opacity:.85; animation:sweep 1.7s linear infinite;}
+@keyframes sweep{from{left:-40%;} to{left:104%;}}
+@media (prefers-reduced-motion:reduce){ .scan-sweep::after{animation:none; left:32%;} }
+.check-item{display:flex; align-items:center; gap:.7rem; padding:.6rem 0; border-bottom:1px dashed var(--border); font-size:.92rem; color:var(--text-dim);}
+.check-item:last-child{border-bottom:none;}
+.check-item .tick{width:20px; height:20px; border-radius:50%; border:1px solid var(--border-strong); display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all .3s;}
+.check-item.ticked{color:var(--text);}
+.check-item.ticked .tick{background:var(--success); border-color:var(--success); color:#08150e; box-shadow:0 0 12px var(--success-bg);}
+.byte-counter{font-family:var(--font-display); font-size:1.6rem; letter-spacing:.03em;}
+.progress-track{height:8px; border-radius:999px; background:var(--surface-2); overflow:hidden; margin-top:.8rem;}
+.progress-fill{height:100%; background:var(--accent-grad); width:0%; transition:width .4s ease;}
+
+/* ============ DASHBOARD ============ */
+.dash{display:grid; grid-template-columns:220px 1fr; min-height:100vh;}
+.dash-side{background:var(--surface); border-right:1px solid var(--border); padding:1.6rem 1rem; display:flex; flex-direction:column; gap:.3rem;}
+.dash-side .nav-logo{padding:0 .6rem 1.2rem;}
+.dash-nav-item{display:flex; align-items:center; gap:.7rem; padding:.65rem .8rem; border-radius:10px; color:var(--text-dim); font-size:.88rem;}
+.dash-nav-item svg{width:17px;height:17px; flex-shrink:0;}
+.dash-nav-item.active{background:var(--accent-grad-soft); color:var(--text);}
+.dash-nav-item:hover{background:var(--surface-2); color:var(--text);}
+.dash-main{padding:1.6rem clamp(1rem,3vw,2.2rem) 3rem; max-width:1400px;}
+.dash-topbar{display:flex; align-items:center; justify-content:space-between; margin-bottom:1.6rem; gap:1rem; flex-wrap:wrap;}
+.dash-kpis{display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin-bottom:1.6rem;}
+.kpi-card{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-md); padding:1.2rem;}
+.kpi-card .label{font-size:.76rem; color:var(--text-faint); letter-spacing:.04em; text-transform:uppercase;}
+.kpi-card .value{font-family:var(--font-display); font-size:1.7rem; margin:.3rem 0;}
+.kpi-card .delta{font-size:.78rem; font-weight:600;}
+.delta.up{color:var(--success);} .delta.down{color:var(--danger);}
+.dash-cols{display:grid; grid-template-columns:1.6fr 1fr; gap:1.2rem; align-items:start;}
+.panel{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-md); padding:1.3rem;}
+.panel h3{font-size:1rem; margin-bottom:1rem;}
+.dtable{width:100%; border-collapse:collapse; font-size:.85rem;}
+.dtable th{text-align:left; color:var(--text-faint); font-weight:600; font-size:.72rem; letter-spacing:.05em; text-transform:uppercase; padding:.5rem .4rem; border-bottom:1px solid var(--border);}
+.dtable td{padding:.65rem .4rem; border-bottom:1px solid var(--border); color:var(--text-dim);}
+.dtable tr:last-child td{border-bottom:none;}
+.alert-row{display:flex; gap:.7rem; padding:.7rem 0; border-bottom:1px solid var(--border);}
+.alert-row:last-child{border-bottom:none;}
+.severity-stripe{width:3px; border-radius:3px; flex-shrink:0;}
+@media (max-width:980px){ .dash{grid-template-columns:1fr;} .dash-side{display:none;} .dash-kpis{grid-template-columns:repeat(2,1fr);} .dash-cols{grid-template-columns:1fr;} }
+
+/* generic table for pricing/specs */
+.spec-table{width:100%; border-collapse:collapse; font-size:.9rem;}
+.spec-table th,.spec-table td{padding:.7rem .5rem; border-bottom:1px solid var(--border); text-align:left; color:var(--text-dim);}
+.spec-table th{color:var(--text-faint); font-size:.74rem; text-transform:uppercase; letter-spacing:.05em;}
+.table-scroll{overflow-x:auto;}
+
+details.faq{border-bottom:1px solid var(--border); padding:1.1rem 0;}
+details.faq summary{cursor:pointer; font-family:var(--font-display); font-weight:600; font-size:.98rem; list-style:none; display:flex; justify-content:space-between; align-items:center;}
+details.faq summary::-webkit-details-marker{display:none;}
+details.faq summary::after{content:"+"; font-size:1.3rem; color:var(--accent-2); transition:transform .25s;}
+details.faq[open] summary::after{transform:rotate(45deg);}
+details.faq p{color:var(--text-dim); margin-top:.8rem; max-width:64ch; font-size:.92rem;}
+
+.hairline-grid{display:grid; gap:1px; background:var(--border); border:1px solid var(--border); border-radius:var(--radius-md); overflow:hidden;}
+</style>
+
+<a href="#main" class="skip-link">Skip to content</a>
+
+<div id="intro" class="intro" role="presentation" aria-hidden="true">
+  <canvas id="introCanvas"></canvas>
+  <div class="intro-mark"><span class="w1">TECHBISS</span><span class="w2">AURORA SYSTEMS</span></div>
+  <div class="intro-skip">click or press any key to continue</div>
+</div>
+
+<div id="iris" class="iris" aria-hidden="true"></div>
+
+<div class="nav-wrap" id="navWrap">
+  <nav class="nav-pill" aria-label="Primary">
+    <a href="#/" data-link class="nav-logo"><span class="dot"></span>TECHBISS</a>
+    <div class="nav-links" id="navLinks"></div>
+    <div class="nav-actions">
+      <button class="icon-btn" id="themeToggle" aria-label="Switch to dark theme" data-magnetic>
+        <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M4.2 4.2l1.7 1.7M18.1 18.1l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.2 19.8l1.7-1.7M18.1 5.9l1.7-1.7" stroke-linecap="round"/></svg>
+      </button>
+      <button class="nav-mobile-trigger icon-btn" id="mobileTrigger" aria-label="Open menu" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+<div class="nav-mobile-panel" id="mobilePanel"></div>
+
+<main id="app" id="main" tabindex="-1"></main>
+
+<footer class="site">
+  <div class="footer-grid">
+    <div>
+      <div class="nav-logo" style="margin-bottom:.8rem;"><span class="dot"></span>TECHBISS</div>
+      <p style="color:var(--text-dim); font-size:.9rem; max-width:32ch;">Custom software, cloud &amp; AI systems, and migration tooling for organizations operating at planetary scale.</p>
+    </div>
+    <div>
+      <h4>Platform</h4>
+      <a href="#/services" data-link>Services</a>
+      <a href="#/solutions" data-link>Solutions</a>
+      <a href="#/marketplace" data-link>Marketplace</a>
+      <a href="#/installer" data-link>Installer</a>
+    </div>
+    <div>
+      <h4>Company</h4>
+      <a href="#/work" data-link>Work</a>
+      <a href="#/process" data-link>Process</a>
+      <a href="#/about" data-link>About</a>
+      <a href="#/resources" data-link>Resources</a>
+    </div>
+    <div>
+      <h4>Access</h4>
+      <a href="#/pricing" data-link>Pricing</a>
+      <a href="#/contact" data-link>Contact</a>
+      <a href="#/login" data-link>Login</a>
+      <a href="#/dashboard" data-link>Console preview</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 TECHBISS. Concept: Aurora.</span>
+    <span>Built for orbit, not for launch parties.</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+"use strict";
+var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ============ NAV DATA ============ */
+var NAV = [
+  {href:'#/', label:'Home'},
+  {href:'#/services', label:'Services'},
+  {href:'#/solutions', label:'Solutions'},
+  {href:'#/marketplace', label:'Marketplace'},
+  {href:'#/work', label:'Work'},
+  {href:'#/process', label:'Process'},
+  {href:'#/about', label:'About'},
+  {href:'#/resources', label:'Resources'},
+  {href:'#/pricing', label:'Pricing'},
+  {href:'#/installer', label:'Installer'},
+  {href:'#/dashboard', label:'Console'},
+  {href:'#/contact', label:'Contact'},
+  {href:'#/login', label:'Login'}
+];
+var navLinksEl = document.getElementById('navLinks');
+var mobilePanelEl = document.getElementById('mobilePanel');
+navLinksEl.innerHTML = NAV.map(function(n){ return '<a href="'+n.href+'" data-link data-route="'+n.href+'">'+n.label+'</a>'; }).join('');
+mobilePanelEl.innerHTML = NAV.map(function(n){ return '<a href="'+n.href+'" data-link data-route="'+n.href+'">'+n.label+'</a>'; }).join('');
+
+/* ============ ICONS ============ */
+var ICONS = {
+  code:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8.5 8 4 12l4.5 4M15.5 8 20 12l-4.5 4M13.5 5.5l-3 13" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  cloud:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M7 18h10.5a3.5 3.5 0 0 0 0-7 5.5 5.5 0 0 0-10.6-1.7A4 4 0 0 0 7 18Z" stroke-linejoin="round"/></svg>',
+  cart:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 4h2l1.6 10.6a2 2 0 0 0 2 1.7h7.5a2 2 0 0 0 2-1.6L19.5 8H6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9.5" cy="20" r="1.3"/><circle cx="17" cy="20" r="1.3"/></svg>',
+  migrate:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 12h13M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  gauge:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 15a8 8 0 1 1 16 0M12 15l4-5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  shield:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3Z" stroke-linejoin="round"/></svg>',
+  spark:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3v5M12 16v5M3 12h5M16 12h5M6 6l3 3M18 18l-3-3M18 6l-3 3M6 18l3-3" stroke-linecap="round"/></svg>',
+  layers:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3 3 8l9 5 9-5-9-5Z" stroke-linejoin="round"/><path d="M3 12l9 5 9-5M3 16l9 5 9-5" stroke-linejoin="round"/></svg>',
+  grid:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3.5" y="3.5" width="7" height="7" rx="1"/><rect x="13.5" y="3.5" width="7" height="7" rx="1"/><rect x="3.5" y="13.5" width="7" height="7" rx="1"/><rect x="13.5" y="13.5" width="7" height="7" rx="1"/></svg>',
+  chat:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 5h16v11H8l-4 4V5Z" stroke-linejoin="round"/></svg>',
+  arrow:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 12h13M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l4.5 4.5L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  bolt:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z" stroke-linejoin="round"/></svg>',
+  node:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="6" cy="6" r="2.4"/><circle cx="18" cy="6" r="2.4"/><circle cx="12" cy="18" r="2.4"/><path d="M8 7l3 9M16 7l-3 9M8.4 6h7.2"/></svg>',
+  search:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.8-4.8" stroke-linecap="round"/></svg>',
+  home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 11 12 4l8 7M6 10v9h12v-9" stroke-linejoin="round" stroke-linecap="round"/></svg>',
+  bell:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 10a6 6 0 0 1 12 0v4l2 3H4l2-3v-4Z" stroke-linejoin="round"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>',
+  users:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M16 7.5a3 3 0 1 1 3.3 4.5M17 14c2.3.3 4 2 4 6" stroke-linecap="round"/></svg>',
+  box:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3.5 7.5 12 3l8.5 4.5V16L12 21l-8.5-4.5Z" stroke-linejoin="round"/><path d="M3.5 7.5 12 12l8.5-4.5M12 12v9" stroke-linejoin="round"/></svg>',
+  settings:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.2-1.6l2-1.5-2-3.4-2.3.8a7 7 0 0 0-2.8-1.6L13.3 2h-3.9l-.4 2.7a7 7 0 0 0-2.8 1.6l-2.3-.8-2 3.4 2 1.5A7 7 0 0 0 3.7 12a7 7 0 0 0 .2 1.6l-2 1.5 2 3.4 2.3-.8a7 7 0 0 0 2.8 1.6L10.4 22h3.9l.4-2.7a7 7 0 0 0 2.8-1.6l2.3.8 2-3.4-2-1.5c.1-.5.2-1 .2-1.6Z" stroke-linejoin="round"/></svg>',
+  rocket:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2c3 2 5 6 5 10 0 2-1 4-2 5l-3 3-3-3c-1-1-2-3-2-5 0-4 2-8 5-10Z" stroke-linejoin="round"/><circle cx="12" cy="10" r="1.6"/><path d="M9 17l-3 4M15 17l3 4"/></svg>'
+};
+function icon(name){ return ICONS[name] || ''; }
+
+/* ============ DATA ============ */
+var PRODUCTS = [
+  {id:'orbital-core', name:'Orbital Core', cat:'Platforms', tagline:'Composable application platform for regulated enterprises.',
+   desc:'Orbital Core is the foundation layer beneath most TECHBISS deployments — a composable runtime for building internal and customer-facing software without re-solving identity, audit, and deployment from zero every time. Teams assemble services from vetted modules instead of framework scaffolding.',
+   specs:[['Deployment','Private cloud, hybrid, or on-prem'],['Uptime SLA','99.95%'],['Compliance','SOC 2 Type II, ISO 27001'],['Data residency','Configurable per region']],
+   tiers:[
+     {name:'Starter', price:'$1,900/mo', blurb:'Single environment, core modules.', features:['1 production environment','Core identity & audit modules','Business-hours support','Standard uptime SLA']},
+     {name:'Growth', price:'$6,400/mo', blurb:'Multi-environment with priority support.', features:['Up to 5 environments','Full module catalog','24/5 priority support','99.95% uptime SLA','Dedicated solutions engineer']},
+     {name:'Enterprise', price:'Custom', blurb:'Unlimited scale, dedicated architecture review.', features:['Unlimited environments','Custom module development','24/7 white-glove support','99.99% uptime SLA','Quarterly architecture review']}
+   ]},
+  {id:'signal-ai', name:'Signal AI', cat:'AI Agents', tagline:'Applied inference layer for operational decisioning.',
+   desc:'Signal AI turns operational data — tickets, telemetry, transactions — into decisions a team can act on in seconds. It is built to sit inside existing workflows rather than replace them, with every recommendation traceable back to source data.',
+   specs:[['Model approach','Retrieval-grounded, auditable'],['Latency','Sub-400ms typical'],['Integration','REST, event stream, or embedded SDK'],['Governance','Full decision trail export']],
+   tiers:[
+     {name:'Starter', price:'$2,400/mo', blurb:'One use-case, guided rollout.', features:['1 decisioning workflow','10K inferences / mo','Standard support']},
+     {name:'Growth', price:'$8,100/mo', blurb:'Multi-workflow with fine-tuning.', features:['Up to 6 workflows','250K inferences / mo','Custom grounding sources','Priority support']},
+     {name:'Enterprise', price:'Custom', blurb:'Unlimited workflows, dedicated model ops.', features:['Unlimited workflows','Volume-based inference','Dedicated model operations team','24/7 support']}
+   ]},
+  {id:'ledger-sync', name:'Ledger Sync', cat:'Integrations', tagline:'Real-time reconciliation across core banking systems.',
+   desc:'Ledger Sync keeps disparate financial systems of record in agreement without nightly batch jobs. Built for institutions running legacy cores alongside modern services, it reconciles in near-real-time and flags drift before it compounds.',
+   specs:[['Sync interval','Near real-time (<60s)'],['Connectors','14 core banking systems'],['Reconciliation','Automated with exception queue'],['Audit','Immutable ledger of all reconciliations']],
+   tiers:[
+     {name:'Starter', price:'$3,200/mo', blurb:'Two systems, daily reconciliation.', features:['2 connected systems','Daily reconciliation cycle','Email exception alerts']},
+     {name:'Growth', price:'$9,800/mo', blurb:'Real-time sync, exception workflow.', features:['Up to 6 connected systems','Real-time reconciliation','Exception workflow tooling']},
+     {name:'Enterprise', price:'Custom', blurb:'Unlimited connectors, custom SLAs.', features:['Unlimited connectors','Custom SLA guarantees','Dedicated integration engineer']}
+   ]},
+  {id:'atlas-migrate', name:'Atlas Migrate', cat:'Modules', tagline:'Zero-downtime data migration engine.',
+   desc:'Atlas Migrate moves production data between systems without a maintenance window. It runs a shadow-write phase, verifies parity continuously, and cuts over only once confidence crosses a threshold you set.',
+   specs:[['Downtime','Zero for cutover-eligible migrations'],['Verification','Continuous parity checks'],['Rollback','Instant, pre-cutover'],['Throughput','Up to 40M rows/hr']],
+   tiers:[
+     {name:'Starter', price:'$4,500 / project', blurb:'Single database migration.', features:['1 source, 1 target','Parity verification','Rollback window: 48h']},
+     {name:'Growth', price:'$14,000 / project', blurb:'Multi-system migration program.', features:['Up to 5 systems','Phased cutover plan','Rollback window: 7 days']},
+     {name:'Enterprise', price:'Custom', blurb:'Enterprise-wide legacy retirement.', features:['Unlimited systems','Dedicated migration team','Custom rollback policy']}
+   ]},
+  {id:'vector-mesh', name:'Vector Mesh', cat:'AI Agents', tagline:'Distributed vector search for enterprise knowledge.',
+   desc:'Vector Mesh indexes documents, tickets, and internal wikis into a single searchable knowledge layer, with row-level permissions preserved from source systems so nothing surfaces that a user could not already see.',
+   specs:[['Index size','Up to 200M documents'],['Permissions','Inherited from source ACLs'],['Freshness','Incremental re-index, minutes'],['Query latency','~120ms p95']],
+   tiers:[
+     {name:'Starter', price:'$1,600/mo', blurb:'Single knowledge source.', features:['1 data source','500K documents indexed','Standard support']},
+     {name:'Growth', price:'$5,200/mo', blurb:'Multi-source enterprise search.', features:['Up to 8 sources','10M documents indexed','Priority support']},
+     {name:'Enterprise', price:'Custom', blurb:'Org-wide knowledge fabric.', features:['Unlimited sources','Unlimited documents','Dedicated infra tuning']}
+   ]},
+  {id:'perimeter', name:'Perimeter', cat:'Platforms', tagline:'Zero-trust access fabric for hybrid infrastructure.',
+   desc:'Perimeter replaces VPN sprawl with per-request, identity-verified access to every internal system — cloud, on-prem, or legacy. Access policies are written once and enforced everywhere.',
+   specs:[['Model','Zero-trust, per-request verification'],['Deployment','Agent or agentless'],['Policy engine','Attribute-based access control'],['Logging','Full session recording, optional']],
+   tiers:[
+     {name:'Starter', price:'$2.10/user/mo', blurb:'Up to 100 users.', features:['Up to 100 users','Core policy engine','Standard support']},
+     {name:'Growth', price:'$3.40/user/mo', blurb:'Advanced policy + session recording.', features:['Up to 2,000 users','Session recording','Priority support']},
+     {name:'Enterprise', price:'Custom', blurb:'Unlimited users, custom compliance.', features:['Unlimited users','Custom compliance mapping','24/7 support']}
+   ]},
+  {id:'flowline', name:'Flowline', cat:'Modules', tagline:'Workflow orchestration for cross-team operations.',
+   desc:'Flowline coordinates multi-step processes that cross team boundaries — approvals, provisioning, incident response — with visible state at every step instead of buried in someone\\'s inbox.',
+   specs:[['Workflow types','Sequential, parallel, conditional'],['Integrations','40+ native connectors'],['SLA tracking','Built-in per-step timers'],['Audit trail','Full step-by-step history']],
+   tiers:[
+     {name:'Starter', price:'$900/mo', blurb:'Up to 5 active workflows.', features:['5 active workflows','Core connector set','Standard support']},
+     {name:'Growth', price:'$3,100/mo', blurb:'Unlimited workflows, SLA tracking.', features:['Unlimited workflows','SLA tracking & alerts','Priority support']},
+     {name:'Enterprise', price:'Custom', blurb:'Org-wide orchestration.', features:['Custom connector development','Dedicated success manager','24/7 support']}
+   ]},
+  {id:'beacon-analytics', name:'Beacon Analytics', cat:'Integrations', tagline:'Unified telemetry and business intelligence layer.',
+   desc:'Beacon Analytics collapses infrastructure telemetry and business metrics into one queryable layer, so a latency spike and a revenue dip can be examined side by side instead of in separate tools.',
+   specs:[['Data sources','Infra + product + finance'],['Retention','13 months rolling'],['Query language','SQL-compatible'],['Alerting','Threshold & anomaly-based']],
+   tiers:[
+     {name:'Starter', price:'$1,100/mo', blurb:'Core dashboards.', features:['3 data sources','13-month retention','Standard support']},
+     {name:'Growth', price:'$3,600/mo', blurb:'Cross-domain analysis.', features:['10 data sources','Anomaly alerting','Priority support']},
+     {name:'Enterprise', price:'Custom', blurb:'Enterprise data fabric.', features:['Unlimited sources','Custom retention policy','Dedicated analyst']}
+   ]}
+];
+function productById(id){ for(var i=0;i<PRODUCTS.length;i++) if(PRODUCTS[i].id===id) return PRODUCTS[i]; return null; }
+
+var CASES = [
+  {org:'Tier-1 retail bank', region:'EU', challenge:'A 30-year-old core banking system blocked every new product launch.', approach:'Phased migration to Orbital Core with Ledger Sync running in parallel for 9 months.', outcome:'New product time-to-market fell from 14 months to 6 weeks.', metric:'11x faster launches'},
+  {org:'National logistics network', region:'North America', challenge:'Fleet routing decisions were made on data that was 24 hours stale.', approach:'Signal AI deployed against live telemetry with a 3-week guided rollout.', outcome:'Route re-optimization now happens continuously instead of nightly.', metric:'$41M annual fuel savings'},
+  {org:'Public health authority', region:'APAC', challenge:'Citizen data was fragmented across 40+ regional systems.', approach:'Vector Mesh indexed all sources with permission-aware search, deployed via Atlas Migrate.', outcome:'Case workers now search once instead of across a dozen portals.', metric:'68% faster case resolution'},
+  {org:'Global manufacturing group', region:'LATAM', challenge:'Plant access relied on shared VPN credentials with no per-user audit trail.', approach:'Perimeter rolled out across 22 facilities in a single quarter.', outcome:'Every access event is now individually attributable and logged.', metric:'Zero unattributed access events since rollout'}
+];
+
+var SERVICES = [
+  {icon:'code', name:'Custom Software Engineering', desc:'Product and platform engineering for systems that need to outlive the team that built them — clear ownership boundaries, documented interfaces, no tribal knowledge required.', tags:['Product engineering','API design','Legacy modernization']},
+  {icon:'cloud', name:'Cloud Infrastructure & DevOps', desc:'Infrastructure that scales predictably and fails safely. We design for the incident you haven\\'t had yet, not just the traffic you have today.', tags:['Multi-cloud','Kubernetes','Cost governance']},
+  {icon:'spark', name:'Applied AI & Data Systems', desc:'Machine learning and inference systems grounded in your own data, with every output traceable — not a chatbot bolted onto a dashboard.', tags:['ML infrastructure','Inference at scale','Data governance']},
+  {icon:'migrate', name:'Systems Integration & Migration', desc:'Moving off legacy systems without a weekend of downtime and a prayer. Parallel-run verification before every cutover.', tags:['Zero-downtime migration','Legacy retirement','Data parity']},
+  {icon:'gauge', name:'Managed Operations', desc:'Once it\\'s live, someone has to watch it at 3am. Our operations teams do, with response times written into the contract, not the sales deck.', tags:['24/7 monitoring','Incident response','SRE on retainer']}
+];
+
+var SOLUTIONS = [
+  {name:'Financial Systems', challenge:'Core banking platforms that can\\'t be touched without regulatory sign-off, yet must evolve constantly.', approach:'Strangler-pattern modernization: new capability ships alongside the legacy core, not instead of it, until parity is proven.', outcome:'Continuous delivery inside a heavily regulated shell.'},
+  {name:'Healthcare Platforms', challenge:'Patient data spread across systems that were never designed to talk to each other.', approach:'Permission-aware integration layer that respects existing access controls rather than flattening them.', outcome:'Unified records without a single compliance exception.'},
+  {name:'Logistics & Supply Chain', challenge:'Decisions made on data that is hours or days old in an industry where minutes matter.', approach:'Real-time telemetry pipelines feeding applied AI directly into dispatch and routing systems.', outcome:'Operational decisions move from daily to continuous.'},
+  {name:'Retail & Commerce', challenge:'Seasonal traffic spikes that make or break the year, on infrastructure sized for an average Tuesday.', approach:'Elastic cloud architecture load-tested against your actual peak, not a generic benchmark.', outcome:'Peak-season uptime without paying for peak-season capacity year-round.'},
+  {name:'Public Sector', challenge:'Long procurement cycles colliding with the need to modernize citizen-facing services quickly.', approach:'Modular delivery in defined phases, each independently auditable and fundable.', outcome:'Modernization that survives budget cycles and leadership changes.'}
+];
+
+var PROCESS = [
+  {n:'01', name:'Discover', dur:'2–3 weeks', desc:'We map your current systems, constraints, and the decisions that actually depend on this project succeeding — before proposing anything.'},
+  {n:'02', name:'Architect', dur:'2–4 weeks', desc:'A concrete technical architecture and delivery plan, reviewed with your engineering leadership before a line of code is committed.'},
+  {n:'03', name:'Build', dur:'8–20 weeks', desc:'Iterative delivery in two-week cycles, with working software in your hands from cycle one, not at the end.'},
+  {n:'04', name:'Integrate', dur:'2–6 weeks', desc:'Connection to existing systems, parallel-run verification, and staged rollout to real users in controlled batches.'},
+  {n:'05', name:'Launch', dur:'1 week', desc:'Production cutover, monitored in real time by the team that built it — not handed off cold to a support queue.'},
+  {n:'06', name:'Operate', dur:'Ongoing', desc:'Managed operations, continuous improvement, and a quarterly review of whether the system still fits how your business runs.'}
+];
+
+var RESOURCES = [
+  {tag:'Engineering Notes', title:'Why zero-downtime migration is a data problem, not a scheduling one', read:'9 min'},
+  {tag:'Whitepaper', title:'The real cost of deferred infrastructure debt in regulated industries', read:'22 min'},
+  {tag:'Engineering Notes', title:'Designing inference systems that survive an audit', read:'11 min'},
+  {tag:'Webinar', title:'Migrating core banking systems without a maintenance window', read:'38 min'},
+  {tag:'Whitepaper', title:'A practical framework for zero-trust rollout in legacy environments', read:'17 min'},
+  {tag:'Engineering Notes', title:'What we learned reconciling 14 core banking connectors in real time', read:'8 min'}
+];
+
+var TEAM = [
+  {name:'Renata Okoye', role:'Chief Architect', bio:'Twenty years designing systems that outlive the org charts that commissioned them.'},
+  {name:'Dmitri Halvorsen', role:'Head of AI Systems', bio:'Built inference infrastructure for two of the world\\'s largest logistics networks.'},
+  {name:'Priya Ashworth', role:'VP, Client Engineering', bio:'Leads delivery across every regulated-industry engagement TECHBISS runs.'},
+  {name:'Marcus Feldt', role:'Head of Security', bio:'Former national infrastructure security lead, now keeps ours honest.'}
+];
+
+/* ============ ROUTER ============ */
+var app = document.getElementById('app');
+function navigate(hash){ if(location.hash===hash) render(); else location.hash = hash; }
+
+function route(){
+  var h = location.hash.replace(/^#/,'') || '/';
+  var parts = h.split('/').filter(Boolean);
+  if(parts.length===0) return {name:'home'};
+  if(parts[0]==='product' && parts[1]) return {name:'product', id:parts[1]};
+  var map = {services:'services', solutions:'solutions', marketplace:'marketplace', work:'work', process:'process', about:'about', resources:'resources', pricing:'pricing', contact:'contact', login:'login', installer:'installer', dashboard:'dashboard'};
+  if(map[parts[0]]) return {name:map[parts[0]]};
+  return {name:'notfound'};
+}
+
+var TITLES = {home:'TECHBISS — Aurora', services:'Services — TECHBISS', solutions:'Solutions — TECHBISS', marketplace:'Marketplace — TECHBISS', product:'Product — TECHBISS', work:'Work — TECHBISS', process:'Process — TECHBISS', about:'About — TECHBISS', resources:'Resources — TECHBISS', pricing:'Pricing — TECHBISS', contact:'Contact — TECHBISS', login:'Login — TECHBISS', installer:'Installer — TECHBISS', dashboard:'Console — TECHBISS', notfound:'Not found — TECHBISS'};
+
+function render(){
+  var r = route();
+  document.title = TITLES[r.name] || 'TECHBISS';
+  var fn = RENDERERS[r.name] || RENDERERS.notfound;
+  app.innerHTML = fn(r);
+  app.scrollIntoView({block:'start', behavior:'auto'});
+  window.scrollTo(0,0);
+  document.querySelectorAll('.nav-links a, .nav-mobile-panel a').forEach(function(a){
+    var target = a.getAttribute('data-route');
+    var current = '#/' + (r.name==='home' ? '' : (r.name==='product' ? 'marketplace' : r.name));
+    if(target===current || (r.name==='home' && target==='#/')) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current');
+  });
+  afterRender(r);
+  bindMagnetic();
+}
+
+function afterRender(r){
+  if(r.name==='home') initHero();
+  if(r.name==='marketplace') initMarketplace();
+  if(r.name==='product') initProduct(r.id);
+  if(r.name==='installer') initInstaller();
+  if(r.name==='dashboard') initDashboard();
+  if(r.name==='contact') initContact();
+  if(r.name==='login') initLogin();
+  if(r.name==='pricing') initPricing();
+  document.querySelectorAll('.orbit-wrap[data-orbit]').forEach(layoutOrbit);
+}
+
+/* ============ RENDERERS ============ */
+var RENDERERS = {};
+
+RENDERERS.home = function(){
+  var headline = 'Transformation, engineered for orbit.';
+  var chars = headline.split('').map(function(c,i){ return '<span class="ch" style="--i:'+i+'">'+(c===' '?'&nbsp;':c)+'</span>'; }).join('');
+  return ''+
+  '<section class="hero">'+
+    '<div class="hero-blob b1"></div><div class="hero-blob b2"></div>'+
+    '<div class="hero-canvas-wrap"><canvas id="heroCanvas"></canvas></div>'+
+    '<div class="hero-inner">'+
+      '<span class="eyebrow">TECHBISS · AURORA SYSTEMS</span>'+
+      '<h1>'+chars+'</h1>'+
+      '<p class="lead">We build the custom software, cloud infrastructure, and applied AI systems that move enterprises off legacy gravity — and the marketplace, migration tooling, and consoles that keep them there.</p>'+
+      '<div class="hero-ctas">'+
+        '<a href="#/solutions" data-link class="btn btn-primary" data-magnetic>Explore Solutions '+icon('arrow')+'</a>'+
+        '<a href="#/contact" data-link class="btn btn-ghost" data-magnetic>Talk to an Architect</a>'+
+      '</div>'+
+      '<div class="hero-stats">'+
+        '<div><strong class="tabular">214</strong><span>Systems migrated</span></div>'+
+        '<div><strong class="tabular">38</strong><span>Countries deployed</span></div>'+
+        '<div><strong class="tabular">99.98%</strong><span>Platform uptime</span></div>'+
+        '<div><strong class="tabular">6 min</strong><span>Avg. deploy time</span></div>'+
+      '</div>'+
+    '</div>'+
+  '</section>'+
+
+  '<section class="section" aria-labelledby="what-we-build">'+
+    '<div class="section-head"><span class="eyebrow">Capability</span><h2 id="what-we-build">What we build</h2><p>Five practices, one platform underneath — so the software you commission today still fits the system you\\'re running in five years.</p></div>'+
+    '<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:1.1rem;">'+
+      SERVICES.map(function(s,i){ return '<div class="card stagger-in" style="--i:'+i+'"><div class="icon-tile">'+icon(s.icon)+'</div><h3 style="font-size:1.05rem; margin-bottom:.5rem;">'+s.name+'</h3><p style="color:var(--text-dim); font-size:.9rem;">'+s.desc+'</p></div>'; }).join('')+
+    '</div>'+
+  '</section>'+
+
+  '<section class="section" aria-labelledby="mp-teaser">'+
+    '<div class="section-head"><span class="eyebrow">Marketplace</span><h2 id="mp-teaser">Deploy-ready systems, not proposals</h2><p>Eight platform modules, live specs, transparent pricing. Browse the full orbit.</p></div>'+
+    '<div class="orbit-wrap" data-orbit data-count="5">'+
+      PRODUCTS.slice(0,5).map(function(p,i){ return orbitCard(p,i); }).join('')+
+    '</div>'+
+    '<div style="text-align:center; margin-top:1rem;"><a href="#/marketplace" data-link class="btn btn-ghost" data-magnetic>View full marketplace '+icon('arrow')+'</a></div>'+
+  '</section>'+
+
+  '<section class="section" aria-labelledby="work-teaser">'+
+    '<div class="section-head"><span class="eyebrow">Proof</span><h2 id="work-teaser">Recent orbit insertions</h2><p>A sample of engagements where the constraint was real and the deadline was fixed.</p></div>'+
+    '<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:1.1rem;">'+
+      CASES.slice(0,3).map(function(c,i){ return caseCard(c,i); }).join('')+
+    '</div>'+
+  '</section>'+
+
+  '<section class="section" style="text-align:center;">'+
+    '<div class="card" style="padding:clamp(2.4rem,6vw,4rem); background:var(--surface);">'+
+      '<h2 style="font-size:clamp(1.6rem,3vw,2.3rem); margin-bottom:1rem;">Ready to leave <span class="grad-text">legacy orbit</span>?</h2>'+
+      '<p style="color:var(--text-dim); max-width:52ch; margin:0 auto 1.6rem;">Tell us what\\'s holding your systems back. We\\'ll tell you, plainly, whether we\\'re the right team to fix it.</p>'+
+      '<a href="#/contact" data-link class="btn btn-primary" data-magnetic>Start a conversation '+icon('arrow')+'</a>'+
+    '</div>'+
+  '</section>';
+};
+
+function orbitCard(p,i){
+  return '<div class="orbit-item stagger-in" style="--i:'+i+'" data-idx="'+i+'">'+
+    '<a href="#/product/'+p.id+'" data-link class="card" style="display:block; height:100%;" data-magnetic>'+
+      '<span class="eyebrow" style="color:var(--text-faint);">'+p.cat+'</span>'+
+      '<h3 style="font-size:1.05rem; margin:.5rem 0 .4rem;">'+p.name+'</h3>'+
+      '<p style="color:var(--text-dim); font-size:.85rem;">'+p.tagline+'</p>'+
+    '</a>'+
+  '</div>';
+}
+function caseCard(c,i){
+  return '<div class="card stagger-in" style="--i:'+i+'">'+
+    '<span class="eyebrow" style="color:var(--text-faint);">'+c.region+'</span>'+
+    '<h3 style="font-size:1.05rem; margin:.5rem 0 .7rem;">'+c.org+'</h3>'+
+    '<p style="color:var(--text-dim); font-size:.87rem; margin-bottom:.9rem;">'+c.outcome+'</p>'+
+    '<strong class="grad-text" style="font-family:var(--font-display); font-size:1rem;">'+c.metric+'</strong>'+
+  '</div>';
+}
+
+function layoutOrbit(wrap){
+  if(window.innerWidth<=880) return;
+  var items = wrap.querySelectorAll('.orbit-item');
+  var n = items.length;
+  var spread = n>6?150:110;
+  var radius = Math.min(300, 60+n*32);
+  wrap.style.minHeight = (radius*1.35+260)+'px';
+  items.forEach(function(el,i){
+    var angle = n===1?0:(-spread/2 + i*(spread/(n-1)));
+    var r = radius + (i%2===0?0:34);
+    el.style.transform = 'translate(-50%,-30%) rotate('+angle+'deg) translateY(-'+r+'px) rotate('+(-angle)+'deg)';
+  });
+}
+window.addEventListener('resize', function(){ document.querySelectorAll('.orbit-wrap[data-orbit]').forEach(layoutOrbit); });
+
+RENDERERS.services = function(){
+  return '<section class="section">'+
+    '<div class="section-head"><span class="eyebrow">Services</span><h2>Five practices, applied together</h2><p>Most vendors specialize in one layer of the stack. We run all five as one accountable team, which is the only way legacy migrations actually stay on schedule.</p></div>'+
+    '<div style="display:flex; flex-direction:column; gap:1rem;">'+
+      SERVICES.map(function(s,i){ return ''+
+        '<div class="card stagger-in" style="--i:'+i+'; display:grid; grid-template-columns:auto 1fr; gap:1.4rem; align-items:start;">'+
+          '<div class="icon-tile" style="margin-bottom:0;">'+icon(s.icon)+'</div>'+
+          '<div>'+
+            '<h3 style="font-size:1.2rem; margin-bottom:.5rem;">'+s.name+'</h3>'+
+            '<p style="color:var(--text-dim); font-size:.95rem; margin-bottom:.9rem; max-width:64ch;">'+s.desc+'</p>'+
+            '<div style="display:flex; gap:.5rem; flex-wrap:wrap;">'+s.tags.map(function(t){return '<span class="chip">'+t+'</span>';}).join('')+'</div>'+
+          '</div>'+
+        '</div>'; }).join('')+
+    '</div>'+
+  '</section>';
+};
+
+RENDERERS.solutions = function(){
+  return '<section class="section">'+
+    '<div class="section-head"><span class="eyebrow">Solutions</span><h2>Built around your industry\\'s actual constraints</h2><p>A financial system and a public-sector portal fail for different reasons. Our approach starts from what your industry cannot tolerate, not a generic delivery template.</p></div>'+
+    '<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:1.1rem;">'+
+      SOLUTIONS.map(function(s,i){ return ''+
+        '<div class="card stagger-in" style="--i:'+i+'">'+
+          '<h3 style="font-size:1.1rem; margin-bottom:.9rem;">'+s.name+'</h3>'+
+          '<p style="font-size:.78rem; text-transform:uppercase; letter-spacing:.05em; color:var(--text-faint); margin-bottom:.3rem;">Challenge</p>'+
+          '<p style="color:var(--text-dim); font-size:.88rem; margin-bottom:.8rem;">'+s.challenge+'</p>'+
+          '<p style="font-size:.78rem; text-transform:uppercase; letter-spacing:.05em; color:var(--text-faint); margin-bottom:.3rem;">Approach</p>'+
+          '<p style="color:var(--text-dim); font-size:.88rem; margin-bottom:.8rem;">'+s.approach+'</p>'+
+          '<p style="font-size:.78rem; text-transform:uppercase; letter-spacing:.05em; color:var(--accent-2); margin-bottom:.3rem;">Outcome</p>'+
+          '<p style="color:var(--text); font-size:.9rem; font-weight:600;">'+s.outcome+'</p>'+
+        '</div>'; }).join('')+
+    '</div>'+
+  '</section>';
+};
+
+RENDERERS.marketplace = function(){
+  var cats = ['All','Platforms','AI Agents','Integrations','Modules'];
+  return '<section class="section">'+
+    '<div class="section-head"><span class="eyebrow">Marketplace</span><h2>Systems you can deploy this quarter</h2><p>Every module is production-tested across live engagements before it ships here. Choose a category, or browse the full orbit.</p></div>'+
+    '<div class="stage-list" id="mpFilters" style="margin-bottom:2.4rem;">'+cats.map(function(c,i){return '<button class="chip'+(i===0?' active':'')+'" data-cat="'+c+'">'+c+'</button>';}).join('')+'</div>'+
+    '<div class="orbit-wrap" data-orbit id="mpGrid">'+PRODUCTS.map(function(p,i){return orbitCard(p,i)+ '<span class="mp-cat" data-cat="'+p.cat+'" style="display:none"></span>';}).join('')+'</div>'+
+  '</section>';
+};
+function initMarketplace(){
+  var filters = document.getElementById('mpFilters');
+  var grid = document.getElementById('mpGrid');
+  if(!filters) return;
+  filters.addEventListener('click', function(e){
+    var btn = e.target.closest('button[data-cat]'); if(!btn) return;
+    filters.querySelectorAll('button').forEach(function(b){b.classList.remove('active');});
+    btn.classList.add('active');
+    var cat = btn.getAttribute('data-cat');
+    var items = grid.querySelectorAll('.orbit-item');
+    items.forEach(function(el,i){
+      var p = PRODUCTS[i];
+      el.style.display = (cat==='All' || p.cat===cat) ? '' : 'none';
+    });
+    layoutOrbit(grid);
+  });
+}
+
+RENDERERS.product = function(r){
+  var p = productById(r.id) || PRODUCTS[0];
+  var related = PRODUCTS.filter(function(x){return x.id!==p.id;}).slice(0,3);
+  return '<section class="section" style="padding-top:clamp(6.5rem,10vw,8rem);">'+
+    '<a href="#/marketplace" data-link style="color:var(--text-faint); font-size:.85rem; display:inline-block; margin-bottom:1.4rem;">&larr; Back to marketplace</a>'+
+    '<div style="display:grid; grid-template-columns:1.1fr 1fr; gap:2.5rem; align-items:start;" class="product-top">'+
+      '<div>'+
+        '<span class="eyebrow">'+p.cat+'</span>'+
+        '<h1 style="font-size:clamp(1.9rem,3.6vw,2.7rem); margin:.5rem 0 .8rem;">'+p.name+'</h1>'+
+        '<p style="color:var(--text-dim); font-size:1.02rem; margin-bottom:1.6rem;">'+p.desc+'</p>'+
+        '<div class="table-scroll"><table class="spec-table"><tbody>'+p.specs.map(function(s){return '<tr><th>'+s[0]+'</th><td>'+s[1]+'</td></tr>';}).join('')+'</tbody></table></div>'+
+      '</div>'+
+      '<div class="viewport" id="pdViewport"><canvas id="pdCanvas"></canvas></div>'+
+    '</div>'+
+
+    '<div id="customizeSection" style="margin-top:3rem;">'+
+      '<div class="section-head" style="margin-bottom:1.6rem;"><span class="eyebrow">Customize</span><h2 style="font-size:1.6rem;">Choose a tier</h2></div>'+
+      '<div style="display:grid; grid-template-columns:2fr 1fr; gap:1.6rem; align-items:start;" class="customize-grid">'+
+        '<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:1rem;" id="tierOptions">'+
+          p.tiers.map(function(t,i){ return ''+
+          '<button type="button" class="card" data-tier="'+i+'" style="text-align:left; cursor:pointer; border-color:'+(i===1?'var(--accent-2)':'var(--border)')+';">'+
+            '<h3 style="font-size:1.05rem; margin-bottom:.3rem;">'+t.name+'</h3>'+
+            '<p class="tabular" style="font-family:var(--font-display); font-size:1.3rem; margin-bottom:.6rem;">'+t.price+'</p>'+
+            '<p style="color:var(--text-dim); font-size:.85rem; margin-bottom:.9rem;">'+t.blurb+'</p>'+
+            '<ul style="display:flex; flex-direction:column; gap:.4rem;">'+t.features.map(function(f){return '<li style="display:flex; gap:.5rem; font-size:.82rem; color:var(--text-dim);"><span style="color:var(--accent-2); flex-shrink:0;">'+icon('check')+'</span>'+f+'</li>';}).join('')+'</ul>'+
+          '</button>'; }).join('')+
+        '</div>'+
+        '<div class="card" id="summaryPanel" style="position:sticky; top:100px;"></div>'+
+      '</div>'+
+    '</div>'+
+
+    '<div id="deployStage" style="margin-top:3rem; display:none;"></div>'+
+
+    '<div class="section-head" style="margin-top:3.5rem; margin-bottom:1.2rem;"><span class="eyebrow">Also in orbit</span><h2 style="font-size:1.4rem;">Related modules</h2></div>'+
+    '<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:1rem;">'+related.map(function(rp,i){return '<a href="#/product/'+rp.id+'" data-link class="card" data-magnetic><span class="eyebrow" style="color:var(--text-faint);">'+rp.cat+'</span><h3 style="font-size:1rem; margin:.4rem 0;">'+rp.name+'</h3><p style="color:var(--text-dim); font-size:.83rem;">'+rp.tagline+'</p></a>';}).join('')+'</div>'+
+  '</section>'+
+  '<style>@media (max-width:820px){ .product-top,.customize-grid{grid-template-columns:1fr !important;} #summaryPanel{position:static !important;} }</style>';
+};
+
+function summaryHTML(p, tierIdx, state){
+  var t = p.tiers[tierIdx];
+  if(state==='processing'){
+    return '<h3 style="font-size:1rem; margin-bottom:.8rem;">Processing request…</h3><div class="progress-track"><div class="progress-fill" style="width:70%;"></div></div><p style="color:var(--text-faint); font-size:.82rem; margin-top:.8rem;">Verifying tier availability and provisioning quota.</p>';
+  }
+  if(state==='confirmed'){
+    return '<div class="pill good" style="margin-bottom:.9rem;">Order confirmed</div>'+
+    '<p style="font-size:.85rem; color:var(--text-dim); margin-bottom:.4rem;">Reference</p>'+
+    '<p class="tabular" style="font-family:var(--font-display); margin-bottom:1.1rem;">TB-'+p.id.slice(0,3).toUpperCase()+'-'+Math.floor(10000+Math.random()*89999)+'</p>'+
+    '<p style="color:var(--text-dim); font-size:.85rem; margin-bottom:1.2rem;">'+p.name+' · '+t.name+' · '+t.price+'</p>'+
+    '<button class="btn btn-primary" id="deployBtn" style="width:100%;" data-magnetic>Begin deployment '+icon('rocket')+'</button>';
+  }
+  return '<h3 style="font-size:1rem; margin-bottom:1rem;">Order summary</h3>'+
+    '<p style="color:var(--text-dim); font-size:.85rem;">Product</p><p style="margin-bottom:.8rem; font-weight:600;">'+p.name+'</p>'+
+    '<p style="color:var(--text-dim); font-size:.85rem;">Tier</p><p style="margin-bottom:.8rem; font-weight:600;" id="summaryTier">'+t.name+'</p>'+
+    '<p style="color:var(--text-dim); font-size:.85rem;">Price</p><p class="tabular grad-text" style="margin-bottom:1.3rem; font-family:var(--font-display); font-size:1.4rem;" id="summaryPrice">'+t.price+'</p>'+
+    '<button class="btn btn-primary" id="purchaseBtn" style="width:100%;" data-magnetic>Purchase '+icon('cart')+'</button>'+
+    '<p style="color:var(--text-faint); font-size:.75rem; margin-top:.8rem; text-align:center;">Simulated checkout — no payment collected.</p>';
+}
+
+function initProduct(id){
+  var p = productById(id) || PRODUCTS[0];
+  var canvas = document.getElementById('pdCanvas');
+  if(canvas) new AbstractViewport(canvas);
+  var tierIdx = 1;
+  var summary = document.getElementById('summaryPanel');
+  function paintTiers(){
+    document.querySelectorAll('#tierOptions [data-tier]').forEach(function(btn){
+      var i = +btn.getAttribute('data-tier');
+      btn.style.borderColor = i===tierIdx ? 'var(--accent-2)' : 'var(--border)';
+      btn.style.boxShadow = i===tierIdx ? '0 0 0 1px var(--accent-2), 0 20px 50px -28px var(--glow)' : '';
+    });
+  }
+  function paintSummary(state){ summary.innerHTML = summaryHTML(p, tierIdx, state); bindMagnetic(); }
+  paintTiers(); paintSummary();
+  document.getElementById('tierOptions').addEventListener('click', function(e){
+    var btn = e.target.closest('[data-tier]'); if(!btn) return;
+    tierIdx = +btn.getAttribute('data-tier'); paintTiers(); paintSummary();
+  });
+  summary.addEventListener('click', function(e){
+    if(e.target.closest('#purchaseBtn')){
+      paintSummary('processing');
+      setTimeout(function(){ paintSummary('confirmed'); }, 1100);
+    } else if(e.target.closest('#deployBtn')){
+      startDeploy(p, tierIdx);
+    }
+  });
+}
+
+function startDeploy(p, tierIdx){
+  var el = document.getElementById('deployStage');
+  el.style.display = 'block';
+  var stages = ['Provisioning','Configuring','Syncing data','Launching'];
+  var idx = 0;
+  function paint(){
+    el.innerHTML = '<div class="section-head" style="margin-bottom:1.4rem;"><span class="eyebrow">Deploy</span><h2 style="font-size:1.5rem;">Launch sequence</h2></div>'+
+    '<div class="stage-panel" style="text-align:center;">'+
+      '<div class="stage-ring-wrap"><svg width="140" height="140" viewBox="0 0 140 140" id="deployRingSvg">'+
+        '<circle cx="70" cy="70" r="60" fill="none" stroke="var(--border)" stroke-width="8"/>'+
+        '<circle cx="70" cy="70" r="60" fill="none" stroke="url(#dg)" stroke-width="8" stroke-linecap="round" transform="rotate(-90 70 70)" id="deployRing" stroke-dasharray="377" stroke-dashoffset="377"/>'+
+        '<defs><linearGradient id="dg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--accent-1)"/><stop offset="1" stop-color="var(--accent-2)"/></linearGradient></defs>'+
+      '</svg></div>'+
+      '<p style="font-family:var(--font-display); font-size:1.1rem;" id="deployLabel">'+(idx<stages.length?stages[idx]+'…':'Live')+'</p>'+
+      '<canvas id="burstCanvas" style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none;"></canvas>'+
+    '</div>';
+  }
+  paint();
+  var ring = document.getElementById('deployRing');
+  function step(){
+    idx++;
+    var pct = Math.min(1, idx/stages.length);
+    if(ring) ring.style.strokeDashoffset = (377 - 377*pct);
+    var label = document.getElementById('deployLabel');
+    if(idx<stages.length){
+      if(label) label.textContent = stages[idx]+'…';
+      setTimeout(step, 750);
+    } else {
+      if(label) label.innerHTML = '<span class="pill good" style="font-size:.85rem;">'+p.name+' is live</span>';
+      var bc = document.getElementById('burstCanvas');
+      if(bc) burstParticles(bc);
+    }
+  }
+  ring && (ring.style.transition = 'stroke-dashoffset .7s ease');
+  setTimeout(step, 700);
+}
+
+function burstParticles(canvas){
+  if(reducedMotion) return;
+  var ctx = canvas.getContext('2d');
+  var dpr = Math.min(window.devicePixelRatio||1,2);
+  function size(){ var r=canvas.getBoundingClientRect(); canvas.width=r.width*dpr; canvas.height=r.height*dpr; }
+  size();
+  var w = canvas.width/dpr, h = canvas.height/dpr;
+  var cx = w/2, cy = h/2;
+  var colors = ['124,109,251','45,216,240','160,150,255'];
+  var particles = Array.from({length:36}, function(){ var a=Math.random()*Math.PI*2, sp=1+Math.random()*2.4; return {x:cx,y:cy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:1,c:colors[Math.floor(Math.random()*colors.length)]}; });
+  var start = performance.now();
+  function loop(t){
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,w,h);
+    var elapsed = t-start;
+    particles.forEach(function(p){ p.x+=p.vx; p.y+=p.vy; p.vy+=0.01; p.life -= 0.012; if(p.life>0){ ctx.beginPath(); ctx.fillStyle='rgba('+p.c+','+p.life+')'; ctx.arc(p.x,p.y,2.4,0,Math.PI*2); ctx.fill(); } });
+    if(elapsed<1600) requestAnimationFrame(loop); else ctx.clearRect(0,0,w,h);
+  }
+  requestAnimationFrame(loop);
+}
+
+RENDERERS.work = function(){
+  return '<section class="section">'+
+    '<div class="section-head"><span class="eyebrow">Work</span><h2>Case studies</h2><p>Names withheld under NDA where required; the mechanics and outcomes are exact.</p></div>'+
+    '<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:1.1rem;">'+
+      CASES.map(function(c,i){ return ''+
+      '<div class="card stagger-in" style="--i:'+i+'">'+
+        '<span class="eyebrow" style="color:var(--text-faint);">'+c.region+'</span>'+
+        '<h3 style="font-size:1.1rem; margin:.5rem 0 .9rem;">'+c.org+'</h3>'+
+        '<p style="font-size:.78rem; text-transform:uppercase; color:var(--text-faint); margin-bottom:.3rem;">Challenge</p>'+
+        '<p style="color:var(--text-dim); font-size:.87rem; margin-bottom:.8rem;">'+c.challenge+'</p>'+
+        '<p style="font-size:.78rem; text-transform:uppercase; color:var(--text-faint); margin-bottom:.3rem;">Approach</p>'+
+        '<p style="color:var(--text-dim); font-size:.87rem; margin-bottom:1rem;">'+c.approach+'</p>'+
+        '<div class="card" style="background:var(--surface-2); padding:.9rem 1.1rem; text-align:center;"><strong class="grad-text" style="font-family:var(--font-display); font-size:1.15rem;">'+c.metric+'</strong></div>'+
+      '</div>'; }).join('')+
+    '</div>'+
+  '</section>';
+};
+
+RENDERERS.process = function(){
+  return '<section class="section">'+
+    '<div class="section-head"><span class="eyebrow">Process</span><h2>Six stages, no surprises</h2><p>The same sequence runs on every engagement, scaled to size — a two-month integration and a two-year transformation follow the same six stages.</p></div>'+
+    '<div style="display:flex; flex-direction:column; gap:0;">'+
+      PROCESS.map(function(s,i){ return ''+
+      '<div class="stagger-in" style="--i:'+i+'; display:grid; grid-template-columns:80px 1fr; gap:1.4rem; padding:1.6rem 0; border-bottom:1px solid var(--border);">'+
+        '<div style="font-family:var(--font-display); font-size:2rem; color:var(--text-faint); opacity:.5;">'+s.n+'</div>'+
+        '<div><div style="display:flex; align-items:baseline; gap:.8rem; flex-wrap:wrap; margin-bottom:.5rem;"><h3 style="font-size:1.2rem;">'+s.name+'</h3><span class="pill good" style="background:var(--surface-2); color:var(--text-faint);">'+s.dur+'</span></div><p style="color:var(--text-dim); font-size:.92rem; max-width:60ch;">'+s.desc+'</p></div>'+
+      '</div>'; }).join('')+
+    '</div>'+
+  '</section>';
+};
+
+RENDERERS.about = function(){
+  return '<section class="section">'+
+    '<div class="section-head"><span class="eyebrow">About</span><h2>Built by people who\\'ve run the incident call</h2><p>TECHBISS was founded by engineers who spent a decade inside enterprises watching modernization projects stall. We build the thing we wished someone had sold us.</p></div>'+
+    '<div style="display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--border); border:1px solid var(--border); border-radius:var(--radius-md); overflow:hidden; margin-bottom:3rem;" class="about-values">'+
+      [['Say the hard thing early','We tell clients when a timeline is unrealistic in the first meeting, not the last one.'],['Own the whole system','No layer we hand off without documentation, tests, and a named owner on our side.'],['Build for the next team','Every system ships assuming someone who isn\\'t us will maintain it eventually.']].map(function(v){ return '<div style="background:var(--surface); padding:1.6rem;"><h3 style="font-size:1rem; margin-bottom:.6rem;">'+v[0]+'</h3><p style="color:var(--text-dim); font-size:.87rem;">'+v[1]+'</p></div>'; }).join('')+
+    '</div>'+
+    '<div class="section-head" style="margin-bottom:1.4rem;"><h2 style="font-size:1.4rem;">Leadership</h2></div>'+
+    '<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:1rem; margin-bottom:3rem;">'+
+      TEAM.map(function(t,i){ return '<div class="card stagger-in" style="--i:'+i+'"><div class="icon-tile">'+icon('users')+'</div><h3 style="font-size:1.02rem; margin-bottom:.2rem;">'+t.name+'</h3><p style="color:var(--accent-2); font-size:.8rem; margin-bottom:.7rem;">'+t.role+'</p><p style="color:var(--text-dim); font-size:.85rem;">'+t.bio+'</p></div>'; }).join('')+
+    '</div>'+
+    '<div class="hairline-grid" style="grid-template-columns:repeat(4,1fr);">'+
+      [['2014','Founded by three infrastructure engineers'],['2018','First multi-region core banking migration'],['2022','Applied AI practice launched'],['2026','Engagements spanning 38 countries']].map(function(m){return '<div style="background:var(--surface); padding:1.4rem; text-align:center;"><strong class="tabular" style="font-family:var(--font-display); display:block; font-size:1.3rem;">'+m[0]+'</strong><span style="color:var(--text-dim); font-size:.82rem;">'+m[1]+'</span></div>';}).join('')+
+    '</div>'+
+    '<style>@media (max-width:760px){.about-values{grid-template-columns:1fr !important;}}</style>'+
+  '</section>';
+};
+
+RENDERERS.resources = function(){
+  var tags = ['All','Engineering Notes','Whitepaper','Webinar'];
+  return '<section class="section">'+
+    '<div class="section-head"><span class="eyebrow">Resources</span><h2>Notes from inside the work</h2><p>Written by the engineers who did it, not a content team summarizing them afterward.</p></div>'+
+    '<div class="stage-list" id="resFilters" style="margin-bottom:2rem;">'+tags.map(function(t,i){return '<button class="chip'+(i===0?' active':'')+'" data-tag="'+t+'">'+t+'</button>';}).join('')+'</div>'+
+    '<div style="display:flex; flex-direction:column; gap:0;" id="resList">'+
+      RESOURCES.map(function(r){ return ''+
+      '<a href="#" class="res-row" data-tag="'+r.tag+'" style="display:flex; justify-content:space-between; gap:1.2rem; padding:1.3rem 0; border-bottom:1px solid var(--border); align-items:center;" onclick="return false;">'+
+        '<div><span class="eyebrow" style="color:var(--text-faint);">'+r.tag+'</span><h3 style="font-size:1.05rem; margin-top:.4rem; font-family:var(--font-body); font-weight:600;">'+r.title+'</h3></div>'+
+        '<span style="color:var(--text-faint); font-size:.82rem; white-space:nowrap;">'+r.read+'</span>'+
+      '</a>'; }).join('')+
+    '</div>'+
+  '</section>';
+};
+document.addEventListener('click', function(e){
+  var b = e.target.closest('#resFilters button'); if(!b) return;
+  b.parentElement.querySelectorAll('button').forEach(function(x){x.classList.remove('active');});
+  b.classList.add('active');
+  var tag = b.getAttribute('data-tag');
+  document.querySelectorAll('.res-row').forEach(function(row){ row.style.display = (tag==='All'||row.getAttribute('data-tag')===tag) ? 'flex':'none'; });
+});
+
+RENDERERS.pricing = function(){
+  var plans = [
+    {name:'Foundation', price:{m:'$4,200',y:'$42,000'}, desc:'For a single system in need of modernization.', features:['1 active engagement','Core platform access','Business-hours support','Quarterly architecture review']},
+    {name:'Scale', price:{m:'$14,500',y:'$145,000'}, feat:true, desc:'For organizations running multiple concurrent systems.', features:['Up to 5 active engagements','Full platform + marketplace access','24/5 priority support','Monthly architecture review','Dedicated delivery lead']},
+    {name:'Enterprise', price:{m:'Custom',y:'Custom'}, desc:'For portfolio-scale transformation programs.', features:['Unlimited engagements','White-glove onboarding','24/7 support with named responders','Custom compliance mapping','Executive quarterly business review']}
+  ];
+  return '<section class="section">'+
+    '<div class="section-head" style="margin:0 auto 2rem; text-align:center; align-items:center;"><span class="eyebrow">Pricing</span><h2>Straightforward, by engagement scale</h2><p style="text-align:center;">Every tier includes the full delivery team — architecture, engineering, and operations — not just software access.</p></div>'+
+    '<div style="text-align:center; margin-bottom:2.4rem;"><div class="toggle-group" id="billToggle"><button class="active" data-b="m">Monthly</button><button data-b="y">Annual — save 17%</button></div></div>'+
+    '<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:1.1rem; align-items:stretch;">'+
+      plans.map(function(p,i){ return ''+
+      '<div class="card stagger-in" style="--i:'+i+'; '+(p.feat?'border-color:var(--accent-2); box-shadow:0 0 0 1px var(--accent-2);':'')+'">'+
+        (p.feat?'<span class="pill good" style="margin-bottom:.9rem;">Most common</span>':'')+
+        '<h3 style="font-size:1.15rem; margin-bottom:.4rem;">'+p.name+'</h3>'+
+        '<p style="color:var(--text-dim); font-size:.87rem; margin-bottom:1rem;">'+p.desc+'</p>'+
+        '<p class="tabular price-val" style="font-family:var(--font-display); font-size:2rem; margin-bottom:.2rem;" data-m="'+p.price.m+'" data-y="'+p.price.y+'">'+p.price.m+'</p>'+
+        '<p style="color:var(--text-faint); font-size:.78rem; margin-bottom:1.3rem;">per month, billed as selected</p>'+
+        '<ul style="display:flex; flex-direction:column; gap:.55rem; margin-bottom:1.4rem;">'+p.features.map(function(f){return '<li style="display:flex; gap:.5rem; font-size:.85rem; color:var(--text-dim);"><span style="color:var(--accent-2); flex-shrink:0;">'+icon('check')+'</span>'+f+'</li>';}).join('')+'</ul>'+
+        '<a href="#/contact" data-link class="btn '+(p.feat?'btn-primary':'btn-ghost')+'" style="width:100%;" data-magnetic>Get started</a>'+
+      '</div>'; }).join('')+
+    '</div>'+
+    '<div class="section-head" style="margin:3.5rem auto 1rem;"><h2 style="font-size:1.4rem;">Frequently asked</h2></div>'+
+    '<div>'+
+      [['Do prices include implementation, or just software access?','Every tier includes the delivery team — architects and engineers — not a software license you\\'re left to implement alone.'],
+       ['Can we change tiers mid-engagement?','Yes. Tier changes take effect at the start of the next billing cycle with no penalty.'],
+       ['What happens after the engagement ends?','Systems we build remain fully documented and owned by you. Managed Operations is optional, not required.'],
+       ['Is there a minimum contract length?','Foundation and Scale run month-to-month after an initial 3-month term. Enterprise terms are negotiated per program.']
+      ].map(function(f){return '<details class="faq"><summary>'+f[0]+'</summary><p>'+f[1]+'</p></details>';}).join('')+
+    '</div>'+
+  '</section>';
+};
+function initPricing(){
+  var toggle = document.getElementById('billToggle');
+  if(!toggle) return;
+  toggle.addEventListener('click', function(e){
+    var b = e.target.closest('button'); if(!b) return;
+    toggle.querySelectorAll('button').forEach(function(x){x.classList.remove('active');});
+    b.classList.add('active');
+    var key = b.getAttribute('data-b');
+    document.querySelectorAll('.price-val').forEach(function(el){ el.textContent = el.getAttribute('data-'+key); });
+  });
+}
+
+RENDERERS.contact = function(){
+  return '<section class="section" style="max-width:920px;">'+
+    '<div class="section-head"><span class="eyebrow">Contact</span><h2>Tell us what\\'s not working</h2><p>A short brief gets you a faster, more useful first call than a form full of marketing questions. We read every submission personally.</p></div>'+
+    '<div style="display:grid; grid-template-columns:1.3fr 1fr; gap:2rem;" class="contact-grid">'+
+      '<form id="contactForm" novalidate>'+
+        '<div class="form-grid" style="margin-bottom:1.1rem;">'+
+          '<div class="field"><label for="cf-name">Full name</label><input id="cf-name" name="name" required placeholder="Jordan Ito"></div>'+
+          '<div class="field"><label for="cf-email">Work email</label><input id="cf-email" name="email" type="email" required placeholder="jordan@company.com"></div>'+
+        '</div>'+
+        '<div class="form-grid" style="margin-bottom:1.1rem;">'+
+          '<div class="field"><label for="cf-org">Organization</label><input id="cf-org" name="org" required placeholder="Company name"></div>'+
+          '<div class="field"><label for="cf-budget">Estimated scope</label><select id="cf-budget" name="budget"><option>Under $50K</option><option selected>$50K – $250K</option><option>$250K – $1M</option><option>$1M+</option></select></div>'+
+        '</div>'+
+        '<div class="field" style="margin-bottom:1.3rem;"><label for="cf-msg">What\\'s the constraint?</label><textarea id="cf-msg" name="message" rows="5" required placeholder="Tell us what system, what deadline, what\\'s blocking it today."></textarea></div>'+
+        '<button class="btn btn-primary" type="submit" data-magnetic>Send brief '+icon('arrow')+'</button>'+
+        '<p id="contactMsg" role="status" style="margin-top:1rem; font-size:.88rem; color:var(--success);"></p>'+
+      '</form>'+
+      '<div>'+
+        '<div class="card" style="margin-bottom:1rem;"><h3 style="font-size:.95rem; margin-bottom:.4rem;">Headquarters</h3><p style="color:var(--text-dim); font-size:.87rem;">4 Meridian Way, Suite 1900<br>Singapore 018956</p></div>'+
+        '<div class="card" style="margin-bottom:1rem;"><h3 style="font-size:.95rem; margin-bottom:.4rem;">Regional offices</h3><p style="color:var(--text-dim); font-size:.87rem;">London · New York · São Paulo · Bengaluru</p></div>'+
+        '<div class="card"><h3 style="font-size:.95rem; margin-bottom:.4rem;">Response time</h3><p style="color:var(--text-dim); font-size:.87rem;">Every brief gets a reply from an architect, not sales, within one business day.</p></div>'+
+      '</div>'+
+    '</div>'+
+    '<style>@media (max-width:760px){.contact-grid{grid-template-columns:1fr !important;}}</style>'+
+  '</section>';
+};
+function initContact(){
+  var form = document.getElementById('contactForm');
+  if(!form) return;
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    if(!form.checkValidity()){ form.reportValidity(); return; }
+    var msg = document.getElementById('contactMsg');
+    msg.textContent = 'Sending…'; msg.style.color = 'var(--text-faint)';
+    setTimeout(function(){
+      msg.textContent = 'Received. An architect will respond within one business day.';
+      msg.style.color = 'var(--success)';
+      form.reset();
+    }, 900);
+  });
+}
+
+RENDERERS.login = function(){
+  return '<section class="section" style="max-width:440px; padding-top:clamp(6.5rem,12vw,8rem);">'+
+    '<div class="card" style="padding:2.2rem;">'+
+      '<div class="toggle-group" id="loginTabs" style="width:100%; margin-bottom:1.6rem;"><button class="active" data-tab="in" style="flex:1;">Sign in</button><button data-tab="req" style="flex:1;">Request access</button></div>'+
+      '<div id="loginPane"></div>'+
+    '</div>'+
+  '</section>';
+};
+function loginPaneHTML(tab){
+  if(tab==='req'){
+    return '<div class="field" style="margin-bottom:1rem;"><label for="lg-name">Full name</label><input id="lg-name" placeholder="Full name"></div>'+
+    '<div class="field" style="margin-bottom:1rem;"><label for="lg-em2">Work email</label><input id="lg-em2" type="email" placeholder="you@company.com"></div>'+
+    '<div class="field" style="margin-bottom:1.3rem;"><label for="lg-role">Requesting</label><select id="lg-role"><option>Client console access</option><option>Staff console access</option><option>Admin console access</option></select></div>'+
+    '<button class="btn btn-primary" style="width:100%;" id="loginSubmit" data-magnetic>Request access</button>'+
+    '<p id="loginStatus" style="margin-top:.9rem; font-size:.85rem; color:var(--success);"></p>';
+  }
+  return '<div class="field" style="margin-bottom:1rem;"><label for="lg-email">Email</label><input id="lg-email" type="email" placeholder="you@company.com"></div>'+
+  '<div class="field" style="margin-bottom:.6rem;"><label for="lg-pass">Password</label><input id="lg-pass" type="password" placeholder="••••••••"></div>'+
+  '<p style="text-align:right; font-size:.8rem; color:var(--accent-2); margin-bottom:1.3rem;">Forgot password?</p>'+
+  '<button class="btn btn-primary" style="width:100%; margin-bottom:.8rem;" id="loginSubmit" data-magnetic>Access console '+icon('arrow')+'</button>'+
+  '<button class="btn btn-ghost" style="width:100%;" type="button">Continue with SSO</button>'+
+  '<p id="loginStatus" style="margin-top:.9rem; font-size:.85rem; color:var(--success);"></p>';
+}
+function initLogin(){
+  var tabs = document.getElementById('loginTabs');
+  var pane = document.getElementById('loginPane');
+  if(!tabs) return;
+  var current = 'in';
+  function paint(){ pane.innerHTML = loginPaneHTML(current); }
+  paint();
+  tabs.addEventListener('click', function(e){
+    var b = e.target.closest('button'); if(!b) return;
+    tabs.querySelectorAll('button').forEach(function(x){x.classList.remove('active');});
+    b.classList.add('active'); current = b.getAttribute('data-tab'); paint();
+  });
+  pane.addEventListener('click', function(e){
+    if(!e.target.closest('#loginSubmit')) return;
+    var status = document.getElementById('loginStatus');
+    status.textContent = 'Verifying…'; status.style.color = 'var(--text-faint)';
+    setTimeout(function(){
+      if(current==='in'){ status.textContent = 'Access granted. Redirecting to console…'; status.style.color='var(--success)'; setTimeout(function(){ navigate('#/dashboard'); }, 700); }
+      else { status.textContent = 'Request received — an admin will provision access within one business day.'; status.style.color='var(--success)'; }
+    }, 800);
+  });
+}
+
+RENDERERS.installer = function(){
+  var stages = ['Select','Detect','Configure','Import','Install','Verify','Launch'];
+  return '<section class="section" style="max-width:900px;">'+
+    '<div class="section-head" style="text-align:center; margin:0 auto 2rem; align-items:center;"><span class="eyebrow">Installer</span><h2>Migration &amp; deployment console</h2><p style="text-align:center;">Seven launch stages, run against your environment. Nothing here touches production until Install.</p></div>'+
+    '<div class="stage-list" id="stageChips">'+stages.map(function(s,i){return '<div class="stage-chip" data-i="'+i+'"><span class="stage-num">'+(i+1)+'</span>'+s+'</div>';}).join('')+'</div>'+
+    '<div id="stagePanelWrap"></div>'+
+  '</section>';
+};
+
+var INSTALL_SOURCES = ['Legacy ERP export','On-prem file server','Competitor SaaS platform','Custom SQL database'];
+function initInstaller(){
+  var stages = ['Select','Detect','Configure','Import','Install','Verify','Launch'];
+  var idx = 0, selectedSource = 0, running = false;
+  var chips = document.getElementById('stageChips');
+  var wrap = document.getElementById('stagePanelWrap');
+
+  function paintChips(){
+    chips.querySelectorAll('.stage-chip').forEach(function(c){
+      var i = +c.getAttribute('data-i');
+      c.classList.toggle('active', i===idx);
+      c.classList.toggle('done', i<idx);
+    });
+  }
+  function ringSvg(pct, size){
+    size = size||120; var r = size/2-10; var c = 2*Math.PI*r;
+    return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 '+size+' '+size+'">'+
+      '<circle cx="'+size/2+'" cy="'+size/2+'" r="'+r+'" fill="none" stroke="var(--border)" stroke-width="8"/>'+
+      '<circle cx="'+size/2+'" cy="'+size/2+'" r="'+r+'" fill="none" stroke="url(#ig)" stroke-width="8" stroke-linecap="round" transform="rotate(-90 '+size/2+' '+size/2+')" stroke-dasharray="'+c+'" stroke-dashoffset="'+(c-c*pct)+'" style="transition:stroke-dashoffset .5s ease;"/>'+
+      '<defs><linearGradient id="ig" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--accent-1)"/><stop offset="1" stop-color="var(--accent-2)"/></linearGradient></defs>'+
+    '</svg>';
+  }
+
+  function paintPanel(){
+    var overallPct = idx/(stages.length-1);
+    var body = '';
+    if(idx===0){
+      body = '<h3 style="font-size:1.1rem; margin-bottom:1.1rem;">Select a migration source</h3>'+
+      '<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:.8rem; margin-bottom:1.6rem;">'+
+        INSTALL_SOURCES.map(function(s,i){ return '<button type="button" class="card" data-src="'+i+'" style="text-align:left; border-color:'+(i===selectedSource?'var(--accent-2)':'var(--border)')+';"><strong style="font-size:.9rem;">'+s+'</strong></button>'; }).join('')+
+      '</div>'+
+      '<button class="btn btn-primary" id="stageNext" data-magnetic>Continue '+icon('arrow')+'</button>';
+    } else if(idx===1){
+      body = '<h3 style="font-size:1.1rem; margin-bottom:.6rem;">Detecting environment</h3>'+
+      '<p style="color:var(--text-dim); font-size:.88rem; margin-bottom:.4rem;">Scanning '+INSTALL_SOURCES[selectedSource]+' for schema, volume, and dependency graph.</p>'+
+      '<div class="scan-sweep"></div>'+
+      '<div id="detectResults" style="min-height:24px; font-size:.85rem; color:var(--text-faint);">Scanning…</div>'+
+      '<button class="btn btn-primary" id="stageNext" data-magnetic disabled style="margin-top:1rem;">Continue '+icon('arrow')+'</button>';
+    } else if(idx===2){
+      body = '<h3 style="font-size:1.1rem; margin-bottom:1.1rem;">Configure target environment</h3>'+
+      '<div class="form-grid" style="margin-bottom:1.2rem;">'+
+        '<div class="field"><label>Environment</label><select id="cfgEnv"><option>Staging</option><option selected>Production</option></select></div>'+
+        '<div class="field"><label>Region</label><select id="cfgRegion"><option>us-east</option><option>eu-west</option><option selected>ap-southeast</option></select></div>'+
+      '</div>'+
+      '<div style="display:flex; gap:1.4rem; flex-wrap:wrap; margin-bottom:1.4rem;">'+
+        ['Enable audit logging','Preserve source IDs','Run in shadow mode first'].map(function(l,i){return '<label style="display:flex; align-items:center; gap:.5rem; font-size:.87rem; color:var(--text-dim);"><input type="checkbox" '+(i<2?'checked':'')+' style="width:auto;">'+l+'</label>';}).join('')+
+      '</div>'+
+      '<button class="btn btn-primary" id="stageNext" data-magnetic>Continue '+icon('arrow')+'</button>';
+    } else if(idx===3){
+      body = '<h3 style="font-size:1.1rem; margin-bottom:.6rem;">Importing data</h3>'+
+      '<p class="byte-counter tabular grad-text" id="byteCounter">0 MB / 4,820 MB</p>'+
+      '<div class="progress-track"><div class="progress-fill" id="importFill"></div></div>'+
+      '<button class="btn btn-primary" id="stageNext" data-magnetic disabled style="margin-top:1.2rem;">Continue '+icon('arrow')+'</button>';
+    } else if(idx===4){
+      body = '<h3 style="font-size:1.1rem; margin-bottom:1.1rem;">Installing</h3>'+
+      '<div class="stage-ring-wrap">'+ringSvg(0,140)+'</div>'+
+      '<p id="installPct" style="font-family:var(--font-display); font-size:1.1rem;">0%</p>'+
+      '<button class="btn btn-primary" id="stageNext" data-magnetic disabled style="margin-top:.8rem;">Continue '+icon('arrow')+'</button>';
+    } else if(idx===5){
+      var checks = ['Schema integrity','Row-count parity','Permission mapping','Index rebuild','Rollback snapshot saved'];
+      body = '<h3 style="font-size:1.1rem; margin-bottom:1rem;">Verifying deployment</h3>'+
+      '<div id="checkList">'+checks.map(function(c,i){return '<div class="check-item" data-c="'+i+'"><span class="tick"></span>'+c+'</div>';}).join('')+'</div>'+
+      '<button class="btn btn-primary" id="stageNext" data-magnetic disabled style="margin-top:1.2rem;">Continue '+icon('arrow')+'</button>';
+    } else {
+      body = '<div style="text-align:center;">'+
+      '<div class="icon-tile" style="width:64px; height:64px; margin:0 auto 1.2rem; border-radius:50%;">'+icon('rocket')+'</div>'+
+      '<h3 style="font-size:1.4rem; margin-bottom:.6rem;">Cleared for launch</h3>'+
+      '<p style="color:var(--text-dim); font-size:.92rem; margin-bottom:1.6rem;">'+INSTALL_SOURCES[selectedSource]+' has been fully migrated and verified. The system is live.</p>'+
+      '<a href="#/dashboard" data-link class="btn btn-primary" data-magnetic>View in console '+icon('arrow')+'</a>'+
+      '<canvas id="installBurst" style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none;"></canvas>'+
+      '</div>';
+    }
+    wrap.innerHTML = '<div class="stage-panel">'+
+      '<div class="stage-ring-wrap" style="margin-bottom:1.4rem;">'+ringSvg(overallPct,90)+'</div>'+
+      body+
+    '</div>';
+    bindMagnetic();
+    wireStage();
+  }
+
+  function wireStage(){
+    var next = document.getElementById('stageNext');
+    if(idx===0){
+      wrap.querySelectorAll('[data-src]').forEach(function(btn){
+        btn.addEventListener('click', function(){ selectedSource=+btn.getAttribute('data-src'); paintPanel(); });
+      });
+      next && next.addEventListener('click', advance);
+    } else if(idx===1){
+      setTimeout(function(){
+        var res = document.getElementById('detectResults');
+        if(res) res.innerHTML = 'Found 4 schemas · 128 tables · 3 downstream dependencies flagged for review.';
+        var n = document.getElementById('stageNext'); if(n) n.removeAttribute('disabled');
+      }, 1600);
+      next && next.addEventListener('click', advance);
+    } else if(idx===2){
+      next.addEventListener('click', advance);
+    } else if(idx===3){
+      var fill = document.getElementById('importFill'); var counter = document.getElementById('byteCounter');
+      var total = 4820, cur = 0;
+      var t = setInterval(function(){
+        cur += Math.random()*380+120; if(cur>total) cur=total;
+        if(fill) fill.style.width = (cur/total*100)+'%';
+        if(counter) counter.textContent = Math.round(cur).toLocaleString()+' MB / '+total.toLocaleString()+' MB';
+        if(cur>=total){ clearInterval(t); var n=document.getElementById('stageNext'); if(n) n.removeAttribute('disabled'); }
+      }, 220);
+      next.addEventListener('click', advance);
+    } else if(idx===4){
+      var pctEl = document.getElementById('installPct');
+      var svgRing = wrap.querySelector('svg circle:nth-child(2)');
+      var r = 60, c = 2*Math.PI*r; var pct=0;
+      var t2 = setInterval(function(){
+        pct += Math.random()*8+4; if(pct>100) pct=100;
+        if(svgRing) svgRing.style.strokeDashoffset = (c-c*pct/100);
+        if(pctEl) pctEl.textContent = Math.round(pct)+'%';
+        if(pct>=100){ clearInterval(t2); var n=document.getElementById('stageNext'); if(n) n.removeAttribute('disabled'); }
+      }, 260);
+      next.addEventListener('click', advance);
+    } else if(idx===5){
+      var items = wrap.querySelectorAll('.check-item');
+      items.forEach(function(el,i){
+        setTimeout(function(){ el.classList.add('ticked'); el.querySelector('.tick').innerHTML = icon('check'); if(i===items.length-1){ var n=document.getElementById('stageNext'); if(n) n.removeAttribute('disabled'); } }, 450*(i+1));
+      });
+      next.addEventListener('click', advance);
+    } else if(idx===6){
+      var bc = document.getElementById('installBurst');
+      if(bc) burstParticles(bc);
+    }
+  }
+  function advance(){ if(idx<stages.length-1){ idx++; paintChips(); paintPanel(); } }
+  chips.addEventListener('click', function(e){
+    var c = e.target.closest('.stage-chip'); if(!c) return;
+    var i = +c.getAttribute('data-i'); if(i<=idx || i===idx+1){ if(i<idx){ idx=i; paintChips(); paintPanel(); } }
+  });
+  paintChips(); paintPanel();
+}
+
+/* ============ DASHBOARD ============ */
+RENDERERS.dashboard = function(){
+  var deployments = [
+    {name:'Orbital Core', env:'Production', stage:'Live', status:'good', eta:'—'},
+    {name:'Ledger Sync — EU cluster', env:'Production', stage:'Rolling update', status:'warn', eta:'12 min'},
+    {name:'Atlas Migrate — Batch 14', env:'Staging', stage:'Verifying', status:'warn', eta:'4 min'},
+    {name:'Signal AI — inference v2.3', env:'Production', stage:'Live', status:'good', eta:'—'},
+    {name:'Perimeter — APAC rollout', env:'Production', stage:'Provisioning', status:'good', eta:'26 min'},
+    {name:'Beacon Analytics — retention job', env:'Production', stage:'Failed health check', status:'bad', eta:'—'}
+  ];
+  var alerts = [
+    {sev:'bad', text:'Beacon Analytics retention job failed health check on ap-southeast-2.', time:'3 min ago'},
+    {sev:'warn', text:'Ledger Sync EU cluster latency above 400ms threshold.', time:'18 min ago'},
+    {sev:'good', text:'Perimeter APAC rollout passed policy validation.', time:'41 min ago'},
+    {sev:'warn', text:'Atlas Migrate batch 14 flagged 2 rows for manual review.', time:'1 hr ago'}
+  ];
+  var nodes = ['Core API','Auth','Marketplace','AI Inference','CDN Edge'];
+  var sparkPath = function(seed){
+    var pts = []; var v = 40 + seed;
+    for(var i=0;i<12;i++){ v += (Math.sin(i+seed)*6 + (Math.random()-0.5)*8); v = Math.max(10,Math.min(70,v)); pts.push(v); }
+    return pts.map(function(p,i){ return (i*(120/11)).toFixed(1)+','+(70-p).toFixed(1); }).join(' ');
+  };
+  return '<div class="dash">'+
+    '<aside class="dash-side">'+
+      '<div class="nav-logo"><span class="dot"></span>TECHBISS</div>'+
+      '<a href="#/dashboard" data-link class="dash-nav-item active">'+icon('home')+'Overview</a>'+
+      '<a href="#/marketplace" data-link class="dash-nav-item">'+icon('grid')+'Deployments</a>'+
+      '<a href="#/marketplace" data-link class="dash-nav-item">'+icon('box')+'Marketplace</a>'+
+      '<a href="#/installer" data-link class="dash-nav-item">'+icon('migrate')+'Installer</a>'+
+      '<a href="#/resources" data-link class="dash-nav-item">'+icon('bell')+'Alerts</a>'+
+      '<a href="#/about" data-link class="dash-nav-item">'+icon('users')+'Team</a>'+
+      '<a href="#/pricing" data-link class="dash-nav-item">'+icon('settings')+'Billing</a>'+
+      '<div style="margin-top:auto; padding:.8rem; font-size:.75rem; color:var(--text-faint);">Signed in as<br><strong style="color:var(--text);">admin@techbiss.com</strong></div>'+
+    '</aside>'+
+    '<div class="dash-main">'+
+      '<div class="dash-topbar">'+
+        '<div><span class="eyebrow">Mission control</span><h1 style="font-size:1.5rem; margin-top:.2rem;">Overview</h1></div>'+
+        '<div style="display:flex; align-items:center; gap:.8rem;"><span class="pill good">All core systems nominal</span><button class="icon-btn" aria-label="Search" data-magnetic>'+icon('search')+'</button><button class="icon-btn" aria-label="Notifications" data-magnetic>'+icon('bell')+'</button></div>'+
+      '</div>'+
+      '<div class="dash-kpis">'+
+        [['Active deployments','128','+6 this week','up',sparkPath(1)],['Fleet health','99.2%','+0.3%','up',sparkPath(2)],['Open incidents','3','+1','down',sparkPath(3)],['MRR','$482K','+4.1%','up',sparkPath(4)]].map(function(k){ return ''+
+        '<div class="kpi-card"><div class="label">'+k[0]+'</div><div class="value tabular">'+k[1]+'</div><div class="delta '+k[3]+'">'+(k[3]==='up'?'▲':'▼')+' '+k[2]+'</div>'+
+        '<svg width="100%" height="34" viewBox="0 0 120 70" preserveAspectRatio="none" style="margin-top:.4rem;"><polyline points="'+k[4]+'" fill="none" stroke="var(--accent-2)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>'+
+        '</div>'; }).join('')+
+      '</div>'+
+      '<div class="dash-cols">'+
+        '<div class="panel"><h3>Deployment queue</h3><div class="table-scroll"><table class="dtable"><thead><tr><th>System</th><th>Environment</th><th>Stage</th><th>Status</th><th>ETA</th></tr></thead><tbody>'+
+          deployments.map(function(d){ return '<tr><td style="color:var(--text); font-weight:600;">'+d.name+'</td><td>'+d.env+'</td><td>'+d.stage+'</td><td><span class="pill '+d.status+'">'+(d.status==='good'?'Healthy':d.status==='warn'?'Watch':'Action needed')+'</span></td><td class="tabular">'+d.eta+'</td></tr>'; }).join('')+
+        '</tbody></table></div></div>'+
+        '<div style="display:flex; flex-direction:column; gap:1.2rem;">'+
+          '<div class="panel"><h3>Alerts</h3>'+
+            alerts.map(function(a){ var c = a.sev==='bad'?'var(--danger)':a.sev==='warn'?'var(--warning)':'var(--success)'; return '<div class="alert-row"><div class="severity-stripe" style="background:'+c+';"></div><div><p style="font-size:.85rem; color:var(--text);">'+a.text+'</p><p style="font-size:.74rem; color:var(--text-faint); margin-top:.2rem;">'+a.time+'</p></div></div>'; }).join('')+
+          '</div>'+
+          '<div class="panel"><h3>System map</h3>'+
+            '<svg viewBox="0 0 220 140" width="100%" style="overflow:visible;">'+
+              '<line x1="40" y1="30" x2="110" y2="70" stroke="var(--border)" stroke-width="1.5"/>'+
+              '<line x1="180" y1="30" x2="110" y2="70" stroke="var(--border)" stroke-width="1.5"/>'+
+              '<line x1="40" y1="110" x2="110" y2="70" stroke="var(--border)" stroke-width="1.5"/>'+
+              '<line x1="180" y1="110" x2="110" y2="70" stroke="var(--border)" stroke-width="1.5"/>'+
+              '<circle cx="110" cy="70" r="16" fill="var(--surface-2)" stroke="var(--accent-2)" stroke-width="1.5"/>'+
+              '<circle cx="40" cy="30" r="10" fill="var(--success)"/><circle cx="180" cy="30" r="10" fill="var(--success)"/>'+
+              '<circle cx="40" cy="110" r="10" fill="var(--warning)"/><circle cx="180" cy="110" r="10" fill="var(--success)"/>'+
+              '<text x="110" y="74" text-anchor="middle" font-size="7" fill="var(--text)" font-family="Space Grotesk">CORE</text>'+
+            '</svg>'+
+            '<div style="display:flex; flex-wrap:wrap; gap:.5rem; margin-top:.6rem;">'+nodes.map(function(n,i){return '<span class="pill '+(i===3?'warn':'good')+'" style="font-size:.7rem;">'+n+'</span>';}).join('')+'</div>'+
+          '</div>'+
+        '</div>'+
+      '</div>'+
+    '</div>'+
+  '</div>';
+};
+function initDashboard(){ /* static realistic screen; kpi sparklines already rendered inline */ }
+
+RENDERERS.notfound = function(){
+  return '<section class="section" style="text-align:center; padding-top:8rem;">'+
+    '<span class="eyebrow">404</span><h2 style="margin:.6rem 0 1rem; font-size:2rem;">This coordinate doesn\\'t exist</h2>'+
+    '<p style="color:var(--text-dim); margin-bottom:1.6rem;">The page you\\'re looking for has drifted out of orbit.</p>'+
+    '<a href="#/" data-link class="btn btn-primary" data-magnetic>Return home</a>'+
+  '</section>';
+};
+
+/* ============ HERO / VIEWPORT CANVASES ============ */
+function StarField(canvas, opts){
+  opts = opts || {};
+  this.canvas = canvas; this.ctx = canvas.getContext('2d');
+  this.dpr = Math.min(window.devicePixelRatio||1, 2);
+  this.density = opts.density || 9000;
+  this.max = opts.max || 110;
+  this.paused = false;
+  this.resize(); this.init();
+  var self = this;
+  window.addEventListener('resize', function(){ self.resize(); self.init(); });
+  document.addEventListener('visibilitychange', function(){ if(document.hidden) self.stop(); else self.start(); });
+  if(reducedMotion){ this.draw(0); } else { this.start(); }
+}
+StarField.prototype.resize = function(){
+  var r = this.canvas.getBoundingClientRect();
+  this.w = r.width; this.h = r.height || 1;
+  this.canvas.width = this.w*this.dpr; this.canvas.height = this.h*this.dpr;
+};
+StarField.prototype.init = function(){
+  var n = Math.min(this.max, Math.max(30, Math.floor(this.w*this.h/this.density)));
+  this.stars = Array.from({length:n}, function(){ return {x:Math.random(), y:Math.random(), r:Math.random()*1.3+0.4, vy:Math.random()*0.00018+0.00004, phase:Math.random()*Math.PI*2, tint:Math.random()>0.85}; });
+};
+StarField.prototype.start = function(){ if(this.raf || reducedMotion) return; var self=this; function loop(t){ self.draw(t); self.raf=requestAnimationFrame(loop); } this.raf=requestAnimationFrame(loop); };
+StarField.prototype.stop = function(){ if(this.raf){ cancelAnimationFrame(this.raf); this.raf=null; } };
+StarField.prototype.draw = function(t){
+  var ctx=this.ctx; ctx.setTransform(this.dpr,0,0,this.dpr,0,0); ctx.clearRect(0,0,this.w,this.h);
+  var rgb = getComputedStyle(document.documentElement).getPropertyValue('--star-rgb').trim() || '255,255,255';
+  var accent2 = getComputedStyle(document.documentElement).getPropertyValue('--accent-2').trim();
+  this.stars.forEach(function(s){
+    s.y -= s.vy; if(s.y<-0.01) s.y = 1.01;
+    var tw = 0.35 + Math.sin((t||0)/1000 + s.phase)*0.25;
+    ctx.beginPath();
+    ctx.fillStyle = s.tint ? hexToRgba(accent2, Math.max(0,tw)) : 'rgba('+rgb+','+Math.max(0,tw)+')';
+    ctx.arc(s.x*(this.w||1), s.y*(this.h||1), s.r, 0, Math.PI*2);
+    ctx.fill();
+  }, this);
+};
+function hexToRgba(hex, a){
+  hex = hex.replace('#','');
+  if(hex.length===3) hex = hex.split('').map(function(c){return c+c;}).join('');
+  var num = parseInt(hex,16);
+  if(isNaN(num)) return 'rgba(255,255,255,'+a+')';
+  var r=(num>>16)&255, g=(num>>8)&255, b=num&255;
+  return 'rgba('+r+','+g+','+b+','+a+')';
+}
+
+var heroStarField = null;
+function initHero(){
+  var c = document.getElementById('heroCanvas');
+  if(!c) return;
+  heroStarField = new StarField(c, {density:8000, max:120});
+  var hero = document.querySelector('.hero');
+  if(!reducedMotion && hero){
+    window.addEventListener('scroll', function onScroll(){
+      if(!document.querySelector('.hero')){ window.removeEventListener('scroll', onScroll); return; }
+      var y = window.scrollY;
+      hero.style.setProperty('--py', (y*0.06)+'px');
+    }, {passive:true});
+  }
+}
+
+function AbstractViewport(canvas){
+  this.canvas = canvas; this.ctx = canvas.getContext('2d');
+  this.dpr = Math.min(window.devicePixelRatio||1,2);
+  this.resize();
+  var self=this;
+  window.addEventListener('resize', function(){ self.resize(); });
+  this.t0 = performance.now();
+  if(reducedMotion){ this.draw(0); } else { this.start(); }
+}
+AbstractViewport.prototype.resize = function(){ var r=this.canvas.getBoundingClientRect(); this.w=r.width; this.h=r.height; this.canvas.width=this.w*this.dpr; this.canvas.height=this.h*this.dpr; };
+AbstractViewport.prototype.start = function(){ var self=this; function loop(t){ self.draw(t); self.raf=requestAnimationFrame(loop); } this.raf=requestAnimationFrame(loop); };
+AbstractViewport.prototype.draw = function(t){
+  var ctx=this.ctx, w=this.w, h=this.h; ctx.setTransform(this.dpr,0,0,this.dpr,0,0);
+  var a1 = getComputedStyle(document.documentElement).getPropertyValue('--accent-1').trim();
+  var a2 = getComputedStyle(document.documentElement).getPropertyValue('--accent-2').trim();
+  ctx.clearRect(0,0,w,h);
+  var time = (t||0)/1000;
+  ctx.save();
+  var g = ctx.createRadialGradient(w*0.35,h*0.4,10, w*0.5,h*0.5, Math.max(w,h)*0.75);
+  g.addColorStop(0, hexToRgba(a1,0.35)); g.addColorStop(1, hexToRgba(a2,0));
+  ctx.fillStyle = g; ctx.fillRect(0,0,w,h);
+  ctx.strokeStyle = hexToRgba(a2,0.5); ctx.lineWidth = 1;
+  var cx=w/2, cy=h/2, rings=4;
+  for(var i=1;i<=rings;i++){
+    ctx.beginPath();
+    var rad = (Math.min(w,h)/2)*(i/rings)*0.85;
+    for(var a=0;a<=Math.PI*2+0.1;a+=0.12){
+      var wob = Math.sin(a*3+time*0.6+i)*4;
+      var x = cx + Math.cos(a)*(rad+wob), y = cy + Math.sin(a)*(rad+wob)*0.55;
+      if(a===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.globalAlpha = 0.5 - i*0.08;
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+  ctx.restore();
+};
+
+/* ============ INTRO SEQUENCE ============ */
+function runIntro(){
+  var intro = document.getElementById('intro');
+  var seen = sessionStorage.getItem('auroraIntroSeen');
+  if(seen){ intro.style.display = 'none'; return; }
+  var canvas = document.getElementById('introCanvas');
+  var sf = new StarField(canvas, {density:6000, max:140});
+  var dismissed = false;
+  function dismiss(){
+    if(dismissed) return; dismissed = true;
+    sessionStorage.setItem('auroraIntroSeen','1');
+    intro.style.opacity = '0';
+    setTimeout(function(){ intro.style.display='none'; sf.stop(); }, reducedMotion?0:500);
+    document.removeEventListener('keydown', dismiss);
+    intro.removeEventListener('click', dismiss);
+  }
+  intro.addEventListener('click', dismiss);
+  document.addEventListener('keydown', dismiss);
+  setTimeout(dismiss, reducedMotion?200:1400);
+}
+
+/* ============ IRIS TRANSITION ============ */
+var iris = document.getElementById('iris');
+function irisTransition(x,y,cb){
+  if(reducedMotion){ cb(); return; }
+  iris.style.setProperty('clip-path','circle(0% at '+x+'px '+y+'px)');
+  iris.classList.add('animate');
+  requestAnimationFrame(function(){
+    iris.style.clipPath = 'circle(150% at '+x+'px '+y+'px)';
+    setTimeout(function(){
+      cb();
+      requestAnimationFrame(function(){
+        iris.style.clipPath = 'circle(0% at '+x+'px '+y+'px)';
+        setTimeout(function(){ iris.classList.remove('animate'); }, 600);
+      });
+    }, 520);
+  });
+}
+
+/* ============ NAV BEHAVIOR ============ */
+var navWrap = document.getElementById('navWrap');
+window.addEventListener('scroll', function(){
+  navWrap.classList.toggle('is-scrolled', window.scrollY > 40);
+}, {passive:true});
+
+var mobileTrigger = document.getElementById('mobileTrigger');
+var mobilePanel = document.getElementById('mobilePanel');
+mobileTrigger.addEventListener('click', function(){
+  var open = mobilePanel.classList.toggle('open');
+  mobileTrigger.setAttribute('aria-expanded', open?'true':'false');
+});
+document.addEventListener('click', function(e){
+  if(!mobilePanel.contains(e.target) && !mobileTrigger.contains(e.target)){
+    mobilePanel.classList.remove('open'); mobileTrigger.setAttribute('aria-expanded','false');
+  }
+});
+
+/* delegated internal link handling with iris wipe */
+document.addEventListener('click', function(e){
+  var a = e.target.closest('a[data-link]');
+  if(!a) return;
+  e.preventDefault();
+  var href = a.getAttribute('href');
+  if(href === location.hash || (href==='#/' && (location.hash===''||location.hash==='#/'))){ mobilePanel.classList.remove('open'); return; }
+  mobilePanel.classList.remove('open');
+  var rect = a.getBoundingClientRect();
+  var x = e.clientX || (rect.left+rect.width/2), y = e.clientY || (rect.top+rect.height/2);
+  irisTransition(x, y, function(){ location.hash = href; });
+});
+window.addEventListener('hashchange', render);
+
+/* ============ THEME TOGGLE ============ */
+var themeBtn = document.getElementById('themeToggle');
+var themeIcon = document.getElementById('themeIcon');
+var MOON = '<path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z" stroke-linejoin="round"/>';
+var SUN = document.getElementById('themeIcon').innerHTML;
+function applyTheme(theme){
+  if(theme){ document.documentElement.setAttribute('data-theme', theme); }
+  else { document.documentElement.removeAttribute('data-theme'); }
+  var isDark = theme==='dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  themeIcon.innerHTML = isDark ? SUN : MOON;
+  themeBtn.setAttribute('aria-label', isDark ? 'Switch to light theme' : 'Switch to dark theme');
+}
+(function initTheme(){
+  var saved = localStorage.getItem('aurora-theme');
+  applyTheme(saved);
+})();
+themeBtn.addEventListener('click', function(e){
+  var rect = themeBtn.getBoundingClientRect();
+  var x = rect.left+rect.width/2, y = rect.top+rect.height/2;
+  var current = document.documentElement.getAttribute('data-theme');
+  var isDarkNow = current==='dark' || (!current && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  var next = isDarkNow ? 'light' : 'dark';
+  irisTransition(x,y,function(){
+    localStorage.setItem('aurora-theme', next);
+    applyTheme(next);
+  });
+});
+
+/* ============ MAGNETIC HOVER ============ */
+function bindMagnetic(){
+  document.querySelectorAll('[data-magnetic]:not([data-mag-bound])').forEach(function(el){
+    el.setAttribute('data-mag-bound','1');
+    if(reducedMotion) return;
+    el.addEventListener('mousemove', function(e){
+      var r = el.getBoundingClientRect();
+      var x = e.clientX - r.left - r.width/2, y = e.clientY - r.top - r.height/2;
+      el.style.transform = 'translate('+(x/r.width*16)+'px,'+(y/r.height*16)+'px)';
+    });
+    el.addEventListener('mouseleave', function(){ el.style.transform=''; });
+  });
+}
+
+/* ============ INIT ============ */
+runIntro();
+render();
+bindMagnetic();
+})();
+</script>

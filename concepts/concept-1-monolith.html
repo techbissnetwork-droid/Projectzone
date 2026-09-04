@@ -1,0 +1,1518 @@
+<title>TECHBISS — Monolith</title>
+<meta name="description" content="Monolith: a Swiss-editorial, brutalist-premium design concept for TECHBISS.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============================= TOKENS ============================= */
+:root{
+  --bg:#f5f5f2;
+  --fg:#0b0b0c;
+  --bg-inv:#0b0b0c;
+  --fg-inv:#f5f5f2;
+  --line: rgba(11,11,12,0.16);
+  --line-strong: rgba(11,11,12,0.55);
+  --muted: rgba(11,11,12,0.58);
+  --surface: #f5f5f2;
+  --surface-2: rgba(11,11,12,0.035);
+  --accent:#1d3ef5;
+  --accent-fg:#f5f5f2;
+  --focus:#1d3ef5;
+  --good:#0f7a3d;
+  --warn:#a6650a;
+  --bad:#c2291b;
+  --rail-w: 232px;
+  --rail-w-collapsed: 64px;
+  --ff-display: 'Space Grotesk','Archivo','Helvetica Neue',Arial,sans-serif;
+  --ff-mono: 'IBM Plex Mono','SFMono-Regular',Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0b0b0c; --fg:#f5f5f2; --bg-inv:#f5f5f2; --fg-inv:#0b0b0c;
+    --line: rgba(245,245,242,0.16); --line-strong: rgba(245,245,242,0.55);
+    --muted: rgba(245,245,242,0.58);
+    --surface:#0b0b0c; --surface-2: rgba(245,245,242,0.045);
+    --accent:#5c78ff; --accent-fg:#0b0b0c; --focus:#5c78ff;
+    --good:#3fcf7f; --warn:#e0a334; --bad:#ff6a57;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0b0b0c; --fg:#f5f5f2; --bg-inv:#f5f5f2; --fg-inv:#0b0b0c;
+  --line: rgba(245,245,242,0.16); --line-strong: rgba(245,245,242,0.55);
+  --muted: rgba(245,245,242,0.58);
+  --surface:#0b0b0c; --surface-2: rgba(245,245,242,0.045);
+  --accent:#5c78ff; --accent-fg:#0b0b0c; --focus:#5c78ff;
+  --good:#3fcf7f; --warn:#e0a334; --bad:#ff6a57;
+}
+
+/* ============================= RESET / BASE ============================= */
+*,*::before,*::after{ box-sizing:border-box; }
+html{ -webkit-text-size-adjust:100%; scroll-behavior:smooth; }
+@media (prefers-reduced-motion: reduce){ html{ scroll-behavior:auto; } }
+body{
+  margin:0; background:var(--bg); color:var(--fg);
+  font-family: var(--ff-display);
+  font-size: 15px; line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+h1,h2,h3,h4,p,figure{ margin:0; }
+a{ color:inherit; }
+button{ font-family:inherit; color:inherit; background:none; border:0; cursor:pointer; }
+input,textarea,select{ font-family:inherit; color:inherit; background:none; }
+ul{ list-style:none; margin:0; padding:0; }
+:focus-visible{ outline:2px solid var(--focus); outline-offset:3px; }
+.mono{ font-family: var(--ff-mono); }
+.hidden{ display:none !important; }
+.sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+
+/* ============================= LAYOUT SHELL ============================= */
+#shell{ position:relative; min-height:100vh; }
+#app{
+  margin-left: var(--rail-w-collapsed);
+  min-height:100vh;
+  position:relative;
+}
+@media (min-width: 900px){
+  #app{ margin-left: var(--rail-w); }
+}
+.wrap{
+  max-width: 1720px;
+  padding: 0 clamp(20px, 4vw, 64px);
+  margin: 0 auto;
+}
+.grid12{
+  display:grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: clamp(12px, 2vw, 32px);
+}
+.hr{ border:0; border-top:1px solid var(--line); margin:0; }
+.hr-strong{ border:0; border-top:1px solid var(--line-strong); margin:0; }
+
+/* ============================= NAV RAIL ============================= */
+#rail{
+  position:fixed; top:0; left:0; bottom:0;
+  width: var(--rail-w-collapsed);
+  border-right:1px solid var(--line);
+  background: var(--bg);
+  z-index: 60;
+  display:flex; flex-direction:column; align-items:center;
+  padding: 18px 0 16px;
+}
+@media (min-width:900px){
+  #rail{ width: var(--rail-w); align-items:stretch; padding: 22px 0 18px; }
+}
+.rail-mark{
+  width:34px; height:34px; display:flex; align-items:center; justify-content:center;
+  border:1px solid var(--line-strong); border-radius:2px; flex-shrink:0;
+}
+@media (min-width:900px){ .rail-mark{ margin-left:24px; } }
+.rail-mark svg{ width:18px; height:18px; display:block; }
+
+.rail-wordmark{
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-family: var(--ff-mono);
+  font-size:11px; letter-spacing:.22em; font-weight:500;
+  color: var(--muted);
+  margin: 22px 0;
+  user-select:none;
+}
+@media (min-width:900px){
+  .rail-wordmark{ display:none; }
+}
+.rail-wordmark-h{
+  display:none;
+  font-family: var(--ff-mono); font-size:11px; letter-spacing:.24em; font-weight:500;
+  color: var(--muted); margin: 20px 0 20px 24px;
+}
+@media (min-width:900px){ .rail-wordmark-h{ display:block; } }
+
+.rail-index{ display:none; flex:1; overflow-y:auto; }
+@media (min-width:900px){ .rail-index{ display:block; } }
+.rail-index li{ border-top:1px solid var(--line); }
+.rail-index li:last-child{ border-bottom:1px solid var(--line); }
+.rail-index a{
+  display:flex; align-items:baseline; gap:10px;
+  padding:9px 10px 9px 24px; text-decoration:none;
+  font-family:var(--ff-mono); font-size:11.5px; letter-spacing:.06em; color: var(--muted);
+  position:relative;
+}
+.rail-index a .n{ color: var(--muted); font-variant-numeric: tabular-nums; }
+.rail-index a:hover{ color:var(--fg); }
+.rail-index a[aria-current="page"]{ color:var(--fg); font-weight:600; }
+.rail-index a[aria-current="page"]::before{
+  content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--accent);
+}
+.rail-index .rail-sep{ margin-top:8px; padding-top:8px; }
+
+.rail-bottom{ display:flex; flex-direction:column; align-items:center; gap:14px; margin-top:auto; }
+@media (min-width:900px){ .rail-bottom{ align-items:stretch; padding: 0 10px 0 24px; gap:6px; } }
+.rail-util{ display:none; }
+@media (min-width:900px){
+  .rail-util{ display:block; padding-top:10px; border-top:1px solid var(--line); }
+  .rail-util a{ display:block; font-family:var(--ff-mono); font-size:10.5px; letter-spacing:.08em; color:var(--muted); text-decoration:none; padding:5px 0; }
+  .rail-util a:hover{ color:var(--fg); }
+}
+
+.rail-trigger{
+  width:36px; height:36px; border:1px solid var(--line-strong); border-radius:2px;
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+@media (min-width:900px){ .rail-trigger{ display:none; } }
+.rail-trigger svg{ width:16px; height:16px; }
+
+.theme-toggle{
+  width:36px; height:36px; border:1px solid var(--line-strong); border-radius:2px;
+  display:flex; align-items:center; justify-content:center; flex-shrink:0; position:relative; overflow:hidden;
+}
+@media (min-width:900px){ .theme-toggle{ width:auto; height:auto; border:0; justify-content:flex-start; } }
+.theme-toggle svg{ width:16px; height:16px; }
+.theme-toggle .tt-label{ display:none; }
+@media (min-width:900px){
+  .theme-toggle{ display:flex; align-items:center; gap:8px; font-family:var(--ff-mono); font-size:10.5px; letter-spacing:.08em; color:var(--muted); padding:6px 0; }
+  .theme-toggle:hover{ color:var(--fg); }
+  .theme-toggle .tt-label{ display:inline; }
+}
+.tt-wipe{ position:absolute; inset:0; background:var(--fg); transform:translateY(101%); }
+.tt-wipe.run{ animation: ttwipe .5s ease forwards; }
+@keyframes ttwipe{ 0%{transform:translateY(101%);} 45%{transform:translateY(0);} 100%{transform:translateY(-101%);} }
+
+/* full-screen mobile index overlay */
+#index-overlay{
+  position:fixed; inset:0; background:var(--bg); z-index:90;
+  display:flex; flex-direction:column;
+  transform: translateY(-100%); transition: transform .45s cubic-bezier(.77,0,.18,1);
+}
+#index-overlay.open{ transform:translateY(0); }
+@media (prefers-reduced-motion: reduce){ #index-overlay{ transition:none; } }
+.io-top{ display:flex; justify-content:space-between; align-items:center; padding:20px clamp(20px,5vw,48px) 0; }
+.io-close{ width:40px; height:40px; border:1px solid var(--line-strong); display:flex; align-items:center; justify-content:center; }
+.io-close svg{ width:18px; height:18px; }
+.io-list{ flex:1; overflow-y:auto; padding: 10px clamp(20px,5vw,48px) 30px; }
+.io-list a{
+  display:flex; align-items:baseline; gap:18px; text-decoration:none; padding:14px 0;
+  border-top:1px solid var(--line);
+  font-family: var(--ff-display); font-weight:600; font-size:clamp(28px,7vw,52px); letter-spacing:-0.01em;
+}
+.io-list li:last-child a{ border-bottom:1px solid var(--line); }
+.io-list a .n{ font-family:var(--ff-mono); font-size:14px; color:var(--muted); font-weight:400; }
+.io-list a:hover{ color:var(--accent); }
+.io-foot{ padding: 16px clamp(20px,5vw,48px) 26px; display:flex; gap:24px; flex-wrap:wrap; font-family:var(--ff-mono); font-size:11px; letter-spacing:.08em; color:var(--muted); border-top:1px solid var(--line); }
+.io-foot a{ text-decoration:none; color:var(--muted); }
+.io-foot a:hover{ color:var(--fg); }
+
+/* ============================= WIPE TRANSITION ============================= */
+#wipe{ position:fixed; inset:0; background:var(--fg); transform:scaleY(0); transform-origin:top; z-index:80; pointer-events:none; }
+#wipe.cover{ animation: wipeCover .68s cubic-bezier(.77,0,.18,1) forwards; }
+@keyframes wipeCover{
+  0%{ transform:scaleY(0); transform-origin:top; }
+  48%{ transform:scaleY(1); transform-origin:top; }
+  52%{ transform:scaleY(1); transform-origin:bottom; }
+  100%{ transform:scaleY(0); transform-origin:bottom; }
+}
+@media (prefers-reduced-motion: reduce){ #wipe.cover{ animation:none; } }
+
+/* ============================= INTRO LOADER ============================= */
+#intro{
+  position:fixed; inset:0; background:var(--bg-inv); color:var(--fg-inv); z-index:100;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px;
+  transition: opacity .4s ease, visibility .4s ease;
+}
+#intro.gone{ opacity:0; visibility:hidden; pointer-events:none; }
+.intro-mark{ font-family:var(--ff-display); font-weight:700; font-size:clamp(34px,7vw,64px); letter-spacing:-0.02em; overflow:hidden; }
+.intro-mark span{ display:inline-block; transform:translateY(105%); animation: introUp .6s cubic-bezier(.2,.8,.2,1) forwards; }
+.intro-mark span:nth-child(2){ animation-delay:.06s; }
+@keyframes introUp{ to{ transform:translateY(0); } }
+.intro-count{ font-family:var(--ff-mono); font-size:12px; letter-spacing:.25em; opacity:.7; }
+.intro-skip{ position:absolute; bottom:22px; right:24px; font-family:var(--ff-mono); font-size:10.5px; letter-spacing:.1em; opacity:.55; }
+@media (prefers-reduced-motion: reduce){
+  .intro-mark span{ animation:none; transform:none; }
+}
+
+/* ============================= TYPE SCALE ============================= */
+.eyebrow{ font-family:var(--ff-mono); font-size:11.5px; letter-spacing:.16em; color:var(--muted); text-transform:uppercase; }
+.display-xl{ font-family:var(--ff-display); font-weight:700; letter-spacing:-0.02em; line-height:.98; text-wrap:balance; font-size:clamp(44px, 8.4vw, 132px); }
+.display-l{ font-family:var(--ff-display); font-weight:700; letter-spacing:-0.015em; line-height:1.02; text-wrap:balance; font-size:clamp(32px, 5.2vw, 72px); }
+.display-m{ font-family:var(--ff-display); font-weight:600; letter-spacing:-0.01em; line-height:1.08; text-wrap:balance; font-size:clamp(24px, 3vw, 40px); }
+.lede{ font-size:clamp(16px,1.6vw,20px); line-height:1.55; color:var(--fg); max-width:52ch; }
+.body-copy{ font-size:15px; line-height:1.7; color:var(--muted); max-width:60ch; }
+.num-giant{ font-family:var(--ff-mono); font-variant-numeric:tabular-nums; font-weight:500; font-size:clamp(60px,10vw,160px); line-height:.9; color:var(--line-strong); }
+
+/* reveal-on-scroll lines */
+.reveal-line{ overflow:hidden; }
+.reveal-line > span{ display:block; transform: translateY(100%); transition: transform .8s cubic-bezier(.2,.8,.2,1); }
+.reveal-line.in > span{ transform: translateY(0); }
+@media (prefers-reduced-motion: reduce){
+  .reveal-line > span{ transition:none; transform:none; }
+}
+.fade-up{ opacity:0; transform:translateY(18px); transition:opacity .6s ease, transform .6s ease; }
+.fade-up.in{ opacity:1; transform:translateY(0); }
+@media (prefers-reduced-motion: reduce){ .fade-up{ opacity:1; transform:none; transition:none; } }
+
+/* ============================= SECTIONS / COMMON ============================= */
+.section{ padding: clamp(56px,8vw,120px) 0; }
+.section-tight{ padding: clamp(36px,5vw,64px) 0; }
+.section + .section, .section-tight + .section-tight, .section + .section-tight, .section-tight + .section{ border-top:1px solid var(--line); }
+.page-head{ padding: clamp(120px,14vw,180px) 0 clamp(40px,6vw,64px); }
+@media (min-width:900px){ .page-head{ padding-top: clamp(90px,10vw,140px); } }
+
+.index-list li{ border-top:1px solid var(--line); }
+.index-list li:last-child{ border-bottom:1px solid var(--line); }
+.index-row{ display:grid; grid-template-columns: 64px 1fr; gap: clamp(14px,3vw,32px); padding: clamp(20px,3vw,34px) 0; align-items:start; width:100%; text-align:left; }
+.index-row .n{ font-family:var(--ff-mono); font-size:13px; color:var(--muted); padding-top:6px; }
+.index-row h3{ font-family:var(--ff-display); font-weight:600; font-size:clamp(20px,2.6vw,30px); letter-spacing:-0.01em; }
+.index-row .meta{ font-family:var(--ff-mono); font-size:11px; letter-spacing:.08em; color:var(--muted); margin-top:6px; }
+button.index-row{ cursor:pointer; }
+.index-row .chev{ margin-left:auto; flex-shrink:0; transition: transform .3s ease; }
+.index-row[aria-expanded="true"] .chev{ transform:rotate(45deg); }
+.index-detail{ display:grid; grid-template-rows:0fr; transition:grid-template-rows .38s ease; }
+.index-detail > div{ overflow:hidden; }
+.index-row[aria-expanded="true"] + .index-detail{ grid-template-rows:1fr; }
+@media (prefers-reduced-motion: reduce){ .index-detail{ transition:none; } }
+
+.tag{ display:inline-flex; align-items:center; gap:6px; font-family:var(--ff-mono); font-size:10.5px; letter-spacing:.08em; color:var(--muted); border:1px solid var(--line); padding:3px 8px; border-radius:2px; }
+.btn{
+  display:inline-flex; align-items:center; gap:10px; font-family:var(--ff-mono); font-size:12px; letter-spacing:.1em;
+  padding: 14px 22px; border:1px solid var(--fg); text-decoration:none; text-transform:uppercase;
+}
+.btn-solid{ background:var(--fg); color:var(--bg); }
+.btn-solid:hover{ background:var(--accent); border-color:var(--accent); color:var(--accent-fg); }
+.btn-line:hover{ background:var(--fg); color:var(--bg); }
+.btn-accent{ background:var(--accent); color:var(--accent-fg); border-color:var(--accent); }
+.btn[disabled]{ opacity:.4; cursor:not-allowed; }
+.btn svg{ width:14px; height:14px; }
+
+.icon{ width:20px; height:20px; }
+.icon-btn{ width:38px; height:38px; border:1px solid var(--line-strong); display:flex; align-items:center; justify-content:center; }
+
+table.spec{ width:100%; border-collapse:collapse; }
+table.spec tr{ border-top:1px solid var(--line); }
+table.spec tr:last-child{ border-bottom:1px solid var(--line); }
+table.spec th,table.spec td{ text-align:left; padding:14px 10px; font-size:13.5px; }
+table.spec th{ font-family:var(--ff-mono); font-weight:400; color:var(--muted); width:38%; letter-spacing:.02em; }
+table.spec td{ font-family:var(--ff-display); font-weight:500; }
+
+.plate{ aspect-ratio:16/10; border:1px solid var(--line-strong); position:relative; overflow:hidden; background:
+  repeating-linear-gradient(115deg, var(--surface-2) 0 2px, transparent 2px 14px);
+}
+.plate::after{ content:attr(data-code); position:absolute; bottom:12px; right:14px; font-family:var(--ff-mono); font-size:11px; letter-spacing:.1em; color:var(--muted); }
+.plate::before{ content:""; position:absolute; inset:0; background: linear-gradient(135deg, transparent 40%, var(--accent) 40%, var(--accent) 41%, transparent 41%); opacity:.5; }
+
+/* marquee */
+.marquee{ border-top:1px solid var(--line); border-bottom:1px solid var(--line); overflow:hidden; padding:20px 0; }
+.marquee-track{ display:flex; white-space:nowrap; width:max-content; will-change:transform; }
+.marquee-track span{ font-family:var(--ff-mono); font-size:clamp(14px,2vw,20px); letter-spacing:.05em; padding:0 26px; color:var(--muted); display:flex; align-items:center; gap:26px; }
+.marquee-track span::after{ content:"—"; color:var(--accent); }
+
+/* stat strip */
+.stats{ display:grid; grid-template-columns:repeat(2,1fr); border-top:1px solid var(--line-strong); }
+@media (min-width:700px){ .stats{ grid-template-columns:repeat(4,1fr); } }
+.stat{ padding: 26px clamp(14px,2vw,24px); border-right:1px solid var(--line); border-bottom:1px solid var(--line-strong); }
+.stat .v{ font-family:var(--ff-mono); font-weight:500; font-size:clamp(26px,3.4vw,42px); font-variant-numeric:tabular-nums; }
+.stat .l{ margin-top:6px; font-family:var(--ff-mono); font-size:10.5px; letter-spacing:.08em; color:var(--muted); }
+
+/* forms */
+.field{ display:flex; flex-direction:column; gap:8px; padding: 18px 0; border-top:1px solid var(--line); }
+.field label{ font-family:var(--ff-mono); font-size:11px; letter-spacing:.1em; color:var(--muted); text-transform:uppercase; }
+.field input, .field textarea, .field select{
+  border:0; border-bottom:1px solid var(--line-strong); padding:8px 2px; font-size:16px; font-family:var(--ff-display);
+  background:transparent; color:var(--fg); width:100%;
+}
+.field input:focus, .field textarea:focus, .field select:focus{ border-bottom-color:var(--accent); outline:0; }
+.field textarea{ resize:vertical; min-height:100px; }
+.field-radio{ display:flex; align-items:center; gap:12px; padding:14px 0; border-top:1px solid var(--line); cursor:pointer; }
+.field-radio input{ width:16px; height:16px; accent-color:var(--accent); }
+.field-radio .fr-title{ font-weight:600; }
+.field-radio .fr-price{ margin-left:auto; font-family:var(--ff-mono); font-variant-numeric:tabular-nums; }
+
+/* checklist / pills */
+.pill{ display:inline-flex; align-items:center; gap:6px; font-family:var(--ff-mono); font-size:10.5px; letter-spacing:.06em; padding:3px 9px; border-radius:20px; border:1px solid var(--line-strong); }
+.pill .dot{ width:6px; height:6px; border-radius:50%; }
+.pill.ok .dot{ background:var(--good); } .pill.ok{ color:var(--good); border-color:currentColor; }
+.pill.warn .dot{ background:var(--warn); } .pill.warn{ color:var(--warn); border-color:currentColor; }
+.pill.bad .dot{ background:var(--bad); } .pill.bad{ color:var(--bad); border-color:currentColor; }
+.pill.neutral .dot{ background:var(--muted); } .pill.neutral{ color:var(--muted); }
+
+/* footer */
+#site-footer{ padding: clamp(40px,6vw,64px) 0; }
+.foot-grid{ display:grid; gap:28px; grid-template-columns:1fr; }
+@media (min-width:700px){ .foot-grid{ grid-template-columns:2fr 1fr 1fr 1fr; } }
+.foot-grid a{ display:block; text-decoration:none; font-family:var(--ff-mono); font-size:12px; color:var(--muted); padding:4px 0; }
+.foot-grid a:hover{ color:var(--fg); }
+.foot-grid h4{ font-family:var(--ff-mono); font-size:11px; letter-spacing:.1em; color:var(--muted); margin-bottom:10px; }
+
+::selection{ background:var(--accent); color:var(--accent-fg); }
+</style>
+
+<div id="intro" aria-hidden="true">
+  <div class="intro-mark"><span>TECHBISS</span></div>
+  <div class="intro-count mono" id="intro-count">ASSEMBLING INDEX — 00%</div>
+  <div class="intro-skip mono">CLICK / PRESS ANY KEY TO SKIP</div>
+</div>
+
+<div id="wipe"></div>
+
+<div id="shell">
+  <nav id="rail" aria-label="Primary">
+    <div style="display:flex;align-items:center;gap:10px;width:100%;">
+      <a href="#/" class="rail-mark" aria-label="TECHBISS — Home">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 4h16v4H14v12h-4V8H4z"/></svg>
+      </a>
+      <span class="rail-wordmark-h">TECHBISS™</span>
+    </div>
+    <div class="rail-wordmark">TECHBISS — DIGITAL TRANSFORMATION PLATFORM</div>
+    <ul class="rail-index" id="rail-index"></ul>
+    <div class="rail-bottom">
+      <button class="rail-trigger" id="open-index" aria-haspopup="dialog" aria-controls="index-overlay" aria-label="Open section index">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><line x1="3" y1="7" x2="21" y2="7"/><line x1="3" y1="13" x2="21" y2="13"/><line x1="3" y1="19" x2="13" y2="19"/></svg>
+      </button>
+      <button class="theme-toggle" id="theme-toggle" aria-label="Toggle color theme">
+        <div class="tt-wipe" id="tt-wipe"></div>
+        <svg id="tt-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="12" r="4.4"/><path d="M12 2v2.4M12 19.6V22M4.2 4.2l1.7 1.7M18.1 18.1l1.7 1.7M2 12h2.4M19.6 12H22M4.2 19.8l1.7-1.7M18.1 5.9l1.7-1.7"/></svg>
+        <span class="tt-label" id="tt-label">DARK MODE</span>
+      </button>
+      <div class="rail-util">
+        <a href="#/login">LOGIN</a>
+        <a href="#/installer">INSTALLER</a>
+        <a href="#/dashboard">DASHBOARD</a>
+      </div>
+    </div>
+  </nav>
+
+  <div id="index-overlay" role="dialog" aria-modal="true" aria-label="Section index">
+    <div class="io-top">
+      <span class="mono" style="font-size:11px;letter-spacing:.2em;color:var(--muted);">INDEX</span>
+      <button class="io-close" id="close-index" aria-label="Close section index">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
+      </button>
+    </div>
+    <ul class="io-list" id="io-list"></ul>
+    <div class="io-foot">
+      <a href="#/login">LOGIN</a>
+      <a href="#/installer">INSTALLER</a>
+      <a href="#/dashboard">DASHBOARD PREVIEW</a>
+    </div>
+  </div>
+
+  <main id="app" tabindex="-1"></main>
+</div>
+
+<script>
+(function(){
+"use strict";
+var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ============================= NAV DATA ============================= */
+var NAV = [
+  {n:'01', label:'HOME', path:'#/'},
+  {n:'02', label:'SERVICES', path:'#/services'},
+  {n:'03', label:'SOLUTIONS', path:'#/solutions'},
+  {n:'04', label:'MARKETPLACE', path:'#/marketplace'},
+  {n:'05', label:'WORK', path:'#/work'},
+  {n:'06', label:'PROCESS', path:'#/process'},
+  {n:'07', label:'ABOUT', path:'#/about'},
+  {n:'08', label:'RESOURCES', path:'#/resources'},
+  {n:'09', label:'PRICING', path:'#/pricing'},
+  {n:'10', label:'CONTACT', path:'#/contact'}
+];
+
+function buildNav(){
+  var rail = document.getElementById('rail-index');
+  var io = document.getElementById('io-list');
+  rail.innerHTML = NAV.map(function(i){
+    return '<li><a href="'+i.path+'" data-path="'+i.path+'"><span class="n">'+i.n+'</span><span>'+i.label+'</span></a></li>';
+  }).join('') + '<li class="rail-sep"></li>';
+  io.innerHTML = NAV.map(function(i){
+    return '<li><a href="'+i.path+'" data-path="'+i.path+'"><span class="n">'+i.n+'</span><span>'+i.label+'</span></a></li>';
+  }).join('');
+}
+buildNav();
+
+function setActiveNav(path){
+  var base = '#/'+ (path.split('/')[1]||'');
+  if(path==='/') base='#/';
+  document.querySelectorAll('#rail-index a, #io-list a').forEach(function(a){
+    if(a.getAttribute('data-path')===base){ a.setAttribute('aria-current','page'); }
+    else { a.removeAttribute('aria-current'); }
+  });
+}
+
+/* ============================= INDEX OVERLAY ============================= */
+var overlay = document.getElementById('index-overlay');
+document.getElementById('open-index').addEventListener('click', function(){
+  overlay.classList.add('open'); document.body.style.overflow='hidden';
+});
+document.getElementById('close-index').addEventListener('click', closeOverlay);
+overlay.querySelectorAll('a').forEach(function(a){ a.addEventListener('click', closeOverlay); });
+function closeOverlay(){ overlay.classList.remove('open'); document.body.style.overflow=''; }
+
+/* ============================= THEME ============================= */
+var root = document.documentElement;
+function getTheme(){ try{ return localStorage.getItem('tb-theme'); }catch(e){ return null; } }
+function applyTheme(t, animate){
+  if(t){ root.setAttribute('data-theme', t); } else { root.removeAttribute('data-theme'); }
+  try{ localStorage.setItem('tb-theme', t||''); }catch(e){}
+  var isDark = t==='dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  document.getElementById('tt-label').textContent = isDark ? 'LIGHT MODE' : 'DARK MODE';
+  if(animate && !reduce){
+    var w = document.getElementById('tt-wipe');
+    w.classList.remove('run'); void w.offsetWidth; w.classList.add('run');
+  }
+}
+(function(){ var t=getTheme(); if(t) applyTheme(t,false); else applyTheme(null,false); })();
+document.getElementById('theme-toggle').addEventListener('click', function(){
+  var isDark = root.getAttribute('data-theme')==='dark' || (!root.getAttribute('data-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  applyTheme(isDark ? 'light' : 'dark', true);
+});
+
+/* ============================= INTRO ============================= */
+(function(){
+  var el = document.getElementById('intro');
+  var shown = false;
+  try{ shown = sessionStorage.getItem('tb-intro')==='1'; }catch(e){}
+  if(shown || reduce){ el.classList.add('gone'); el.setAttribute('aria-hidden','true'); return; }
+  var counter = document.getElementById('intro-count');
+  var pct = 0;
+  var timer = setInterval(function(){
+    pct = Math.min(100, pct + Math.round(6+Math.random()*18));
+    counter.textContent = 'ASSEMBLING INDEX — ' + String(pct).padStart(2,'0') + '%';
+    if(pct>=100){ clearInterval(timer); finish(); }
+  }, 110);
+  function finish(){
+    el.classList.add('gone');
+    try{ sessionStorage.setItem('tb-intro','1'); }catch(e){}
+  }
+  setTimeout(finish, 1400);
+  el.addEventListener('click', finish);
+  window.addEventListener('keydown', finish, {once:true});
+})();
+
+/* ============================= REVEAL OBSERVER ============================= */
+var io_obs = new IntersectionObserver(function(entries){
+  entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io_obs.unobserve(e.target); } });
+}, {threshold:0.2});
+function observeReveals(root_){
+  (root_||document).querySelectorAll('.reveal-line, .fade-up').forEach(function(el){
+    if(reduce){ el.classList.add('in'); } else { io_obs.observe(el); }
+  });
+}
+
+/* ============================= MARQUEE (scroll-scrubbed) ============================= */
+function initMarquee(){
+  var tracks = document.querySelectorAll('.marquee-track');
+  if(!tracks.length) return;
+  if(reduce){ return; }
+  var raf = null;
+  function update(){
+    var y = window.scrollY;
+    tracks.forEach(function(t){
+      var w = t.scrollWidth/2;
+      var x = (y*0.6) % w;
+      t.style.transform = 'translateX(-'+x+'px)';
+    });
+    raf = null;
+  }
+  window.addEventListener('scroll', function(){ if(!raf) raf = requestAnimationFrame(update); }, {passive:true});
+  update();
+}
+
+/* ============================= WIPE + ROUTER ============================= */
+var app = document.getElementById('app');
+var wipeEl = document.getElementById('wipe');
+
+var ROUTES = {}; // path pattern -> {render, init}
+
+function matchRoute(path){
+  var parts = path.split('/').filter(Boolean);
+  for(var key in ROUTES){
+    var kp = key.split('/').filter(Boolean);
+    if(kp.length !== parts.length) continue;
+    var params = {}; var ok = true;
+    for(var i=0;i<kp.length;i++){
+      if(kp[i].charAt(0)===':'){ params[kp[i].slice(1)] = decodeURIComponent(parts[i]); }
+      else if(kp[i] !== parts[i]){ ok=false; break; }
+    }
+    if(ok) return {route:ROUTES[key], params: params};
+  }
+  return null;
+}
+
+function currentPath(){
+  var h = location.hash.replace(/^#/, '');
+  if(!h) h = '/';
+  return h;
+}
+
+function go(doRender){
+  if(reduce){ doRender(); window.scrollTo(0,0); return; }
+  wipeEl.classList.remove('cover'); void wipeEl.offsetWidth;
+  wipeEl.classList.add('cover');
+  setTimeout(function(){ doRender(); window.scrollTo(0,0); }, 330);
+}
+
+function render(){
+  var path = currentPath();
+  var m = matchRoute(path);
+  go(function(){
+    if(!m){ app.innerHTML = render404(); setActiveNav('/'); focusApp(); return; }
+    app.innerHTML = m.route.render(m.params);
+    setActiveNav(path);
+    if(m.route.init) m.route.init(m.params);
+    observeReveals(app);
+    initMarquee();
+    focusApp();
+  });
+}
+function focusApp(){ app.focus({preventScroll:true}); }
+window.addEventListener('hashchange', render);
+
+/* ============================= ICONS ============================= */
+function ic(name){
+  var paths = {
+    arrow:'<path d="M5 12h14M13 6l6 6-6 6"/>',
+    check:'<path d="M4 12l5 5L20 6"/>',
+    plus:'<path d="M12 4v16M4 12h16"/>',
+    globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>',
+    layer:'<path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/>',
+    shield:'<path d="M12 3l8 3v6c0 5-3.5 7.7-8 9-4.5-1.3-8-4-8-9V6l8-3z"/>',
+    cpu:'<rect x="7" y="7" width="10" height="10"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.5 4.5l2 2M17.5 17.5l2 2M19.5 4.5l-2 2M6.5 17.5l-2 2"/>',
+    stack:'<path d="M4 6h16M4 12h16M4 18h10"/>',
+    lock:'<rect x="5" y="11" width="14" height="9" rx="1"/><path d="M8 11V7a4 4 0 018 0v4"/>'
+  };
+  return '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true">'+(paths[name]||'')+'</svg>';
+}
+
+/* ============================= SHARED PARTIALS ============================= */
+function marquee(items){
+  var seq = items.concat(items).map(function(s){ return '<span>'+s+'</span>'; }).join('');
+  return '<div class="marquee" aria-hidden="true"><div class="marquee-track">'+seq+seq+'</div></div>';
+}
+function pageHead(eyebrow, title, lede){
+  return '<header class="page-head wrap">'+
+    '<p class="eyebrow fade-up in">'+eyebrow+'</p>'+
+    '<h1 class="display-l" style="margin-top:14px;">'+title+'</h1>'+
+    (lede? '<p class="lede fade-up in" style="margin-top:22px;">'+lede+'</p>':'')+
+  '</header>';
+}
+function footer(){
+  return '<footer id="site-footer" class="wrap">'+
+    '<div class="hr-strong" style="margin-bottom:34px;"></div>'+
+    '<div class="foot-grid">'+
+      '<div><div class="display-m" style="font-size:clamp(20px,2vw,26px);">Building the systems that carry the next decade of work.</div></div>'+
+      '<div><h4>NAVIGATE</h4><a href="#/services">Services</a><a href="#/marketplace">Marketplace</a><a href="#/work">Work</a><a href="#/pricing">Pricing</a></div>'+
+      '<div><h4>COMPANY</h4><a href="#/about">About</a><a href="#/process">Process</a><a href="#/resources">Resources</a><a href="#/contact">Contact</a></div>'+
+      '<div><h4>PLATFORM</h4><a href="#/login">Login</a><a href="#/installer">Installer</a><a href="#/dashboard">Dashboard</a></div>'+
+    '</div>'+
+    '<div class="hr" style="margin:30px 0 18px;"></div>'+
+    '<div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;font-family:var(--ff-mono);font-size:10.5px;letter-spacing:.06em;color:var(--muted);">'+
+      '<span>© 2026 TECHBISS GLOBAL — DIGITAL TRANSFORMATION PLATFORM</span><span>ISO 27001 · SOC 2 TYPE II · 38 MARKETS</span>'+
+    '</div>'+
+  '</footer>';
+}
+function revealTitle(text, tag){
+  tag = tag||'h2';
+  var words = text.split(' ');
+  return '<'+tag+' class="display-l">'+ '<span class="reveal-line" style="display:block;"><span>'+text+'</span></span>' +'</'+tag+'>';
+}
+
+/* ============================= HOME ============================= */
+function renderHome(){
+  return ''+
+  '<section class="wrap page-head">'+
+    '<p class="eyebrow fade-up in">TECHBISS — DIGITAL TRANSFORMATION, AT SCALE</p>'+
+    '<h1 class="display-xl" style="margin-top:18px;">'+
+      '<span class="reveal-line"><span>WE BUILD THE</span></span>'+
+      '<span class="reveal-line"><span>INFRASTRUCTURE</span></span>'+
+      '<span class="reveal-line"><span>INDUSTRIES <em style="font-style:normal;color:var(--accent);">RUN</em> ON.</span></span>'+
+    '</h1>'+
+    '<div class="grid12" style="margin-top:40px;">'+
+      '<div style="grid-column:1/span 12;" class="grid12">'+
+        '<div style="grid-column:1/span 12;" class="wrap-inner"></div>'+
+      '</div>'+
+    '</div>'+
+    '<div class="grid12" style="margin-top:8px;">'+
+      '<div style="grid-column:1/span 12;grid-column:8/span 5;grid-column: 8 / span 5;" ></div>'+
+    '</div>'+
+    '<div class="grid12" style="margin-top:16px;">'+
+      '<div style="grid-column: 8 / span 5; grid-column-start:8;" class="fade-up in">'+
+        '<p class="lede">Custom software, cloud and AI systems, a product marketplace, and the migration tooling to move a decade of legacy work into it — engineered by one platform, run by one accountable team.</p>'+
+        '<div style="display:flex;gap:14px;margin-top:26px;flex-wrap:wrap;">'+
+          '<a class="btn btn-solid" href="#/contact">START A PROJECT '+ic('arrow')+'</a>'+
+          '<a class="btn btn-line" style="border-color:var(--line-strong);" href="#/work">SEE THE WORK</a>'+
+        '</div>'+
+      '</div>'+
+    '</div>'+
+  '</section>'+
+
+  marquee(['CLOUD ARCHITECTURE','CUSTOM SOFTWARE','AI &amp; ML SYSTEMS','DATA PLATFORMS','ZERO-TRUST SECURITY','LEGACY MIGRATION','PRODUCT MARKETPLACE','MANAGED OPERATIONS']) +
+
+  '<section class="section wrap">'+
+    '<div class="grid12">'+
+      '<div style="grid-column:1/span 3;" class="fade-up"><p class="eyebrow">01 / WHAT WE DO</p></div>'+
+      '<div style="grid-column:4/span 9;" class="fade-up">'+revealTitle('Five disciplines. One accountable delivery model.','h2')+'</div>'+
+    '</div>'+
+    '<ul class="index-list" style="margin-top:44px;">'+
+      indexEntry('01','Custom Software Engineering','Product teams embedded end to end — discovery through long-term ownership.',['WEB','MOBILE','ENTERPRISE'])+
+      indexEntry('02','Cloud &amp; Infrastructure','Multi-cloud architecture built for regulated, high-throughput environments.',['AWS','AZURE','GCP','K8s'])+
+      indexEntry('03','AI &amp; Data Systems','Applied ML, data platforms, and agentic workflows wired into real operations.',['MLOPS','LLM','PIPELINES'])+
+      indexEntry('04','Marketplace &amp; Installer','Pre-built modules and a guided migration engine that gets legacy systems live in days.',['CATALOGUE','MIGRATION'])+
+    '</ul>'+
+  '</section>'+
+
+  '<section class="section-tight wrap">'+
+    '<div class="stats">'+
+      stat('38','COUNTRIES OF ACTIVE DEPLOYMENT')+stat('1,240+','ENGINEERS &amp; ARCHITECTS')+stat('$10.4B','PLATFORM VALUE UNDER MANAGEMENT')+stat('99.98%','TRAILING 12-MONTH UPTIME SLA')+
+    '</div>'+
+  '</section>'+
+
+  '<section class="section wrap">'+
+    '<div class="grid12">'+
+      '<div style="grid-column:1/span 3;" class="fade-up"><p class="eyebrow">02 / SELECTED WORK</p></div>'+
+      '<div style="grid-column:4/span 9;" class="fade-up">'+revealTitle('Outcomes we can put a number on.','h2')+'</div>'+
+    '</div>'+
+    '<ul class="index-list" style="margin-top:44px;">'+
+      staticCase('01','Regional Banking Consortium','Core-banking replatform across 6 subsidiaries','−41% transaction latency')+
+      staticCase('02','National Health Authority','Unified patient-records migration, 4.2M records','Zero-downtime cutover')+
+      staticCase('03','Tier-1 Logistics Network','Realtime fleet + inventory data mesh','+18% route efficiency')+
+    '</ul>'+
+    '<div style="margin-top:30px;"><a class="btn btn-line" style="border-color:var(--line-strong);" href="#/work">READ THE FULL CASE INDEX '+ic('arrow')+'</a></div>'+
+  '</section>'+
+
+  '<section class="section wrap fade-up">'+
+    '<div class="grid12">'+
+      '<div style="grid-column:1/span 12;" class="hr-strong" ></div>'+
+    '</div>'+
+    '<div class="grid12" style="margin-top:34px;align-items:end;">'+
+      '<div style="grid-column:1/span 7;">'+revealTitle('Ready to move the roadmap forward?','h2')+'</div>'+
+      '<div style="grid-column:9/span 4;">'+
+        '<p class="body-copy">Tell us the system you need replaced, connected, or migrated. A senior architect responds within one business day.</p>'+
+        '<a class="btn btn-accent" style="margin-top:20px;" href="#/contact">START A PROJECT '+ic('arrow')+'</a>'+
+      '</div>'+
+    '</div>'+
+  '</section>'+
+  footer();
+}
+function stat(v,l){ return '<div class="stat"><div class="v">'+v+'</div><div class="l">'+l+'</div></div>'; }
+function indexEntry(n,title,desc,tags){
+  return '<li><div class="index-row"><span class="n">'+n+'</span><div>'+
+    '<h3>'+title+'</h3><p class="body-copy" style="margin-top:8px;">'+desc+'</p>'+
+    '<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">'+tags.map(function(t){return '<span class="tag">'+t+'</span>';}).join('')+'</div>'+
+    '</div></div></li>';
+}
+function staticCase(n,client,desc,metric){
+  return '<li><div class="index-row"><span class="n">'+n+'</span><div style="display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;">'+
+    '<div><h3>'+client+'</h3><p class="body-copy" style="margin-top:6px;">'+desc+'</p></div>'+
+    '<div class="mono" style="font-size:13px;color:var(--accent);white-space:nowrap;align-self:center;">'+metric+'</div>'+
+  '</div></div></li>';
+}
+
+ROUTES['/'] = {render: renderHome};
+
+/* ============================= SERVICES ============================= */
+var SERVICES = [
+  {t:'Custom Software Engineering', d:'Dedicated product squads — design, engineering, and QA — that ship and then stay to operate what they built.', bullets:['Web & native applications','Enterprise systems integration','API & platform architecture','Staff augmentation & embedded teams']},
+  {t:'Cloud &amp; Infrastructure', d:'Landing zones, IaC, and cost-governed multi-cloud environments engineered for regulated, high-throughput workloads.', bullets:['AWS / Azure / GCP architecture','Kubernetes & container platforms','Site reliability & observability','FinOps & cost governance']},
+  {t:'AI &amp; Data Systems', d:'Applied machine learning and data platforms wired into the operations they are meant to change — not lab demos.', bullets:['LLM & agentic workflow design','MLOps & model lifecycle','Data pipelines & warehousing','Predictive & decision systems']},
+  {t:'Product Marketplace', d:'Pre-built, spec-sheet-documented modules you can deploy standalone or compose into a larger build.', bullets:['Catalogue of certified modules','Transparent tiered pricing','One-click customization & deploy','Versioned, supported releases']},
+  {t:'Migration &amp; Installer Tooling', d:'A guided installer that detects, maps, and migrates legacy systems with a verifiable audit trail at every step.', bullets:['Automated environment detection','Data & schema migration','Rollback-safe cutover','Post-migration verification suite']},
+  {t:'Managed Operations &amp; Support', d:'SRE-backed operations with contractual SLAs, so what we build keeps running long after launch day.', bullets:['24/7 monitored operations','Tiered SLA response','Quarterly architecture reviews','Security patching & compliance']}
+];
+function renderServices(){
+  return pageHead('02 — SERVICES','What TECHBISS delivers, end to end.','Six disciplines, one delivery contract. Every engagement is staffed, scoped, and billed against the same accountable model.') +
+  '<section class="section-tight wrap"><ul class="index-list">'+
+    SERVICES.map(function(s,i){
+      var n = String(i+1).padStart(2,'0');
+      return '<li>'+
+        '<button class="index-row" aria-expanded="false" data-acc>'+
+          '<span class="n">'+n+'</span>'+
+          '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;width:100%;">'+
+            '<div><h3>'+s.t+'</h3><p class="body-copy" style="margin-top:8px;">'+s.d+'</p></div>'+
+            '<span class="icon-btn chev">'+ic('plus')+'</span>'+
+          '</div>'+
+        '</button>'+
+        '<div class="index-detail"><div>'+
+          '<ul style="padding:0 0 26px 64px;display:grid;gap:8px;">'+s.bullets.map(function(b){return '<li class="mono" style="font-size:12.5px;color:var(--muted);display:flex;gap:10px;"><span style="color:var(--accent);">—</span>'+b+'</li>';}).join('')+'</ul>'+
+        '</div></div>'+
+      '</li>';
+    }).join('')+
+  '</ul></section>'+
+  '<section class="section wrap">'+
+    '<div class="grid12" style="align-items:end;">'+
+      '<div style="grid-column:1/span 7;">'+revealTitle('Not sure which discipline fits?','h2')+'</div>'+
+      '<div style="grid-column:9/span 4;"><p class="body-copy">Talk to a solutions architect — most engagements combine two or three of the above.</p><a class="btn btn-solid" style="margin-top:18px;" href="#/contact">BOOK A SCOPING CALL '+ic('arrow')+'</a></div>'+
+    '</div>'+
+  '</section>'+footer();
+}
+ROUTES['/services'] = {render: renderServices, init: initAccordions};
+function initAccordions(){
+  app.querySelectorAll('[data-acc]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var open = btn.getAttribute('aria-expanded')==='true';
+      btn.setAttribute('aria-expanded', open? 'false':'true');
+    });
+  });
+}
+
+/* ============================= SOLUTIONS ============================= */
+var SOLUTIONS = [
+  {t:'Financial Services', d:'Core-banking replatforms, real-time fraud systems, and regulatory-grade data lineage.', m:'−41% latency, avg.'},
+  {t:'Healthcare &amp; Life Sciences', d:'Interoperable records, clinical workflow tooling, and HIPAA/GxP-aligned infrastructure.', m:'Zero-downtime cutovers'},
+  {t:'Public Sector &amp; Government', d:'Citizen-facing platforms and legacy modernization built to procurement and audit standards.', m:'4.2M records migrated'},
+  {t:'Retail &amp; Logistics', d:'Realtime inventory, fleet, and demand-planning systems that hold up during peak load.', m:'+18% route efficiency'},
+  {t:'Manufacturing &amp; Industry 4.0', d:'Plant-floor telemetry, predictive maintenance, and MES/ERP integration.', m:'−27% unplanned downtime'},
+  {t:'Media &amp; Telecom', d:'High-throughput content and network-operations platforms built for constant change.', m:'220M req/day sustained'}
+];
+function renderSolutions(){
+  return pageHead('03 — SOLUTIONS','Built for how your industry actually runs.','Domain-specific architecture patterns, compliance baked in from day one, and teams who have shipped inside your regulatory environment before.')+
+  '<section class="section-tight wrap"><ul class="index-list">'+
+    SOLUTIONS.map(function(s,i){
+      var n=String(i+1).padStart(2,'0');
+      return '<li><div class="index-row"><span class="n">'+n+'</span><div style="display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;width:100%;">'+
+        '<div style="max-width:56ch;"><h3>'+s.t+'</h3><p class="body-copy" style="margin-top:8px;">'+s.d+'</p></div>'+
+        '<div class="mono" style="font-size:13px;color:var(--accent);white-space:nowrap;align-self:center;">'+s.m+'</div>'+
+      '</div></div></li>';
+    }).join('')+
+  '</ul></section>'+footer();
+}
+ROUTES['/solutions'] = {render: renderSolutions};
+
+/* ============================= MARKETPLACE / PRODUCTS ============================= */
+var PRODUCTS = {
+  atlas:{n:'01', name:'ATLAS', cat:'CLOUD MIGRATION', pitch:'A guided engine that lifts and re-platforms legacy workloads without a rewrite.',
+    desc:'ATLAS discovers your current environment, maps dependencies, and re-platforms workloads onto managed cloud infrastructure with a rollback-safe cutover path. Built for teams migrating under a live production constraint.',
+    specs:{'Runtime':'Kubernetes / Serverless hybrid','Deployment Model':'Managed or self-hosted','SLA':'99.95% — 99.99%','Integrations':'AWS, Azure, GCP, on-prem VMware','Footprint':'Single-tenant or shared cluster'},
+    tiers:[{n:'Standard',p:4200,f:['Environment discovery','Single-cloud target','Business-hours support']},{n:'Pro',p:9800,f:['Multi-cloud target','Rollback-safe cutover','24/7 monitored support']},{n:'Enterprise',p:0,f:['Dedicated migration team','Custom compliance controls','Named SRE on-call']}],
+    addons:[{n:'Dedicated infra pool',p:1200},{n:'Priority migration window',p:800},{n:'Extended audit logging',p:450}]},
+  signal:{n:'02', name:'SIGNAL', cat:'DATA MESH', pitch:'Realtime data mesh for organizations that can no longer wait on nightly batch.',
+    desc:'SIGNAL streams operational data across services with schema governance and sub-second propagation, replacing brittle batch ETL with an event-native backbone.',
+    specs:{'Runtime':'Kafka-compatible streaming','Deployment Model':'Managed cloud','SLA':'99.97%','Integrations':'Snowflake, BigQuery, Databricks','Footprint':'Multi-region active-active'},
+    tiers:[{n:'Standard',p:3600,f:['5 stream topics','Schema registry','Email alerting']},{n:'Pro',p:8100,f:['Unlimited topics','Multi-region replication','PagerDuty integration']},{n:'Enterprise',p:0,f:['Dedicated cluster','Custom retention policy','Compliance reporting']}],
+    addons:[{n:'Extra region replication',p:950},{n:'Real-time anomaly detection',p:700},{n:'Dedicated support engineer',p:1500}]},
+  forge:{n:'03', name:'FORGE', cat:'SOFTWARE STUDIO', pitch:'A packaged product-engineering studio — squads, tooling, and delivery cadence in one line item.',
+    desc:'FORGE gives you a standing product team — design, engineering, QA — provisioned with our internal delivery tooling, sprint cadence, and reporting, without the twelve-week staffing runway.',
+    specs:{'Runtime':'N/A — service engagement','Deployment Model':'Embedded or remote squad','SLA':'Sprint-based delivery SLA','Integrations':'Jira, Linear, GitHub, GitLab','Footprint':'4–12 person pods'},
+    tiers:[{n:'Standard',p:18000,f:['4-person pod','Bi-weekly demos','Standard reporting']},{n:'Pro',p:34000,f:['8-person pod','Weekly demos','Dedicated PM']},{n:'Enterprise',p:0,f:['12+ person pod','Custom governance','Executive steering committee']}],
+    addons:[{n:'Embedded security engineer',p:4200},{n:'UX research retainer',p:2600},{n:'Design system build-out',p:5200}]},
+  cipher:{n:'04', name:'CIPHER', cat:'SECURITY FABRIC', pitch:'Zero-trust access and policy enforcement layered across every environment you run.',
+    desc:'CIPHER enforces identity-based access, continuous policy verification, and encrypted service mesh traffic across cloud, on-prem, and edge — with a single audit trail.',
+    specs:{'Runtime':'Sidecar mesh + policy engine','Deployment Model':'Hybrid','SLA':'99.99%','Integrations':'Okta, Azure AD, HashiCorp Vault','Footprint':'Cluster-wide agent'},
+    tiers:[{n:'Standard',p:5200,f:['Identity-based access','Policy engine','Quarterly audit']},{n:'Pro',p:11400,f:['Continuous verification','Full mesh encryption','Monthly audit + reporting']},{n:'Enterprise',p:0,f:['Custom compliance mapping','Dedicated security architect','Real-time SOC feed']}],
+    addons:[{n:'SOC 2 evidence automation',p:1300},{n:'Penetration test bundle',p:6000},{n:'24/7 SOC monitoring',p:2400}]},
+  loom:{n:'05', name:'LOOM', cat:'AI ORCHESTRATION', pitch:'Agentic workflow orchestration that wires LLMs into real operational systems.',
+    desc:'LOOM coordinates multi-step AI workflows — retrieval, tool use, human approval gates — across your existing systems of record, with full traceability on every decision an agent makes.',
+    specs:{'Runtime':'Orchestration engine + model gateway','Deployment Model':'Managed or VPC-isolated','SLA':'99.9%','Integrations':'OpenAI, Anthropic, Azure OpenAI, self-hosted models','Footprint':'API-first'},
+    tiers:[{n:'Standard',p:2800,f:['3 active workflows','Model gateway','Usage dashboard']},{n:'Pro',p:7200,f:['Unlimited workflows','Human-in-the-loop gates','Full decision tracing']},{n:'Enterprise',p:0,f:['VPC-isolated deployment','Custom model routing','Dedicated ML engineer']}],
+    addons:[{n:'Custom model fine-tuning',p:3800},{n:'Extended trace retention',p:600},{n:'Dedicated ML engineer (part-time)',p:5400}]},
+  beacon:{n:'06', name:'BEACON', cat:'OBSERVABILITY', pitch:'Unified observability and SRE tooling across every service you operate.',
+    desc:'BEACON aggregates metrics, logs, and traces into one operational surface, with SLO tracking, incident workflows, and on-call routing built in from day one.',
+    specs:{'Runtime':'OpenTelemetry-native','Deployment Model':'Managed cloud','SLA':'99.95%','Integrations':'PagerDuty, Slack, Datadog export','Footprint':'Agent-based collection'},
+    tiers:[{n:'Standard',p:2100,f:['Core metrics + logs','5 SLOs tracked','Email + Slack alerts']},{n:'Pro',p:5300,f:['Distributed tracing','Unlimited SLOs','On-call routing']},{n:'Enterprise',p:0,f:['Custom retention','Dedicated SRE liaison','Quarterly reliability review']}],
+    addons:[{n:'Extended trace retention',p:500},{n:'Custom SLO dashboards',p:900},{n:'Incident response retainer',p:2200}]}
+};
+var PRODUCT_ORDER = ['atlas','signal','forge','cipher','loom','beacon'];
+
+function money(n){ return n===0? 'CUSTOM' : '$'+n.toLocaleString('en-US'); }
+
+function renderMarketplace(){
+  return pageHead('04 — MARKETPLACE','The catalogue.','Certified, spec-sheeted modules you can preview, configure, and deploy without waiting on a custom build.')+
+  '<section class="section-tight wrap"><ul class="index-list">'+
+    PRODUCT_ORDER.map(function(id){
+      var p = PRODUCTS[id];
+      return '<li>'+
+        '<button class="index-row" aria-expanded="false" data-acc>'+
+          '<span class="n">'+p.n+'</span>'+
+          '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;width:100%;">'+
+            '<div><h3>'+p.name+' <span class="tag" style="margin-left:8px;vertical-align:middle;">'+p.cat+'</span></h3><p class="body-copy" style="margin-top:8px;">'+p.pitch+'</p></div>'+
+            '<span class="icon-btn chev">'+ic('plus')+'</span>'+
+          '</div>'+
+        '</button>'+
+        '<div class="index-detail"><div>'+
+          '<div style="padding:0 0 30px 64px;display:flex;gap:24px;flex-wrap:wrap;align-items:center;">'+
+            '<p class="body-copy" style="margin:0;flex:1;min-width:220px;">'+p.desc+'</p>'+
+            '<a class="btn btn-solid" href="#/product/'+id+'">VIEW SPEC SHEET '+ic('arrow')+'</a>'+
+          '</div>'+
+        '</div></div>'+
+      '</li>';
+    }).join('')+
+  '</ul></section>'+footer();
+}
+ROUTES['/marketplace'] = {render: renderMarketplace, init: initAccordions};
+
+function renderProduct(params){
+  var p = PRODUCTS[params.id];
+  if(!p) return render404();
+  return pageHead('MARKETPLACE / 0'+ (PRODUCT_ORDER.indexOf(params.id)+1), p.name, p.pitch)+
+  '<section class="section-tight wrap">'+
+    '<div class="grid12">'+
+      '<div style="grid-column:1/span 5;" class="fade-up"><div class="plate" data-code="'+p.name+'-PLATE"></div></div>'+
+      '<div style="grid-column:7/span 6;" class="fade-up">'+
+        '<p class="eyebrow">SPEC SHEET</p>'+
+        '<table class="spec" style="margin-top:14px;">'+Object.keys(p.specs).map(function(k){return '<tr><th>'+k+'</th><td>'+p.specs[k]+'</td></tr>';}).join('')+'</table>'+
+      '</div>'+
+    '</div>'+
+    '<div class="grid12" style="margin-top:44px;">'+
+      '<div style="grid-column:1/span 7;"><p class="body-copy">'+p.desc+'</p></div>'+
+      '<div style="grid-column:9/span 4;display:flex;flex-direction:column;gap:12px;align-items:flex-start;">'+
+        '<a class="btn btn-accent" href="#/product/'+params.id+'/customize">CUSTOMIZE '+ic('arrow')+'</a>'+
+        '<a class="btn btn-line" style="border-color:var(--line-strong);" href="#/marketplace">BACK TO CATALOGUE</a>'+
+      '</div>'+
+    '</div>'+
+  '</section>'+footer();
+}
+ROUTES['/product/:id'] = {render: renderProduct};
+
+function renderCustomize(params){
+  var p = PRODUCTS[params.id];
+  if(!p) return render404();
+  return pageHead('MARKETPLACE / CUSTOMIZE', p.name+' — Configuration', 'Choose a tier and any add-ons. The running summary updates as you build.')+
+  '<section class="section-tight wrap">'+
+    '<div class="grid12">'+
+      '<div style="grid-column:1/span 7;">'+
+        '<p class="eyebrow">SELECT TIER</p>'+
+        '<div id="tier-list" style="margin-top:8px;">'+
+          p.tiers.map(function(t,i){
+            return '<label class="field-radio"><input type="radio" name="tier" value="'+i+'" data-price="'+t.p+'" '+(i===0?'checked':'')+'>'+
+              '<span class="fr-title">'+t.n+'</span>'+
+              '<span class="mono" style="font-size:11px;color:var(--muted);">'+t.f.join(' · ')+'</span>'+
+              '<span class="fr-price">'+money(t.p)+(t.p? '/mo':'')+'</span>'+
+            '</label>';
+          }).join('')+
+        '</div>'+
+        '<p class="eyebrow" style="margin-top:34px;">ADD-ONS</p>'+
+        '<div id="addon-list" style="margin-top:8px;">'+
+          p.addons.map(function(a,i){
+            return '<label class="field-radio"><input type="checkbox" data-addon="'+i+'" data-price="'+a.p+'">'+
+              '<span class="fr-title">'+a.n+'</span><span class="fr-price">+$'+a.p.toLocaleString('en-US')+'/mo</span></label>';
+          }).join('')+
+        '</div>'+
+      '</div>'+
+      '<div style="grid-column:9/span 4;">'+
+        '<div style="border:1px solid var(--line-strong);padding:26px;position:sticky;top:26px;">'+
+          '<p class="eyebrow">RUNNING SUMMARY</p>'+
+          '<div style="margin-top:18px;" id="summary-lines" class="mono" ></div>'+
+          '<div class="hr" style="margin:16px 0;"></div>'+
+          '<div style="display:flex;justify-content:space-between;align-items:baseline;">'+
+            '<span class="mono" style="font-size:11px;color:var(--muted);">EST. MONTHLY</span>'+
+            '<span class="mono" id="summary-total" style="font-size:26px;font-variant-numeric:tabular-nums;">$0</span>'+
+          '</div>'+
+          '<a class="btn btn-accent" href="#/product/'+params.id+'/purchase" style="width:100%;justify-content:center;margin-top:22px;">PROCEED TO PURCHASE '+ic('arrow')+'</a>'+
+        '</div>'+
+      '</div>'+
+    '</div>'+
+  '</section>'+footer();
+}
+ROUTES['/product/:id/customize'] = {render: renderCustomize, init: function(params){
+  var p = PRODUCTS[params.id];
+  function recalc(){
+    var tier = app.querySelector('input[name="tier"]:checked');
+    var tierIdx = tier? parseInt(tier.value,10):0;
+    var total = parseInt(tier.dataset.price,10) || 0;
+    var lines = ['<div style="display:flex;justify-content:space-between;padding:4px 0;"><span>'+p.tiers[tierIdx].n.toUpperCase()+' TIER</span><span>'+money(total)+'</span></div>'];
+    app.querySelectorAll('[data-addon]:checked').forEach(function(cb){
+      var idx = parseInt(cb.dataset.addon,10);
+      var a = p.addons[idx];
+      total += a.p;
+      lines.push('<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px;color:var(--muted);"><span>+ '+a.n+'</span><span>+$'+a.p.toLocaleString('en-US')+'</span></div>');
+    });
+    app.querySelector('#summary-lines').innerHTML = lines.join('');
+    app.querySelector('#summary-total').textContent = tierIdx===2 && !app.querySelectorAll('[data-addon]:checked').length ? 'CUSTOM' : '$'+total.toLocaleString('en-US');
+  }
+  app.querySelectorAll('input[name="tier"], [data-addon]').forEach(function(inp){ inp.addEventListener('change', recalc); });
+  recalc();
+}};
+
+function renderPurchase(params){
+  var p = PRODUCTS[params.id];
+  if(!p) return render404();
+  return pageHead('MARKETPLACE / PURCHASE', p.name+' — Order Confirmation', 'This is a simulated checkout. No payment is processed in this concept.')+
+  '<section class="section-tight wrap">'+
+    '<div class="grid12" id="purchase-form">'+
+      '<div style="grid-column:1/span 7;">'+
+        '<div class="field"><label for="pf-company">Company name</label><input id="pf-company" type="text" placeholder="Acme Holdings, Inc."></div>'+
+        '<div class="field"><label for="pf-email">Billing contact email</label><input id="pf-email" type="email" placeholder="finance@company.com"></div>'+
+        '<p class="eyebrow" style="margin-top:24px;">PAYMENT METHOD</p>'+
+        '<label class="field-radio"><input type="radio" name="pay" checked><span class="fr-title">Purchase Order</span></label>'+
+        '<label class="field-radio"><input type="radio" name="pay"><span class="fr-title">Wire Transfer</span></label>'+
+        '<label class="field-radio"><input type="radio" name="pay"><span class="fr-title">Corporate Card</span></label>'+
+        '<button class="btn btn-accent" id="confirm-purchase" style="margin-top:26px;">CONFIRM PURCHASE '+ic('arrow')+'</button>'+
+      '</div>'+
+      '<div style="grid-column:9/span 4;">'+
+        '<div style="border:1px solid var(--line-strong);padding:26px;">'+
+          '<p class="eyebrow">ORDER</p>'+
+          '<h3 class="display-m" style="margin-top:10px;">'+p.name+'</h3>'+
+          '<p class="mono" style="font-size:11px;color:var(--muted);margin-top:6px;">'+p.cat+'</p>'+
+        '</div>'+
+      '</div>'+
+    '</div>'+
+    '<div id="purchase-success" class="hidden">'+
+      '<div class="grid12" style="align-items:center;padding:40px 0;">'+
+        '<div style="grid-column:1/span 12;text-align:center;">'+
+          '<p class="eyebrow">ORDER CONFIRMED</p>'+
+          '<h2 class="display-l" style="margin-top:12px;">ORDER <span id="order-id" style="color:var(--accent);"></span></h2>'+
+          '<p class="body-copy" style="margin:16px auto 0;">Your instance is provisioned and ready for deployment configuration.</p>'+
+          '<a class="btn btn-solid" id="go-deploy" style="margin-top:26px;">BEGIN DEPLOYMENT '+ic('arrow')+'</a>'+
+        '</div>'+
+      '</div>'+
+    '</div>'+
+  '</section>'+footer();
+}
+ROUTES['/product/:id/purchase'] = {render: renderPurchase, init: function(params){
+  var btn = app.querySelector('#confirm-purchase');
+  btn.addEventListener('click', function(){
+    btn.setAttribute('disabled','');
+    btn.textContent = 'PROCESSING…';
+    setTimeout(function(){
+      var id = 'TB-'+Math.floor(100000+Math.random()*899999);
+      app.querySelector('#purchase-form').classList.add('hidden');
+      app.querySelector('#purchase-success').classList.remove('hidden');
+      app.querySelector('#order-id').textContent = '#'+id;
+      app.querySelector('#go-deploy').href = '#/product/'+params.id+'/deploy';
+    }, 900);
+  });
+}};
+
+var DEPLOY_STEPS = ['Provision environment','Apply configuration manifest','Migrate & validate data','Run verification suite','Cutover & go live'];
+function renderDeploy(params){
+  var p = PRODUCTS[params.id];
+  if(!p) return render404();
+  return pageHead('MARKETPLACE / DEPLOY', p.name+' — Deployment', 'A simulated deployment run. Each line completes in sequence, exactly as the real pipeline reports it.')+
+  '<section class="section-tight wrap">'+
+    '<div class="grid12">'+
+      '<div style="grid-column:1/span 8;">'+
+        '<div class="mono" id="manifest" style="font-size:13.5px;line-height:2.1;border:1px solid var(--line-strong);padding:26px;min-height:220px;"></div>'+
+      '</div>'+
+      '<div style="grid-column:10/span 3;">'+
+        '<p class="eyebrow">PROGRESS</p>'+
+        '<div class="num-giant" id="deploy-pct" style="color:var(--fg);font-size:clamp(50px,6vw,90px);">00%</div>'+
+        '<div class="hr" style="margin:14px 0;"></div>'+
+        '<p class="mono" id="deploy-status" style="font-size:12px;color:var(--muted);">QUEUED</p>'+
+      '</div>'+
+    '</div>'+
+    '<div id="deploy-success" class="hidden" style="margin-top:40px;text-align:center;">'+
+      '<p class="eyebrow" style="color:var(--accent);">STATUS: LIVE</p>'+
+      '<h2 class="display-xl" style="margin-top:10px;">DEPLOYED.</h2>'+
+      '<p class="mono" style="margin-top:14px;color:var(--muted);" id="deploy-id"></p>'+
+      '<a class="btn btn-solid" href="#/dashboard" style="margin-top:26px;">OPEN DASHBOARD '+ic('arrow')+'</a>'+
+    '</div>'+
+  '</section>'+footer();
+}
+ROUTES['/product/:id/deploy'] = {render: renderDeploy, init: function(params){
+  var manifest = app.querySelector('#manifest');
+  var pctEl = app.querySelector('#deploy-pct');
+  var statusEl = app.querySelector('#deploy-status');
+  var lines = [];
+  var i = 0;
+  function step(){
+    if(i >= DEPLOY_STEPS.length){
+      pctEl.textContent = '100%'; statusEl.textContent = 'COMPLETE';
+      app.querySelector('#deploy-success').classList.remove('hidden');
+      app.querySelector('#deploy-id').textContent = 'DEPLOY ID: DEP-'+Math.floor(10000+Math.random()*89999)+' — '+ new Date().toISOString().slice(0,16).replace('T',' ') +' UTC';
+      return;
+    }
+    lines.push('<div>['+String(i+1).padStart(2,'0')+'/0'+DEPLOY_STEPS.length+'] '+DEPLOY_STEPS[i]+' … <span style="color:var(--accent);">RUNNING</span></div>');
+    manifest.innerHTML = lines.join('');
+    statusEl.textContent = DEPLOY_STEPS[i].toUpperCase();
+    var pct = Math.round(((i+1)/DEPLOY_STEPS.length)*100);
+    setTimeout(function(){
+      lines[lines.length-1] = lines[lines.length-1].replace('RUNNING','<span style=\"color:var(--good);\">DONE</span>').replace('color:var(--accent);','color:var(--good);');
+      manifest.innerHTML = lines.join('');
+      pctEl.textContent = String(pct).padStart(2,'0')+'%';
+      i++;
+      setTimeout(step, reduce?60:520);
+    }, reduce?40:620);
+  }
+  setTimeout(step, reduce?40:400);
+}};
+
+/* ============================= WORK ============================= */
+var CASES = [
+  {t:'Regional Banking Consortium', tag:'FINANCIAL SERVICES', challenge:'Six subsidiary banks running incompatible core-banking systems after a merger.', approach:'Unified core-banking replatform with a phased, zero-downtime cutover sequence across all six entities.', result:'−41% transaction latency, 100% regulatory sign-off on first audit.'},
+  {t:'National Health Authority', tag:'PUBLIC SECTOR', challenge:'4.2M patient records spread across 14 legacy systems with no shared schema.', approach:'ATLAS-driven migration with a custom schema-mapping layer and clinician-verified data reconciliation.', result:'Zero-downtime cutover, full interoperability within one fiscal quarter.'},
+  {t:'Tier-1 Logistics Network', tag:'LOGISTICS', challenge:'Nightly batch inventory sync causing systemic overselling during peak season.', approach:'SIGNAL-based realtime data mesh replacing batch ETL across 40 distribution centers.', result:'+18% route efficiency, overselling incidents reduced to zero.'},
+  {t:'Global Retail Group', tag:'RETAIL', challenge:'Fragmented e-commerce and POS stacks across 22 markets, each with bespoke code.', approach:'Consolidated commerce platform built on a shared FORGE-provisioned product team.', result:'Time-to-market for new markets cut from 9 months to 6 weeks.'},
+  {t:'Telecom Infrastructure Operator', tag:'TELECOM', challenge:'Network operations lacked unified visibility across 60,000 edge devices.', approach:'BEACON observability rollout with custom SLO tracking and automated incident routing.', result:'Mean time to resolution down 63%, sustained 220M requests/day.'}
+];
+function renderWork(){
+  return pageHead('05 — WORK','Case index.','A representative sample. Every figure below is drawn from a signed engagement summary — full detail available under NDA.')+
+  '<section class="section-tight wrap"><ul class="index-list">'+
+    CASES.map(function(c,i){
+      var n = String(i+1).padStart(2,'0');
+      return '<li>'+
+        '<button class="index-row" aria-expanded="false" data-acc>'+
+          '<span class="n">'+n+'</span>'+
+          '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;width:100%;">'+
+            '<div><h3>'+c.t+'</h3><span class="tag" style="margin-top:8px;display:inline-block;">'+c.tag+'</span></div>'+
+            '<span class="icon-btn chev">'+ic('plus')+'</span>'+
+          '</div>'+
+        '</button>'+
+        '<div class="index-detail"><div>'+
+          '<div style="padding:0 0 28px 64px;display:grid;gap:14px;grid-template-columns:1fr;max-width:70ch;">'+
+            '<div><p class="eyebrow">CHALLENGE</p><p class="body-copy" style="margin-top:6px;">'+c.challenge+'</p></div>'+
+            '<div><p class="eyebrow">APPROACH</p><p class="body-copy" style="margin-top:6px;">'+c.approach+'</p></div>'+
+            '<div><p class="eyebrow">RESULT</p><p class="mono" style="margin-top:6px;color:var(--accent);font-size:13px;">'+c.result+'</p></div>'+
+          '</div>'+
+        '</div></div>'+
+      '</li>';
+    }).join('')+
+  '</ul></section>'+footer();
+}
+ROUTES['/work'] = {render: renderWork, init: initAccordions};
+
+/* ============================= PROCESS ============================= */
+var STAGES = [
+  {t:'Discover', d:'We map the current system, the constraints, and the metric that defines success before a single line of code is written.', w:'2–4 weeks'},
+  {t:'Architect', d:'Target architecture, staffing plan, and delivery milestones — reviewed with your engineering leadership before commitment.', w:'2–3 weeks'},
+  {t:'Build', d:'Embedded squads ship in two-week increments against a visible backlog, with weekly demos into your organization.', w:'8–24 weeks'},
+  {t:'Deploy', d:'Staged rollout with automated verification at every gate, and a rollback path defined before go-live, not during it.', w:'1–3 weeks'},
+  {t:'Operate', d:'SRE-backed operations under contractual SLA, with a quarterly architecture review built into every retainer.', w:'Ongoing'}
+];
+function renderProcess(){
+  return pageHead('06 — PROCESS','Five stages. No surprises.','The same delivery sequence for a six-week module and a two-year replatform — only the duration changes.')+
+  '<section class="section-tight wrap">'+
+    '<div class="grid12">'+
+      '<div style="grid-column:1/span 3;position:relative;">'+
+        '<div style="position:sticky;top:120px;">'+
+          '<p class="eyebrow">CURRENT STAGE</p>'+
+          '<div class="num-giant" id="proc-counter">01</div>'+
+          '<p class="mono" id="proc-label" style="margin-top:10px;font-size:13px;color:var(--muted);">DISCOVER</p>'+
+        '</div>'+
+      '</div>'+
+      '<div style="grid-column:5/span 8;">'+
+        '<ul class="index-list" id="proc-list">'+
+          STAGES.map(function(s,i){
+            var n = String(i+1).padStart(2,'0');
+            return '<li data-stage="'+n+'" data-label="'+s.t.toUpperCase()+'"><div class="index-row"><span class="n">'+n+'</span><div>'+
+              '<h3>'+s.t+'</h3><p class="body-copy" style="margin-top:8px;">'+s.d+'</p>'+
+              '<p class="mono" style="margin-top:10px;font-size:11px;color:var(--muted);letter-spacing:.08em;">TYPICAL DURATION — '+s.w.toUpperCase()+'</p>'+
+            '</div></div></li>';
+          }).join('')+
+        '</ul>'+
+      '</div>'+
+    '</div>'+
+  '</section>'+footer();
+}
+ROUTES['/process'] = {render: renderProcess, init: function(){
+  var items = app.querySelectorAll('#proc-list li');
+  var counter = app.querySelector('#proc-counter');
+  var label = app.querySelector('#proc-label');
+  if(!items.length) return;
+  var obs = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        counter.textContent = e.target.dataset.stage;
+        label.textContent = e.target.dataset.label;
+      }
+    });
+  }, {rootMargin:'-40% 0px -50% 0px'});
+  items.forEach(function(li){ obs.observe(li); });
+}};
+
+/* ============================= ABOUT ============================= */
+function renderAbout(){
+  return pageHead('07 — ABOUT','A platform company, built like a studio.','Founded 2014. Headquartered across four hubs. Still run by the engineers who wrote the first commit.')+
+  '<section class="section-tight wrap">'+
+    '<div class="grid12">'+
+      '<div style="grid-column:1/span 6;">'+revealTitle('We think a $10B platform should still feel like it has one accountable team behind it.','h2')+'</div>'+
+      '<div style="grid-column:8/span 5;"><p class="body-copy">TECHBISS exists because most "digital transformation" vendors hand off after the slide deck. We stay: the team that architects your system is the team on call for it three years later.</p></div>'+
+    '</div>'+
+    '<div class="stats" style="margin-top:50px;">'+stat('2014','FOUNDED')+stat('4','GLOBAL DELIVERY HUBS')+stat('1,240+','ENGINEERS &amp; ARCHITECTS')+stat('38','COUNTRIES SERVED')+
+    '</div>'+
+  '</section>'+
+  '<section class="section wrap">'+
+    '<div class="grid12">'+
+      '<div style="grid-column:1/span 3;"><p class="eyebrow">LEADERSHIP</p></div>'+
+      '<div style="grid-column:4/span 9;">'+
+        '<ul class="index-list">'+
+          leader('01','Renata Solis','Chief Executive Officer')+
+          leader('02','Marcus Webb','Chief Technology Officer')+
+          leader('03','Amara Osei','Chief Operating Officer')+
+          leader('04','Daniel Kwon','Chief Information Security Officer')+
+        '</ul>'+
+      '</div>'+
+    '</div>'+
+  '</section>'+
+  '<section class="section-tight wrap">'+
+    '<div class="grid12">'+
+      '<div style="grid-column:1/span 3;"><p class="eyebrow">VALUES</p></div>'+
+      '<div style="grid-column:4/span 9;">'+
+        '<ul class="index-list">'+
+          indexEntry('01','Own the outcome, not the ticket','We measure delivery against your business metric, not story points closed.',[])+
+          indexEntry('02','Show the work, weekly','Every engagement runs on a visible backlog and a standing demo cadence.',[])+
+          indexEntry('03','Build for the handoff you\'ll never need','Documentation and runbooks are a deliverable, not an afterthought.',[])+
+        '</ul>'+
+      '</div>'+
+    '</div>'+
+  '</section>'+footer();
+}
+function leader(n,name,title){
+  return '<li><div class="index-row"><span class="n">'+n+'</span><div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;"><h3>'+name+'</h3><span class="mono" style="color:var(--muted);font-size:12.5px;align-self:center;">'+title+'</span></div></div></li>';
+}
+ROUTES['/about'] = {render: renderAbout};
+
+/* ============================= RESOURCES ============================= */
+var RESOURCES = [
+  {type:'GUIDE', t:'Zero-downtime cutover: a field checklist', time:'12 MIN READ', date:'AUG 2026'},
+  {type:'WHITEPAPER', t:'What core-banking replatforms actually cost', time:'24 MIN READ', date:'JUL 2026'},
+  {type:'WEBINAR', t:'Agentic workflows in regulated environments', time:'48 MIN WATCH', date:'JUN 2026'},
+  {type:'GUIDE', t:'Reading a cloud migration spec sheet', time:'8 MIN READ', date:'MAY 2026'},
+  {type:'REPORT', t:'The 2026 state of legacy modernization', time:'31 MIN READ', date:'MAR 2026'},
+  {type:'WHITEPAPER', t:'Designing SLOs that survive an incident review', time:'16 MIN READ', date:'FEB 2026'}
+];
+function renderResources(){
+  return pageHead('08 — RESOURCES','Field notes, not marketing copy.','Written by the architects who ran the engagement, published after the client review — not before.')+
+  '<section class="section-tight wrap"><ul class="index-list">'+
+    RESOURCES.map(function(r,i){
+      var n = String(i+1).padStart(2,'0');
+      return '<li><a href="#/resources" style="text-decoration:none;display:block;"><div class="index-row"><span class="n">'+n+'</span>'+
+        '<div style="display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;width:100%;">'+
+          '<div><span class="tag">'+r.type+'</span><h3 style="margin-top:10px;">'+r.t+'</h3></div>'+
+          '<div class="mono" style="font-size:11px;color:var(--muted);white-space:nowrap;align-self:center;text-align:right;">'+r.time+'<br>'+r.date+'</div>'+
+        '</div></div></a></li>';
+    }).join('')+
+  '</ul></section>'+footer();
+}
+ROUTES['/resources'] = {render: renderResources};
+
+/* ============================= PRICING ============================= */
+var PLANS = [
+  {t:'Starter', p:'$2,400', per:'/mo', d:'For a single module or a focused proof of value.', f:['1 marketplace module','Business-hours support','Standard SLA (99.9%)','Monthly usage reporting']},
+  {t:'Growth', p:'$8,900', per:'/mo', d:'For teams running multiple systems in production.', f:['Up to 5 marketplace modules','24/7 monitored support','Elevated SLA (99.95%)','Quarterly architecture review']},
+  {t:'Enterprise', p:'Custom', per:'', d:'For platform-scale programs across multiple business units.', f:['Unlimited modules & custom builds','Dedicated delivery pod','Contractual SLA up to 99.99%','Named SRE & security architect']}
+];
+function renderPricing(){
+  return pageHead('09 — PRICING','Priced like infrastructure, not seats.','Every tier includes deployment, monitoring, and support — there is no separate line item for keeping the lights on.')+
+  '<section class="section-tight wrap"><div class="grid12">'+
+    PLANS.map(function(pl,i){
+      return '<div style="grid-column:span 4;grid-column:span 12;" class="plan-col fade-up">'+
+        '<div style="border-top:1px solid var(--line-strong);padding-top:22px;">'+
+          '<p class="mono" style="font-size:11px;color:var(--muted);">0'+(i+1)+' / '+pl.t.toUpperCase()+'</p>'+
+          '<div style="display:flex;align-items:baseline;gap:8px;margin-top:10px;"><span class="display-m">'+pl.p+'</span><span class="mono" style="color:var(--muted);font-size:12px;">'+pl.per+'</span></div>'+
+          '<p class="body-copy" style="margin-top:12px;">'+pl.d+'</p>'+
+          '<ul style="margin-top:20px;display:grid;gap:10px;">'+pl.f.map(function(f){return '<li style="display:flex;gap:10px;align-items:flex-start;font-size:13px;">'+ic('check')+'<span>'+f+'</span></li>';}).join('')+'</ul>'+
+          '<a class="btn '+(i===1?'btn-accent':'btn-line')+'" style="'+(i!==1?'border-color:var(--line-strong);':'')+'margin-top:24px;width:100%;justify-content:center;" href="#/contact">'+(i===2?'TALK TO SALES':'GET STARTED')+' '+ic('arrow')+'</a>'+
+        '</div>'+
+      '</div>';
+    }).join('')+
+  '</div></section>'+
+  '<style>@media(min-width:800px){.plan-col{grid-column:span 4 !important;}}</style>'+
+  footer();
+}
+ROUTES['/pricing'] = {render: renderPricing};
+
+/* ============================= CONTACT ============================= */
+function renderContact(){
+  return pageHead('10 — CONTACT','Tell us what needs to change.','A senior architect reviews every submission personally and responds within one business day.')+
+  '<section class="section-tight wrap">'+
+    '<div class="grid12">'+
+      '<div style="grid-column:1/span 7;" id="contact-form-wrap">'+
+        '<div class="field"><label for="c-name">Full name</label><input id="c-name" required></div>'+
+        '<div class="field"><label for="c-company">Company</label><input id="c-company" required></div>'+
+        '<div class="field"><label for="c-email">Work email</label><input id="c-email" type="email" required></div>'+
+        '<div class="field"><label for="c-msg">What are you trying to solve?</label><textarea id="c-msg" required></textarea></div>'+
+        '<button class="btn btn-accent" id="contact-submit" style="margin-top:22px;">SEND '+ic('arrow')+'</button>'+
+      '</div>'+
+      '<div id="contact-success" class="hidden" style="grid-column:1/span 7;">'+
+        '<p class="eyebrow" style="color:var(--accent);">MESSAGE SENT</p>'+
+        '<h2 class="display-m" style="margin-top:12px;">Received. We\'ll follow up within one business day.</h2>'+
+      '</div>'+
+      '<div style="grid-column:9/span 4;">'+
+        '<p class="eyebrow">HEADQUARTERS</p>'+
+        '<p class="body-copy" style="margin-top:10px;">1 Meridian Plaza, Suite 4400<br>Chicago, IL 60601</p>'+
+        '<p class="eyebrow" style="margin-top:26px;">GENERAL INQUIRIES</p>'+
+        '<p class="mono" style="margin-top:10px;font-size:13px;">hello@techbiss.com</p>'+
+        '<p class="eyebrow" style="margin-top:26px;">SUPPORT (24/7)</p>'+
+        '<p class="mono" style="margin-top:10px;font-size:13px;">support@techbiss.com</p>'+
+      '</div>'+
+    '</div>'+
+  '</section>'+footer();
+}
+ROUTES['/contact'] = {render: renderContact, init: function(){
+  var btn = app.querySelector('#contact-submit');
+  btn.addEventListener('click', function(){
+    var name = app.querySelector('#c-name').value.trim();
+    var email = app.querySelector('#c-email').value.trim();
+    if(!name || !email){ app.querySelector('#c-name').focus(); return; }
+    app.querySelector('#contact-form-wrap').classList.add('hidden');
+    app.querySelector('#contact-success').classList.remove('hidden');
+  });
+}};
+
+/* ============================= LOGIN ============================= */
+function renderLogin(){
+  return '<section class="wrap" style="min-height:100vh;display:flex;align-items:center;padding:120px 0 60px;">'+
+    '<div class="grid12" style="width:100%;">'+
+      '<div style="grid-column:3/span 8;max-width:420px;">'+
+        '<p class="eyebrow">PLATFORM ACCESS</p>'+
+        '<h1 class="display-m" style="margin-top:12px;">Sign in to TECHBISS.</h1>'+
+        '<div id="login-form" style="margin-top:26px;">'+
+          '<div class="field"><label for="l-email">Email</label><input id="l-email" type="email" value="team@techbiss.com"></div>'+
+          '<div class="field"><label for="l-pass">Password</label><input id="l-pass" type="password" placeholder="••••••••••"></div>'+
+          '<button class="btn btn-solid" id="login-btn" style="margin-top:22px;width:100%;justify-content:center;">ACCESS PLATFORM '+ic('arrow')+'</button>'+
+          '<p class="mono" style="margin-top:16px;font-size:11px;color:var(--muted);">Forgot password? · Request access</p>'+
+        '</div>'+
+        '<div id="login-loading" class="hidden mono" style="margin-top:26px;color:var(--muted);font-size:12px;">AUTHENTICATING…</div>'+
+      '</div>'+
+    '</div>'+
+  '</section>';
+}
+ROUTES['/login'] = {render: renderLogin, init: function(){
+  var btn = app.querySelector('#login-btn');
+  btn.addEventListener('click', function(){
+    app.querySelector('#login-form').classList.add('hidden');
+    app.querySelector('#login-loading').classList.remove('hidden');
+    setTimeout(function(){ location.hash = '#/dashboard'; }, 900);
+  });
+}};
+
+/* ============================= INSTALLER ============================= */
+var INSTALL_STEPS = [
+  {t:'Select', d:'Choose the system profile you\'re migrating from.'},
+  {t:'Detect', d:'Scanning the source environment for services, schemas, and dependencies.'},
+  {t:'Configure', d:'Reviewing the generated migration plan and target architecture.'},
+  {t:'Import / Migrate', d:'Transferring data and re-mapping schemas to the target platform.'},
+  {t:'Install', d:'Provisioning target infrastructure and applying the configuration manifest.'},
+  {t:'Verify', d:'Running the post-migration verification suite against the source of record.'},
+  {t:'Launch', d:'Cutting traffic over to the new environment.'}
+];
+function renderInstaller(){
+  return pageHead('INSTALLER','Migrate a legacy system in seven steps.','A guided wizard — the same one our own migration engineers run in the field.')+
+  '<section class="section-tight wrap">'+
+    '<div class="grid12">'+
+      '<div style="grid-column:1/span 3;">'+
+        '<ul id="inst-index" class="mono" style="font-size:12px;display:grid;gap:2px;">'+
+          INSTALL_STEPS.map(function(s,i){ return '<li data-idx="'+i+'" style="padding:10px 0;border-top:1px solid var(--line);color:var(--muted);display:flex;gap:10px;"><span class="n">'+String(i+1).padStart(2,'0')+'</span><span>'+s.t.toUpperCase()+'</span></li>'; }).join('')+
+          '<li style="border-bottom:1px solid var(--line);"></li>'+
+        '</ul>'+
+      '</div>'+
+      '<div style="grid-column:5/span 8;">'+
+        '<div id="inst-panel" style="border:1px solid var(--line-strong);padding:30px;min-height:340px;"></div>'+
+        '<div style="display:flex;justify-content:space-between;margin-top:20px;">'+
+          '<button class="btn btn-line" style="border-color:var(--line-strong);" id="inst-back">BACK</button>'+
+          '<button class="btn btn-solid" id="inst-next">CONTINUE '+ic('arrow')+'</button>'+
+        '</div>'+
+      '</div>'+
+    '</div>'+
+  '</section>'+footer();
+}
+ROUTES['/installer'] = {render: renderInstaller, init: function(){
+  var idx = 0;
+  var panel = app.querySelector('#inst-panel');
+  var back = app.querySelector('#inst-back');
+  var next = app.querySelector('#inst-next');
+  var indexItems = app.querySelectorAll('#inst-index li[data-idx]');
+
+  function markIndex(){
+    indexItems.forEach(function(li,i){
+      li.style.color = i===idx ? 'var(--fg)' : (i<idx ? 'var(--good)' : 'var(--muted)');
+      li.style.fontWeight = i===idx ? '600':'400';
+    });
+    back.disabled = idx===0;
+    next.textContent = idx===INSTALL_STEPS.length-1 ? 'LAUNCHED — DONE' : 'CONTINUE ▸';
+  }
+
+  function panelSelect(){
+    return '<p class="eyebrow">STEP 01 — SELECT SOURCE SYSTEM</p>'+
+      '<div style="margin-top:18px;display:grid;gap:0;">'+
+        ['On-premise VMware cluster','Legacy monolith (self-hosted)','Competing cloud platform','Custom / mixed environment'].map(function(o,i){
+          return '<label class="field-radio"><input type="radio" name="src" '+(i===0?'checked':'')+'><span class="fr-title">'+o+'</span></label>';
+        }).join('')+
+      '</div>';
+  }
+  function panelDetect(){
+    return '<p class="eyebrow">STEP 02 — DETECTING SOURCE ENVIRONMENT</p>'+
+      '<div class="mono" id="scan-line" style="margin-top:20px;font-size:12.5px;height:2px;background:var(--line-strong);position:relative;overflow:hidden;">'+
+        '<div id="scan-sweep" style="position:absolute;top:0;bottom:0;left:0;width:30%;background:var(--accent);"></div>'+
+      '</div>'+
+      '<div id="scan-log" class="mono" style="margin-top:18px;font-size:12px;color:var(--muted);display:grid;gap:6px;"></div>';
+  }
+  function panelConfigure(){
+    return '<p class="eyebrow">STEP 03 — REVIEW MIGRATION PLAN</p>'+
+      '<table class="spec" style="margin-top:16px;">'+
+        '<tr><th>Services detected</th><td>14</td></tr>'+
+        '<tr><th>Databases</th><td>3 (PostgreSQL, Redis, MongoDB)</td></tr>'+
+        '<tr><th>Estimated data volume</th><td>2.8 TB</td></tr>'+
+        '<tr><th>Target</th><td>TECHBISS Managed Cloud — multi-AZ</td></tr>'+
+      '</table>';
+  }
+  function panelImport(){
+    return '<p class="eyebrow">STEP 04 — IMPORT / MIGRATE</p>'+
+      '<div id="import-bar" style="margin-top:20px;height:8px;background:var(--line);position:relative;"><div id="import-fill" style="height:100%;width:0%;background:var(--accent);transition:width .3s linear;"></div></div>'+
+      '<p class="mono" id="import-pct" style="margin-top:10px;font-size:12px;color:var(--muted);">0% TRANSFERRED</p>';
+  }
+  function panelInstall(){
+    return '<p class="eyebrow">STEP 05 — INSTALL</p>'+
+      '<div class="mono" id="install-log" style="margin-top:18px;font-size:12.5px;line-height:2;color:var(--muted);"></div>';
+  }
+  function panelVerify(){
+    return '<p class="eyebrow">STEP 06 — VERIFY</p>'+
+      '<ul id="verify-list" class="mono" style="margin-top:18px;font-size:12.5px;display:grid;gap:10px;">'+
+        ['Schema parity check','Record count reconciliation','API contract tests','Latency benchmark','Rollback path validated'].map(function(v,i){
+          return '<li data-v="'+i+'" style="display:flex;gap:12px;align-items:center;color:var(--muted);"><span class="v-box" style="width:16px;height:16px;border:1px solid var(--line-strong);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;"></span>'+v+'</li>';
+        }).join('')+
+      '</ul>';
+  }
+  function panelLaunch(){
+    return '<div style="text-align:center;padding:30px 0;">'+
+      '<p class="eyebrow" style="color:var(--accent);">CUTOVER COMPLETE</p>'+
+      '<h2 class="display-l" id="launch-text" style="margin-top:14px;">LAUNCHED.</h2>'+
+      '<p class="mono" style="margin-top:14px;color:var(--muted);font-size:12px;">MIGRATION ID: MIG-'+Math.floor(10000+Math.random()*89999)+'</p>'+
+      '<a class="btn btn-solid" href="#/dashboard" style="margin-top:24px;">OPEN DASHBOARD '+ic('arrow')+'</a>'+
+    '</div>';
+  }
+
+  var panels = [panelSelect, panelDetect, panelConfigure, panelImport, panelInstall, panelVerify, panelLaunch];
+  var stepAnims = [null, animateDetect, null, animateImport, animateInstall, animateVerify, null];
+
+  function animateDetect(){
+    var sweep = app.querySelector('#scan-sweep');
+    var log = app.querySelector('#scan-log');
+    var items = ['Discovered 14 running services','Identified 3 database engines','Mapped 212 API endpoints','Estimated data volume: 2.8 TB'];
+    if(reduce){ sweep.style.display='none'; log.innerHTML = items.map(function(t){return '<div>▸ '+t+'</div>';}).join(''); return; }
+    var pos=0, dir=1;
+    var mv = setInterval(function(){ pos += dir*4; if(pos>70||pos<0){dir*=-1;} sweep.style.left = pos+'%'; }, 60);
+    items.forEach(function(t,i){ setTimeout(function(){ log.innerHTML += '<div>▸ '+t+'</div>'; }, 400+i*450); });
+    setTimeout(function(){ clearInterval(mv); }, 2200);
+  }
+  function animateImport(){
+    var fill = app.querySelector('#import-fill');
+    var pctEl = app.querySelector('#import-pct');
+    var pct = 0;
+    var timer = setInterval(function(){
+      pct = Math.min(100, pct+Math.round(4+Math.random()*10));
+      fill.style.width = pct+'%';
+      pctEl.textContent = pct+'% TRANSFERRED';
+      if(pct>=100) clearInterval(timer);
+    }, reduce?20:150);
+  }
+  function animateInstall(){
+    var log = app.querySelector('#install-log');
+    var lines = ['Provisioning compute nodes…','Applying network policy…','Restoring database snapshot…','Applying configuration manifest…','Starting services…','Health checks passed.'];
+    lines.forEach(function(t,i){ setTimeout(function(){ log.innerHTML += '<div>$ '+t+'</div>'; }, reduce?10:i*380); });
+  }
+  function animateVerify(){
+    var items = app.querySelectorAll('#verify-list li');
+    items.forEach(function(li,i){
+      setTimeout(function(){
+        li.style.color = 'var(--fg)';
+        li.querySelector('.v-box').innerHTML = ic('check');
+        li.querySelector('.v-box').style.color = 'var(--good)';
+        li.querySelector('.v-box').style.borderColor = 'var(--good)';
+      }, reduce?10:i*380+300);
+    });
+  }
+
+  function renderStep(){
+    panel.innerHTML = panels[idx]();
+    markIndex();
+    if(stepAnims[idx]) setTimeout(stepAnims[idx], 60);
+    next.disabled = false;
+  }
+  next.addEventListener('click', function(){
+    if(idx < INSTALL_STEPS.length-1){ idx++; renderStep(); }
+    else { next.textContent = 'LAUNCHED'; next.setAttribute('disabled',''); }
+  });
+  back.addEventListener('click', function(){ if(idx>0){ idx--; renderStep(); } });
+  renderStep();
+}};
+
+/* ============================= DASHBOARD (Admin persona) ============================= */
+function spark(vals, w, h){
+  w = w||100; h = h||28;
+  var max = Math.max.apply(null, vals), min = Math.min.apply(null, vals);
+  var range = (max-min)||1;
+  var pts = vals.map(function(v,i){
+    var x = (i/(vals.length-1))*w;
+    var y = h - ((v-min)/range)*h;
+    return x+','+y;
+  }).join(' ');
+  return '<svg viewBox="0 0 '+w+' '+h+'" width="100%" height="'+h+'" preserveAspectRatio="none" aria-hidden="true">'+
+    '<polyline points="'+pts+'" fill="none" stroke="var(--accent)" stroke-width="1.6"/></svg>';
+}
+function renderDashboard(){
+  var projects = [
+    {name:'Regional Banking Consortium', mod:'ATLAS', status:'ok', label:'ON TRACK', pct:'82%'},
+    {name:'National Health Authority', mod:'ATLAS + CIPHER', status:'warn', label:'AT RISK', pct:'61%'},
+    {name:'Tier-1 Logistics Network', mod:'SIGNAL', status:'ok', label:'ON TRACK', pct:'94%'},
+    {name:'Global Retail Group', mod:'FORGE', status:'ok', label:'ON TRACK', pct:'47%'},
+    {name:'Telecom Infrastructure Operator', mod:'BEACON', status:'bad', label:'BLOCKED', pct:'23%'}
+  ];
+  var activity = [
+    {t:'CIPHER policy audit completed', w:'National Health Authority', when:'12 MIN AGO'},
+    {t:'Deployment DEP-48213 verified', w:'Tier-1 Logistics Network', when:'1 HR AGO'},
+    {t:'New SLA breach flagged', w:'Telecom Infrastructure Operator', when:'3 HR AGO'},
+    {t:'Sprint demo scheduled', w:'Global Retail Group', when:'6 HR AGO'}
+  ];
+  return '<section class="wrap" style="padding:26px clamp(20px,4vw,64px) 0;">'+
+    '<div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:12px;padding-top:70px;">'+
+      '<div><p class="eyebrow">DASHBOARD — ADMIN</p><h1 class="display-m" style="margin-top:8px;">Good morning, Renata.</h1></div>'+
+      '<div class="mono" style="font-size:11px;color:var(--muted);text-align:right;">SESSION: team@techbiss.com<br>'+ new Date().toDateString().toUpperCase() +'</div>'+
+    '</div>'+
+  '</section>'+
+  '<section class="section-tight wrap">'+
+    '<div class="stats">'+
+      dashStat('14','ACTIVE DEPLOYMENTS',[4,6,5,8,7,9,10,11,12,13,12,14])+
+      dashStat('7','OPEN TICKETS',[12,10,11,9,8,9,7,8,6,7,7,7])+
+      dashStat('$1.84M','MONTHLY RECURRING REVENUE',[1.2,1.3,1.35,1.4,1.5,1.55,1.6,1.65,1.7,1.75,1.8,1.84])+
+      dashStat('99.97%','PLATFORM UPTIME (30D)',[99.9,99.95,99.9,99.98,99.96,99.99,99.97,99.98,99.99,99.97,99.98,99.97])+
+    '</div>'+
+  '</section>'+
+  '<section class="section-tight wrap">'+
+    '<div class="grid12">'+
+      '<div style="grid-column:1/span 8;">'+
+        '<p class="eyebrow">ACTIVE PROJECTS</p>'+
+        '<ul class="index-list" style="margin-top:10px;">'+
+          projects.map(function(p,i){
+            return '<li><div class="index-row" style="grid-template-columns:40px 1fr;"><span class="n">'+String(i+1).padStart(2,'0')+'</span>'+
+              '<div style="display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;width:100%;">'+
+                '<div><h3 style="font-size:16px;">'+p.name+'</h3><p class="mono" style="font-size:11px;color:var(--muted);margin-top:4px;">MODULE — '+p.mod+'</p></div>'+
+                '<div style="display:flex;align-items:center;gap:16px;">'+
+                  '<span class="mono" style="font-size:13px;font-variant-numeric:tabular-nums;">'+p.pct+'</span>'+
+                  '<span class="pill '+p.status+'"><span class="dot"></span>'+p.label+'</span>'+
+                '</div>'+
+              '</div></div></li>';
+          }).join('')+
+        '</ul>'+
+      '</div>'+
+      '<div style="grid-column:9/span 4;">'+
+        '<p class="eyebrow">ACTIVITY</p>'+
+        '<ul style="margin-top:10px;">'+
+          activity.map(function(a){
+            return '<li style="border-top:1px solid var(--line);padding:14px 0;">'+
+              '<p style="font-size:13.5px;font-weight:500;">'+a.t+'</p>'+
+              '<p class="mono" style="font-size:10.5px;color:var(--muted);margin-top:4px;">'+a.w+' · '+a.when+'</p>'+
+            '</li>';
+          }).join('')+
+          '<li style="border-top:1px solid var(--line);border-bottom:1px solid var(--line);"></li>'+
+        '</ul>'+
+        '<p class="eyebrow" style="margin-top:26px;">PLATFORM ALERTS</p>'+
+        '<div style="border-top:1px solid var(--line);margin-top:10px;padding:14px 0;display:flex;gap:10px;align-items:flex-start;">'+
+          '<span class="pill bad" style="margin-top:2px;"><span class="dot"></span>SLA</span>'+
+          '<p style="font-size:13px;">Telecom Infrastructure Operator — BEACON latency SLO breached at 03:12 UTC. Incident INC-2291 opened.</p>'+
+        '</div>'+
+        '<div style="border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:14px 0;display:flex;gap:10px;align-items:flex-start;">'+
+          '<span class="pill warn" style="margin-top:2px;"><span class="dot"></span>REVIEW</span>'+
+          '<p style="font-size:13px;">Quarterly architecture review due for 3 accounts this week.</p>'+
+        '</div>'+
+      '</div>'+
+    '</div>'+
+  '</section>'+footer();
+}
+function dashStat(v,l,vals){
+  return '<div class="stat"><div class="v">'+v+'</div><div class="l">'+l+'</div><div style="margin-top:10px;">'+spark(vals)+'</div></div>';
+}
+ROUTES['/dashboard'] = {render: renderDashboard};
+
+/* ============================= 404 ============================= */
+function render404(){
+  return '<section class="wrap" style="min-height:80vh;display:flex;flex-direction:column;justify-content:center;padding-top:100px;">'+
+    '<p class="eyebrow">ERROR</p><h1 class="display-xl" style="margin-top:14px;">404 / NOT INDEXED</h1>'+
+    '<p class="lede" style="margin-top:20px;">This entry doesn\'t exist in the current index.</p>'+
+    '<a class="btn btn-solid" href="#/" style="margin-top:26px;width:fit-content;">RETURN TO HOME '+ic('arrow')+'</a>'+
+  '</section>';
+}
+
+/* ============================= INIT ============================= */
+render();
+})();
+</script>
