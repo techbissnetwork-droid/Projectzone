@@ -700,8 +700,8 @@ Pages['/contact'] = function(){
 
 Pages['/login'] = function(){
   var S = window.SITE_SETTINGS || {};
-  return '<section class="hero"><div class="container hero-grid" style="align-items:stretch;">'
-    +'<div class="card" style="max-width:440px;">'
+  return '<section class="hero"><div class="container" style="max-width:480px;">'
+    +'<div class="card">'
       +'<h3 style="margin-bottom:18px;">Sign in</h3>'
       +'<div id="authPanels">'
         +'<form id="emailStepForm" onsubmit="return false;">'
@@ -718,12 +718,6 @@ Pages['/login'] = function(){
         +'<p id="loginError" class="badge danger" hidden style="margin-top:16px;"></p>'
       +'</div>'
       +'<p style="font-size:.85rem;color:var(--ink-faint);margin-top:20px;">Client accounts are set up by our team once your project starts — <a href="'+BP+'/contact" style="color:var(--accent-1);font-weight:600;">get in touch</a> if you need access.</p>'
-    +'</div>'
-    +'<div class="hero-visual" style="aspect-ratio:auto;">'
-      +'<div class="card" style="background:var(--grad);color:#fff2ea;border:none;text-align:center;padding:44px;">'
-      +'<div class="logo-mark" style="width:64px;height:64px;margin:0 auto 18px;"><svg viewBox="0 0 24 24" fill="none"><g><rect x="3" y="3" width="18" height="18" rx="6" fill="#fff2ea"/><rect x="7.5" y="7.5" width="9" height="2.6" rx="1.3" fill="url(#logoGrad)"/><rect x="10.7" y="7.5" width="2.6" height="9.5" rx="1.3" fill="url(#logoGrad)"/></g></svg></div>'
-      +'<h2 style="color:#fff2ea;">Good to see you again.</h2><p style="color:rgba(255,242,234,.9);">Your dashboard, marketplace orders and site updates are exactly where you left them — sign in to pick up right where you left off.</p>'
-      +'</div>'
     +'</div>'
   +'</div></section>';
 };
