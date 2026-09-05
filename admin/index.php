@@ -159,7 +159,7 @@ if ($canBusinesses) {
       </div>
       <div class="flex gap-8">
         <?php if ($r['contact_email']): ?><a class="icon-btn" href="mailto:<?= e($r['contact_email']) ?>" aria-label="Email"><?= ico('mail') ?></a><?php endif; ?>
-        <?php if ($waDigits): ?><a class="icon-btn" href="https://wa.me/<?= e($waDigits) ?>" target="_blank" rel="noopener" aria-label="WhatsApp"><?= ico('users') ?></a><?php endif; ?>
+        <?php if ($waDigits): ?><a class="icon-btn" href="https://wa.me/<?= e($waDigits) ?>" target="_blank" rel="noopener" aria-label="WhatsApp"><?= ico('chat') ?></a><?php endif; ?>
         <?php if ($r['contact_phone']): ?><a class="icon-btn" href="tel:<?= e($r['contact_phone']) ?>" aria-label="Call"><?= ico('phone') ?></a><?php endif; ?>
       </div>
     </div>

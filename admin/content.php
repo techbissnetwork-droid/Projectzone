@@ -58,7 +58,7 @@ $SECTIONS = [
         ],
     ],
     'industries' => [
-        'table' => 'content_industries', 'label' => 'Industry', 'title' => 'name',
+        'table' => 'content_industries', 'label' => 'Solution', 'title' => 'name',
         'fields' => [
             'icon' => ['type' => 'icon', 'label' => 'Icon'],
             'name' => ['type' => 'text', 'label' => 'Name', 'required' => true],
@@ -276,7 +276,7 @@ function content_field_html(string $key, array $f, ?array $editing): string
 
   <?php
   $tabList = [
-      'services' => ['grid', 'Services'], 'industries' => ['users', 'Industries'], 'cases' => ['star', 'Case Studies'],
+      'services' => ['grid', 'Services'], 'industries' => ['users', 'Solutions'], 'cases' => ['star', 'Case Studies'],
       'faqs' => ['chat', 'Pricing FAQ'], 'team' => ['edit', 'Team'], 'values' => ['shield', 'Values'],
   ];
   ?>

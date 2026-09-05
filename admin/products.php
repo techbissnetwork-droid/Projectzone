@@ -32,7 +32,17 @@ require_staff_access($staff, 'products.php');
 $pdo = db();
 
 $CATEGORIES = ['Templates', 'AI Agents', 'Dashboards', 'Bundles', 'Themes'];
-$PRICING_TYPES = ['monthly' => 'Monthly subscription', 'fixed' => 'One-time fixed price'];
+$PRICING_TYPES = ['fixed' => 'One-time fixed price', 'monthly' => 'Monthly subscription'];
+
+// The icons the public marketplace can actually draw (assets/app.js ICONS).
+// The field used to be free text, so a typo like "carts" silently rendered
+// the generic fallback icon — a dropdown of real keys can't miss.
+$ICON_CHOICES = [
+    'box', 'cart', 'star', 'rocket', 'cloud', 'code', 'chart', 'shield', 'gear',
+    'users', 'chat', 'compass', 'target', 'bolt', 'puzzle', 'globe', 'lock',
+    'monitor', 'calendar', 'mail', 'phone', 'download', 'heart', 'flag', 'book',
+    'search', 'refresh', 'spark', 'layers',
+];
 
 /**
  * A product id is only ever minted by slugify_id(), which emits lowercase
@@ -316,7 +326,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $category = in_array($_POST['category'] ?? '', $CATEGORIES, true) ? $_POST['category'] : $CATEGORIES[0];
         $icon = trim((string)($_POST['icon'] ?? 'box'));
         $price = max(0, (float)($_POST['price'] ?? 0));
-        $pricingType = array_key_exists($_POST['pricing_type'] ?? '', $PRICING_TYPES) ? $_POST['pricing_type'] : 'monthly';
+        $pricingType = array_key_exists($_POST['pricing_type'] ?? '', $PRICING_TYPES) ? $_POST['pricing_type'] : 'fixed';
         $rating = min(5, max(0, (float)($_POST['rating'] ?? 4.5)));
         $tagline = trim((string)($_POST['tagline'] ?? ''));
         $desc = trim((string)($_POST['description'] ?? ''));
@@ -480,10 +490,13 @@ $token = csrf_token();
         </select></div>
       </div>
       <div class="grid grid-4" style="gap:16px;">
-        <div class="field"><label>Icon name</label><input name="icon" value="<?= e((string)$val('icon', 'box')) ?>" placeholder="cart, chat, box, star…"></div>
+        <div class="field"><label>Icon <small style="font-weight:400;color:var(--ink-faint);">(shown when a product has no image)</small></label>
+          <?php $curIcon = (string)$val('icon', 'box'); if (!in_array($curIcon, $ICON_CHOICES, true)) { array_unshift($ICON_CHOICES, $curIcon); } ?>
+          <select name="icon"><?php foreach ($ICON_CHOICES as $ic): ?><option value="<?= e($ic) ?>" <?= $curIcon === $ic ? 'selected' : '' ?>><?= e($ic) ?></option><?php endforeach; ?></select>
+        </div>
         <div class="field"><label>Price (USD)</label><input type="number" min="0" step="1" name="price" value="<?= e((string)$val('price', 99)) ?>"></div>
         <div class="field"><label>Pricing type</label><select name="pricing_type">
-          <?php foreach ($PRICING_TYPES as $pt => $label): ?><option value="<?= e($pt) ?>" <?= (string)$val('pricing_type', 'monthly') === $pt ? 'selected' : '' ?>><?= e($label) ?></option><?php endforeach; ?>
+          <?php foreach ($PRICING_TYPES as $pt => $label): ?><option value="<?= e($pt) ?>" <?= (string)$val('pricing_type', 'fixed') === $pt ? 'selected' : '' ?>><?= e($label) ?></option><?php endforeach; ?>
         </select></div>
         <div class="field"><label>Rating (0–5)</label><input type="number" min="0" max="5" step="0.1" name="rating" value="<?= e((string)$val('rating', 4.8)) ?>"></div>
       </div>
@@ -507,7 +520,7 @@ $token = csrf_token();
         <input type="file" name="image_files[]" accept=".jpg,.jpeg,.png,.webp" multiple>
       </div>
       <div class="field">
-        <label>Downloadable file <small style="font-weight:400;color:var(--ink-faint);">(zip or pdf, up to 25MB — required for customers to actually receive something after buying)</small></label>
+        <label>Downloadable file <small style="font-weight:400;color:var(--ink-faint);">(zip or pdf, up to 25MB — the file a customer downloads once you deliver their order)</small></label>
         <?php if (!empty($editing['download_path'])): ?>
           <?php // Deliberately not a direct link: assets/uploads/products/.htaccess denies .zip/.pdf so nobody can bypass checkout, which made the old "view current file" link a guaranteed 403. ?>
           <p style="font-size:.85rem;margin-bottom:8px;"><span class="badge success"><?= ico('check') ?> File attached</span> — <code style="font-size:.8rem;"><?= e(basename((string)$editing['download_path'])) ?></code><?php $fp = __DIR__ . '/../' . $editing['download_path']; ?><?= is_file($fp) ? ' (' . number_format(filesize($fp) / 1024, 0) . ' KB)' : ' <span class="badge danger">missing on disk</span>' ?></p>

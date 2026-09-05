@@ -1,4 +1,4 @@
-/* techbiss-assets 2026.09.05.10 */
+/* techbiss-assets 2026.09.05.11 */
 (function(){
 "use strict";
 
@@ -406,7 +406,7 @@ Pages['/'] = function(){
     +'<div><span class="eyebrow">Websites & apps, fully handled</span>'
     +'<h1>'+esc(S.heroHeadlineMain||'We help offline businesses')+' <span class="grad-text">'+esc(S.heroHeadlineAccent||'thrive online.')+'</span></h1>'
     +'<p class="lede">'+esc(S.heroSubheadline||'TECHBISS builds your website or app, then sets up your domain, hosting, email and app store listing — so you launch with everything working and ready to be found.')+'</p>'
-    +'<div class="hero-cta"><a href="'+BP+'/services" class="btn btn-primary magnetic">See what we build '+ico('arrow')+'</a><a href="'+BP+'/contact" class="btn btn-ghost magnetic">Book a free call</a></div>'
+    +'<div class="hero-cta"><a href="'+BP+'/services" class="btn btn-primary magnetic">See what we build '+ico('arrow')+'</a><a href="'+BP+'/contact" class="btn btn-ghost magnetic">Book a call</a></div>'
     +'<div class="hero-stats">'+statBlock(S.stat1Value||'1,900+',S.stat1Label||'Businesses & apps launched')+statBlock(S.stat2Value||'38',S.stat2Label||'Countries served')+statBlock(S.stat3Value||'4.9/5',S.stat3Label||'Customer rating')+statBlock(S.stat4Value||'72 hrs',S.stat4Label||'To your first draft')+'</div>'
     +'</div>'
     +'<div class="hero-visual"><svg class="hero-blob-main" viewBox="0 0 200 200"><path fill="url(#heroGrad)" d="M52,-64C67,-54,78,-38,81,-20C84,-2,79,17,68,33C57,49,40,62,20,69C0,76,-24,77,-42,66C-60,55,-72,32,-75,8C-78,-16,-72,-42,-56,-58C-40,-74,-14,-80,7,-83C28,-86,37,-74,52,-64Z" transform="translate(100 100)"/><defs><linearGradient id="heroGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" style="stop-color:var(--accent-1)"/><stop offset="55%" style="stop-color:var(--accent-3)"/><stop offset="100%" style="stop-color:var(--accent-2)"/></linearGradient></defs></svg>'
@@ -460,7 +460,7 @@ Pages['/'] = function(){
   +'<section class="section tone-c"><div class="container text-center">'
     +'<h2 style="max-width:20ch;margin-inline:auto;">Ready to take your business online?</h2>'
     +'<p class="lede" style="margin:0 auto 28px;">Tell us about your business, we\'ll tell you exactly what it takes to get you live.</p>'
-    +'<div class="hero-cta" style="justify-content:center;"><a href="'+BP+'/contact" class="btn btn-primary magnetic">Book a free call</a><a href="'+BP+'/pricing" class="btn btn-ghost magnetic">See pricing</a></div>'
+    +'<div class="hero-cta" style="justify-content:center;"><a href="'+BP+'/contact" class="btn btn-primary magnetic">Book a call</a><a href="'+BP+'/pricing" class="btn btn-ghost magnetic">See pricing</a></div>'
   +'</div></section>';
 };
 
@@ -833,7 +833,7 @@ Pages['/login'] = function(){
     +'</div>'
     +'<div class="card" style="background:var(--grad);color:#fff2ea;border:none;text-align:center;padding:36px;margin-top:20px;">'
       +'<div class="logo-mark" style="width:56px;height:56px;margin:0 auto 16px;"><svg viewBox="0 0 24 24" fill="none"><g><rect x="3" y="3" width="18" height="18" rx="6" fill="#fff2ea"/><rect x="7.5" y="7.5" width="9" height="2.6" rx="1.3" fill="url(#logoGrad)"/><rect x="10.7" y="7.5" width="2.6" height="9.5" rx="1.3" fill="url(#logoGrad)"/></g></svg></div>'
-      +'<h3 style="color:#fff2ea;">Good to see you again.</h3><p style="color:rgba(255,242,234,.9);margin-bottom:0;">Your dashboard, marketplace orders and site updates are exactly where you left them — sign in to pick up right where you left off.</p>'
+      +'<h3 style="color:#fff2ea;">Good to see you again.</h3><p style="color:rgba(255,242,234,.9);margin-bottom:0;">Your dashboard, orders and project updates are all here — sign in to pick up where you left off.</p>'
     +'</div>'
   +'</div></section>';
 };
@@ -1303,7 +1303,7 @@ function wireProductDetail(id){
         ? '<div class="hero-visual" style="aspect-ratio:1/1;overflow:hidden;border-radius:20px;"><img src="'+BP+'/'+esc(p.image)+'" alt="" style="width:100%;height:100%;object-fit:cover;"></div>'
         : '<div class="hero-visual" style="aspect-ratio:1/1;"><svg viewBox="0 0 200 200" style="width:80%;height:80%;"><path fill="url(#pvGrad)" d="M46,-52C58,-42,64,-24,64,-6C64,12,58,28,46,40C34,52,16,60,-3,63C-22,66,-44,64,-56,52C-68,40,-70,18,-67,-3C-64,-24,-56,-46,-40,-58C-24,-70,-2,-72,17,-68C36,-64,34,-62,46,-52Z" transform="translate(100 100)"/><defs><linearGradient id="pvGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" style="stop-color:var(--accent-1)"/><stop offset="100%" style="stop-color:var(--accent-2)"/></linearGradient></defs></svg></div>')
       +'</div><button class="btn btn-primary magnetic" style="margin-top:24px;" data-goto="buy">'
-      +((window.SITE_SETTINGS||{}).paymentsEnabled ? 'Buy for '+fmtMoney(p.price)+(p.pricing_type==='fixed'?'':'/mo') : 'Get this for '+fmtMoney(p.price)+(p.pricing_type==='fixed'?'':'/mo'))
+      +((window.SITE_SETTINGS||{}).paymentsEnabled ? 'Buy for '+fmtMoney(p.price)+(p.pricing_type==='fixed'?'':'/mo') : 'Enquire about this')
       +' '+ico('arrow')+'</button>';
   }
   function renderBuy(){

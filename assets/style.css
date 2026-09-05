@@ -1,4 +1,4 @@
-/* techbiss-assets 2026.09.05.10 */
+/* techbiss-assets 2026.09.05.11 */
 /* ============================= TOKENS ============================= */
 :root{
   --bg:#fbfaf7;
@@ -129,7 +129,7 @@ body{
   background:var(--bg);
   color:var(--ink);
   font-family:var(--font-body);
-  font-size:16px;
+  font-size:1rem;
   line-height:1.6;
   -webkit-font-smoothing:antialiased;
   overflow-x:hidden;

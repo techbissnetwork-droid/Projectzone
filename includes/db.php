@@ -781,9 +781,19 @@ function get_flash(): ?array
     return $f;
 }
 
-function time_ago(string $datetime): string
+function time_ago(?string $datetime): string
 {
-    $diff = time() - strtotime($datetime);
+    // A NULL/empty timestamp (a legacy business row with no last_activity_at,
+    // say) used to reach strtotime(null) — a deprecation warning on PHP 8.1+
+    // and a nonsense "53 years ago". Answer plainly instead.
+    if ($datetime === null || trim($datetime) === '') {
+        return 'never';
+    }
+    $ts = strtotime($datetime);
+    if ($ts === false) {
+        return 'never';
+    }
+    $diff = time() - $ts;
     if ($diff < 0) {
         $ahead = -$diff;
         if ($ahead < 3600) return 'in ' . max(1, (int)floor($ahead / 60)) . ' min';
