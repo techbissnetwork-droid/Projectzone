@@ -105,7 +105,8 @@ function admin_bottomnav(array $staff, string $active): string
     $items .= '<details class="dock-menu"><summary class="' . $summaryCls . '">' . ico('menu') . '<span>Menu</span></summary>'
         . '<div class="dock-menu-panel">' . $panel . '</div></details>';
 
-    return '<nav class="bottom-dock admin-bottomnav" aria-label="Admin quick access">' . $items . '</nav>';
+    return '<nav class="bottom-dock admin-bottomnav" aria-label="Admin quick access">' . $items . '</nav>'
+        . '<script>function toggleAddForm(id){var c=document.getElementById(id+"Card"),b=document.getElementById(id+"Btn");var show=c.hidden;c.hidden=!show;b.hidden=show;if(show)c.scrollIntoView({behavior:"smooth",block:"nearest"});}</script>';
 }
 
 function admin_flash_html(): string

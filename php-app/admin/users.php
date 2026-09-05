@@ -56,7 +56,7 @@ $users = $pdo->query(
 $token = csrf_token();
 ?>
 <!doctype html>
-<html lang="en"<?= palette_attr() . logo_motion_attr() ?>>
+<html lang="en"<?= palette_attr() . logo_motion_attr() . ui_zoom_attr() ?>>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -72,9 +72,10 @@ $token = csrf_token();
   <?= admin_flash_html() ?>
   <div class="admin-toolbar">
     <div><h1 style="margin-bottom:4px;">Users</h1><p class="lede" style="margin-bottom:0;">Client login accounts — each user can own one or more businesses.</p></div>
+    <?php if (!$editing): ?><button class="btn btn-primary" type="button" id="addBtn" onclick="toggleAddForm('add')"><?= ico('plus') ?> Add a user</button><?php endif; ?>
   </div>
 
-  <div class="card admin-form-card">
+  <div class="card admin-form-card" id="addCard"<?= $editing ? '' : ' hidden' ?>>
     <div class="card-head"><?= blob_icon($editing ? 'edit' : 'plus', 'sm', true) ?><h3><?= $editing ? 'Edit user' : 'Add a user' ?></h3></div>
     <form method="post">
       <input type="hidden" name="action" value="save">
@@ -87,7 +88,7 @@ $token = csrf_token();
       <p style="font-size:.78rem;color:var(--ink-faint);margin:-6px 0 14px;">No password needed — they'll sign in with a one-time code emailed to this address.</p>
       <div class="flex gap-12">
         <button class="btn btn-primary" type="submit"><?= $editing ? 'Save changes' : 'Add user' ?></button>
-        <?php if ($editing): ?><a href="users.php" class="btn btn-ghost">Cancel</a><?php endif; ?>
+        <?php if ($editing): ?><a href="users.php" class="btn btn-ghost">Cancel</a><?php else: ?><button type="button" class="btn btn-ghost" onclick="toggleAddForm('add')">Cancel</button><?php endif; ?>
       </div>
     </form>
   </div>

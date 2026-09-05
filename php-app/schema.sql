@@ -226,6 +226,7 @@ INSERT INTO `settings` (`id`, `value`) VALUES
 ('logo_style', 'icon_text'),
 ('logo_animation', 'on'),
 ('marketing_daily_goal_default', '5'),
+('ui_zoom', '100'),
 ('smtp_host', ''),
 ('smtp_port', '587'),
 ('smtp_user', ''),

@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $token = csrf_token();
 ?>
 <!doctype html>
-<html lang="en"<?= palette_attr() . logo_motion_attr() ?>>
+<html lang="en"<?= palette_attr() . logo_motion_attr() . ui_zoom_attr() ?>>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">

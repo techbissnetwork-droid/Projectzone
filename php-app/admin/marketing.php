@@ -90,7 +90,7 @@ $statusTone = ['Pending' => 'warning', 'Approved' => 'success', 'Rejected' => 'd
 $token = csrf_token();
 ?>
 <!doctype html>
-<html lang="en"<?= palette_attr() . logo_motion_attr() ?>>
+<html lang="en"<?= palette_attr() . logo_motion_attr() . ui_zoom_attr() ?>>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -106,13 +106,16 @@ $token = csrf_token();
   <?= admin_flash_html() ?>
   <div class="admin-toolbar">
     <div><h1 style="margin-bottom:4px;">Marketing</h1><p class="lede" style="margin-bottom:0;">Offline businesses found in the field, ready for a follow-up call or visit.</p></div>
+    <?php if ($canSubmit): ?><button class="btn btn-primary" type="button" id="addBtn" onclick="toggleAddForm('add')"><?= ico('plus') ?> Submit a lead</button><?php endif; ?>
   </div>
 
   <?php if ($canSubmit): ?>
-  <div class="card admin-form-card">
-    <div class="card-head"><?= blob_icon('plus', 'sm', true) ?><h3>Submit a lead</h3></div>
+  <div class="card" style="margin-bottom:22px;">
     <p class="lede" style="margin-bottom:6px;">Today's goal: <b><?= min($myTodayCount, $myGoal) ?> of <?= $myGoal ?></b> leads<?= $myTodayCount >= $myGoal ? ' — goal met! 🎉' : '' ?></p>
-    <div class="progress-track" style="margin-bottom:16px;"><div class="progress-fill" style="width:<?= min(100, (int)round($myTodayCount / $myGoal * 100)) ?>%;"></div></div>
+    <div class="progress-track"><div class="progress-fill" style="width:<?= min(100, (int)round($myTodayCount / $myGoal * 100)) ?>%;"></div></div>
+  </div>
+  <div class="card admin-form-card" id="addCard" hidden>
+    <div class="card-head"><?= blob_icon('plus', 'sm', true) ?><h3>Submit a lead</h3></div>
     <form method="post">
       <input type="hidden" name="action" value="submit">
       <input type="hidden" name="csrf" value="<?= e($token) ?>">
@@ -122,7 +125,10 @@ $token = csrf_token();
       </div>
       <div class="field"><label>Address</label><input name="address" required placeholder="Street, city, state"></div>
       <div class="field"><label>Notes <small style="font-weight:400;color:var(--ink-faint);">(optional)</small></label><textarea name="notes" placeholder="What do they do? Why are they a good fit?"></textarea></div>
-      <button class="btn btn-primary" type="submit">Submit lead</button>
+      <div class="flex gap-12">
+        <button class="btn btn-primary" type="submit">Submit lead</button>
+        <button type="button" class="btn btn-ghost" onclick="toggleAddForm('add')">Cancel</button>
+      </div>
     </form>
   </div>
   <?php endif; ?>

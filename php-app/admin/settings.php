@@ -106,6 +106,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute(['logo_style', $logoStyle]);
         $logoMotion = array_key_exists($_POST['logo_animation'] ?? '', $LOGO_MOTION_OPTIONS) ? $_POST['logo_animation'] : 'on';
         $stmt->execute(['logo_animation', $logoMotion]);
+        $uiZoom = max(50, min(150, (int)($_POST['ui_zoom'] ?? 100)));
+        $stmt->execute(['ui_zoom', (string)$uiZoom]);
 
         $stmt->execute(['smtp_host', trim((string)($_POST['smtp_host'] ?? ''))]);
         $stmt->execute(['smtp_port', (string)max(1, (int)($_POST['smtp_port'] ?? 587))]);
@@ -150,7 +152,7 @@ $faviconPath = $current['favicon_path'] ?? 'assets/favicon.ico';
 $socialPath = $current['social_image_path'] ?? 'assets/social-default.png';
 ?>
 <!doctype html>
-<html lang="en"<?= palette_attr() . logo_motion_attr() ?>>
+<html lang="en"<?= palette_attr() . logo_motion_attr() . ui_zoom_attr() ?>>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -207,6 +209,19 @@ $socialPath = $current['social_image_path'] ?? 'assets/social-default.png';
         <div class="field"><label>Contact phone</label><input name="contact_phone" value="<?= e($current['contact_phone'] ?? '') ?>"></div>
       </div>
       <div class="field"><label>WhatsApp number <small style="font-weight:400;color:var(--ink-faint);">(with country code, e.g. 14155550148 — leave blank to hide the WhatsApp button)</small></label><input name="whatsapp_number" value="<?= e($current['whatsapp_number'] ?? '') ?>"></div>
+      <div class="field">
+        <label>Site zoom <small style="font-weight:400;color:var(--ink-faint);">(shrinks or enlarges the whole site — public pages and this admin panel — for every visitor)</small></label>
+        <div class="flex gap-12" style="align-items:center;">
+          <input type="range" min="50" max="150" step="5" name="ui_zoom" id="uiZoomRange" value="<?= (int)($current['ui_zoom'] ?? 100) ?>" style="flex:1;">
+          <b id="uiZoomLabel" style="min-width:48px;text-align:right;"><?= (int)($current['ui_zoom'] ?? 100) ?>%</b>
+        </div>
+      </div>
+      <script>
+      (function(){
+        var r = document.getElementById('uiZoomRange'), l = document.getElementById('uiZoomLabel');
+        r.addEventListener('input', function(){ l.textContent = r.value + '%'; });
+      })();
+      </script>
     </div>
     </div>
 

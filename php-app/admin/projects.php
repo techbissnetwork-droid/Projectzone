@@ -119,7 +119,7 @@ function days_until(?string $date): ?int
 $token = csrf_token();
 ?>
 <!doctype html>
-<html lang="en"<?= palette_attr() . logo_motion_attr() ?>>
+<html lang="en"<?= palette_attr() . logo_motion_attr() . ui_zoom_attr() ?>>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -142,9 +142,10 @@ $token = csrf_token();
       <h1 style="margin-bottom:4px;">Projects — <?= e($business['name']) ?></h1>
       <p class="lede" style="margin-bottom:0;">What's being built or maintained for this client, and what's near renewal.</p>
     </div>
+    <?php if (!$editing): ?><button class="btn btn-primary" type="button" id="addBtn" onclick="toggleAddForm('add')"><?= ico('plus') ?> Add a project</button><?php endif; ?>
   </div>
 
-  <div class="card admin-form-card">
+  <div class="card admin-form-card" id="addCard"<?= $editing ? '' : ' hidden' ?>>
     <div class="card-head"><?= blob_icon($editing ? 'edit' : 'plus', 'sm', true) ?><h3><?= $editing ? 'Edit project' : 'Add a project' ?></h3></div>
     <form method="post">
       <input type="hidden" name="action" value="save">
@@ -171,7 +172,7 @@ $token = csrf_token();
       <label class="flex items-center gap-8" style="font-size:.85rem;margin-bottom:14px;"><input type="checkbox" name="portfolio_visible" <?= !empty($editing['portfolio_visible']) ? 'checked' : '' ?>> Show this project in the public portfolio once it's live</label>
       <div class="flex gap-12">
         <button class="btn btn-primary" type="submit"><?= $editing ? 'Save changes' : 'Add project' ?></button>
-        <?php if ($editing): ?><a href="projects.php?business=<?= (int)$businessId ?>" class="btn btn-ghost">Cancel</a><?php endif; ?>
+        <?php if ($editing): ?><a href="projects.php?business=<?= (int)$businessId ?>" class="btn btn-ghost">Cancel</a><?php else: ?><button type="button" class="btn btn-ghost" onclick="toggleAddForm('add')">Cancel</button><?php endif; ?>
       </div>
     </form>
   </div>

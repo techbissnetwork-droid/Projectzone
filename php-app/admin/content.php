@@ -213,7 +213,7 @@ function content_field_html(string $key, array $f, ?array $editing): string
 }
 ?>
 <!doctype html>
-<html lang="en"<?= palette_attr() . logo_motion_attr() ?>>
+<html lang="en"<?= palette_attr() . logo_motion_attr() . ui_zoom_attr() ?>>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -248,7 +248,12 @@ function content_field_html(string $key, array $f, ?array $editing): string
   </div>
 
   <?php $cfg = $SECTIONS[$activeTab]; ?>
-  <div class="card admin-form-card">
+  <?php if (!$editing): ?>
+  <div class="flex" style="justify-content:flex-end;margin-bottom:16px;">
+    <button class="btn btn-primary" type="button" id="addBtn" onclick="toggleAddForm('add')"><?= ico('plus') ?> Add a <?= strtolower($cfg['label']) ?></button>
+  </div>
+  <?php endif; ?>
+  <div class="card admin-form-card" id="addCard"<?= $editing ? '' : ' hidden' ?>>
     <div class="card-head"><?= blob_icon($editing ? 'edit' : 'plus', 'sm', true) ?><h3><?= $editing ? 'Edit ' . strtolower($cfg['label']) : 'Add a ' . strtolower($cfg['label']) ?></h3></div>
     <form method="post">
       <input type="hidden" name="section" value="<?= e($activeTab) ?>">
@@ -264,7 +269,7 @@ function content_field_html(string $key, array $f, ?array $editing): string
       <?php endforeach; ?>
       <div class="flex gap-12">
         <button class="btn btn-primary" type="submit"><?= $editing ? 'Save changes' : 'Add ' . strtolower($cfg['label']) ?></button>
-        <?php if ($editing): ?><a href="content.php?tab=<?= e($activeTab) ?>" class="btn btn-ghost">Cancel</a><?php endif; ?>
+        <?php if ($editing): ?><a href="content.php?tab=<?= e($activeTab) ?>" class="btn btn-ghost">Cancel</a><?php else: ?><button type="button" class="btn btn-ghost" onclick="toggleAddForm('add')">Cancel</button><?php endif; ?>
       </div>
     </form>
   </div>

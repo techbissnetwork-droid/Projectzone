@@ -349,6 +349,19 @@ function logo_motion_attr(): string
 }
 
 /**
+ * A single admin-set zoom level applied to every visitor, on both the
+ * public site and the admin panel — lets an admin shrink the whole UI
+ * so more fits on small screens without touching individual pages.
+ * zoom (not transform:scale) is used specifically because it doesn't
+ * break position:fixed headers/docks/modals the way scale would.
+ */
+function ui_zoom_attr(): string
+{
+    $zoom = max(50, min(150, (int)get_setting('ui_zoom', '100')));
+    return $zoom !== 100 ? ' style="zoom:' . $zoom . '%"' : '';
+}
+
+/**
  * The logo has four possible states, controlled by Admin > Settings >
  * Branding:
  *  - A custom uploaded image always wins: it's the whole logo, alone,
