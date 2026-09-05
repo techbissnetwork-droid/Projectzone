@@ -455,16 +455,18 @@ body{ min-height:100vh; padding:40px 20px; }
       <?php endif; ?>
     </div>
 
-    <div class="card" style="border-color:var(--danger);">
-      <h3 style="margin-bottom:6px;color:var(--danger);">Option B — Fresh install</h3>
-      <p style="font-size:.85rem;color:var(--ink-faint);margin-bottom:14px;">Permanently deletes every business, customer, ticket, project and setting in this database, then sends you back to step 1 to create a brand new admin account from scratch. This cannot be undone — if this site has real data on it, back it up first.</p>
-      <?php if ($formError && ($_POST['action'] ?? '') === 'wipe_reinstall'): ?><p class="badge danger" style="margin-bottom:14px;"><?= e($formError) ?></p><?php endif; ?>
-      <form method="post" onsubmit="return confirm('Really delete everything in this database? This cannot be undone.');">
-        <input type="hidden" name="action" value="wipe_reinstall">
-        <input type="hidden" name="csrf" value="<?= e($token) ?>">
-        <div class="field"><label>Type <code>DELETE EVERYTHING</code> to confirm</label><input name="confirm_text" placeholder="DELETE EVERYTHING" required></div>
-        <button class="btn btn-block" style="background:var(--danger);color:#fff;" type="submit">Wipe database &amp; reinstall</button>
-      </form>
+    <div class="card">
+      <details<?php if ($formError && ($_POST['action'] ?? '') === 'wipe_reinstall'): ?> open<?php endif; ?>>
+        <summary style="cursor:pointer;color:var(--danger);font-weight:600;">Danger zone — wipe &amp; reinstall</summary>
+        <p style="font-size:.85rem;color:var(--ink-faint);margin:14px 0;">Permanently deletes every business, customer, ticket, project and setting in this database, then sends you back to step 1 to create a brand new admin account from scratch. This cannot be undone — if this site has real data on it, back it up first.</p>
+        <?php if ($formError && ($_POST['action'] ?? '') === 'wipe_reinstall'): ?><p class="badge danger" style="margin-bottom:14px;"><?= e($formError) ?></p><?php endif; ?>
+        <form method="post" onsubmit="return confirm('Really delete everything in this database? This cannot be undone.');">
+          <input type="hidden" name="action" value="wipe_reinstall">
+          <input type="hidden" name="csrf" value="<?= e($token) ?>">
+          <div class="field"><label>Type <code>DELETE EVERYTHING</code> to confirm</label><input name="confirm_text" placeholder="DELETE EVERYTHING" required></div>
+          <button class="btn btn-block" style="background:var(--danger);color:#fff;" type="submit">Wipe database &amp; reinstall</button>
+        </form>
+      </details>
     </div>
 
     <div class="card" style="border-color:var(--danger);">
