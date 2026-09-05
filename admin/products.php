@@ -385,7 +385,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 product_gallery_remove($pdo, $id, (array)($_POST['remove_gallery'] ?? []));
                 product_gallery_add($pdo, $id, $imageError);
                 product_sync_primary_image($pdo, $id);
-                flash($savedMessage);
+                // The files were validated up front, so the only way this is
+                // set now is a filesystem failure (e.g. the uploads folder
+                // isn't writable). The product itself did save — say so, but
+                // don't claim the images landed when they didn't.
+                if ($imageError) {
+                    flash($savedMessage . ' But the images could not be saved — ' . $imageError, 'error');
+                } else {
+                    flash($savedMessage);
+                }
             }
             }
         }

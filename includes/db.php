@@ -283,10 +283,14 @@ function otp_issue(int $customerId, string $purpose, ?string $newEmail = null, i
     // simply request a fresh code every 60s and spend 5 more guesses on it,
     // forever. Cap how many codes one account can be issued per hour so the
     // guess rate is bounded overall, not just per code.
+    // Scoped to this purpose: the email-change flow issues two codes per
+    // attempt, and counting every purpose together let a few email-change
+    // retries exhaust the budget for the unrelated login purpose — locking
+    // the customer out of simply signing in.
     $burst = $pdo->prepare(
-        'SELECT COUNT(*) FROM otp_codes WHERE customer_id = ? AND created_at > (NOW() - INTERVAL 1 HOUR)'
+        'SELECT COUNT(*) FROM otp_codes WHERE customer_id = ? AND purpose = ? AND created_at > (NOW() - INTERVAL 1 HOUR)'
     );
-    $burst->execute([$customerId]);
+    $burst->execute([$customerId, $purpose]);
     if ((int)$burst->fetchColumn() >= OTP_MAX_PER_HOUR) {
         throw new RuntimeException('Too many codes requested for this account. Please try again later.');
     }
@@ -307,13 +311,14 @@ function otp_verify_code(int $customerId, string $purpose, string $code): ?array
     $pdo = db();
 
     // A failed guess burns an attempt on whichever code is current; once an
-    // account has burned this many across all its recent codes, stop
-    // answering at all until they age out, so requesting a fresh code no
-    // longer buys a fresh allowance.
+    // account has burned this many across all its recent codes for this
+    // purpose, stop answering until they age out, so requesting a fresh code
+    // no longer buys a fresh allowance. Scoped per purpose so failed
+    // email-change guesses can't lock the customer out of login.
     $recentFails = $pdo->prepare(
-        'SELECT COALESCE(SUM(attempts),0) FROM otp_codes WHERE customer_id = ? AND created_at > (NOW() - INTERVAL 1 HOUR)'
+        'SELECT COALESCE(SUM(attempts),0) FROM otp_codes WHERE customer_id = ? AND purpose = ? AND created_at > (NOW() - INTERVAL 1 HOUR)'
     );
-    $recentFails->execute([$customerId]);
+    $recentFails->execute([$customerId, $purpose]);
     if ((int)$recentFails->fetchColumn() >= OTP_MAX_FAILURES_PER_HOUR) {
         return null;
     }

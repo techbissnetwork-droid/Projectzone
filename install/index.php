@@ -207,12 +207,16 @@ if ($pdo && !$lockExists && $action === 'create_admin') {
 }
 
 // ---- Step: apply any pending migrations to an already-installed site ----
-// Once the site is locked (already fully installed), this requires an
-// authenticated staff session — otherwise any anonymous visitor could
-// trigger schema migrations at will.
+// An already-installed site requires an authenticated staff session before
+// migrations run — otherwise any anonymous visitor could trigger schema
+// migrations at will. Gated on install_guard_installed (installed-for-real,
+// not the lock file alone): a redeploy that drops the gitignored
+// install.lock while the schema is still there must NOT re-open this to an
+// anonymous caller — the same hole the other pre-lock actions were hardened
+// against.
 if ($pdo && $action === 'run_migrations') {
-    if ($lockExists && !current_staff()) {
-        $formError = 'Please sign in to /admin/ first, then come back here to run pending updates.';
+    if (!install_guard_installed($installedForReal, $formError)) {
+        // $formError set — needs a staff sign-in; fall through to render.
     } elseif (!csrf_check((string)($_POST['csrf'] ?? ''))) {
         $formError = 'Your session expired — please try again.';
     } else {

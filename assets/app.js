@@ -1,4 +1,4 @@
-/* techbiss-assets 2026.09.05.12 */
+/* techbiss-assets 2026.09.05.13 */
 (function(){
 "use strict";
 
@@ -74,7 +74,10 @@ function applyTheme(t, persist){
   if(t){ root.setAttribute('data-theme', t); } else { root.removeAttribute('data-theme'); }
   if(persist!==false){ try{ localStorage.setItem('bloom-theme', t||''); }catch(e){} }
   var pressed = (t==='dark') || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches);
-  $('#themeToggle').setAttribute('aria-pressed', String(pressed));
+  // Guarded: initTheme() calls this at load, before the toggle's own guard
+  // below. A missing #themeToggle (markup a version out of step with this
+  // script) must not throw here and abort the whole page.
+  var tg = $('#themeToggle'); if(tg) tg.setAttribute('aria-pressed', String(pressed));
 }
 (function initTheme(){
   var saved = null;
@@ -238,7 +241,7 @@ var mobileNav = $('#mobileNav');
 /* Every route gets a row, each led by its own icon. Rows that the bottom
    dock is already showing as an icon are then hidden by syncSheetDupes()
    below, so nothing appears twice. */
-ROUTES.forEach(function(r){
+if(mobileNav) ROUTES.forEach(function(r){
   var a = document.createElement('a');
   a.href=BP+r.path; a.dataset.path=r.path;
   a.innerHTML = '<span class="sheet-ico">'+ico(r.icon)+'</span><span class="sheet-label">'+esc(r.label)+'</span>'+ico('arrow','sheet-arrow');
@@ -1428,15 +1431,16 @@ function navigate(path){
 var wipe = $('#routeWipe');
 var AUTH_USER = null;
 function syncDashboardNavLink(){
-  var inDesktop = navLinksEl.querySelector('a[data-path="/dashboard"]');
-  var inMobile = mobileNav.querySelector('a[data-path="/dashboard"]');
+  if(!navLinksEl && !mobileNav) return;
+  var inDesktop = navLinksEl && navLinksEl.querySelector('a[data-path="/dashboard"]');
+  var inMobile = mobileNav && mobileNav.querySelector('a[data-path="/dashboard"]');
   if(AUTH_USER){
-    if(!inDesktop){
+    if(!inDesktop && navLinksEl && navLinksEl.firstChild){
       var a = document.createElement('a');
       a.href = BP+'/dashboard'; a.className='nav-link'; a.textContent='Dashboard'; a.dataset.path='/dashboard';
       navLinksEl.insertBefore(a, navLinksEl.firstChild.nextSibling);
     }
-    if(!inMobile){
+    if(!inMobile && mobileNav){
       var m = document.createElement('a');
       m.href = BP+'/dashboard'; m.dataset.path='/dashboard';
       m.innerHTML = 'Dashboard'+ico('arrow');
@@ -1485,10 +1489,12 @@ function doRender(){
   var loginBtn = $('#navLoginBtn');
   var dockLogin = $('.dock-item[data-path="/login"], .dock-item[data-path="/account"]');
   if(AUTH_USER){
-    loginBtn.textContent = 'Profile';
-    loginBtn.setAttribute('href',BP+'/account');
-    loginBtn.style.display = (r.nav==='/account') ? 'none' : '';
-    loginBtn.onclick = null;
+    if(loginBtn){
+      loginBtn.textContent = 'Profile';
+      loginBtn.setAttribute('href',BP+'/account');
+      loginBtn.style.display = (r.nav==='/account') ? 'none' : '';
+      loginBtn.onclick = null;
+    }
     if(dockLogin){
       dockLogin.querySelector('span').textContent = 'Profile';
       dockLogin.setAttribute('href',BP+'/account');
@@ -1496,10 +1502,12 @@ function doRender(){
       dockLogin.onclick = null;
     }
   } else {
-    loginBtn.textContent = 'Log in';
-    loginBtn.setAttribute('href',BP+'/login');
-    loginBtn.onclick = null;
-    if(r.nav==='/dashboard'||r.nav==='/login'){ loginBtn.style.display='none'; } else { loginBtn.style.display=''; }
+    if(loginBtn){
+      loginBtn.textContent = 'Log in';
+      loginBtn.setAttribute('href',BP+'/login');
+      loginBtn.onclick = null;
+      if(r.nav==='/dashboard'||r.nav==='/login'){ loginBtn.style.display='none'; } else { loginBtn.style.display=''; }
+    }
     if(dockLogin){
       dockLogin.querySelector('span').textContent = 'Log in';
       dockLogin.setAttribute('href',BP+'/login');
@@ -1648,6 +1656,9 @@ document.addEventListener('click', function(e){
   }
 })();
 
-refreshAuth().then(doRender);
+// safeRender (not doRender) on the FIRST paint too: a hard load or a direct
+// link must fall back to the error panel on a render exception, not blank —
+// only the client-navigation path went through safeRender before.
+refreshAuth().then(safeRender);
 
 })();
