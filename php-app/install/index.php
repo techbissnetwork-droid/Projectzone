@@ -251,6 +251,10 @@ body{ min-height:100vh; padding:40px 20px; }
         <button class="btn btn-primary btn-block" type="submit">Create account &amp; install</button>
       </form>
     </div>
+    <form method="post">
+      <input type="hidden" name="csrf" value="<?= e($token) ?>">
+      <button class="btn btn-ghost btn-block" type="submit" formaction="reset.php" onclick="return confirm('This deletes the saved config.php so you can connect to a different database. Nothing has been installed yet, so this is safe. Continue?');">Start over with different database details</button>
+    </form>
 
   <?php elseif ($view === 'pending_locked'): ?>
     <div class="card">
