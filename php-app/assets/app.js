@@ -260,6 +260,12 @@ burger.addEventListener('click', function(){ openSheet(!sheet.classList.contains
 dockMenuBtn.addEventListener('click', function(){ openSheet(!sheet.classList.contains('open')); });
 backdrop.addEventListener('click', function(){ openSheet(false); });
 mobileNav.addEventListener('click', function(){ openSheet(false); });
+/* A close button lives inside the sheet itself (not just the backdrop and
+   the dock button) because with enough nav items the sheet can grow tall
+   enough to cover the dock's own Close icon — this one is always visible
+   regardless of how much content is in the sheet. */
+var sheetCloseBtn = $('#sheetCloseBtn');
+if(sheetCloseBtn) sheetCloseBtn.addEventListener('click', function(){ openSheet(false); });
 
 /* ===================================================================
    6. 3D TILT + MAGNETIC

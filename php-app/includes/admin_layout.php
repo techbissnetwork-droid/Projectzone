@@ -106,7 +106,9 @@ function admin_bottomnav(array $staff, string $active): string
     $closeIconHtml = ico('close');
     $items .= '<details class="dock-menu"><summary class="' . $summaryCls . '">' . $menuIconHtml . '<span>Menu</span></summary>'
         . '<div class="dock-menu-backdrop" onclick="this.closest(\'details\').open=false;"></div>'
-        . '<div class="dock-menu-panel"><div class="grabber"></div>' . $panel . '</div></details>';
+        . '<div class="dock-menu-panel"><div class="grabber"></div>'
+        . '<button type="button" class="sheet-close" aria-label="Close menu" onclick="this.closest(\'details\').open=false;">' . $closeIconHtml . '</button>'
+        . $panel . '</div></details>';
 
     return '<nav class="bottom-dock admin-bottomnav" aria-label="Admin quick access">' . $items . '</nav>'
         . '<script>function toggleAddForm(id){var c=document.getElementById(id+"Card"),b=document.getElementById(id+"Btn");var show=c.hidden;c.hidden=!show;b.hidden=show;if(show)c.scrollIntoView({behavior:"smooth",block:"nearest"});}'
