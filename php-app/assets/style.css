@@ -537,7 +537,17 @@ tr:last-child td{ border-bottom:none; }
 @media (max-width:1360px){ .footer{ padding-bottom:calc(var(--dock-h) + 12px); } }
 .footer-grid{ display:grid; grid-template-columns:1.4fr repeat(3,1fr); gap:32px; margin-bottom:50px; align-items:start; }
 .footer-grid > div{ margin:0; }
-@media (max-width:800px){ .footer-grid{ grid-template-columns:1fr 1fr; } }
+@media (max-width:800px){
+  /* The brand block (logo/tagline/email badge) is much taller than the
+     three link columns — sharing a row with any of them stretched that
+     row's height to match, leaving an ugly empty gap under the shorter
+     column before the next row even started. Giving it a full-width row
+     of its own, with Company/Platform/Get started as an even 3-column
+     row underneath, keeps every row's height driven by comparable
+     content instead. */
+  .footer-grid{ grid-template-columns:repeat(3,1fr); gap:20px; }
+  .footer-grid > div:first-child{ grid-column:1 / -1; margin-bottom:10px; }
+}
 .footer-grid h4{ font-size:.85rem; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-faint); margin-bottom:16px; }
 .footer-grid a{ display:block; padding:6px 0; color:var(--ink-soft); font-size:.92rem; }
 .footer-grid a:hover{ color:var(--accent-1); }
