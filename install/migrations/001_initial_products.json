@@ -1,0 +1,130 @@
+[
+  {
+    "id": "p1",
+    "name": "Orchard Storefront",
+    "cat": "Templates",
+    "icon": "cart",
+    "price": 349,
+    "rating": 4.9,
+    "tagline": "A ready-made online store you can brand as your own in an afternoon.",
+    "desc": "A fully responsive storefront theme with cart, wishlist and a component library tuned for small retail. Drop in your logo and colors — no code needed. Ships with light and dark themes.",
+    "specs": [
+      "42 ready-made sections",
+      "No-code branding",
+      "WCAG AA out of the box",
+      "Free updates for 12 months"
+    ]
+  },
+  {
+    "id": "p2",
+    "name": "Signal Support Agent",
+    "cat": "AI Agents",
+    "icon": "chat",
+    "price": 129,
+    "rating": 4.8,
+    "tagline": "An AI assistant that answers customers and books appointments while you're busy.",
+    "desc": "A drop-in AI agent trained on your business info that answers common questions and books appointments, with a graceful hand-off to you when it's unsure. Works on your website or as a chat widget.",
+    "specs": [
+      "Trains on your business info",
+      "Books appointments automatically",
+      "Hands off to you when unsure",
+      "Works on any website"
+    ]
+  },
+  {
+    "id": "p3",
+    "name": "Meridian Ops Dashboard",
+    "cat": "Dashboards",
+    "icon": "monitor",
+    "price": 249,
+    "rating": 4.9,
+    "tagline": "One screen for orders, bookings and messages — no more checking five apps.",
+    "desc": "A simple dashboard that pulls orders, bookings and customer messages from your site and socials into one screen, so you're not logging into five different apps every day.",
+    "specs": [
+      "Orders & bookings in one place",
+      "Daily & weekly summaries",
+      "Works with most booking tools",
+      "Mobile-friendly"
+    ]
+  },
+  {
+    "id": "p4",
+    "name": "Domain, Hosting & Email Starter Kit",
+    "cat": "Bundles",
+    "icon": "globe",
+    "price": 89,
+    "rating": 4.7,
+    "tagline": "Domain, fast hosting, SSL and a business email — set up and handed to you.",
+    "desc": "Everything your website needs to actually go live: a domain name registered in your business's name, fast and secure hosting with SSL included, and a professional email address ready to use from day one.",
+    "specs": [
+      "Domain registration included",
+      "Hosting + SSL, fully managed",
+      "Business email on your domain",
+      "Renewal reminders, no surprise lapses"
+    ]
+  },
+  {
+    "id": "p5",
+    "name": "Bramble Field Themes",
+    "cat": "Themes",
+    "icon": "spark",
+    "price": 59,
+    "rating": 4.6,
+    "tagline": "Twelve ready-made themes for any small business website.",
+    "desc": "A theme pack built for shops, studios and service businesses — organic shapes, accessible contrast, and full light/dark parity. Brand any one of them as your own.",
+    "specs": [
+      "12 curated themes",
+      "Light & dark parity",
+      "Fully brandable",
+      "Drop-in, no developer needed"
+    ]
+  },
+  {
+    "id": "p6",
+    "name": "App Store Launch Kit",
+    "cat": "Bundles",
+    "icon": "compass",
+    "price": 199,
+    "rating": 4.8,
+    "tagline": "Everything it takes to get your app live on the App Store and Play Store.",
+    "desc": "We handle the developer accounts, store listings, screenshots and the entire review process, so your app goes from finished to published without you touching App Store Connect or the Play Console.",
+    "specs": [
+      "iOS & Android submission handled",
+      "Store listing & screenshots included",
+      "Review process managed for you",
+      "Post-launch update support"
+    ]
+  },
+  {
+    "id": "p7",
+    "name": "Willow Client Portal",
+    "cat": "Templates",
+    "icon": "users",
+    "price": 279,
+    "rating": 4.9,
+    "tagline": "A booking and client portal your customers will actually enjoy using.",
+    "desc": "A branded portal for appointments, files and updates, so \"when's my next appointment\" never turns into a text-message thread. Built for salons, studios, clinics and consultants.",
+    "specs": [
+      "Online booking & reminders",
+      "File & document sharing",
+      "Branded to your business",
+      "Client notification emails"
+    ]
+  },
+  {
+    "id": "p8",
+    "name": "Nectar Ranking Agent",
+    "cat": "AI Agents",
+    "icon": "chart",
+    "price": 159,
+    "rating": 4.7,
+    "tagline": "Tracks your search ranking and tells you, in plain language, what to fix.",
+    "desc": "A plain-language SEO agent that checks how your site ranks for the searches that matter to your business, and tells you exactly what to fix — no jargon, no dashboard full of numbers to decode.",
+    "specs": [
+      "Plain-language ranking reports",
+      "Local search tracking",
+      "Actionable fix-it suggestions",
+      "Weekly email summary"
+    ]
+  }
+]

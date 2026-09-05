@@ -1,0 +1,131 @@
+<?php
+const ADMIN_NAV = [
+    ['path' => 'index.php', 'label' => 'Dashboard', 'icon' => 'grid'],
+    ['path' => 'users.php', 'label' => 'Users', 'icon' => 'users'],
+    ['path' => 'businesses.php', 'label' => 'Businesses', 'icon' => 'box'],
+    ['path' => 'marketing.php', 'label' => 'Marketing', 'icon' => 'pin'],
+    ['path' => 'tickets.php', 'label' => 'Tickets', 'icon' => 'chat'],
+    ['path' => 'products.php', 'label' => 'Products', 'icon' => 'star'],
+    ['path' => 'content.php', 'label' => 'Content', 'icon' => 'edit'],
+    ['path' => 'staff.php', 'label' => 'Staff', 'icon' => 'shield'],
+    ['path' => 'settings.php', 'label' => 'Settings', 'icon' => 'settings'],
+];
+
+// Sections an admin can grant/withhold per staff member (Dashboard excluded — always available).
+// marketing_submit/marketing_review are independent — a staffer can be given
+// either one, both, or neither, unlike every other section here which maps
+// 1:1 to a page.
+const STAFF_SECTIONS = [
+    'users' => 'Users',
+    'businesses' => 'Businesses',
+    'marketing_submit' => 'Marketing: submit leads',
+    'marketing_review' => 'Marketing: approve/reject leads',
+    'tickets' => 'Tickets',
+    'products' => 'Products',
+    'content' => 'Content',
+    'staff' => 'Staff & permissions',
+    'settings' => 'Settings',
+];
+
+// Pages unlocked by more than one of the granular keys above, instead of the
+// usual single filename-derived key (see staff_can()).
+const PAGE_PERMISSION_ALIASES = [
+    'marketing.php' => ['marketing_submit', 'marketing_review'],
+];
+
+function admin_visible_nav(array $staff): array
+{
+    return array_values(array_filter(ADMIN_NAV, function ($item) use ($staff) {
+        return staff_can($staff, $item['path']);
+    }));
+}
+
+function admin_header(array $staff, string $active): string
+{
+    $links = '';
+    foreach (admin_visible_nav($staff) as $item) {
+        $cls = $item['path'] === $active ? 'admin-nav-link active' : 'admin-nav-link';
+        $links .= '<a href="' . e($item['path']) . '" class="' . $cls . '">' . e($item['label']) . '</a>';
+    }
+    $defaultTheme = get_setting('default_theme', 'auto');
+    return '<header class="admin-header">'
+        . '<div class="container admin-header-inner">'
+        . '<a href="index.php" class="logo" aria-label="TECHBISS admin home">'
+        . logo_mark_html(false, '../')
+        . logo_wordmark_html() . '<span class="admin-badge">admin</span>'
+        . '</a>'
+        . '<nav class="admin-nav" aria-label="Admin sections">' . $links . '</nav>'
+        . '<div class="admin-header-actions">'
+        . '<button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" aria-pressed="false">'
+        . '<span class="theme-icon-wrap">'
+        . '<svg class="theme-icon sun" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.8"/><path d="M12 2v2M12 20v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2 12h2M20 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>'
+        . '<svg class="theme-icon moon" viewBox="0 0 24 24" fill="none"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+        . '</span></button>'
+        . '<span class="admin-who">' . e($staff['name']) . '<small>' . e($staff['role']) . '</small></span>'
+        . '<a href="logout.php" class="btn btn-ghost btn-sm" aria-label="Log out">' . ico('logout') . ' <span>Log out</span></a>'
+        . '</div>'
+        . '</div>'
+        . '</header>'
+        . '<script>(function(){'
+        . 'var root=document.documentElement,DEF=' . json_encode($defaultTheme) . ';'
+        . 'function apply(t,persist){ if(t){root.setAttribute("data-theme",t);}else{root.removeAttribute("data-theme");} if(persist!==false){try{localStorage.setItem("bloom-theme",t||"");}catch(e){}} var btn=document.getElementById("themeToggle"); if(btn){btn.setAttribute("aria-pressed", String(t==="dark"||(!t&&window.matchMedia("(prefers-color-scheme: dark)").matches)));} }'
+        . 'var saved=null; try{saved=localStorage.getItem("bloom-theme");}catch(e){}'
+        . 'apply(saved!==null?saved:(DEF!=="auto"?DEF:""), false);'
+        . 'document.getElementById("themeToggle").addEventListener("click",function(){'
+        . 'var cur=root.getAttribute("data-theme"); var isDark=cur?cur==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;'
+        . 'apply(isDark?"light":"dark");'
+        . '});'
+        . '})();</script>';
+}
+
+function admin_bottomnav(array $staff, string $active): string
+{
+    $visible = admin_visible_nav($staff);
+    $primary = array_slice($visible, 0, 3);
+    $overflow = array_slice($visible, 3);
+    $activeInOverflow = false;
+
+    $items = '';
+    foreach ($primary as $item) {
+        $cls = $item['path'] === $active ? 'dock-item active' : 'dock-item';
+        $items .= '<a href="' . e($item['path']) . '" class="' . $cls . '">' . ico($item['icon']) . '<span>' . e($item['label']) . '</span></a>';
+    }
+
+    $panel = '';
+    foreach ($overflow as $item) {
+        $isActive = $item['path'] === $active;
+        if ($isActive) {
+            $activeInOverflow = true;
+        }
+        $cls = $isActive ? 'dock-menu-link active' : 'dock-menu-link';
+        $panel .= '<a href="' . e($item['path']) . '" class="' . $cls . '">' . ico($item['icon']) . '<span>' . e($item['label']) . '</span></a>';
+    }
+
+    $summaryCls = $activeInOverflow ? 'dock-item active' : 'dock-item';
+    $menuIconHtml = ico('menu');
+    $closeIconHtml = ico('close');
+    $items .= '<details class="dock-menu"><summary class="' . $summaryCls . '">' . $menuIconHtml . '<span>Menu</span></summary>'
+        . '<div class="dock-menu-backdrop" onclick="this.closest(\'details\').open=false;"></div>'
+        . '<div class="dock-menu-panel"><div class="grabber"></div>'
+        . '<button type="button" class="sheet-close" aria-label="Close menu" onclick="this.closest(\'details\').open=false;">' . $closeIconHtml . '</button>'
+        . $panel . '</div></details>';
+
+    return '<nav class="bottom-dock admin-bottomnav" aria-label="Admin quick access">' . $items . '</nav>'
+        . '<script>function toggleAddForm(id){var c=document.getElementById(id+"Card"),b=document.getElementById(id+"Btn");var show=c.hidden;c.hidden=!show;b.hidden=show;if(show)c.scrollIntoView({behavior:"smooth",block:"nearest"});}'
+        . '(function(){var d=document.querySelector(".bottom-dock .dock-menu");if(!d)return;var s=d.querySelector("summary"),icon=s.querySelector("svg"),label=s.querySelector("span");'
+        . 'var menuIcon=' . json_encode($menuIconHtml) . ',closeIcon=' . json_encode($closeIconHtml) . ';'
+        . 'd.addEventListener("toggle",function(){icon.outerHTML=d.open?closeIcon:menuIcon;icon=s.querySelector("svg");label.textContent=d.open?"Close":"Menu";document.body.style.overflow=d.open?"hidden":"";});'
+        . '})();'
+        . '(function(){var dock=document.querySelector(".bottom-dock");if(!dock)return;function sync(){document.documentElement.style.setProperty("--dock-h",dock.getBoundingClientRect().height+"px");}sync();window.addEventListener("resize",sync);})();'
+        . '</script>';
+}
+
+function admin_flash_html(): string
+{
+    $f = get_flash();
+    if (!$f) {
+        return '';
+    }
+    $tone = $f['type'] === 'error' ? 'danger' : 'success';
+    return '<p class="badge ' . $tone . '" style="margin-bottom:20px;">' . e($f['message']) . '</p>';
+}
