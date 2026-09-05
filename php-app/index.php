@@ -2,13 +2,14 @@
 require_once __DIR__ . '/includes/db.php';
 require_installed('install/');
 
-$products = db()->query('SELECT id, name, category AS cat, icon, price, pricing_type, rating, tagline, description AS `desc`, specs_json, download_path FROM products ORDER BY sort_order ASC')->fetchAll();
+$products = db()->query('SELECT id, name, category AS cat, icon, image_path, price, pricing_type, rating, tagline, description AS `desc`, specs_json, download_path FROM products ORDER BY sort_order ASC')->fetchAll();
 foreach ($products as &$p) {
     $p['price'] = (float)$p['price'];
     $p['rating'] = (float)$p['rating'];
     $p['specs'] = json_decode($p['specs_json'], true) ?: [];
     $p['hasDownload'] = $p['download_path'] !== null;
-    unset($p['specs_json'], $p['download_path']);
+    $p['image'] = $p['image_path'];
+    unset($p['specs_json'], $p['download_path'], $p['image_path']);
 }
 unset($p);
 

@@ -1,10 +1,15 @@
-# Product deliverables must be paid for and downloaded through
+# Product deliverables (zip/pdf) must be paid for and downloaded through
 # api/download.php (which checks a per-purchase token) — never served
 # directly, or anyone could guess a product's file URL and skip paying.
-<IfModule mod_authz_core.c>
-    Require all denied
-</IfModule>
-<IfModule !mod_authz_core.c>
-    Order allow,deny
-    Deny from all
-</IfModule>
+# Product photos (jpg/png/webp) are meant to be public — they're shown
+# right on the marketplace — so only the deliverable file types are
+# blocked here, not the whole directory.
+<FilesMatch "\.(zip|pdf)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>

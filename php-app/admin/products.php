@@ -61,6 +61,72 @@ function product_file_upload(string $productId, ?string &$error): ?string
     return 'assets/uploads/products/' . $filename;
 }
 
+/**
+ * Same null/''/path contract as product_file_upload(), but for a real
+ * photo/screenshot of the product — validated as an actual image, and
+ * stored under a distinct "-img" basename so it never collides with the
+ * downloadable file above.
+ */
+function product_image_upload(string $productId, ?string &$error): ?string
+{
+    $uploadDir = __DIR__ . '/../assets/uploads/products';
+    $basename = $productId . '-img';
+
+    if (isset($_POST['remove_image'])) {
+        foreach (glob($uploadDir . '/' . $basename . '.*') ?: [] as $old) {
+            @unlink($old);
+        }
+        return '';
+    }
+
+    if (empty($_FILES['image_file']['name']) || ($_FILES['image_file']['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+        return null;
+    }
+    if ($_FILES['image_file']['error'] !== UPLOAD_ERR_OK) {
+        $error = 'That image upload failed — please try again.';
+        return null;
+    }
+    if ($_FILES['image_file']['size'] > 5 * 1024 * 1024) {
+        $error = 'That image is over 5MB — please use a smaller file.';
+        return null;
+    }
+    $ext = strtolower(pathinfo($_FILES['image_file']['name'], PATHINFO_EXTENSION));
+    if (!in_array($ext, ['jpg', 'jpeg', 'png', 'webp'], true)) {
+        $error = 'Unsupported image type — allowed: jpg, png, webp.';
+        return null;
+    }
+    if (!@getimagesize($_FILES['image_file']['tmp_name'])) {
+        $error = 'That file does not look like a valid image.';
+        return null;
+    }
+    if (!is_dir($uploadDir) && !@mkdir($uploadDir, 0755, true)) {
+        $error = 'Could not create assets/uploads/products/ — check folder permissions.';
+        return null;
+    }
+    $filename = $basename . '.' . $ext;
+    if (!move_uploaded_file($_FILES['image_file']['tmp_name'], $uploadDir . '/' . $filename)) {
+        $error = 'Could not save the uploaded image — check that assets/uploads/products/ is writable.';
+        return null;
+    }
+    foreach (glob($uploadDir . '/' . $basename . '.*') ?: [] as $old) {
+        if (basename($old) !== $filename) {
+            @unlink($old);
+        }
+    }
+    return 'assets/uploads/products/' . $filename;
+}
+
+/** Resolves an upload helper's null/''/path result against the current
+ * saved value: null keeps it unchanged, '' clears it, anything else
+ * replaces it. */
+function resolve_upload(?string $uploadResult, ?string $current): ?string
+{
+    if ($uploadResult === null) {
+        return $current;
+    }
+    return $uploadResult === '' ? null : $uploadResult;
+}
+
 function slugify_id(string $name, PDO $pdo, ?string $keepId = null): string
 {
     $base = strtolower(preg_replace('/[^a-z0-9]+/i', '-', trim($name)));
@@ -103,24 +169,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             flash('Name and tagline are required.', 'error');
         } else {
             $id = $existingId !== '' ? $existingId : slugify_id($name, $pdo);
+            $currentDownload = null;
+            $currentImage = null;
+            if ($existingId !== '') {
+                $cur = $pdo->prepare('SELECT download_path, image_path FROM products WHERE id = ?');
+                $cur->execute([$existingId]);
+                $curRow = $cur->fetch();
+                $currentDownload = $curRow['download_path'] ?? null;
+                $currentImage = $curRow['image_path'] ?? null;
+            }
             $uploadError = null;
-            $downloadPath = product_file_upload($id, $uploadError);
+            $downloadPath = resolve_upload(product_file_upload($id, $uploadError), $currentDownload);
+            $imageError = null;
+            $imagePath = resolve_upload(product_image_upload($id, $imageError), $currentImage);
 
-            if ($uploadError) {
-                flash($uploadError, 'error');
+            if ($uploadError || $imageError) {
+                flash($uploadError ?: $imageError, 'error');
             } elseif ($existingId !== '') {
-                if ($downloadPath !== null) {
-                    $pdo->prepare('UPDATE products SET name=?, category=?, icon=?, price=?, pricing_type=?, rating=?, tagline=?, description=?, specs_json=?, download_path=? WHERE id=?')
-                        ->execute([$name, $category, $icon, $price, $pricingType, $rating, $tagline, $desc, json_encode($specs), $downloadPath, $existingId]);
-                } else {
-                    $pdo->prepare('UPDATE products SET name=?, category=?, icon=?, price=?, pricing_type=?, rating=?, tagline=?, description=?, specs_json=? WHERE id=?')
-                        ->execute([$name, $category, $icon, $price, $pricingType, $rating, $tagline, $desc, json_encode($specs), $existingId]);
-                }
+                $pdo->prepare('UPDATE products SET name=?, category=?, icon=?, price=?, pricing_type=?, rating=?, tagline=?, description=?, specs_json=?, download_path=?, image_path=? WHERE id=?')
+                    ->execute([$name, $category, $icon, $price, $pricingType, $rating, $tagline, $desc, json_encode($specs), $downloadPath, $imagePath, $existingId]);
                 flash('Product updated.');
             } else {
                 $maxSort = (int)$pdo->query('SELECT COALESCE(MAX(sort_order),0) FROM products')->fetchColumn();
-                $stmt = $pdo->prepare('INSERT INTO products (id, name, category, icon, price, pricing_type, rating, tagline, description, specs_json, download_path, sort_order) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)');
-                $stmt->execute([$id, $name, $category, $icon, $price, $pricingType, $rating, $tagline, $desc, json_encode($specs), $downloadPath, $maxSort + 1]);
+                $stmt = $pdo->prepare('INSERT INTO products (id, name, category, icon, price, pricing_type, rating, tagline, description, specs_json, download_path, image_path, sort_order) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)');
+                $stmt->execute([$id, $name, $category, $icon, $price, $pricingType, $rating, $tagline, $desc, json_encode($specs), $downloadPath, $imagePath, $maxSort + 1]);
                 flash('Product added — now live on the public marketplace.');
             }
         }
@@ -187,6 +259,16 @@ $token = csrf_token();
       <div class="field"><label>Full description</label><textarea name="description"><?= e($editing['description'] ?? '') ?></textarea></div>
       <div class="field"><label>What's included (one per line)</label><textarea name="specs" placeholder="One feature per line"><?= e($editingSpecs) ?></textarea></div>
       <div class="field">
+        <label>Product image <small style="font-weight:400;color:var(--ink-faint);">(jpg, png or webp, up to 5MB — shown instead of the icon on the marketplace card and product page)</small></label>
+        <?php if (!empty($editing['image_path'])): ?>
+          <div class="flex items-center gap-12" style="margin-bottom:10px;">
+            <img src="../<?= e($editing['image_path']) ?>" alt="" style="width:64px;height:64px;object-fit:cover;border-radius:12px;">
+            <label class="flex items-center gap-8" style="font-size:.85rem;"><input type="checkbox" name="remove_image"> Remove the current image</label>
+          </div>
+        <?php endif; ?>
+        <input type="file" name="image_file" accept=".jpg,.jpeg,.png,.webp">
+      </div>
+      <div class="field">
         <label>Downloadable file <small style="font-weight:400;color:var(--ink-faint);">(zip or pdf, up to 25MB — required for customers to actually receive something after buying)</small></label>
         <?php if (!empty($editing['download_path'])): ?>
           <p style="font-size:.85rem;margin-bottom:8px;"><span class="badge success"><?= ico('check') ?> File attached</span> — <a class="card-link" href="../<?= e($editing['download_path']) ?>" target="_blank">view current file</a></p>
@@ -202,9 +284,10 @@ $token = csrf_token();
   </div>
 
   <div class="card">
-    <div class="table-wrap"><table><thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Rating</th><th>Download</th><th></th></tr></thead><tbody>
+    <div class="table-wrap"><table><thead><tr><th></th><th>Product</th><th>Category</th><th>Price</th><th>Rating</th><th>Download</th><th></th></tr></thead><tbody>
       <?php foreach ($products as $p): ?>
       <tr>
+        <td><?php if (!empty($p['image_path'])): ?><img src="../<?= e($p['image_path']) ?>" alt="" style="width:40px;height:40px;object-fit:cover;border-radius:8px;"><?php else: ?><span style="color:var(--ink-faint);">—</span><?php endif; ?></td>
         <td style="font-weight:600;"><?= e($p['name']) ?></td>
         <td><?= e($p['category']) ?></td>
         <td>$<?= number_format((float)$p['price'], 0) ?><?= $p['pricing_type'] === 'monthly' ? '/mo' : '' ?></td>
@@ -221,7 +304,7 @@ $token = csrf_token();
         </td>
       </tr>
       <?php endforeach; ?>
-      <?php if (!$products): ?><tr><td colspan="6" style="color:var(--ink-faint);">No products yet.</td></tr><?php endif; ?>
+      <?php if (!$products): ?><tr><td colspan="7" style="color:var(--ink-faint);">No products yet.</td></tr><?php endif; ?>
     </tbody></table></div>
   </div>
 </main>
