@@ -518,6 +518,8 @@ tr:last-child td{ border-bottom:none; }
 .footer-grid a:hover{ color:var(--accent-1); }
 .footer-grid a.logo{ display:flex; padding:0; }
 .footer-bottom{ display:flex; justify-content:space-between; align-items:center; padding-top:28px; border-top:1px solid var(--border-soft); flex-wrap:wrap; gap:12px; color:var(--ink-faint); font-size:.85rem; }
+.footer-bottom a{ color:var(--ink-faint); }
+.footer-bottom a:hover{ color:var(--accent-1); }
 
 /* ============================= CONFETTI ============================= */
 .confetti-layer{ position:fixed; inset:0; z-index:9998; pointer-events:none; overflow:hidden; }
@@ -668,14 +670,16 @@ main{ display:block; }
 #tab-stats:checked ~ .tab-labels label[for="tab-stats"],
 #tab-seo:checked ~ .tab-labels label[for="tab-seo"],
 #tab-branding:checked ~ .tab-labels label[for="tab-branding"],
-#tab-email:checked ~ .tab-labels label[for="tab-email"]{
+#tab-email:checked ~ .tab-labels label[for="tab-email"],
+#tab-legal:checked ~ .tab-labels label[for="tab-legal"]{
   background:var(--grad-soft); color:var(--accent-1); border-color:transparent;
 }
 #tab-general:checked ~ #panel-general,
 #tab-stats:checked ~ #panel-stats,
 #tab-seo:checked ~ #panel-seo,
 #tab-branding:checked ~ #panel-branding,
-#tab-email:checked ~ #panel-email{ display:block; }
+#tab-email:checked ~ #panel-email,
+#tab-legal:checked ~ #panel-legal{ display:block; }
 .content-item{ background:var(--surface-2); }
 .content-item summary::-webkit-details-marker{ display:none; }
 

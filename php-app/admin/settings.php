@@ -14,6 +14,7 @@ $TEXT_FIELDS = [
     'stat1_value', 'stat1_label', 'stat2_value', 'stat2_label',
     'stat3_value', 'stat3_label', 'stat4_value', 'stat4_label',
     'stat5_value', 'stat5_label', 'about_story', 'careers_quote',
+    'privacy_policy', 'privacy_updated_at', 'terms_conditions', 'terms_updated_at',
 ];
 $THEME_OPTIONS = ['auto' => 'Automatic (matches visitor device)', 'light' => 'Light', 'dark' => 'Dark'];
 $LOGO_STYLE_OPTIONS = ['icon_text' => 'Icon + site name', 'icon_only' => 'Icon only (no site name)', 'text_only' => 'Site name only (no icon)'];
@@ -189,6 +190,7 @@ $socialPath = $current['social_image_path'] ?? 'assets/social-default.png';
       <input type="radio" name="stab" id="tab-seo" class="tab-radio">
       <input type="radio" name="stab" id="tab-branding" class="tab-radio">
       <input type="radio" name="stab" id="tab-email" class="tab-radio">
+      <input type="radio" name="stab" id="tab-legal" class="tab-radio">
 
       <div class="tab-labels">
         <label for="tab-general"><?= ico('edit') ?> General</label>
@@ -196,6 +198,7 @@ $socialPath = $current['social_image_path'] ?? 'assets/social-default.png';
         <label for="tab-seo"><?= ico('star') ?> SEO &amp; Social</label>
         <label for="tab-branding"><?= ico('grid') ?> Branding</label>
         <label for="tab-email"><?= ico('mail') ?> Email</label>
+        <label for="tab-legal"><?= ico('shield') ?> Legal</label>
       </div>
 
     <div class="tab-panel" id="panel-general">
@@ -381,6 +384,18 @@ $socialPath = $current['social_image_path'] ?? 'assets/social-default.png';
         <div class="field"><label>From name</label><input name="smtp_from_name" value="<?= e($current['smtp_from_name'] ?? '') ?>" placeholder="<?= e($current['site_name'] ?? 'TECHBISS') ?>"></div>
       </div>
       <div class="field"><label>From email</label><input type="email" name="smtp_from_email" value="<?= e($current['smtp_from_email'] ?? '') ?>" placeholder="<?= e($current['contact_email'] ?? 'hello@techbiss.com') ?>"></div>
+    </div>
+    </div>
+
+    <div class="tab-panel" id="panel-legal">
+    <div class="card admin-form-card">
+      <p style="font-size:.85rem;color:var(--ink-faint);margin-bottom:16px;">Shown at <code>/privacy</code> and <code>/terms</code>, linked from the footer. Separate paragraphs with a blank line. This is placeholder text, not legal advice — have a professional review it before you rely on it.</p>
+      <div class="grid grid-2" style="gap:16px;">
+        <div class="field"><label>Privacy Policy — last updated</label><input name="privacy_updated_at" value="<?= e($current['privacy_updated_at'] ?? '') ?>" placeholder="e.g. January 2026"></div>
+        <div class="field"><label>Terms &amp; Conditions — last updated</label><input name="terms_updated_at" value="<?= e($current['terms_updated_at'] ?? '') ?>" placeholder="e.g. January 2026"></div>
+      </div>
+      <div class="field"><label>Privacy Policy</label><textarea name="privacy_policy" rows="10"><?= e($current['privacy_policy'] ?? '') ?></textarea></div>
+      <div class="field"><label>Terms &amp; Conditions</label><textarea name="terms_conditions" rows="10"><?= e($current['terms_conditions'] ?? '') ?></textarea></div>
     </div>
     </div>
 

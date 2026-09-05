@@ -644,6 +644,30 @@ Pages['/pricing'] = function(){
   +'</div></section>';
 };
 
+function legalParagraphs(text){
+  return String(text||'').split(/\n\s*\n/).map(function(p){return p.trim();}).filter(Boolean)
+    .map(function(p){return '<p>'+esc(p).replace(/\n/g,'<br>')+'</p>';}).join('');
+}
+Pages['/privacy'] = function(){
+  var S = window.SITE_SETTINGS || {};
+  return '<section class="hero hero-sub" style="padding-bottom:20px;"><div class="container">'
+    +'<span class="eyebrow">Legal</span><h1 style="max-width:20ch;">Privacy Policy</h1>'
+    +'<p class="lede">Last updated '+esc(S.privacyUpdatedAt||'')+'</p>'
+  +'</div></section>'
+  +'<section class="section tone-a" style="padding-top:0;"><div class="container">'
+    +'<div class="card" style="max-width:760px;margin:0 auto;line-height:1.7;">'+legalParagraphs(S.privacyPolicy)+'</div>'
+  +'</div></section>';
+};
+Pages['/terms'] = function(){
+  var S = window.SITE_SETTINGS || {};
+  return '<section class="hero hero-sub" style="padding-bottom:20px;"><div class="container">'
+    +'<span class="eyebrow">Legal</span><h1 style="max-width:20ch;">Terms &amp; Conditions</h1>'
+    +'<p class="lede">Last updated '+esc(S.termsUpdatedAt||'')+'</p>'
+  +'</div></section>'
+  +'<section class="section tone-a" style="padding-top:0;"><div class="container">'
+    +'<div class="card" style="max-width:760px;margin:0 auto;line-height:1.7;">'+legalParagraphs(S.termsConditions)+'</div>'
+  +'</div></section>';
+};
 Pages['/contact'] = function(){
   var S = window.SITE_SETTINGS || {};
   return '<section class="hero hero-sub" style="padding-bottom:20px;"><div class="container">'

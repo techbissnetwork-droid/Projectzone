@@ -26,6 +26,10 @@ $siteSettings = [
     'priceStartPublish' => (int)get_setting('price_start_publish', '1500'),
     'aboutStory' => get_setting('about_story', 'TECHBISS began by building one shop owner a website over a weekend. Nine years later, the same conviction runs the platform: we build every project like it\'s the most important one — because to the person running the business, it is.'),
     'careersQuote' => get_setting('careers_quote', 'We\'re always looking for people who\'d rather ship a small business\'s first website than polish a slide deck.'),
+    'privacyPolicy' => get_setting('privacy_policy', ''),
+    'privacyUpdatedAt' => get_setting('privacy_updated_at', ''),
+    'termsConditions' => get_setting('terms_conditions', ''),
+    'termsUpdatedAt' => get_setting('terms_updated_at', ''),
     'splashEnabled' => get_setting('splash_enabled', 'on') !== 'off',
     'pageTransitionEnabled' => get_setting('page_transition_enabled', 'on') !== 'off',
     'defaultTheme' => get_setting('default_theme', 'auto'),
@@ -215,6 +219,7 @@ if ($baseUrl !== '') {
     </div>
     <div class="footer-bottom">
       <span>© <?= date('Y') ?> <?= e($siteName) ?>. All rights reserved.</span>
+      <div class="flex gap-16"><a href="/privacy">Privacy Policy</a><a href="/terms">Terms &amp; Conditions</a></div>
     </div>
   </div>
 </footer>
