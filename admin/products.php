@@ -35,6 +35,22 @@ $CATEGORIES = ['Templates', 'AI Agents', 'Dashboards', 'Bundles', 'Themes'];
 $PRICING_TYPES = ['monthly' => 'Monthly subscription', 'fixed' => 'One-time fixed price'];
 
 /**
+ * A product id is only ever minted by slugify_id(), which emits lowercase
+ * letters, digits and hyphens. Every id that reaches the filesystem
+ * (glob/unlink/move_uploaded_file below) must match that shape.
+ *
+ * Without this, `existing_id` — supplied by the client on an "edit" —
+ * flowed straight into those paths, so a staff member with only the
+ * "products" permission could send `../../../config` and have the server
+ * delete or overwrite files well outside the uploads folder. The id is
+ * the file's basename, so a single character-class check closes it.
+ */
+function product_id_is_safe(string $id): bool
+{
+    return $id !== '' && preg_match('/^[a-z0-9][a-z0-9-]{0,63}$/', $id) === 1;
+}
+
+/**
  * Handles the optional "downloadable file" upload for a product.
  * Returns: null (no change — keep whatever's already saved), '' (the
  * admin asked to remove the current file), or a new relative path to
@@ -42,6 +58,12 @@ $PRICING_TYPES = ['monthly' => 'Monthly subscription', 'fixed' => 'One-time fixe
  */
 function product_file_upload(string $productId, ?string &$error): ?string
 {
+    // Defence in depth: never let a traversing id reach the filesystem,
+    // whatever the caller did or didn't validate.
+    if (!product_id_is_safe($productId)) {
+        $error = 'Invalid product reference.';
+        return null;
+    }
     $uploadDir = __DIR__ . '/../assets/uploads/products';
 
     $hasNewFile = !empty($_FILES['download_file']['name'])
@@ -97,6 +119,10 @@ function product_file_upload(string $productId, ?string &$error): ?string
  */
 function product_image_upload(string $productId, ?string &$error): ?string
 {
+    if (!product_id_is_safe($productId)) {
+        $error = 'Invalid product reference.';
+        return null;
+    }
     $uploadDir = __DIR__ . '/../assets/uploads/products';
     $basename = $productId . '-img';
 
@@ -226,6 +252,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($name === '' || $tagline === '') {
             flash_input($_POST);
             flash('Name and tagline are required.', 'error');
+        } elseif ($existingId !== '' && !product_id_is_safe($existingId)) {
+            // An edit carries the id of the row being edited; a real one
+            // always passes. Anything else is a tampered request.
+            flash('That product could not be found.', 'error');
         } else {
             $id = $existingId !== '' ? $existingId : slugify_id($name, $pdo);
             $currentDownload = null;
@@ -273,7 +303,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // key now restricts, so say why rather than surfacing a raw error.
         $inUse = $pdo->prepare('SELECT COUNT(*) FROM product_orders WHERE product_id = ?');
         $inUse->execute([$deleteId]);
-        if ((int)$inUse->fetchColumn() > 0) {
+        if (!product_id_is_safe($deleteId)) {
+            // The id is glob()'d against the uploads folder below; a
+            // traversing value would have unlinked files outside it.
+            flash('That product could not be found.', 'error');
+        } elseif ((int)$inUse->fetchColumn() > 0) {
             flash('That product has orders against it, so deleting it would erase those customers\' purchase history and downloads. Remove its file instead to take it off sale.', 'error');
         } else {
             $pdo->prepare('DELETE FROM products WHERE id=?')->execute([$deleteId]);
