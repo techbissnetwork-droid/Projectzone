@@ -13,7 +13,7 @@ $TEXT_FIELDS = [
     'site_name', 'contact_email', 'contact_phone', 'whatsapp_number', 'studios_locations', 'seo_title', 'meta_description',
     'stat1_value', 'stat1_label', 'stat2_value', 'stat2_label',
     'stat3_value', 'stat3_label', 'stat4_value', 'stat4_label',
-    'stat5_value', 'stat5_label',
+    'stat5_value', 'stat5_label', 'about_story', 'careers_quote',
 ];
 $THEME_OPTIONS = ['auto' => 'Automatic (matches visitor device)', 'light' => 'Light', 'dark' => 'Dark'];
 $LOGO_STYLE_OPTIONS = ['icon_text' => 'Icon + site name', 'icon_only' => 'Icon only (no site name)', 'text_only' => 'Site name only (no icon)'];
@@ -113,6 +113,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute(['ui_zoom', (string)$uiZoom]);
         $startingPrice = max(0, (int)($_POST['pricing_starting_price'] ?? 5));
         $stmt->execute(['pricing_starting_price', (string)$startingPrice]);
+        $stmt->execute(['price_start_build', (string)max(0, (int)($_POST['price_start_build'] ?? 900))]);
+        $stmt->execute(['price_start_buy', (string)max(0, (int)($_POST['price_start_buy'] ?? 59))]);
+        $stmt->execute(['price_start_publish', (string)max(0, (int)($_POST['price_start_publish'] ?? 1500))]);
 
         $stmt->execute(['smtp_host', trim((string)($_POST['smtp_host'] ?? ''))]);
         $stmt->execute(['smtp_port', (string)max(1, (int)($_POST['smtp_port'] ?? 587))]);
@@ -256,6 +259,13 @@ $socialPath = $current['social_image_path'] ?? 'assets/social-default.png';
         <div class="field"><label>Stat 5 — label</label><input name="stat5_label" value="<?= e($current['stat5_label'] ?? '') ?>"></div>
       </div>
       <div class="field"><label>Pricing page — "Starting from" price ($) <small style="font-weight:400;color:var(--ink-faint);">(every project is quoted individually, so this is just the teaser figure)</small></label><input type="number" min="0" step="1" name="pricing_starting_price" value="<?= e($current['pricing_starting_price'] ?? '5') ?>"></div>
+      <div class="grid grid-3" style="gap:16px;">
+        <div class="field"><label>Solutions page — "Build" from ($)</label><input type="number" min="0" step="1" name="price_start_build" value="<?= e($current['price_start_build'] ?? '900') ?>"></div>
+        <div class="field"><label>Solutions page — "Buy" from ($)</label><input type="number" min="0" step="1" name="price_start_buy" value="<?= e($current['price_start_buy'] ?? '59') ?>"></div>
+        <div class="field"><label>Solutions page — "Publish" from ($)</label><input type="number" min="0" step="1" name="price_start_publish" value="<?= e($current['price_start_publish'] ?? '1500') ?>"></div>
+      </div>
+      <div class="field"><label>About page — origin story</label><textarea name="about_story"><?= e($current['about_story'] ?? '') ?></textarea></div>
+      <div class="field"><label>About page — careers quote <small style="font-weight:400;color:var(--ink-faint);">(shown as a pull-quote, attributed to "Careers at " + your site name)</small></label><textarea name="careers_quote"><?= e($current['careers_quote'] ?? '') ?></textarea></div>
     </div>
     </div>
 

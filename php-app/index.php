@@ -12,6 +12,7 @@ foreach ($products as &$p) {
 unset($p);
 
 $siteSettings = [
+    'siteName' => get_setting('site_name', 'TECHBISS'),
     'heroHeadlineMain' => get_setting('hero_headline_main', 'We help offline businesses'),
     'heroHeadlineAccent' => get_setting('hero_headline_accent', 'thrive online.'),
     'heroSubheadline' => get_setting('hero_subheadline', 'TECHBISS builds your website or app, then sets up your domain, hosting, email and app store listing — so you launch with everything working and ready to be found.'),
@@ -20,6 +21,11 @@ $siteSettings = [
     'whatsappNumber' => get_setting('whatsapp_number', ''),
     'studiosLocations' => get_setting('studios_locations', 'San Francisco · Lisbon · Singapore'),
     'pricingStartingPrice' => (int)get_setting('pricing_starting_price', '5'),
+    'priceStartBuild' => (int)get_setting('price_start_build', '900'),
+    'priceStartBuy' => (int)get_setting('price_start_buy', '59'),
+    'priceStartPublish' => (int)get_setting('price_start_publish', '1500'),
+    'aboutStory' => get_setting('about_story', 'TECHBISS began by building one shop owner a website over a weekend. Nine years later, the same conviction runs the platform: we build every project like it\'s the most important one — because to the person running the business, it is.'),
+    'careersQuote' => get_setting('careers_quote', 'We\'re always looking for people who\'d rather ship a small business\'s first website than polish a slide deck.'),
     'splashEnabled' => get_setting('splash_enabled', 'on') !== 'off',
     'pageTransitionEnabled' => get_setting('page_transition_enabled', 'on') !== 'off',
     'defaultTheme' => get_setting('default_theme', 'auto'),
@@ -208,7 +214,7 @@ if ($baseUrl !== '') {
       </div>
     </div>
     <div class="footer-bottom">
-      <span>© 2026 TECHBISS. All rights reserved.</span>
+      <span>© <?= date('Y') ?> <?= e($siteName) ?>. All rights reserved.</span>
     </div>
   </div>
 </footer>

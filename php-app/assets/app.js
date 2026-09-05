@@ -374,7 +374,7 @@ Pages['/'] = function(){
   +'<section class="section tone-b"><div class="container">'
     +'<p style="text-align:center;color:var(--ink-faint);font-size:.85rem;font-family:var(--font-display);letter-spacing:.04em;text-transform:uppercase;margin-bottom:22px;">Loved by shop owners, creators and small teams going online</p>'
     +'<div class="trust-strip"><div class="trust-track">'
-      + ['Maple & Co. Bakery','Solstice Yoga Studio','Corner Hardware & Repair','Bloom & Bramble Florist','Nomad Coffee Roasters','Kinship Pet Rescue','Maple & Co. Bakery','Solstice Yoga Studio','Corner Hardware & Repair','Bloom & Bramble Florist','Nomad Coffee Roasters','Kinship Pet Rescue'].map(function(n){return '<span>'+n+'</span>';}).join('')
+      + CASESTUDIES.map(function(c){return c.client;}).concat(CASESTUDIES.map(function(c){return c.client;})).map(function(n){return '<span>'+esc(n)+'</span>';}).join('')
     +'</div></div>'
   +'</div></section>'
   +wave('b','var(--bg)',true)
@@ -407,7 +407,7 @@ Pages['/'] = function(){
 
   +wave('b','var(--bg-alt)')
   +'<section class="section tone-b"><div class="container">'
-    +'<div class="quote-blob"><p>"We went from a Facebook page to a real website with online ordering in under two weeks — and they still pick up the phone when we call."</p><cite>— Priya Anand, Owner, Maple & Co. Bakery</cite></div>'
+    +(CASESTUDIES[0]?'<div class="quote-blob"><p>"'+esc(CASESTUDIES[0].quote)+'"</p><cite>— '+esc(CASESTUDIES[0].client)+'</cite></div>':'')
   +'</div></section>'
   +wave('c','var(--bg-alt-2)',true)
 
@@ -445,6 +445,7 @@ Pages['/services'] = function(){
 };
 
 Pages['/solutions'] = function(){
+  var S = window.SITE_SETTINGS || {};
   return '<section class="hero hero-sub" style="padding-bottom:20px;"><div class="container">'
     +'<span class="eyebrow">Who we help</span><h1 style="max-width:18ch;">Built for real businesses, not enterprise IT teams.</h1>'
     +'<p class="lede">Every business is different, but the care we put into your project never changes.</p>'
@@ -456,18 +457,19 @@ Pages['/solutions'] = function(){
   +'<section class="section tone-b"><div class="container">'
     +'<div class="section-head center"><span class="eyebrow">Pick your path</span><h2>Build, buy a theme, or add an app</h2></div>'
     +'<div class="table-wrap"><table><thead><tr><th>Path</th><th>Best for</th><th>Typical timeline</th><th>Starting from</th></tr></thead><tbody>'
-      +'<tr><td><b>Build</b></td><td>A site or app built from scratch around your business</td><td>2–6 weeks</td><td>'+fmtMoney(900)+'</td></tr>'
-      +'<tr><td><b>Buy</b></td><td>A ready-made theme, branded and launched as your own</td><td>2–5 days</td><td>'+fmtMoney(59)+'</td></tr>'
-      +'<tr><td><b>Publish</b></td><td>Add an app and get it live on the App Store & Play Store</td><td>3–8 weeks</td><td>'+fmtMoney(1500)+'</td></tr>'
+      +'<tr><td><b>Build</b></td><td>A site or app built from scratch around your business</td><td>2–6 weeks</td><td>'+fmtMoney(S.priceStartBuild||900)+'</td></tr>'
+      +'<tr><td><b>Buy</b></td><td>A ready-made theme, branded and launched as your own</td><td>2–5 days</td><td>'+fmtMoney(S.priceStartBuy||59)+'</td></tr>'
+      +'<tr><td><b>Publish</b></td><td>Add an app and get it live on the App Store & Play Store</td><td>3–8 weeks</td><td>'+fmtMoney(S.priceStartPublish||1500)+'</td></tr>'
     +'</tbody></table></div>'
   +'</div></section>';
 };
 
 Pages['/marketplace'] = function(){
+  var S = window.SITE_SETTINGS || {};
   var cats = ['All','Templates','Bundles','AI Agents','Dashboards','Themes'];
   return '<section class="hero hero-sub" style="padding-bottom:10px;"><div class="container">'
     +'<span class="eyebrow">Marketplace</span><h1 style="max-width:16ch;">Ready-made themes, branded just for you.</h1>'
-    +'<p class="lede">Preview any theme, then let us apply your logo and colors and launch it as your own — every listing is built and maintained by the TECHBISS studio.</p>'
+    +'<p class="lede">Preview any theme, then let us apply your logo and colors and launch it as your own — every listing is built and maintained by the '+esc(S.siteName||'TECHBISS')+' studio.</p>'
   +'</div></section>'
   +'<section class="section tone-a" style="padding-top:10px;"><div class="container">'
     +'<div class="search-field">'+ico('search')+'<input type="search" id="mktSearch" placeholder="Search the marketplace" aria-label="Search marketplace"></div>'
@@ -555,8 +557,8 @@ Pages['/about'] = function(){
     {i:'JT', n:'Jonah Traeger', r:'VP Client Success'}
   ];
   return '<section class="hero hero-sub" style="padding-bottom:20px;"><div class="container">'
-    +'<span class="eyebrow">About</span><h1 style="max-width:16ch;">We started TECHBISS because getting online shouldn\'t be this hard.</h1>'
-    +'<p class="lede">TECHBISS began by building one shop owner a website over a weekend. Nine years later, the same conviction runs the platform: we build every project like it\'s the most important one — because to the person running the business, it is.</p>'
+    +'<span class="eyebrow">About</span><h1 style="max-width:16ch;">We started '+esc(S.siteName||'TECHBISS')+' because getting online shouldn\'t be this hard.</h1>'
+    +'<p class="lede">'+esc(S.aboutStory||'TECHBISS began by building one shop owner a website over a weekend. Nine years later, the same conviction runs the platform: we build every project like it\'s the most important one — because to the person running the business, it is.')+'</p>'
   +'</div></section>'
   +'<section class="section tone-a"><div class="container">'
     +'<div class="grid grid-4">'+[[S.stat5Value||'9',S.stat5Label||'Years in business'],[S.stat1Value||'1,900+',S.stat1Label||'Businesses & apps launched'],[S.stat2Value||'38',S.stat2Label||'Countries served'],[S.stat3Value||'4.9/5',S.stat3Label||'Customer rating']].map(function(s){return '<div class="card tilt text-center">'+statBlock(s[0],s[1])+'</div>';}).join('')+'</div>'
@@ -572,7 +574,7 @@ Pages['/about'] = function(){
     +'<div class="grid grid-4">'+team.map(function(t){return '<div class="card tilt text-center"><div class="avatar-blob" style="margin:0 auto 14px;">'+esc(t.i)+'</div><h3 style="font-size:1.05rem;">'+esc(t.n)+'</h3><p style="font-size:.85rem;">'+esc(t.r)+'</p></div>';}).join('')+'</div>'
   +'</div></section>'
   +'<section class="section tone-a" style="padding-top:0;"><div class="container text-center">'
-    +'<div class="quote-blob"><p>"We\'re always looking for people who\'d rather ship a small business\'s first website than polish a slide deck."</p><cite>— Careers at TECHBISS</cite></div>'
+    +'<div class="quote-blob"><p>"'+esc(S.careersQuote||'We\'re always looking for people who\'d rather ship a small business\'s first website than polish a slide deck.')+'"</p><cite>— Careers at '+esc(S.siteName||'TECHBISS')+'</cite></div>'
   +'</div></section>';
 };
 
