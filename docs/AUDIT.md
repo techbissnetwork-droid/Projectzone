@@ -3,6 +3,11 @@
 Scanned: `techbissdeploy.zip` — 82 files, ~7,700 lines (PHP 8, MySQL, vanilla-JS SPA).
 Date: 2026-09-05.
 
+> **Status: most of this is now fixed in this branch.** See
+> [`docs/FIXES.md`](FIXES.md) for what was changed, what was deliberately left,
+> and what still needs a decision from you. The findings below are kept as the
+> record of what was found and why each one mattered.
+
 Every PHP file passes `php -l` and `assets/app.js` passes `node --check`, so nothing
 below is a syntax error. These are behavioural, security and design problems found by
 reading the code.
