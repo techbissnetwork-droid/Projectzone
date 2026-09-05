@@ -343,10 +343,19 @@ function logo_motion_attr(): string
  * zoom (not transform:scale) is used specifically because it doesn't
  * break position:fixed headers/docks/modals the way scale would.
  */
-function ui_zoom_attr(): string
+/**
+ * The site-wide "Site zoom" setting, as a viewport initial-scale value
+ * (e.g. "1.30"). Deliberately NOT implemented with CSS `zoom` on <html>:
+ * that's a non-standard property that some mobile browsers fail to
+ * reconcile with their own pinch-zoom state on load, leaving the page
+ * rendered too large until the visitor manually pinches back out.
+ * initial-scale is the browser's own native zoom mechanism, so it
+ * can't disagree with itself.
+ */
+function ui_zoom_scale(): string
 {
     $zoom = max(50, min(150, (int)get_setting('ui_zoom', '100')));
-    return $zoom !== 100 ? ' style="zoom:' . $zoom . '%"' : '';
+    return number_format($zoom / 100, 2, '.', '');
 }
 
 /**

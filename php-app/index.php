@@ -76,10 +76,10 @@ if ($baseUrl !== '') {
 }
 ?>
 <!doctype html>
-<html lang="en"<?= palette_attr() . logo_motion_attr() . ui_zoom_attr() ?>>
+<html lang="en"<?= palette_attr() . logo_motion_attr() ?>>
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=<?= ui_zoom_scale() ?>">
 <title><?= e($seoTitle) ?></title>
 <meta name="description" content="<?= e($metaDescription) ?>">
 <?php if ($canonicalUrl !== ''): ?><link rel="canonical" href="<?= e($canonicalUrl) ?>"><?php endif; ?>

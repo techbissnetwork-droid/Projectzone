@@ -138,10 +138,10 @@ $statusTone = ['Pending' => 'warning', 'Approved' => 'success', 'Rejected' => 'd
 $token = csrf_token();
 ?>
 <!doctype html>
-<html lang="en"<?= palette_attr() . logo_motion_attr() . ui_zoom_attr() ?>>
+<html lang="en"<?= palette_attr() . logo_motion_attr() ?>>
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=<?= ui_zoom_scale() ?>">
 <title>Marketing — TECHBISS Admin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
