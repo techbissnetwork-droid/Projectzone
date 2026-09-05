@@ -10,6 +10,7 @@ $pdo = db();
 
 $PLANS = ['Starter', 'Growth', 'App + Web', 'Scale'];
 $STATUSES = ['Active', 'Trial', 'Past due'];
+$PRICE_TYPES = ['recurring' => 'Recurring (monthly)', 'fixed' => 'Fixed (one-time)'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
@@ -18,10 +19,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($action === 'save') {
         $id = (int)($_POST['id'] ?? 0);
         $name = trim((string)($_POST['name'] ?? ''));
+        $appName = trim((string)($_POST['app_name'] ?? ''));
+        $websiteName = trim((string)($_POST['website_name'] ?? ''));
         $sector = trim((string)($_POST['sector'] ?? ''));
         $plan = in_array($_POST['plan'] ?? '', $PLANS, true) ? $_POST['plan'] : $PLANS[0];
         $status = in_array($_POST['status'] ?? '', $STATUSES, true) ? $_POST['status'] : $STATUSES[0];
-        $mrr = max(0, (float)($_POST['mrr'] ?? 0));
+        $priceType = isset($PRICE_TYPES[$_POST['price_type'] ?? '']) ? $_POST['price_type'] : 'recurring';
+        $price = max(0, (float)($_POST['price'] ?? 0));
         $contactEmail = trim((string)($_POST['contact_email'] ?? ''));
         $contactPhone = trim((string)($_POST['contact_phone'] ?? ''));
         $ownerRaw = trim((string)($_POST['owner_id'] ?? ''));
@@ -58,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($errors) {
             flash(implode(' ', $errors), 'error');
         } else {
-            $mrrCents = (int)round($mrr * 100);
+            $priceCents = (int)round($price * 100);
 
             $ownerId = null;
             if ($creatingNewUser) {
@@ -70,12 +74,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             if ($id > 0) {
-                $stmt = $pdo->prepare('UPDATE businesses SET name=?, sector=?, plan=?, status=?, mrr_cents=?, contact_email=?, contact_phone=?, customer_id=? WHERE id=?');
-                $stmt->execute([$name, $sector, $plan, $status, $mrrCents, $contactEmail, $contactPhone, $ownerId, $id]);
+                $stmt = $pdo->prepare('UPDATE businesses SET name=?, app_name=?, website_name=?, sector=?, plan=?, status=?, price_type=?, price_cents=?, contact_email=?, contact_phone=?, customer_id=? WHERE id=?');
+                $stmt->execute([$name, $appName ?: null, $websiteName ?: null, $sector, $plan, $status, $priceType, $priceCents, $contactEmail, $contactPhone, $ownerId, $id]);
                 flash('Business updated.');
             } else {
-                $stmt = $pdo->prepare('INSERT INTO businesses (name, sector, plan, status, mrr_cents, contact_email, contact_phone, customer_id, last_activity_at) VALUES (?,?,?,?,?,?,?,?,NOW())');
-                $stmt->execute([$name, $sector, $plan, $status, $mrrCents, $contactEmail, $contactPhone, $ownerId]);
+                $stmt = $pdo->prepare('INSERT INTO businesses (name, app_name, website_name, sector, plan, status, price_type, price_cents, contact_email, contact_phone, customer_id, last_activity_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,NOW())');
+                $stmt->execute([$name, $appName ?: null, $websiteName ?: null, $sector, $plan, $status, $priceType, $priceCents, $contactEmail, $contactPhone, $ownerId]);
                 flash('Business added.');
             }
         }
@@ -156,14 +160,23 @@ $token = csrf_token();
         <div class="field"><label>Business name</label><input name="name" required value="<?= e($editing['name'] ?? '') ?>"></div>
         <div class="field"><label>Sector</label><input name="sector" required value="<?= e($editing['sector'] ?? '') ?>" placeholder="e.g. Bakery, Fitness, Retail"></div>
       </div>
-      <div class="grid grid-3" style="gap:16px;">
+      <div class="grid grid-2" style="gap:16px;">
+        <div class="field"><label>App name <small style="font-weight:400;color:var(--ink-faint);">(if they have one)</small></label><input name="app_name" value="<?= e($editing['app_name'] ?? '') ?>" placeholder="e.g. Maple & Co."></div>
+        <div class="field"><label>Website name <small style="font-weight:400;color:var(--ink-faint);">(if they have one)</small></label><input name="website_name" value="<?= e($editing['website_name'] ?? '') ?>" placeholder="e.g. maplebakery.com"></div>
+      </div>
+      <div class="grid grid-2" style="gap:16px;">
         <div class="field"><label>Plan</label><select name="plan">
           <?php foreach ($PLANS as $p): ?><option value="<?= e($p) ?>" <?= ($editing['plan'] ?? '') === $p ? 'selected' : '' ?>><?= e($p) ?></option><?php endforeach; ?>
         </select></div>
         <div class="field"><label>Status</label><select name="status">
           <?php foreach ($STATUSES as $s): ?><option value="<?= e($s) ?>" <?= ($editing['status'] ?? '') === $s ? 'selected' : '' ?>><?= e($s) ?></option><?php endforeach; ?>
         </select></div>
-        <div class="field"><label>MRR (USD/mo)</label><input type="number" min="0" step="1" name="mrr" value="<?= e((string)(($editing['mrr_cents'] ?? 0) / 100)) ?>"></div>
+      </div>
+      <div class="grid grid-2" style="gap:16px;">
+        <div class="field"><label>Price type</label><select name="price_type">
+          <?php foreach ($PRICE_TYPES as $val => $label): ?><option value="<?= e($val) ?>" <?= ($editing['price_type'] ?? 'recurring') === $val ? 'selected' : '' ?>><?= e($label) ?></option><?php endforeach; ?>
+        </select></div>
+        <div class="field"><label>Price (USD)</label><input type="number" min="0" step="1" name="price" value="<?= e((string)(($editing['price_cents'] ?? 0) / 100)) ?>"></div>
       </div>
       <div class="grid grid-2" style="gap:16px;">
         <div class="field"><label>Contact email</label><input type="email" name="contact_email" value="<?= e($editing['contact_email'] ?? '') ?>" placeholder="owner@theirbusiness.com"></div>
@@ -200,12 +213,14 @@ $token = csrf_token();
   </script>
 
   <div class="card">
-    <div class="table-wrap"><table><thead><tr><th>Business</th><th>Sector</th><th>Plan</th><th>Owner</th><th>Projects</th><th>Status</th><th>Last activity</th><th></th></tr></thead><tbody>
+    <div class="table-wrap"><table><thead><tr><th>Business</th><th>App / Website</th><th>Sector</th><th>Plan</th><th>Price</th><th>Owner</th><th>Projects</th><th>Status</th><th>Last activity</th><th></th></tr></thead><tbody>
       <?php foreach ($accounts as $a): ?>
       <tr>
         <td style="font-weight:600;"><?= e($a['name']) ?></td>
+        <td style="color:var(--ink-faint);font-size:.85rem;"><?= e(trim(($a['app_name'] ? 'App: ' . $a['app_name'] : '') . (($a['app_name'] && $a['website_name']) ? ' · ' : '') . ($a['website_name'] ? 'Web: ' . $a['website_name'] : '')) ?: '—') ?></td>
         <td><?= e($a['sector']) ?></td>
         <td><?= e($a['plan']) ?></td>
+        <td>$<?= number_format($a['price_cents'] / 100, 0) ?><?= $a['price_type'] === 'recurring' ? '/mo' : ' one-time' ?></td>
         <td><?= $a['owner_name'] ? '<a class="card-link" href="users.php?edit=' . (int)$a['customer_id'] . '">' . e($a['owner_name']) . '</a>' : '<span class="badge">None</span>' ?></td>
         <td><a class="card-link" href="projects.php?business=<?= (int)$a['id'] ?>"><?= (int)$a['project_count'] ?> <?= ico('arrow') ?></a></td>
         <td><span class="badge <?= $statusTone[$a['status']] ?? '' ?>"><?= e($a['status']) ?></span></td>
@@ -221,7 +236,7 @@ $token = csrf_token();
         </td>
       </tr>
       <?php endforeach; ?>
-      <?php if (!$accounts): ?><tr><td colspan="8" style="color:var(--ink-faint);">No businesses yet — add your first one above.</td></tr><?php endif; ?>
+      <?php if (!$accounts): ?><tr><td colspan="10" style="color:var(--ink-faint);">No businesses yet — add your first one above.</td></tr><?php endif; ?>
     </tbody></table></div>
   </div>
 </main>

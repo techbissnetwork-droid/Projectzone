@@ -670,7 +670,7 @@ Pages['/contact'] = function(){
       +'<div class="card"><div class="card-head">'+blobIcon('mail','sm',true)+'<h3 style="font-size:1.05rem;">Email</h3></div><p style="font-size:.9rem;">'+esc(S.contactEmail||'hello@techbiss.com')+'</p></div>'
       +'<div class="card"><div class="card-head">'+blobIcon('phone','sm',true)+'<h3 style="font-size:1.05rem;">Phone</h3></div><p style="font-size:.9rem;">'+esc(S.contactPhone||'+1 (415) 555-0148')+'</p></div>'
       +(S.whatsappNumber?'<div class="card"><div class="card-head">'+blobIcon('chat','sm',true)+'<h3 style="font-size:1.05rem;">WhatsApp</h3></div><p style="font-size:.9rem;margin-bottom:12px;">Message us any time — usually a same-day reply.</p><a href="https://wa.me/'+esc(S.whatsappNumber.replace(/\D+/g,''))+'" target="_blank" rel="noopener" class="btn btn-primary btn-block">Chat on WhatsApp</a></div>':'')
-      +'<div class="card"><div class="card-head">'+blobIcon('globe','sm',true)+'<h3 style="font-size:1.05rem;">Studios</h3></div><p style="font-size:.9rem;">San Francisco · Lisbon · Singapore</p></div>'
+      +'<div class="card"><div class="card-head">'+blobIcon('globe','sm',true)+'<h3 style="font-size:1.05rem;">Studios</h3></div><p style="font-size:.9rem;">'+esc(S.studiosLocations||'San Francisco · Lisbon · Singapore')+'</p></div>'
     +'</div>'
   +'</div></section>';
 };

@@ -25,7 +25,7 @@ a genuinely access-controlled staff admin panel.
   log out) and its own bottom nav on mobile — not linked from the public
   site; you reach it by typing the URL. It requires a real staff login
   (session-gated) and is full read/write, not just a dashboard:
-  - **Businesses** — add, edit, delete client accounts (plan, MRR, status).
+  - **Businesses** — add, edit, delete client accounts (app/website name, plan, fixed or recurring price, status).
   - **Tickets** — create, edit, reassign, change status/priority, delete.
   - **Products** — add, edit, delete marketplace listings; changes go
     live on the public marketplace immediately.

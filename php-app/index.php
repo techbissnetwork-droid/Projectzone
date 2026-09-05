@@ -18,6 +18,7 @@ $siteSettings = [
     'contactEmail' => get_setting('contact_email', 'hello@techbiss.com'),
     'contactPhone' => get_setting('contact_phone', '+1 (415) 555-0148'),
     'whatsappNumber' => get_setting('whatsapp_number', ''),
+    'studiosLocations' => get_setting('studios_locations', 'San Francisco · Lisbon · Singapore'),
     'splashEnabled' => get_setting('splash_enabled', 'on') !== 'off',
     'pageTransitionEnabled' => get_setting('page_transition_enabled', 'on') !== 'off',
     'defaultTheme' => get_setting('default_theme', 'auto'),

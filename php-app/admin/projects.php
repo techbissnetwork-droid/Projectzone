@@ -9,6 +9,7 @@ require_staff_access($staff, 'businesses.php');
 $pdo = db();
 
 $STATUSES = ['Planning', 'In progress', 'Live', 'On hold'];
+$WORK_TYPES = ['Build', 'Upgrade', 'Setup', 'Maintenance', 'Other'];
 $statusTone = ['Planning' => '', 'In progress' => 'warning', 'Live' => 'success', 'On hold' => 'danger'];
 $EXPIRY_FIELDS = [
     'domain_expires_at' => 'Domain',
@@ -27,6 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $id = (int)($_POST['id'] ?? 0);
         $bizId = (int)($_POST['business_id'] ?? 0);
         $title = trim((string)($_POST['title'] ?? ''));
+        $workType = in_array($_POST['work_type'] ?? '', $WORK_TYPES, true) ? $_POST['work_type'] : $WORK_TYPES[0];
         $status = in_array($_POST['status'] ?? '', $STATUSES, true) ? $_POST['status'] : $STATUSES[0];
         $progress = max(0, min(100, (int)($_POST['progress_pct'] ?? 0)));
         $domain = trim((string)($_POST['domain'] ?? ''));
@@ -43,24 +45,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             if ($id > 0) {
                 $stmt = $pdo->prepare(
-                    'UPDATE projects SET title=?, status=?, progress_pct=?, domain=?,
+                    'UPDATE projects SET title=?, work_type=?, status=?, progress_pct=?, domain=?,
                      domain_expires_at=?, hosting_expires_at=?, ssl_expires_at=?, email_expires_at=?,
                      notes=?, portfolio_visible=? WHERE id=?'
                 );
                 $stmt->execute([
-                    $title, $status, $progress, $domain,
+                    $title, $workType, $status, $progress, $domain,
                     $dates['domain_expires_at'], $dates['hosting_expires_at'], $dates['ssl_expires_at'], $dates['email_expires_at'],
                     $notes, $portfolioVisible, $id,
                 ]);
                 flash('Project updated.');
             } else {
                 $stmt = $pdo->prepare(
-                    'INSERT INTO projects (business_id, title, status, progress_pct, domain,
+                    'INSERT INTO projects (business_id, title, work_type, status, progress_pct, domain,
                      domain_expires_at, hosting_expires_at, ssl_expires_at, email_expires_at, notes, portfolio_visible)
-                     VALUES (?,?,?,?,?,?,?,?,?,?,?)'
+                     VALUES (?,?,?,?,?,?,?,?,?,?,?,?)'
                 );
                 $stmt->execute([
-                    $bizId, $title, $status, $progress, $domain,
+                    $bizId, $title, $workType, $status, $progress, $domain,
                     $dates['domain_expires_at'], $dates['hosting_expires_at'], $dates['ssl_expires_at'], $dates['email_expires_at'],
                     $notes, $portfolioVisible,
                 ]);
@@ -157,7 +159,10 @@ $token = csrf_token();
         <div class="field"><label>Project title</label><input name="title" required value="<?= e($editing['title'] ?? $prefillTitle) ?>" placeholder="e.g. Website redesign"></div>
         <div class="field"><label>Domain</label><input name="domain" value="<?= e($editing['domain'] ?? '') ?>" placeholder="example.com"></div>
       </div>
-      <div class="grid grid-2" style="gap:16px;">
+      <div class="grid grid-3" style="gap:16px;">
+        <div class="field"><label>Work type</label><select name="work_type">
+          <?php foreach ($WORK_TYPES as $w): ?><option value="<?= e($w) ?>" <?= ($editing['work_type'] ?? $WORK_TYPES[0]) === $w ? 'selected' : '' ?>><?= e($w) ?></option><?php endforeach; ?>
+        </select></div>
         <div class="field"><label>Status</label><select name="status">
           <?php foreach ($STATUSES as $s): ?><option value="<?= e($s) ?>" <?= ($editing['status'] ?? '') === $s ? 'selected' : '' ?>><?= e($s) ?></option><?php endforeach; ?>
         </select></div>
@@ -178,10 +183,11 @@ $token = csrf_token();
   </div>
 
   <div class="card">
-    <div class="table-wrap"><table><thead><tr><th>Project</th><th>Status</th><th>Progress</th><th>Renewals</th><th></th></tr></thead><tbody>
+    <div class="table-wrap"><table><thead><tr><th>Project</th><th>Work type</th><th>Status</th><th>Progress</th><th>Renewals</th><th></th></tr></thead><tbody>
       <?php foreach ($projects as $p): ?>
       <tr>
         <td style="font-weight:600;"><?= e($p['title']) ?><?= $p['domain'] ? '<br><span style="font-weight:400;color:var(--ink-faint);font-size:.82rem;">' . e($p['domain']) . '</span>' : '' ?></td>
+        <td><span class="badge"><?= e($p['work_type'] ?? 'Build') ?></span></td>
         <td><span class="badge <?= $statusTone[$p['status']] ?? '' ?>"><?= e($p['status']) ?></span></td>
         <td style="min-width:120px;"><div class="progress-track"><div class="progress-fill" style="width:<?= (int)$p['progress_pct'] ?>%;"></div></div></td>
         <td>
@@ -201,7 +207,7 @@ $token = csrf_token();
         </td>
       </tr>
       <?php endforeach; ?>
-      <?php if (!$projects): ?><tr><td colspan="5" style="color:var(--ink-faint);">No projects yet — add the first one above.</td></tr><?php endif; ?>
+      <?php if (!$projects): ?><tr><td colspan="6" style="color:var(--ink-faint);">No projects yet — add the first one above.</td></tr><?php endif; ?>
     </tbody></table></div>
   </div>
 </main>

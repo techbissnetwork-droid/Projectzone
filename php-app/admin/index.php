@@ -18,7 +18,7 @@ $canStaff = staff_can($staff, 'staff.php');
 
 $totalUsers = $canUsers ? (int)$pdo->query('SELECT COUNT(*) c FROM customers')->fetch()['c'] : 0;
 $businessCount = $canBusinesses ? (int)$pdo->query('SELECT COUNT(*) c FROM businesses')->fetch()['c'] : 0;
-$mrrCents = $canBusinesses ? (int)$pdo->query('SELECT COALESCE(SUM(mrr_cents),0) s FROM businesses')->fetch()['s'] : 0;
+$mrrCents = $canBusinesses ? (int)$pdo->query("SELECT COALESCE(SUM(price_cents),0) s FROM businesses WHERE price_type='recurring'")->fetch()['s'] : 0;
 $productCount = $canProducts ? (int)$pdo->query('SELECT COUNT(*) c FROM products')->fetch()['c'] : 0;
 $totalTickets = $canTickets ? (int)$pdo->query('SELECT COUNT(*) c FROM tickets')->fetch()['c'] : 0;
 $openTickets = $canTickets ? (int)$pdo->query("SELECT COUNT(*) c FROM tickets WHERE status != 'Closed'")->fetch()['c'] : 0;

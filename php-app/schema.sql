@@ -94,9 +94,12 @@ DROP TABLE IF EXISTS `businesses`;
 CREATE TABLE `businesses` (
   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   `name` VARCHAR(150) NOT NULL,
+  `app_name` VARCHAR(150) NULL,
+  `website_name` VARCHAR(150) NULL,
   `sector` VARCHAR(80) NOT NULL,
   `plan` VARCHAR(60) NOT NULL,
-  `mrr_cents` INT UNSIGNED NOT NULL DEFAULT 0,
+  `price_type` ENUM('fixed','recurring') NOT NULL DEFAULT 'recurring',
+  `price_cents` INT UNSIGNED NOT NULL DEFAULT 0,
   `status` ENUM('Active','Trial','Past due') NOT NULL DEFAULT 'Active',
   `contact_email` VARCHAR(190) NULL,
   `contact_phone` VARCHAR(40) NULL,
@@ -104,13 +107,13 @@ CREATE TABLE `businesses` (
   `last_activity_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO `businesses` (`name`, `sector`, `plan`, `mrr_cents`, `status`, `last_activity_at`) VALUES
-('Maple & Co. Bakery', 'Bakery', 'Growth', 14900, 'Active', DATE_SUB(NOW(), INTERVAL 2 HOUR)),
-('Solstice Yoga Studio', 'Fitness', 'Starter', 7900, 'Active', DATE_SUB(NOW(), INTERVAL 1 DAY)),
-('Corner Hardware & Repair', 'Home services', 'Growth', 14900, 'Active', DATE_SUB(NOW(), INTERVAL 3 DAY)),
-('Nomad Coffee Roasters', 'Creator', 'App + Web', 22900, 'Trial', DATE_SUB(NOW(), INTERVAL 6 HOUR)),
-('Kinship Pet Rescue', 'Nonprofit', 'Starter', 7900, 'Active', DATE_SUB(NOW(), INTERVAL 1 DAY)),
-('Bloom & Bramble Florist', 'Retail', 'Growth', 14900, 'Past due', DATE_SUB(NOW(), INTERVAL 11 DAY));
+INSERT INTO `businesses` (`name`, `sector`, `plan`, `price_type`, `price_cents`, `status`, `last_activity_at`) VALUES
+('Maple & Co. Bakery', 'Bakery', 'Growth', 'recurring', 14900, 'Active', DATE_SUB(NOW(), INTERVAL 2 HOUR)),
+('Solstice Yoga Studio', 'Fitness', 'Starter', 'recurring', 7900, 'Active', DATE_SUB(NOW(), INTERVAL 1 DAY)),
+('Corner Hardware & Repair', 'Home services', 'Growth', 'recurring', 14900, 'Active', DATE_SUB(NOW(), INTERVAL 3 DAY)),
+('Nomad Coffee Roasters', 'Creator', 'App + Web', 'recurring', 22900, 'Trial', DATE_SUB(NOW(), INTERVAL 6 HOUR)),
+('Kinship Pet Rescue', 'Nonprofit', 'Starter', 'recurring', 7900, 'Active', DATE_SUB(NOW(), INTERVAL 1 DAY)),
+('Bloom & Bramble Florist', 'Retail', 'Growth', 'recurring', 14900, 'Past due', DATE_SUB(NOW(), INTERVAL 11 DAY));
 
 -- ---------------------------------------------------------------
 -- projects — real work tracked per business (replaces the placeholder
@@ -121,6 +124,7 @@ CREATE TABLE `projects` (
   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   `business_id` INT UNSIGNED NOT NULL,
   `title` VARCHAR(150) NOT NULL,
+  `work_type` ENUM('Build','Upgrade','Setup','Maintenance','Other') NOT NULL DEFAULT 'Build',
   `status` ENUM('Planning','In progress','Live','On hold') NOT NULL DEFAULT 'Planning',
   `progress_pct` TINYINT UNSIGNED NOT NULL DEFAULT 0,
   `domain` VARCHAR(190) NULL,
