@@ -229,7 +229,10 @@ navLinksEl.addEventListener('mouseover', function(e){
 navLinksEl.addEventListener('mouseleave', function(){ moveNavBlob(currentNavLink()); });
 
 var mobileNav = $('#mobileNav');
-ROUTES.forEach(function(r){
+/* Home is left out of this sheet — the bottom dock (visible at the same
+   widths this sheet opens from) already has its own dedicated Home icon,
+   so listing it again here would just duplicate it. */
+ROUTES.filter(function(r){ return r.path !== '/'; }).forEach(function(r){
   var a = document.createElement('a');
   a.href=BP+r.path; a.dataset.path=r.path;
   a.innerHTML = r.label + ico('arrow');
@@ -1282,7 +1285,7 @@ function syncDashboardNavLink(){
       var m = document.createElement('a');
       m.href = BP+'/dashboard'; m.dataset.path='/dashboard';
       m.innerHTML = 'Dashboard'+ico('arrow');
-      mobileNav.insertBefore(m, mobileNav.firstChild.nextSibling);
+      mobileNav.insertBefore(m, mobileNav.firstChild);
     }
   } else {
     if(inDesktop) inDesktop.remove();

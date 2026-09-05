@@ -624,11 +624,16 @@ main{ display:block; }
 .dock-menu > summary svg{ width:20px; height:20px; }
 .dock-menu:hover > summary, .dock-menu > summary.active{ color:var(--accent-1); }
 .dock-menu[open] > summary{ color:var(--accent-1); }
-.dock-menu-panel{
-  position:absolute; bottom:calc(100% + 10px); right:-6px; left:auto; transform:none;
-  background:var(--surface); border:1px solid var(--border-soft); border-radius:18px;
-  box-shadow:var(--shadow-lg); padding:8px; display:flex; flex-direction:column; gap:3px; min-width:210px;
+.dock-menu-backdrop{ display:none; }
+.dock-menu[open] .dock-menu-backdrop{
+  display:block; position:fixed; inset:0; z-index:600; background:rgba(30,20,10,.35);
 }
+.dock-menu-panel{
+  position:fixed; left:0; right:0; bottom:0; z-index:601; max-height:75vh; overflow-y:auto;
+  background:var(--surface); border:1px solid var(--border-soft); border-bottom:none; border-radius:22px 22px 0 0;
+  box-shadow:var(--shadow-lg); padding:6px 16px calc(16px + env(safe-area-inset-bottom,0px)); display:flex; flex-direction:column; gap:3px;
+}
+.dock-menu-panel .grabber{ width:44px; height:5px; border-radius:var(--r-full); background:var(--border); margin:10px auto 12px; }
 .dock-menu-link{
   display:flex; align-items:center; gap:12px; padding:13px 16px; border-radius:12px;
   font-family:var(--font-display); font-weight:600; font-size:.92rem; color:var(--ink-soft);
