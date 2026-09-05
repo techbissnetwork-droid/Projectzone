@@ -591,17 +591,18 @@ tr:last-child td{ border-bottom:none; }
   .footer-bottom{ flex-direction:column; align-items:flex-start; gap:10px; }
   .footer-bottom > .flex{ flex-wrap:wrap; }
 }
-.footer-grid{ display:grid; grid-template-columns:1.6fr repeat(4,1fr); gap:32px; margin-bottom:50px; align-items:start; }
+/* Same shape at every width: the brand block (logo above description) gets
+   a row to itself, then the link columns sit underneath — four across on
+   desktop, two by two on phones. */
+.footer-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:34px 32px; margin-bottom:50px; align-items:start; }
+.footer-grid > .footer-brand{ grid-column:1 / -1; }
 .footer-grid > div{ margin:0; }
 /* The brand block spans the full width once the link columns wrap, so the
    four of them sit two-by-two underneath it rather than leaving a ragged
    gap beside a tall paragraph. */
-/* Below the widest breakpoint the brand block (logo, description, email)
-   takes a row of its own and the link columns sit underneath it. Each
-   block below is self-contained rather than layering on the one above —
-   the span has to be restated, or a narrower rule that only changes
-   grid-template-columns leaves the brand sharing row one with Company,
-   which is what the long description used to collide with. */
+/* Each block restates the span rather than relying on the one above it: a
+   narrower rule that only changed grid-template-columns used to drop the
+   brand back into row one, beside Company. */
 @media (max-width:1024px){
   .footer-grid{ grid-template-columns:repeat(4,1fr); gap:28px 24px; }
   .footer-grid > .footer-brand{ grid-column:1 / -1; }
@@ -618,7 +619,7 @@ tr:last-child td{ border-bottom:none; }
    largest text in the footer — bigger than the column links and heavier
    than the logo it sits under. Sized to sit just below the links so the
    logo stays the anchor of the block. */
-.footer-brand p{ font-size:.9rem; line-height:1.65; max-width:34ch; margin-bottom:0; color:var(--ink-soft); }
+.footer-brand p{ font-size:.9rem; line-height:1.65; max-width:62ch; margin-bottom:0; color:var(--ink-soft); }
 .footer-brand .logo{ font-size:1.15rem; }
 .footer-brand .logo-mark{ width:34px; height:34px; }
 .footer-grid h4{ font-size:.85rem; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-faint); margin-bottom:16px; }

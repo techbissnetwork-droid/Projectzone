@@ -230,7 +230,7 @@ if (!$isKnownRoute) {
       </div>
       <div>
         <h4>Company</h4>
-        <a href="/about">About</a><a href="/work">Case studies</a><a href="/process">How we work</a><a href="/resources">Resources</a>
+        <a href="/about">About</a><a href="/work">Case studies</a><a href="/process">How we work</a>
       </div>
       <div>
         <h4>Platform</h4>
@@ -238,7 +238,7 @@ if (!$isKnownRoute) {
       </div>
       <div>
         <h4>Get started</h4>
-        <a href="/pricing">Pricing</a><a href="/contact">Contact</a><a href="/login">Log in</a>
+        <a href="/pricing">Pricing</a><a href="/contact">Contact</a>
       </div>
       <div>
         <h4>Legal</h4>
