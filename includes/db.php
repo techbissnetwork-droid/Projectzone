@@ -14,6 +14,19 @@ const OTP_MAX_FAILURES_PER_HOUR = 12;
 const LOGIN_MAX_ATTEMPTS = 8;
 const LOGIN_WINDOW_SECONDS = 900;
 
+/**
+ * Cache-buster for assets/style.css and assets/app.js.
+ *
+ * This was filemtime(), which looks right but fails in practice: FTP and
+ * many deploy tools preserve the original modification time, so the ?v=
+ * value doesn't change on upload and browsers keep serving the old
+ * stylesheet against freshly-updated PHP. That produced two separate
+ * "it looks broken on my phone" reports — new markup, stale CSS.
+ *
+ * Bump this string whenever assets/ changes.
+ */
+const ASSET_VERSION = '2026.09.05.3';
+
 if (file_exists(CONFIG_PATH)) {
     require_once CONFIG_PATH;
 }

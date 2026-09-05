@@ -122,7 +122,7 @@ if (!$isKnownRoute) {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="<?= e($basePath) ?>/assets/style.css?v=<?= @filemtime(__DIR__ . '/assets/style.css') ?: '1' ?>">
+<link rel="stylesheet" href="<?= e($basePath) ?>/assets/style.css?v=<?= ASSET_VERSION ?>">
 <?= ui_zoom_style() ?>
 </head>
 <body>
@@ -221,7 +221,7 @@ if (!$isKnownRoute) {
 <footer class="footer">
   <div class="container">
     <div class="footer-grid">
-      <div>
+      <div class="footer-brand">
         <a href="/" class="logo" style="margin-bottom:14px;">
           <?= logo_mark_html(true, $basePath !== '' ? $basePath . '/' : '/') ?>
           <?= logo_wordmark_html() ?>
@@ -266,6 +266,6 @@ if (!$isKnownRoute) {
   var VALUES_DATA = <?= json_encode($contentSections['values'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>;
   var PORTFOLIO_DATA = <?= json_encode($contentSections['portfolio'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>;
 </script>
-<script src="<?= e($basePath) ?>/assets/app.js?v=<?= @filemtime(__DIR__ . '/assets/app.js') ?: '1' ?>"></script>
+<script src="<?= e($basePath) ?>/assets/app.js?v=<?= ASSET_VERSION ?>"></script>
 </body>
 </html>

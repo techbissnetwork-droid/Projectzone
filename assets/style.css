@@ -584,8 +584,24 @@ tr:last-child td{ border-bottom:none; }
 /* The brand block spans the full width once the link columns wrap, so the
    four of them sit two-by-two underneath it rather than leaving a ragged
    gap beside a tall paragraph. */
-@media (max-width:1024px){ .footer-grid{ grid-template-columns:repeat(4,1fr); gap:28px 24px; } .footer-grid > div:first-child{ grid-column:1 / -1; } }
-@media (max-width:800px){ .footer-grid{ grid-template-columns:1fr 1fr; } }
+/* Below the widest breakpoint the brand block (logo, description, email)
+   takes a row of its own and the link columns sit underneath it. Each
+   block below is self-contained rather than layering on the one above —
+   the span has to be restated, or a narrower rule that only changes
+   grid-template-columns leaves the brand sharing row one with Company,
+   which is what the long description used to collide with. */
+@media (max-width:1024px){
+  .footer-grid{ grid-template-columns:repeat(4,1fr); gap:28px 24px; }
+  .footer-grid > .footer-brand{ grid-column:1 / -1; }
+}
+@media (max-width:800px){
+  /* Phone: brand across the top, then the four link columns 2 x 2. */
+  .footer-grid{ grid-template-columns:1fr 1fr; gap:26px 18px; margin-bottom:36px; }
+  .footer-grid > .footer-brand{ grid-column:1 / -1; margin-bottom:6px; }
+  .footer-grid > .footer-brand p{ max-width:46ch; }
+  .footer-grid h4{ margin-bottom:10px; }
+  .footer-grid a{ padding:5px 0; }
+}
 .footer-grid h4{ font-size:.85rem; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-faint); margin-bottom:16px; }
 .footer-grid a{ display:block; padding:6px 0; color:var(--ink-soft); font-size:.92rem; }
 .footer-grid a:hover{ color:var(--accent-1); }
