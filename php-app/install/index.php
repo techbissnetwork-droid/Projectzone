@@ -140,6 +140,34 @@ if ($pdo && $action === 'run_migrations') {
     }
 }
 
+// ---- Step: wipe the database and start over from a blank install ----
+// Deliberately destructive, so it's gated behind an authenticated staff
+// session (same reasoning as run_migrations above) PLUS a typed
+// confirmation phrase — a stray click here can't nuke a live site.
+if ($pdo && $lockExists && $action === 'wipe_reinstall') {
+    if (!current_staff()) {
+        $formError = 'Please sign in to /admin/ first, then come back here to wipe and reinstall.';
+    } elseif (!csrf_check((string)($_POST['csrf'] ?? ''))) {
+        $formError = 'Your session expired — please try again.';
+    } elseif (trim((string)($_POST['confirm_text'] ?? '')) !== 'DELETE EVERYTHING') {
+        $formError = 'Type DELETE EVERYTHING exactly (all capitals) to confirm you want to wipe the database.';
+    } else {
+        try {
+            $pdo->exec('SET FOREIGN_KEY_CHECKS = 0');
+            $tables = $pdo->query('SHOW TABLES')->fetchAll(PDO::FETCH_COLUMN);
+            foreach ($tables as $t) {
+                $pdo->exec('DROP TABLE `' . $t . '`');
+            }
+            $pdo->exec('SET FOREIGN_KEY_CHECKS = 1');
+            @unlink(INSTALL_LOCK_PATH);
+            header('Location: ./');
+            exit;
+        } catch (Throwable $e) {
+            $formError = 'Could not wipe the database: ' . $e->getMessage();
+        }
+    }
+}
+
 $token = csrf_token();
 $detectedUrl = detect_base_url();
 
@@ -288,8 +316,22 @@ body{ min-height:100vh; padding:40px 20px; }
         <a href="../" class="btn btn-primary">View the site</a>
         <a href="../admin/" class="btn btn-ghost">Staff sign in</a>
       </div>
-      <p style="margin-top:22px;font-size:.82rem;color:var(--ink-faint);">For tidiness (not required for security — this page refuses to reconfigure or reinstall a locked site) you can now delete the <code>install/</code> folder.</p>
+      <p style="margin-top:22px;font-size:.82rem;color:var(--ink-faint);">For tidiness, you can now delete the <code>install/</code> folder — it isn't linked from the public site, and reconfiguring or wiping this site through it requires a staff sign-in either way.</p>
     </div>
+  <?php endif; ?>
+
+  <?php if ($lockExists && current_staff() && in_array($view, ['pending_locked', 'pending_migrations', 'done'], true)): ?>
+  <details class="card" style="margin-top:18px;border-color:var(--danger);" <?= ($_POST['action'] ?? '') === 'wipe_reinstall' ? 'open' : '' ?>>
+    <summary style="cursor:pointer;font-weight:600;color:var(--danger);">Danger zone — wipe the database and start over</summary>
+    <p style="font-size:.85rem;color:var(--ink-faint);margin:14px 0;">This permanently deletes every business, customer, ticket, project and setting in this database, then sends you back to step 1 to create a brand new admin account from scratch. This cannot be undone — if this site has real data on it, back it up first.</p>
+    <?php if ($formError && ($_POST['action'] ?? '') === 'wipe_reinstall'): ?><p class="badge danger" style="margin-bottom:14px;"><?= e($formError) ?></p><?php endif; ?>
+    <form method="post" onsubmit="return confirm('Really delete everything in this database? This cannot be undone.');">
+      <input type="hidden" name="action" value="wipe_reinstall">
+      <input type="hidden" name="csrf" value="<?= e($token) ?>">
+      <div class="field"><label>Type <code>DELETE EVERYTHING</code> to confirm</label><input name="confirm_text" placeholder="DELETE EVERYTHING" required></div>
+      <button class="btn btn-block" style="background:var(--danger);color:#fff;" type="submit">Wipe database &amp; reinstall</button>
+    </form>
+  </details>
   <?php endif; ?>
 </main>
 </body>
