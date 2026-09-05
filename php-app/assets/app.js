@@ -99,9 +99,10 @@ $('#themeToggle').addEventListener('click', function(){
    3. SPLASH (once per tab session)
 =================================================================== */
 (function splash(){
+  var s = $('#splash');
+  if(window.SITE_SETTINGS && window.SITE_SETTINGS.splashEnabled === false){ s.remove(); return; }
   var seen=false;
   try{ seen = sessionStorage.getItem('bloomIntro')==='1'; }catch(e){}
-  var s = $('#splash');
   if(seen){ s.remove(); return; }
   function dismiss(){
     s.classList.add('hide');
@@ -1443,7 +1444,8 @@ function resetTransition(){
 function runTransition(){
   if(transitioning) return;
   transitioning=true;
-  if(!motionOK){ try{ doRender(); }catch(e){} transitioning=false; return; }
+  var wipeEnabled = motionOK && !(window.SITE_SETTINGS && window.SITE_SETTINGS.pageTransitionEnabled === false);
+  if(!wipeEnabled){ try{ doRender(); }catch(e){} transitioning=false; return; }
   wipe.classList.add('covering');
   var safety = setTimeout(resetTransition, 1500);
   setTimeout(function(){

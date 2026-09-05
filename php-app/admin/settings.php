@@ -18,6 +18,7 @@ $TEXT_FIELDS = [
 $THEME_OPTIONS = ['auto' => 'Automatic (matches visitor device)', 'light' => 'Light', 'dark' => 'Dark'];
 $LOGO_STYLE_OPTIONS = ['icon_text' => 'Icon + site name', 'icon_only' => 'Icon only (no site name)', 'text_only' => 'Site name only (no icon)'];
 $LOGO_MOTION_OPTIONS = ['on' => 'On (gentle idle tilt)', 'off' => 'Off (static)'];
+$ON_OFF_OPTIONS = ['on' => 'On', 'off' => 'Off'];
 $PALETTE_OPTIONS = [
     '' => 'Bloom (coral & amber — default)',
     'fresh' => 'Fresh (teal & lime)',
@@ -106,6 +107,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute(['logo_style', $logoStyle]);
         $logoMotion = array_key_exists($_POST['logo_animation'] ?? '', $LOGO_MOTION_OPTIONS) ? $_POST['logo_animation'] : 'on';
         $stmt->execute(['logo_animation', $logoMotion]);
+        $stmt->execute(['splash_enabled', array_key_exists($_POST['splash_enabled'] ?? '', $ON_OFF_OPTIONS) ? $_POST['splash_enabled'] : 'on']);
+        $stmt->execute(['page_transition_enabled', array_key_exists($_POST['page_transition_enabled'] ?? '', $ON_OFF_OPTIONS) ? $_POST['page_transition_enabled'] : 'on']);
         $uiZoom = max(50, min(150, (int)($_POST['ui_zoom'] ?? 100)));
         $stmt->execute(['ui_zoom', (string)$uiZoom]);
 
@@ -191,6 +194,20 @@ $socialPath = $current['social_image_path'] ?? 'assets/social-default.png';
       </div>
 
     <div class="tab-panel" id="panel-general">
+    <div class="card admin-form-card" style="border:1.5px solid var(--accent-1);">
+      <div class="card-head"><?= blob_icon('chart', 'sm', true) ?><h3>Site zoom</h3></div>
+      <p class="lede" style="margin-bottom:14px;">Shrinks or enlarges the whole site — public pages and this admin panel — for every visitor. Useful for fitting more on small screens.</p>
+      <div class="flex gap-12" style="align-items:center;">
+        <input type="range" min="50" max="150" step="5" name="ui_zoom" id="uiZoomRange" value="<?= (int)($current['ui_zoom'] ?? 100) ?>" style="flex:1;">
+        <b id="uiZoomLabel" style="min-width:48px;text-align:right;font-size:1.1rem;"><?= (int)($current['ui_zoom'] ?? 100) ?>%</b>
+      </div>
+    </div>
+    <script>
+    (function(){
+      var r = document.getElementById('uiZoomRange'), l = document.getElementById('uiZoomLabel');
+      r.addEventListener('input', function(){ l.textContent = r.value + '%'; });
+    })();
+    </script>
     <div class="card admin-form-card">
       <div class="field"><label>Site name</label><input name="site_name" value="<?= e($current['site_name'] ?? 'TECHBISS') ?>">
         <p style="font-size:.78rem;color:var(--ink-faint);margin-top:6px;">Shown next to the logo in the header, footer and splash screen. Hidden automatically if you upload a custom logo in the Branding tab.</p>
@@ -209,19 +226,6 @@ $socialPath = $current['social_image_path'] ?? 'assets/social-default.png';
         <div class="field"><label>Contact phone</label><input name="contact_phone" value="<?= e($current['contact_phone'] ?? '') ?>"></div>
       </div>
       <div class="field"><label>WhatsApp number <small style="font-weight:400;color:var(--ink-faint);">(with country code, e.g. 14155550148 — leave blank to hide the WhatsApp button)</small></label><input name="whatsapp_number" value="<?= e($current['whatsapp_number'] ?? '') ?>"></div>
-      <div class="field">
-        <label>Site zoom <small style="font-weight:400;color:var(--ink-faint);">(shrinks or enlarges the whole site — public pages and this admin panel — for every visitor)</small></label>
-        <div class="flex gap-12" style="align-items:center;">
-          <input type="range" min="50" max="150" step="5" name="ui_zoom" id="uiZoomRange" value="<?= (int)($current['ui_zoom'] ?? 100) ?>" style="flex:1;">
-          <b id="uiZoomLabel" style="min-width:48px;text-align:right;"><?= (int)($current['ui_zoom'] ?? 100) ?>%</b>
-        </div>
-      </div>
-      <script>
-      (function(){
-        var r = document.getElementById('uiZoomRange'), l = document.getElementById('uiZoomLabel');
-        r.addEventListener('input', function(){ l.textContent = r.value + '%'; });
-      })();
-      </script>
     </div>
     </div>
 
@@ -295,6 +299,20 @@ $socialPath = $current['social_image_path'] ?? 'assets/social-default.png';
             <?php endforeach; ?>
           </select>
         </div>
+        <div class="field"><label>Intro splash screen <small style="font-weight:400;color:var(--ink-faint);">(the one-time animation on first page load)</small></label>
+          <select name="splash_enabled">
+            <?php foreach ($ON_OFF_OPTIONS as $val => $label): ?>
+            <option value="<?= e($val) ?>" <?= ($current['splash_enabled'] ?? 'on') === $val ? 'selected' : '' ?>><?= e($label) ?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+        <div class="field"><label>Page transition <small style="font-weight:400;color:var(--ink-faint);">(the wipe animation between pages)</small></label>
+          <select name="page_transition_enabled">
+            <?php foreach ($ON_OFF_OPTIONS as $val => $label): ?>
+            <option value="<?= e($val) ?>" <?= ($current['page_transition_enabled'] ?? 'on') === $val ? 'selected' : '' ?>><?= e($label) ?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
         <div class="field"><label>Favicon</label>
           <div class="flex items-center gap-12" style="flex-wrap:wrap;">
             <img class="settings-preview" src="../<?= e($faviconPath) ?>" alt="">
@@ -357,7 +375,7 @@ $socialPath = $current['social_image_path'] ?? 'assets/social-default.png';
     <button class="btn btn-primary" type="submit">Save settings</button>
   </form>
 
-  <div class="card admin-form-card" style="margin-top:22px;">
+  <div class="card admin-form-card" id="testEmailCard" hidden style="margin-top:22px;">
     <div class="card-head"><?= blob_icon('mail', 'sm', true) ?><h3>Send a test email</h3></div>
     <p class="lede" style="margin-bottom:14px;">Save your SMTP settings above first, then send a test to confirm they work.</p>
     <form method="post" class="flex gap-12" style="flex-wrap:wrap;align-items:flex-end;">
@@ -367,6 +385,15 @@ $socialPath = $current['social_image_path'] ?? 'assets/social-default.png';
       <button class="btn btn-ghost" type="submit">Send test</button>
     </form>
   </div>
+  <script>
+  (function(){
+    var tab = document.getElementById('tab-email'), card = document.getElementById('testEmailCard');
+    function sync(){ card.hidden = !tab.checked; }
+    tab.addEventListener('change', sync);
+    document.querySelectorAll('input[name="stab"]').forEach(function(r){ r.addEventListener('change', sync); });
+    sync();
+  })();
+  </script>
 </main>
 <?= admin_bottomnav($staff, 'settings.php') ?>
 </body>

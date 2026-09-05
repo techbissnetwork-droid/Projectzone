@@ -226,6 +226,8 @@ INSERT INTO `settings` (`id`, `value`) VALUES
 ('site_name', 'TECHBISS'),
 ('logo_style', 'icon_text'),
 ('logo_animation', 'on'),
+('splash_enabled', 'on'),
+('page_transition_enabled', 'on'),
 ('marketing_daily_goal_default', '5'),
 ('marketing_daily_cap_default', '0'),
 ('ui_zoom', '100'),

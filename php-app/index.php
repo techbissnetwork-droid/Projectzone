@@ -18,6 +18,8 @@ $siteSettings = [
     'contactEmail' => get_setting('contact_email', 'hello@techbiss.com'),
     'contactPhone' => get_setting('contact_phone', '+1 (415) 555-0148'),
     'whatsappNumber' => get_setting('whatsapp_number', ''),
+    'splashEnabled' => get_setting('splash_enabled', 'on') !== 'off',
+    'pageTransitionEnabled' => get_setting('page_transition_enabled', 'on') !== 'off',
     'defaultTheme' => get_setting('default_theme', 'auto'),
     'stat1Value' => get_setting('stat1_value', '1,900+'),
     'stat1Label' => get_setting('stat1_label', 'Businesses & apps launched'),

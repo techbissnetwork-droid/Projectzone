@@ -363,6 +363,9 @@ button{ cursor:pointer; }
 .stat{ text-align:left; }
 .stat .num{ font-family:var(--font-display); font-weight:800; font-size:clamp(1.8rem,3vw,2.6rem); }
 .stat .label{ color:var(--ink-faint); font-size:.85rem; }
+.stat-row{ display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+.stat-row .blob-icon{ margin-bottom:0; }
+.stat-row .label{ color:var(--ink-faint); font-size:.85rem; }
 
 /* ============================= HERO ============================= */
 .hero{ padding-top:calc(var(--header-h) + 56px); position:relative; }

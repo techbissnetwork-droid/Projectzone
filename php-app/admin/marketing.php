@@ -160,10 +160,10 @@ $token = csrf_token();
 
   <?php if ($canSubmit): ?>
   <div class="grid grid-4" style="margin-bottom:22px;">
-    <div class="card tilt"><?= blob_icon('pin', 'sm', true) ?><div class="stat" style="margin-top:12px;"><div class="num"><?= number_format($myStats['total']) ?></div><div class="label">Total submitted</div></div></div>
-    <div class="card tilt"><?= blob_icon('chart', 'sm', true) ?><div class="stat" style="margin-top:12px;"><div class="num"><?= number_format($myStats['pending']) ?></div><div class="label">Pending review</div></div></div>
-    <div class="card tilt"><?= blob_icon('shield', 'sm', true) ?><div class="stat" style="margin-top:12px;"><div class="num"><?= number_format($myStats['approved']) ?></div><div class="label">Approved</div></div></div>
-    <div class="card tilt"><?= blob_icon('close', 'sm', true) ?><div class="stat" style="margin-top:12px;"><div class="num"><?= number_format($myStats['rejected']) ?></div><div class="label">Rejected</div></div></div>
+    <div class="card tilt"><div class="stat-row"><?= blob_icon('pin', 'sm', true) ?><span class="label">Total submitted</span></div><div class="stat"><div class="num"><?= number_format($myStats['total']) ?></div></div></div>
+    <div class="card tilt"><div class="stat-row"><?= blob_icon('chart', 'sm', true) ?><span class="label">Pending review</span></div><div class="stat"><div class="num"><?= number_format($myStats['pending']) ?></div></div></div>
+    <div class="card tilt"><div class="stat-row"><?= blob_icon('shield', 'sm', true) ?><span class="label">Approved</span></div><div class="stat"><div class="num"><?= number_format($myStats['approved']) ?></div></div></div>
+    <div class="card tilt"><div class="stat-row"><?= blob_icon('close', 'sm', true) ?><span class="label">Rejected</span></div><div class="stat"><div class="num"><?= number_format($myStats['rejected']) ?></div></div></div>
   </div>
   <div class="card" style="margin-bottom:22px;">
     <p class="lede" style="margin-bottom:6px;">Today's goal: <b><?= min($myTodayCount, $myGoal) ?> of <?= $myGoal ?></b> leads<?= $myTodayCount >= $myGoal ? ' — goal met! 🎉' : '' ?><?= $myStats['success_rate'] !== null ? ' · Success rate: <b>' . $myStats['success_rate'] . '%</b>' : '' ?></p>
@@ -195,10 +195,10 @@ $token = csrf_token();
 
   <?php if ($canReview): ?>
   <div class="grid grid-4" style="margin-bottom:22px;">
-    <div class="card tilt"><?= blob_icon('pin', 'sm', true) ?><div class="stat" style="margin-top:12px;"><div class="num"><?= number_format($globalStats['total']) ?></div><div class="label">Total leads, all staff</div></div></div>
-    <div class="card tilt"><?= blob_icon('chart', 'sm', true) ?><div class="stat" style="margin-top:12px;"><div class="num"><?= number_format($globalStats['pending']) ?></div><div class="label">Awaiting your review</div></div></div>
-    <div class="card tilt"><?= blob_icon('shield', 'sm', true) ?><div class="stat" style="margin-top:12px;"><div class="num"><?= number_format($globalStats['approved']) ?></div><div class="label">Approved</div></div></div>
-    <div class="card tilt"><?= blob_icon('close', 'sm', true) ?><div class="stat" style="margin-top:12px;"><div class="num"><?= $globalStats['success_rate'] !== null ? $globalStats['success_rate'] . '%' : '—' ?></div><div class="label">Success rate<?= $globalStats['rejected'] > 0 ? ' (' . number_format($globalStats['rejected']) . ' rejected)' : '' ?></div></div></div>
+    <div class="card tilt"><div class="stat-row"><?= blob_icon('pin', 'sm', true) ?><span class="label">Total leads, all staff</span></div><div class="stat"><div class="num"><?= number_format($globalStats['total']) ?></div></div></div>
+    <div class="card tilt"><div class="stat-row"><?= blob_icon('chart', 'sm', true) ?><span class="label">Awaiting your review</span></div><div class="stat"><div class="num"><?= number_format($globalStats['pending']) ?></div></div></div>
+    <div class="card tilt"><div class="stat-row"><?= blob_icon('shield', 'sm', true) ?><span class="label">Approved</span></div><div class="stat"><div class="num"><?= number_format($globalStats['approved']) ?></div></div></div>
+    <div class="card tilt"><div class="stat-row"><?= blob_icon('close', 'sm', true) ?><span class="label">Success rate<?= $globalStats['rejected'] > 0 ? ' (' . number_format($globalStats['rejected']) . ' rejected)' : '' ?></span></div><div class="stat"><div class="num"><?= $globalStats['success_rate'] !== null ? $globalStats['success_rate'] . '%' : '—' ?></div></div></div>
   </div>
   <div class="card" style="margin-bottom:22px;">
     <div class="card-head"><?= blob_icon('chart', 'sm', true) ?><h3>Daily goal</h3></div>

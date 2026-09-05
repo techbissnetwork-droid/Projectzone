@@ -95,14 +95,14 @@ $priTone = ['High' => 'danger', 'Normal' => 'warning', 'Low' => 'success'];
 
   <div class="grid grid-4" style="margin-bottom:28px;">
     <?php if ($canBusinesses): ?>
-    <a class="card tilt" href="businesses.php" style="display:block;color:inherit;"><?= blob_icon('box', 'sm', true) ?><div class="stat" style="margin-top:12px;"><div class="num"><?= number_format($businessCount) ?></div><div class="label">Businesses on platform</div></div></a>
-    <div class="card tilt"><?= blob_icon('chart', 'sm', true) ?><div class="stat" style="margin-top:12px;"><div class="num">$<?= number_format($mrrCents / 100, 0) ?></div><div class="label">Monthly recurring revenue</div></div></div>
+    <a class="card tilt" href="businesses.php" style="display:block;color:inherit;"><div class="stat-row"><?= blob_icon('box', 'sm', true) ?><span class="label">Businesses on platform</span></div><div class="stat"><div class="num"><?= number_format($businessCount) ?></div></div></a>
+    <div class="card tilt"><div class="stat-row"><?= blob_icon('chart', 'sm', true) ?><span class="label">Monthly recurring revenue</span></div><div class="stat"><div class="num">$<?= number_format($mrrCents / 100, 0) ?></div></div></div>
     <?php endif; ?>
     <?php if ($canProducts): ?>
-    <a class="card tilt" href="products.php" style="display:block;color:inherit;"><?= blob_icon('star', 'sm', true) ?><div class="stat" style="margin-top:12px;"><div class="num"><?= number_format($productCount) ?></div><div class="label">Marketplace products live</div></div></a>
+    <a class="card tilt" href="products.php" style="display:block;color:inherit;"><div class="stat-row"><?= blob_icon('star', 'sm', true) ?><span class="label">Marketplace products live</span></div><div class="stat"><div class="num"><?= number_format($productCount) ?></div></div></a>
     <?php endif; ?>
     <?php if ($canTickets): ?>
-    <a class="card tilt" href="tickets.php" style="display:block;color:inherit;"><?= blob_icon('chat', 'sm', true) ?><div class="stat" style="margin-top:12px;"><div class="num"><?= number_format($openTickets) ?></div><div class="label">Open support tickets</div></div></a>
+    <a class="card tilt" href="tickets.php" style="display:block;color:inherit;"><div class="stat-row"><?= blob_icon('chat', 'sm', true) ?><span class="label">Open support tickets</span></div><div class="stat"><div class="num"><?= number_format($openTickets) ?></div></div></a>
     <?php endif; ?>
   </div>
 
