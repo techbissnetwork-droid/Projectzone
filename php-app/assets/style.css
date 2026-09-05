@@ -330,7 +330,6 @@ button{ cursor:pointer; }
 .wa-float:hover{ transform:scale(1.08); }
 .wa-float svg{ width:26px; height:26px; }
 @media (max-width:1360px){ .wa-float{ bottom:calc(84px + env(safe-area-inset-bottom,0px)); } }
-@media (max-width:1360px){ .footer{ padding-bottom:calc(72px + env(safe-area-inset-bottom,0px)); } }
 
 /* ============================= BLOB BACKGROUND LAYER ============================= */
 .blob-field{ position:fixed; inset:0; z-index:-1; overflow:hidden; pointer-events:none; }
@@ -529,6 +528,13 @@ tr:last-child td{ border-bottom:none; }
 .quote-blob cite{ font-style:normal; font-weight:700; }
 
 .footer{ background:var(--bg-alt-2); padding:70px 0 32px; border-top:1px solid var(--border-soft); }
+/* Must come after the shorthand `padding` above (same specificity, later
+   wins) — this was previously declared earlier in the file and got
+   silently overridden by that shorthand's `32px` bottom value, leaving
+   the footer's last line (Privacy Policy / Terms & Conditions) sitting
+   underneath the fixed bottom dock on every mobile width instead of
+   clearing it. */
+@media (max-width:1360px){ .footer{ padding-bottom:calc(var(--dock-h) + 12px); } }
 .footer-grid{ display:grid; grid-template-columns:1.4fr repeat(3,1fr); gap:32px; margin-bottom:50px; align-items:start; }
 .footer-grid > div{ margin:0; }
 @media (max-width:800px){ .footer-grid{ grid-template-columns:1fr 1fr; } }
