@@ -127,8 +127,7 @@ if ($pdo && !$lockExists && $action === 'create_admin') {
                 if (!file_exists(INSTALL_LOCK_PATH)) {
                     file_put_contents(INSTALL_LOCK_PATH, date('c'));
                 }
-                install_self_destruct();
-                header('Location: ../admin/');
+                header('Location: ./');
                 exit;
             } catch (Throwable $e) {
                 $formError = 'Setup failed while creating the database tables: ' . $e->getMessage();
@@ -154,12 +153,28 @@ if ($pdo && $action === 'run_migrations') {
             if (!file_exists(INSTALL_LOCK_PATH)) {
                 file_put_contents(INSTALL_LOCK_PATH, date('c'));
             }
-            install_self_destruct();
-            header('Location: ../admin/');
+            header('Location: ./');
             exit;
         } catch (Throwable $e) {
             $formError = 'Migration failed: ' . $e->getMessage();
         }
+    }
+}
+
+// ---- Step: staff-triggered deletion of this install/ folder ----
+// Never automatic — a stray fresh install or update run must not silently
+// remove the tools an admin might still need. This requires an
+// authenticated staff session plus CSRF, same as the other post-install
+// actions above.
+if ($lockExists && $action === 'delete_install') {
+    if (!current_staff()) {
+        $formError = 'Please sign in to /admin/ first, then come back here to delete the install folder.';
+    } elseif (!csrf_check((string)($_POST['csrf'] ?? ''))) {
+        $formError = 'Your session expired — please try again.';
+    } else {
+        install_self_destruct();
+        header('Location: ../admin/');
+        exit;
     }
 }
 
@@ -330,7 +345,6 @@ body{ min-height:100vh; padding:40px 20px; }
         <a href="../" class="btn btn-primary">View the site</a>
         <a href="../admin/" class="btn btn-ghost">Go to admin</a>
       </div>
-      <p style="margin-top:20px;font-size:.82rem;color:var(--ink-faint);">This <code>install/</code> folder deletes itself automatically the moment you use either option below — nothing to clean up by hand.</p>
     </div>
 
     <div class="card" style="border-color:var(--accent-1);">
@@ -363,6 +377,17 @@ body{ min-height:100vh; padding:40px 20px; }
       </form>
     </div>
 
+    <div class="card" style="border-color:var(--danger);">
+      <h3 style="margin-bottom:6px;color:var(--danger);">Delete the install folder</h3>
+      <p style="font-size:.85rem;color:var(--ink-faint);margin-bottom:14px;">Once you're done setting up or updating, you can remove this <code>install/</code> folder from the server. It isn't required for the site to keep running — future updates arrive by re-uploading a zip that includes a fresh copy of it. This step is optional and permanent: you'll need to re-upload the folder to run an update or wipe the database again later.</p>
+      <?php if ($formError && ($_POST['action'] ?? '') === 'delete_install'): ?><p class="badge danger" style="margin-bottom:14px;"><?= e($formError) ?></p><?php endif; ?>
+      <form method="post" onsubmit="return confirm('Delete the install/ folder now? You will need to re-upload it to run future updates.');">
+        <input type="hidden" name="action" value="delete_install">
+        <input type="hidden" name="csrf" value="<?= e($token) ?>">
+        <button class="btn btn-block" style="background:var(--danger);color:#fff;" type="submit">Delete install/ folder</button>
+      </form>
+    </div>
+
   <?php else: /* done — already installed, visiting anonymously, nothing pending */ ?>
     <div class="card" style="text-align:center;">
       <div class="blob-icon lg soft" style="margin:0 auto 14px;"><svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
@@ -372,6 +397,7 @@ body{ min-height:100vh; padding:40px 20px; }
         <a href="../" class="btn btn-primary">View the site</a>
         <a href="../admin/" class="btn btn-ghost">Staff sign in</a>
       </div>
+      <p style="margin-top:20px;font-size:.82rem;color:var(--ink-faint);">This <code>install/</code> folder is still here — it isn't deleted automatically. Sign in to <code>/admin/</code>, then come back to this page to remove it with one click whenever you're ready.</p>
     </div>
   <?php endif; ?>
 </main>
