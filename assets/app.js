@@ -710,7 +710,7 @@ Pages['/resources'] = function(){
 
 Pages['/pricing'] = function(){
   var S = window.SITE_SETTINGS || {};
-  var startPrice = S.pricingStartingPrice || 5;
+  var startPrice = S.pricingStartingPrice || 59;
   return '<section class="hero hero-sub" style="padding-bottom:20px;"><div class="container text-center">'
     +'<span class="eyebrow">Pricing</span><h1 style="max-width:20ch;margin-inline:auto;">No fixed plans — every project is quoted for your business.</h1>'
     +'<p class="lede" style="max-width:46ch;margin-inline:auto;">A one-page site and a multi-screen app cost different amounts to build and maintain, so we price each project after a quick call, not off a menu.</p>'

@@ -135,7 +135,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute(['page_transition_enabled', array_key_exists($_POST['page_transition_enabled'] ?? '', $ON_OFF_OPTIONS) ? $_POST['page_transition_enabled'] : 'on']);
         $uiZoom = max(50, min(150, (int)($_POST['ui_zoom'] ?? 100)));
         $stmt->execute(['ui_zoom', (string)$uiZoom]);
-        $startingPrice = max(0, (int)($_POST['pricing_starting_price'] ?? 5));
+        $startingPrice = max(0, (int)($_POST['pricing_starting_price'] ?? 59));
         $stmt->execute(['pricing_starting_price', (string)$startingPrice]);
         $stmt->execute(['price_start_build', (string)max(0, (int)($_POST['price_start_build'] ?? 900))]);
         $stmt->execute(['price_start_buy', (string)max(0, (int)($_POST['price_start_buy'] ?? 59))]);
@@ -296,7 +296,7 @@ $socialPath = $current['social_image_path'] ?? 'assets/social-default.png';
         <div class="field"><label>Stat 5 — value <small style="font-weight:400;color:var(--ink-faint);">(About page only)</small></label><input name="stat5_value" value="<?= e($current['stat5_value'] ?? '') ?>"></div>
         <div class="field"><label>Stat 5 — label</label><input name="stat5_label" value="<?= e($current['stat5_label'] ?? '') ?>"></div>
       </div>
-      <div class="field"><label>Pricing page — "Starting from" price ($) <small style="font-weight:400;color:var(--ink-faint);">(every project is quoted individually, so this is just the teaser figure)</small></label><input type="number" min="0" step="1" name="pricing_starting_price" value="<?= e($current['pricing_starting_price'] ?? '5') ?>"></div>
+      <div class="field"><label>Pricing page — "Starting from" price ($) <small style="font-weight:400;color:var(--ink-faint);">(every project is quoted individually, so this is just the teaser figure)</small></label><input type="number" min="0" step="1" name="pricing_starting_price" value="<?= e($current['pricing_starting_price'] ?? '59') ?>"></div>
       <div class="grid grid-3" style="gap:16px;">
         <div class="field"><label>Solutions page — "Build" from ($)</label><input type="number" min="0" step="1" name="price_start_build" value="<?= e($current['price_start_build'] ?? '900') ?>"></div>
         <div class="field"><label>Solutions page — "Buy" from ($)</label><input type="number" min="0" step="1" name="price_start_buy" value="<?= e($current['price_start_buy'] ?? '59') ?>"></div>
