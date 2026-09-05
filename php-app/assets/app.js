@@ -829,12 +829,27 @@ function wireRequestForm(){
       });
   });
 }
+function dashOrdersHTML(orders){
+  if(!orders || !orders.length) return '';
+  return '<h3 style="margin:28px 0 12px;">Your marketplace purchases</h3>'
+    + orders.map(function(o){
+      return '<div class="card" style="margin-bottom:12px;"><div class="flex justify-between items-center" style="flex-wrap:wrap;gap:10px;">'
+        +'<div><b>'+esc(o.product_name)+'</b><br><span style="font-size:.82rem;color:var(--ink-faint);">Order '+esc(o.order_ref)+'</span></div>'
+        +'<a href="'+esc(o.download_url)+'" class="btn btn-ghost btn-sm">Download again '+ico('arrow')+'</a>'
+      +'</div></div>';
+    }).join('');
+}
+function dashMarketplaceCTA(){
+  return '<div class="card" style="margin-top:22px;"><div class="card-head">'+blobIcon('cart','sm',true)+'<h3>Looking for something ready-made?</h3></div><p style="font-size:.9rem;">Browse themes, templates and bundles you can buy and download right now.</p><a href="'+BP+'/marketplace" class="btn btn-primary">Browse the marketplace '+ico('arrow')+'</a></div>';
+}
 function wireDashboard(){
   var body = $('#dashBody');
   fetch(BP+'/api/dashboard.php').then(function(r){ return r.json(); }).then(function(data){
     var businesses = data.businesses || [];
+    var orders = data.orders || [];
     if(!businesses.length){
-      body.innerHTML = dashEmptyState('users','Your project isn\'t linked yet','Once our team sets up your account, your project status will show up here.','<a href="'+BP+'/contact" class="btn btn-primary">Contact us</a>');
+      body.innerHTML = dashEmptyState('users','Your project isn\'t linked yet','Once our team sets up your account, your project status will show up here.','<a href="'+BP+'/contact" class="btn btn-primary">Contact us</a>')
+        + dashOrdersHTML(orders) + dashMarketplaceCTA();
       return;
     }
     var anyProjects = businesses.some(function(b){ return b.projects && b.projects.length; });
@@ -852,6 +867,7 @@ function wireDashboard(){
     if(anyProjects){
       html += '<div class="card" style="background:var(--grad);color:#fff2ea;border:none;"><div class="card-head">'+blobIcon('users','sm',false)+'<h3 style="color:#fff2ea;">Need something changed?</h3></div><p style="color:rgba(255,242,234,.9);">Reach out any time — we\'ll take it from there.</p><a href="'+BP+'/contact" class="btn" style="background:#fff2ea;color:var(--accent-1);">Contact us</a></div>';
     }
+    html += dashOrdersHTML(orders) + dashMarketplaceCTA();
     html += dashRequestFormHTML(businesses);
     body.innerHTML = html;
     wireRequestForm();
@@ -1189,9 +1205,13 @@ function wireProductDetail(id){
       +'</div></div>';
   }
   function renderPurchase(){
+    if(!p.hasDownload){
+      return '<div class="text-center" style="padding:20px 0;">'+blobIcon('mail','lg')+'<h3>Not available for instant purchase yet</h3><p style="max-width:40ch;margin:0 auto;">This product isn\'t set up for self-checkout right now — reach out and we\'ll sort it out directly.</p>'
+        +'<a href="'+BP+'/contact" class="btn btn-primary magnetic" style="margin-top:14px;">Contact us '+ico('arrow')+'</a></div>';
+    }
     if(state.order){
-      return '<div class="text-center" style="padding:20px 0;">'+blobIcon('check','lg')+'<h3>You\'re all set, thank you.</h3><p>Confirmation <b>'+state.order+'</b> — a receipt is on its way to your inbox. This is a design preview, so no card was actually charged.</p>'
-        +'<button class="btn btn-primary magnetic" data-goto="deploy">Continue to deploy '+ico('arrow')+'</button></div>';
+      return '<div class="text-center" style="padding:20px 0;">'+blobIcon('check','lg')+'<h3>You\'re all set, thank you.</h3><p>Order <b>'+esc(state.order)+'</b> — we\'ve also emailed your download link'+(AUTH_USER?'':' and set up your account so you can sign back in with this email any time')+'.</p>'
+        +'<div class="flex gap-12" style="justify-content:center;flex-wrap:wrap;margin-top:14px;"><a href="'+esc(state.downloadUrl)+'" class="btn btn-primary magnetic">Download now '+ico('arrow')+'</a>'+(AUTH_USER?'<a href="'+BP+'/dashboard" class="btn btn-ghost">Go to dashboard</a>':'')+'</div></div>';
     }
     var tier = TIERS.filter(function(t){return t.k===state.tier;})[0];
     return '<div class="hero-grid" style="align-items:flex-start;">'
@@ -1202,8 +1222,10 @@ function wireProductDetail(id){
         +'<tr><td><b>Total due today</b></td><td><b>'+fmtMoney(total())+'</b></td></tr>'
       +'</tbody></table></div>'
       +'<div class="field" style="margin-top:20px;"><label>Card details (demo only)</label><input placeholder="4242 4242 4242 4242" disabled></div>'
+      +(AUTH_USER?'':'<div class="grid grid-2" style="gap:16px;"><div class="field"><label for="pdName">Full name</label><input id="pdName" required placeholder="Jordan Lee"></div><div class="field"><label for="pdEmail">Email</label><input id="pdEmail" type="email" required placeholder="jordan@yourbusiness.com"></div></div>')
       +'</div>'
-      +'<div class="card"><h3>Ready when you are</h3><p style="font-size:.85rem;">No payment is actually processed in this concept — confirming just simulates the flow.</p>'
+      +'<div class="card"><h3>Ready when you are</h3><p style="font-size:.85rem;">No payment is actually processed in this concept, but your download and account are real.</p>'
+      +'<p id="pdError" class="badge danger" hidden style="margin-bottom:14px;"></p>'
       +'<button class="btn btn-primary btn-block magnetic" id="confirmPurchase">Confirm purchase '+ico('arrow')+'</button></div>'
       +'</div>';
   }
@@ -1238,10 +1260,29 @@ function wireProductDetail(id){
     if(tab==='purchase'){
       var btn = $('#confirmPurchase');
       if(btn) btn.addEventListener('click', function(){
-        state.order = 'TB-'+Math.floor(100000+Math.random()*899999);
-        showTab('purchase');
-        var r = panels.getBoundingClientRect();
-        confettiBurst(r.left+r.width/2, r.top+40);
+        var errEl = $('#pdError');
+        var payload = { product_id: p.id, total: total() };
+        if(!AUTH_USER){
+          payload.name = $('#pdName').value;
+          payload.email = $('#pdEmail').value;
+        }
+        errEl.hidden = true;
+        btn.disabled = true;
+        fetch(BP+'/api/purchase.php', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) })
+          .then(function(r){ return r.json().then(function(data){ return {ok:r.ok, data:data}; }); })
+          .then(function(res){
+            btn.disabled = false;
+            if(!res.ok){ errEl.textContent = res.data.error || 'Something went wrong — please try again.'; errEl.hidden = false; return; }
+            state.order = res.data.order_ref;
+            state.downloadUrl = res.data.download_url;
+            showTab('purchase');
+            var r = panels.getBoundingClientRect();
+            confettiBurst(r.left+r.width/2, r.top+40);
+          })
+          .catch(function(){
+            btn.disabled = false;
+            errEl.textContent = 'Could not reach the server — please try again.'; errEl.hidden = false;
+          });
       });
     }
     if(tab==='deploy'){

@@ -9,12 +9,28 @@ if (!$customer) {
 }
 
 $pdo = db();
+
+$orderStmt = $pdo->prepare(
+    'SELECT o.order_ref, o.download_token, o.created_at, p.name AS product_name
+     FROM product_orders o JOIN products p ON p.id = o.product_id
+     WHERE o.customer_id = ? ORDER BY o.created_at DESC'
+);
+$orderStmt->execute([$customer['id']]);
+$orders = array_map(function ($o) {
+    return [
+        'order_ref' => $o['order_ref'],
+        'product_name' => $o['product_name'],
+        'created_at' => $o['created_at'],
+        'download_url' => rtrim(SITE_URL, '/') . '/api/download.php?token=' . $o['download_token'],
+    ];
+}, $orderStmt->fetchAll());
+
 $stmt = $pdo->prepare('SELECT id, name FROM businesses WHERE customer_id = ? ORDER BY id');
 $stmt->execute([$customer['id']]);
 $businesses = $stmt->fetchAll();
 
 if (!$businesses) {
-    send_json(['businesses' => []]);
+    send_json(['businesses' => [], 'orders' => $orders]);
 }
 
 $projStmt = $pdo->prepare(
@@ -50,4 +66,4 @@ foreach ($businesses as $b) {
     ];
 }
 
-send_json(['businesses' => $result]);
+send_json(['businesses' => $result, 'orders' => $orders]);
