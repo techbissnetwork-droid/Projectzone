@@ -246,9 +246,13 @@ function current_customer(): ?array
     if (empty($_SESSION['customer_id'])) {
         return null;
     }
-    $stmt = db()->prepare('SELECT id, name, email FROM customers WHERE id = ?');
-    $stmt->execute([$_SESSION['customer_id']]);
-    $row = $stmt->fetch();
+    try {
+        $stmt = db()->prepare('SELECT id, name, email FROM customers WHERE id = ?');
+        $stmt->execute([$_SESSION['customer_id']]);
+        $row = $stmt->fetch();
+    } catch (Throwable $e) {
+        return null;
+    }
     return $row ?: null;
 }
 
@@ -390,9 +394,18 @@ function current_staff(): ?array
     if (empty($_SESSION['staff_id'])) {
         return null;
     }
-    $stmt = db()->prepare('SELECT id, name, email, role, permissions, is_owner, marketing_daily_goal, marketing_daily_cap FROM staff WHERE id = ?');
-    $stmt->execute([$_SESSION['staff_id']]);
-    $row = $stmt->fetch();
+    try {
+        $stmt = db()->prepare('SELECT id, name, email, role, permissions, is_owner, marketing_daily_goal, marketing_daily_cap FROM staff WHERE id = ?');
+        $stmt->execute([$_SESSION['staff_id']]);
+        $row = $stmt->fetch();
+    } catch (Throwable $e) {
+        // The staff table may legitimately not exist yet — the installer
+        // asks who you are before the schema is created, and a browser can
+        // still be holding a session cookie from a previous install or a
+        // database that has since been wiped. "Can't tell" is not signed in,
+        // and must never be a 500 on the one page you'd use to recover.
+        return null;
+    }
     return $row ?: null;
 }
 
