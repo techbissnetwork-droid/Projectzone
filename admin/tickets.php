@@ -25,15 +25,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $priority = in_array($_POST['priority'] ?? '', $PRIORITIES, true) ? $_POST['priority'] : 'Normal';
         $status = in_array($_POST['status'] ?? '', $STATUSES, true) ? $_POST['status'] : 'Open';
         $assigneeId = (int)($_POST['assignee_staff_id'] ?? 0) ?: null;
+
+        // A project_task ticket with no project_id never reaches the
+        // customer: api/dashboard.php only shows open tickets that name a
+        // project. Admin had no way to set it, so every task raised here
+        // was invisible to the client it was about.
+        $projectId = (int)($_POST['project_id'] ?? 0) ?: null;
+        if ($projectId !== null) {
+            $owns = $pdo->prepare('SELECT id FROM projects WHERE id = ? AND business_id = ?');
+            $owns->execute([$projectId, $businessId]);
+            if (!$owns->fetch()) {
+                $projectId = null;
+            }
+        }
+        if ($type === 'project_task' && $projectId === null) {
+            $projectId = null;
+        }
+
         if ($title === '' || $businessId <= 0) {
             flash('Pick a business and enter a title.', 'error');
         } elseif ($id > 0) {
-            $stmt = $pdo->prepare('UPDATE tickets SET business_id=?, title=?, description=?, type=?, priority=?, status=?, assignee_staff_id=? WHERE id=?');
-            $stmt->execute([$businessId, $title, $description !== '' ? $description : null, $type, $priority, $status, $assigneeId, $id]);
+            $stmt = $pdo->prepare('UPDATE tickets SET business_id=?, project_id=?, title=?, description=?, type=?, priority=?, status=?, assignee_staff_id=? WHERE id=?');
+            $stmt->execute([$businessId, $projectId, $title, $description !== '' ? $description : null, $type, $priority, $status, $assigneeId, $id]);
+            touch_business_activity($businessId);
             flash('Ticket updated.');
         } else {
-            $stmt = $pdo->prepare('INSERT INTO tickets (business_id, title, description, type, priority, status, assignee_staff_id) VALUES (?,?,?,?,?,?,?)');
-            $stmt->execute([$businessId, $title, $description !== '' ? $description : null, $type, $priority, $status, $assigneeId]);
+            $stmt = $pdo->prepare('INSERT INTO tickets (business_id, project_id, title, description, type, priority, status, assignee_staff_id) VALUES (?,?,?,?,?,?,?,?)');
+            $stmt->execute([$businessId, $projectId, $title, $description !== '' ? $description : null, $type, $priority, $status, $assigneeId]);
+            touch_business_activity($businessId);
             flash('Ticket created.');
         }
     } elseif ($action === 'delete') {
@@ -53,6 +72,7 @@ if (isset($_GET['edit'])) {
 
 $businesses = $pdo->query('SELECT id, name FROM businesses ORDER BY name')->fetchAll();
 $staffList = $pdo->query('SELECT id, name FROM staff ORDER BY name')->fetchAll();
+$projectOptions = $pdo->query('SELECT id, business_id, title FROM projects ORDER BY title')->fetchAll();
 $tickets = $pdo->query(
     "SELECT t.*, b.name AS business_name, s.name AS assignee_name, s.initials AS assignee_initials,
             p.title AS project_title
@@ -76,6 +96,7 @@ $token = csrf_token();
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/style.css?v=<?= @filemtime(__DIR__ . '/../assets/style.css') ?: '1' ?>">
+<?= ui_zoom_style() ?>
 </head>
 <body>
 <?= admin_header($staff, 'tickets.php') ?>
@@ -98,7 +119,9 @@ $token = csrf_token();
       <div class="field"><label>Title</label><input name="title" required value="<?= e($editing['title'] ?? '') ?>"></div>
       <div class="field"><label>Description <small style="font-weight:400;color:var(--ink-faint);">(optional)</small></label><textarea name="description"><?= e($editing['description'] ?? '') ?></textarea></div>
       <div class="grid grid-4" style="gap:16px;">
-        <div class="field"><label>Business</label><select name="business_id">
+        <div class="field"><label>Business</label><select name="business_id" required>
+          <?php // No silent default: picking the alphabetically-first client by accident files the ticket against the wrong account. ?>
+          <?php if (!$editing): ?><option value="">Choose a business…</option><?php endif; ?>
           <?php foreach ($businesses as $b): ?><option value="<?= (int)$b['id'] ?>" <?= (int)($editing['business_id'] ?? 0) === (int)$b['id'] ? 'selected' : '' ?>><?= e($b['name']) ?></option><?php endforeach; ?>
         </select></div>
         <div class="field"><label>Type</label><select name="type">
@@ -110,6 +133,14 @@ $token = csrf_token();
         <div class="field"><label>Status</label><select name="status">
           <?php foreach ($STATUSES as $s): ?><option value="<?= e($s) ?>" <?= ($editing['status'] ?? '') === $s ? 'selected' : '' ?>><?= e($s) ?></option><?php endforeach; ?>
         </select></div>
+      </div>
+      <div class="field"><label>Project <small style="font-weight:400;color:var(--ink-faint);">(a project task only reaches the customer's dashboard once it names a project)</small></label>
+        <select name="project_id" id="ticketProject">
+          <option value="">Not tied to a project</option>
+          <?php foreach ($projectOptions as $po): ?>
+          <option value="<?= (int)$po['id'] ?>" data-biz="<?= (int)$po['business_id'] ?>" <?= (int)($editing['project_id'] ?? 0) === (int)$po['id'] ? 'selected' : '' ?>><?= e($po['title']) ?></option>
+          <?php endforeach; ?>
+        </select>
       </div>
       <div class="field"><label>Assignee</label><select name="assignee_staff_id">
         <option value="">Unassigned</option>
@@ -161,6 +192,27 @@ $token = csrf_token();
       <?php if (!$tickets): ?><tr><td colspan="7" style="color:var(--ink-faint);">No tickets yet.</td></tr><?php endif; ?>
     </tbody></table></div>
   </div>
+  <script>
+  /* Only offer projects that belong to the business currently selected. */
+  (function(){
+    var biz = document.querySelector('select[name="business_id"]');
+    var proj = document.getElementById('ticketProject');
+    if(!biz || !proj) return;
+    var all = Array.prototype.slice.call(proj.options);
+    function sync(){
+      var want = biz.value;
+      all.forEach(function(o){
+        if(!o.value){ return; }
+        var match = o.dataset.biz === want;
+        o.hidden = !match;
+        o.disabled = !match;
+        if(!match && o.selected){ proj.value = ''; }
+      });
+    }
+    biz.addEventListener('change', sync);
+    sync();
+  })();
+  </script>
 </main>
 <?= admin_bottomnav($staff, 'tickets.php') ?>
 </body>

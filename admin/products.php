@@ -21,14 +21,19 @@ function product_file_upload(string $productId, ?string &$error): ?string
 {
     $uploadDir = __DIR__ . '/../assets/uploads/products';
 
-    if (isset($_POST['remove_download'])) {
+    $hasNewFile = !empty($_FILES['download_file']['name'])
+        && ($_FILES['download_file']['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE;
+
+    // "Remove" used to win outright, so a replacement uploaded in the same
+    // submit was deleted along with the old file, without a word.
+    if (isset($_POST['remove_download']) && !$hasNewFile) {
         foreach (glob($uploadDir . '/' . $productId . '.*') ?: [] as $old) {
             @unlink($old);
         }
         return '';
     }
 
-    if (empty($_FILES['download_file']['name']) || ($_FILES['download_file']['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+    if (!$hasNewFile) {
         return null;
     }
     if ($_FILES['download_file']['error'] !== UPLOAD_ERR_OK) {
@@ -72,14 +77,17 @@ function product_image_upload(string $productId, ?string &$error): ?string
     $uploadDir = __DIR__ . '/../assets/uploads/products';
     $basename = $productId . '-img';
 
-    if (isset($_POST['remove_image'])) {
+    $hasNewImage = !empty($_FILES['image_file']['name'])
+        && ($_FILES['image_file']['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE;
+
+    if (isset($_POST['remove_image']) && !$hasNewImage) {
         foreach (glob($uploadDir . '/' . $basename . '.*') ?: [] as $old) {
             @unlink($old);
         }
         return '';
     }
 
-    if (empty($_FILES['image_file']['name']) || ($_FILES['image_file']['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+    if (!$hasNewImage) {
         return null;
     }
     if ($_FILES['image_file']['error'] !== UPLOAD_ERR_OK) {
@@ -114,6 +122,33 @@ function product_image_upload(string $productId, ?string &$error): ?string
         }
     }
     return 'assets/uploads/products/' . $filename;
+}
+
+/**
+ * Pre-flight check for one upload field, run for every file before any of
+ * them is moved, so a product save is all-or-nothing on disk.
+ */
+function product_validate_upload(string $field, array $allowedExts, int $maxMb, bool $mustBeImage, ?string &$error): void
+{
+    if (empty($_FILES[$field]['name']) || ($_FILES[$field]['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+        return;
+    }
+    if ($_FILES[$field]['error'] !== UPLOAD_ERR_OK) {
+        $error = 'That upload failed — please try again.';
+        return;
+    }
+    if ($_FILES[$field]['size'] > $maxMb * 1024 * 1024) {
+        $error = 'That file is over ' . $maxMb . 'MB — please use a smaller one.';
+        return;
+    }
+    $ext = strtolower(pathinfo($_FILES[$field]['name'], PATHINFO_EXTENSION));
+    if (!in_array($ext, $allowedExts, true)) {
+        $error = 'Unsupported file type — allowed: ' . implode(', ', $allowedExts) . '.';
+        return;
+    }
+    if ($mustBeImage && !@getimagesize($_FILES[$field]['tmp_name'])) {
+        $error = 'That file does not look like a valid image.';
+    }
 }
 
 /** Resolves an upload helper's null/''/path result against the current
@@ -166,6 +201,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $specs = array_values(array_filter(array_map('trim', explode("\n", $specsRaw))));
 
         if ($name === '' || $tagline === '') {
+            flash_input($_POST);
             flash('Name and tagline are required.', 'error');
         } else {
             $id = $existingId !== '' ? $existingId : slugify_id($name, $pdo);
@@ -178,9 +214,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $currentDownload = $curRow['download_path'] ?? null;
                 $currentImage = $curRow['image_path'] ?? null;
             }
+            // Validate both files before moving either. Previously the image
+            // was moved to disk first, so a failing download upload left an
+            // orphaned image behind with the row never updated to match.
             $uploadError = null;
-            $downloadPath = resolve_upload(product_file_upload($id, $uploadError), $currentDownload);
             $imageError = null;
+            product_validate_upload('download_file', ['zip', 'pdf'], 25, false, $uploadError);
+            product_validate_upload('image_file', ['jpg', 'jpeg', 'png', 'webp'], 5, true, $imageError);
+
+            if ($uploadError || $imageError) {
+                flash_input($_POST);
+                flash($uploadError ?: $imageError, 'error');
+            } else {
+            $downloadPath = resolve_upload(product_file_upload($id, $uploadError), $currentDownload);
             $imagePath = resolve_upload(product_image_upload($id, $imageError), $currentImage);
 
             if ($uploadError || $imageError) {
@@ -195,10 +241,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->execute([$id, $name, $category, $icon, $price, $pricingType, $rating, $tagline, $desc, json_encode($specs), $downloadPath, $imagePath, $maxSort + 1]);
                 flash('Product added — now live on the public marketplace.');
             }
+            }
         }
     } elseif ($action === 'delete') {
-        $pdo->prepare('DELETE FROM products WHERE id=?')->execute([(string)($_POST['id'] ?? '')]);
-        flash('Product removed from the marketplace.');
+        $deleteId = (string)($_POST['id'] ?? '');
+        // product_orders used to cascade with the product, silently erasing
+        // every sale of it and every buyer's download access. The foreign
+        // key now restricts, so say why rather than surfacing a raw error.
+        $inUse = $pdo->prepare('SELECT COUNT(*) FROM product_orders WHERE product_id = ?');
+        $inUse->execute([$deleteId]);
+        if ((int)$inUse->fetchColumn() > 0) {
+            flash('That product has orders against it, so deleting it would erase those customers\' purchase history and downloads. Remove its file instead to take it off sale.', 'error');
+        } else {
+            $pdo->prepare('DELETE FROM products WHERE id=?')->execute([$deleteId]);
+            // Leftover uploads used to linger forever, and the next product
+            // that slugified to the same id inherited them.
+            foreach (glob(__DIR__ . '/../assets/uploads/products/' . $deleteId . '.*') ?: [] as $old) {
+                @unlink($old);
+            }
+            foreach (glob(__DIR__ . '/../assets/uploads/products/' . $deleteId . '-img.*') ?: [] as $old) {
+                @unlink($old);
+            }
+            flash('Product removed from the marketplace.');
+        }
     }
     header('Location: products.php');
     exit;
@@ -210,7 +275,19 @@ if (isset($_GET['edit'])) {
     $stmt->execute([(string)$_GET['edit']]);
     $editing = $stmt->fetch() ?: null;
 }
-$editingSpecs = $editing ? implode("\n", json_decode($editing['specs_json'], true) ?: []) : '';
+$old = take_old_input();
+// A failed save re-renders with whatever was typed, falling back to the
+// stored row (when editing) and then to the field's default.
+$val = function (string $key, $fallback = '') use ($old, $editing) {
+    if (array_key_exists($key, $old)) {
+        return $old[$key];
+    }
+    return $editing[$key] ?? $fallback;
+};
+$editingSpecs = array_key_exists('specs', $old)
+    ? (string)$old['specs']
+    : ($editing ? implode("\n", json_decode($editing['specs_json'], true) ?: []) : '');
+$formOpen = $editing || $old;
 
 $products = $pdo->query('SELECT * FROM products ORDER BY sort_order ASC')->fetchAll();
 $token = csrf_token();
@@ -225,6 +302,7 @@ $token = csrf_token();
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/style.css?v=<?= @filemtime(__DIR__ . '/../assets/style.css') ?: '1' ?>">
+<?= ui_zoom_style() ?>
 </head>
 <body>
 <?= admin_header($staff, 'products.php') ?>
@@ -232,31 +310,31 @@ $token = csrf_token();
   <?= admin_flash_html() ?>
   <div class="admin-toolbar">
     <div><h1 style="margin-bottom:4px;">Marketplace products</h1><p class="lede" style="margin-bottom:0;">Changes here go live on the public marketplace immediately.</p></div>
-    <?php if (!$editing): ?><button class="btn btn-primary" type="button" id="addBtn" onclick="toggleAddForm('add')"><?= ico('plus') ?> Add a product</button><?php endif; ?>
+    <?php if (!$formOpen): ?><button class="btn btn-primary" type="button" id="addBtn" onclick="toggleAddForm('add')"><?= ico('plus') ?> Add a product</button><?php endif; ?>
   </div>
 
-  <div class="card admin-form-card" id="addCard"<?= $editing ? '' : ' hidden' ?>>
+  <div class="card admin-form-card" id="addCard"<?= $formOpen ? '' : ' hidden' ?>>
     <div class="card-head"><?= blob_icon($editing ? 'edit' : 'plus', 'sm', true) ?><h3><?= $editing ? 'Edit product' : 'Add a product' ?></h3></div>
     <form method="post" enctype="multipart/form-data">
       <input type="hidden" name="action" value="save">
       <input type="hidden" name="csrf" value="<?= e($token) ?>">
       <input type="hidden" name="existing_id" value="<?= e($editing['id'] ?? '') ?>">
       <div class="grid grid-2" style="gap:16px;">
-        <div class="field"><label>Name</label><input name="name" required value="<?= e($editing['name'] ?? '') ?>"></div>
+        <div class="field"><label>Name</label><input name="name" required value="<?= e((string)$val('name')) ?>"></div>
         <div class="field"><label>Category</label><select name="category">
-          <?php foreach ($CATEGORIES as $c): ?><option value="<?= e($c) ?>" <?= ($editing['category'] ?? '') === $c ? 'selected' : '' ?>><?= e($c) ?></option><?php endforeach; ?>
+          <?php foreach ($CATEGORIES as $c): ?><option value="<?= e($c) ?>" <?= (string)$val('category') === $c ? 'selected' : '' ?>><?= e($c) ?></option><?php endforeach; ?>
         </select></div>
       </div>
       <div class="grid grid-4" style="gap:16px;">
-        <div class="field"><label>Icon name</label><input name="icon" value="<?= e($editing['icon'] ?? 'box') ?>" placeholder="cart, chat, box, star…"></div>
-        <div class="field"><label>Price (USD)</label><input type="number" min="0" step="1" name="price" value="<?= e((string)($editing['price'] ?? 99)) ?>"></div>
+        <div class="field"><label>Icon name</label><input name="icon" value="<?= e((string)$val('icon', 'box')) ?>" placeholder="cart, chat, box, star…"></div>
+        <div class="field"><label>Price (USD)</label><input type="number" min="0" step="1" name="price" value="<?= e((string)$val('price', 99)) ?>"></div>
         <div class="field"><label>Pricing type</label><select name="pricing_type">
-          <?php foreach ($PRICING_TYPES as $val => $label): ?><option value="<?= e($val) ?>" <?= ($editing['pricing_type'] ?? 'monthly') === $val ? 'selected' : '' ?>><?= e($label) ?></option><?php endforeach; ?>
+          <?php foreach ($PRICING_TYPES as $pt => $label): ?><option value="<?= e($pt) ?>" <?= (string)$val('pricing_type', 'monthly') === $pt ? 'selected' : '' ?>><?= e($label) ?></option><?php endforeach; ?>
         </select></div>
-        <div class="field"><label>Rating (0–5)</label><input type="number" min="0" max="5" step="0.1" name="rating" value="<?= e((string)($editing['rating'] ?? 4.8)) ?>"></div>
+        <div class="field"><label>Rating (0–5)</label><input type="number" min="0" max="5" step="0.1" name="rating" value="<?= e((string)$val('rating', 4.8)) ?>"></div>
       </div>
-      <div class="field"><label>Tagline (one line, shown on the card)</label><input name="tagline" required value="<?= e($editing['tagline'] ?? '') ?>"></div>
-      <div class="field"><label>Full description</label><textarea name="description"><?= e($editing['description'] ?? '') ?></textarea></div>
+      <div class="field"><label>Tagline (one line, shown on the card)</label><input name="tagline" required value="<?= e((string)$val('tagline')) ?>"></div>
+      <div class="field"><label>Full description</label><textarea name="description"><?= e((string)$val('description')) ?></textarea></div>
       <div class="field"><label>What's included (one per line)</label><textarea name="specs" placeholder="One feature per line"><?= e($editingSpecs) ?></textarea></div>
       <div class="field">
         <label>Product image <small style="font-weight:400;color:var(--ink-faint);">(jpg, png or webp, up to 5MB — shown instead of the icon on the marketplace card and product page)</small></label>
@@ -271,7 +349,8 @@ $token = csrf_token();
       <div class="field">
         <label>Downloadable file <small style="font-weight:400;color:var(--ink-faint);">(zip or pdf, up to 25MB — required for customers to actually receive something after buying)</small></label>
         <?php if (!empty($editing['download_path'])): ?>
-          <p style="font-size:.85rem;margin-bottom:8px;"><span class="badge success"><?= ico('check') ?> File attached</span> — <a class="card-link" href="../<?= e($editing['download_path']) ?>" target="_blank">view current file</a></p>
+          <?php // Deliberately not a direct link: assets/uploads/products/.htaccess denies .zip/.pdf so nobody can bypass checkout, which made the old "view current file" link a guaranteed 403. ?>
+          <p style="font-size:.85rem;margin-bottom:8px;"><span class="badge success"><?= ico('check') ?> File attached</span> — <code style="font-size:.8rem;"><?= e(basename((string)$editing['download_path'])) ?></code><?php $fp = __DIR__ . '/../' . $editing['download_path']; ?><?= is_file($fp) ? ' (' . number_format(filesize($fp) / 1024, 0) . ' KB)' : ' <span class="badge danger">missing on disk</span>' ?></p>
           <label class="flex items-center gap-8" style="font-size:.85rem;margin-bottom:10px;"><input type="checkbox" name="remove_download"> Remove the current file</label>
         <?php endif; ?>
         <input type="file" name="download_file" accept=".zip,.pdf">

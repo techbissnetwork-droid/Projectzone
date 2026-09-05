@@ -88,6 +88,13 @@ return function (PDO $pdo, array $context): void {
                     COALESCE((SELECT MAX(p.created_at) FROM projects p WHERE p.business_id = b.id), b.last_activity_at)
                 )");
 
+    // contact_messages was write-only until now; admin/messages.php needs
+    // somewhere to record that an enquiry has been dealt with.
+    $msgCols = $pdo->query('SHOW COLUMNS FROM contact_messages')->fetchAll(PDO::FETCH_COLUMN);
+    if (!in_array('handled_at', $msgCols, true)) {
+        $pdo->exec('ALTER TABLE contact_messages ADD COLUMN `handled_at` DATETIME NULL');
+    }
+
     $stmt = $pdo->prepare('INSERT IGNORE INTO settings (id, value) VALUES (?, ?)');
     $stmt->execute(['payments_enabled', 'off']);
     $stmt->execute(['contact_notify_email', '']);

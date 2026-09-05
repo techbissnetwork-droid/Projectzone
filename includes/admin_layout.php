@@ -3,6 +3,8 @@ const ADMIN_NAV = [
     ['path' => 'index.php', 'label' => 'Dashboard', 'icon' => 'grid'],
     ['path' => 'users.php', 'label' => 'Users', 'icon' => 'users'],
     ['path' => 'businesses.php', 'label' => 'Businesses', 'icon' => 'box'],
+    ['path' => 'messages.php', 'label' => 'Messages', 'icon' => 'mail'],
+    ['path' => 'orders.php', 'label' => 'Orders', 'icon' => 'star'],
     ['path' => 'marketing.php', 'label' => 'Marketing', 'icon' => 'pin'],
     ['path' => 'tickets.php', 'label' => 'Tickets', 'icon' => 'chat'],
     ['path' => 'products.php', 'label' => 'Products', 'icon' => 'star'],
@@ -18,6 +20,8 @@ const ADMIN_NAV = [
 const STAFF_SECTIONS = [
     'users' => 'Users',
     'businesses' => 'Businesses',
+    'messages' => 'Contact messages',
+    'orders' => 'Orders & newsletter',
     'marketing_submit' => 'Marketing: submit leads',
     'marketing_review' => 'Marketing: approve/reject leads',
     'tickets' => 'Tickets',

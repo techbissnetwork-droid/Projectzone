@@ -15,9 +15,14 @@
   --hue-2:#ffb648;   /* amber — theme base color 2 */
   --accent-1: var(--hue-1);
   --accent-2: var(--hue-2);
+  /* Static fallbacks first: an engine without color-mix() (pre-2023) drops
+     the declaration that follows and would otherwise leave these unset,
+     silently rendering the accent gradient and soft focus ring as nothing. */
+  --accent-3: var(--hue-2);
   --accent-3: color-mix(in srgb, var(--hue-1) 50%, var(--hue-2) 50%);
 
   --grad: linear-gradient(135deg, var(--accent-1) 0%, var(--accent-3) 52%, var(--accent-2) 100%);
+  --grad-soft: linear-gradient(135deg, rgba(255,122,82,.15), rgba(255,182,72,.15));
   --grad-soft: linear-gradient(135deg, color-mix(in srgb, var(--hue-1) 15%, transparent), color-mix(in srgb, var(--hue-2) 15%, transparent));
   --grad-text: linear-gradient(120deg, var(--hue-1), var(--hue-2));
 
@@ -233,7 +238,7 @@ button{ cursor:pointer; }
 }
 .nav-link:hover, .nav-link.active{ color:var(--accent-1); }
 .nav-actions{ display:flex; align-items:center; gap:12px; flex:none; }
-@media (max-width:1360px){
+@media (max-width:1024px){
   .nav-links{ display:none; }
   #navLoginBtn{ display:none !important; }
   .nav-burger{ display:flex; }
@@ -321,7 +326,7 @@ button{ cursor:pointer; }
 .dock-item:hover{ color:var(--accent-1); }
 .dock-item:hover svg{ transform:translateY(-2px); }
 .dock-item.active{ color:var(--accent-1); }
-@media (min-width:1361px){ .bottom-dock{ display:none; } }
+@media (min-width:1025px){ .bottom-dock{ display:none; } }
 .wa-float{
   position:fixed; right:20px; bottom:24px; z-index:510;
   width:54px; height:54px; border-radius:50%; display:flex; align-items:center; justify-content:center;
@@ -329,8 +334,8 @@ button{ cursor:pointer; }
 }
 .wa-float:hover{ transform:scale(1.08); }
 .wa-float svg{ width:26px; height:26px; }
-@media (max-width:1360px){ .wa-float{ bottom:calc(84px + env(safe-area-inset-bottom,0px)); } }
-@media (max-width:1360px){ .footer{ padding-bottom:calc(72px + env(safe-area-inset-bottom,0px)); } }
+@media (max-width:1024px){ .wa-float{ bottom:calc(84px + env(safe-area-inset-bottom,0px)); } }
+@media (max-width:1024px){ .footer{ padding-bottom:calc(72px + env(safe-area-inset-bottom,0px)); } }
 
 /* ============================= BLOB BACKGROUND LAYER ============================= */
 .blob-field{ position:fixed; inset:0; z-index:-1; overflow:hidden; pointer-events:none; }
@@ -601,7 +606,7 @@ main{ display:block; }
 .admin-header-actions{ display:flex; align-items:center; gap:14px; flex:none; }
 .admin-who{ display:flex; flex-direction:column; line-height:1.25; font-size:.85rem; font-weight:600; text-align:right; }
 .admin-who small{ font-weight:500; font-size:.72rem; color:var(--ink-faint); }
-@media (max-width:1360px){
+@media (max-width:1024px){
   .admin-nav{ display:none; }
   .admin-who{ display:none; }
   .admin-header-actions .btn span{ display:none; }
@@ -627,11 +632,11 @@ main{ display:block; }
 .admin-page th, .admin-page td{ padding:11px 14px; font-size:.86rem; }
 .admin-page .btn{ padding:9px 18px; font-size:.86rem; }
 .admin-page .btn-sm{ padding:7px 14px; }
-@media (max-width:1360px){
+@media (max-width:1024px){
   .admin-page{ padding-bottom:calc(90px + env(safe-area-inset-bottom,0px)); }
 }
 .admin-bottomnav{ display:none; }
-@media (max-width:1360px){ .admin-bottomnav{ display:flex; } }
+@media (max-width:1024px){ .admin-bottomnav{ display:flex; } }
 .dock-menu{ flex:1 1 0; position:relative; }
 .dock-menu > summary{
   flex:1 1 0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
@@ -671,6 +676,7 @@ main{ display:block; }
 }
 .icon-btn:hover{ border-color:var(--accent-1); color:var(--accent-1); }
 .icon-btn.danger:hover{ border-color:var(--danger); color:var(--danger); }
+.icon-btn[disabled]{ cursor:not-allowed; }
 .icon-btn svg{ width:15px; height:15px; }
 
 /* CSS-only tabs (admin Settings) — no JS on admin pages, so plain radio

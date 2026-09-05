@@ -57,5 +57,6 @@ $ticketTitle = mb_substr($title, 0, 255);
 
 $stmt = $pdo->prepare("INSERT INTO tickets (business_id, title, description, type, priority, status) VALUES (?, ?, ?, 'new_project', ?, ?)");
 $stmt->execute([$businessId, $ticketTitle, $description !== '' ? $description : null, 'Normal', 'Open']);
+touch_business_activity((int)$businessId);
 
 send_json(['ok' => true]);

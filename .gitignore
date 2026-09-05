@@ -6,6 +6,7 @@
 # customer-purchased product files — but not the .htaccess that blocks
 # direct access to the latter, which must ship with the app.
 /assets/uploads/*
+!/assets/uploads/.htaccess
 !/assets/uploads/.gitkeep
 !/assets/uploads/products/
 /assets/uploads/products/*

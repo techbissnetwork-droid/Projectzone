@@ -46,7 +46,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $errors[] = 'That contact email doesn\'t look valid.';
         }
 
-        $creatingNewUser = $newUserEmail !== '';
+        // Picking an existing owner wins. The new-user inputs are only
+        // hidden client-side, and hidden inputs still submit — so a stale
+        // address typed and then abandoned used to quietly create a
+        // duplicate customer and assign them instead of the chosen owner.
+        $creatingNewUser = $newUserEmail !== '' && $ownerRaw === '';
         if ($creatingNewUser) {
             if ($newUserName === '' || !filter_var($newUserEmail, FILTER_VALIDATE_EMAIL)) {
                 $errors[] = 'Enter a name and a valid email for the new user.';
@@ -136,6 +140,7 @@ $token = csrf_token();
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/style.css?v=<?= @filemtime(__DIR__ . '/../assets/style.css') ?: '1' ?>">
+<?= ui_zoom_style() ?>
 </head>
 <body>
 <?= admin_header($staff, 'businesses.php') ?>
@@ -206,7 +211,12 @@ $token = csrf_token();
   (function(){
     var sel = document.getElementById('ownerSelect');
     var wrap = document.getElementById('newUserFields');
-    function sync(){ wrap.style.display = sel.value ? 'none' : ''; }
+    function sync(){
+      var picked = !!sel.value;
+      wrap.style.display = picked ? 'none' : '';
+      // Clear as well as hide, so nothing stale is submitted.
+      if(picked){ wrap.querySelectorAll('input').forEach(function(i){ i.value = ''; }); }
+    }
     sel.addEventListener('change', sync);
     sync();
   })();

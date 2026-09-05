@@ -535,6 +535,33 @@ function content_case_studies_rows(): array
     ], $rows);
 }
 
+/**
+ * Live client projects an admin has ticked "show in the public portfolio"
+ * on. Until now that checkbox wrote a column nothing ever read, so the
+ * toggle did nothing at all — /work showed only the hand-typed case
+ * studies. These are appended to those.
+ */
+function content_portfolio_rows(): array
+{
+    try {
+        $rows = db()->query(
+            "SELECT p.title, p.work_type, p.domain, b.name AS business_name, b.sector
+             FROM projects p JOIN businesses b ON b.id = p.business_id
+             WHERE p.portfolio_visible = 1 AND p.status = 'Live'
+             ORDER BY p.created_at DESC LIMIT 12"
+        )->fetchAll();
+    } catch (PDOException $e) {
+        return [];
+    }
+    return array_map(fn($r) => [
+        'client' => $r['business_name'],
+        'sector' => $r['sector'],
+        'title' => $r['title'],
+        'workType' => $r['work_type'],
+        'domain' => $r['domain'],
+    ], $rows);
+}
+
 function content_pricing_faqs_rows(): array
 {
     $rows = db()->query('SELECT question, answer FROM content_pricing_faqs ORDER BY sort_order ASC, id ASC')->fetchAll();
@@ -633,9 +660,50 @@ function logo_wordmark_html(): string
     return '<b>' . e(get_setting('site_name', 'TECHBISS')) . '</b>';
 }
 
+/**
+ * businesses.last_activity_at used to be written once, on insert, and never
+ * again — while the admin list sorted by it under a "Last activity"
+ * heading. Call this wherever something real happens for a business.
+ */
+function touch_business_activity(int $businessId): void
+{
+    if ($businessId <= 0) {
+        return;
+    }
+    try {
+        db()->prepare('UPDATE businesses SET last_activity_at = NOW() WHERE id = ?')->execute([$businessId]);
+    } catch (Throwable $e) {
+        // Never let a timestamp update break the action that triggered it.
+    }
+}
+
 function flash(string $message, string $type = 'success'): void
 {
     $_SESSION['flash'] = ['message' => $message, 'type' => $type];
+}
+
+/**
+ * Every admin page answers a validation failure with flash() + redirect,
+ * which re-renders the form empty — losing a long product description or
+ * project note to a single mistyped email. Stash the submitted values so
+ * the redirected page can put them back.
+ */
+function flash_input(array $input): void
+{
+    unset($input['csrf'], $input['action'], $input['password']);
+    $_SESSION['flash_input'] = $input;
+}
+
+function old_input(string $key, $default = '')
+{
+    return $_SESSION['flash_input'][$key] ?? $default;
+}
+
+function take_old_input(): array
+{
+    $in = $_SESSION['flash_input'] ?? [];
+    unset($_SESSION['flash_input']);
+    return $in;
 }
 
 function get_flash(): ?array

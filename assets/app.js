@@ -468,7 +468,7 @@ Pages['/services'] = function(){
       +[['One-time build','A website or app, built once and handed over — fully yours, no lock-in.','box'],
         ['Bring your own template','Buy a theme from our marketplace and we\'ll brand and launch it for you.','cart'],
         ['Care plan','Hosting, updates, small changes and support, handled every month.','refresh']]
-      .map(function(m){ return '<div class="card tilt"><div class="card-head">'+blobIcon(m[2],'sm',true)+'<h3>'+m[0]+'</h3></div><p>'+m[1]+'</p></div>'; }).join('')
+      .map(function(m){ return '<div class="card tilt"><div class="card-head">'+blobIcon(m[2],'sm',true)+'<h3>'+esc(m[0])+'</h3></div><p>'+esc(m[1])+'</p></div>'; }).join('')
     +'</div>'
   +'</div></section>';
 };
@@ -495,7 +495,11 @@ Pages['/solutions'] = function(){
 
 Pages['/marketplace'] = function(){
   var S = window.SITE_SETTINGS || {};
-  var cats = ['All','Templates','Bundles','AI Agents','Dashboards','Themes'];
+  /* Derived from what is actually on sale, so a category added in admin
+     can't produce products that no chip is able to filter to. */
+  var cats = ['All'].concat(PRODUCTS.map(function(p){ return p.cat; })
+    .filter(function(c, i, a){ return c && a.indexOf(c) === i; })
+    .sort());
   return '<section class="hero hero-sub" style="padding-bottom:10px;"><div class="container">'
     +'<span class="eyebrow">Marketplace</span><h1 style="max-width:16ch;">Ready-made themes, branded just for you.</h1>'
     +'<p class="lede">Preview any theme, then let us apply your logo and colors and launch it as your own — every listing is built and maintained by the '+esc(S.siteName||'TECHBISS')+' studio.</p>'
@@ -509,7 +513,17 @@ Pages['/marketplace'] = function(){
 };
 
 Pages['/marketplace/detail'] = function(id){
-  var p = PRODUCTS.filter(function(x){return x.id===id;})[0] || PRODUCTS[0];
+  var p = PRODUCTS.filter(function(x){return x.id===id;})[0];
+  /* Falling back to PRODUCTS[0] showed a different product under the
+     requested URL — and threw outright when the catalogue was empty. */
+  if(!p){
+    return '<section class="hero"><div class="container text-center" style="padding:70px 20px;">'
+      +'<span class="eyebrow">Marketplace</span>'
+      +'<h1 style="max-width:20ch;margin-inline:auto;">That product isn\'t available.</h1>'
+      +'<p class="lede" style="max-width:42ch;margin:14px auto 24px;">It may have been renamed or taken off sale. Everything currently available is on the marketplace.</p>'
+      +'<a href="'+BP+'/marketplace" class="btn btn-primary">Browse the marketplace '+ico('arrow')+'</a>'
+    +'</div></section>';
+  }
   return '<section class="hero" style="padding-bottom:0;"><div class="container">'
     +'<a href="'+BP+'/marketplace" class="card-link" style="margin-bottom:18px;">'+ico('arrow').replace('12h14','14h-14').replace('M13 6l6 6-6 6','M11 6l-6 6 6 6')+' Back to marketplace</a>'
     +'<div class="hero-grid" style="align-items:flex-start;">'
@@ -517,7 +531,7 @@ Pages['/marketplace/detail'] = function(id){
         +'<span class="badge grad">'+esc(p.cat)+'</span>'
         +'<h1 style="margin-top:14px;">'+esc(p.name)+'</h1>'
         +'<p class="lede">'+esc(p.tagline)+'</p>'
-        +'<div class="flex items-center gap-12" style="margin:18px 0 28px;"><span class="stat"><span class="num" style="font-size:1.4rem;">'+fmtMoney(p.price)+'</span></span><span class="badge">★ '+p.rating+' rating</span></div>'
+        +'<div class="flex items-center gap-12" style="margin:18px 0 28px;"><span class="stat"><span class="num" style="font-size:1.4rem;">'+fmtMoney(p.price)+'</span></span><span class="badge">★ '+esc(p.rating)+' rating</span></div>'
       +'</div>'
       +(p.image
         ? '<div class="hero-visual" style="aspect-ratio:4/3;overflow:hidden;border-radius:20px;"><img src="'+BP+'/'+esc(p.image)+'" alt="" style="width:100%;height:100%;object-fit:cover;"></div>'
@@ -525,7 +539,7 @@ Pages['/marketplace/detail'] = function(id){
     +'</div></div></section>'
   +'<section class="section tone-a" style="padding-top:26px;"><div class="container">'
     +'<div class="tabbar" id="pdTabs" role="tablist">'
-      +['Overview','Buy'].map(function(t,i){return '<button role="tab" class="'+(i===0?'active':'')+'" data-tab="'+t.toLowerCase()+'">'+(i+1)+'. '+t+'</button>';}).join('')
+      +['Overview', ((window.SITE_SETTINGS||{}).paymentsEnabled ? 'Buy' : 'Get it')].map(function(t,i){return '<button role="tab" class="'+(i===0?'active':'')+'" data-tab="'+(i===0?'overview':'buy')+'">'+(i+1)+'. '+esc(t)+'</button>';}).join('')
     +'</div>'
     +'<div id="pdPanels" data-pid="'+esc(p.id)+'"></div>'
   +'</div></section>';
@@ -545,7 +559,25 @@ Pages['/work'] = function(){
       +'<div class="accordion-panel case-panel" data-i="'+i+'"><div class="inner"><p>'+esc(c.body)+'</p></div></div>'
       +'</div>';
     }).join('')+'</div>'
-  +'</div></section>';
+  +'</div></section>'
+  /* Projects an admin ticked "show in the public portfolio" on. That
+     checkbox previously wrote a column nothing read, so it did nothing. */
+  +(function(){
+    var port = window.PORTFOLIO_DATA || [];
+    if(!port.length) return '';
+    return wave('a','var(--bg-alt)')
+      +'<section class="section tone-b"><div class="container">'
+        +'<div class="section-head center"><span class="eyebrow">Recently launched</span><h2>Live projects from the studio</h2></div>'
+        +'<div class="grid grid-3">'+port.map(function(w){
+          return '<div class="card tilt">'
+            +'<div class="card-head">'+blobIcon('rocket','sm',true)+'<h3 style="font-size:1.05rem;">'+esc(w.client)+'</h3></div>'
+            +(w.sector?'<span class="badge">'+esc(w.sector)+'</span>':'')
+            +'<p style="font-size:.9rem;margin-top:10px;">'+esc(w.title)+'</p>'
+            +(w.domain?'<a class="card-link" href="https://'+esc(String(w.domain).replace(/^https?:\/\//,''))+'" target="_blank" rel="noopener">'+esc(w.domain)+' '+ico('arrow')+'</a>':'')
+          +'</div>';
+        }).join('')+'</div>'
+      +'</div></section>';
+  })();
 };
 
 Pages['/process'] = function(){
@@ -565,8 +597,8 @@ Pages['/process'] = function(){
     +steps.map(function(s,i){
       return '<div class="flex" style="gap:28px;padding:30px 0;border-bottom:'+(i<steps.length-1?'1px solid var(--border-soft)':'none')+';align-items:flex-start;">'
         +'<div style="display:flex;flex-direction:column;align-items:center;gap:8px;flex:none;">'+blobIcon(s.icon,'lg')+'<span style="font-family:var(--font-display);font-weight:700;color:var(--ink-faint);">0'+(i+1)+'</span></div>'
-        +'<div style="flex:1;"><h3>'+s.t+'</h3><p class="lede">'+s.d+'</p>'
-        +'<div class="flex gap-8" style="flex-wrap:wrap;">'+s.out.map(function(o){return '<span class="badge">'+o+'</span>';}).join('')+'</div></div>'
+        +'<div style="flex:1;"><h3>'+esc(s.t)+'</h3><p class="lede">'+esc(s.d)+'</p>'
+        +'<div class="flex gap-8" style="flex-wrap:wrap;">'+s.out.map(function(o){return '<span class="badge">'+esc(o)+'</span>';}).join('')+'</div></div>'
       +'</div>';
     }).join('')
     +'</div>'
@@ -628,7 +660,7 @@ Pages['/resources'] = function(){
   +'<section class="section tone-a" style="padding-top:10px;"><div class="container">'
     +'<div class="chip-row" id="resChips">'+types.map(function(t,i){return '<button class="chip'+(i===0?' active':'')+'" data-cat="'+t+'">'+t+'</button>';}).join('')+'</div>'
     +'<div class="grid grid-3" id="resGrid">'+res.map(function(r){
-      return '<div class="card tilt" data-cat="'+r.k+'"><div class="card-head">'+blobIcon(r.icon,'sm',true)+'<h3 style="font-size:1.08rem;">'+r.t+'</h3></div><p style="font-size:.85rem;">'+r.min+'</p><div class="flex items-center justify-between"><span class="card-link">Read '+ico('arrow')+'</span><span class="badge">'+r.k+'</span></div></div>';
+      return '<div class="card tilt" data-cat="'+esc(r.k)+'"><div class="card-head">'+blobIcon(r.icon,'sm',true)+'<h3 style="font-size:1.08rem;">'+esc(r.t)+'</h3></div><p style="font-size:.85rem;">'+esc(r.min)+'</p><div class="flex items-center justify-between"><span class="badge">'+esc(r.k)+'</span></div></div>';
     }).join('')+'</div>'
   +'</div></section>'
   +wave('c','var(--bg-alt-2)')
@@ -636,6 +668,7 @@ Pages['/resources'] = function(){
     +'<h2 style="max-width:20ch;margin-inline:auto;">Get the next field note before anyone else</h2>'
     +'<form id="newsForm" class="flex" style="max-width:420px;margin:24px auto 0;gap:10px;" onsubmit="return false;">'
       +'<input type="email" id="newsEmail" required placeholder="you@company.com" aria-label="Email address" style="flex:1;min-width:0;padding:14px 18px;border-radius:var(--r-full);border:1.5px solid var(--border);background:var(--surface);outline:none;">'
+      +'<div aria-hidden="true" style="position:absolute;left:-9999px;"><label>Website<input id="newsWebsite" type="text" tabindex="-1" autocomplete="off"></label></div>'
       +'<button class="btn btn-primary" type="submit">Subscribe</button>'
     +'</form><p id="newsMsg" class="badge success" style="display:none;margin-top:14px;">'+ico('check')+' You\'re on the list — welcome!</p>'
     +'<p id="newsError" class="badge danger" hidden style="margin-top:14px;"></p>'
@@ -699,6 +732,20 @@ Pages['/terms'] = function(){
     +'<div class="card" style="max-width:760px;margin:0 auto;line-height:1.7;">'+legalParagraphs(S.termsConditions)+'</div>'
   +'</div></section>';
 };
+Pages['/404'] = function(){
+  return '<section class="hero"><div class="container text-center" style="padding:70px 20px;">'
+    +'<span class="eyebrow">404</span>'
+    +'<h1 style="max-width:18ch;margin-inline:auto;">We couldn\'t find that page.</h1>'
+    +'<p class="lede" style="max-width:44ch;margin:14px auto 26px;">The link may be out of date, or the page may have moved. Here are the places people usually want.</p>'
+    +'<div class="flex gap-12" style="justify-content:center;flex-wrap:wrap;">'
+      +'<a href="'+BP+'/" class="btn btn-primary">Home '+ico('arrow')+'</a>'
+      +'<a href="'+BP+'/services" class="btn btn-ghost">Services</a>'
+      +'<a href="'+BP+'/marketplace" class="btn btn-ghost">Marketplace</a>'
+      +'<a href="'+BP+'/contact" class="btn btn-ghost">Contact</a>'
+    +'</div>'
+  +'</div></section>';
+};
+
 Pages['/contact'] = function(){
   var S = window.SITE_SETTINGS || {};
   return '<section class="hero hero-sub" style="padding-bottom:20px;"><div class="container">'
@@ -715,6 +762,7 @@ Pages['/contact'] = function(){
         +'<div class="field"><label for="cCompany">Business name</label><input id="cCompany" placeholder="Your business or project name"></div>'
         +'<div class="field"><label for="cType">What do you need?</label><select id="cType"><option>A new website</option><option>A new app</option><option>Both a website and an app</option><option>Domain, hosting & email setup</option><option>A ready-made theme, branded for me</option><option>Not sure yet</option></select></div>'
         +'<div class="field"><label for="cMsg">What are you trying to solve?</label><textarea id="cMsg" required placeholder="A sentence or two is plenty to start."></textarea></div>'
+        +'<div aria-hidden="true" style="position:absolute;left:-9999px;"><label>Website<input id="cWebsite" type="text" tabindex="-1" autocomplete="off"></label></div>'
         +'<button class="btn btn-primary btn-block magnetic" type="submit">Send message '+ico('arrow')+'</button>'
         +'<p id="contactError" class="badge danger" hidden style="margin-top:14px;"></p>'
       +'</form>'
@@ -768,10 +816,18 @@ Pages['/dashboard'] = function(){
   +'</div></section>';
 };
 function dashEmptyState(icon,title,body,cta){
-  return '<div class="card" style="text-align:center;padding:44px 24px;">'+blobIcon(icon,'lg')+'<h3 style="margin:14px 0 4px;">'+title+'</h3><p class="lede" style="margin-bottom:'+(cta?'18px':'0')+';">'+body+'</p>'+(cta||'')+'</div>';
+  return '<div class="card" style="text-align:center;padding:44px 24px;">'+blobIcon(icon,'lg')+'<h3 style="margin:14px 0 4px;">'+esc(title)+'</h3><p class="lede" style="margin-bottom:'+(cta?'18px':'0')+';">'+esc(body)+'</p>'+(cta||'')+'</div>';
 }
 function dashExpiryBadge(label,dateStr){
-  var days = Math.floor((new Date(dateStr) - new Date(new Date().toDateString())) / 86400000);
+  /* "2026-01-15" parses as UTC midnight, but new Date().toDateString()
+     is local midnight — so in any timezone behind UTC this read one day
+     lower than the same date shown in admin (which uses PHP strtotime).
+     Compare both ends as plain calendar dates instead. */
+  var parts = String(dateStr).slice(0,10).split('-');
+  var target = Date.UTC(+parts[0], (+parts[1] || 1) - 1, +parts[2] || 1);
+  var now = new Date();
+  var today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+  var days = Math.round((target - today) / 86400000);
   var tone = days < 0 ? 'danger' : (days <= 30 ? 'warning' : '');
   return '<span class="badge '+tone+'">'+esc(label)+': '+(days<0?'overdue':days+'d')+'</span>';
 }
@@ -1052,7 +1108,7 @@ function wireResources(){
       var err = $('#newsError'); err.hidden = true;
       var email = $('#newsEmail').value;
       var btn = form.querySelector('button[type=submit]'); btn.disabled = true;
-      fetch(BP+'/api/newsletter.php', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email:email}) })
+      fetch(BP+'/api/newsletter.php', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email:email, website: ($('#newsWebsite')||{}).value || ''}) })
         .then(function(r){ return r.json().then(function(data){ return {ok:r.ok, data:data}; }); })
         .then(function(res){
           if(!res.ok){ btn.disabled=false; err.textContent = res.data.error || 'Something went wrong — please try again.'; err.hidden = false; return; }
@@ -1082,7 +1138,8 @@ function wireContact(){
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
         name: $('#cName').value, email: $('#cEmail').value,
-        company: $('#cCompany').value, need: $('#cType').value, message: $('#cMsg').value
+        company: $('#cCompany').value, need: $('#cType').value, message: $('#cMsg').value,
+        website: ($('#cWebsite') || {}).value || ''
       })
     }).then(function(r){ return r.json().then(function(data){ return {ok:r.ok, data:data}; }); })
       .then(function(res){
@@ -1188,8 +1245,9 @@ function wireLogin(){
 }
 
 function wireProductDetail(id){
-  var p = PRODUCTS.filter(function(x){return x.id===id;})[0] || PRODUCTS[0];
+  var p = PRODUCTS.filter(function(x){return x.id===id;})[0];
   var tabs = $('#pdTabs'), panels = $('#pdPanels');
+  if(!p || !tabs || !panels) return;
   var state = { order:null, downloadUrl:null };
   function renderOverview(){
     return '<div class="grid grid-2"><div><h3>Overview</h3><p>'+esc(p.desc)+'</p>'
@@ -1197,9 +1255,19 @@ function wireProductDetail(id){
       +(p.image
         ? '<div class="hero-visual" style="aspect-ratio:1/1;overflow:hidden;border-radius:20px;"><img src="'+BP+'/'+esc(p.image)+'" alt="" style="width:100%;height:100%;object-fit:cover;"></div>'
         : '<div class="hero-visual" style="aspect-ratio:1/1;"><svg viewBox="0 0 200 200" style="width:80%;height:80%;"><path fill="url(#pvGrad)" d="M46,-52C58,-42,64,-24,64,-6C64,12,58,28,46,40C34,52,16,60,-3,63C-22,66,-44,64,-56,52C-68,40,-70,18,-67,-3C-64,-24,-56,-46,-40,-58C-24,-70,-2,-72,17,-68C36,-64,34,-62,46,-52Z" transform="translate(100 100)"/><defs><linearGradient id="pvGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" style="stop-color:var(--accent-1)"/><stop offset="100%" style="stop-color:var(--accent-2)"/></linearGradient></defs></svg></div>')
-      +'</div><button class="btn btn-primary magnetic" style="margin-top:24px;" data-goto="buy">Buy for '+fmtMoney(p.price)+(p.pricing_type==='fixed'?'':'/mo')+' '+ico('arrow')+'</button>';
+      +'</div><button class="btn btn-primary magnetic" style="margin-top:24px;" data-goto="buy">'
+      +((window.SITE_SETTINGS||{}).paymentsEnabled ? 'Buy for '+fmtMoney(p.price)+(p.pricing_type==='fixed'?'':'/mo') : 'Get this for '+fmtMoney(p.price)+(p.pricing_type==='fixed'?'':'/mo'))
+      +' '+ico('arrow')+'</button>';
   }
   function renderBuy(){
+    var S = window.SITE_SETTINGS || {};
+    /* No payment processor is connected, so unless an admin has knowingly
+       switched checkout on, send buyers to Contact rather than handing out
+       the paid file for free. */
+    if(!S.paymentsEnabled){
+      return '<div class="text-center" style="padding:20px 0;">'+blobIcon('mail','lg')+'<h3>Buy through us directly</h3><p style="max-width:42ch;margin:0 auto;">Online checkout isn\'t open yet. Tell us which product you want and we\'ll get it to you — usually the same day.</p>'
+        +'<a href="'+BP+'/contact" class="btn btn-primary magnetic" style="margin-top:14px;">Contact us '+ico('arrow')+'</a></div>';
+    }
     if(!p.hasDownload){
       return '<div class="text-center" style="padding:20px 0;">'+blobIcon('mail','lg')+'<h3>Not available for instant purchase yet</h3><p style="max-width:40ch;margin:0 auto;">This product isn\'t set up for self-checkout right now — reach out and we\'ll sort it out directly.</p>'
         +'<a href="'+BP+'/contact" class="btn btn-primary magnetic" style="margin-top:14px;">Contact us '+ico('arrow')+'</a></div>';
@@ -1234,7 +1302,9 @@ function wireProductDetail(id){
       var btn = $('#confirmPurchase');
       if(btn) btn.addEventListener('click', function(){
         var errEl = $('#pdError');
-        var payload = { product_id: p.id, total: p.price };
+        /* The price is read server-side from the product row — sending a
+           "total" from here let any caller name their own. */
+        var payload = { product_id: p.id };
         if(!AUTH_USER){
           payload.name = $('#pdName').value;
           payload.email = $('#pdEmail').value;
@@ -1245,7 +1315,14 @@ function wireProductDetail(id){
           .then(function(r){ return r.json().then(function(data){ return {ok:r.ok, data:data}; }); })
           .then(function(res){
             btn.disabled = false;
-            if(!res.ok){ errEl.textContent = res.data.error || 'Something went wrong — please try again.'; errEl.hidden = false; return; }
+            if(!res.ok){
+              errEl.textContent = res.data.error || 'Something went wrong — please try again.';
+              errEl.hidden = false;
+              if(res.data.needs_login){
+                errEl.innerHTML = esc(res.data.error) + ' <a href="'+BP+'/login" style="color:inherit;text-decoration:underline;">Sign in</a>';
+              }
+              return;
+            }
             state.order = res.data.order_ref;
             state.downloadUrl = res.data.download_url;
             showTab('buy');
@@ -1281,7 +1358,9 @@ function parseRoute(){
   var h = currentPathname();
   var m = h.match(/^\/marketplace\/detail\/(.+)$/);
   if(m) return {key:'/marketplace/detail', param:m[1], nav:'/marketplace'};
-  return {key: Pages[h] ? h : '/', param:null, nav:h};
+  /* Unknown paths used to silently render the homepage. They now get a
+     real not-found page (index.php sends the 404 status to match). */
+  return {key: Pages[h] ? h : '/404', param:null, nav:h};
 }
 function navigate(path){
   if(currentPathname() === path) return;
@@ -1445,17 +1524,34 @@ function resetTransition(){
   transitioning=false;
   wipe.classList.remove('covering');
 }
+/* doRender() used to run inside a bare `catch(e){}`, so any exception in
+   any page renderer produced a blank or frozen page with nothing logged
+   anywhere. Report it, and show the visitor something they can act on. */
+function safeRender(){
+  try{ doRender(); }
+  catch(err){
+    if(window.console && console.error) console.error('Page render failed:', err);
+    var v = $('#view');
+    if(v){
+      v.innerHTML = '<section class="section"><div class="container text-center" style="padding:60px 20px;">'
+        +'<h1 style="max-width:20ch;margin-inline:auto;">Something went wrong on this page.</h1>'
+        +'<p class="lede" style="max-width:44ch;margin:12px auto 22px;">Sorry — please try again, or head back to the homepage.</p>'
+        +'<a href="'+BP+'/" class="btn btn-primary">Back to home '+ico('arrow')+'</a>'
+      +'</div></section>';
+    }
+  }
+}
+
 function runTransition(){
   if(transitioning) return;
   transitioning=true;
   var wipeEnabled = motionOK && !(window.SITE_SETTINGS && window.SITE_SETTINGS.pageTransitionEnabled === false);
-  if(!wipeEnabled){ try{ doRender(); }catch(e){} transitioning=false; return; }
+  if(!wipeEnabled){ safeRender(); transitioning=false; return; }
   wipe.classList.add('covering');
   var safety = setTimeout(resetTransition, 1500);
   setTimeout(function(){
-    try{ doRender(); }
-    catch(e){}
-    finally{
+    safeRender();
+    {
       clearTimeout(safety);
       requestAnimationFrame(function(){
         wipe.classList.remove('covering');

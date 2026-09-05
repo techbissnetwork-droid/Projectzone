@@ -156,6 +156,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $id = (int)($_POST['id'] ?? 0);
         $pdo->prepare("DELETE FROM `$table` WHERE id = ?")->execute([$id]);
         flash($cfg['label'] . ' removed.');
+    } elseif ($action === 'move') {
+        // sort_order was set to MAX+1 on insert and never exposed again, so
+        // reordering meant deleting and retyping everything below the item
+        // you wanted to move. Swap with the neighbour in that direction.
+        $id = (int)($_POST['id'] ?? 0);
+        $dir = ($_POST['dir'] ?? '') === 'up' ? 'up' : 'down';
+
+        $rows = $pdo->query("SELECT id, sort_order FROM `$table` ORDER BY sort_order ASC, id ASC")->fetchAll();
+        $index = null;
+        foreach ($rows as $i => $r) {
+            if ((int)$r['id'] === $id) {
+                $index = $i;
+                break;
+            }
+        }
+        $swapWith = $dir === 'up' ? ($index ?? 0) - 1 : ($index ?? 0) + 1;
+        if ($index !== null && isset($rows[$swapWith])) {
+            // Rewrite the whole column: legacy rows can share a sort_order
+            // (or all be 0), and swapping two equal values does nothing.
+            $order = array_column($rows, 'id');
+            [$order[$index], $order[$swapWith]] = [$order[$swapWith], $order[$index]];
+            $upd = $pdo->prepare("UPDATE `$table` SET sort_order = ? WHERE id = ?");
+            foreach ($order as $position => $rowId) {
+                $upd->execute([$position, $rowId]);
+            }
+            flash('Order updated.');
+        }
     }
     header('Location: content.php?tab=' . e($section));
     exit;
@@ -210,6 +237,7 @@ function content_field_html(string $key, array $f, ?array $editing): string
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/style.css?v=<?= @filemtime(__DIR__ . '/../assets/style.css') ?: '1' ?>">
+<?= ui_zoom_style() ?>
 <style>.content-row{ display:flex; justify-content:space-between; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid var(--border-soft); }
 .content-row:last-child{ border-bottom:none; }
 .content-row-title{ font-weight:600; font-size:.92rem; }
@@ -264,7 +292,7 @@ function content_field_html(string $key, array $f, ?array $editing): string
 
   <div class="card">
     <?php $rows = $rowsBySection[$activeTab]; ?>
-    <?php foreach ($rows as $r): ?>
+    <?php foreach ($rows as $rowIndex => $r): ?>
     <div class="content-row">
       <div>
         <div class="content-row-title"><?= e((string)($r[$cfg['title']] ?? '')) ?></div>
@@ -272,6 +300,22 @@ function content_field_html(string $key, array $f, ?array $editing): string
         <?php if ($activeTab === 'team'): ?><div class="content-row-sub"><?= e($r['role']) ?></div><?php endif; ?>
       </div>
       <div class="admin-actions-cell">
+        <form method="post" style="display:inline;">
+          <input type="hidden" name="section" value="<?= e($activeTab) ?>">
+          <input type="hidden" name="action" value="move">
+          <input type="hidden" name="dir" value="up">
+          <input type="hidden" name="csrf" value="<?= e($token) ?>">
+          <input type="hidden" name="id" value="<?= (int)$r['id'] ?>">
+          <button class="icon-btn" type="submit" aria-label="Move up" <?= $rowIndex === 0 ? 'disabled style="opacity:.35;"' : '' ?>>&#9650;</button>
+        </form>
+        <form method="post" style="display:inline;">
+          <input type="hidden" name="section" value="<?= e($activeTab) ?>">
+          <input type="hidden" name="action" value="move">
+          <input type="hidden" name="dir" value="down">
+          <input type="hidden" name="csrf" value="<?= e($token) ?>">
+          <input type="hidden" name="id" value="<?= (int)$r['id'] ?>">
+          <button class="icon-btn" type="submit" aria-label="Move down" <?= $rowIndex === count($rows) - 1 ? 'disabled style="opacity:.35;"' : '' ?>>&#9660;</button>
+        </form>
         <a class="icon-btn" href="content.php?tab=<?= e($activeTab) ?>&edit=<?= (int)$r['id'] ?>" aria-label="Edit"><?= ico('edit') ?></a>
         <form method="post" onsubmit="return confirm('Remove this <?= strtolower($cfg['label']) ?>?');">
           <input type="hidden" name="section" value="<?= e($activeTab) ?>">

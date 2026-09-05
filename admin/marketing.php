@@ -28,14 +28,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $pdo->prepare("SELECT COUNT(*) FROM marketing_leads WHERE staff_id = ? AND DATE(created_at) = CURDATE()");
         $stmt->execute([$staff['id']]);
         $todayCountNow = (int)$stmt->fetchColumn();
+
+        // Nothing stopped the same business being submitted over and over,
+        // which made the daily goal, the progress bar and the success rate
+        // trivial to inflate. Compare on digits only, so "+1 555 0100" and
+        // "(555) 0100" count as the same number.
+        $phoneDigits = preg_replace('/\D+/', '', $phone);
+        $dupe = null;
+        if ($phoneDigits !== '') {
+            $d = $pdo->prepare(
+                "SELECT l.id, s.name AS staff_name, l.created_at FROM marketing_leads l
+                 JOIN staff s ON s.id = l.staff_id
+                 WHERE REPLACE(REPLACE(REPLACE(REPLACE(l.phone,' ',''),'-',''),'(',''),')','') LIKE ?
+                 ORDER BY l.id DESC LIMIT 1"
+            );
+            $d->execute(['%' . $phoneDigits]);
+            $dupe = $d->fetch() ?: null;
+        }
+
         if ($name === '' || $phone === '' || $address === '') {
             flash('Business name, phone and address are all required.', 'error');
         } elseif ($myCap > 0 && $todayCountNow >= $myCap) {
             flash("You've reached today's limit of $myCap leads — come back tomorrow.", 'error');
+        } elseif ($dupe) {
+            flash('That phone number was already submitted by ' . $dupe['staff_name'] . ' ' . time_ago($dupe['created_at']) . '.', 'error');
         } else {
             $pdo->prepare('INSERT INTO marketing_leads (staff_id, business_name, phone, address, notes) VALUES (?,?,?,?,?)')
                 ->execute([$staff['id'], $name, $phone, $address, $notes !== '' ? $notes : null]);
-            flash('Lead submitted.');
+            // Re-check after the write: two submissions racing each other
+            // both passed the check above, because the count was read before
+            // either had inserted.
+            $stmt->execute([$staff['id']]);
+            if ($myCap > 0 && (int)$stmt->fetchColumn() > $myCap) {
+                $pdo->prepare('DELETE FROM marketing_leads WHERE id = ?')->execute([$pdo->lastInsertId()]);
+                flash("You've reached today's limit of $myCap leads — come back tomorrow.", 'error');
+            } else {
+                flash('Lead submitted.');
+            }
         }
     } elseif ($action === 'review' && $canReview) {
         $id = (int)($_POST['id'] ?? 0);
@@ -94,12 +123,8 @@ function marketing_status_counts(PDO $pdo, ?int $staffId): array
     return $counts;
 }
 
-if ($canSubmit) {
-    $myStats = marketing_status_counts($pdo, (int)$staff['id']);
-}
-if ($canReview) {
-    $globalStats = marketing_status_counts($pdo, null);
-}
+$myStats = $canSubmit ? marketing_status_counts($pdo, (int)$staff['id']) : null;
+$globalStats = $canReview ? marketing_status_counts($pdo, null) : null;
 
 if ($canReview) {
     $leads = $pdo->query(
@@ -118,7 +143,8 @@ if ($canReview) {
                 (SELECT COUNT(*) FROM marketing_leads l WHERE l.staff_id = s.id AND l.status = 'Approved') AS approved_count,
                 (SELECT COUNT(*) FROM marketing_leads l WHERE l.staff_id = s.id AND l.status = 'Rejected') AS rejected_count
          FROM staff s
-         WHERE s.permissions IS NULL OR JSON_CONTAINS(s.permissions, '\"marketing_submit\"')
+         WHERE s.permissions IS NULL OR s.permissions = ''
+            OR (JSON_VALID(s.permissions) AND JSON_CONTAINS(s.permissions, '\"marketing_submit\"'))
          ORDER BY s.name"
     )->fetchAll();
 } else {
@@ -147,6 +173,7 @@ $token = csrf_token();
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/style.css?v=<?= @filemtime(__DIR__ . '/../assets/style.css') ?: '1' ?>">
+<?= ui_zoom_style() ?>
 </head>
 <body>
 <?= admin_header($staff, 'marketing.php') ?>
