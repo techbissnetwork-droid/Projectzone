@@ -121,11 +121,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute(['smtp_host', trim((string)($_POST['smtp_host'] ?? ''))]);
         $stmt->execute(['smtp_port', (string)max(1, (int)($_POST['smtp_port'] ?? 587))]);
         $stmt->execute(['smtp_user', trim((string)($_POST['smtp_user'] ?? ''))]);
-        $stmt->execute(['smtp_pass', (string)($_POST['smtp_pass'] ?? '')]);
+        // Only overwrite when a new password is actually typed. The field
+        // renders empty (see the Email tab) because it used to be printed
+        // into the page source on every Settings load, where view-source,
+        // the browser cache and any XSS could read the live mail credential.
+        $newSmtpPass = (string)($_POST['smtp_pass'] ?? '');
+        if ($newSmtpPass !== '') {
+            $stmt->execute(['smtp_pass', $newSmtpPass]);
+        } elseif (isset($_POST['clear_smtp_pass'])) {
+            $stmt->execute(['smtp_pass', '']);
+        }
         $smtpEncryption = in_array($_POST['smtp_encryption'] ?? '', ['tls', 'ssl', 'none'], true) ? $_POST['smtp_encryption'] : 'tls';
         $stmt->execute(['smtp_encryption', $smtpEncryption]);
         $stmt->execute(['smtp_from_email', trim((string)($_POST['smtp_from_email'] ?? ''))]);
         $stmt->execute(['smtp_from_name', trim((string)($_POST['smtp_from_name'] ?? ''))]);
+        $stmt->execute(['contact_notify_email', trim((string)($_POST['contact_notify_email'] ?? ''))]);
+        $stmt->execute(['payments_enabled', ($_POST['payments_enabled'] ?? 'off') === 'on' ? 'on' : 'off']);
 
         if (isset($_POST['remove_logo'])) {
             branding_remove('logo_path', '', 'logo');
@@ -170,6 +181,7 @@ $socialPath = $current['social_image_path'] ?? 'assets/social-default.png';
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/style.css?v=<?= @filemtime(__DIR__ . '/../assets/style.css') ?: '1' ?>">
+<?= ui_zoom_style() ?>
 <style>.settings-preview{ width:56px;height:56px;border-radius:14px;object-fit:contain;background:var(--surface-2);border:1px solid var(--border-soft);padding:6px; }</style>
 </head>
 <body>
@@ -204,7 +216,7 @@ $socialPath = $current['social_image_path'] ?? 'assets/social-default.png';
     <div class="tab-panel" id="panel-general">
     <div class="card admin-form-card" style="border:1.5px solid var(--accent-1);">
       <div class="card-head"><?= blob_icon('chart', 'sm', true) ?><h3>Site zoom</h3></div>
-      <p class="lede" style="margin-bottom:14px;">Shrinks or enlarges the whole site — public pages and this admin panel — for every visitor. Useful for fitting more on small screens.</p>
+      <p class="lede" style="margin-bottom:14px;">Shrinks or enlarges the whole site — public pages and this admin panel — for every visitor, on phones and desktops alike. Useful for fitting more on small screens.</p>
       <div class="flex gap-12" style="align-items:center;">
         <input type="range" min="50" max="150" step="5" name="ui_zoom" id="uiZoomRange" value="<?= (int)($current['ui_zoom'] ?? 100) ?>" style="flex:1;">
         <b id="uiZoomLabel" style="min-width:48px;text-align:right;font-size:1.1rem;"><?= (int)($current['ui_zoom'] ?? 100) ?>%</b>
@@ -371,7 +383,12 @@ $socialPath = $current['social_image_path'] ?? 'assets/social-default.png';
       </div>
       <div class="grid grid-2" style="gap:16px;">
         <div class="field"><label>Username</label><input name="smtp_user" value="<?= e($current['smtp_user'] ?? '') ?>" autocomplete="off"></div>
-        <div class="field"><label>Password</label><input type="password" name="smtp_pass" value="<?= e($current['smtp_pass'] ?? '') ?>" autocomplete="new-password"></div>
+        <div class="field"><label>Password</label>
+          <input type="password" name="smtp_pass" value="" autocomplete="new-password" placeholder="<?= ($current['smtp_pass'] ?? '') !== '' ? 'Saved — leave blank to keep it' : 'Not set' ?>">
+          <?php if (($current['smtp_pass'] ?? '') !== ''): ?>
+          <label class="flex items-center gap-8" style="font-size:.78rem;margin-top:6px;color:var(--ink-faint);"><input type="checkbox" name="clear_smtp_pass"> Clear the saved password</label>
+          <?php endif; ?>
+        </div>
       </div>
       <div class="grid grid-2" style="gap:16px;">
         <div class="field"><label>Encryption</label>
@@ -384,6 +401,21 @@ $socialPath = $current['social_image_path'] ?? 'assets/social-default.png';
         <div class="field"><label>From name</label><input name="smtp_from_name" value="<?= e($current['smtp_from_name'] ?? '') ?>" placeholder="<?= e($current['site_name'] ?? 'TECHBISS') ?>"></div>
       </div>
       <div class="field"><label>From email</label><input type="email" name="smtp_from_email" value="<?= e($current['smtp_from_email'] ?? '') ?>" placeholder="<?= e($current['contact_email'] ?? 'hello@techbiss.com') ?>"></div>
+    </div>
+    <div class="card admin-form-card">
+      <div class="card-head"><?= blob_icon('chat', 'sm', true) ?><h3>Contact form notifications</h3></div>
+      <p style="font-size:.85rem;color:var(--ink-faint);margin-bottom:14px;">Where to send an alert each time someone submits the contact form. Every enquiry is also kept at <a class="card-link" href="messages.php">Messages</a>. Leave blank to use the public contact email.</p>
+      <div class="field"><label>Notify this address</label><input type="email" name="contact_notify_email" value="<?= e($current['contact_notify_email'] ?? '') ?>" placeholder="<?= e($current['contact_email'] ?? 'hello@techbiss.com') ?>"></div>
+    </div>
+    <div class="card admin-form-card" style="border-color:var(--danger);">
+      <div class="card-head"><?= blob_icon('shield', 'sm', true) ?><h3 style="color:var(--danger);">Marketplace checkout</h3></div>
+      <p style="font-size:.85rem;color:var(--ink-faint);margin-bottom:14px;"><b>No payment processor is connected.</b> With checkout on, anyone who clicks "Confirm purchase" receives the product's download file without paying — there is nothing in the code that charges a card. Leave this off until a real processor is wired in; the buy button routes visitors to Contact instead.</p>
+      <div class="field"><label>Online checkout</label>
+        <select name="payments_enabled">
+          <option value="off" <?= ($current['payments_enabled'] ?? 'off') !== 'on' ? 'selected' : '' ?>>Off — send buyers to Contact (recommended)</option>
+          <option value="on" <?= ($current['payments_enabled'] ?? 'off') === 'on' ? 'selected' : '' ?>>On — hand out downloads without taking payment</option>
+        </select>
+      </div>
     </div>
     </div>
 
@@ -406,7 +438,8 @@ $socialPath = $current['social_image_path'] ?? 'assets/social-default.png';
 
   <div class="card admin-form-card" id="testEmailCard" hidden style="margin-top:22px;">
     <div class="card-head"><?= blob_icon('mail', 'sm', true) ?><h3>Send a test email</h3></div>
-    <p class="lede" style="margin-bottom:14px;">Save your SMTP settings above first, then send a test to confirm they work.</p>
+    <p class="lede" style="margin-bottom:14px;">Sends using the SMTP settings currently saved. If you've just edited them above, hit <b>Save settings</b> first — this form is separate, and anything unsaved up there won't be used.</p>
+    <p class="badge warning" style="margin-bottom:14px;"><?= ico('shield') ?> Unsaved changes in the form above are not included in this test.</p>
     <form method="post" class="flex gap-12" style="flex-wrap:wrap;align-items:flex-end;">
       <input type="hidden" name="action" value="test_email">
       <input type="hidden" name="csrf" value="<?= e($token) ?>">

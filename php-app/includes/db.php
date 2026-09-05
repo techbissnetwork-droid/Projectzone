@@ -4,23 +4,124 @@ require_once __DIR__ . '/mailer.php';
 define('CONFIG_PATH', __DIR__ . '/../config.php');
 define('INSTALL_LOCK_PATH', __DIR__ . '/../install.lock');
 
+// Sign-in code limits. Per-code attempts (5) bound one guess session; these
+// two bound the account overall, so requesting new codes can't be used to
+// buy unlimited guesses.
+const OTP_MAX_PER_HOUR = 6;
+const OTP_MAX_FAILURES_PER_HOUR = 12;
+
+// Staff login throttle: attempts allowed per email and per IP per window.
+const LOGIN_MAX_ATTEMPTS = 8;
+const LOGIN_WINDOW_SECONDS = 900;
+
 if (file_exists(CONFIG_PATH)) {
     require_once CONFIG_PATH;
+}
+
+function request_is_https(): bool
+{
+    if (!empty($_SERVER['HTTPS']) && strtolower((string)$_SERVER['HTTPS']) !== 'off') {
+        return true;
+    }
+    if (($_SERVER['SERVER_PORT'] ?? '') == 443) {
+        return true;
+    }
+    // Behind a load balancer / CDN the origin request is plain HTTP, so the
+    // scheme the visitor actually used only survives in this header.
+    return strtolower((string)($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '')) === 'https';
 }
 
 if (session_status() === PHP_SESSION_NONE) {
     session_set_cookie_params([
         'lifetime' => 0,
         'path' => '/',
+        // Only set Secure when the request really is HTTPS: setting it on a
+        // plain-HTTP dev server would make the browser drop the cookie and
+        // no one could stay signed in.
+        'secure' => request_is_https(),
         'httponly' => true,
         'samesite' => 'Lax',
     ]);
     session_start();
 }
 
+/**
+ * Sent from every entry point. Frame-blocking matters most for /admin/,
+ * but there is no page here that benefits from being embedded elsewhere.
+ * Set before any output so they survive on error paths too.
+ */
+function send_security_headers(): void
+{
+    if (headers_sent()) {
+        return;
+    }
+    header('X-Frame-Options: DENY');
+    header('X-Content-Type-Options: nosniff');
+    header('Referrer-Policy: strict-origin-when-cross-origin');
+    header('Cross-Origin-Opener-Policy: same-origin');
+    if (request_is_https()) {
+        header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
+    }
+}
+send_security_headers();
+
+/**
+ * True when the connected database already holds this application's own
+ * tables. This — not the presence of install.lock — is what "already
+ * installed" really means: install.lock is listed in .gitignore, so any
+ * deploy that pushes from git or re-uploads the repository arrives
+ * without it. Deriving installed-state from the file alone re-opened the
+ * installer (and its database-wiping branch) on live sites.
+ *
+ * Cached for the request; a false result is not cached, because the
+ * installer creates these tables mid-request and must see that happen.
+ */
+function db_has_app_tables(?PDO $pdo = null): bool
+{
+    static $found = false;
+    if ($found) {
+        return true;
+    }
+    try {
+        if ($pdo === null) {
+            if (!defined('DB_HOST')) {
+                return false;
+            }
+            // A short-lived connection of its own, rather than db(): db()
+            // exits the request with a JSON error when the database is
+            // unreachable, and this must be answerable with a plain false.
+            $pdo = new PDO(
+                'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8mb4',
+                DB_USER,
+                DB_PASS,
+                [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_TIMEOUT => 5]
+            );
+        }
+        // `staff` is created by the very first migration and is never
+        // dropped by an update, so its presence means a real install.
+        $found = (bool)$pdo->query("SHOW TABLES LIKE 'staff'")->fetch();
+    } catch (Throwable $e) {
+        return false;
+    }
+    return $found;
+}
+
 function is_installed(): bool
 {
-    return file_exists(CONFIG_PATH) && file_exists(INSTALL_LOCK_PATH) && defined('DB_HOST');
+    if (!file_exists(CONFIG_PATH) || !defined('DB_HOST')) {
+        return false;
+    }
+    if (file_exists(INSTALL_LOCK_PATH)) {
+        return true;
+    }
+    // Lock file missing but the schema is there: a redeploy dropped the
+    // file. Treat the site as installed and rewrite the lock rather than
+    // sending every visitor back into the installer.
+    if (db_has_app_tables()) {
+        @file_put_contents(INSTALL_LOCK_PATH, date('c'));
+        return true;
+    }
+    return false;
 }
 
 /**
@@ -65,9 +166,9 @@ function db(): PDO
     } catch (PDOException $e) {
         http_response_code(500);
         header('Content-Type: application/json');
-        echo json_encode(['error' => APP_DEBUG
+        echo json_encode(['error' => (defined('APP_DEBUG') && APP_DEBUG)
             ? ('Database connection failed: ' . $e->getMessage())
-            : 'Database connection failed. Check config.php and that schema.sql has been imported.']);
+            : 'Database connection failed. Check config.php and that the installer has been run.']);
         exit;
     }
     return $pdo;
@@ -109,12 +210,29 @@ function current_customer(): ?array
 function otp_issue(int $customerId, string $purpose, ?string $newEmail = null, int $ttlMinutes = 10): array
 {
     $pdo = db();
+
+    // Expired and spent codes are never read again; without this the table
+    // grows without bound and every verify scans more rows than the last.
+    $pdo->exec('DELETE FROM otp_codes WHERE expires_at < (NOW() - INTERVAL 1 DAY)');
+
     $recent = $pdo->prepare(
         'SELECT id FROM otp_codes WHERE customer_id = ? AND purpose = ? AND used_at IS NULL AND created_at > (NOW() - INTERVAL 60 SECOND)'
     );
     $recent->execute([$customerId, $purpose]);
     if ($recent->fetch()) {
         throw new RuntimeException('Please wait a moment before requesting another code.');
+    }
+
+    // Per-code attempt limits alone don't stop brute force: an attacker can
+    // simply request a fresh code every 60s and spend 5 more guesses on it,
+    // forever. Cap how many codes one account can be issued per hour so the
+    // guess rate is bounded overall, not just per code.
+    $burst = $pdo->prepare(
+        'SELECT COUNT(*) FROM otp_codes WHERE customer_id = ? AND created_at > (NOW() - INTERVAL 1 HOUR)'
+    );
+    $burst->execute([$customerId]);
+    if ((int)$burst->fetchColumn() >= OTP_MAX_PER_HOUR) {
+        throw new RuntimeException('Too many codes requested for this account. Please try again later.');
     }
     $code = str_pad((string)random_int(0, 999999), 6, '0', STR_PAD_LEFT);
     $token = bin2hex(random_bytes(32));
@@ -131,6 +249,18 @@ function otp_issue(int $customerId, string $purpose, ?string $newEmail = null, i
 function otp_verify_code(int $customerId, string $purpose, string $code): ?array
 {
     $pdo = db();
+
+    // A failed guess burns an attempt on whichever code is current; once an
+    // account has burned this many across all its recent codes, stop
+    // answering at all until they age out, so requesting a fresh code no
+    // longer buys a fresh allowance.
+    $recentFails = $pdo->prepare(
+        'SELECT COALESCE(SUM(attempts),0) FROM otp_codes WHERE customer_id = ? AND created_at > (NOW() - INTERVAL 1 HOUR)'
+    );
+    $recentFails->execute([$customerId]);
+    if ((int)$recentFails->fetchColumn() >= OTP_MAX_FAILURES_PER_HOUR) {
+        return null;
+    }
     $stmt = $pdo->prepare(
         "SELECT * FROM otp_codes WHERE customer_id = ? AND purpose = ? AND used_at IS NULL AND expires_at > NOW() ORDER BY id DESC LIMIT 1"
     );
@@ -160,6 +290,47 @@ function otp_verify_token(string $purpose, string $token): ?array
     }
     $pdo->prepare('UPDATE otp_codes SET used_at = NOW() WHERE id = ?')->execute([$row['id']]);
     return $row;
+}
+
+/**
+ * Fixed-window counter keyed on an arbitrary string, backed by a table so
+ * it survives across PHP workers (an in-process counter would reset on
+ * every request). Returns false once $limit is reached inside $window
+ * seconds. Fails open if the table is missing — a rate limiter must never
+ * be the reason a site stops working.
+ */
+function rate_limit_hit(string $key, int $limit, int $windowSeconds): bool
+{
+    try {
+        $pdo = db();
+        $pdo->prepare('DELETE FROM rate_limits WHERE window_start < (NOW() - INTERVAL ? SECOND)')
+            ->execute([$windowSeconds * 4]);
+
+        $hash = hash('sha256', $key);
+        $stmt = $pdo->prepare('SELECT hits, UNIX_TIMESTAMP(window_start) AS started FROM rate_limits WHERE id = ?');
+        $stmt->execute([$hash]);
+        $row = $stmt->fetch();
+
+        if (!$row || (time() - (int)$row['started']) >= $windowSeconds) {
+            $pdo->prepare(
+                'INSERT INTO rate_limits (id, hits, window_start) VALUES (?, 1, NOW())
+                 ON DUPLICATE KEY UPDATE hits = 1, window_start = NOW()'
+            )->execute([$hash]);
+            return true;
+        }
+        if ((int)$row['hits'] >= $limit) {
+            return false;
+        }
+        $pdo->prepare('UPDATE rate_limits SET hits = hits + 1 WHERE id = ?')->execute([$hash]);
+        return true;
+    } catch (Throwable $e) {
+        return true;
+    }
+}
+
+function client_ip(): string
+{
+    return (string)($_SERVER['REMOTE_ADDR'] ?? 'unknown');
 }
 
 function current_staff(): ?array
@@ -221,6 +392,17 @@ function staff_has_permission(array $staff, string $key): bool
     return $perms === null || in_array($key, $perms, true);
 }
 
+/**
+ * Only the owner may hand out access. Without this, the "staff" section
+ * was a superuser bit: anyone holding it could tick "Full access" on their
+ * own account and unlock every other section, or reset a colleague's
+ * password and sign in as them.
+ */
+function staff_is_owner(array $staff): bool
+{
+    return !empty($staff['is_owner']);
+}
+
 function require_staff_access(array $staff, string $page): void
 {
     if (!staff_can($staff, $page)) {
@@ -228,6 +410,52 @@ function require_staff_access(array $staff, string $page): void
         header('Location: index.php');
         exit;
     }
+}
+
+/**
+ * The JSON endpoints have no CSRF token of their own. SameSite=Lax on the
+ * session cookie already blocks the classic cross-site form post, but it
+ * is one setting and covers less than it looks (no protection if a browser
+ * defaults differently, none for same-site subdomains). Checking that the
+ * request actually came from this site is three lines and closes the gap.
+ *
+ * Requests with no Origin/Referer at all are allowed: same-origin GETs and
+ * some privacy tools omit both, and the callers here are all POSTs already
+ * gated on a session.
+ */
+function require_same_origin(): void
+{
+    $origin = (string)($_SERVER['HTTP_ORIGIN'] ?? '');
+    if ($origin === '' && !empty($_SERVER['HTTP_REFERER'])) {
+        $origin = (string)parse_url((string)$_SERVER['HTTP_REFERER'], PHP_URL_SCHEME)
+            . '://' . (string)parse_url((string)$_SERVER['HTTP_REFERER'], PHP_URL_HOST);
+        $port = parse_url((string)$_SERVER['HTTP_REFERER'], PHP_URL_PORT);
+        if ($port) {
+            $origin .= ':' . $port;
+        }
+    }
+    if ($origin === '') {
+        return;
+    }
+
+    $expected = [];
+    if (defined('SITE_URL')) {
+        $u = parse_url(SITE_URL);
+        if (!empty($u['host'])) {
+            $expected[] = ($u['scheme'] ?? 'https') . '://' . $u['host'] . (!empty($u['port']) ? ':' . $u['port'] : '');
+        }
+    }
+    if (!empty($_SERVER['HTTP_HOST'])) {
+        $scheme = request_is_https() ? 'https' : 'http';
+        $expected[] = $scheme . '://' . $_SERVER['HTTP_HOST'];
+    }
+
+    foreach ($expected as $candidate) {
+        if (strcasecmp($origin, $candidate) === 0) {
+            return;
+        }
+    }
+    send_json(['error' => 'Request blocked — it did not come from this site.'], 403);
 }
 
 function csrf_token(): string
@@ -307,6 +535,33 @@ function content_case_studies_rows(): array
     ], $rows);
 }
 
+/**
+ * Live client projects an admin has ticked "show in the public portfolio"
+ * on. Until now that checkbox wrote a column nothing ever read, so the
+ * toggle did nothing at all — /work showed only the hand-typed case
+ * studies. These are appended to those.
+ */
+function content_portfolio_rows(): array
+{
+    try {
+        $rows = db()->query(
+            "SELECT p.title, p.work_type, p.domain, b.name AS business_name, b.sector
+             FROM projects p JOIN businesses b ON b.id = p.business_id
+             WHERE p.portfolio_visible = 1 AND p.status = 'Live'
+             ORDER BY p.created_at DESC LIMIT 12"
+        )->fetchAll();
+    } catch (PDOException $e) {
+        return [];
+    }
+    return array_map(fn($r) => [
+        'client' => $r['business_name'],
+        'sector' => $r['sector'],
+        'title' => $r['title'],
+        'workType' => $r['work_type'],
+        'domain' => $r['domain'],
+    ], $rows);
+}
+
 function content_pricing_faqs_rows(): array
 {
     $rows = db()->query('SELECT question, answer FROM content_pricing_faqs ORDER BY sort_order ASC, id ASC')->fetchAll();
@@ -337,25 +592,36 @@ function logo_motion_attr(): string
 }
 
 /**
- * A single admin-set zoom level applied to every visitor, on both the
- * public site and the admin panel — lets an admin shrink the whole UI
- * so more fits on small screens without touching individual pages.
- * zoom (not transform:scale) is used specifically because it doesn't
- * break position:fixed headers/docks/modals the way scale would.
+ * The site-wide "Site zoom" setting.
+ *
+ * This used to be emitted only as a viewport `initial-scale`, which
+ * desktop browsers ignore entirely — so the slider did nothing on exactly
+ * the screens where fitting more on the page matters most. It is now
+ * applied on two axes that between them cover every visitor:
+ *
+ *  - ui_zoom_scale()  -> viewport initial-scale, the browser's own native
+ *                        zoom on mobile (it can't disagree with itself the
+ *                        way non-standard CSS `zoom` can).
+ *  - ui_zoom_style()  -> a root font-size percentage, which desktop
+ *                        browsers do honour. Every size in style.css that
+ *                        matters is in rem/em, so this scales the layout
+ *                        without breaking position:fixed the way
+ *                        transform:scale would.
  */
-/**
- * The site-wide "Site zoom" setting, as a viewport initial-scale value
- * (e.g. "1.30"). Deliberately NOT implemented with CSS `zoom` on <html>:
- * that's a non-standard property that some mobile browsers fail to
- * reconcile with their own pinch-zoom state on load, leaving the page
- * rendered too large until the visitor manually pinches back out.
- * initial-scale is the browser's own native zoom mechanism, so it
- * can't disagree with itself.
- */
+function ui_zoom_percent(): int
+{
+    return max(50, min(150, (int)get_setting('ui_zoom', '100')));
+}
+
 function ui_zoom_scale(): string
 {
-    $zoom = max(50, min(150, (int)get_setting('ui_zoom', '100')));
-    return number_format($zoom / 100, 2, '.', '');
+    return number_format(ui_zoom_percent() / 100, 2, '.', '');
+}
+
+function ui_zoom_style(): string
+{
+    $zoom = ui_zoom_percent();
+    return $zoom === 100 ? '' : '<style>:root{font-size:' . $zoom . '%;}</style>';
 }
 
 /**
@@ -394,9 +660,50 @@ function logo_wordmark_html(): string
     return '<b>' . e(get_setting('site_name', 'TECHBISS')) . '</b>';
 }
 
+/**
+ * businesses.last_activity_at used to be written once, on insert, and never
+ * again — while the admin list sorted by it under a "Last activity"
+ * heading. Call this wherever something real happens for a business.
+ */
+function touch_business_activity(int $businessId): void
+{
+    if ($businessId <= 0) {
+        return;
+    }
+    try {
+        db()->prepare('UPDATE businesses SET last_activity_at = NOW() WHERE id = ?')->execute([$businessId]);
+    } catch (Throwable $e) {
+        // Never let a timestamp update break the action that triggered it.
+    }
+}
+
 function flash(string $message, string $type = 'success'): void
 {
     $_SESSION['flash'] = ['message' => $message, 'type' => $type];
+}
+
+/**
+ * Every admin page answers a validation failure with flash() + redirect,
+ * which re-renders the form empty — losing a long product description or
+ * project note to a single mistyped email. Stash the submitted values so
+ * the redirected page can put them back.
+ */
+function flash_input(array $input): void
+{
+    unset($input['csrf'], $input['action'], $input['password']);
+    $_SESSION['flash_input'] = $input;
+}
+
+function old_input(string $key, $default = '')
+{
+    return $_SESSION['flash_input'][$key] ?? $default;
+}
+
+function take_old_input(): array
+{
+    $in = $_SESSION['flash_input'] ?? [];
+    unset($_SESSION['flash_input']);
+    return $in;
 }
 
 function get_flash(): ?array
@@ -412,6 +719,13 @@ function get_flash(): ?array
 function time_ago(string $datetime): string
 {
     $diff = time() - strtotime($datetime);
+    if ($diff < 0) {
+        $ahead = -$diff;
+        if ($ahead < 3600) return 'in ' . max(1, (int)floor($ahead / 60)) . ' min';
+        if ($ahead < 86400) return 'in ' . (int)floor($ahead / 3600) . ' hours';
+        $days = (int)floor($ahead / 86400);
+        return $days === 1 ? 'tomorrow' : 'in ' . $days . ' days';
+    }
     if ($diff < 60) return 'just now';
     if ($diff < 3600) return floor($diff / 60) . ' min ago';
     if ($diff < 86400) return floor($diff / 3600) . ' hours ago';

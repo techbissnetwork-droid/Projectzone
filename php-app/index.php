@@ -32,6 +32,7 @@ $siteSettings = [
     'privacyUpdatedAt' => get_setting('privacy_updated_at', ''),
     'termsConditions' => get_setting('terms_conditions', ''),
     'termsUpdatedAt' => get_setting('terms_updated_at', ''),
+    'paymentsEnabled' => get_setting('payments_enabled', 'off') === 'on',
     'splashEnabled' => get_setting('splash_enabled', 'on') !== 'off',
     'pageTransitionEnabled' => get_setting('page_transition_enabled', 'on') !== 'off',
     'defaultTheme' => get_setting('default_theme', 'auto'),
@@ -53,6 +54,7 @@ $contentSections = [
     'pricingFaq' => content_pricing_faqs_rows(),
     'team' => content_team_rows(),
     'values' => content_values_rows(),
+    'portfolio' => content_portfolio_rows(),
 ];
 
 $siteName = get_setting('site_name', 'TECHBISS');
@@ -74,6 +76,28 @@ $basePath = '';
 if ($baseUrl !== '') {
     $urlPath = (string)parse_url($baseUrl, PHP_URL_PATH);
     $basePath = rtrim($urlPath, '/');
+}
+
+/**
+ * Unknown paths used to render the homepage with HTTP 200, which is an
+ * unlimited supply of duplicate-content URLs for crawlers and a silent
+ * dead end for visitors. The router knows the same list; sending the
+ * status here is what search engines actually read.
+ */
+const KNOWN_ROUTES = [
+    '/', '/services', '/solutions', '/marketplace', '/work', '/process',
+    '/pricing', '/about', '/resources', '/contact', '/login', '/dashboard',
+    '/account', '/privacy', '/terms',
+];
+$requestPath = (string)parse_url((string)($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH);
+if ($basePath !== '' && str_starts_with($requestPath, $basePath)) {
+    $requestPath = substr($requestPath, strlen($basePath));
+}
+$requestPath = rtrim($requestPath, '/') ?: '/';
+$isKnownRoute = in_array($requestPath, KNOWN_ROUTES, true)
+    || str_starts_with($requestPath, '/marketplace/detail/');
+if (!$isKnownRoute) {
+    http_response_code(404);
 }
 ?>
 <!doctype html>
@@ -99,6 +123,7 @@ if ($baseUrl !== '') {
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="<?= e($basePath) ?>/assets/style.css?v=<?= @filemtime(__DIR__ . '/assets/style.css') ?: '1' ?>">
+<?= ui_zoom_style() ?>
 </head>
 <body>
 
@@ -161,9 +186,6 @@ if ($baseUrl !== '') {
 <div class="sheet-backdrop" id="sheetBackdrop"></div>
 <div class="mobile-sheet" id="mobileSheet">
   <div class="grabber"></div>
-  <button class="sheet-close" id="sheetCloseBtn" aria-label="Close menu">
-    <svg viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-  </button>
   <nav id="mobileNav" aria-label="Mobile"></nav>
 </div>
 
@@ -242,6 +264,7 @@ if ($baseUrl !== '') {
   var PRICING_FAQ_DATA = <?= json_encode($contentSections['pricingFaq'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>;
   var TEAM_DATA = <?= json_encode($contentSections['team'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>;
   var VALUES_DATA = <?= json_encode($contentSections['values'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>;
+  var PORTFOLIO_DATA = <?= json_encode($contentSections['portfolio'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>;
 </script>
 <script src="<?= e($basePath) ?>/assets/app.js?v=<?= @filemtime(__DIR__ . '/assets/app.js') ?: '1' ?>"></script>
 </body>

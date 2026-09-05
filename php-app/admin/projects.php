@@ -54,6 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $dates['domain_expires_at'], $dates['hosting_expires_at'], $dates['ssl_expires_at'], $dates['email_expires_at'],
                     $notes, $portfolioVisible, $id,
                 ]);
+                touch_business_activity($bizId);
                 flash('Project updated.');
             } else {
                 $stmt = $pdo->prepare(
@@ -72,6 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $pdo->prepare("UPDATE tickets SET project_id=?, status='Closed' WHERE id=? AND type='new_project'")
                         ->execute([$newProjectId, $fromTicket]);
                 }
+                touch_business_activity($bizId);
                 flash('Project added.');
             }
             $businessId = $bizId;
@@ -130,6 +132,7 @@ $token = csrf_token();
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/style.css?v=<?= @filemtime(__DIR__ . '/../assets/style.css') ?: '1' ?>">
+<?= ui_zoom_style() ?>
 <style>.expiry-chip{ display:inline-flex; align-items:center; gap:4px; padding:3px 9px; border-radius:var(--r-full); font-size:.74rem; font-weight:600; background:var(--surface-2); }
 .expiry-chip.soon{ background:rgba(217,154,43,.15); color:var(--warning); }
 .expiry-chip.overdue{ background:rgba(224,96,74,.15); color:var(--danger); }</style>

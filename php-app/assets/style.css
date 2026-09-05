@@ -15,9 +15,14 @@
   --hue-2:#ffb648;   /* amber — theme base color 2 */
   --accent-1: var(--hue-1);
   --accent-2: var(--hue-2);
+  /* Static fallbacks first: an engine without color-mix() (pre-2023) drops
+     the declaration that follows and would otherwise leave these unset,
+     silently rendering the accent gradient and soft focus ring as nothing. */
+  --accent-3: var(--hue-2);
   --accent-3: color-mix(in srgb, var(--hue-1) 50%, var(--hue-2) 50%);
 
   --grad: linear-gradient(135deg, var(--accent-1) 0%, var(--accent-3) 52%, var(--accent-2) 100%);
+  --grad-soft: linear-gradient(135deg, rgba(255,122,82,.15), rgba(255,182,72,.15));
   --grad-soft: linear-gradient(135deg, color-mix(in srgb, var(--hue-1) 15%, transparent), color-mix(in srgb, var(--hue-2) 15%, transparent));
   --grad-text: linear-gradient(120deg, var(--hue-1), var(--hue-2));
 
@@ -233,7 +238,7 @@ button{ cursor:pointer; }
 }
 .nav-link:hover, .nav-link.active{ color:var(--accent-1); }
 .nav-actions{ display:flex; align-items:center; gap:12px; flex:none; }
-@media (max-width:1360px){
+@media (max-width:1024px){
   .nav-links{ display:none; }
   #navLoginBtn{ display:none !important; }
   .nav-burger{ display:flex; }
@@ -285,15 +290,20 @@ button{ cursor:pointer; }
 }
 .mobile-sheet.open{ transform:translateY(0); }
 .mobile-sheet .grabber{ width:44px; height:5px; border-radius:var(--r-full); background:var(--border); margin:6px auto 18px; }
-.sheet-close{
-  position:absolute; top:14px; right:18px; width:34px; height:34px; border-radius:50%;
-  display:flex; align-items:center; justify-content:center;
-  border:1px solid var(--border-soft); background:var(--surface-2); color:var(--ink-soft);
-}
-.sheet-close svg{ width:16px; height:16px; }
-.sheet-close:hover{ border-color:var(--accent-1); color:var(--accent-1); }
-.mobile-sheet a{ display:flex; align-items:center; justify-content:space-between; padding:15px 6px; font-family:var(--font-display); font-weight:600; font-size:1.05rem; border-bottom:1px solid var(--border-soft); }
+.mobile-sheet a{ display:flex; align-items:center; gap:14px; padding:14px 6px; font-family:var(--font-display); font-weight:600; font-size:1.02rem; border-bottom:1px solid var(--border-soft); color:var(--ink); }
 .mobile-sheet a:last-of-type{ border-bottom:none; }
+/* Every row is icon + label + trailing arrow. The icon tile is a fixed
+   size so the labels line up in a column regardless of glyph width. */
+.mobile-sheet .sheet-ico{
+  width:34px; height:34px; flex:none; border-radius:11px;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--grad-soft); color:var(--accent-1);
+}
+.mobile-sheet .sheet-ico svg{ width:18px; height:18px; }
+.mobile-sheet .sheet-label{ flex:1; min-width:0; }
+.mobile-sheet .sheet-arrow{ flex:none; width:18px; height:18px; color:var(--ink-faint); }
+.mobile-sheet a.active{ color:var(--accent-1); }
+.mobile-sheet a.active .sheet-ico{ background:var(--grad); color:#fff2ea; }
 .sheet-backdrop{ position:fixed; left:0; right:0; top:0; bottom:var(--dock-h); z-index:590; background:rgba(30,20,10,.35); opacity:0; pointer-events:none; transition:opacity .35s ease; }
 .sheet-backdrop.open{ opacity:1; pointer-events:auto; }
 
@@ -303,7 +313,7 @@ button{ cursor:pointer; }
    the dock's 4 icons must stay visible and usable even while the sheet
    above it is open, never covered by it. This fallback only applies for
    the instant before that script runs. */
-:root{ --dock-h:64px; }
+:root{ --dock-h:64px; --fab-clear:0px; }
 .bottom-dock{
   position:fixed; z-index:520; left:0; right:0; bottom:0;
   display:flex; align-items:stretch; justify-content:space-around;
@@ -321,7 +331,7 @@ button{ cursor:pointer; }
 .dock-item:hover{ color:var(--accent-1); }
 .dock-item:hover svg{ transform:translateY(-2px); }
 .dock-item.active{ color:var(--accent-1); }
-@media (min-width:1361px){ .bottom-dock{ display:none; } }
+@media (min-width:1025px){ .bottom-dock{ display:none; } }
 .wa-float{
   position:fixed; right:20px; bottom:24px; z-index:510;
   width:54px; height:54px; border-radius:50%; display:flex; align-items:center; justify-content:center;
@@ -329,7 +339,17 @@ button{ cursor:pointer; }
 }
 .wa-float:hover{ transform:scale(1.08); }
 .wa-float svg{ width:26px; height:26px; }
-@media (max-width:1360px){ .wa-float{ bottom:calc(84px + env(safe-area-inset-bottom,0px)); } }
+/* Keep clear of the fixed bottom dock. --dock-h is its real measured
+   height (set by JS), so these don't drift when the dock's contents or the
+   device's safe-area inset change. --fab-clear is the same idea for the
+   floating WhatsApp button, and is 0px when no WhatsApp number is set.
+   The matching .footer rule lives immediately after the .footer base rule
+   further down, NOT here: .footer is re-declared at that point with a
+   `padding` shorthand, which would reset whatever padding-bottom this
+   block set. That is exactly what used to happen — the footer kept its
+   32px desktop padding on mobile, and the Privacy / Terms row ended up
+   underneath the dock, below the reachable scroll area. */
+@media (max-width:1024px){ .wa-float{ bottom:calc(var(--dock-h) + 20px + env(safe-area-inset-bottom,0px)); } }
 
 /* ============================= BLOB BACKGROUND LAYER ============================= */
 .blob-field{ position:fixed; inset:0; z-index:-1; overflow:hidden; pointer-events:none; }
@@ -410,6 +430,24 @@ button{ cursor:pointer; }
 .chip-1{ top:6%; left:-4%; animation-delay:0s; }
 .chip-2{ bottom:10%; right:-6%; animation-delay:1.4s; }
 .chip-3{ bottom:26%; left:2%; animation-delay:2.6s; }
+/* These decorative chips deliberately hang outside the hero art. Once the
+   hero is nearly the full viewport width that overhang becomes real page
+   overflow (body has overflow-x:hidden, so it showed up as clipped content
+   rather than a scrollbar) — so pull them back inside on smaller screens. */
+@media (max-width:900px){
+  .chip-1{ left:0; }
+  .chip-2{ right:0; }
+}
+
+/* Services list: icon beside the copy, stacking under it once there isn't
+   room for both. Was an inline `grid-template-columns:auto 1fr`, which a
+   media query cannot override — at 320px the text column was squeezed past
+   the viewport edge. */
+.service-row{ display:grid; grid-template-columns:auto 1fr; gap:22px; align-items:flex-start; }
+.service-row > div{ min-width:0; }
+@media (max-width:420px){
+  .service-row{ grid-template-columns:1fr; gap:16px; }
+}
 @keyframes floaty{ 0%,100%{ transform:translateY(0px); } 50%{ transform:translateY(-14px); } }
 
 /* trust strip */
@@ -528,32 +566,31 @@ tr:last-child td{ border-bottom:none; }
 .quote-blob cite{ font-style:normal; font-weight:700; }
 
 .footer{ background:var(--bg-alt-2); padding:70px 0 32px; border-top:1px solid var(--border-soft); }
-/* Must come after the shorthand `padding` above (same specificity, later
-   wins) — this was previously declared earlier in the file and got
-   silently overridden by that shorthand's `32px` bottom value, leaving
-   the footer's last line (Privacy Policy / Terms & Conditions) sitting
-   underneath the fixed bottom dock on every mobile width instead of
-   clearing it. */
-@media (max-width:1360px){ .footer{ padding-bottom:calc(var(--dock-h) + 12px); } }
-.footer-grid{ display:grid; grid-template-columns:1.4fr repeat(4,1fr); gap:32px; margin-bottom:50px; align-items:start; }
-.footer-grid > div{ margin:0; }
-@media (max-width:800px){
-  /* The brand block (logo/tagline/email badge) is much taller than the
-     link columns — sharing a row with any of them stretched that row's
-     height to match, leaving an ugly empty gap under the shorter column
-     before the next row even started. Giving it a full-width row of its
-     own, with Company/Platform/Get started/Legal as an even 2x2 grid
-     underneath, keeps every row's height driven by comparable content
-     instead. */
-  .footer-grid{ grid-template-columns:repeat(2,1fr); gap:20px; margin-bottom:28px; }
-  .footer-grid > div:first-child{ grid-column:1 / -1; margin-bottom:10px; }
+/* Must come after the shorthand above, or it is silently discarded. */
+@media (max-width:1024px){
+  /* Clear the dock *and* the floating action button: the last footer row
+     sits bottom-right, which is exactly where the FAB floats, so it used
+     to land on top of the Terms & Conditions link. */
+  .footer{ padding-bottom:calc(var(--dock-h) + var(--fab-clear) + 28px + env(safe-area-inset-bottom,0px)); }
 }
+@media (max-width:640px){
+  /* Stacked and left-aligned, so the links are never tucked into the
+     bottom-right corner under the FAB in the first place. */
+  .footer-bottom{ flex-direction:column; align-items:flex-start; gap:10px; }
+  .footer-bottom > .flex{ flex-wrap:wrap; }
+}
+.footer-grid{ display:grid; grid-template-columns:1.6fr repeat(4,1fr); gap:32px; margin-bottom:50px; align-items:start; }
+.footer-grid > div{ margin:0; }
+/* The brand block spans the full width once the link columns wrap, so the
+   four of them sit two-by-two underneath it rather than leaving a ragged
+   gap beside a tall paragraph. */
+@media (max-width:1024px){ .footer-grid{ grid-template-columns:repeat(4,1fr); gap:28px 24px; } .footer-grid > div:first-child{ grid-column:1 / -1; } }
+@media (max-width:800px){ .footer-grid{ grid-template-columns:1fr 1fr; } }
 .footer-grid h4{ font-size:.85rem; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-faint); margin-bottom:16px; }
 .footer-grid a{ display:block; padding:6px 0; color:var(--ink-soft); font-size:.92rem; }
 .footer-grid a:hover{ color:var(--accent-1); }
 .footer-grid a.logo{ display:flex; padding:0; }
 .footer-bottom{ display:flex; justify-content:space-between; align-items:center; padding-top:28px; border-top:1px solid var(--border-soft); flex-wrap:wrap; gap:12px; color:var(--ink-faint); font-size:.85rem; }
-@media (max-width:800px){ .footer-bottom{ padding-top:18px; } }
 .footer-bottom a{ color:var(--ink-faint); }
 .footer-bottom a:hover{ color:var(--accent-1); }
 
@@ -618,7 +655,7 @@ main{ display:block; }
 .admin-header-actions{ display:flex; align-items:center; gap:14px; flex:none; }
 .admin-who{ display:flex; flex-direction:column; line-height:1.25; font-size:.85rem; font-weight:600; text-align:right; }
 .admin-who small{ font-weight:500; font-size:.72rem; color:var(--ink-faint); }
-@media (max-width:1360px){
+@media (max-width:1024px){
   .admin-nav{ display:none; }
   .admin-who{ display:none; }
   .admin-header-actions .btn span{ display:none; }
@@ -644,11 +681,11 @@ main{ display:block; }
 .admin-page th, .admin-page td{ padding:11px 14px; font-size:.86rem; }
 .admin-page .btn{ padding:9px 18px; font-size:.86rem; }
 .admin-page .btn-sm{ padding:7px 14px; }
-@media (max-width:1360px){
-  .admin-page{ padding-bottom:calc(90px + env(safe-area-inset-bottom,0px)); }
+@media (max-width:1024px){
+  .admin-page{ padding-bottom:calc(var(--dock-h) + 30px + env(safe-area-inset-bottom,0px)); }
 }
 .admin-bottomnav{ display:none; }
-@media (max-width:1360px){ .admin-bottomnav{ display:flex; } }
+@media (max-width:1024px){ .admin-bottomnav{ display:flex; } }
 .dock-menu{ flex:1 1 0; position:relative; }
 .dock-menu > summary{
   flex:1 1 0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
@@ -671,12 +708,20 @@ main{ display:block; }
 }
 .dock-menu-panel .grabber{ width:44px; height:5px; border-radius:var(--r-full); background:var(--border); margin:10px auto 12px; }
 .dock-menu-link{
-  display:flex; align-items:center; gap:12px; padding:13px 16px; border-radius:12px;
-  font-family:var(--font-display); font-weight:600; font-size:.92rem; color:var(--ink-soft);
+  display:flex; align-items:center; gap:14px; padding:11px 12px; border-radius:14px;
+  font-family:var(--font-display); font-weight:600; font-size:.95rem; color:var(--ink);
 }
-.dock-menu-link svg{ width:19px; height:19px; flex:none; }
-.dock-menu-link:hover{ background:var(--surface-2); color:var(--ink); }
+.dock-menu-link .sheet-ico{
+  width:34px; height:34px; flex:none; border-radius:11px;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--grad-soft); color:var(--accent-1);
+}
+.dock-menu-link .sheet-ico svg{ width:18px; height:18px; }
+.dock-menu-link .sheet-label{ flex:1; min-width:0; }
+.dock-menu-link .sheet-arrow{ flex:none; width:18px; height:18px; color:var(--ink-faint); }
+.dock-menu-link:hover{ background:var(--surface-2); }
 .dock-menu-link.active{ background:var(--grad-soft); color:var(--accent-1); }
+.dock-menu-link.active .sheet-ico{ background:var(--grad); color:#fff2ea; }
 .admin-toolbar{ display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap; margin-bottom:24px; }
 .admin-form-card{ margin-bottom:24px; }
 .admin-actions-cell{ display:flex; gap:8px; justify-content:flex-end; }
@@ -688,6 +733,7 @@ main{ display:block; }
 }
 .icon-btn:hover{ border-color:var(--accent-1); color:var(--accent-1); }
 .icon-btn.danger:hover{ border-color:var(--danger); color:var(--danger); }
+.icon-btn[disabled]{ cursor:not-allowed; }
 .icon-btn svg{ width:15px; height:15px; }
 
 /* CSS-only tabs (admin Settings) — no JS on admin pages, so plain radio

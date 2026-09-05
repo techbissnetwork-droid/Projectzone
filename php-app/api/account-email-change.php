@@ -11,6 +11,7 @@ if (!$customer) {
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     send_json(['error' => 'Method not allowed'], 405);
 }
+require_same_origin();
 
 $body = json_body();
 $action = (string)($body['action'] ?? '');

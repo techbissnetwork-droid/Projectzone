@@ -1,13 +1,13 @@
 # Block direct access to files that ship with the app but should never be
-# fetchable over the web: schema.sql carries the seeded demo password
-# hashes and full table structure, README/dotfiles carry deployment
-# details, and none of them are read by the app at runtime.
-<FilesMatch "(^|/)(schema\.sql|README\.md|\.gitignore|\.gitattributes|composer\.(json|lock)|\.env.*)$">
+# fetchable over the web: README/dotfiles carry deployment details,
+# install.lock leaks the exact install time, and none of them are read by
+# the app over HTTP.
+<FilesMatch "(^|/)(schema\.sql|README\.md|install\.lock|\.gitignore|\.gitattributes|composer\.(json|lock)|\.env.*)$">
     Require all denied
 </FilesMatch>
 # Apache 2.2 fallback for the rule above.
 <IfModule !mod_authz_core.c>
-    <FilesMatch "(^|/)(schema\.sql|README\.md|\.gitignore|\.gitattributes|composer\.(json|lock)|\.env.*)$">
+    <FilesMatch "(^|/)(schema\.sql|README\.md|install\.lock|\.gitignore|\.gitattributes|composer\.(json|lock)|\.env.*)$">
         Order allow,deny
         Deny from all
     </FilesMatch>
@@ -16,6 +16,16 @@
 <FilesMatch "^\.(htaccess|git)">
     Require all denied
 </FilesMatch>
+
+# Security headers. PHP sends these too (includes/db.php), but static files
+# are served straight by Apache and never reach PHP.
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "DENY"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    # Uncomment once HTTPS is confirmed working on every hostname you serve:
+    # Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+</IfModule>
 
 # Clean URLs: TECHBISS is a single-page app served from index.php. Any
 # request that isn't an existing file or folder (assets/, admin/, install/,

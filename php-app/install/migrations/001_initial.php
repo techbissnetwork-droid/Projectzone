@@ -73,19 +73,24 @@ return function (PDO $pdo, array $context): void {
         `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
-    // --- Seed staff: the account you're creating right now, plus three
-    // illustrative teammates that share the SAME password you just chose
-    // (never a hardcoded default) so the admin panel looks populated.
-    // Rename/remove/change these freely once you're in.
+    // --- Seed staff: your account, and only your account.
+    // This used to also create Devon/Rhea/Jonah sharing the exact password
+    // you chose here, each with permissions = NULL, which means full access
+    // to every admin section. They were never disabled, and rotating your
+    // own password later left theirs untouched — three standing full-admin
+    // logins on a credential you may well have reused. Add teammates
+    // deliberately from Admin > Staff instead.
     if ((int)$pdo->query('SELECT COUNT(*) FROM staff')->fetchColumn() === 0) {
-        $hash = $context['admin_password_hash'];
         $stmt = $pdo->prepare(
             'INSERT INTO staff (name, email, password_hash, role, initials) VALUES (?, ?, ?, ?, ?)'
         );
-        $stmt->execute([$context['admin_name'], $context['admin_email'], $hash, $context['admin_role'] ?? 'Admin', $context['admin_initials'] ?? strtoupper(substr($context['admin_name'], 0, 2))]);
-        $stmt->execute(['Devon Kwan', 'devon@' . $context['email_domain'], $hash, 'Head of Engineering', 'DK']);
-        $stmt->execute(['Rhea Solano', 'rhea@' . $context['email_domain'], $hash, 'Head of Design', 'RS']);
-        $stmt->execute(['Jonah Traeger', 'jonah@' . $context['email_domain'], $hash, 'VP Client Success', 'JT']);
+        $stmt->execute([
+            $context['admin_name'],
+            $context['admin_email'],
+            $context['admin_password_hash'],
+            $context['admin_role'] ?? 'Admin',
+            $context['admin_initials'] ?? strtoupper(substr($context['admin_name'], 0, 2)),
+        ]);
     }
 
     if ((int)$pdo->query('SELECT COUNT(*) FROM businesses')->fetchColumn() === 0) {

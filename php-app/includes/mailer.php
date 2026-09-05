@@ -7,11 +7,28 @@
  * the app stays a single flat zip.
  */
 
+/** A newline in any of these becomes header or SMTP-command injection. */
+function mail_sanitize_header_value(string $value): string
+{
+    return trim(str_replace(["\r", "\n", "\0"], '', $value));
+}
+
 function send_mail(string $to, string $subject, string $bodyText): bool
 {
-    $host = trim(get_setting('smtp_host', ''));
-    $fromEmail = get_setting('smtp_from_email', '') ?: get_setting('contact_email', 'hello@techbiss.com');
-    $fromName = get_setting('smtp_from_name', '') ?: get_setting('site_name', 'TECHBISS');
+    $to = mail_sanitize_header_value($to);
+    if (!filter_var($to, FILTER_VALIDATE_EMAIL)) {
+        error_log('Refusing to send mail to an invalid address: ' . $to);
+        return false;
+    }
+    $subject = mail_sanitize_header_value($subject);
+
+    $host = mail_sanitize_header_value(trim(get_setting('smtp_host', '')));
+    $fromEmail = mail_sanitize_header_value(get_setting('smtp_from_email', '') ?: get_setting('contact_email', 'hello@techbiss.com'));
+    $fromName = mail_sanitize_header_value(get_setting('smtp_from_name', '') ?: get_setting('site_name', 'TECHBISS'));
+    if (!filter_var($fromEmail, FILTER_VALIDATE_EMAIL)) {
+        error_log('smtp_from_email / contact_email is not a valid address; mail not sent.');
+        return false;
+    }
 
     if ($host === '') {
         return mail_fallback($to, $subject, $bodyText, $fromEmail, $fromName);
@@ -33,8 +50,10 @@ function send_mail(string $to, string $subject, string $bodyText): bool
 function mail_fallback(string $to, string $subject, string $bodyText, string $fromEmail, string $fromName): bool
 {
     $headers = 'From: ' . mail_encode_header($fromName) . ' <' . $fromEmail . ">\r\n"
+        . 'Reply-To: <' . $fromEmail . ">\r\n"
+        . "MIME-Version: 1.0\r\n"
         . "Content-Type: text/plain; charset=UTF-8\r\n";
-    return @mail($to, mail_encode_header($subject), $bodyText, $headers);
+    return @mail($to, mail_encode_header($subject), str_replace(["\r\n", "\r"], "\n", $bodyText), $headers);
 }
 
 function mail_encode_header(string $text): string
@@ -86,14 +105,18 @@ function smtp_send(
     smtp_command($fp, 'DATA', 354);
 
     $date = date('r');
+    $domain = (defined('SITE_URL') ? parse_url(SITE_URL, PHP_URL_HOST) : null) ?: 'localhost';
     $message = "Date: $date\r\n"
         . 'From: ' . mail_encode_header($fromName) . " <$fromEmail>\r\n"
         . "To: <$to>\r\n"
+        . "Reply-To: <$fromEmail>\r\n"
+        . 'Message-ID: <' . bin2hex(random_bytes(12)) . '@' . $domain . ">\r\n"
         . 'Subject: ' . mail_encode_header($subject) . "\r\n"
         . "MIME-Version: 1.0\r\n"
         . "Content-Type: text/plain; charset=UTF-8\r\n"
+        . "Content-Transfer-Encoding: 8bit\r\n"
         . "\r\n"
-        . str_replace("\n.", "\n..", $bodyText)
+        . smtp_prepare_body($bodyText)
         . "\r\n.\r\n";
     fwrite($fp, $message);
     smtp_expect($fp, 250);
@@ -101,6 +124,24 @@ function smtp_send(
     smtp_command($fp, 'QUIT', 221);
     fclose($fp);
     return true;
+}
+
+/**
+ * RFC 5321 wants CRLF line endings, and a line that begins with "." must be
+ * escaped or it terminates the message early. The previous version wrote
+ * bare LF and only dot-stuffed "\n." — so it missed the "\r\n." case and
+ * left bodies to be normalised (or mangled) by whichever MTA received them.
+ */
+function smtp_prepare_body(string $body): string
+{
+    $body = str_replace(["\r\n", "\r"], "\n", $body);
+    $lines = explode("\n", $body);
+    foreach ($lines as $i => $line) {
+        if (isset($line[0]) && $line[0] === '.') {
+            $lines[$i] = '.' . $line;
+        }
+    }
+    return implode("\r\n", $lines);
 }
 
 function smtp_command($fp, string $line, $expect): void

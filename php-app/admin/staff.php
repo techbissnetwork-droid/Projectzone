@@ -31,8 +31,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header('Location: staff.php');
             exit;
         }
+
+        $isOwner = staff_is_owner($staff);
+        $editingSelf = $id > 0 && $id === (int)$staff['id'];
+
+        // Holding the "staff" section used to be a superuser bit: you could
+        // tick Full access on your own account and unlock every other
+        // section, or set a colleague's password and sign in as them.
+        // Granting access, and changing someone else's credentials, is now
+        // the owner's alone.
+        if (!$isOwner && $editingSelf) {
+            flash('You can\'t change your own access level. Ask the owner to do it.', 'error');
+            header('Location: staff.php');
+            exit;
+        }
+        if (!$isOwner && $id === 0) {
+            flash('Only the owner can create staff accounts.', 'error');
+            header('Location: staff.php');
+            exit;
+        }
+        if (!$isOwner && $password !== '') {
+            flash('Only the owner can set another staff member\'s password.', 'error');
+            header('Location: staff.php');
+            exit;
+        }
+
         if ($editingOwner) {
             $permissions = null;
+        } elseif (!$isOwner) {
+            // A non-owner may tidy up names and roles, but never widen or
+            // narrow what anyone can reach — keep whatever is stored.
+            $keep = $pdo->prepare('SELECT permissions FROM staff WHERE id = ?');
+            $keep->execute([$id]);
+            $permissions = $keep->fetchColumn();
+            $permissions = $permissions === false ? json_encode([]) : $permissions;
         } elseif (isset($_POST['full_access'])) {
             $permissions = null;
         } else {
@@ -41,11 +73,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (isset($_POST['perm_' . $key])) {
                     $selected[] = $key;
                 }
-            }
-            if ($id === (int)$staff['id']) {
-                // Never let someone remove their own access to this page.
-                $selected[] = 'staff';
-                $selected = array_values(array_unique($selected));
             }
             $permissions = json_encode($selected);
         }
@@ -78,6 +105,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     } elseif ($action === 'delete') {
         $id = (int)($_POST['id'] ?? 0);
+        if (!staff_is_owner($staff)) {
+            flash('Only the owner can remove staff accounts.', 'error');
+            header('Location: staff.php');
+            exit;
+        }
         $target = $pdo->prepare('SELECT is_owner FROM staff WHERE id = ?');
         $target->execute([$id]);
         $total = (int)$pdo->query('SELECT COUNT(*) FROM staff')->fetchColumn();
@@ -118,6 +150,7 @@ $token = csrf_token();
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/style.css?v=<?= @filemtime(__DIR__ . '/../assets/style.css') ?: '1' ?>">
+<?= ui_zoom_style() ?>
 </head>
 <body>
 <?= admin_header($staff, 'staff.php') ?>
@@ -125,8 +158,31 @@ $token = csrf_token();
   <?= admin_flash_html() ?>
   <div class="admin-toolbar">
     <div><h1 style="margin-bottom:4px;">Staff</h1><p class="lede" style="margin-bottom:0;">Who can sign in to this admin panel.</p></div>
-    <?php if (!$editing): ?><button class="btn btn-primary" type="button" id="addBtn" onclick="toggleAddForm('add')"><?= ico('plus') ?> Add a staff account</button><?php endif; ?>
+    <?php if (!$editing && staff_is_owner($staff)): ?><button class="btn btn-primary" type="button" id="addBtn" onclick="toggleAddForm('add')"><?= ico('plus') ?> Add a staff account</button><?php endif; ?>
   </div>
+
+  <?php
+  /* Older installs seeded three extra full-access teammates sharing the
+     owner's own password — the same hash string copied across all four
+     rows, so they are identifiable exactly. New installs no longer do this
+     (install/migrations/001_initial.php), but existing sites still carry
+     them, so say so plainly rather than silently leaving them live. */
+  $shared = $pdo->query(
+      'SELECT s.id, s.name, s.email FROM staff s
+       JOIN (SELECT password_hash FROM staff GROUP BY password_hash HAVING COUNT(*) > 1) d
+         ON d.password_hash = s.password_hash
+       WHERE s.is_owner = 0 ORDER BY s.id'
+  )->fetchAll();
+  ?>
+  <?php if ($shared): ?>
+  <div class="card" style="border-color:var(--danger);margin-bottom:22px;">
+    <div class="card-head"><?= blob_icon('shield', 'sm', true) ?><h3 style="color:var(--danger);">These accounts share a password with another account</h3></div>
+    <p style="font-size:.9rem;margin-bottom:10px;">Earlier versions of the installer created sample teammates using the same password you chose for yourself, each with full access to every section. Anyone who knows that one password can sign in as any of them, and changing your own password does not change theirs.</p>
+    <p style="font-size:.9rem;margin-bottom:0;"><b>Delete the ones you don't use, and set a fresh password on the ones you keep:</b>
+      <?= e(implode(', ', array_map(fn($r) => $r['name'] . ' (' . $r['email'] . ')', $shared))) ?>.
+    </p>
+  </div>
+  <?php endif; ?>
 
   <div class="card admin-form-card" id="addCard"<?= $editing ? '' : ' hidden' ?>>
     <div class="card-head"><?= blob_icon($editing ? 'edit' : 'plus', 'sm', true) ?><h3><?= $editing ? 'Edit staff account' : 'Add a staff account' ?></h3></div>
@@ -140,10 +196,16 @@ $token = csrf_token();
       </div>
       <div class="grid grid-2" style="gap:16px;">
         <div class="field"><label>Role / title</label><input name="role" value="<?= e($editing['role'] ?? '') ?>" placeholder="e.g. Head of Design"></div>
-        <div class="field"><label>Password <?= $editing ? '(leave blank to keep current)' : '' ?></label><input type="password" name="password" minlength="8" <?= $editing ? '' : 'required' ?>></div>
+        <?php if (staff_is_owner($staff) || ($editing && (int)$editing['id'] === (int)$staff['id'])): ?>
+        <div class="field"><label>Password <?= $editing ? '(leave blank to keep current)' : '' ?></label><input type="password" name="password" minlength="8" autocomplete="new-password" <?= $editing ? '' : 'required' ?>></div>
+        <?php else: ?>
+        <div class="field"><label>Password</label><input type="password" disabled placeholder="Owner only"></div>
+        <?php endif; ?>
       </div>
       <?php if ($editing && !empty($editing['is_owner'])): ?>
       <p class="badge" style="margin-bottom:14px;"><?= ico('shield') ?> Owner account — always has full access to every section.</p>
+      <?php elseif (!staff_is_owner($staff)): ?>
+      <p class="badge" style="margin-bottom:14px;"><?= ico('shield') ?> Only the owner can change access levels or passwords.</p>
       <?php else: ?>
       <?php $editingPerms = $editing ? staff_permissions($editing) : null; ?>
       <div class="field">
@@ -186,7 +248,7 @@ $token = csrf_token();
           <?php if (empty($s['is_owner']) || (int)$s['id'] === (int)$staff['id']): ?>
           <a class="icon-btn" href="staff.php?edit=<?= (int)$s['id'] ?>" aria-label="Edit"><?= ico('edit') ?></a>
           <?php endif; ?>
-          <?php if (empty($s['is_owner'])): ?>
+          <?php if (empty($s['is_owner']) && staff_is_owner($staff)): ?>
           <form method="post" onsubmit="return confirm('Remove <?= e(addslashes($s['name'])) ?>? Their open tickets will become unassigned.');">
             <input type="hidden" name="action" value="delete">
             <input type="hidden" name="csrf" value="<?= e($token) ?>">

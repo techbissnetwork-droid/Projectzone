@@ -15,6 +15,8 @@ $canBusinesses = staff_can($staff, 'businesses.php');
 $canProducts = staff_can($staff, 'products.php');
 $canTickets = staff_can($staff, 'tickets.php');
 $canStaff = staff_can($staff, 'staff.php');
+$canMessages = staff_can($staff, 'messages.php');
+$canOrders = staff_can($staff, 'orders.php');
 
 $totalUsers = $canUsers ? (int)$pdo->query('SELECT COUNT(*) c FROM customers')->fetch()['c'] : 0;
 $businessCount = $canBusinesses ? (int)$pdo->query('SELECT COUNT(*) c FROM businesses')->fetch()['c'] : 0;
@@ -22,6 +24,8 @@ $mrrCents = $canBusinesses ? (int)$pdo->query("SELECT COALESCE(SUM(price_cents),
 $productCount = $canProducts ? (int)$pdo->query('SELECT COUNT(*) c FROM products')->fetch()['c'] : 0;
 $totalTickets = $canTickets ? (int)$pdo->query('SELECT COUNT(*) c FROM tickets')->fetch()['c'] : 0;
 $openTickets = $canTickets ? (int)$pdo->query("SELECT COUNT(*) c FROM tickets WHERE status != 'Closed'")->fetch()['c'] : 0;
+$openMessages = $canMessages ? (int)$pdo->query('SELECT COUNT(*) c FROM contact_messages WHERE handled_at IS NULL')->fetch()['c'] : 0;
+$orderCount = $canOrders ? (int)$pdo->query('SELECT COUNT(*) c FROM product_orders')->fetch()['c'] : 0;
 
 $EXPIRY_FIELDS = ['domain_expires_at' => 'Domain', 'hosting_expires_at' => 'Hosting', 'ssl_expires_at' => 'SSL', 'email_expires_at' => 'Email'];
 $renewals = [];
@@ -63,6 +67,7 @@ if ($canBusinesses) {
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/style.css?v=<?= @filemtime(__DIR__ . '/../assets/style.css') ?: '1' ?>">
+<?= ui_zoom_style() ?>
 </head>
 <body>
 <?= admin_header($staff, 'index.php') ?>
@@ -72,7 +77,7 @@ if ($canBusinesses) {
   <h1 style="max-width:22ch;margin-bottom:6px;">Every client, every ticket, one screen.</h1>
   <p class="lede" style="margin-bottom:28px;">All figures below are live from the database.</p>
 
-  <?php if (!$canUsers && !$canBusinesses && !$canProducts && !$canTickets && !$canStaff): ?>
+  <?php if (!$canUsers && !$canBusinesses && !$canProducts && !$canTickets && !$canStaff && !$canMessages && !$canOrders): ?>
   <div class="card" style="text-align:center;padding:36px 24px;"><?= blob_icon('shield', 'lg') ?><h3 style="margin:14px 0 4px;">Nothing to show here yet</h3><p class="lede" style="margin-bottom:0;">You don't have access to any of this dashboard's sections. Ask an admin to grant you a section from Staff &amp; permissions.</p></div>
   <?php endif; ?>
 
@@ -86,6 +91,12 @@ if ($canBusinesses) {
     <?php endif; ?>
     <?php if ($canProducts): ?>
     <a class="card tilt" href="products.php" style="display:block;color:inherit;"><div class="stat-row"><?= blob_icon('star', 'sm', true) ?><span class="label">Marketplace products live</span></div><div class="stat"><div class="num"><?= number_format($productCount) ?></div></div></a>
+    <?php endif; ?>
+    <?php if ($canMessages): ?>
+    <a class="card tilt" href="messages.php" style="display:block;color:inherit;"><div class="stat-row"><?= blob_icon('mail', 'sm', true) ?><span class="label">Enquiries needing a reply</span></div><div class="stat"><div class="num"><?= number_format($openMessages) ?></div></div></a>
+    <?php endif; ?>
+    <?php if ($canOrders): ?>
+    <a class="card tilt" href="orders.php" style="display:block;color:inherit;"><div class="stat-row"><?= blob_icon('star', 'sm', true) ?><span class="label">Marketplace orders</span></div><div class="stat"><div class="num"><?= number_format($orderCount) ?></div></div></a>
     <?php endif; ?>
     <?php if ($canTickets): ?>
     <a class="card tilt" href="tickets.php" style="display:block;color:inherit;"><div class="stat-row"><?= blob_icon('chat', 'sm', true) ?><span class="label">Total tickets</span></div><div class="stat"><div class="num"><?= number_format($totalTickets) ?></div></div></a>

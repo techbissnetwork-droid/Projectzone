@@ -6,6 +6,7 @@ require_installed_api();
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     send_json(['error' => 'Method not allowed'], 405);
 }
+require_same_origin();
 
 $customer = current_customer();
 if (!$customer) {
@@ -46,5 +47,6 @@ $stmt = $pdo->prepare(
     "INSERT INTO tickets (business_id, project_id, title, description, type, priority, status) VALUES (?, ?, ?, ?, 'project_task', ?, ?)"
 );
 $stmt->execute([$project['business_id'], $projectId, $ticketTitle, $description !== '' ? $description : null, 'Normal', 'Open']);
+touch_business_activity((int)$project['business_id']);
 
 send_json(['ok' => true]);

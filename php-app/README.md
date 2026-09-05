@@ -13,13 +13,12 @@ a genuinely access-controlled staff admin panel.
 - The contact form — saves every submission to `contact_messages`.
 - The Resources page newsletter signup — saves to `newsletter_subscribers`
   (previously faked a "you're on the list" success without saving anything).
-- Customer sign up / log in / log out — real accounts in `customers`,
-  hashed passwords (`password_hash`/`password_verify`), PHP sessions.
-- `/dashboard` (hash route `#/dashboard`) requires a signed-in customer —
-  it redirects to `#/login` otherwise. The dashboard content itself is
-  still the same illustrative "preview" shown to every signed-in customer
-  (it isn't wired to per-business real data yet — see "Natural next
-  steps" below).
+- Customer log in / log out — real accounts in `customers`. Customers have
+  no password: they sign in with a six-digit code emailed to them, or the
+  magic link in the same email (`otp_codes`, see migration 019).
+- `/dashboard` requires a signed-in customer and redirects to `/login`
+  otherwise. It shows that customer's own businesses, projects, renewal
+  dates and marketplace orders, pulled live from the database.
 - The **staff admin panel** at `/admin/` is a completely separate app from
   the public SPA, with its own header (logo, section nav, signed-in-as,
   log out) and its own bottom nav on mobile — not linked from the public
@@ -32,6 +31,12 @@ a genuinely access-controlled staff admin panel.
   - **Staff** — add, edit, delete staff accounts (a delete is blocked if
     it would remove the last remaining account, so you can't lock
     yourself out).
+  - **Messages** — every contact-form enquiry, with a "needs a reply"
+    queue. Staff are also emailed on each new submission (configure the
+    address in Settings > Email).
+  - **Orders** — marketplace orders, who bought what, and a one-click
+    re-issue for an expired download link; plus the newsletter list with
+    a CSV export.
   - **Settings** — edit the homepage headline/subheading, footer
     tagline, contact email/phone, SEO title/meta description, the
     social-share image, the logo, the favicon, and the default light/dark
@@ -48,19 +53,21 @@ a genuinely access-controlled staff admin panel.
   below.
 
 **Not implemented (flagged, not silently faked):**
-- No payment processor — the marketplace "buy" flow does not charge
-  anyone, for either monthly or one-time-priced products (see Products
-  in the admin panel — each product has a Monthly/Fixed pricing type,
-  which only controls the "/mo" label, not actual billing). Wire
-  Stripe/PayPal into a new `api/checkout.php` before accepting real orders.
-- No outbound email — the contact form saves to the database but does not
-  send a notification email. Add `mail()`/PHPMailer/a transactional email
-  API in `api/contact.php` if you want that.
-- The "Continue with SSO" button on the login page is a disabled
-  "coming soon" placeholder (grayed out, can't be clicked) rather than a
-  live no-op — wire real OAuth into it once you have a provider set up.
-- The customer dashboard shows the same illustrative content to every
-  customer rather than that customer's real projects — see below.
+- **No payment processor.** The marketplace "buy" flow does not charge
+  anyone. Because a live checkout that takes no money simply hands the
+  paid file to whoever clicks, it now ships **disabled**: `payments_enabled`
+  defaults to `off`, `api/purchase.php` refuses with a 503, and the product
+  page routes buyers to Contact instead. The switch is in
+  Settings > Email &amp; checkout if you want the old behaviour knowingly.
+  To take real money, wire Stripe Checkout into a new `api/checkout.php`
+  and insert `product_orders` only from a verified
+  `payment_intent.succeeded` webhook — never from a browser request.
+- The Resources page's article list is placeholder content hardcoded in
+  `assets/app.js`; the articles don't exist and aren't editable from
+  Admin > Content.
+- The Process page's five stages, and the Solutions page's "Pick your
+  path" timelines, are likewise hardcoded (the prices in that table are
+  editable settings; the timelines beside them are not).
 
 ## Requirements
 
@@ -95,15 +102,15 @@ a genuinely access-controlled staff admin panel.
    - Ask for your database host/name/username/password, test the
      connection, and write `config.php` for you.
    - Ask you to create your own admin account (name, email, password) —
-     this becomes your real `/admin/` login. A few illustrative
-     teammates (Devon, Rhea, Jonah) are added alongside you sharing that
-     same password, purely so the admin panel isn't empty on day one;
-     rename, repurpose or delete them once you're in.
+     this becomes your real `/admin/` login, and it is the **only**
+     account created. (Earlier versions also seeded three sample
+     teammates sharing your password, each with full access to every
+     section. They no longer are; if you installed an older version,
+     Admin > Staff now flags any account still sharing a password.)
 4. Once it says "You're live", the public site and `/admin/` both work
-   immediately. You can delete the `install/` folder for tidiness — it
-   isn't required for security, since the installer permanently refuses
-   to reconfigure the database or create another admin account once a
-   site is installed (see "How the installer protects itself" below).
+   immediately. Deleting the `install/` folder afterwards is still worth
+   doing, and there's a one-click button for it in `/install/` once you're
+   signed in (see "How the installer protects itself" below).
 
 **Re-running `/install/` later** (e.g. after uploading a future update
 that adds a new `install/migrations/*.php` file) detects it's already
@@ -112,47 +119,45 @@ touches your existing data or asks for database credentials again.
 
 ### How the installer protects itself
 
-The moment install finishes, it writes `install.lock`. From then on,
-`/install/`:
+"Already installed" is determined by whether the database holds the app's
+own tables — **not** by the `install.lock` file alone. That matters:
+`install.lock` is listed in `.gitignore`, so a deploy that pushes from git
+or re-uploads the repo arrives without it, and gating on the file alone
+used to re-open the installer (including its database-wiping branch) on a
+live site, to anyone who visited. The lock file is still written, and
+rewritten automatically if a deploy drops it, but it is a cache of the
+answer rather than the answer itself.
+
+Once the database has data, `/install/`:
 - Will never show the database-credentials form again (so a leftover
   `install/` folder can't be used to repoint a live site at a different
   database).
 - Will never show the "create admin account" form again (so it can't be
   used to mint a new admin login on a site that already has one).
+- Refuses to wipe the database at all from an anonymous session.
 - Only remaining action is "run pending migrations" — safe, additive,
   and using the same `CREATE TABLE IF NOT EXISTS` / count-before-seed
-  pattern as the initial install, so it never drops or duplicates data.
+  pattern as the initial install, so it never drops or duplicates data —
+  and it requires a signed-in staff session.
 
 ## Manual setup (alternative, if you'd rather not use the web installer)
 
-1. Create a database and import `schema.sql` via phpMyAdmin's Import tab
-   — this creates every table and seeds sample data directly.
+There is no `schema.sql` in this package — the schema lives in
+`install/migrations/`, which is the only place it is maintained. To set up
+without the web UI:
+
+1. Create an empty database.
 2. Copy `config.sample.php` to `config.php` and fill in your database
    host/name/username/password (and `SITE_URL`).
-3. Manually create an empty `install.lock` file next to `config.php` (any
-   content, e.g. just today's date) — this tells the app setup is
-   complete, matching what the web installer would have written.
-4. Upload everything to your host as in step 2 above.
+3. Upload everything to your host, then visit `/install/` once and complete
+   the "create your admin account" step. That runs every migration in order
+   and writes `install.lock` for you.
 
-With this path, the seed staff logins all share one starter password:
+Running the migrations by hand is possible (each file returns a
+`function(PDO $pdo, array $context)`), but `001_initial.php` needs an
+`admin_password_hash` in `$context`, so the installer is much the easier
+path.
 
-| Email | Role |
-|---|---|
-| mara@techbiss.com | Founder & CEO |
-| devon@techbiss.com | Head of Engineering |
-| rhea@techbiss.com | Head of Design |
-| admin@techbiss.com | VP Client Success |
-
-**Password for all four:** `techbiss-admin-2026` — **change this before
-putting the site anywhere public.** Generate a new hash and update each
-row's `password_hash` in phpMyAdmin:
-
-```php
-<?php echo password_hash('your-new-password', PASSWORD_DEFAULT);
-```
-
-(This is exactly the problem the web installer avoids — with it, you pick
-your own password at setup time and no shared default ever exists.)
 
 ## Site settings
 
@@ -268,5 +273,8 @@ assets/brand/*-source.svg             Source vector art for the default logo/soc
 assets/favicon.ico, apple-touch-icon.png, social-default.png  Default brand assets, generated from assets/brand/
 assets/uploads/                       Staff-uploaded logo/favicon/social image land here (gitignored, created on first upload)
 config.sample.php                     Template — the installer writes the real config.php for you
-schema.sql                            Manual-setup alternative to the installer (see "Manual setup" above)
+install/migrations/033_security_hardening.php  Rate limiting, download expiry, FK fixes, checkout kill-switch
+admin/messages.php                    Contact-form enquiries (with a "needs a reply" queue)
+admin/orders.php                      Marketplace orders + newsletter list and CSV export
+assets/uploads/.htaccess              Blocks script execution in the upload directory
 ```

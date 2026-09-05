@@ -6,11 +6,19 @@ require_installed_api();
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     send_json(['error' => 'Method not allowed'], 405);
 }
+require_same_origin();
 
 $body = json_body();
 $email = trim(strtolower((string)($body['email'] ?? '')));
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     send_json(['error' => 'Enter a valid email address.'], 400);
+}
+
+// otp_issue() caps codes per account; this caps one source address
+// sweeping many accounts, and stops the endpoint being used to send mail
+// on someone else's behalf at volume.
+if (!rate_limit_hit('otp:ip:' . client_ip(), 15, 3600)) {
+    send_json(['error' => 'Too many requests. Please wait a few minutes and try again.'], 429);
 }
 
 $stmt = db()->prepare('SELECT id, name FROM customers WHERE email = ?');
