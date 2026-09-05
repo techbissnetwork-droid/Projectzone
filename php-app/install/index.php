@@ -406,16 +406,18 @@ body{ min-height:100vh; padding:40px 20px; }
       </form>
     </div>
 
-    <div class="card" style="border-color:var(--danger);">
-      <h3 style="margin-bottom:6px;color:var(--danger);">Option B — Fresh install</h3>
-      <p style="font-size:.85rem;color:var(--ink-faint);margin-bottom:14px;">Permanently deletes every table in this database, then sends you to step 1 to create a brand new admin account from scratch. This cannot be undone — if this data matters, back it up first.</p>
-      <?php if ($formError && ($_POST['action'] ?? '') === 'fresh_install_existing'): ?><p class="badge danger" style="margin-bottom:14px;"><?= e($formError) ?></p><?php endif; ?>
-      <form method="post" onsubmit="return confirm('Really delete everything in this database? This cannot be undone.');">
-        <input type="hidden" name="action" value="fresh_install_existing">
-        <input type="hidden" name="csrf" value="<?= e($token) ?>">
-        <div class="field"><label>Type <code>DELETE EVERYTHING</code> to confirm</label><input name="confirm_text" placeholder="DELETE EVERYTHING" required></div>
-        <button class="btn btn-block" style="background:var(--danger);color:#fff;" type="submit">Wipe database &amp; start fresh</button>
-      </form>
+    <div class="card">
+      <details<?php if ($formError && ($_POST['action'] ?? '') === 'fresh_install_existing'): ?> open<?php endif; ?>>
+        <summary style="cursor:pointer;color:var(--danger);font-weight:600;">Option B — Fresh install (wipes this database)</summary>
+        <p style="font-size:.85rem;color:var(--ink-faint);margin:14px 0;">Permanently deletes every table in this database, then sends you to step 1 to create a brand new admin account from scratch. This cannot be undone — if this data matters, back it up first.</p>
+        <?php if ($formError && ($_POST['action'] ?? '') === 'fresh_install_existing'): ?><p class="badge danger" style="margin-bottom:14px;"><?= e($formError) ?></p><?php endif; ?>
+        <form method="post" onsubmit="return confirm('Really delete everything in this database? This cannot be undone.');">
+          <input type="hidden" name="action" value="fresh_install_existing">
+          <input type="hidden" name="csrf" value="<?= e($token) ?>">
+          <div class="field"><label>Type <code>DELETE EVERYTHING</code> to confirm</label><input name="confirm_text" placeholder="DELETE EVERYTHING" required></div>
+          <button class="btn btn-block" style="background:var(--danger);color:#fff;" type="submit">Wipe database &amp; start fresh</button>
+        </form>
+      </details>
     </div>
 
   <?php elseif ($view === 'pending_locked'): ?>
