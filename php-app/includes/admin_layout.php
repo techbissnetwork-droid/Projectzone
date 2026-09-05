@@ -115,7 +115,9 @@ function admin_bottomnav(array $staff, string $active): string
         . '(function(){var d=document.querySelector(".bottom-dock .dock-menu");if(!d)return;var s=d.querySelector("summary"),icon=s.querySelector("svg"),label=s.querySelector("span");'
         . 'var menuIcon=' . json_encode($menuIconHtml) . ',closeIcon=' . json_encode($closeIconHtml) . ';'
         . 'd.addEventListener("toggle",function(){icon.outerHTML=d.open?closeIcon:menuIcon;icon=s.querySelector("svg");label.textContent=d.open?"Close":"Menu";document.body.style.overflow=d.open?"hidden":"";});'
-        . '})();</script>';
+        . '})();'
+        . '(function(){var dock=document.querySelector(".bottom-dock");if(!dock)return;function sync(){document.documentElement.style.setProperty("--dock-h",dock.getBoundingClientRect().height+"px");}sync();window.addEventListener("resize",sync);})();'
+        . '</script>';
 }
 
 function admin_flash_html(): string

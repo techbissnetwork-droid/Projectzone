@@ -273,11 +273,15 @@ button{ cursor:pointer; }
 
 /* ============================= COLOR THEME PICKER ============================= */
 .mobile-sheet{
-  position:fixed; inset:auto 0 0 0; z-index:600; background:var(--surface);
+  position:fixed; left:0; right:0; bottom:var(--dock-h); z-index:600; background:var(--surface);
   border-radius:32px 32px 0 0; box-shadow:0 -20px 60px -20px rgba(0,0,0,.3);
-  padding:14px 22px calc(28px + env(safe-area-inset-bottom, 0px));
-  max-height:80vh; overflow-y:auto;
-  transform:translateY(105%); transition:transform .45s cubic-bezier(.32,.9,.4,1);
+  padding:14px 22px 24px;
+  max-height:calc(80vh - var(--dock-h)); overflow-y:auto;
+  /* Sits just above the dock (bottom:var(--dock-h)), so closing it needs to
+     clear its own full height PLUS the dock's height — otherwise this
+     translate would land the closed sheet overlapping the dock instead of
+     off-screen below it, silently eating clicks meant for the dock. */
+  transform:translateY(calc(100% + var(--dock-h) + 20px)); transition:transform .45s cubic-bezier(.32,.9,.4,1);
 }
 .mobile-sheet.open{ transform:translateY(0); }
 .mobile-sheet .grabber{ width:44px; height:5px; border-radius:var(--r-full); background:var(--border); margin:6px auto 18px; }
@@ -290,9 +294,16 @@ button{ cursor:pointer; }
 .sheet-close:hover{ border-color:var(--accent-1); color:var(--accent-1); }
 .mobile-sheet a{ display:flex; align-items:center; justify-content:space-between; padding:15px 6px; font-family:var(--font-display); font-weight:600; font-size:1.05rem; border-bottom:1px solid var(--border-soft); }
 .mobile-sheet a:last-of-type{ border-bottom:none; }
-.sheet-backdrop{ position:fixed; inset:0; z-index:590; background:rgba(30,20,10,.35); opacity:0; pointer-events:none; transition:opacity .35s ease; }
+.sheet-backdrop{ position:fixed; left:0; right:0; top:0; bottom:var(--dock-h); z-index:590; background:rgba(30,20,10,.35); opacity:0; pointer-events:none; transition:opacity .35s ease; }
 .sheet-backdrop.open{ opacity:1; pointer-events:auto; }
 
+/* --dock-h is the dock's real rendered height, measured and set by JS
+   (see the dock-height script in app.js / admin_layout.php) so
+   .mobile-sheet and .sheet-backdrop can stop exactly at its top edge —
+   the dock's 4 icons must stay visible and usable even while the sheet
+   above it is open, never covered by it. This fallback only applies for
+   the instant before that script runs. */
+:root{ --dock-h:64px; }
 .bottom-dock{
   position:fixed; z-index:520; left:0; right:0; bottom:0;
   display:flex; align-items:stretch; justify-content:space-around;
@@ -634,12 +645,12 @@ main{ display:block; }
 .dock-menu[open] > summary{ color:var(--accent-1); }
 .dock-menu-backdrop{ display:none; }
 .dock-menu[open] .dock-menu-backdrop{
-  display:block; position:fixed; inset:0; z-index:600; background:rgba(30,20,10,.35);
+  display:block; position:fixed; left:0; right:0; top:0; bottom:var(--dock-h); z-index:600; background:rgba(30,20,10,.35);
 }
 .dock-menu-panel{
-  position:fixed; left:0; right:0; bottom:0; z-index:601; max-height:75vh; overflow-y:auto;
+  position:fixed; left:0; right:0; bottom:var(--dock-h); z-index:601; max-height:calc(75vh - var(--dock-h)); overflow-y:auto;
   background:var(--surface); border:1px solid var(--border-soft); border-bottom:none; border-radius:22px 22px 0 0;
-  box-shadow:var(--shadow-lg); padding:6px 16px calc(16px + env(safe-area-inset-bottom,0px)); display:flex; flex-direction:column; gap:3px;
+  box-shadow:var(--shadow-lg); padding:6px 16px 16px; display:flex; flex-direction:column; gap:3px;
 }
 .dock-menu-panel .grabber{ width:44px; height:5px; border-radius:var(--r-full); background:var(--border); margin:10px auto 12px; }
 .dock-menu-link{

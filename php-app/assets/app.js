@@ -267,6 +267,18 @@ mobileNav.addEventListener('click', function(){ openSheet(false); });
 var sheetCloseBtn = $('#sheetCloseBtn');
 if(sheetCloseBtn) sheetCloseBtn.addEventListener('click', function(){ openSheet(false); });
 
+/* The bottom dock's 4 icons must stay visible and usable at all times,
+   even while the menu sheet above it is open — so the sheet and its
+   backdrop stop exactly at the dock's top edge (--dock-h), measured here
+   instead of guessed, since the dock's real height depends on the
+   device's safe-area inset. */
+var bottomDock = $('.bottom-dock');
+function syncDockHeight(){
+  if(bottomDock) document.documentElement.style.setProperty('--dock-h', bottomDock.getBoundingClientRect().height+'px');
+}
+syncDockHeight();
+window.addEventListener('resize', syncDockHeight);
+
 /* ===================================================================
    6. 3D TILT + MAGNETIC
 =================================================================== */
