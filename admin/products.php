@@ -117,60 +117,134 @@ function product_file_upload(string $productId, ?string &$error): ?string
  * stored under a distinct "-img" basename so it never collides with the
  * downloadable file above.
  */
-function product_image_upload(string $productId, ?string &$error): ?string
+/**
+ * Every gallery image for a product, primary (lowest sort_order) first.
+ * @return list<array{id:int,path:string}>
+ */
+function product_gallery(PDO $pdo, string $productId): array
+{
+    $stmt = $pdo->prepare('SELECT id, path FROM product_images WHERE product_id = ? ORDER BY sort_order ASC, id ASC');
+    $stmt->execute([$productId]);
+    return array_map(fn($r) => ['id' => (int)$r['id'], 'path' => $r['path']], $stmt->fetchAll());
+}
+
+/**
+ * Pre-flight validate every file in the multi-image field before any of
+ * them is written, so a product save stays all-or-nothing on disk. An
+ * empty field (nothing chosen) is fine — it just means "no new images".
+ */
+function product_validate_gallery(string $field, array $allowedExts, int $maxMb, ?string &$error): void
+{
+    if (empty($_FILES[$field]) || !is_array($_FILES[$field]['name'] ?? null)) {
+        return;
+    }
+    foreach ($_FILES[$field]['name'] as $i => $name) {
+        $err = $_FILES[$field]['error'][$i] ?? UPLOAD_ERR_NO_FILE;
+        if ($err === UPLOAD_ERR_NO_FILE || $name === '') {
+            continue;
+        }
+        if ($err !== UPLOAD_ERR_OK) {
+            $error = 'One of the images failed to upload — please try again.';
+            return;
+        }
+        if (($_FILES[$field]['size'][$i] ?? 0) > $maxMb * 1024 * 1024) {
+            $error = 'Each image must be under ' . $maxMb . 'MB.';
+            return;
+        }
+        $ext = strtolower(pathinfo((string)$name, PATHINFO_EXTENSION));
+        if (!in_array($ext, $allowedExts, true)) {
+            $error = 'Unsupported image type — allowed: ' . implode(', ', $allowedExts) . '.';
+            return;
+        }
+        if (!@getimagesize($_FILES[$field]['tmp_name'][$i])) {
+            $error = 'One of the files does not look like a valid image.';
+            return;
+        }
+    }
+}
+
+/**
+ * Move every newly uploaded gallery image into place and record it,
+ * appended after whatever the product already has. Each file gets a random
+ * suffix so uploads never collide and are addressed by their stored path,
+ * not a guessable name. Returns how many were added.
+ */
+function product_gallery_add(PDO $pdo, string $productId, ?string &$error): int
 {
     if (!product_id_is_safe($productId)) {
         $error = 'Invalid product reference.';
-        return null;
+        return 0;
+    }
+    if (empty($_FILES['image_files']) || !is_array($_FILES['image_files']['name'] ?? null)) {
+        return 0;
     }
     $uploadDir = __DIR__ . '/../assets/uploads/products';
-    $basename = $productId . '-img';
-
-    $hasNewImage = !empty($_FILES['image_file']['name'])
-        && ($_FILES['image_file']['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE;
-
-    if (isset($_POST['remove_image']) && !$hasNewImage) {
-        foreach (glob($uploadDir . '/' . $basename . '.*') ?: [] as $old) {
-            @unlink($old);
-        }
-        return '';
-    }
-
-    if (!$hasNewImage) {
-        return null;
-    }
-    if ($_FILES['image_file']['error'] !== UPLOAD_ERR_OK) {
-        $error = 'That image upload failed — please try again.';
-        return null;
-    }
-    if ($_FILES['image_file']['size'] > 5 * 1024 * 1024) {
-        $error = 'That image is over 5MB — please use a smaller file.';
-        return null;
-    }
-    $ext = strtolower(pathinfo($_FILES['image_file']['name'], PATHINFO_EXTENSION));
-    if (!in_array($ext, ['jpg', 'jpeg', 'png', 'webp'], true)) {
-        $error = 'Unsupported image type — allowed: jpg, png, webp.';
-        return null;
-    }
-    if (!@getimagesize($_FILES['image_file']['tmp_name'])) {
-        $error = 'That file does not look like a valid image.';
-        return null;
-    }
     if (!is_dir($uploadDir) && !@mkdir($uploadDir, 0755, true)) {
         $error = 'Could not create assets/uploads/products/ — check folder permissions.';
-        return null;
+        return 0;
     }
-    $filename = $basename . '.' . $ext;
-    if (!move_uploaded_file($_FILES['image_file']['tmp_name'], $uploadDir . '/' . $filename)) {
-        $error = 'Could not save the uploaded image — check that assets/uploads/products/ is writable.';
-        return null;
-    }
-    foreach (glob($uploadDir . '/' . $basename . '.*') ?: [] as $old) {
-        if (basename($old) !== $filename) {
-            @unlink($old);
+    $ord = $pdo->prepare('SELECT COALESCE(MAX(sort_order), -1) + 1 FROM product_images WHERE product_id = ?');
+    $ord->execute([$productId]);
+    $nextOrder = (int)$ord->fetchColumn();
+
+    $ins = $pdo->prepare('INSERT INTO product_images (product_id, path, sort_order) VALUES (?, ?, ?)');
+    $added = 0;
+    foreach ($_FILES['image_files']['name'] as $i => $name) {
+        $err = $_FILES['image_files']['error'][$i] ?? UPLOAD_ERR_NO_FILE;
+        if ($err !== UPLOAD_ERR_OK || $name === '') {
+            continue;
+        }
+        $ext = strtolower(pathinfo((string)$name, PATHINFO_EXTENSION));
+        if (!in_array($ext, ['jpg', 'jpeg', 'png', 'webp'], true)) {
+            continue;
+        }
+        $filename = $productId . '-g' . bin2hex(random_bytes(5)) . '.' . $ext;
+        if (move_uploaded_file($_FILES['image_files']['tmp_name'][$i], $uploadDir . '/' . $filename)) {
+            $ins->execute([$productId, 'assets/uploads/products/' . $filename, $nextOrder++]);
+            $added++;
         }
     }
-    return 'assets/uploads/products/' . $filename;
+    return $added;
+}
+
+/**
+ * Delete the gallery images the admin unticked, by their row id — both the
+ * row and the file. The path comes from the row (written by this app), and
+ * is realpath-confined to the uploads folder before unlinking, so a
+ * tampered id can only ever remove a product image, never anything else.
+ */
+function product_gallery_remove(PDO $pdo, string $productId, array $ids): void
+{
+    $ids = array_values(array_unique(array_filter(array_map('intval', $ids))));
+    if (!$ids) {
+        return;
+    }
+    $uploadRoot = realpath(__DIR__ . '/../assets/uploads/products');
+    $in = implode(',', array_fill(0, count($ids), '?'));
+    $sel = $pdo->prepare("SELECT path FROM product_images WHERE product_id = ? AND id IN ($in)");
+    $sel->execute(array_merge([$productId], $ids));
+    foreach ($sel->fetchAll(PDO::FETCH_COLUMN) as $relPath) {
+        $abs = realpath(__DIR__ . '/../' . $relPath);
+        if ($uploadRoot !== false && $abs !== false && str_starts_with($abs, $uploadRoot . DIRECTORY_SEPARATOR)) {
+            @unlink($abs);
+        }
+    }
+    $del = $pdo->prepare("DELETE FROM product_images WHERE product_id = ? AND id IN ($in)");
+    $del->execute(array_merge([$productId], $ids));
+}
+
+/**
+ * Keep products.image_path — the single column the marketplace card and
+ * every pre-gallery code path still read — pointing at the current primary
+ * (lowest sort_order) gallery image, or NULL when the product has none.
+ */
+function product_sync_primary_image(PDO $pdo, string $productId): void
+{
+    $stmt = $pdo->prepare('SELECT path FROM product_images WHERE product_id = ? ORDER BY sort_order ASC, id ASC LIMIT 1');
+    $stmt->execute([$productId]);
+    $primary = $stmt->fetchColumn();
+    $pdo->prepare('UPDATE products SET image_path = ? WHERE id = ?')
+        ->execute([$primary !== false ? $primary : null, $productId]);
 }
 
 /**
@@ -259,40 +333,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $id = $existingId !== '' ? $existingId : slugify_id($name, $pdo);
             $currentDownload = null;
-            $currentImage = null;
             if ($existingId !== '') {
-                $cur = $pdo->prepare('SELECT download_path, image_path FROM products WHERE id = ?');
+                $cur = $pdo->prepare('SELECT download_path FROM products WHERE id = ?');
                 $cur->execute([$existingId]);
-                $curRow = $cur->fetch();
-                $currentDownload = $curRow['download_path'] ?? null;
-                $currentImage = $curRow['image_path'] ?? null;
+                $currentDownload = $cur->fetchColumn() ?: null;
             }
-            // Validate both files before moving either. Previously the image
-            // was moved to disk first, so a failing download upload left an
-            // orphaned image behind with the row never updated to match.
+            // Validate every uploaded file before moving any of them, so a
+            // save is all-or-nothing on disk — one bad image doesn't leave
+            // the others half-applied.
             $uploadError = null;
             $imageError = null;
             product_validate_upload('download_file', ['zip', 'pdf'], 25, false, $uploadError);
-            product_validate_upload('image_file', ['jpg', 'jpeg', 'png', 'webp'], 5, true, $imageError);
+            product_validate_gallery('image_files', ['jpg', 'jpeg', 'png', 'webp'], 5, $imageError);
 
             if ($uploadError || $imageError) {
                 flash_input($_POST);
                 flash($uploadError ?: $imageError, 'error');
             } else {
             $downloadPath = resolve_upload(product_file_upload($id, $uploadError), $currentDownload);
-            $imagePath = resolve_upload(product_image_upload($id, $imageError), $currentImage);
 
-            if ($uploadError || $imageError) {
-                flash($uploadError ?: $imageError, 'error');
-            } elseif ($existingId !== '') {
-                $pdo->prepare('UPDATE products SET name=?, category=?, icon=?, price=?, pricing_type=?, rating=?, tagline=?, description=?, specs_json=?, download_path=?, image_path=? WHERE id=?')
-                    ->execute([$name, $category, $icon, $price, $pricingType, $rating, $tagline, $desc, json_encode($specs), $downloadPath, $imagePath, $existingId]);
-                flash('Product updated.');
+            if ($uploadError) {
+                flash($uploadError, 'error');
             } else {
-                $maxSort = (int)$pdo->query('SELECT COALESCE(MAX(sort_order),0) FROM products')->fetchColumn();
-                $stmt = $pdo->prepare('INSERT INTO products (id, name, category, icon, price, pricing_type, rating, tagline, description, specs_json, download_path, image_path, sort_order) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)');
-                $stmt->execute([$id, $name, $category, $icon, $price, $pricingType, $rating, $tagline, $desc, json_encode($specs), $downloadPath, $imagePath, $maxSort + 1]);
-                flash('Product added — now live on the public marketplace.');
+                // The product row is written FIRST: product_images has a
+                // foreign key to products(id), so the row it references must
+                // exist before any gallery image can be inserted. image_path
+                // is filled in afterwards by product_sync_primary_image().
+                if ($existingId !== '') {
+                    $pdo->prepare('UPDATE products SET name=?, category=?, icon=?, price=?, pricing_type=?, rating=?, tagline=?, description=?, specs_json=?, download_path=? WHERE id=?')
+                        ->execute([$name, $category, $icon, $price, $pricingType, $rating, $tagline, $desc, json_encode($specs), $downloadPath, $existingId]);
+                    $savedMessage = 'Product updated.';
+                } else {
+                    $maxSort = (int)$pdo->query('SELECT COALESCE(MAX(sort_order),0) FROM products')->fetchColumn();
+                    $pdo->prepare('INSERT INTO products (id, name, category, icon, price, pricing_type, rating, tagline, description, specs_json, download_path, image_path, sort_order) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)')
+                        ->execute([$id, $name, $category, $icon, $price, $pricingType, $rating, $tagline, $desc, json_encode($specs), $downloadPath, null, $maxSort + 1]);
+                    $savedMessage = 'Product added — now live on the public marketplace.';
+                }
+                // Gallery: drop the images the admin unticked, add any newly
+                // uploaded ones, then repoint products.image_path at the new
+                // primary (the marketplace card still reads that column).
+                product_gallery_remove($pdo, $id, (array)($_POST['remove_gallery'] ?? []));
+                product_gallery_add($pdo, $id, $imageError);
+                product_sync_primary_image($pdo, $id);
+                flash($savedMessage);
             }
             }
         }
@@ -310,9 +393,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif ((int)$inUse->fetchColumn() > 0) {
             flash('That product has orders against it, so deleting it would erase those customers\' purchase history and downloads. Remove its file instead to take it off sale.', 'error');
         } else {
+            // Unlink the gallery files by the paths stored against the
+            // product before the row (and its cascading product_images
+            // rows) go away.
+            $uploadRoot = realpath(__DIR__ . '/../assets/uploads/products');
+            $imgs = $pdo->prepare('SELECT path FROM product_images WHERE product_id = ?');
+            $imgs->execute([$deleteId]);
+            foreach ($imgs->fetchAll(PDO::FETCH_COLUMN) as $relPath) {
+                $abs = realpath(__DIR__ . '/../' . $relPath);
+                if ($uploadRoot !== false && $abs !== false && str_starts_with($abs, $uploadRoot . DIRECTORY_SEPARATOR)) {
+                    @unlink($abs);
+                }
+            }
             $pdo->prepare('DELETE FROM products WHERE id=?')->execute([$deleteId]);
-            // Leftover uploads used to linger forever, and the next product
-            // that slugified to the same id inherited them.
+            // Leftover download/legacy-image uploads used to linger forever,
+            // and the next product that slugified to the same id inherited
+            // them. product_id_is_safe() above keeps this glob confined.
             foreach (glob(__DIR__ . '/../assets/uploads/products/' . $deleteId . '.*') ?: [] as $old) {
                 @unlink($old);
             }
@@ -332,6 +428,7 @@ if (isset($_GET['edit'])) {
     $stmt->execute([(string)$_GET['edit']]);
     $editing = $stmt->fetch() ?: null;
 }
+$editingGallery = $editing ? product_gallery($pdo, (string)$editing['id']) : [];
 $old = take_old_input();
 // A failed save re-renders with whatever was typed, falling back to the
 // stored row (when editing) and then to the field's default.
@@ -394,14 +491,20 @@ $token = csrf_token();
       <div class="field"><label>Full description</label><textarea name="description"><?= e((string)$val('description')) ?></textarea></div>
       <div class="field"><label>What's included (one per line)</label><textarea name="specs" placeholder="One feature per line"><?= e($editingSpecs) ?></textarea></div>
       <div class="field">
-        <label>Product image <small style="font-weight:400;color:var(--ink-faint);">(jpg, png or webp, up to 5MB — shown instead of the icon on the marketplace card and product page)</small></label>
-        <?php if (!empty($editing['image_path'])): ?>
-          <div class="flex items-center gap-12" style="margin-bottom:10px;">
-            <img src="../<?= e($editing['image_path']) ?>" alt="" style="width:64px;height:64px;object-fit:cover;border-radius:12px;">
-            <label class="flex items-center gap-8" style="font-size:.85rem;"><input type="checkbox" name="remove_image"> Remove the current image</label>
+        <label>Product images <small style="font-weight:400;color:var(--ink-faint);">(jpg, png or webp, up to 5MB each — the first is used on the marketplace card; the rest form a gallery on the product page)</small></label>
+        <?php if ($editingGallery): ?>
+          <div class="flex items-center gap-12" style="flex-wrap:wrap;margin-bottom:12px;">
+            <?php foreach ($editingGallery as $gi => $img): ?>
+            <div style="text-align:center;">
+              <img src="../<?= e($img['path']) ?>" alt="" style="width:72px;height:72px;object-fit:cover;border-radius:12px;display:block;<?= $gi === 0 ? 'outline:2px solid var(--accent-1);outline-offset:2px;' : '' ?>">
+              <?php if ($gi === 0): ?><span style="font-size:.68rem;color:var(--accent-1);font-weight:600;">Primary</span><?php endif; ?>
+              <label class="flex items-center gap-8" style="font-size:.72rem;justify-content:center;margin-top:2px;"><input type="checkbox" name="remove_gallery[]" value="<?= (int)$img['id'] ?>"> Remove</label>
+            </div>
+            <?php endforeach; ?>
           </div>
+          <p style="font-size:.78rem;color:var(--ink-faint);margin:-4px 0 8px;">Tick "Remove" under any image to delete it. New images you add below are appended after these.</p>
         <?php endif; ?>
-        <input type="file" name="image_file" accept=".jpg,.jpeg,.png,.webp">
+        <input type="file" name="image_files[]" accept=".jpg,.jpeg,.png,.webp" multiple>
       </div>
       <div class="field">
         <label>Downloadable file <small style="font-weight:400;color:var(--ink-faint);">(zip or pdf, up to 25MB — required for customers to actually receive something after buying)</small></label>

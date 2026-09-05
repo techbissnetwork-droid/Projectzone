@@ -1,4 +1,4 @@
-/* techbiss-assets 2026.09.05.9 */
+/* techbiss-assets 2026.09.05.10 */
 (function(){
 "use strict";
 
@@ -529,6 +529,24 @@ Pages['/marketplace'] = function(){
   +'</div></section>';
 };
 
+/* The product page image area. A product can carry several images now
+   (p.images, primary first); this renders the first one large with a
+   thumbnail strip beneath when there is more than one. Falls back to the
+   single p.image, then to the decorative blob when a product has no photo
+   at all. Thumbnails are wired in wireProductDetail(). */
+function productGallery(p){
+  var imgs = (p.images && p.images.length) ? p.images : (p.image ? [p.image] : []);
+  if(!imgs.length){
+    return '<div class="hero-visual" style="aspect-ratio:4/3;"><svg viewBox="0 0 200 150" style="width:100%;height:100%;"><path fill="url(#pdGrad)" d="M40,-40C56,-30,68,-10,66,10C64,30,48,46,28,54C8,62,-16,62,-34,50C-52,38,-64,14,-62,-8C-60,-30,-44,-50,-24,-58C-4,-66,20,-50,40,-40Z" transform="translate(100 76)"/><defs><linearGradient id="pdGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" style="stop-color:var(--accent-1)"/><stop offset="100%" style="stop-color:var(--accent-2)"/></linearGradient></defs></svg><div style="position:absolute;color:#fff;">'+ico(p.icon).replace('width:22px;height:22px','width:56px;height:56px')+'</div></div>';
+  }
+  var main = '<div class="hero-visual pd-main" style="aspect-ratio:4/3;overflow:hidden;border-radius:20px;"><img id="pdMainImg" src="'+BP+'/'+esc(imgs[0])+'" alt="'+esc(p.name)+'" style="width:100%;height:100%;object-fit:cover;"></div>';
+  if(imgs.length < 2){ return main; }
+  var thumbs = '<div class="pd-thumbs" id="pdThumbs">'+imgs.map(function(src,i){
+    return '<button type="button" class="pd-thumb'+(i===0?' active':'')+'" data-src="'+esc(src)+'" aria-label="Show image '+(i+1)+'"><img src="'+BP+'/'+esc(src)+'" alt=""></button>';
+  }).join('')+'</div>';
+  return '<div class="pd-gallery">'+main+thumbs+'</div>';
+}
+
 Pages['/marketplace/detail'] = function(id){
   var p = PRODUCTS.filter(function(x){return x.id===id;})[0];
   /* Falling back to PRODUCTS[0] showed a different product under the
@@ -550,9 +568,7 @@ Pages['/marketplace/detail'] = function(id){
         +'<p class="lede">'+esc(p.tagline)+'</p>'
         +'<div class="flex items-center gap-12" style="margin:18px 0 28px;"><span class="stat"><span class="num" style="font-size:1.4rem;">'+fmtMoney(p.price)+'</span></span><span class="badge">★ '+esc(p.rating)+' rating</span></div>'
       +'</div>'
-      +(p.image
-        ? '<div class="hero-visual" style="aspect-ratio:4/3;overflow:hidden;border-radius:20px;"><img src="'+BP+'/'+esc(p.image)+'" alt="" style="width:100%;height:100%;object-fit:cover;"></div>'
-        : '<div class="hero-visual" style="aspect-ratio:4/3;"><svg viewBox="0 0 200 150" style="width:100%;height:100%;"><path fill="url(#pdGrad)" d="M40,-40C56,-30,68,-10,66,10C64,30,48,46,28,54C8,62,-16,62,-34,50C-52,38,-64,14,-62,-8C-60,-30,-44,-50,-24,-58C-4,-66,20,-50,40,-40Z" transform="translate(100 76)"/><defs><linearGradient id="pdGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" style="stop-color:var(--accent-1)"/><stop offset="100%" style="stop-color:var(--accent-2)"/></linearGradient></defs></svg><div style="position:absolute;color:#fff;">'+ico(p.icon).replace('width:22px;height:22px','width:56px;height:56px')+'</div></div>')
+      +productGallery(p)
     +'</div></div></section>'
   +'<section class="section tone-a" style="padding-top:26px;"><div class="container">'
     +'<div class="tabbar" id="pdTabs" role="tablist">'
@@ -1268,6 +1284,17 @@ function wireProductDetail(id){
   var p = PRODUCTS.filter(function(x){return x.id===id;})[0];
   var tabs = $('#pdTabs'), panels = $('#pdPanels');
   if(!p || !tabs || !panels) return;
+
+  // Gallery thumbnails swap the large image. data-src holds a server-written
+  // path, so it is safe to place straight into the src.
+  var thumbs = $('#pdThumbs');
+  if(thumbs){
+    thumbs.addEventListener('click', function(e){
+      var btn = e.target.closest('.pd-thumb'); if(!btn) return;
+      var main = $('#pdMainImg'); if(main){ main.src = BP+'/'+btn.dataset.src; }
+      $all('.pd-thumb', thumbs).forEach(function(t){ t.classList.toggle('active', t===btn); });
+    });
+  }
   var state = { order:null, downloadUrl:null };
   function renderOverview(){
     return '<div class="grid grid-2"><div><h3>Overview</h3><p>'+esc(p.desc)+'</p>'

@@ -1,4 +1,4 @@
-/* techbiss-assets 2026.09.05.9 */
+/* techbiss-assets 2026.09.05.10 */
 /* ============================= TOKENS ============================= */
 :root{
   --bg:#fbfaf7;
@@ -510,6 +510,19 @@ button{ cursor:pointer; }
     var(--surface-2);
 }
 .pf-preview .icon{ width:38%; height:38%; max-width:56px; max-height:56px; color:var(--accent-1); opacity:.45; }
+
+/* Product-page image gallery: one large image with a thumbnail strip
+   beneath it (only shown when a product has more than one image). */
+.pd-gallery{ display:flex; flex-direction:column; gap:12px; }
+.pd-thumbs{ display:flex; gap:10px; flex-wrap:wrap; }
+.pd-thumb{
+  width:64px; height:64px; padding:0; flex:none; cursor:pointer; overflow:hidden;
+  border-radius:12px; border:2px solid var(--border-soft); background:var(--surface-2);
+  transition:border-color .2s ease, transform .2s ease;
+}
+.pd-thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
+.pd-thumb:hover{ transform:translateY(-2px); }
+.pd-thumb.active{ border-color:var(--accent-1); }
 .pf-tags{ display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap; }
 .pf-foot{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:auto; padding-top:16px; border-top:1px solid var(--border-soft); }
 .pf-price{ font-family:var(--font-display); font-weight:800; font-size:1.2rem; color:var(--ink); }

@@ -36,6 +36,32 @@ foreach ($products as &$p) {
 }
 unset($p);
 
+// Gallery images per product (primary first), so the product page can show
+// more than one photo. Fetched in a single query and grouped, rather than
+// one query per product. Wrapped so a database without the product_images
+// table yet (mid-upgrade) still renders — each product then falls back to
+// its single image below.
+$imagesByProduct = [];
+try {
+    foreach (db()->query('SELECT product_id, path FROM product_images ORDER BY sort_order ASC, id ASC')->fetchAll() as $ir) {
+        $imagesByProduct[$ir['product_id']][] = $ir['path'];
+    }
+} catch (Throwable $e) {
+    $imagesByProduct = [];
+}
+foreach ($products as &$p) {
+    $imgs = $imagesByProduct[$p['id']] ?? [];
+    if (!$imgs && !empty($p['image'])) {
+        $imgs = [$p['image']];
+    }
+    $p['images'] = $imgs;
+    // Keep the single "image" the card uses pointing at the primary.
+    if ($imgs) {
+        $p['image'] = $imgs[0];
+    }
+}
+unset($p);
+
 $siteSettings = [
     'siteName' => get_setting('site_name', 'TECHBISS'),
     'heroHeadlineMain' => get_setting('hero_headline_main', 'We help offline businesses'),
