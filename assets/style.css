@@ -213,8 +213,16 @@ button{ cursor:pointer; }
   border-bottom:1px solid var(--border-soft);
 }
 .nav-wrap{ display:flex; align-items:center; justify-content:space-between; gap:20px; width:100%; }
-.logo{ display:flex; align-items:center; gap:11px; font-family:var(--font-display); font-weight:700; font-size:1.2rem; }
-.logo-mark{ width:40px; height:40px; flex:none; display:flex; }
+.logo{ display:flex; align-items:center; gap:11px; font-family:var(--font-display); font-weight:700; font-size:1.38rem; }
+.logo-mark{ width:48px; height:48px; flex:none; display:flex; }
+/* Eased back on the narrowest screens, where the header also has to hold
+   the theme toggle, the call-to-action and the menu button. */
+@media (max-width:480px){
+  .logo{ font-size:1.22rem; gap:9px; }
+  .logo-mark{ width:40px; height:40px; }
+  .nav-actions .btn-sm{ padding:10px 16px; font-size:.86rem; }
+  .nav-actions .theme-toggle{ width:36px; height:36px; }
+}
 .logo-mark svg{ width:100%; height:100%; overflow:visible; }
 .logo-mark g{ animation:logoBreathe 5s ease-in-out infinite; transform-box:fill-box; transform-origin:center; transition:transform .45s cubic-bezier(.34,1.56,.64,1); }
 .logo:hover .logo-mark g{ animation-play-state:paused; transform:rotate(-10deg) scale(1.08); }
@@ -238,6 +246,13 @@ button{ cursor:pointer; }
 }
 .nav-link:hover, .nav-link.active{ color:var(--accent-1); }
 .nav-actions{ display:flex; align-items:center; gap:12px; flex:none; }
+/* Scaled with the logo — a 34px toggle and .85rem buttons read as small
+   next to a 48px mark. Scoped to the header so admin tables and card
+   actions keep their own compact .btn-sm. */
+.nav-actions .btn-sm{ padding:12px 22px; font-size:.92rem; }
+.nav-actions .theme-toggle{ width:40px; height:40px; }
+.nav-actions .theme-toggle .theme-icon-wrap,
+.nav-actions .theme-toggle .theme-icon{ width:20px; height:20px; }
 @media (max-width:1024px){
   .nav-links{ display:none; }
   #navLoginBtn{ display:none !important; }
@@ -620,8 +635,8 @@ tr:last-child td{ border-bottom:none; }
    than the logo it sits under. Sized to sit just below the links so the
    logo stays the anchor of the block. */
 .footer-brand p{ font-size:.9rem; line-height:1.65; max-width:62ch; margin-bottom:0; color:var(--ink-soft); }
-.footer-brand .logo{ font-size:1.15rem; }
-.footer-brand .logo-mark{ width:34px; height:34px; }
+.footer-brand .logo{ font-size:1.22rem; }
+.footer-brand .logo-mark{ width:38px; height:38px; }
 .footer-grid h4{ font-size:.85rem; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-faint); margin-bottom:16px; }
 .footer-grid a{ display:block; padding:6px 0; color:var(--ink-soft); font-size:.92rem; }
 .footer-grid a:hover{ color:var(--accent-1); }
