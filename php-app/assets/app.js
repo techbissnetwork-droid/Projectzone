@@ -610,34 +610,31 @@ Pages['/resources'] = function(){
 };
 
 Pages['/pricing'] = function(){
-  var tiers = window.PRICING_DATA || [
-    {n:'Starter', m:39, y:31, d:'Hosting, domain renewal and a small monthly update — for once your site is live.', f:['Hosting, SSL & domain included','1 small update per month','Email support','Uptime monitoring'], cta:'Start with Starter'},
-    {n:'Growth', m:99, y:79, d:'For businesses adding bookings, an online store, or an app.', f:['Everything in Starter','Priority support','Marketplace theme credit','Monthly SEO check-in','App store update handling'], cta:'Start with Growth', rec:true},
-    {n:'Custom Build', m:null, y:null, d:'A website or app built from scratch around your business.', f:['Custom design & development','Dedicated project lead','Domain, hosting, SSL & email included','App Store & Play Store publishing','Free ranking check-up'], cta:'Get a free quote'}
-  ];
+  var S = window.SITE_SETTINGS || {};
+  var startPrice = S.pricingStartingPrice || 5;
   return '<section class="hero hero-sub" style="padding-bottom:20px;"><div class="container text-center">'
-    +'<span class="eyebrow">Pricing</span><h1 style="max-width:20ch;margin-inline:auto;">Simple care plans, and custom builds quoted upfront.</h1>'
-    +'<div class="toggle-pill" id="priceToggle" style="margin-top:20px;"><button class="active" data-p="m">Monthly</button><button data-p="y">Annual — save 20%</button></div>'
+    +'<span class="eyebrow">Pricing</span><h1 style="max-width:20ch;margin-inline:auto;">No fixed plans — every project is quoted for your business.</h1>'
+    +'<p class="lede" style="max-width:46ch;margin-inline:auto;">A one-page site and a multi-screen app cost different amounts to build and maintain, so we price each project after a quick call, not off a menu.</p>'
   +'</div></section>'
   +'<section class="section tone-a" style="padding-top:0;"><div class="container">'
-    +'<div class="grid grid-3" id="priceGrid">'+tiers.map(function(t,i){
-      return '<div class="card tilt" style="'+(t.rec?'border-color:var(--accent-1);box-shadow:var(--shadow-lg);position:relative;':'')+'">'
-        +(t.rec?'<span class="badge grad" style="position:absolute;top:-14px;left:32px;">Most popular</span>':'')
-        +'<h3>'+esc(t.n)+'</h3><p style="font-size:.9rem;">'+esc(t.d)+'</p>'
-        +'<div style="margin:14px 0 20px;"><span class="price-amt" data-m="'+esc(t.m)+'" data-y="'+esc(t.y)+'" style="font-family:var(--font-display);font-weight:800;font-size:2.2rem;">'+(t.m?fmtMoney(t.m):'Custom')+'</span>'+(t.m?'<span style="color:var(--ink-faint);"> /mo</span>':'')+'</div>'
-        +'<ul style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px;">'+t.f.map(function(f){return '<li style="display:flex;gap:8px;font-size:.9rem;">'+ico('check')+'<span>'+esc(f)+'</span></li>';}).join('')+'</ul>'
-        +'<a href="'+BP+'/contact" class="btn '+(t.rec?'btn-primary':'btn-ghost')+' btn-block">'+esc(t.cta)+'</a>'
-      +'</div>';
-    }).join('')+'</div>'
+    +'<div class="card tilt" style="max-width:560px;margin:0 auto;text-align:center;padding:44px 32px;">'
+      +'<span class="eyebrow">Starting from</span>'
+      +'<div style="font-family:var(--font-display);font-weight:800;font-size:3rem;margin:10px 0 6px;">'+fmtMoney(startPrice)+'</div>'
+      +'<p style="font-size:.92rem;color:var(--ink-faint);margin-bottom:24px;">Final price depends on scope — a quick call gets you an exact number, in writing, before any work starts.</p>'
+      +'<ul style="display:flex;flex-direction:column;gap:10px;margin-bottom:28px;text-align:left;max-width:340px;margin-inline:auto;">'
+        +['Domain, hosting & SSL included','No hidden add-ons','Quoted upfront, in writing','Ongoing care available after launch'].map(function(f){return '<li style="display:flex;gap:8px;font-size:.9rem;">'+ico('check')+'<span>'+esc(f)+'</span></li>';}).join('')
+      +'</ul>'
+      +'<a href="'+BP+'/contact" class="btn btn-primary btn-block magnetic">Get a free quote</a>'
+    +'</div>'
   +'</div></section>'
   +wave('a','var(--bg-alt)')
   +'<section class="section tone-b"><div class="container">'
     +'<div class="section-head center"><span class="eyebrow">Questions</span><h2>Pricing FAQ</h2></div>'
     +'<div id="priceFaq">'+(window.PRICING_FAQ_DATA || [
-      ['Do you build the website too, or is this just hosting?','These plans cover hosting, care and updates after launch. New builds — a website, an app, or both — are quoted upfront based on what you need.'],
-      ['Can I switch plans later?','Yes — upgrade or downgrade at the start of any billing cycle, and we\'ll prorate the difference.'],
+      ['How do you land on a final price?','We ask what you need, what you already have, and how complex it is, then send a fixed quote before any work starts — no surprise invoices.'],
       ['What if I already have a website?','We can take over hosting and support for an existing site, or rebuild it if it needs modern love — either way, nothing changes for your visitors during the switch.'],
-      ['Can I start with a marketplace theme instead of a custom build?','Yes — Growth and Custom Build plans include a marketplace credit toward any ready-made theme, which we\'ll brand and launch for you.'],
+      ['Can I start with a marketplace theme instead of a custom build?','Yes — a ready-made theme costs less than a custom build, and we\'ll still brand and launch it for you.'],
+      ['Is ongoing support included?','Ongoing hosting, domain renewal and small updates can be added as a monthly care plan once your site or app is live — we\'ll go over options on the quote call.'],
       ['Do you offer nonprofit or small business discounts?','Yes, reach out through Contact and we\'ll tailor a plan for community and mission-driven organizations.']
     ]).map(function(f,i){
       return '<div class="accordion-item'+(i===0?' open':'')+'"><button aria-expanded="'+(i===0)+'">'+esc(f[0])+ico('arrow').replace('M13 6l6 6-6 6','m6 9 6 6 6-6').replace('M5 12h14','')+'</button><div class="accordion-panel"><div class="inner">'+esc(f[1])+'</div></div></div>';
@@ -997,15 +994,6 @@ function wireResources(){
   }
 }
 function wirePricing(){
-  var toggle = $('#priceToggle');
-  toggle.addEventListener('click', function(e){
-    var b=e.target.closest('button'); if(!b) return;
-    $all('button',toggle).forEach(function(x){x.classList.remove('active');}); b.classList.add('active');
-    $all('.price-amt').forEach(function(el){
-      var v = b.dataset.p==='y' ? el.dataset.y : el.dataset.m;
-      el.textContent = v==='null' ? 'Custom' : fmtMoney(+v);
-    });
-  });
   $all('.accordion-item').forEach(function(item){
     item.querySelector('button').addEventListener('click', function(){
       var wasOpen = item.classList.contains('open');

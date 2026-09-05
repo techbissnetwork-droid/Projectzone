@@ -19,6 +19,7 @@ $siteSettings = [
     'contactPhone' => get_setting('contact_phone', '+1 (415) 555-0148'),
     'whatsappNumber' => get_setting('whatsapp_number', ''),
     'studiosLocations' => get_setting('studios_locations', 'San Francisco · Lisbon · Singapore'),
+    'pricingStartingPrice' => (int)get_setting('pricing_starting_price', '5'),
     'splashEnabled' => get_setting('splash_enabled', 'on') !== 'off',
     'pageTransitionEnabled' => get_setting('page_transition_enabled', 'on') !== 'off',
     'defaultTheme' => get_setting('default_theme', 'auto'),
@@ -37,7 +38,6 @@ $contentSections = [
     'services' => content_services_rows(),
     'solutions' => content_industries_rows(),
     'caseStudies' => content_case_studies_rows(),
-    'pricing' => content_pricing_rows(),
     'pricingFaq' => content_pricing_faqs_rows(),
     'team' => content_team_rows(),
     'values' => content_values_rows(),
@@ -220,7 +220,6 @@ if ($baseUrl !== '') {
   var SERVICES_DATA = <?= json_encode($contentSections['services'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>;
   var SOLUTIONS_DATA = <?= json_encode($contentSections['solutions'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>;
   var CASESTUDIES_DATA = <?= json_encode($contentSections['caseStudies'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>;
-  var PRICING_DATA = <?= json_encode($contentSections['pricing'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>;
   var PRICING_FAQ_DATA = <?= json_encode($contentSections['pricingFaq'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>;
   var TEAM_DATA = <?= json_encode($contentSections['team'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>;
   var VALUES_DATA = <?= json_encode($contentSections['values'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>;

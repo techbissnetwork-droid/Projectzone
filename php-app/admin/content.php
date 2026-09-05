@@ -54,18 +54,6 @@ $SECTIONS = [
             'body' => ['type' => 'textarea', 'label' => 'Story'],
         ],
     ],
-    'pricing' => [
-        'table' => 'content_pricing_plans', 'label' => 'Plan', 'title' => 'name',
-        'fields' => [
-            'name' => ['type' => 'text', 'label' => 'Plan name', 'required' => true],
-            'cta' => ['type' => 'text', 'label' => 'Button text'],
-            'monthly_price' => ['type' => 'number_nullable', 'label' => 'Monthly price ($) — leave blank for "Custom"'],
-            'yearly_price' => ['type' => 'number_nullable', 'label' => 'Annual price ($/mo, billed yearly)'],
-            'description' => ['type' => 'text', 'label' => 'Description'],
-            'features' => ['type' => 'lines', 'label' => 'Features (one per line)', 'column' => 'features_json'],
-            'is_recommended' => ['type' => 'checkbox', 'label' => 'Mark as "Most popular"'],
-        ],
-    ],
     'faqs' => [
         'table' => 'content_pricing_faqs', 'label' => 'FAQ', 'title' => 'question',
         'fields' => [
@@ -232,13 +220,13 @@ function content_field_html(string $key, array $f, ?array $editing): string
 <main class="admin-page">
   <?= admin_flash_html() ?>
   <div class="admin-toolbar">
-    <div><h1 style="margin-bottom:4px;">Site content</h1><p class="lede" style="margin-bottom:0;">Add, edit or remove the Services, Industries, Case Studies, Pricing and About page content shown on the public site.</p></div>
+    <div><h1 style="margin-bottom:4px;">Site content</h1><p class="lede" style="margin-bottom:0;">Add, edit or remove the Services, Industries, Case Studies, Pricing FAQ and About page content shown on the public site. The Pricing page's "Starting from" price is in Settings.</p></div>
   </div>
 
   <?php
   $tabList = [
       'services' => ['grid', 'Services'], 'industries' => ['users', 'Industries'], 'cases' => ['star', 'Case Studies'],
-      'pricing' => ['chart', 'Pricing'], 'faqs' => ['chat', 'FAQ'], 'team' => ['edit', 'Team'], 'values' => ['shield', 'Values'],
+      'faqs' => ['chat', 'Pricing FAQ'], 'team' => ['edit', 'Team'], 'values' => ['shield', 'Values'],
   ];
   ?>
   <div class="tab-labels">
@@ -280,7 +268,6 @@ function content_field_html(string $key, array $f, ?array $editing): string
     <div class="content-row">
       <div>
         <div class="content-row-title"><?= e((string)($r[$cfg['title']] ?? '')) ?></div>
-        <?php if ($activeTab === 'pricing'): ?><div class="content-row-sub"><?= $r['monthly_price'] !== null ? '$' . (int)$r['monthly_price'] . '/mo' : 'Custom' ?><?= $r['is_recommended'] ? ' · Most popular' : '' ?></div><?php endif; ?>
         <?php if ($activeTab === 'cases'): ?><div class="content-row-sub"><?= e($r['sector']) ?></div><?php endif; ?>
         <?php if ($activeTab === 'team'): ?><div class="content-row-sub"><?= e($r['role']) ?></div><?php endif; ?>
       </div>

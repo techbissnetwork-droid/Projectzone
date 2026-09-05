@@ -36,10 +36,10 @@ return [
         ['n' => 'Custom Build', 'm' => null, 'y' => null, 'd' => 'A website or app built from scratch around your business.', 'f' => ['Custom design & development', 'Dedicated project lead', 'Domain, hosting, SSL & email included', 'App Store & Play Store publishing', 'Free ranking check-up'], 'cta' => 'Get a free quote', 'rec' => false],
     ],
     'pricing_faq' => [
-        ['Do you build the website too, or is this just hosting?', 'These plans cover hosting, care and updates after launch. New builds — a website, an app, or both — are quoted upfront based on what you need.'],
-        ['Can I switch plans later?', 'Yes — upgrade or downgrade at the start of any billing cycle, and we\'ll prorate the difference.'],
+        ['How do you land on a final price?', 'We ask what you need, what you already have, and how complex it is, then send a fixed quote before any work starts — no surprise invoices.'],
         ['What if I already have a website?', 'We can take over hosting and support for an existing site, or rebuild it if it needs modern love — either way, nothing changes for your visitors during the switch.'],
-        ['Can I start with a marketplace theme instead of a custom build?', 'Yes — Growth and Custom Build plans include a marketplace credit toward any ready-made theme, which we\'ll brand and launch for you.'],
+        ['Can I start with a marketplace theme instead of a custom build?', 'Yes — a ready-made theme costs less than a custom build, and we\'ll still brand and launch it for you.'],
+        ['Is ongoing support included?', 'Ongoing hosting, domain renewal and small updates can be added as a monthly care plan once your site or app is live — we\'ll go over options on the quote call.'],
         ['Do you offer nonprofit or small business discounts?', 'Yes, reach out through Contact and we\'ll tailor a plan for community and mission-driven organizations.'],
     ],
     'team' => [

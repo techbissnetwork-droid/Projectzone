@@ -307,18 +307,6 @@ function content_case_studies_rows(): array
     ], $rows);
 }
 
-function content_pricing_rows(): array
-{
-    $rows = db()->query('SELECT name, monthly_price, yearly_price, description, features_json, cta, is_recommended FROM content_pricing_plans ORDER BY sort_order ASC, id ASC')->fetchAll();
-    return array_map(fn($r) => [
-        'n' => $r['name'],
-        'm' => $r['monthly_price'] !== null ? (int)$r['monthly_price'] : null,
-        'y' => $r['yearly_price'] !== null ? (int)$r['yearly_price'] : null,
-        'd' => $r['description'], 'f' => json_decode($r['features_json'], true) ?: [],
-        'cta' => $r['cta'], 'rec' => (bool)$r['is_recommended'],
-    ], $rows);
-}
-
 function content_pricing_faqs_rows(): array
 {
     $rows = db()->query('SELECT question, answer FROM content_pricing_faqs ORDER BY sort_order ASC, id ASC')->fetchAll();
