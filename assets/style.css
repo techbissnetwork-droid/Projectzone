@@ -290,15 +290,20 @@ button{ cursor:pointer; }
 }
 .mobile-sheet.open{ transform:translateY(0); }
 .mobile-sheet .grabber{ width:44px; height:5px; border-radius:var(--r-full); background:var(--border); margin:6px auto 18px; }
-.sheet-close{
-  position:absolute; top:14px; right:18px; width:34px; height:34px; border-radius:50%;
-  display:flex; align-items:center; justify-content:center;
-  border:1px solid var(--border-soft); background:var(--surface-2); color:var(--ink-soft);
-}
-.sheet-close svg{ width:16px; height:16px; }
-.sheet-close:hover{ border-color:var(--accent-1); color:var(--accent-1); }
-.mobile-sheet a{ display:flex; align-items:center; justify-content:space-between; padding:15px 6px; font-family:var(--font-display); font-weight:600; font-size:1.05rem; border-bottom:1px solid var(--border-soft); }
+.mobile-sheet a{ display:flex; align-items:center; gap:14px; padding:14px 6px; font-family:var(--font-display); font-weight:600; font-size:1.02rem; border-bottom:1px solid var(--border-soft); color:var(--ink); }
 .mobile-sheet a:last-of-type{ border-bottom:none; }
+/* Every row is icon + label + trailing arrow. The icon tile is a fixed
+   size so the labels line up in a column regardless of glyph width. */
+.mobile-sheet .sheet-ico{
+  width:34px; height:34px; flex:none; border-radius:11px;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--grad-soft); color:var(--accent-1);
+}
+.mobile-sheet .sheet-ico svg{ width:18px; height:18px; }
+.mobile-sheet .sheet-label{ flex:1; min-width:0; }
+.mobile-sheet .sheet-arrow{ flex:none; width:18px; height:18px; color:var(--ink-faint); }
+.mobile-sheet a.active{ color:var(--accent-1); }
+.mobile-sheet a.active .sheet-ico{ background:var(--grad); color:#fff2ea; }
 .sheet-backdrop{ position:fixed; left:0; right:0; top:0; bottom:var(--dock-h); z-index:590; background:rgba(30,20,10,.35); opacity:0; pointer-events:none; transition:opacity .35s ease; }
 .sheet-backdrop.open{ opacity:1; pointer-events:auto; }
 
@@ -703,12 +708,20 @@ main{ display:block; }
 }
 .dock-menu-panel .grabber{ width:44px; height:5px; border-radius:var(--r-full); background:var(--border); margin:10px auto 12px; }
 .dock-menu-link{
-  display:flex; align-items:center; gap:12px; padding:13px 16px; border-radius:12px;
-  font-family:var(--font-display); font-weight:600; font-size:.92rem; color:var(--ink-soft);
+  display:flex; align-items:center; gap:14px; padding:11px 12px; border-radius:14px;
+  font-family:var(--font-display); font-weight:600; font-size:.95rem; color:var(--ink);
 }
-.dock-menu-link svg{ width:19px; height:19px; flex:none; }
-.dock-menu-link:hover{ background:var(--surface-2); color:var(--ink); }
+.dock-menu-link .sheet-ico{
+  width:34px; height:34px; flex:none; border-radius:11px;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--grad-soft); color:var(--accent-1);
+}
+.dock-menu-link .sheet-ico svg{ width:18px; height:18px; }
+.dock-menu-link .sheet-label{ flex:1; min-width:0; }
+.dock-menu-link .sheet-arrow{ flex:none; width:18px; height:18px; color:var(--ink-faint); }
+.dock-menu-link:hover{ background:var(--surface-2); }
 .dock-menu-link.active{ background:var(--grad-soft); color:var(--accent-1); }
+.dock-menu-link.active .sheet-ico{ background:var(--grad); color:#fff2ea; }
 .admin-toolbar{ display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap; margin-bottom:24px; }
 .admin-form-card{ margin-bottom:24px; }
 .admin-actions-cell{ display:flex; gap:8px; justify-content:flex-end; }

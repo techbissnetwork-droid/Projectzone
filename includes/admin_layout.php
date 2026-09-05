@@ -4,7 +4,7 @@ const ADMIN_NAV = [
     ['path' => 'users.php', 'label' => 'Users', 'icon' => 'users'],
     ['path' => 'businesses.php', 'label' => 'Businesses', 'icon' => 'box'],
     ['path' => 'messages.php', 'label' => 'Messages', 'icon' => 'mail'],
-    ['path' => 'orders.php', 'label' => 'Orders', 'icon' => 'star'],
+    ['path' => 'orders.php', 'label' => 'Orders', 'icon' => 'chart'],
     ['path' => 'marketing.php', 'label' => 'Marketing', 'icon' => 'pin'],
     ['path' => 'tickets.php', 'label' => 'Tickets', 'icon' => 'chat'],
     ['path' => 'products.php', 'label' => 'Products', 'icon' => 'star'],
@@ -95,23 +95,31 @@ function admin_bottomnav(array $staff, string $active): string
         $items .= '<a href="' . e($item['path']) . '" class="' . $cls . '">' . ico($item['icon']) . '<span>' . e($item['label']) . '</span></a>';
     }
 
+    // The panel lists every section this staff member can reach, not just
+    // the ones that didn't fit in the dock — the dock's three shortcuts are
+    // a subset of the menu, so showing only the remainder made the menu
+    // look like it was missing pages. Same shape as the public site's sheet.
     $panel = '';
-    foreach ($overflow as $item) {
+    foreach ($visible as $item) {
         $isActive = $item['path'] === $active;
-        if ($isActive) {
+        if ($isActive && in_array($item, $overflow, true)) {
             $activeInOverflow = true;
         }
         $cls = $isActive ? 'dock-menu-link active' : 'dock-menu-link';
-        $panel .= '<a href="' . e($item['path']) . '" class="' . $cls . '">' . ico($item['icon']) . '<span>' . e($item['label']) . '</span></a>';
+        $panel .= '<a href="' . e($item['path']) . '" class="' . $cls . '">'
+            . '<span class="sheet-ico">' . ico($item['icon']) . '</span>'
+            . '<span class="sheet-label">' . e($item['label']) . '</span>'
+            . ico('arrow', 'sheet-arrow') . '</a>';
     }
 
     $summaryCls = $activeInOverflow ? 'dock-item active' : 'dock-item';
     $menuIconHtml = ico('menu');
     $closeIconHtml = ico('close');
+    // No separate close control: the Menu icon itself becomes the close
+    // icon while the panel is open (see the toggle handler below).
     $items .= '<details class="dock-menu"><summary class="' . $summaryCls . '">' . $menuIconHtml . '<span>Menu</span></summary>'
         . '<div class="dock-menu-backdrop" onclick="this.closest(\'details\').open=false;"></div>'
         . '<div class="dock-menu-panel"><div class="grabber"></div>'
-        . '<button type="button" class="sheet-close" aria-label="Close menu" onclick="this.closest(\'details\').open=false;">' . $closeIconHtml . '</button>'
         . $panel . '</div></details>';
 
     return '<nav class="bottom-dock admin-bottomnav" aria-label="Admin quick access">' . $items . '</nav>'

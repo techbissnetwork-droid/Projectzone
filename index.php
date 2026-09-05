@@ -186,9 +186,6 @@ if (!$isKnownRoute) {
 <div class="sheet-backdrop" id="sheetBackdrop"></div>
 <div class="mobile-sheet" id="mobileSheet">
   <div class="grabber"></div>
-  <button class="sheet-close" id="sheetCloseBtn" aria-label="Close menu">
-    <svg viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-  </button>
   <nav id="mobileNav" aria-label="Mobile"></nav>
 </div>
 

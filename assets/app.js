@@ -59,7 +59,8 @@ var ICONS = {
   refresh:'<path d="M4 12a8 8 0 0 1 13.9-5.4M20 12a8 8 0 0 1-13.9 5.4M17 3.5V7h-3.5M7 20.5V17h3.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>',
   spark:'<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M18 6l-2.5 2.5M8.5 15.5 6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
   layers:'<path d="M12 3.5 3.5 8 12 12.5 20.5 8 12 3.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="m3.5 12 8.5 4.5L20.5 12M3.5 16l8.5 4.5L20.5 16" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>',
-  star:'<path d="M12 3.4l2.7 5.5 6 .9-4.4 4.2 1 6-5.3-2.8-5.3 2.8 1-6-4.4-4.2 6-.9L12 3.4Z" fill="currentColor"/>'
+  star:'<path d="M12 3.4l2.7 5.5 6 .9-4.4 4.2 1 6-5.3-2.8-5.3 2.8 1-6-4.4-4.2 6-.9L12 3.4Z" fill="currentColor"/>',
+  home:'<path d="M4 11.5 12 4l8 7.5M6 10v9.5a1 1 0 0 0 1 1h3.5V15a1.5 1.5 0 0 1 1.5-1.5v0A1.5 1.5 0 0 1 13.5 15v5.5H17a1 1 0 0 0 1-1V10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>'
 };
 function ico(name,cls){ return '<svg class="icon '+(cls||'')+'" viewBox="0 0 24 24" fill="none" aria-hidden="true">'+(ICONS[name]||ICONS.spark)+'</svg>'; }
 function blobIcon(name,size,soft){ return '<div class="blob-icon '+(size||'')+' '+(soft?'soft':'')+'">'+ico(name)+'</div>'; }
@@ -193,16 +194,16 @@ var BlobField = (function(){
    5. NAV — blob indicator + routing links + mobile sheet
 =================================================================== */
 var ROUTES = [
-  {path:'/', label:'Home'},
-  {path:'/services', label:'Services'},
-  {path:'/solutions', label:'Solutions'},
-  {path:'/marketplace', label:'Marketplace'},
-  {path:'/work', label:'Work'},
-  {path:'/process', label:'Process'},
-  {path:'/pricing', label:'Pricing'},
-  {path:'/about', label:'About'},
-  {path:'/resources', label:'Resources'},
-  {path:'/contact', label:'Contact'}
+  {path:'/', label:'Home', icon:'home'},
+  {path:'/services', label:'Services', icon:'layers'},
+  {path:'/solutions', label:'Solutions', icon:'puzzle'},
+  {path:'/marketplace', label:'Marketplace', icon:'cart'},
+  {path:'/work', label:'Work', icon:'star'},
+  {path:'/process', label:'Process', icon:'compass'},
+  {path:'/pricing', label:'Pricing', icon:'chart'},
+  {path:'/about', label:'About', icon:'users'},
+  {path:'/resources', label:'Resources', icon:'book'},
+  {path:'/contact', label:'Contact', icon:'mail'}
 ];
 var navLinksEl = $('#navLinks');
 ROUTES.forEach(function(r){
@@ -229,18 +230,15 @@ navLinksEl.addEventListener('mouseover', function(e){
 navLinksEl.addEventListener('mouseleave', function(){ moveNavBlob(currentNavLink()); });
 
 var mobileNav = $('#mobileNav');
-/* Home is left out of this sheet — the bottom dock (visible at the same
-   widths this sheet opens from) already has its own dedicated Home icon,
-   so listing it again here would just duplicate it. */
-ROUTES.filter(function(r){ return r.path !== '/'; }).forEach(function(r){
+/* The complete nav, each row led by its own icon — the dock's four
+   shortcuts are a subset of this, not a replacement for it, so leaving
+   entries out of here just made the menu look like it was missing pages. */
+ROUTES.forEach(function(r){
   var a = document.createElement('a');
   a.href=BP+r.path; a.dataset.path=r.path;
-  a.innerHTML = r.label + ico('arrow');
+  a.innerHTML = '<span class="sheet-ico">'+ico(r.icon)+'</span><span class="sheet-label">'+esc(r.label)+'</span>'+ico('arrow','sheet-arrow');
   mobileNav.appendChild(a);
 });
-/* "Log in" is intentionally left out of this menu — the bottom dock (visible
-   at the same widths this menu opens from) already has its own dedicated
-   Log in icon, so listing it again here would just duplicate it. */
 var burger=$('#navBurger'), sheet=$('#mobileSheet'), backdrop=$('#sheetBackdrop'), dockMenuBtn=$('#dockMenuBtn');
 var burgerIconOpen = burger.querySelector('svg').outerHTML;
 var dockMenuIconOpen = dockMenuBtn.querySelector('svg').outerHTML;
@@ -260,13 +258,6 @@ burger.addEventListener('click', function(){ openSheet(!sheet.classList.contains
 dockMenuBtn.addEventListener('click', function(){ openSheet(!sheet.classList.contains('open')); });
 backdrop.addEventListener('click', function(){ openSheet(false); });
 mobileNav.addEventListener('click', function(){ openSheet(false); });
-/* A close button lives inside the sheet itself (not just the backdrop and
-   the dock button) because with enough nav items the sheet can grow tall
-   enough to cover the dock's own Close icon — this one is always visible
-   regardless of how much content is in the sheet. */
-var sheetCloseBtn = $('#sheetCloseBtn');
-if(sheetCloseBtn) sheetCloseBtn.addEventListener('click', function(){ openSheet(false); });
-
 /* The bottom dock's 4 icons must stay visible and usable at all times,
    even while the menu sheet above it is open — so the sheet and its
    backdrop stop exactly at the dock's top edge (--dock-h), measured here
