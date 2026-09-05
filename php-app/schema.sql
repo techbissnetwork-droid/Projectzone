@@ -20,6 +20,7 @@ CREATE TABLE `staff` (
   `is_owner` TINYINT(1) NOT NULL DEFAULT 0,
   `initials` VARCHAR(4) NOT NULL DEFAULT '',
   `marketing_daily_goal` INT UNSIGNED NULL,
+  `marketing_daily_cap` INT UNSIGNED NULL,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -226,6 +227,7 @@ INSERT INTO `settings` (`id`, `value`) VALUES
 ('logo_style', 'icon_text'),
 ('logo_animation', 'on'),
 ('marketing_daily_goal_default', '5'),
+('marketing_daily_cap_default', '0'),
 ('ui_zoom', '100'),
 ('smtp_host', ''),
 ('smtp_port', '587'),

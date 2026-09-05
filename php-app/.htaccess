@@ -1,3 +1,22 @@
+# Block direct access to files that ship with the app but should never be
+# fetchable over the web: schema.sql carries the seeded demo password
+# hashes and full table structure, README/dotfiles carry deployment
+# details, and none of them are read by the app at runtime.
+<FilesMatch "(^|/)(schema\.sql|README\.md|\.gitignore|\.gitattributes|composer\.(json|lock)|\.env.*)$">
+    Require all denied
+</FilesMatch>
+# Apache 2.2 fallback for the rule above.
+<IfModule !mod_authz_core.c>
+    <FilesMatch "(^|/)(schema\.sql|README\.md|\.gitignore|\.gitattributes|composer\.(json|lock)|\.env.*)$">
+        Order allow,deny
+        Deny from all
+    </FilesMatch>
+</IfModule>
+# Never serve a literal .htaccess/.git if one ends up in the webroot.
+<FilesMatch "^\.(htaccess|git)">
+    Require all denied
+</FilesMatch>
+
 # Clean URLs: TECHBISS is a single-page app served from index.php. Any
 # request that isn't an existing file or folder (assets/, admin/, install/,
 # api/, config.php, ...) falls through to index.php, which renders the

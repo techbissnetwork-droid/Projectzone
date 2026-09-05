@@ -167,7 +167,7 @@ function current_staff(): ?array
     if (empty($_SESSION['staff_id'])) {
         return null;
     }
-    $stmt = db()->prepare('SELECT id, name, email, role, permissions, is_owner, marketing_daily_goal FROM staff WHERE id = ?');
+    $stmt = db()->prepare('SELECT id, name, email, role, permissions, is_owner, marketing_daily_goal, marketing_daily_cap FROM staff WHERE id = ?');
     $stmt->execute([$_SESSION['staff_id']]);
     $row = $stmt->fetch();
     return $row ?: null;

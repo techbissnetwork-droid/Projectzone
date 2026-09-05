@@ -11,6 +11,11 @@ $pdo = db();
 $canSubmit = staff_has_permission($staff, 'marketing_submit');
 $canReview = staff_has_permission($staff, 'marketing_review');
 
+$defaultGoal = max(1, (int)get_setting('marketing_daily_goal_default', 5));
+$myGoal = $staff['marketing_daily_goal'] !== null ? (int)$staff['marketing_daily_goal'] : $defaultGoal;
+$defaultCap = max(0, (int)get_setting('marketing_daily_cap_default', 0));
+$myCap = $staff['marketing_daily_cap'] !== null ? (int)$staff['marketing_daily_cap'] : $defaultCap;
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
     if (!csrf_check((string)($_POST['csrf'] ?? ''))) {
@@ -20,8 +25,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $phone = trim((string)($_POST['phone'] ?? ''));
         $address = trim((string)($_POST['address'] ?? ''));
         $notes = trim((string)($_POST['notes'] ?? ''));
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM marketing_leads WHERE staff_id = ? AND DATE(created_at) = CURDATE()");
+        $stmt->execute([$staff['id']]);
+        $todayCountNow = (int)$stmt->fetchColumn();
         if ($name === '' || $phone === '' || $address === '') {
             flash('Business name, phone and address are all required.', 'error');
+        } elseif ($myCap > 0 && $todayCountNow >= $myCap) {
+            flash("You've reached today's limit of $myCap leads — come back tomorrow.", 'error');
         } else {
             $pdo->prepare('INSERT INTO marketing_leads (staff_id, business_name, phone, address, notes) VALUES (?,?,?,?,?)')
                 ->execute([$staff['id'], $name, $phone, $address, $notes !== '' ? $notes : null]);
@@ -37,25 +47,59 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     } elseif ($action === 'set_goal_default' && $canReview) {
         $goal = max(1, (int)($_POST['goal_default'] ?? 5));
-        $pdo->prepare('INSERT INTO settings (id, value) VALUES (?, ?) ON DUPLICATE KEY UPDATE value = VALUES(value)')
-            ->execute(['marketing_daily_goal_default', (string)$goal]);
-        flash('Default daily goal updated.');
+        $cap = max(0, (int)($_POST['cap_default'] ?? 0));
+        $stmt = $pdo->prepare('INSERT INTO settings (id, value) VALUES (?, ?) ON DUPLICATE KEY UPDATE value = VALUES(value)');
+        $stmt->execute(['marketing_daily_goal_default', (string)$goal]);
+        $stmt->execute(['marketing_daily_cap_default', (string)$cap]);
+        flash('Defaults updated.');
     } elseif ($action === 'set_staff_goal' && $canReview) {
         $staffId = (int)($_POST['staff_id'] ?? 0);
-        $custom = trim((string)($_POST['custom_goal'] ?? ''));
-        $pdo->prepare('UPDATE staff SET marketing_daily_goal = ? WHERE id = ?')
-            ->execute([$custom !== '' ? max(1, (int)$custom) : null, $staffId]);
+        $customGoal = trim((string)($_POST['custom_goal'] ?? ''));
+        $customCap = trim((string)($_POST['custom_cap'] ?? ''));
+        $pdo->prepare('UPDATE staff SET marketing_daily_goal = ?, marketing_daily_cap = ? WHERE id = ?')
+            ->execute([
+                $customGoal !== '' ? max(1, (int)$customGoal) : null,
+                $customCap !== '' ? max(0, (int)$customCap) : null,
+                $staffId,
+            ]);
         flash('Goal updated.');
     }
     header('Location: marketing.php');
     exit;
 }
 
-$defaultGoal = max(1, (int)get_setting('marketing_daily_goal_default', 5));
-$myGoal = $staff['marketing_daily_goal'] !== null ? (int)$staff['marketing_daily_goal'] : $defaultGoal;
 $stmt = $pdo->prepare("SELECT COUNT(*) FROM marketing_leads WHERE staff_id = ? AND DATE(created_at) = CURDATE()");
 $stmt->execute([$staff['id']]);
 $myTodayCount = (int)$stmt->fetchColumn();
+
+function marketing_status_counts(PDO $pdo, ?int $staffId): array
+{
+    $sql = "SELECT
+        COUNT(*) AS total,
+        SUM(status = 'Pending') AS pending,
+        SUM(status = 'Approved') AS approved,
+        SUM(status = 'Rejected') AS rejected
+        FROM marketing_leads" . ($staffId !== null ? ' WHERE staff_id = ?' : '');
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($staffId !== null ? [$staffId] : []);
+    $row = $stmt->fetch();
+    $counts = [
+        'total' => (int)($row['total'] ?? 0),
+        'pending' => (int)($row['pending'] ?? 0),
+        'approved' => (int)($row['approved'] ?? 0),
+        'rejected' => (int)($row['rejected'] ?? 0),
+    ];
+    $reviewed = $counts['approved'] + $counts['rejected'];
+    $counts['success_rate'] = $reviewed > 0 ? (int)round($counts['approved'] / $reviewed * 100) : null;
+    return $counts;
+}
+
+if ($canSubmit) {
+    $myStats = marketing_status_counts($pdo, (int)$staff['id']);
+}
+if ($canReview) {
+    $globalStats = marketing_status_counts($pdo, null);
+}
 
 if ($canReview) {
     $leads = $pdo->query(
@@ -67,8 +111,12 @@ if ($canReview) {
     )->fetchAll();
 
     $team = $pdo->query(
-        "SELECT s.id, s.name, s.marketing_daily_goal,
-                (SELECT COUNT(*) FROM marketing_leads l WHERE l.staff_id = s.id AND DATE(l.created_at) = CURDATE()) AS today_count
+        "SELECT s.id, s.name, s.marketing_daily_goal, s.marketing_daily_cap,
+                (SELECT COUNT(*) FROM marketing_leads l WHERE l.staff_id = s.id AND DATE(l.created_at) = CURDATE()) AS today_count,
+                (SELECT COUNT(*) FROM marketing_leads l WHERE l.staff_id = s.id) AS total_count,
+                (SELECT COUNT(*) FROM marketing_leads l WHERE l.staff_id = s.id AND l.status = 'Pending') AS pending_count,
+                (SELECT COUNT(*) FROM marketing_leads l WHERE l.staff_id = s.id AND l.status = 'Approved') AS approved_count,
+                (SELECT COUNT(*) FROM marketing_leads l WHERE l.staff_id = s.id AND l.status = 'Rejected') AS rejected_count
          FROM staff s
          WHERE s.permissions IS NULL OR JSON_CONTAINS(s.permissions, '\"marketing_submit\"')
          ORDER BY s.name"
@@ -104,16 +152,27 @@ $token = csrf_token();
 <?= admin_header($staff, 'marketing.php') ?>
 <main class="admin-page">
   <?= admin_flash_html() ?>
+  <?php $capReached = $myCap > 0 && $myTodayCount >= $myCap; ?>
   <div class="admin-toolbar">
     <div><h1 style="margin-bottom:4px;">Marketing</h1><p class="lede" style="margin-bottom:0;">Offline businesses found in the field, ready for a follow-up call or visit.</p></div>
-    <?php if ($canSubmit): ?><button class="btn btn-primary" type="button" id="addBtn" onclick="toggleAddForm('add')"><?= ico('plus') ?> Submit a lead</button><?php endif; ?>
+    <?php if ($canSubmit && !$capReached): ?><button class="btn btn-primary" type="button" id="addBtn" onclick="toggleAddForm('add')"><?= ico('plus') ?> Submit a lead</button><?php endif; ?>
   </div>
 
   <?php if ($canSubmit): ?>
-  <div class="card" style="margin-bottom:22px;">
-    <p class="lede" style="margin-bottom:6px;">Today's goal: <b><?= min($myTodayCount, $myGoal) ?> of <?= $myGoal ?></b> leads<?= $myTodayCount >= $myGoal ? ' — goal met! 🎉' : '' ?></p>
-    <div class="progress-track"><div class="progress-fill" style="width:<?= min(100, (int)round($myTodayCount / $myGoal * 100)) ?>%;"></div></div>
+  <div class="grid grid-4" style="margin-bottom:22px;">
+    <div class="card tilt"><?= blob_icon('pin', 'sm', true) ?><div class="stat" style="margin-top:12px;"><div class="num"><?= number_format($myStats['total']) ?></div><div class="label">Total submitted</div></div></div>
+    <div class="card tilt"><?= blob_icon('chart', 'sm', true) ?><div class="stat" style="margin-top:12px;"><div class="num"><?= number_format($myStats['pending']) ?></div><div class="label">Pending review</div></div></div>
+    <div class="card tilt"><?= blob_icon('shield', 'sm', true) ?><div class="stat" style="margin-top:12px;"><div class="num"><?= number_format($myStats['approved']) ?></div><div class="label">Approved</div></div></div>
+    <div class="card tilt"><?= blob_icon('close', 'sm', true) ?><div class="stat" style="margin-top:12px;"><div class="num"><?= number_format($myStats['rejected']) ?></div><div class="label">Rejected</div></div></div>
   </div>
+  <div class="card" style="margin-bottom:22px;">
+    <p class="lede" style="margin-bottom:6px;">Today's goal: <b><?= min($myTodayCount, $myGoal) ?> of <?= $myGoal ?></b> leads<?= $myTodayCount >= $myGoal ? ' — goal met! 🎉' : '' ?><?= $myStats['success_rate'] !== null ? ' · Success rate: <b>' . $myStats['success_rate'] . '%</b>' : '' ?></p>
+    <div class="progress-track"><div class="progress-fill" style="width:<?= min(100, (int)round($myTodayCount / $myGoal * 100)) ?>%;"></div></div>
+    <?php if ($myCap > 0): ?>
+    <p style="font-size:.82rem;color:var(--ink-faint);margin:10px 0 0;">Daily limit: <?= $myCap ?> leads<?= $capReached ? ' — <b style="color:var(--danger);">reached for today, come back tomorrow</b>' : " ($myTodayCount used)" ?></p>
+    <?php endif; ?>
+  </div>
+  <?php if (!$capReached): ?>
   <div class="card admin-form-card" id="addCard" hidden>
     <div class="card-head"><?= blob_icon('plus', 'sm', true) ?><h3>Submit a lead</h3></div>
     <form method="post">
@@ -132,34 +191,47 @@ $token = csrf_token();
     </form>
   </div>
   <?php endif; ?>
+  <?php endif; ?>
 
   <?php if ($canReview): ?>
+  <div class="grid grid-4" style="margin-bottom:22px;">
+    <div class="card tilt"><?= blob_icon('pin', 'sm', true) ?><div class="stat" style="margin-top:12px;"><div class="num"><?= number_format($globalStats['total']) ?></div><div class="label">Total leads, all staff</div></div></div>
+    <div class="card tilt"><?= blob_icon('chart', 'sm', true) ?><div class="stat" style="margin-top:12px;"><div class="num"><?= number_format($globalStats['pending']) ?></div><div class="label">Awaiting your review</div></div></div>
+    <div class="card tilt"><?= blob_icon('shield', 'sm', true) ?><div class="stat" style="margin-top:12px;"><div class="num"><?= number_format($globalStats['approved']) ?></div><div class="label">Approved</div></div></div>
+    <div class="card tilt"><?= blob_icon('close', 'sm', true) ?><div class="stat" style="margin-top:12px;"><div class="num"><?= $globalStats['success_rate'] !== null ? $globalStats['success_rate'] . '%' : '—' ?></div><div class="label">Success rate<?= $globalStats['rejected'] > 0 ? ' (' . number_format($globalStats['rejected']) . ' rejected)' : '' ?></div></div></div>
+  </div>
   <div class="card" style="margin-bottom:22px;">
     <div class="card-head"><?= blob_icon('chart', 'sm', true) ?><h3>Daily goal</h3></div>
     <form method="post" class="flex gap-12" style="flex-wrap:wrap;align-items:flex-end;margin-bottom:20px;">
       <input type="hidden" name="action" value="set_goal_default">
       <input type="hidden" name="csrf" value="<?= e($token) ?>">
-      <div class="field" style="margin-bottom:0;"><label>Default leads/day <small style="font-weight:400;color:var(--ink-faint);">(applies to everyone without a custom goal)</small></label><input type="number" min="1" name="goal_default" value="<?= (int)$defaultGoal ?>" style="max-width:120px;"></div>
-      <button class="btn btn-ghost" type="submit">Save default</button>
+      <div class="field" style="margin-bottom:0;"><label>Default leads/day <small style="font-weight:400;color:var(--ink-faint);">(the tracked target)</small></label><input type="number" min="1" name="goal_default" value="<?= (int)$defaultGoal ?>" style="max-width:120px;"></div>
+      <div class="field" style="margin-bottom:0;"><label>Default daily limit <small style="font-weight:400;color:var(--ink-faint);">(0 = unlimited submissions)</small></label><input type="number" min="0" name="cap_default" value="<?= (int)$defaultCap ?>" style="max-width:120px;"></div>
+      <button class="btn btn-ghost" type="submit">Save defaults</button>
     </form>
-    <div class="table-wrap"><table><thead><tr><th>Staff</th><th>Today</th><th>Goal</th><th>Custom goal</th></tr></thead><tbody>
-      <?php foreach ($team as $t): ?>
+    <div class="table-wrap"><table><thead><tr><th>Staff</th><th>Today</th><th>Goal</th><th>Limit</th><th>Set custom goal / limit</th></tr></thead><tbody>
+      <?php foreach ($team as $t):
+        $effGoal = $t['marketing_daily_goal'] !== null ? (int)$t['marketing_daily_goal'] : $defaultGoal;
+        $effCap = $t['marketing_daily_cap'] !== null ? (int)$t['marketing_daily_cap'] : $defaultCap;
+      ?>
       <tr>
         <td style="font-weight:600;"><?= e($t['name']) ?></td>
         <td><?= (int)$t['today_count'] ?></td>
-        <td><?= $t['marketing_daily_goal'] !== null ? (int)$t['marketing_daily_goal'] : $defaultGoal ?><?= $t['marketing_daily_goal'] === null ? ' (default)' : '' ?></td>
+        <td><?= $effGoal ?><?= $t['marketing_daily_goal'] === null ? ' (default)' : '' ?></td>
+        <td><?= $effCap > 0 ? $effCap : 'Unlimited' ?><?= $t['marketing_daily_cap'] === null ? ' (default)' : '' ?></td>
         <td>
           <form method="post" class="flex gap-8" style="align-items:center;">
             <input type="hidden" name="action" value="set_staff_goal">
             <input type="hidden" name="csrf" value="<?= e($token) ?>">
             <input type="hidden" name="staff_id" value="<?= (int)$t['id'] ?>">
-            <input type="number" min="1" name="custom_goal" value="<?= $t['marketing_daily_goal'] !== null ? (int)$t['marketing_daily_goal'] : '' ?>" placeholder="Default" style="max-width:100px;">
+            <input type="number" min="1" name="custom_goal" value="<?= $t['marketing_daily_goal'] !== null ? (int)$t['marketing_daily_goal'] : '' ?>" placeholder="Goal" style="max-width:80px;">
+            <input type="number" min="0" name="custom_cap" value="<?= $t['marketing_daily_cap'] !== null ? (int)$t['marketing_daily_cap'] : '' ?>" placeholder="Limit" style="max-width:80px;">
             <button class="btn btn-ghost btn-sm" type="submit">Save</button>
           </form>
         </td>
       </tr>
       <?php endforeach; ?>
-      <?php if (!$team): ?><tr><td colspan="4" style="color:var(--ink-faint);">No staff with marketing access yet.</td></tr><?php endif; ?>
+      <?php if (!$team): ?><tr><td colspan="5" style="color:var(--ink-faint);">No staff with marketing access yet.</td></tr><?php endif; ?>
     </tbody></table></div>
   </div>
   <?php endif; ?>
