@@ -535,17 +535,17 @@ tr:last-child td{ border-bottom:none; }
    underneath the fixed bottom dock on every mobile width instead of
    clearing it. */
 @media (max-width:1360px){ .footer{ padding-bottom:calc(var(--dock-h) + 12px); } }
-.footer-grid{ display:grid; grid-template-columns:1.4fr repeat(3,1fr); gap:32px; margin-bottom:50px; align-items:start; }
+.footer-grid{ display:grid; grid-template-columns:1.4fr repeat(4,1fr); gap:32px; margin-bottom:50px; align-items:start; }
 .footer-grid > div{ margin:0; }
 @media (max-width:800px){
   /* The brand block (logo/tagline/email badge) is much taller than the
-     three link columns — sharing a row with any of them stretched that
-     row's height to match, leaving an ugly empty gap under the shorter
-     column before the next row even started. Giving it a full-width row
-     of its own, with Company/Platform/Get started as an even 3-column
-     row underneath, keeps every row's height driven by comparable
-     content instead. */
-  .footer-grid{ grid-template-columns:repeat(3,1fr); gap:20px; }
+     link columns — sharing a row with any of them stretched that row's
+     height to match, leaving an ugly empty gap under the shorter column
+     before the next row even started. Giving it a full-width row of its
+     own, with Company/Platform/Get started/Legal as an even 2x2 grid
+     underneath, keeps every row's height driven by comparable content
+     instead. */
+  .footer-grid{ grid-template-columns:repeat(2,1fr); gap:20px; margin-bottom:28px; }
   .footer-grid > div:first-child{ grid-column:1 / -1; margin-bottom:10px; }
 }
 .footer-grid h4{ font-size:.85rem; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-faint); margin-bottom:16px; }
@@ -553,6 +553,7 @@ tr:last-child td{ border-bottom:none; }
 .footer-grid a:hover{ color:var(--accent-1); }
 .footer-grid a.logo{ display:flex; padding:0; }
 .footer-bottom{ display:flex; justify-content:space-between; align-items:center; padding-top:28px; border-top:1px solid var(--border-soft); flex-wrap:wrap; gap:12px; color:var(--ink-faint); font-size:.85rem; }
+@media (max-width:800px){ .footer-bottom{ padding-top:18px; } }
 .footer-bottom a{ color:var(--ink-faint); }
 .footer-bottom a:hover{ color:var(--accent-1); }
 

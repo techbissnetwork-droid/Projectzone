@@ -221,10 +221,13 @@ if ($baseUrl !== '') {
         <h4>Get started</h4>
         <a href="/pricing">Pricing</a><a href="/contact">Contact</a><a href="/login">Log in</a>
       </div>
+      <div>
+        <h4>Legal</h4>
+        <a href="/privacy">Privacy Policy</a><a href="/terms">Terms &amp; Conditions</a>
+      </div>
     </div>
     <div class="footer-bottom">
       <span>© <?= date('Y') ?> <?= e($siteName) ?>. All rights reserved.</span>
-      <div class="flex gap-16"><a href="/privacy">Privacy Policy</a><a href="/terms">Terms &amp; Conditions</a></div>
     </div>
   </div>
 </footer>
