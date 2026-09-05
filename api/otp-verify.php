@@ -6,6 +6,11 @@ require_installed_api();
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     send_json(['error' => 'Method not allowed'], 405);
 }
+require_same_origin();
+
+if (!rate_limit_hit('otpverify:' . client_ip(), 30, 3600)) {
+    send_json(['error' => 'Too many attempts. Please wait a few minutes and try again.'], 429);
+}
 
 $body = json_body();
 $token = trim((string)($body['token'] ?? ''));

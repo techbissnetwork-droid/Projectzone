@@ -10,7 +10,8 @@ require_once __DIR__ . '/../includes/migrate.php';
  * nothing about the update mechanism depends on this folder surviving
  * between deploys.
  */
-function install_self_destruct(): void
+/** @return bool true only if the folder is really gone afterwards. */
+function install_self_destruct(): bool
 {
     $dir = __DIR__;
     $items = new RecursiveIteratorIterator(
@@ -21,6 +22,11 @@ function install_self_destruct(): void
         $item->isDir() ? @rmdir($item->getPathname()) : @unlink($item->getPathname());
     }
     @rmdir($dir);
+    clearstatcache();
+    // Previously this reported success unconditionally, so an admin whose
+    // permissions blocked the delete believed a publicly reachable
+    // installer was gone when it was still sitting there.
+    return !is_dir($dir);
 }
 
 function detect_base_url(): string
@@ -29,7 +35,14 @@ function detect_base_url(): string
         || (($_SERVER['SERVER_PORT'] ?? '') == 443)
         || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
     $scheme = $https ? 'https' : 'http';
-    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    // The Host header is attacker-controllable, and whatever lands here is
+    // saved as SITE_URL — which builds every sign-in magic link and download
+    // URL the site emails out. It is only ever a suggestion for the admin to
+    // confirm (see the warning next to the field), never trusted as-is.
+    $host = (string)($_SERVER['HTTP_HOST'] ?? 'localhost');
+    if (!preg_match('/^[A-Za-z0-9.\-]+(:\d+)?$/', $host)) {
+        $host = 'localhost';
+    }
     // This script lives in /install/, so the site root is one level up.
     $scriptDir = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '/install/index.php'));
     $root = rtrim(dirname($scriptDir), '/');
@@ -56,9 +69,42 @@ if ($configExists && defined('DB_HOST')) {
 $action = $_SERVER['REQUEST_METHOD'] === 'POST' ? ($_POST['action'] ?? '') : '';
 $formError = '';
 
+/**
+ * install.lock is listed in .gitignore, so any deploy that pushes from git
+ * or re-uploads the repository arrives without it. Gating the installer's
+ * setup and database-wiping branches on that file alone therefore re-opened
+ * them — unauthenticated — on live sites carrying real customer data.
+ *
+ * The real question is whether this database already holds the app's
+ * tables. When it does, the site is installed no matter what is on disk,
+ * and nothing below may reconfigure or wipe it without a staff session.
+ */
+$hasAppTables = $pdo ? db_has_app_tables($pdo) : false;
+if ($hasAppTables && !$lockExists) {
+    @file_put_contents(INSTALL_LOCK_PATH, date('c'));
+    $lockExists = file_exists(INSTALL_LOCK_PATH);
+}
+$installedForReal = $lockExists || $hasAppTables;
+
+/** Destructive and reconfiguring actions on an installed site need a staff session. */
+function install_guard_installed(bool $installedForReal, ?string &$formError): bool
+{
+    if (!$installedForReal) {
+        return true;
+    }
+    if (current_staff()) {
+        return true;
+    }
+    $formError = 'This site is already installed. Sign in at /admin/ first — the installer will not '
+        . 'reconfigure or erase a database that already contains data.';
+    return false;
+}
+
 // ---- Step: save database connection + site URL, write config.php ----
 if (!$lockExists && $action === 'save_db') {
-    if (!csrf_check((string)($_POST['csrf'] ?? ''))) {
+    if (!install_guard_installed($installedForReal, $formError)) {
+        // handled — $formError is set
+    } elseif (!csrf_check((string)($_POST['csrf'] ?? ''))) {
         $formError = 'Your session expired — please try again.';
     } else {
         $dbHost = trim((string)($_POST['db_host'] ?? ''));
@@ -100,7 +146,9 @@ if (!$lockExists && $action === 'save_db') {
 
 // ---- Step: create the first admin account, run the fresh-install migration ----
 if ($pdo && !$lockExists && $action === 'create_admin') {
-    if (!csrf_check((string)($_POST['csrf'] ?? ''))) {
+    if (!install_guard_installed($installedForReal, $formError)) {
+        // handled — $formError is set
+    } elseif (!csrf_check((string)($_POST['csrf'] ?? ''))) {
         $formError = 'Your session expired — please try again.';
     } else {
         $name = trim((string)($_POST['admin_name'] ?? ''));
@@ -192,7 +240,9 @@ if ($pdo && !$lockExists && $action === 'migrate_existing') {
 }
 
 if ($pdo && !$lockExists && $action === 'fresh_install_existing') {
-    if (!csrf_check((string)($_POST['csrf'] ?? ''))) {
+    if (!install_guard_installed($installedForReal, $formError)) {
+        // handled — $formError is set
+    } elseif (!csrf_check((string)($_POST['csrf'] ?? ''))) {
         $formError = 'Your session expired — please try again.';
     } elseif (trim((string)($_POST['confirm_text'] ?? '')) !== 'DELETE EVERYTHING') {
         $formError = 'Type DELETE EVERYTHING exactly (all capitals) to confirm you want to wipe the database.';
@@ -223,9 +273,12 @@ if ($lockExists && $action === 'delete_install') {
     } elseif (!csrf_check((string)($_POST['csrf'] ?? ''))) {
         $formError = 'Your session expired — please try again.';
     } else {
-        install_self_destruct();
-        header('Location: ../admin/');
-        exit;
+        if (install_self_destruct()) {
+            header('Location: ../admin/');
+            exit;
+        }
+        $formError = 'Could not delete the install/ folder — the web server does not have permission to '
+            . 'remove it. Delete it over FTP/SSH instead; leaving it in place is a real risk.';
     }
 }
 
@@ -304,7 +357,9 @@ body{ min-height:100vh; padding:40px 20px; }
       <h3 style="margin-bottom:14px;">1. Requirements</h3>
       <div class="req-row"><span>PHP 8.0 or newer</span><span class="badge <?= $phpOk ? 'success' : 'danger' ?>"><?= $phpOk ? 'OK — ' . PHP_VERSION : 'Missing (' . PHP_VERSION . ')' ?></span></div>
       <div class="req-row"><span>pdo_mysql extension</span><span class="badge <?= $pdoOk ? 'success' : 'danger' ?>"><?= $pdoOk ? 'OK' : 'Missing' ?></span></div>
-      <div class="req-row"><span>install/ folder writable</span><span class="badge <?= is_writable(__DIR__) ? 'success' : 'warning' ?>"><?= is_writable(__DIR__) ? 'OK' : 'Check permissions' ?></span></div>
+      <?php // config.php is written to the site root, not to install/ — check the folder we actually write to. ?>
+      <?php $rootWritable = is_writable(dirname(__DIR__)); ?>
+      <div class="req-row"><span>Site root writable (for config.php)</span><span class="badge <?= $rootWritable ? 'success' : 'warning' ?>"><?= $rootWritable ? 'OK' : 'Check permissions' ?></span></div>
     </div>
 
     <?php if (!$phpOk || !$pdoOk): ?>
@@ -321,7 +376,9 @@ body{ min-height:100vh; padding:40px 20px; }
         <div class="field"><label>Database name</label><input name="db_name" value="<?= e($_POST['db_name'] ?? '') ?>" required></div>
         <div class="field"><label>Database username</label><input name="db_user" value="<?= e($_POST['db_user'] ?? '') ?>" required></div>
         <div class="field"><label>Database password</label><input type="password" name="db_pass" value=""></div>
-        <div class="field"><label>Site URL <span style="color:var(--ink-faint);font-weight:400;">(auto-detected — edit if wrong)</span></label><input name="site_url" value="<?= e($_POST['site_url'] ?? $detectedUrl) ?>" required></div>
+        <div class="field"><label>Site URL <span style="color:var(--ink-faint);font-weight:400;">(auto-detected — check this carefully)</span></label><input name="site_url" value="<?= e($_POST['site_url'] ?? $detectedUrl) ?>" required>
+          <p style="font-size:.78rem;color:var(--ink-faint);margin-top:6px;">This is guessed from the address you loaded this page on, and it becomes the base of every sign-in link and download link the site emails out. Make sure it is exactly your real public address before continuing.</p>
+        </div>
         <button class="btn btn-primary btn-block" type="submit">Connect &amp; continue</button>
       </form>
     </div>
@@ -345,7 +402,7 @@ body{ min-height:100vh; padding:40px 20px; }
   <?php elseif ($view === 'admin_account'): ?>
     <div class="card">
       <h3 style="margin-bottom:6px;">3. Create your admin account</h3>
-      <p style="font-size:.85rem;color:var(--ink-faint);margin-bottom:14px;">This becomes your staff login at <code>/admin/</code>. A few illustrative teammates are added alongside you with the same password, purely so the admin panel isn't empty on day one — rename or remove them once you're in.</p>
+      <p style="font-size:.85rem;color:var(--ink-faint);margin-bottom:14px;">This becomes your staff login at <code>/admin/</code>. It is the only account created — add teammates yourself from Admin &gt; Staff, so nobody ever shares your password.</p>
       <?php if ($formError): ?><p class="badge danger" style="margin-bottom:16px;"><?= e($formError) ?></p><?php endif; ?>
       <form method="post">
         <input type="hidden" name="action" value="create_admin">

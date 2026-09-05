@@ -6,6 +6,7 @@ require_installed_api();
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     send_json(['error' => 'Method not allowed'], 405);
 }
+require_same_origin();
 
 $customer = current_customer();
 if (!$customer) {
