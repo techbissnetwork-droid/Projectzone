@@ -378,7 +378,7 @@ $pdoOk = extension_loaded('pdo_mysql');
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/style.css?v=<?= ASSET_VERSION ?>">
+<link rel="stylesheet" href="../assets/style.css?v=<?= asset_version() ?>">
 <style>
 body{ min-height:100vh; padding:40px 20px; }
 .install-wrap{ max-width:560px; margin:0 auto; }

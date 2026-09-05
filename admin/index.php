@@ -66,13 +66,30 @@ if ($canBusinesses) {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/style.css?v=<?= ASSET_VERSION ?>">
+<link rel="stylesheet" href="../assets/style.css?v=<?= asset_version() ?>">
 <?= ui_zoom_style() ?>
 </head>
 <body>
 <?= admin_header($staff, 'index.php') ?>
 <main class="admin-page">
   <?= admin_flash_html() ?>
+
+  <?php if (assets_look_stale()): ?>
+  <?php $markers = asset_markers(); ?>
+  <div class="card" style="border-color:var(--danger);margin-bottom:20px;">
+    <div class="card-head"><?= blob_icon('shield', 'sm', true) ?><h3 style="color:var(--danger);">Your upload looks incomplete</h3></div>
+    <p style="font-size:.9rem;margin-bottom:10px;">
+      The stylesheet and script on this server don't come from the same release, so the site is running new PHP against old design files. That shows up as a broken-looking layout — a footer in the wrong shape, a menu covering the bottom bar — even though the code is correct.
+    </p>
+    <p style="font-size:.9rem;margin-bottom:10px;">
+      <?php foreach ($markers as $file => $mark): ?>
+      <code><?= e($file) ?></code> — <?= $mark === '' ? '<b style="color:var(--danger);">no version marker (old file)</b>' : e($mark) ?><br>
+      <?php endforeach; ?>
+    </p>
+    <p style="font-size:.9rem;margin-bottom:0;"><b>Fix:</b> re-upload the whole <code>assets/</code> folder, overwriting what's there. Some file managers skip a folder that already exists.</p>
+  </div>
+  <?php endif; ?>
+
   <span class="badge warning" style="margin-bottom:14px;"><?= ico('shield') ?> Internal — staff access only</span>
   <h1 style="max-width:22ch;margin-bottom:6px;">Every client, every ticket, one screen.</h1>
   <p class="lede" style="margin-bottom:28px;">All figures below are live from the database.</p>

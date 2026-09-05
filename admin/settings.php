@@ -180,7 +180,7 @@ $socialPath = $current['social_image_path'] ?? 'assets/social-default.png';
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/style.css?v=<?= ASSET_VERSION ?>">
+<link rel="stylesheet" href="../assets/style.css?v=<?= asset_version() ?>">
 <?= ui_zoom_style() ?>
 <style>.settings-preview{ width:56px;height:56px;border-radius:14px;object-fit:contain;background:var(--surface-2);border:1px solid var(--border-soft);padding:6px; }</style>
 </head>

@@ -14,18 +14,56 @@ const OTP_MAX_FAILURES_PER_HOUR = 12;
 const LOGIN_MAX_ATTEMPTS = 8;
 const LOGIN_WINDOW_SECONDS = 900;
 
+const ASSET_PATHS = ['assets/style.css', 'assets/app.js'];
+
 /**
- * Cache-buster for assets/style.css and assets/app.js.
+ * Cache-buster for the stylesheet and script, derived from what those
+ * files actually contain.
  *
- * This was filemtime(), which looks right but fails in practice: FTP and
- * many deploy tools preserve the original modification time, so the ?v=
- * value doesn't change on upload and browsers keep serving the old
- * stylesheet against freshly-updated PHP. That produced two separate
- * "it looks broken on my phone" reports — new markup, stale CSS.
- *
- * Bump this string whenever assets/ changes.
+ * It was filemtime() before, which looks right and fails in practice: FTP
+ * and most upload tools preserve the original modification time, so ?v=
+ * never changed and browsers kept serving an old stylesheet against
+ * freshly-updated PHP. A hand-bumped constant fixed that but had to be
+ * remembered. A content hash cannot drift and cannot miss a change.
  */
-const ASSET_VERSION = '2026.09.05.7';
+function asset_version(): string
+{
+    static $v = null;
+    if ($v !== null) {
+        return $v;
+    }
+    $seed = '';
+    foreach (ASSET_PATHS as $rel) {
+        $path = __DIR__ . '/../' . $rel;
+        $seed .= is_file($path) ? md5_file($path) : 'missing';
+    }
+    return $v = substr(md5($seed), 0, 10);
+}
+
+/**
+ * The release marker written at the top of each asset. A deploy that
+ * updates the PHP but not assets/ leaves these disagreeing — which is
+ * invisible otherwise, and shows up only as "the layout is wrong on my
+ * phone". admin/index.php surfaces the mismatch.
+ *
+ * @return array<string,string> path => marker ('' when absent)
+ */
+function asset_markers(): array
+{
+    $out = [];
+    foreach (ASSET_PATHS as $rel) {
+        $path = __DIR__ . '/../' . $rel;
+        $head = is_file($path) ? (string)file_get_contents($path, false, null, 0, 120) : '';
+        $out[$rel] = preg_match('~techbiss-assets ([0-9.]+)~', $head, $m) ? $m[1] : '';
+    }
+    return $out;
+}
+
+function assets_look_stale(): bool
+{
+    $markers = array_values(asset_markers());
+    return in_array('', $markers, true) || count(array_unique($markers)) > 1;
+}
 
 if (file_exists(CONFIG_PATH)) {
     require_once CONFIG_PATH;

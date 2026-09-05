@@ -236,7 +236,7 @@ function content_field_html(string $key, array $f, ?array $editing): string
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/style.css?v=<?= ASSET_VERSION ?>">
+<link rel="stylesheet" href="../assets/style.css?v=<?= asset_version() ?>">
 <?= ui_zoom_style() ?>
 <style>.content-row{ display:flex; justify-content:space-between; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid var(--border-soft); }
 .content-row:last-child{ border-bottom:none; }
