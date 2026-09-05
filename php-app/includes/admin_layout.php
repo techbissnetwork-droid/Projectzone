@@ -102,11 +102,17 @@ function admin_bottomnav(array $staff, string $active): string
     }
 
     $summaryCls = $activeInOverflow ? 'dock-item active' : 'dock-item';
-    $items .= '<details class="dock-menu"><summary class="' . $summaryCls . '">' . ico('menu') . '<span>Menu</span></summary>'
+    $menuIconHtml = ico('menu');
+    $closeIconHtml = ico('close');
+    $items .= '<details class="dock-menu"><summary class="' . $summaryCls . '">' . $menuIconHtml . '<span>Menu</span></summary>'
         . '<div class="dock-menu-panel">' . $panel . '</div></details>';
 
     return '<nav class="bottom-dock admin-bottomnav" aria-label="Admin quick access">' . $items . '</nav>'
-        . '<script>function toggleAddForm(id){var c=document.getElementById(id+"Card"),b=document.getElementById(id+"Btn");var show=c.hidden;c.hidden=!show;b.hidden=show;if(show)c.scrollIntoView({behavior:"smooth",block:"nearest"});}</script>';
+        . '<script>function toggleAddForm(id){var c=document.getElementById(id+"Card"),b=document.getElementById(id+"Btn");var show=c.hidden;c.hidden=!show;b.hidden=show;if(show)c.scrollIntoView({behavior:"smooth",block:"nearest"});}'
+        . '(function(){var d=document.querySelector(".bottom-dock .dock-menu");if(!d)return;var s=d.querySelector("summary"),icon=s.querySelector("svg"),label=s.querySelector("span");'
+        . 'var menuIcon=' . json_encode($menuIconHtml) . ',closeIcon=' . json_encode($closeIconHtml) . ';'
+        . 'd.addEventListener("toggle",function(){icon.outerHTML=d.open?closeIcon:menuIcon;icon=s.querySelector("svg");label.textContent=d.open?"Close":"Menu";});'
+        . '})();</script>';
 }
 
 function admin_flash_html(): string

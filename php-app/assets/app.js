@@ -239,10 +239,18 @@ ROUTES.forEach(function(r){
    at the same widths this menu opens from) already has its own dedicated
    Log in icon, so listing it again here would just duplicate it. */
 var burger=$('#navBurger'), sheet=$('#mobileSheet'), backdrop=$('#sheetBackdrop'), dockMenuBtn=$('#dockMenuBtn');
+var burgerIconOpen = burger.querySelector('svg').outerHTML;
+var dockMenuIconOpen = dockMenuBtn.querySelector('svg').outerHTML;
+var closeIconSvg = ico('close');
 function openSheet(o){
   sheet.classList.toggle('open',o); backdrop.classList.toggle('open',o);
   burger.setAttribute('aria-expanded', String(o));
   dockMenuBtn.setAttribute('aria-expanded', String(o));
+  burger.setAttribute('aria-label', o ? 'Close menu' : 'Open menu');
+  dockMenuBtn.setAttribute('aria-label', o ? 'Close navigation menu' : 'Open navigation menu');
+  burger.querySelector('svg').outerHTML = o ? closeIconSvg : burgerIconOpen;
+  dockMenuBtn.querySelector('svg').outerHTML = o ? closeIconSvg : dockMenuIconOpen;
+  var dockLabel = dockMenuBtn.querySelector('span'); if(dockLabel) dockLabel.textContent = o ? 'Close' : 'Menu';
   document.body.style.overflow = o ? 'hidden':'';
 }
 burger.addEventListener('click', function(){ openSheet(!sheet.classList.contains('open')); });
