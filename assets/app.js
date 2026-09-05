@@ -1,4 +1,4 @@
-/* techbiss-assets 2026.09.05.8 */
+/* techbiss-assets 2026.09.05.9 */
 (function(){
 "use strict";
 
@@ -1076,14 +1076,17 @@ function wireMarketplace(){
       return okCat && okQ;
     });
     grid.innerHTML = items.map(function(p){
+      // The whole front is a link to the product page. It used to be an
+      // inert card whose only working control was the little flip button,
+      // so tapping the card — the obvious thing to do — did nothing.
       return '<div class="flip-card"><div class="flip-inner">'
-        +'<div class="flip-face flip-front">'
+        +'<a class="flip-face flip-front" href="'+BP+'/marketplace/detail/'+esc(p.id)+'">'
           +'<div class="card-head" style="margin-bottom:12px;">'+blobIcon(p.icon,'sm')+'<h3 style="font-size:1.05rem;">'+esc(p.name)+'</h3></div>'
           +'<p style="font-size:.85rem;">'+esc(p.tagline)+'</p>'
           +'<div class="pf-preview">'+(p.image?'<img src="'+BP+'/'+esc(p.image)+'" alt="" style="width:100%;height:100%;object-fit:cover;">':ico(p.icon))+'</div>'
           +'<div class="pf-tags" style="justify-content:space-between;align-items:center;"><div style="display:flex;gap:6px;flex-wrap:wrap;"><span class="badge">'+esc(p.cat)+'</span>'+(p.rating>=4.9?'<span class="badge grad">Popular</span>':'')+'</div><span class="pf-rating">'+ico('star')+' '+esc(p.rating)+'</span></div>'
           +'<div class="pf-foot"><span class="pf-price">'+fmtMoney(p.price)+(p.pricing_type==='fixed'?'':'<span> /mo</span>')+'</span><span class="pf-hint">Flip to preview '+ico('refresh')+'</span></div>'
-        +'</div>'
+        +'</a>'
         +'<div class="flip-face flip-back">'
           +'<div><h3 style="color:#fff2ea;font-size:1.05rem;">'+esc(p.name)+'</h3>'
           +'<p style="font-size:.85rem;">'+esc(p.desc)+'</p>'
