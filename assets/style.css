@@ -574,8 +574,12 @@ tr:last-child td{ border-bottom:none; }
   .footer-bottom{ flex-direction:column; align-items:flex-start; gap:10px; }
   .footer-bottom > .flex{ flex-wrap:wrap; }
 }
-.footer-grid{ display:grid; grid-template-columns:1.4fr repeat(3,1fr); gap:32px; margin-bottom:50px; align-items:start; }
+.footer-grid{ display:grid; grid-template-columns:1.6fr repeat(4,1fr); gap:32px; margin-bottom:50px; align-items:start; }
 .footer-grid > div{ margin:0; }
+/* The brand block spans the full width once the link columns wrap, so the
+   four of them sit two-by-two underneath it rather than leaving a ragged
+   gap beside a tall paragraph. */
+@media (max-width:1024px){ .footer-grid{ grid-template-columns:repeat(4,1fr); gap:28px 24px; } .footer-grid > div:first-child{ grid-column:1 / -1; } }
 @media (max-width:800px){ .footer-grid{ grid-template-columns:1fr 1fr; } }
 .footer-grid h4{ font-size:.85rem; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-faint); margin-bottom:16px; }
 .footer-grid a{ display:block; padding:6px 0; color:var(--ink-soft); font-size:.92rem; }
