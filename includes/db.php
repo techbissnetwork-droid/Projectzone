@@ -25,7 +25,7 @@ const LOGIN_WINDOW_SECONDS = 900;
  *
  * Bump this string whenever assets/ changes.
  */
-const ASSET_VERSION = '2026.09.05.3';
+const ASSET_VERSION = '2026.09.05.4';
 
 if (file_exists(CONFIG_PATH)) {
     require_once CONFIG_PATH;

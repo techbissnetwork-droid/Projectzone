@@ -226,10 +226,7 @@ if (!$isKnownRoute) {
           <?= logo_mark_html(true, $basePath !== '' ? $basePath . '/' : '/') ?>
           <?= logo_wordmark_html() ?>
         </a>
-        <p style="max-width:32ch;"><?= e($siteTagline) ?></p>
-        <div class="flex gap-12" style="margin-top:18px;">
-          <a href="/contact" class="badge"><?= e($siteSettings['contactEmail']) ?></a>
-        </div>
+        <p><?= e($siteTagline) ?></p>
       </div>
       <div>
         <h4>Company</h4>

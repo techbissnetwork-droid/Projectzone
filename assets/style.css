@@ -278,15 +278,15 @@ button{ cursor:pointer; }
 
 /* ============================= COLOR THEME PICKER ============================= */
 .mobile-sheet{
-  position:fixed; left:0; right:0; bottom:var(--dock-h); z-index:600; background:var(--surface);
+  position:fixed; left:0; right:0; bottom:var(--dock-clear); z-index:600; background:var(--surface);
   border-radius:32px 32px 0 0; box-shadow:0 -20px 60px -20px rgba(0,0,0,.3);
   padding:14px 22px 24px;
-  max-height:calc(80vh - var(--dock-h)); overflow-y:auto;
+  max-height:calc(80vh - var(--dock-clear)); overflow-y:auto;
   /* Sits just above the dock (bottom:var(--dock-h)), so closing it needs to
      clear its own full height PLUS the dock's height — otherwise this
      translate would land the closed sheet overlapping the dock instead of
      off-screen below it, silently eating clicks meant for the dock. */
-  transform:translateY(calc(100% + var(--dock-h) + 20px)); transition:transform .45s cubic-bezier(.32,.9,.4,1);
+  transform:translateY(calc(100% + var(--dock-clear) + 20px)); transition:transform .45s cubic-bezier(.32,.9,.4,1);
 }
 .mobile-sheet.open{ transform:translateY(0); }
 .mobile-sheet .grabber{ width:44px; height:5px; border-radius:var(--r-full); background:var(--border); margin:6px auto 18px; }
@@ -304,7 +304,7 @@ button{ cursor:pointer; }
 .mobile-sheet .sheet-arrow{ flex:none; width:18px; height:18px; color:var(--ink-faint); }
 .mobile-sheet a.active{ color:var(--accent-1); }
 .mobile-sheet a.active .sheet-ico{ background:var(--grad); color:#fff2ea; }
-.sheet-backdrop{ position:fixed; left:0; right:0; top:0; bottom:var(--dock-h); z-index:590; background:rgba(30,20,10,.35); opacity:0; pointer-events:none; transition:opacity .35s ease; }
+.sheet-backdrop{ position:fixed; left:0; right:0; top:0; bottom:var(--dock-clear); z-index:590; background:rgba(30,20,10,.35); opacity:0; pointer-events:none; transition:opacity .35s ease; }
 .sheet-backdrop.open{ opacity:1; pointer-events:auto; }
 
 /* --dock-h is the dock's real rendered height, measured and set by JS
@@ -314,8 +314,20 @@ button{ cursor:pointer; }
    above it is open, never covered by it. This fallback only applies for
    the instant before that script runs. */
 :root{ --dock-h:64px; --fab-clear:0px; }
+/* Everything that must stop above the dock uses this, never --dock-h
+   directly: --dock-h is written by JS, and if it is missing, stale or zero
+   the menu sheet covered the dock and every icon in it became unreachable.
+   The 56px floor is just under the dock's real height, so the guarantee
+   holds even with no JS at all. */
+:root{ --dock-clear:max(var(--dock-h, 64px), 56px); }
+/* z-index deliberately ABOVE .mobile-sheet (600) and .sheet-backdrop (590).
+   The sheet already stops at the dock's top edge via --dock-h, but that
+   variable is set by JS — if it is ever missing, stale or zero (a cached
+   stylesheet, a blocked script), the sheet covered the dock completely and
+   all four icons became unreachable. Painting the dock on top means it
+   survives that, whatever --dock-h says. */
 .bottom-dock{
-  position:fixed; z-index:520; left:0; right:0; bottom:0;
+  position:fixed; z-index:620; left:0; right:0; bottom:0;
   display:flex; align-items:stretch; justify-content:space-around;
   background:var(--surface); border-top:1px solid var(--border-soft);
   box-shadow:0 -10px 26px -16px rgba(0,0,0,.18);
@@ -598,10 +610,17 @@ tr:last-child td{ border-bottom:none; }
   /* Phone: brand across the top, then the four link columns 2 x 2. */
   .footer-grid{ grid-template-columns:1fr 1fr; gap:26px 18px; margin-bottom:36px; }
   .footer-grid > .footer-brand{ grid-column:1 / -1; margin-bottom:6px; }
-  .footer-grid > .footer-brand p{ max-width:46ch; }
+  .footer-grid > .footer-brand p{ max-width:52ch; }
   .footer-grid h4{ margin-bottom:10px; }
   .footer-grid a{ padding:5px 0; }
 }
+/* The description used to inherit the 1rem body size, which made it the
+   largest text in the footer — bigger than the column links and heavier
+   than the logo it sits under. Sized to sit just below the links so the
+   logo stays the anchor of the block. */
+.footer-brand p{ font-size:.9rem; line-height:1.65; max-width:34ch; margin-bottom:0; color:var(--ink-soft); }
+.footer-brand .logo{ font-size:1.15rem; }
+.footer-brand .logo-mark{ width:34px; height:34px; }
 .footer-grid h4{ font-size:.85rem; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-faint); margin-bottom:16px; }
 .footer-grid a{ display:block; padding:6px 0; color:var(--ink-soft); font-size:.92rem; }
 .footer-grid a:hover{ color:var(--accent-1); }
@@ -715,10 +734,10 @@ main{ display:block; }
 .dock-menu[open] > summary{ color:var(--accent-1); }
 .dock-menu-backdrop{ display:none; }
 .dock-menu[open] .dock-menu-backdrop{
-  display:block; position:fixed; left:0; right:0; top:0; bottom:var(--dock-h); z-index:600; background:rgba(30,20,10,.35);
+  display:block; position:fixed; left:0; right:0; top:0; bottom:var(--dock-clear); z-index:600; background:rgba(30,20,10,.35);
 }
 .dock-menu-panel{
-  position:fixed; left:0; right:0; bottom:var(--dock-h); z-index:601; max-height:calc(75vh - var(--dock-h)); overflow-y:auto;
+  position:fixed; left:0; right:0; bottom:var(--dock-clear); z-index:601; max-height:calc(75vh - var(--dock-clear)); overflow-y:auto;
   background:var(--surface); border:1px solid var(--border-soft); border-bottom:none; border-radius:22px 22px 0 0;
   box-shadow:var(--shadow-lg); padding:6px 16px 16px; display:flex; flex-direction:column; gap:3px;
 }
