@@ -80,23 +80,22 @@ $formError = '';
  * and nothing below may reconfigure or wipe it without a staff session.
  */
 $hasAppTables = $pdo ? db_has_app_tables($pdo) : false;
-if ($hasAppTables && !$lockExists) {
-    @file_put_contents(INSTALL_LOCK_PATH, date('c'));
-    $lockExists = file_exists(INSTALL_LOCK_PATH);
-}
 $installedForReal = $lockExists || $hasAppTables;
 
-/** Destructive and reconfiguring actions on an installed site need a staff session. */
+/**
+ * Anything that reconfigures or erases a database already holding this
+ * app's tables needs a staff session first. The choice itself is still
+ * offered — this only decides who may act on it. A database with the app's
+ * tables always has a staff account to sign in with, and the site keeps
+ * serving during this state, so /admin/ is reachable.
+ */
 function install_guard_installed(bool $installedForReal, ?string &$formError): bool
 {
-    if (!$installedForReal) {
+    if (!$installedForReal || current_staff()) {
         return true;
     }
-    if (current_staff()) {
-        return true;
-    }
-    $formError = 'This site is already installed. Sign in at /admin/ first — the installer will not '
-        . 'reconfigure or erase a database that already contains data.';
+    $formError = 'This database already belongs to an installed site, so this step needs a staff sign-in. '
+        . 'Open /admin/ in another tab, sign in, then come back and choose again.';
     return false;
 }
 
@@ -221,7 +220,9 @@ if ($pdo && $action === 'run_migrations') {
 // credentials (the same trust boundary the rest of this pre-lock flow
 // already relies on).
 if ($pdo && !$lockExists && $action === 'migrate_existing') {
-    if (!csrf_check((string)($_POST['csrf'] ?? ''))) {
+    if (!install_guard_installed($installedForReal, $formError)) {
+        // handled — $formError is set
+    } elseif (!csrf_check((string)($_POST['csrf'] ?? ''))) {
         $formError = 'Your session expired — please try again.';
     } else {
         try {
@@ -286,8 +287,55 @@ $token = csrf_token();
 $detectedUrl = detect_base_url();
 
 // Decide what to render.
-$view = 'setup';
+/**
+ * Which screen the installer shows. Pure, so the decision table can be
+ * tested without a database — see install/view-logic-test.php.
+ *
+ * The order matters: a database that already holds data always gets the
+ * "migrate or start fresh?" question first, and is never auto-resolved
+ * one way or the other. Who is allowed to act on that answer is a
+ * separate question, handled by install_guard_installed().
+ */
+function install_choose_view(
+    bool $configExists,
+    bool $dbConnected,
+    bool $dbError,
+    bool $lockExists,
+    bool $hasExistingData,
+    bool $needsAdminAccount,
+    bool $staffSignedIn,
+    bool $hasPending
+): string {
+    if ($configExists && $dbConnected) {
+        if (!$lockExists && $hasExistingData) {
+            return 'existing_data';
+        }
+        if ($needsAdminAccount) {
+            // Never consult current_staff() for this one: right after a
+            // wipe the staff table itself doesn't exist yet, and this is
+            // exactly the "no tables yet" case.
+            return 'admin_account';
+        }
+        if ($lockExists && $staffSignedIn) {
+            return 'manage';
+        }
+        if ($lockExists && $hasPending) {
+            return 'pending_locked';
+        }
+        return 'done';
+    }
+    if ($configExists && $dbError) {
+        return $lockExists ? 'db_error_locked' : 'db_error_unlocked';
+    }
+    return 'setup';
+}
+
 $pending = [];
+$hasExistingData = false;
+$needsAdminAccount = false;
+// current_staff() needs a working connection — db() exits the request when
+// there isn't one, so it must not be evaluated on the no-config path.
+$staffSignedIn = false;
 if ($configExists && $pdo) {
     $pending = pending_migrations($pdo);
     // "Existing data" means real tables beyond the migrations bookkeeping
@@ -297,31 +345,25 @@ if ($configExists && $pdo) {
     $existingTables = array_diff($pdo->query('SHOW TABLES')->fetchAll(PDO::FETCH_COLUMN), ['schema_migrations']);
     $hasExistingData = !empty($existingTables);
     $needsAdminAccount = in_array('001_initial', array_map(fn($f) => basename($f, '.php'), $pending), true) && !$lockExists;
-    if (!$lockExists && $hasExistingData) {
-        // Connected to a database that already has data, but this
-        // install/ hasn't locked it yet — ask, don't assume.
-        $view = 'existing_data';
-    } elseif ($needsAdminAccount) {
-        // Never call current_staff() here: right after a wipe, the
-        // staff table itself doesn't exist yet, and this branch is
-        // exactly the "no tables yet" case.
-        $view = 'admin_account';
-    } elseif ($lockExists && current_staff()) {
-        // Already installed and signed in: this is the one place that
-        // asks "update this install, or wipe it and start fresh?" —
-        // both are equally real options, not one hidden behind the other.
-        $view = 'manage';
-    } elseif ($lockExists && !empty($pending)) {
-        $view = 'pending_locked';
-    } else {
-        if (!$lockExists) {
-            @file_put_contents(INSTALL_LOCK_PATH, date('c'));
-            $lockExists = true;
-        }
-        $view = 'done';
-    }
-} elseif ($configExists && $error) {
-    $view = $lockExists ? 'db_error_locked' : 'db_error_unlocked';
+    $staffSignedIn = (bool)current_staff();
+}
+
+$view = install_choose_view(
+    $configExists,
+    (bool)$pdo,
+    $error !== '',
+    $lockExists,
+    $hasExistingData,
+    $needsAdminAccount,
+    $staffSignedIn,
+    !empty($pending)
+);
+
+// Only 'done' means there is nothing left to decide, so that is the only
+// place the lock is written without someone choosing it.
+if ($view === 'done' && !$lockExists) {
+    @file_put_contents(INSTALL_LOCK_PATH, date('c'));
+    $lockExists = true;
 }
 
 $phpOk = version_compare(PHP_VERSION, '8.0.0', '>=');
@@ -419,9 +461,18 @@ body{ min-height:100vh; padding:40px 20px; }
     </form>
 
   <?php elseif ($view === 'existing_data'): ?>
+    <?php $needsSignIn = $installedForReal && !current_staff(); ?>
     <div class="card">
       <h3 style="margin-bottom:6px;">Existing data found</h3>
-      <p style="font-size:.9rem;color:var(--ink-faint);margin-bottom:0;">This database already has data in it — either a previous install, or one moved from another server. Choose how to proceed; nothing happens automatically.</p>
+      <p style="font-size:.9rem;color:var(--ink-faint);margin-bottom:<?= $needsSignIn ? '14px' : '0' ?>;">
+        This database already has data in it — either a previous install, or one moved from another server. Choose how to proceed; nothing happens automatically.
+        <?php if ($hasAppTables): ?>It already contains this site's own tables, so "Migrate" is almost certainly what you want.<?php endif; ?>
+      </p>
+      <?php if ($needsSignIn): ?>
+      <p class="badge warning" style="margin-bottom:14px;">Sign in first — this database belongs to an installed site, so neither option below will run for a signed-out visitor.</p>
+      <a href="../admin/login.php" class="btn btn-primary btn-block">Staff sign in</a>
+      <p style="font-size:.82rem;color:var(--ink-faint);margin:12px 0 0;">Then return to this page and pick an option.</p>
+      <?php endif; ?>
     </div>
 
     <div class="card" style="border-color:var(--accent-1);">
@@ -431,7 +482,7 @@ body{ min-height:100vh; padding:40px 20px; }
       <form method="post">
         <input type="hidden" name="action" value="migrate_existing">
         <input type="hidden" name="csrf" value="<?= e($token) ?>">
-        <button class="btn btn-primary btn-block" type="submit">Migrate &amp; keep existing data</button>
+        <button class="btn btn-primary btn-block" type="submit"<?= $needsSignIn ? ' disabled' : '' ?>>Migrate &amp; keep existing data</button>
       </form>
     </div>
 
@@ -444,7 +495,7 @@ body{ min-height:100vh; padding:40px 20px; }
           <input type="hidden" name="action" value="fresh_install_existing">
           <input type="hidden" name="csrf" value="<?= e($token) ?>">
           <div class="field"><label>Type <code>DELETE EVERYTHING</code> to confirm</label><input name="confirm_text" placeholder="DELETE EVERYTHING" required></div>
-          <button class="btn btn-block" style="background:var(--danger);color:#fff;" type="submit">Wipe database &amp; start fresh</button>
+          <button class="btn btn-block" style="background:var(--danger);color:#fff;" type="submit"<?= $needsSignIn ? ' disabled' : '' ?>>Wipe database &amp; start fresh</button>
         </form>
       </details>
     </div>

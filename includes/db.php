@@ -25,7 +25,7 @@ const LOGIN_WINDOW_SECONDS = 900;
  *
  * Bump this string whenever assets/ changes.
  */
-const ASSET_VERSION = '2026.09.05.6';
+const ASSET_VERSION = '2026.09.05.7';
 
 if (file_exists(CONFIG_PATH)) {
     require_once CONFIG_PATH;
@@ -127,14 +127,15 @@ function is_installed(): bool
     if (file_exists(INSTALL_LOCK_PATH)) {
         return true;
     }
-    // Lock file missing but the schema is there: a redeploy dropped the
-    // file. Treat the site as installed and rewrite the lock rather than
-    // sending every visitor back into the installer.
-    if (db_has_app_tables()) {
-        @file_put_contents(INSTALL_LOCK_PATH, date('c'));
-        return true;
-    }
-    return false;
+    // Lock file missing but the schema is there — a redeploy dropped it
+    // (install.lock is gitignored). The site is installed: keep serving it,
+    // and let staff sign in, so nobody is locked out.
+    //
+    // Deliberately does NOT rewrite the lock here. Doing that answered the
+    // installer's "migrate or start fresh?" question automatically, before
+    // anyone was asked. Only the installer writes the lock, once a person
+    // has actually chosen (install/index.php).
+    return db_has_app_tables();
 }
 
 /**
