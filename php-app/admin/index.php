@@ -10,17 +10,18 @@ $pdo = db();
 // Every widget below is gated by the same permission its own admin page
 // requires, so this dashboard can never show a staff member data they're
 // not allowed to open the real section for.
+$canUsers = staff_can($staff, 'users.php');
 $canBusinesses = staff_can($staff, 'businesses.php');
 $canProducts = staff_can($staff, 'products.php');
 $canTickets = staff_can($staff, 'tickets.php');
 $canStaff = staff_can($staff, 'staff.php');
 
+$totalUsers = $canUsers ? (int)$pdo->query('SELECT COUNT(*) c FROM customers')->fetch()['c'] : 0;
 $businessCount = $canBusinesses ? (int)$pdo->query('SELECT COUNT(*) c FROM businesses')->fetch()['c'] : 0;
 $mrrCents = $canBusinesses ? (int)$pdo->query('SELECT COALESCE(SUM(mrr_cents),0) s FROM businesses')->fetch()['s'] : 0;
 $productCount = $canProducts ? (int)$pdo->query('SELECT COUNT(*) c FROM products')->fetch()['c'] : 0;
+$totalTickets = $canTickets ? (int)$pdo->query('SELECT COUNT(*) c FROM tickets')->fetch()['c'] : 0;
 $openTickets = $canTickets ? (int)$pdo->query("SELECT COUNT(*) c FROM tickets WHERE status != 'Closed'")->fetch()['c'] : 0;
-
-$accounts = $canBusinesses ? $pdo->query('SELECT * FROM businesses ORDER BY last_activity_at DESC LIMIT 8')->fetchAll() : [];
 
 $EXPIRY_FIELDS = ['domain_expires_at' => 'Domain', 'hosting_expires_at' => 'Hosting', 'ssl_expires_at' => 'SSL', 'email_expires_at' => 'Email'];
 $renewals = [];
@@ -51,24 +52,6 @@ if ($canBusinesses) {
     $renewals = array_slice($renewals, 0, 8);
 }
 
-$queue = $canTickets ? $pdo->query(
-    "SELECT t.id, t.title, t.priority, b.name AS business_name, s.initials AS assignee_initials, s.name AS assignee_name
-     FROM tickets t
-     JOIN businesses b ON b.id = t.business_id
-     LEFT JOIN staff s ON s.id = t.assignee_staff_id
-     WHERE t.status != 'Closed'
-     ORDER BY FIELD(t.priority,'High','Normal','Low'), t.created_at DESC
-     LIMIT 8"
-)->fetchAll() : [];
-
-$staffList = $canStaff ? $pdo->query(
-    "SELECT s.id, s.name, s.role, s.initials,
-            (SELECT COUNT(*) FROM tickets t WHERE t.assignee_staff_id = s.id AND t.status != 'Closed') AS open_count
-     FROM staff s ORDER BY s.id"
-)->fetchAll() : [];
-
-$statusTone = ['Active' => 'success', 'Trial' => 'warning', 'Past due' => 'danger'];
-$priTone = ['High' => 'danger', 'Normal' => 'warning', 'Low' => 'success'];
 ?>
 <!doctype html>
 <html lang="en"<?= palette_attr() . logo_motion_attr() . ui_zoom_attr() ?>>
@@ -89,11 +72,14 @@ $priTone = ['High' => 'danger', 'Normal' => 'warning', 'Low' => 'success'];
   <h1 style="max-width:22ch;margin-bottom:6px;">Every client, every ticket, one screen.</h1>
   <p class="lede" style="margin-bottom:28px;">All figures below are live from the database.</p>
 
-  <?php if (!$canBusinesses && !$canProducts && !$canTickets && !$canStaff): ?>
+  <?php if (!$canUsers && !$canBusinesses && !$canProducts && !$canTickets && !$canStaff): ?>
   <div class="card" style="text-align:center;padding:36px 24px;"><?= blob_icon('shield', 'lg') ?><h3 style="margin:14px 0 4px;">Nothing to show here yet</h3><p class="lede" style="margin-bottom:0;">You don't have access to any of this dashboard's sections. Ask an admin to grant you a section from Staff &amp; permissions.</p></div>
   <?php endif; ?>
 
   <div class="grid grid-4" style="margin-bottom:28px;">
+    <?php if ($canUsers): ?>
+    <a class="card tilt" href="users.php" style="display:block;color:inherit;"><div class="stat-row"><?= blob_icon('users', 'sm', true) ?><span class="label">Total users</span></div><div class="stat"><div class="num"><?= number_format($totalUsers) ?></div></div></a>
+    <?php endif; ?>
     <?php if ($canBusinesses): ?>
     <a class="card tilt" href="businesses.php" style="display:block;color:inherit;"><div class="stat-row"><?= blob_icon('box', 'sm', true) ?><span class="label">Businesses on platform</span></div><div class="stat"><div class="num"><?= number_format($businessCount) ?></div></div></a>
     <div class="card tilt"><div class="stat-row"><?= blob_icon('chart', 'sm', true) ?><span class="label">Monthly recurring revenue</span></div><div class="stat"><div class="num">$<?= number_format($mrrCents / 100, 0) ?></div></div></div>
@@ -102,27 +88,10 @@ $priTone = ['High' => 'danger', 'Normal' => 'warning', 'Low' => 'success'];
     <a class="card tilt" href="products.php" style="display:block;color:inherit;"><div class="stat-row"><?= blob_icon('star', 'sm', true) ?><span class="label">Marketplace products live</span></div><div class="stat"><div class="num"><?= number_format($productCount) ?></div></div></a>
     <?php endif; ?>
     <?php if ($canTickets): ?>
+    <a class="card tilt" href="tickets.php" style="display:block;color:inherit;"><div class="stat-row"><?= blob_icon('chat', 'sm', true) ?><span class="label">Total tickets</span></div><div class="stat"><div class="num"><?= number_format($totalTickets) ?></div></div></a>
     <a class="card tilt" href="tickets.php" style="display:block;color:inherit;"><div class="stat-row"><?= blob_icon('chat', 'sm', true) ?><span class="label">Open support tickets</span></div><div class="stat"><div class="num"><?= number_format($openTickets) ?></div></div></a>
     <?php endif; ?>
   </div>
-
-  <?php if ($canBusinesses): ?>
-  <div class="card" style="margin-bottom:22px;">
-    <div class="card-head" style="justify-content:space-between;"><div class="flex items-center gap-12"><?= blob_icon('box', 'sm', true) ?><h3>Business accounts</h3></div><a href="businesses.php" class="card-link">Manage all <?= ico('arrow') ?></a></div>
-    <div class="table-wrap"><table><thead><tr><th>Business</th><th>Plan</th><th>MRR</th><th>Status</th><th>Last activity</th></tr></thead><tbody>
-      <?php foreach ($accounts as $a): ?>
-      <tr>
-        <td style="font-weight:600;"><?= e($a['name']) ?></td>
-        <td><?= e($a['plan']) ?></td>
-        <td>$<?= number_format($a['mrr_cents'] / 100, 0) ?></td>
-        <td><span class="badge <?= $statusTone[$a['status']] ?? '' ?>"><?= e($a['status']) ?></span></td>
-        <td style="color:var(--ink-faint);"><?= e(time_ago($a['last_activity_at'])) ?></td>
-      </tr>
-      <?php endforeach; ?>
-      <?php if (!$accounts): ?><tr><td colspan="5" style="color:var(--ink-faint);">No businesses yet.</td></tr><?php endif; ?>
-    </tbody></table></div>
-  </div>
-  <?php endif; ?>
 
   <?php if ($canBusinesses && $renewals): ?>
   <div class="card" style="margin-bottom:22px;">
@@ -147,42 +116,6 @@ $priTone = ['High' => 'danger', 'Normal' => 'warning', 'Low' => 'success'];
   </div>
   <?php endif; ?>
 
-  <?php if ($canTickets || $canStaff): ?>
-  <div class="hero-grid" style="align-items:flex-start;gap:26px;">
-    <?php if ($canTickets): ?>
-    <div class="card">
-      <div class="card-head" style="justify-content:space-between;"><div class="flex items-center gap-12"><?= blob_icon('chat', 'sm', true) ?><h3>Support queue</h3></div><a href="tickets.php" class="card-link">Manage all <?= ico('arrow') ?></a></div>
-      <?php foreach ($queue as $q): ?>
-      <div class="flex justify-between items-center" style="padding:12px 0;border-bottom:1px solid var(--border-soft);">
-        <div>
-          <span style="font-family:var(--font-display);font-weight:600;font-size:.85rem;color:var(--ink-faint);">#<?= 1000 + (int)$q['id'] ?> · <?= e($q['business_name']) ?></span>
-          <p style="margin:2px 0 0;font-size:.9rem;"><?= e($q['title']) ?></p>
-        </div>
-        <div class="flex items-center gap-8">
-          <span class="badge <?= $priTone[$q['priority']] ?? '' ?>"><?= e($q['priority']) ?></span>
-          <span class="blob-icon sm soft" title="Assigned to <?= e($q['assignee_name'] ?? 'Unassigned') ?>" style="width:30px;height:30px;font-size:.65rem;"><?= e($q['assignee_initials'] ?? '—') ?></span>
-        </div>
-      </div>
-      <?php endforeach; ?>
-      <?php if (!$queue): ?><p style="padding:12px 0;color:var(--ink-faint);">No open tickets.</p><?php endif; ?>
-    </div>
-    <?php endif; ?>
-    <?php if ($canStaff): ?>
-    <div style="display:flex;flex-direction:column;gap:22px;">
-      <div class="card">
-        <div class="card-head" style="justify-content:space-between;"><h3>Staff</h3><a href="staff.php" class="card-link">Manage <?= ico('arrow') ?></a></div>
-        <?php foreach ($staffList as $s): ?>
-        <div class="flex items-center gap-12" style="padding:12px 0;border-bottom:1px solid var(--border-soft);">
-          <div class="avatar-blob" style="width:38px;height:38px;font-size:.75rem;"><?= e($s['initials']) ?></div>
-          <div style="flex:1;"><b style="font-size:.9rem;"><?= e($s['name']) ?></b><p style="margin:0;font-size:.78rem;color:var(--ink-faint);"><?= e($s['role']) ?></p></div>
-          <span style="font-size:.78rem;color:var(--ink-faint);"><?= (int)$s['open_count'] ?> open</span>
-        </div>
-        <?php endforeach; ?>
-      </div>
-    </div>
-    <?php endif; ?>
-  </div>
-  <?php endif; ?>
 </main>
 <?= admin_bottomnav($staff, 'index.php') ?>
 </body>
