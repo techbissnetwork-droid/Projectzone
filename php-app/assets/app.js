@@ -502,7 +502,7 @@ Pages['/marketplace/detail'] = function(id){
     +'</div></div></section>'
   +'<section class="section tone-a" style="padding-top:26px;"><div class="container">'
     +'<div class="tabbar" id="pdTabs" role="tablist">'
-      +['Preview','Customize','Purchase','Deploy'].map(function(t,i){return '<button role="tab" class="'+(i===0?'active':'')+'" data-tab="'+t.toLowerCase()+'">'+(i+1)+'. '+t+'</button>';}).join('')
+      +['Overview','Buy'].map(function(t,i){return '<button role="tab" class="'+(i===0?'active':'')+'" data-tab="'+t.toLowerCase()+'">'+(i+1)+'. '+t+'</button>';}).join('')
     +'</div>'
     +'<div id="pdPanels" data-pid="'+esc(p.id)+'"></div>'
   +'</div></section>';
@@ -1163,48 +1163,14 @@ function wireLogin(){
 function wireProductDetail(id){
   var p = PRODUCTS.filter(function(x){return x.id===id;})[0] || PRODUCTS[0];
   var tabs = $('#pdTabs'), panels = $('#pdPanels');
-  var state = { tier:'growth', addons:{} , order:null };
-  var TIERS = [
-    {k:'starter', n:'Starter', price:p.price, d:'The product as-is, standard support.'},
-    {k:'growth', n:'Growth', price:Math.round(p.price*1.8), d:'Priority support & a monthly check-in.'},
-    {k:'scale', n:'Scale', price:Math.round(p.price*3.1), d:'A dedicated person & priority support around the clock.'}
-  ];
-  var ADDONS = [
-    {k:'onboarding', n:'Guided setup call', price:99},
-    {k:'branding', n:'Custom branding pass', price:149},
-    {k:'sla', n:'24/7 priority support', price:219}
-  ];
-  function renderPreview(){
+  var state = { order:null, downloadUrl:null };
+  function renderOverview(){
     return '<div class="grid grid-2"><div><h3>Overview</h3><p>'+esc(p.desc)+'</p>'
       +'<h3 style="margin-top:22px;">What\'s included</h3><ul style="display:flex;flex-direction:column;gap:8px;">'+p.specs.map(function(s){return '<li style="display:flex;gap:8px;font-size:.9rem;">'+ico('check')+'<span>'+esc(s)+'</span></li>';}).join('')+'</ul></div>'
       +'<div class="hero-visual" style="aspect-ratio:1/1;"><svg viewBox="0 0 200 200" style="width:80%;height:80%;"><path fill="url(#pvGrad)" d="M46,-52C58,-42,64,-24,64,-6C64,12,58,28,46,40C34,52,16,60,-3,63C-22,66,-44,64,-56,52C-68,40,-70,18,-67,-3C-64,-24,-56,-46,-40,-58C-24,-70,-2,-72,17,-68C36,-64,34,-62,46,-52Z" transform="translate(100 100)"/><defs><linearGradient id="pvGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" style="stop-color:var(--accent-1)"/><stop offset="100%" style="stop-color:var(--accent-2)"/></linearGradient></defs></svg></div>'
-      +'</div><button class="btn btn-primary magnetic" style="margin-top:24px;" data-goto="customize">Customize this product '+ico('arrow')+'</button>';
+      +'</div><button class="btn btn-primary magnetic" style="margin-top:24px;" data-goto="buy">Buy for '+fmtMoney(p.price)+(p.pricing_type==='fixed'?'':'/mo')+' '+ico('arrow')+'</button>';
   }
-  function total(){
-    var tier = TIERS.filter(function(t){return t.k===state.tier;})[0];
-    var sum = tier.price;
-    ADDONS.forEach(function(a){ if(state.addons[a.k]) sum += a.price; });
-    return sum;
-  }
-  function renderCustomize(){
-    return '<div class="hero-grid" style="align-items:flex-start;">'
-      +'<div><h3>Choose a tier</h3><div class="grid grid-3" style="margin-bottom:26px;">'
-        +TIERS.map(function(t){
-          return '<label class="option-card'+(state.tier===t.k?' selected':'')+'" data-tier="'+t.k+'"><input type="radio" name="tier"><b style="font-family:var(--font-display);">'+t.n+'</b><p style="font-size:.82rem;margin:6px 0;">'+t.d+'</p><span class="price">'+fmtMoney(t.price)+'</span></label>';
-        }).join('')
-      +'</div>'
-      +'<h3>Add-ons</h3><div style="display:flex;flex-direction:column;gap:10px;">'
-        +ADDONS.map(function(a){
-          return '<label class="option-card'+(state.addons[a.k]?' selected':'')+'" data-addon="'+a.k+'" style="display:flex;justify-content:space-between;align-items:center;"><input type="checkbox"><span>'+a.n+'</span><span class="price">+'+fmtMoney(a.price)+'</span></label>';
-        }).join('')
-      +'</div></div>'
-      +'<div class="card" style="background:var(--grad-soft);position:sticky;top:110px;">'
-        +'<h3>Your summary</h3><p style="font-size:.85rem;">'+esc(p.name)+' — '+TIERS.filter(function(t){return t.k===state.tier;})[0].n+' plan</p>'
-        +'<div style="font-family:var(--font-display);font-weight:800;font-size:2rem;margin:14px 0;" id="pdTotal">'+fmtMoney(total())+(p.pricing_type==='fixed'?'':'<span style="font-size:.9rem;color:var(--ink-faint);font-weight:600;"> /mo</span>')+'</div>'
-        +'<button class="btn btn-primary btn-block magnetic" data-goto="purchase">Continue to purchase '+ico('arrow')+'</button>'
-      +'</div></div>';
-  }
-  function renderPurchase(){
+  function renderBuy(){
     if(!p.hasDownload){
       return '<div class="text-center" style="padding:20px 0;">'+blobIcon('mail','lg')+'<h3>Not available for instant purchase yet</h3><p style="max-width:40ch;margin:0 auto;">This product isn\'t set up for self-checkout right now — reach out and we\'ll sort it out directly.</p>'
         +'<a href="'+BP+'/contact" class="btn btn-primary magnetic" style="margin-top:14px;">Contact us '+ico('arrow')+'</a></div>';
@@ -1213,13 +1179,10 @@ function wireProductDetail(id){
       return '<div class="text-center" style="padding:20px 0;">'+blobIcon('check','lg')+'<h3>You\'re all set, thank you.</h3><p>Order <b>'+esc(state.order)+'</b> — we\'ve also emailed your download link'+(AUTH_USER?'':' and set up your account so you can sign back in with this email any time')+'.</p>'
         +'<div class="flex gap-12" style="justify-content:center;flex-wrap:wrap;margin-top:14px;"><a href="'+esc(state.downloadUrl)+'" class="btn btn-primary magnetic">Download now '+ico('arrow')+'</a>'+(AUTH_USER?'<a href="'+BP+'/dashboard" class="btn btn-ghost">Go to dashboard</a>':'')+'</div></div>';
     }
-    var tier = TIERS.filter(function(t){return t.k===state.tier;})[0];
     return '<div class="hero-grid" style="align-items:flex-start;">'
       +'<div><h3>Review your order</h3>'
       +'<div class="table-wrap"><table><tbody>'
-        +'<tr><td>'+esc(p.name)+' — '+tier.n+'</td><td>'+fmtMoney(tier.price)+'</td></tr>'
-        +ADDONS.filter(function(a){return state.addons[a.k];}).map(function(a){return '<tr><td>'+a.n+'</td><td>'+fmtMoney(a.price)+'</td></tr>';}).join('')
-        +'<tr><td><b>Total due today</b></td><td><b>'+fmtMoney(total())+'</b></td></tr>'
+        +'<tr><td>'+esc(p.name)+'</td><td>'+fmtMoney(p.price)+(p.pricing_type==='fixed'?'':'/mo')+'</td></tr>'
       +'</tbody></table></div>'
       +'<div class="field" style="margin-top:20px;"><label>Card details (demo only)</label><input placeholder="4242 4242 4242 4242" disabled></div>'
       +(AUTH_USER?'':'<div class="grid grid-2" style="gap:16px;"><div class="field"><label for="pdName">Full name</label><input id="pdName" required placeholder="Jordan Lee"></div><div class="field"><label for="pdEmail">Email</label><input id="pdEmail" type="email" required placeholder="jordan@yourbusiness.com"></div></div>')
@@ -1229,18 +1192,7 @@ function wireProductDetail(id){
       +'<button class="btn btn-primary btn-block magnetic" id="confirmPurchase">Confirm purchase '+ico('arrow')+'</button></div>'
       +'</div>';
   }
-  var deployed=false;
-  function renderDeploy(){
-    var rows=['Provisioning environment','Configuring services','Running migrations','Finalizing & health checks'];
-    return '<div class="text-center" style="max-width:520px;margin:0 auto;">'
-      +'<div class="blob-icon lg" id="deployBlob" style="margin:0 auto 18px;">'+ico('rocket')+'</div>'
-      +'<h3 id="deployTitle">'+(deployed?'You\'re live.':'Deploying '+esc(p.name)+'…')+'</h3>'
-      +'<div class="progress-track" style="margin:18px 0;"><div class="progress-fill" id="deployFill" style="width:'+(deployed?100:0)+'%;"></div></div>'
-      +'<div class="deploy-log" id="deployLog">'+rows.map(function(r,i){return '<div class="row'+(deployed?' on':'')+'" data-i="'+i+'"><span class="dot">'+(deployed?ico('check').replace('width:22px;height:22px','width:11px;height:11px'):'')+'</span><span>'+r+'</span></div>';}).join('')+'</div>'
-      +(deployed?'<a href="'+BP+'/dashboard" class="btn btn-primary magnetic">Launch workspace '+ico('arrow')+'</a>':'<button class="btn btn-ghost" id="startDeploy">Start deployment</button>')
-    +'</div>';
-  }
-  var renderers = {preview:renderPreview, customize:renderCustomize, purchase:renderPurchase, deploy:renderDeploy};
+  var renderers = {overview:renderOverview, buy:renderBuy};
   function showTab(tab){
     $all('button',tabs).forEach(function(b){ b.classList.toggle('active', b.dataset.tab===tab); });
     panels.innerHTML = renderers[tab]();
@@ -1249,19 +1201,11 @@ function wireProductDetail(id){
   }
   function wirePanel(tab){
     $all('[data-goto]', panels).forEach(function(b){ b.addEventListener('click', function(){ showTab(b.dataset.goto); }); });
-    if(tab==='customize'){
-      $all('[data-tier]', panels).forEach(function(o){
-        o.addEventListener('click', function(){ state.tier=o.dataset.tier; showTab('customize'); });
-      });
-      $all('[data-addon]', panels).forEach(function(o){
-        o.addEventListener('click', function(){ state.addons[o.dataset.addon]=!state.addons[o.dataset.addon]; showTab('customize'); });
-      });
-    }
-    if(tab==='purchase'){
+    if(tab==='buy'){
       var btn = $('#confirmPurchase');
       if(btn) btn.addEventListener('click', function(){
         var errEl = $('#pdError');
-        var payload = { product_id: p.id, total: total() };
+        var payload = { product_id: p.id, total: p.price };
         if(!AUTH_USER){
           payload.name = $('#pdName').value;
           payload.email = $('#pdEmail').value;
@@ -1275,7 +1219,7 @@ function wireProductDetail(id){
             if(!res.ok){ errEl.textContent = res.data.error || 'Something went wrong — please try again.'; errEl.hidden = false; return; }
             state.order = res.data.order_ref;
             state.downloadUrl = res.data.download_url;
-            showTab('purchase');
+            showTab('buy');
             var r = panels.getBoundingClientRect();
             confettiBurst(r.left+r.width/2, r.top+40);
           })
@@ -1285,35 +1229,9 @@ function wireProductDetail(id){
           });
       });
     }
-    if(tab==='deploy'){
-      var start = $('#startDeploy');
-      if(start) start.addEventListener('click', function(){ runDeploy(); });
-    }
-  }
-  function runDeploy(){
-    var fill=$('#deployFill'), log=$('#deployLog'), title=$('#deployTitle');
-    var rows = $all('.row', log);
-    var i=0;
-    function step(){
-      if(i>=rows.length){
-        deployed=true;
-        title.textContent='You\'re live.';
-        var panel = $('#pdPanels');
-        showTab('deploy');
-        var r = panel.getBoundingClientRect();
-        confettiBurst(r.left+r.width/2, r.top+60);
-        return;
-      }
-      rows[i].classList.add('on','active');
-      rows[i].querySelector('.dot').innerHTML = ico('check').replace('width:22px;height:22px','width:11px;height:11px');
-      fill.style.width = Math.round(((i+1)/rows.length)*100)+'%';
-      i++;
-      setTimeout(step, motionOK?700:80);
-    }
-    setTimeout(step, motionOK?400:50);
   }
   tabs.addEventListener('click', function(e){ var b=e.target.closest('button'); if(b) showTab(b.dataset.tab); });
-  showTab('preview');
+  showTab('overview');
 }
 
 
