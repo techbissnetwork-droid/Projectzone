@@ -161,6 +161,57 @@ if ($pdo && $action === 'run_migrations') {
     }
 }
 
+// ---- Step: this database already has real data in it, but this install/
+// hasn't locked it yet — the visitor must choose, we never guess ----
+// This is the "connected an existing/production database to a fresh
+// install/ folder" case: e.g. re-uploading the app to a new server against
+// a restored database, or running the installer again without its lock
+// file. Silently treating that as "already installed" would skip creating
+// an admin account entirely; silently treating it as "brand new" would
+// destroy real data. So neither branch below is reached automatically —
+// both require an explicit, deliberate choice from whoever has the DB
+// credentials (the same trust boundary the rest of this pre-lock flow
+// already relies on).
+if ($pdo && !$lockExists && $action === 'migrate_existing') {
+    if (!csrf_check((string)($_POST['csrf'] ?? ''))) {
+        $formError = 'Your session expired — please try again.';
+    } else {
+        try {
+            foreach (pending_migrations($pdo) as $file) {
+                run_migration($pdo, $file, []);
+            }
+            if (!file_exists(INSTALL_LOCK_PATH)) {
+                file_put_contents(INSTALL_LOCK_PATH, date('c'));
+            }
+            header('Location: ./');
+            exit;
+        } catch (Throwable $e) {
+            $formError = 'Migration failed: ' . $e->getMessage();
+        }
+    }
+}
+
+if ($pdo && !$lockExists && $action === 'fresh_install_existing') {
+    if (!csrf_check((string)($_POST['csrf'] ?? ''))) {
+        $formError = 'Your session expired — please try again.';
+    } elseif (trim((string)($_POST['confirm_text'] ?? '')) !== 'DELETE EVERYTHING') {
+        $formError = 'Type DELETE EVERYTHING exactly (all capitals) to confirm you want to wipe the database.';
+    } else {
+        try {
+            $pdo->exec('SET FOREIGN_KEY_CHECKS = 0');
+            $tables = $pdo->query('SHOW TABLES')->fetchAll(PDO::FETCH_COLUMN);
+            foreach ($tables as $t) {
+                $pdo->exec('DROP TABLE `' . $t . '`');
+            }
+            $pdo->exec('SET FOREIGN_KEY_CHECKS = 1');
+            header('Location: ./');
+            exit;
+        } catch (Throwable $e) {
+            $formError = 'Could not wipe the database: ' . $e->getMessage();
+        }
+    }
+}
+
 // ---- Step: staff-triggered deletion of this install/ folder ----
 // Never automatic — a stray fresh install or update run must not silently
 // remove the tools an admin might still need. This requires an
@@ -214,8 +265,18 @@ $view = 'setup';
 $pending = [];
 if ($configExists && $pdo) {
     $pending = pending_migrations($pdo);
+    // "Existing data" means real tables beyond the migrations bookkeeping
+    // table itself — true regardless of whether schema_migrations happens
+    // to be populated, since a restored/copied database might have real
+    // tables without ever having run through this app's migration tracker.
+    $existingTables = array_diff($pdo->query('SHOW TABLES')->fetchAll(PDO::FETCH_COLUMN), ['schema_migrations']);
+    $hasExistingData = !empty($existingTables);
     $needsAdminAccount = in_array('001_initial', array_map(fn($f) => basename($f, '.php'), $pending), true) && !$lockExists;
-    if ($needsAdminAccount) {
+    if (!$lockExists && $hasExistingData) {
+        // Connected to a database that already has data, but this
+        // install/ hasn't locked it yet — ask, don't assume.
+        $view = 'existing_data';
+    } elseif ($needsAdminAccount) {
         // Never call current_staff() here: right after a wipe, the
         // staff table itself doesn't exist yet, and this branch is
         // exactly the "no tables yet" case.
@@ -327,6 +388,35 @@ body{ min-height:100vh; padding:40px 20px; }
       <input type="hidden" name="csrf" value="<?= e($token) ?>">
       <button class="btn btn-ghost btn-block" type="submit" formaction="reset.php" onclick="return confirm('This deletes the saved config.php so you can connect to a different database. Nothing has been installed yet, so this is safe. Continue?');">Start over with different database details</button>
     </form>
+
+  <?php elseif ($view === 'existing_data'): ?>
+    <div class="card">
+      <h3 style="margin-bottom:6px;">Existing data found</h3>
+      <p style="font-size:.9rem;color:var(--ink-faint);margin-bottom:0;">This database already has data in it — either a previous install, or one moved from another server. Choose how to proceed; nothing happens automatically.</p>
+    </div>
+
+    <div class="card" style="border-color:var(--accent-1);">
+      <h3 style="margin-bottom:6px;">Option A — Migrate this data</h3>
+      <p style="font-size:.85rem;color:var(--ink-faint);margin-bottom:14px;">Keeps everything as-is. Applies any pending updates<?= !empty($pending) ? ' (' . count($pending) . ' found)' : '' ?> and marks this site as installed — your existing staff accounts keep working exactly as before, no new admin account is created.</p>
+      <?php if ($formError && ($_POST['action'] ?? '') === 'migrate_existing'): ?><p class="badge danger" style="margin-bottom:14px;"><?= e($formError) ?></p><?php endif; ?>
+      <form method="post">
+        <input type="hidden" name="action" value="migrate_existing">
+        <input type="hidden" name="csrf" value="<?= e($token) ?>">
+        <button class="btn btn-primary btn-block" type="submit">Migrate &amp; keep existing data</button>
+      </form>
+    </div>
+
+    <div class="card" style="border-color:var(--danger);">
+      <h3 style="margin-bottom:6px;color:var(--danger);">Option B — Fresh install</h3>
+      <p style="font-size:.85rem;color:var(--ink-faint);margin-bottom:14px;">Permanently deletes every table in this database, then sends you to step 1 to create a brand new admin account from scratch. This cannot be undone — if this data matters, back it up first.</p>
+      <?php if ($formError && ($_POST['action'] ?? '') === 'fresh_install_existing'): ?><p class="badge danger" style="margin-bottom:14px;"><?= e($formError) ?></p><?php endif; ?>
+      <form method="post" onsubmit="return confirm('Really delete everything in this database? This cannot be undone.');">
+        <input type="hidden" name="action" value="fresh_install_existing">
+        <input type="hidden" name="csrf" value="<?= e($token) ?>">
+        <div class="field"><label>Type <code>DELETE EVERYTHING</code> to confirm</label><input name="confirm_text" placeholder="DELETE EVERYTHING" required></div>
+        <button class="btn btn-block" style="background:var(--danger);color:#fff;" type="submit">Wipe database &amp; start fresh</button>
+      </form>
+    </div>
 
   <?php elseif ($view === 'pending_locked'): ?>
     <div class="card">
