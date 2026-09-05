@@ -428,3 +428,302 @@ day counts.
 | 6 | S16, S17 — cascade deletes | One mis-click from irreversible data loss |
 | 7 | F4, F5, F6, F7 — dead and disconnected features | Remove or wire up; don't ship placebos |
 | 8 | Everything else | |
+
+---
+---
+
+# Round 2 — second pass
+
+The first pass followed the logic paths. This pass covers what it skipped:
+`assets/style.css`, all 32 migrations, the installer's views, and the HTML bodies of
+every admin page. It found **23 more issues, including one that outranks everything
+above.**
+
+## N1 · CRITICAL — a git deploy re-arms the installer, handing anyone a "wipe this database" button
+
+This is the worst finding in the audit. Three facts combine:
+
+1. `.gitignore` line 3 excludes `/install.lock`.
+2. `is_installed()` (`includes/db.php:23`) returns false without that file.
+3. `install/index.php` gates every destructive action on `!$lockExists` — **not** on
+   whether the database already holds real data.
+
+So any deploy that pushes from git, or re-uploads the repo, arrives with no
+`install.lock`. On a live site with real customers, `/install/` then reopens to the
+public:
+
+- **Config present, tables present, lock missing** → `$view = 'existing_data'`
+  (`install/index.php:275`). An anonymous visitor sees *"Option B — Fresh install (wipes
+  this database)"*. The confirmation phrase it asks for is printed on the same page as
+  the input's placeholder. They type `DELETE EVERYTHING`, and
+  `install/index.php:200-210` runs `SET FOREIGN_KEY_CHECKS = 0` and drops every table.
+  No login required at any point.
+- **Config also missing** (it's gitignored too, line 2) → `$view = 'setup'`. An anonymous
+  visitor points your domain at *their* database, then walks through `create_admin` and
+  owns the panel.
+- Either way `install/reset.php` will delete `config.php` for them — its only guard is a
+  CSRF token, which any visitor mints by loading `/install/` first.
+
+The README states that deleting `install/` "isn't required for security, since the
+installer permanently refuses to reconfigure the database or create another admin
+account once a site is installed." That guarantee rests entirely on a file the project's
+own `.gitignore` throws away.
+
+**Fix.** Stop deriving "installed" from a gitignored file. Treat a non-empty
+`schema_migrations` (or the presence of a `staff` row) as the lock, and refuse
+`fresh_install_existing`, `save_db` and `create_admin` outright whenever the connected
+database already contains this app's tables — regardless of what's on disk.
+
+## N2 · HIGH — `Host` header decides the URL in every email you send
+
+`detect_base_url()` (`install/index.php:32`) reads `$_SERVER['HTTP_HOST']` and offers the
+result as the pre-filled Site URL, which is written into `config.php` as `SITE_URL`.
+`SITE_URL` then builds every OTP magic link (`api/otp-request.php:26`) and every download
+URL (`api/purchase.php:55`, `api/dashboard.php:24`).
+
+Poison the `Host` header on the request that renders the install form — or simply be the
+one who runs the installer — and every future "click here to sign in" email points at a
+domain you control. Validate the submitted URL, and warn loudly when it differs from the
+canonical hostname.
+
+## N3 · HIGH — "Site zoom" does nothing for desktop visitors
+
+`ui_zoom_scale()` renders `<meta name="viewport" content="width=device-width,
+initial-scale=1.30">`. **Desktop browsers ignore the viewport meta entirely** — it is a
+mobile-only mechanism. So the slider is a no-op on exactly the screens where "fit more
+on screen" matters most, including the admin panel.
+
+The feature is documented three incompatible ways:
+
+- `admin/settings.php:207` — "Shrinks or enlarges the whole site — public pages and this
+  admin panel — for every visitor."
+- `install/migrations/022_ui_zoom.php:5` — "Applied via a `zoom` CSS style on `<html>`."
+- `includes/db.php:346-354` — explains it is deliberately *not* CSS `zoom`, and is
+  `initial-scale` instead.
+
+Only the third is true of the code. Either implement it with a root `font-size` /
+`rem`-based scale that works everywhere, or scope the UI copy to mobile and fix the
+migration comment.
+
+## N4 · HIGH — the desktop navigation disappears below 1360px
+
+`assets/style.css:236` and `:585`:
+
+```css
+@media (max-width:1360px){ .nav-links{ display:none; } #navLoginBtn{ display:none !important; } .nav-burger{ display:flex; } }
+@media (max-width:1360px){ .admin-nav{ display:none; } .admin-who{ display:none; } }
+@media (min-width:1361px){ .bottom-dock{ display:none; } }
+```
+
+1360px is an enormous breakpoint. A 1366×768 laptop, a 13" MacBook at 1280×800, and any
+browser window that isn't maximised all fall under it — and get the phone UI: hamburger
+menu, a fixed bottom dock over the content, no section nav in admin, and the signed-in-as
+name hidden. In the admin panel that means three nav items plus a "Menu" sheet on a
+laptop.
+
+`.admin-page` is capped at `max-width:1300px`, so there is a 60-pixel band in which the
+desktop layout is actually the intended one. That strongly suggests 1360 is a typo or a
+leftover. The conventional value here is 900–1024px.
+
+## N5 · MEDIUM — "Last activity" is really "date added", forever
+
+`businesses.last_activity_at` is written exactly once, by the INSERT in
+`admin/businesses.php:81` (`NOW()`). Nothing else ever updates it — not the UPDATE on
+edit, not a new ticket, not a customer signing in. Yet `admin/businesses.php:114` sorts
+the whole table by it and `:227` prints it under a **"Last activity"** column.
+
+So a client you've worked with daily for a year shows "350 days ago", and the list is
+ordered by signup date wearing an activity label. Either update the column on real events
+or rename it "Added".
+
+## N6 · MEDIUM — the admin's "view current file" link always returns 403
+
+`admin/products.php:274` renders a link to `../assets/uploads/products/<id>.zip`. But
+`assets/uploads/products/.htaccess` denies exactly those extensions:
+
+```apache
+<FilesMatch "\.(zip|pdf)$">
+    Require all denied
+</FilesMatch>
+```
+
+The block is correct and necessary — but it means staff can never open the file they just
+uploaded to check it's the right one. Route it through a staff-authenticated download
+endpoint instead.
+
+## N7 · MEDIUM — picking an owner doesn't cancel the "new user" fields
+
+`admin/businesses.php:210-217` hides the New-user name/email inputs with
+`wrap.style.display='none'` when an existing owner is selected. **Hidden inputs still
+submit.** Server-side, `$creatingNewUser = $newUserEmail !== ''` (line 50) is evaluated
+*before* the owner select is consulted, so it wins.
+
+Type a new user's email, change your mind, pick an existing owner from the dropdown, save
+— and you get a duplicate customer record, assigned as the owner instead of the person
+you chose. Clear the inputs on hide, or let the explicit select win.
+
+## N8 · MEDIUM — "Send a test email" throws away everything you just typed
+
+The test-email form (`admin/settings.php:412`) is a separate POST that redirects back to
+`settings.php`. The main settings form is not submitted with it, so any SMTP credentials
+typed but not yet saved are lost.
+
+The card's own hint says "Save your SMTP settings above first" — but the natural moment to
+click "Send test" is immediately after typing the credentials you want to test. Make the
+test button submit the settings first, or disable it until the form is clean.
+
+## N9 · MEDIUM — content items can't be reordered
+
+`admin/content.php` assigns `sort_order = MAX(sort_order)+1` on insert (line 148) and
+never exposes it again — there is no drag handle, no up/down control, no number field.
+The public site orders every content section by `sort_order ASC`
+(`includes/db.php:286-325`).
+
+To move the third service above the second, an admin has to delete and retype everything
+below it. For the panel's most-used screen, that's a significant gap.
+
+## N10 · MEDIUM — every settings save writes all six tabs
+
+`admin/settings.php:104-137` writes all ~50 setting keys on every submit, including the
+tabs the admin never opened (the CSS-only tab panels are `display:none`, which still
+submits). Two admins editing different tabs at the same time will silently overwrite each
+other — last write wins across the whole table, not per field.
+
+## N11 · LOW — the three branding uploads can exceed `post_max_size` together
+
+Logo, favicon and social image are capped at 2MB each (`branding_upload`, line 45), but
+nothing caps their sum. On a host with the common `post_max_size = 8M`, exceeding it makes
+PHP discard `$_POST` entirely — so `csrf_check('')` fails and the admin sees **"Your
+session expired — please try again."** with no hint that size was the problem. Check
+`$_SERVER['CONTENT_LENGTH']` against `post_max_size` and say so.
+
+## N12 · MEDIUM — every page-render error is silently swallowed
+
+`assets/app.js:1434` and `:1439`:
+
+```js
+if(!wipeEnabled){ try{ doRender(); }catch(e){} transitioning=false; return; }
+// ...
+try{ doRender(); }
+catch(e){}
+```
+
+Any exception thrown by any page renderer produces a blank or frozen page with **nothing
+in the console**. That's not hypothetical: on an install with no products,
+`Pages['/marketplace/detail']` (line 493) evaluates `PRODUCTS[0]` → `undefined` → throws
+on `p.cat`, and the visitor gets a silent dead page. At minimum `console.error(e)` and
+render a fallback.
+
+## N13 · LOW — four more places skip `esc()`
+
+Beyond `dashEmptyState()` (B11 above): `Pages['/process']` interpolates `s.t`, `s.d` and
+each `s.out` raw (line 533-556); `Pages['/services']` does the same for `m[0]`/`m[1]` in
+"Ways to work with us" (line 450); `Pages['/resources']` for `r.t`, `r.min`, `r.k` (line
+612); and `Pages['/marketplace/detail']` prints `p.rating` unescaped at line 501 while the
+marketplace grid escapes the identical value at line 992.
+
+Every one is a literal or a numeric cast today, so none is exploitable. They're listed
+because the file opens with an explicit rule (lines 15-20) that admin-sourced values must
+all pass through `esc()`, and these are the exceptions someone will eventually copy.
+
+## N14 · MEDIUM — a lot of "editable" content isn't
+
+Admin → Content covers six sections. These are hardcoded in JavaScript and can't be
+touched without a code change:
+
+- The **Process page**'s five stages — titles, descriptions and all fifteen outcome
+  badges (`app.js:533-556`).
+- The Services page's **"Ways to work with us"** trio (`app.js:450`).
+- The Solutions **"Pick your path"** timelines — "2–6 weeks", "2–5 days", "3–8 weeks"
+  (`app.js:470-472`). The *prices* in that same table are admin-editable settings; the
+  timelines next to them are not.
+- The **marketplace filter chips** (`app.js:480`) are a JS array, while
+  `admin/products.php:11` has its own `$CATEGORIES` array. Add a category in the admin
+  list and products will appear that no chip can filter to.
+
+## N15 · LOW — the installer checks the wrong folder for writability
+
+`install/index.php:335` shows a green "install/ folder writable" row from
+`is_writable(__DIR__)`. But `config.php` is written to `CONFIG_PATH` — the **parent**
+directory (`includes/db.php:4`). A writable `install/` inside a read-only webroot passes
+the check and then fails at the write, with a message about the wrong folder. Should be
+`is_writable(dirname(__DIR__))`.
+
+## N16 · LOW — two migrations exist only to cancel each other
+
+`029_hero_copy_refresh_2.php` sets the hero copy to "Your Digital Business / Starts Here.";
+`030_revert_hero_copy.php` sets it straight back. On a fresh install both run in sequence
+for zero net effect.
+
+Worth noting for whoever writes `033`: 008 and 012 destructure `[$old, $new]`, while 029
+and 030 destructure `[$new, $old]` from arrays that look identical. Both are internally
+correct — but copying the wrong one silently rewrites live site copy in the wrong
+direction.
+
+## N17 · LOW — a table is created, seeded, then dropped during install
+
+`014_content_tables.php:43` creates `content_pricing_plans` and seeds it from
+`includes/default_content.php`; `027_simplify_pricing.php:54` drops it. Fresh installs
+build and populate a table that's deleted moments later, and `default_content.php:69-73`
+still carries the `pricing` array that feeds it. Dead weight in both files.
+
+## N18 · LOW — the Pricing page ships saying "Starting from $5"
+
+`pricing_starting_price` defaults to `'5'` (`027_simplify_pricing.php:50`,
+`index.php:25`), so a fresh install's Pricing page headline reads **$5** — while the
+Solutions page on the same site lists Build from $900, Publish from $1,500. Whatever the
+intent, $5 as the headline number undercuts the positioning everywhere else.
+
+## N19 · LOW — two clients can't share a business name
+
+`businesses.name` is `VARCHAR(150) NOT NULL UNIQUE` (`001_initial.php:32`). Two "Joe's
+Pizza" in different towns is a normal situation for a local-business agency, and it
+surfaces as the misleading "Another business already uses that name."
+
+## N20 · LOW — deleting the install folder reports success either way
+
+`install_self_destruct()` (`install/index.php:16-24`) uses `@rmdir`/`@unlink` and checks
+nothing, then redirects to `../admin/`. If permissions block the deletion, the admin is
+told it worked and believes a publicly-reachable installer is gone when it isn't — which,
+given N1, matters.
+
+## N21 · LOW — no PHP-execution guard on `assets/uploads/`
+
+Uploads are extension-allowlisted *and* validated with `getimagesize()`, and filenames are
+rebuilt server-side as `<id>.<ext>`, so this isn't exploitable today. But the directory
+holds attacker-influenced bytes and has no `php_flag engine off` / `RemoveHandler`. Two
+lines of defence in depth against a future regression.
+
+## N22 · LOW — `color-mix()` with no fallback
+
+`--accent-3` and `--grad-soft` (`style.css:18,21`) are built with `color-mix()`, which
+needs Chrome 111 / Safari 16.2 / Firefox 113 (2023). On anything older those variables are
+invalid, so the accent gradient and the soft focus ring silently render as nothing. Add a
+static fallback declaration before each.
+
+## N23 · LOW — the ticket form defaults to the first business
+
+`admin/tickets.php:102` renders the Business `<select>` with no empty first option, so a
+new ticket silently defaults to whichever business sorts first alphabetically. One
+distracted save files a client's issue against someone else's account.
+
+---
+
+## Revised priority
+
+N1 goes to the top of the list — above the free-downloads bug. Everything else in the
+original ordering holds, with N2 joining step 3, N3/N4/N5 joining step 7, and the rest
+following.
+
+| # | Item | Why |
+|---|---|---|
+| 0 | **N1** — installer re-arms on deploy | Anonymous, unauthenticated, total data loss |
+| 1 | F1 — contact form inbox | Losing leads costs money every day |
+| 2 | S1, S2, S3 — checkout | Free products; client-set prices |
+| 3 | S4, S5, S6, **N2** — credentials, admin privilege, SITE_URL | Standing compromise |
+| 4 | S7, S8 — session flag, login throttling | Two small, high-value fixes |
+| 5 | F3, F2 — orders and subscribers views | Staff can't run the business without them |
+| 6 | S16, S17 — cascade deletes | One mis-click from irreversible loss |
+| 7 | **N4, N3, N5** — laptop layout, dead zoom control, fake activity column | Visible daily |
+| 8 | F4–F7, **N6–N9, N14** — dead and half-wired features | Remove or finish |
+| 9 | Everything else | |
