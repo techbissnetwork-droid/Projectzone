@@ -2,6 +2,27 @@
 require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/migrate.php';
 
+/**
+ * Deletes the entire install/ folder (this script included). Safe to run
+ * automatically: future updates arrive by re-uploading a zip that always
+ * contains a full install/migrations/ folder again, and "what's already
+ * applied" is tracked in the schema_migrations table, not on disk — so
+ * nothing about the update mechanism depends on this folder surviving
+ * between deploys.
+ */
+function install_self_destruct(): void
+{
+    $dir = __DIR__;
+    $items = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS),
+        RecursiveIteratorIterator::CHILD_FIRST
+    );
+    foreach ($items as $item) {
+        $item->isDir() ? @rmdir($item->getPathname()) : @unlink($item->getPathname());
+    }
+    @rmdir($dir);
+}
+
 function detect_base_url(): string
 {
     $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
@@ -106,7 +127,8 @@ if ($pdo && !$lockExists && $action === 'create_admin') {
                 if (!file_exists(INSTALL_LOCK_PATH)) {
                     file_put_contents(INSTALL_LOCK_PATH, date('c'));
                 }
-                header('Location: ./');
+                install_self_destruct();
+                header('Location: ../admin/');
                 exit;
             } catch (Throwable $e) {
                 $formError = 'Setup failed while creating the database tables: ' . $e->getMessage();
@@ -132,7 +154,8 @@ if ($pdo && $action === 'run_migrations') {
             if (!file_exists(INSTALL_LOCK_PATH)) {
                 file_put_contents(INSTALL_LOCK_PATH, date('c'));
             }
-            header('Location: ./');
+            install_self_destruct();
+            header('Location: ../admin/');
             exit;
         } catch (Throwable $e) {
             $formError = 'Migration failed: ' . $e->getMessage();
@@ -178,11 +201,17 @@ if ($configExists && $pdo) {
     $pending = pending_migrations($pdo);
     $needsAdminAccount = in_array('001_initial', array_map(fn($f) => basename($f, '.php'), $pending), true) && !$lockExists;
     if ($needsAdminAccount) {
+        // Never call current_staff() here: right after a wipe, the
+        // staff table itself doesn't exist yet, and this branch is
+        // exactly the "no tables yet" case.
         $view = 'admin_account';
-    } elseif (!empty($pending) && $lockExists && !current_staff()) {
+    } elseif ($lockExists && current_staff()) {
+        // Already installed and signed in: this is the one place that
+        // asks "update this install, or wipe it and start fresh?" —
+        // both are equally real options, not one hidden behind the other.
+        $view = 'manage';
+    } elseif ($lockExists && !empty($pending)) {
         $view = 'pending_locked';
-    } elseif (!empty($pending)) {
-        $view = 'pending_migrations';
     } else {
         if (!$lockExists) {
             @file_put_contents(INSTALL_LOCK_PATH, date('c'));
@@ -292,22 +321,49 @@ body{ min-height:100vh; padding:40px 20px; }
       <a href="../admin/login.php" class="btn btn-primary btn-block" style="margin-top:16px;">Staff sign in</a>
     </div>
 
-  <?php elseif ($view === 'pending_migrations'): ?>
-    <div class="card">
-      <h3 style="margin-bottom:6px;">Update available</h3>
-      <p style="font-size:.9rem;color:var(--ink-faint);margin-bottom:14px;"><?= count($pending) ?> pending update<?= count($pending) === 1 ? '' : 's' ?> found. Nothing you already have will be dropped or overwritten.</p>
-      <?php if ($formError): ?><p class="badge danger" style="margin-bottom:16px;"><?= e($formError) ?></p><?php endif; ?>
-      <ul style="margin-bottom:16px;padding-left:20px;font-size:.88rem;">
-        <?php foreach ($pending as $f): ?><li><?= e(basename($f, '.php')) ?></li><?php endforeach; ?>
-      </ul>
-      <form method="post">
-        <input type="hidden" name="action" value="run_migrations">
+  <?php elseif ($view === 'manage'): ?>
+    <div class="card" style="text-align:center;">
+      <div class="blob-icon lg soft" style="margin:0 auto 14px;"><svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <h3>This site is already installed.</h3>
+      <p style="margin-bottom:20px;color:var(--ink-faint);">Site is installed at <?= e(defined('SITE_URL') ? SITE_URL : $detectedUrl) ?></p>
+      <div class="flex gap-12" style="justify-content:center;flex-wrap:wrap;">
+        <a href="../" class="btn btn-primary">View the site</a>
+        <a href="../admin/" class="btn btn-ghost">Go to admin</a>
+      </div>
+      <p style="margin-top:20px;font-size:.82rem;color:var(--ink-faint);">This <code>install/</code> folder deletes itself automatically the moment you use either option below — nothing to clean up by hand.</p>
+    </div>
+
+    <div class="card" style="border-color:var(--accent-1);">
+      <h3 style="margin-bottom:6px;">Option A — Update</h3>
+      <?php if ($formError && ($_POST['action'] ?? '') === 'run_migrations'): ?><p class="badge danger" style="margin-bottom:14px;"><?= e($formError) ?></p><?php endif; ?>
+      <?php if (!empty($pending)): ?>
+        <p style="font-size:.9rem;color:var(--ink-faint);margin-bottom:14px;"><?= count($pending) ?> pending update<?= count($pending) === 1 ? '' : 's' ?> found. Nothing you already have will be dropped or overwritten.</p>
+        <ul style="margin-bottom:16px;padding-left:20px;font-size:.88rem;">
+          <?php foreach ($pending as $f): ?><li><?= e(basename($f, '.php')) ?></li><?php endforeach; ?>
+        </ul>
+        <form method="post">
+          <input type="hidden" name="action" value="run_migrations">
+          <input type="hidden" name="csrf" value="<?= e($token) ?>">
+          <button class="btn btn-primary btn-block" type="submit">Run update<?= count($pending) === 1 ? '' : 's' ?></button>
+        </form>
+      <?php else: ?>
+        <p class="badge success" style="margin-bottom:0;">Everything is already up to date — nothing pending.</p>
+      <?php endif; ?>
+    </div>
+
+    <div class="card" style="border-color:var(--danger);">
+      <h3 style="margin-bottom:6px;color:var(--danger);">Option B — Fresh install</h3>
+      <p style="font-size:.85rem;color:var(--ink-faint);margin-bottom:14px;">Permanently deletes every business, customer, ticket, project and setting in this database, then sends you back to step 1 to create a brand new admin account from scratch. This cannot be undone — if this site has real data on it, back it up first.</p>
+      <?php if ($formError && ($_POST['action'] ?? '') === 'wipe_reinstall'): ?><p class="badge danger" style="margin-bottom:14px;"><?= e($formError) ?></p><?php endif; ?>
+      <form method="post" onsubmit="return confirm('Really delete everything in this database? This cannot be undone.');">
+        <input type="hidden" name="action" value="wipe_reinstall">
         <input type="hidden" name="csrf" value="<?= e($token) ?>">
-        <button class="btn btn-primary btn-block" type="submit">Run update<?= count($pending) === 1 ? '' : 's' ?></button>
+        <div class="field"><label>Type <code>DELETE EVERYTHING</code> to confirm</label><input name="confirm_text" placeholder="DELETE EVERYTHING" required></div>
+        <button class="btn btn-block" style="background:var(--danger);color:#fff;" type="submit">Wipe database &amp; reinstall</button>
       </form>
     </div>
 
-  <?php else: /* done */ ?>
+  <?php else: /* done — already installed, visiting anonymously, nothing pending */ ?>
     <div class="card" style="text-align:center;">
       <div class="blob-icon lg soft" style="margin:0 auto 14px;"><svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       <h3>You're live.</h3>
@@ -316,22 +372,7 @@ body{ min-height:100vh; padding:40px 20px; }
         <a href="../" class="btn btn-primary">View the site</a>
         <a href="../admin/" class="btn btn-ghost">Staff sign in</a>
       </div>
-      <p style="margin-top:22px;font-size:.82rem;color:var(--ink-faint);">For tidiness, you can now delete the <code>install/</code> folder — it isn't linked from the public site, and reconfiguring or wiping this site through it requires a staff sign-in either way.</p>
     </div>
-  <?php endif; ?>
-
-  <?php if ($lockExists && current_staff() && in_array($view, ['pending_locked', 'pending_migrations', 'done'], true)): ?>
-  <details class="card" style="margin-top:18px;border-color:var(--danger);" <?= ($_POST['action'] ?? '') === 'wipe_reinstall' ? 'open' : '' ?>>
-    <summary style="cursor:pointer;font-weight:600;color:var(--danger);">Danger zone — wipe the database and start over</summary>
-    <p style="font-size:.85rem;color:var(--ink-faint);margin:14px 0;">This permanently deletes every business, customer, ticket, project and setting in this database, then sends you back to step 1 to create a brand new admin account from scratch. This cannot be undone — if this site has real data on it, back it up first.</p>
-    <?php if ($formError && ($_POST['action'] ?? '') === 'wipe_reinstall'): ?><p class="badge danger" style="margin-bottom:14px;"><?= e($formError) ?></p><?php endif; ?>
-    <form method="post" onsubmit="return confirm('Really delete everything in this database? This cannot be undone.');">
-      <input type="hidden" name="action" value="wipe_reinstall">
-      <input type="hidden" name="csrf" value="<?= e($token) ?>">
-      <div class="field"><label>Type <code>DELETE EVERYTHING</code> to confirm</label><input name="confirm_text" placeholder="DELETE EVERYTHING" required></div>
-      <button class="btn btn-block" style="background:var(--danger);color:#fff;" type="submit">Wipe database &amp; reinstall</button>
-    </form>
-  </details>
   <?php endif; ?>
 </main>
 </body>
