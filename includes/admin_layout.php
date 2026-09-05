@@ -95,14 +95,13 @@ function admin_bottomnav(array $staff, string $active): string
         $items .= '<a href="' . e($item['path']) . '" class="' . $cls . '">' . ico($item['icon']) . '<span>' . e($item['label']) . '</span></a>';
     }
 
-    // The panel lists every section this staff member can reach, not just
-    // the ones that didn't fit in the dock — the dock's three shortcuts are
-    // a subset of the menu, so showing only the remainder made the menu
-    // look like it was missing pages. Same shape as the public site's sheet.
+    // Only the sections the dock isn't already showing as an icon. The
+    // first three live in the dock itself, so repeating them here as text
+    // would list the same destination twice.
     $panel = '';
-    foreach ($visible as $item) {
+    foreach ($overflow as $item) {
         $isActive = $item['path'] === $active;
-        if ($isActive && in_array($item, $overflow, true)) {
+        if ($isActive) {
             $activeInOverflow = true;
         }
         $cls = $isActive ? 'dock-menu-link active' : 'dock-menu-link';

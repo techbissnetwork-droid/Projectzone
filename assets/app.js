@@ -230,15 +230,34 @@ navLinksEl.addEventListener('mouseover', function(e){
 navLinksEl.addEventListener('mouseleave', function(){ moveNavBlob(currentNavLink()); });
 
 var mobileNav = $('#mobileNav');
-/* The complete nav, each row led by its own icon — the dock's four
-   shortcuts are a subset of this, not a replacement for it, so leaving
-   entries out of here just made the menu look like it was missing pages. */
+/* Every route gets a row, each led by its own icon. Rows that the bottom
+   dock is already showing as an icon are then hidden by syncSheetDupes()
+   below, so nothing appears twice. */
 ROUTES.forEach(function(r){
   var a = document.createElement('a');
   a.href=BP+r.path; a.dataset.path=r.path;
   a.innerHTML = '<span class="sheet-ico">'+ico(r.icon)+'</span><span class="sheet-label">'+esc(r.label)+'</span>'+ico('arrow','sheet-arrow');
   mobileNav.appendChild(a);
 });
+
+/* The dock's four slots already stand for Home, Marketplace and Log in —
+   and swap to Dashboard and Profile once someone signs in. Listing those
+   same destinations again as text in the menu is pure duplication, so hide
+   whichever ones the dock is currently showing. Reading the dock's live
+   data-path values (rather than a fixed list) keeps this correct when the
+   dock changes on sign-in. */
+function syncSheetDupes(){
+  var onDock = $all('.bottom-dock .dock-item[data-path]').map(function(d){ return d.dataset.path; });
+  var visible = [];
+  $all('a[data-path]', mobileNav).forEach(function(a){
+    a.hidden = onDock.indexOf(a.dataset.path) > -1;
+    if(!a.hidden) visible.push(a);
+  });
+  // :last-of-type would still count the hidden rows, leaving a stray rule
+  // above the sheet's bottom edge.
+  visible.forEach(function(a, i){ a.style.borderBottom = i === visible.length - 1 ? 'none' : ''; });
+}
+syncSheetDupes();
 var burger=$('#navBurger'), sheet=$('#mobileSheet'), backdrop=$('#sheetBackdrop'), dockMenuBtn=$('#dockMenuBtn');
 var burgerIconOpen = burger.querySelector('svg').outerHTML;
 var dockMenuIconOpen = dockMenuBtn.querySelector('svg').outerHTML;
@@ -1447,6 +1466,7 @@ function doRender(){
     }
   }
   $all('.nav-link, #mobileNav a, .dock-item[data-path]').forEach(function(a){ a.classList.toggle('active', a.dataset.path===r.nav); });
+  syncSheetDupes();
 }
 function doLogout(){
   return fetch(BP+'/api/logout.php',{method:'POST'}).then(function(){ AUTH_USER=null; navigate('/'); });
