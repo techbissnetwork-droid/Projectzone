@@ -273,8 +273,14 @@ if(sheetCloseBtn) sheetCloseBtn.addEventListener('click', function(){ openSheet(
    instead of guessed, since the dock's real height depends on the
    device's safe-area inset. */
 var bottomDock = $('.bottom-dock');
+var waFloat = $('.wa-float');
 function syncDockHeight(){
   if(bottomDock) document.documentElement.style.setProperty('--dock-h', bottomDock.getBoundingClientRect().height+'px');
+  /* How much vertical room the floating WhatsApp button needs above the
+     dock. Zero when no WhatsApp number is configured, so the footer
+     doesn't grow a gap for a button that isn't there. */
+  var fab = waFloat ? waFloat.getBoundingClientRect().height + 20 : 0;
+  document.documentElement.style.setProperty('--fab-clear', fab+'px');
 }
 syncDockHeight();
 window.addEventListener('resize', syncDockHeight);
@@ -454,7 +460,7 @@ Pages['/services'] = function(){
   +'</div></section>'
   +'<section class="section tone-a"><div class="container">'
     +'<div class="grid grid-2">'+SERVICES.map(function(s,i){
-      return '<div class="card tilt" style="display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:flex-start;">'
+      return '<div class="card tilt service-row">'
         +blobIcon(s.icon,'lg')
         +'<div><h3 style="font-size:1.35rem;">'+esc(s.name)+'</h3><p>'+esc(s.blurb)+'</p>'
         +'<ul style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">'+s.bullets.map(function(b){return '<li style="display:flex;gap:8px;font-size:.9rem;color:var(--ink-soft);">'+ico('check')+'<span>'+esc(b)+'</span></li>';}).join('')+'</ul>'

@@ -308,7 +308,7 @@ button{ cursor:pointer; }
    the dock's 4 icons must stay visible and usable even while the sheet
    above it is open, never covered by it. This fallback only applies for
    the instant before that script runs. */
-:root{ --dock-h:64px; }
+:root{ --dock-h:64px; --fab-clear:0px; }
 .bottom-dock{
   position:fixed; z-index:520; left:0; right:0; bottom:0;
   display:flex; align-items:stretch; justify-content:space-around;
@@ -334,8 +334,17 @@ button{ cursor:pointer; }
 }
 .wa-float:hover{ transform:scale(1.08); }
 .wa-float svg{ width:26px; height:26px; }
-@media (max-width:1024px){ .wa-float{ bottom:calc(84px + env(safe-area-inset-bottom,0px)); } }
-@media (max-width:1024px){ .footer{ padding-bottom:calc(72px + env(safe-area-inset-bottom,0px)); } }
+/* Keep clear of the fixed bottom dock. --dock-h is its real measured
+   height (set by JS), so these don't drift when the dock's contents or the
+   device's safe-area inset change. --fab-clear is the same idea for the
+   floating WhatsApp button, and is 0px when no WhatsApp number is set.
+   The matching .footer rule lives immediately after the .footer base rule
+   further down, NOT here: .footer is re-declared at that point with a
+   `padding` shorthand, which would reset whatever padding-bottom this
+   block set. That is exactly what used to happen — the footer kept its
+   32px desktop padding on mobile, and the Privacy / Terms row ended up
+   underneath the dock, below the reachable scroll area. */
+@media (max-width:1024px){ .wa-float{ bottom:calc(var(--dock-h) + 20px + env(safe-area-inset-bottom,0px)); } }
 
 /* ============================= BLOB BACKGROUND LAYER ============================= */
 .blob-field{ position:fixed; inset:0; z-index:-1; overflow:hidden; pointer-events:none; }
@@ -416,6 +425,24 @@ button{ cursor:pointer; }
 .chip-1{ top:6%; left:-4%; animation-delay:0s; }
 .chip-2{ bottom:10%; right:-6%; animation-delay:1.4s; }
 .chip-3{ bottom:26%; left:2%; animation-delay:2.6s; }
+/* These decorative chips deliberately hang outside the hero art. Once the
+   hero is nearly the full viewport width that overhang becomes real page
+   overflow (body has overflow-x:hidden, so it showed up as clipped content
+   rather than a scrollbar) — so pull them back inside on smaller screens. */
+@media (max-width:900px){
+  .chip-1{ left:0; }
+  .chip-2{ right:0; }
+}
+
+/* Services list: icon beside the copy, stacking under it once there isn't
+   room for both. Was an inline `grid-template-columns:auto 1fr`, which a
+   media query cannot override — at 320px the text column was squeezed past
+   the viewport edge. */
+.service-row{ display:grid; grid-template-columns:auto 1fr; gap:22px; align-items:flex-start; }
+.service-row > div{ min-width:0; }
+@media (max-width:420px){
+  .service-row{ grid-template-columns:1fr; gap:16px; }
+}
 @keyframes floaty{ 0%,100%{ transform:translateY(0px); } 50%{ transform:translateY(-14px); } }
 
 /* trust strip */
@@ -534,6 +561,19 @@ tr:last-child td{ border-bottom:none; }
 .quote-blob cite{ font-style:normal; font-weight:700; }
 
 .footer{ background:var(--bg-alt-2); padding:70px 0 32px; border-top:1px solid var(--border-soft); }
+/* Must come after the shorthand above, or it is silently discarded. */
+@media (max-width:1024px){
+  /* Clear the dock *and* the floating action button: the last footer row
+     sits bottom-right, which is exactly where the FAB floats, so it used
+     to land on top of the Terms & Conditions link. */
+  .footer{ padding-bottom:calc(var(--dock-h) + var(--fab-clear) + 28px + env(safe-area-inset-bottom,0px)); }
+}
+@media (max-width:640px){
+  /* Stacked and left-aligned, so the links are never tucked into the
+     bottom-right corner under the FAB in the first place. */
+  .footer-bottom{ flex-direction:column; align-items:flex-start; gap:10px; }
+  .footer-bottom > .flex{ flex-wrap:wrap; }
+}
 .footer-grid{ display:grid; grid-template-columns:1.4fr repeat(3,1fr); gap:32px; margin-bottom:50px; align-items:start; }
 .footer-grid > div{ margin:0; }
 @media (max-width:800px){ .footer-grid{ grid-template-columns:1fr 1fr; } }
@@ -633,7 +673,7 @@ main{ display:block; }
 .admin-page .btn{ padding:9px 18px; font-size:.86rem; }
 .admin-page .btn-sm{ padding:7px 14px; }
 @media (max-width:1024px){
-  .admin-page{ padding-bottom:calc(90px + env(safe-area-inset-bottom,0px)); }
+  .admin-page{ padding-bottom:calc(var(--dock-h) + 30px + env(safe-area-inset-bottom,0px)); }
 }
 .admin-bottomnav{ display:none; }
 @media (max-width:1024px){ .admin-bottomnav{ display:flex; } }
