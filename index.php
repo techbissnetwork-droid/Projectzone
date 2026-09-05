@@ -267,6 +267,24 @@ if (!$isKnownRoute) {
   <div id="view"></div>
 </main>
 
+<style>
+/* Footer layout is inlined here on purpose. This file (index.php) always
+   ships with the page, while assets/style.css sometimes lags behind on a
+   partial upload — which is why the footer kept showing the brand jammed
+   next to a column instead of the intended layout. Hardcoding it here makes
+   the footer render correctly whatever stylesheet is on the server. The
+   `.footer` prefix gives it enough weight to win over the external rules. */
+.footer .footer-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:34px 32px; margin-bottom:50px; align-items:start; }
+.footer .footer-grid > .footer-brand{ grid-column:1 / -1; max-width:none; }
+.footer .footer-brand p{ max-width:60ch; }
+@media (max-width:820px){
+  /* Phones: brand as one full-width block on top, then the four link
+     columns as a clean 2x2 (Company · Platform / Legal · Get started). */
+  .footer .footer-grid{ grid-template-columns:1fr 1fr; gap:24px 18px; margin-bottom:34px; }
+  .footer .footer-grid > .footer-brand{ grid-column:1 / -1; margin-bottom:10px; }
+  .footer .footer-brand p{ max-width:52ch; }
+}
+</style>
 <footer class="footer">
   <div class="container">
     <div class="footer-grid">
@@ -286,12 +304,12 @@ if (!$isKnownRoute) {
         <a href="/services">Services</a><a href="/solutions">Solutions</a><a href="/marketplace">Marketplace</a>
       </div>
       <div>
-        <h4>Get started</h4>
-        <a href="/pricing">Pricing</a><a href="/contact">Contact</a>
-      </div>
-      <div>
         <h4>Legal</h4>
         <a href="/privacy">Privacy Policy</a><a href="/terms">Terms &amp; Conditions</a>
+      </div>
+      <div>
+        <h4>Get started</h4>
+        <a href="/pricing">Pricing</a><a href="/contact">Contact</a>
       </div>
     </div>
     <div class="footer-bottom">

@@ -1,4 +1,4 @@
-/* techbiss-assets 2026.09.05.11 */
+/* techbiss-assets 2026.09.05.12 */
 (function(){
 "use strict";
 
@@ -86,7 +86,8 @@ function applyTheme(t, persist){
      who merely loaded the site without ever touching the toggle. */
   applyTheme(saved!==null ? saved : siteDefault, false);
 })();
-$('#themeToggle').addEventListener('click', function(){
+var themeToggleEl = $('#themeToggle');
+if(themeToggleEl) themeToggleEl.addEventListener('click', function(){
   var current = root.getAttribute('data-theme');
   var isDark = current ? current==='dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
   applyTheme(isDark ? 'light' : 'dark');
@@ -207,13 +208,14 @@ var ROUTES = [
   {path:'/contact', label:'Contact', icon:'mail'}
 ];
 var navLinksEl = $('#navLinks');
-ROUTES.forEach(function(r){
+if(navLinksEl) ROUTES.forEach(function(r){
   var a = document.createElement('a');
   a.href = BP+r.path; a.className='nav-link'; a.textContent=r.label; a.dataset.path=r.path;
   navLinksEl.appendChild(a);
 });
 var navBlob = $('#navBlob');
 function moveNavBlob(targetEl){
+  if(!navBlob || !navLinksEl){ return; }
   if(!targetEl){ navBlob.style.opacity=0; return; }
   var navRect = navLinksEl.getBoundingClientRect();
   var r = targetEl.getBoundingClientRect();
@@ -225,10 +227,12 @@ function currentNavLink(){
   var p = currentBasePath();
   return $all('.nav-link').filter(function(a){ return a.dataset.path===p; })[0];
 }
-navLinksEl.addEventListener('mouseover', function(e){
-  var a = e.target.closest('.nav-link'); if(a) moveNavBlob(a);
-});
-navLinksEl.addEventListener('mouseleave', function(){ moveNavBlob(currentNavLink()); });
+if(navLinksEl){
+  navLinksEl.addEventListener('mouseover', function(e){
+    var a = e.target.closest('.nav-link'); if(a) moveNavBlob(a);
+  });
+  navLinksEl.addEventListener('mouseleave', function(){ moveNavBlob(currentNavLink()); });
+}
 
 var mobileNav = $('#mobileNav');
 /* Every route gets a row, each led by its own icon. Rows that the bottom
@@ -260,24 +264,31 @@ function syncSheetDupes(){
 }
 syncSheetDupes();
 var burger=$('#navBurger'), sheet=$('#mobileSheet'), backdrop=$('#sheetBackdrop'), dockMenuBtn=$('#dockMenuBtn');
-var burgerIconOpen = burger.querySelector('svg').outerHTML;
-var dockMenuIconOpen = dockMenuBtn.querySelector('svg').outerHTML;
+/* Every element grabbed here is optional. If a deploy leaves the page's
+   markup (index.php) a version out of step with this script — the exact
+   thing that happens when some files upload and others don't — a missing
+   #navBurger used to throw at load and abort the WHOLE script, so the
+   page rendered its header and footer and nothing in between. Guarding
+   each access means the nav just does less, and the page still renders. */
+function iconHTML(el){ var svg = el && el.querySelector('svg'); return svg ? svg.outerHTML : ''; }
+var burgerIconOpen = iconHTML(burger);
+var dockMenuIconOpen = iconHTML(dockMenuBtn);
 var closeIconSvg = ico('close');
+function setIcon(el, html){ var svg = el && el.querySelector('svg'); if(svg && html){ svg.outerHTML = html; } }
 function openSheet(o){
-  sheet.classList.toggle('open',o); backdrop.classList.toggle('open',o);
-  burger.setAttribute('aria-expanded', String(o));
-  dockMenuBtn.setAttribute('aria-expanded', String(o));
-  burger.setAttribute('aria-label', o ? 'Close menu' : 'Open menu');
-  dockMenuBtn.setAttribute('aria-label', o ? 'Close navigation menu' : 'Open navigation menu');
-  burger.querySelector('svg').outerHTML = o ? closeIconSvg : burgerIconOpen;
-  dockMenuBtn.querySelector('svg').outerHTML = o ? closeIconSvg : dockMenuIconOpen;
-  var dockLabel = dockMenuBtn.querySelector('span'); if(dockLabel) dockLabel.textContent = o ? 'Close' : 'Menu';
+  if(sheet) sheet.classList.toggle('open',o);
+  if(backdrop) backdrop.classList.toggle('open',o);
+  if(burger){ burger.setAttribute('aria-expanded', String(o)); burger.setAttribute('aria-label', o ? 'Close menu' : 'Open menu'); }
+  if(dockMenuBtn){ dockMenuBtn.setAttribute('aria-expanded', String(o)); dockMenuBtn.setAttribute('aria-label', o ? 'Close navigation menu' : 'Open navigation menu'); }
+  setIcon(burger, o ? closeIconSvg : burgerIconOpen);
+  setIcon(dockMenuBtn, o ? closeIconSvg : dockMenuIconOpen);
+  var dockLabel = dockMenuBtn && dockMenuBtn.querySelector('span'); if(dockLabel) dockLabel.textContent = o ? 'Close' : 'Menu';
   document.body.style.overflow = o ? 'hidden':'';
 }
-burger.addEventListener('click', function(){ openSheet(!sheet.classList.contains('open')); });
-dockMenuBtn.addEventListener('click', function(){ openSheet(!sheet.classList.contains('open')); });
-backdrop.addEventListener('click', function(){ openSheet(false); });
-mobileNav.addEventListener('click', function(){ openSheet(false); });
+if(burger) burger.addEventListener('click', function(){ openSheet(!(sheet && sheet.classList.contains('open'))); });
+if(dockMenuBtn) dockMenuBtn.addEventListener('click', function(){ openSheet(!(sheet && sheet.classList.contains('open'))); });
+if(backdrop) backdrop.addEventListener('click', function(){ openSheet(false); });
+if(mobileNav) mobileNav.addEventListener('click', function(){ openSheet(false); });
 /* The bottom dock's 4 icons must stay visible and usable at all times,
    even while the menu sheet above it is open — so the sheet and its
    backdrop stop exactly at the dock's top edge (--dock-h), measured here
